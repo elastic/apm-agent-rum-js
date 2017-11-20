@@ -1,0 +1,38 @@
+{
+  "name": "elastic-apm-js-base",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/bundles/elastic-apm-js-base.umd.js",
+  "scripts": {
+    "karma": "node node_modules/karma/bin/karma start",
+    "serve-e2e": "node node_modules/http-server/bin/http-server ./ -p 8000",
+    "build-dev": "node node_modules/webpack/bin/webpack.js -w",
+    "build-tests": "node node_modules/webpack/bin/webpack.js --context ./test/e2e/general-usecase --config ./test/e2e/general-usecase/webpack.config.js -w",
+    "runUnitTests": "node ./scripts/run-script.js runUnitTests",
+    "test": "npm run runUnitTests",
+    "run-script": "node ./scripts/run-script.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "http-server": "^0.10.0",
+    "jasmine": "^2.8.0",
+    "karma": "^1.7.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-failed-reporter": "0.0.3",
+    "karma-jasmine": "^1.1.0",
+    "karma-sauce-launcher": "^1.2.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-spec-reporter": "0.0.31",
+    "karma-webpack": "^2.0.4",
+    "uglifyjs-webpack-plugin": "^1.0.1",
+    "webpack": "^3.5.6"
+  },
+  "dependencies": {
+    "elastic-apm-js-core": "0.0.3",
+    "elastic-apm-js-zone": "0.8.12-prm"
+  }
+}
