@@ -10,6 +10,10 @@ class ApmBase {
 
   init (config) {
     var configService = this.serviceFactory.getService('ConfigService')
+    configService.setConfig({
+      agentName: 'elastic-apm-js-base',
+      agentVersion: '%%agent-version%%',
+    })
     configService.setConfig(config)
     var errorLogging = this.serviceFactory.getService('ErrorLogging')
     errorLogging.registerGlobalEventListener()

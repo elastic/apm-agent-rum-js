@@ -1,4 +1,5 @@
 var path = require('path')
+var agentVersion = require('./package.json').version
 
 var baseOptions = {
   entry: './src/index.js',
@@ -15,6 +16,14 @@ var baseOptions = {
         loader: 'babel-loader',
         query: {
           presets: ['babel-preset-es2015'].map(require.resolve)
+        }
+      },
+      {
+        test: /\.js$/,
+        loader: 'string-replace-loader',
+        query: {
+          search: '%%agent-version%%',
+          replace: agentVersion
         }
       }
     ]
