@@ -23,11 +23,13 @@
     "karma": "^1.7.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-failed-reporter": "0.0.3",
+    "karma-firefox-launcher": "^1.0.1",
     "karma-jasmine": "^1.1.0",
     "karma-sauce-launcher": "^1.2.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.31",
     "karma-webpack": "^2.0.4",
+    "sauce-connect-launcher": "^1.2.3",
     "uglifyjs-webpack-plugin": "^1.0.1",
     "webpack": "^3.5.6"
   },
