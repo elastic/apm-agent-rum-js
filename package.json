@@ -4,6 +4,10 @@
   "description": "",
   "main": "dist/bundles/elastic-apm-js-base.umd.js",
   "scripts": {
+    "prepare-patch": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release patch && npm run build && npm run push-release",
+    "prepare-minor": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release minor && npm run build && npm run push-release",
+    "push-release": "git push origin master --follow-tags && npm publish",
+    "build": "node node_modules/webpack/bin/webpack.js",
     "karma": "node node_modules/karma/bin/karma start",
     "serve-e2e": "node node_modules/http-server/bin/http-server ./ -p 8000",
     "build-dev": "node node_modules/webpack/bin/webpack.js -w",
@@ -12,6 +16,11 @@
     "test": "npm run runUnitTests",
     "run-script": "node ./scripts/run-script.js"
   },
+  "files": [
+    "src/**/*.js",
+    "test/**/*.js",
+    "dist/**/*.js"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
