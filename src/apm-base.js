@@ -12,7 +12,7 @@ class ApmBase {
     var configService = this.serviceFactory.getService('ConfigService')
     configService.setConfig({
       agentName: 'elastic-apm-js-base',
-      agentVersion: '%%agent-version%%',
+      agentVersion: '%%agent-version%%'
     })
     configService.setConfig(config)
     var errorLogging = this.serviceFactory.getService('ErrorLogging')
@@ -62,8 +62,8 @@ class ApmBase {
   }
 }
 
-function inBrowser () {
-  return typeof window !== 'undefined'
-}
+// function inBrowser () {
+//   return typeof window !== 'undefined'
+// }
 
 module.exports = ApmBase
