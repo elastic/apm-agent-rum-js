@@ -19,7 +19,7 @@
   "files": [
     "src/**/*.js",
     "test/**/*.js",
-    "dist/**/*.js"
+    "dist"
   ],
   "author": "",
   "license": "ISC",
