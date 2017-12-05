@@ -9,3 +9,22 @@
 **Warning: This project is currently in alpha. Use it at your own risk.**
 
 This is the official JavaScript agent for Frontend applications.
+
+## Quick start
+
+Install elastic-apm-js-base: `npm i -S elastic-apm-js-base`
+
+Initialize APM:
+
+```javascript
+import { init as initApm } from 'elastic-apm-js-base'
+
+initApm({
+  apiOrigin: 'http://localhost:8200', // Set to apm-server host address
+  appName: 'app-name' // Choose an application name
+})
+
+```
+
+
+Use `window.elasticApm.setInitialPageLoadName('page name')` to set the current page name. (Call this method before 'load' event fires)
