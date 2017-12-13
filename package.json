@@ -45,7 +45,7 @@
     "webpack": "^3.5.6"
   },
   "dependencies": {
-    "elastic-apm-js-core": "0.1.0",
+    "elastic-apm-js-core": "^0.1.1",
     "elastic-apm-js-zone": "0.8.12-prm"
   }
 }
