@@ -20,8 +20,8 @@ Initialize APM:
 import { init as initApm } from 'elastic-apm-js-base'
 
 initApm({
-  apiOrigin: 'http://localhost:8200', // Set to apm-server host address
-  appName: 'app-name' // Choose an application name
+  serviceUrl: 'http://localhost:8200', // Set to apm-server host address
+  serviceName: 'service-name' // Choose an service name
 })
 
 ```

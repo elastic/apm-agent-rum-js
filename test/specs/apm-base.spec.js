@@ -3,8 +3,8 @@ describe('ApmBase', function () {
   it('should init ApmBase', function (done) {
     var apmBase = new ApmBase()
     apmBase.init({
-      apiOrigin: 'http://localhost:8200',
-      appName: 'apm-agent-js-base-test'
+      serviceUrl: 'http://localhost:8200',
+      serviceName: 'apm-agent-js-base-test'
     })
     if (window.globalConfigs && window.globalConfigs.useMocks) {
       var apmServer = apmBase.serviceFactory.getService('ApmServer')

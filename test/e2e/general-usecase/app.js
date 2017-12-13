@@ -3,8 +3,8 @@ var initElasticApm = require('../../..').init
 
 var elasticApm = initElasticApm({
   debug: true,
-  apiOrigin: 'http://localhost:8200',
-  appName: 'apm-agent-js-base-test-e2e-general-usecase'
+  serviceUrl: 'http://localhost:8200',
+  serviceName: 'apm-agent-js-base-test-e2e-general-usecase'
 })
 
 setTimeout(function () {
