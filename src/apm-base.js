@@ -49,7 +49,7 @@ class ApmBase {
       })
     })
 
-    return this.serviceFactory
+    return this
   }
 
   config (config) {
