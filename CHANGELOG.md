@@ -1,3 +1,13 @@
+<a name="0.1.1"></a>
+## [0.1.1](https://github.com/jahtalab/apm-agent-js-base/compare/v0.1.0...v0.1.1) (2017-12-20)
+
+
+### Bug Fixes
+
+* typo serviceUrl ([9ff81a7](https://github.com/jahtalab/apm-agent-js-base/commit/9ff81a7))
+
+
+
 <a name="0.1.0"></a>
 # [0.1.0](https://github.com/jahtalab/apm-agent-js-base/compare/v0.0.3...v0.1.0) (2017-12-13)
 
