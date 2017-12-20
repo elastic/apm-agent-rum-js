@@ -2,6 +2,9 @@ node_modules
 .DS_Store
 
 *.e2e-bundle.js
+*.e2e-bundle.js.map
 
 dist
 tmp
+
+error-screenshot
