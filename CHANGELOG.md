@@ -1,3 +1,12 @@
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/jahtalab/apm-agent-js-base/compare/v0.1.1...v0.2.0) (2017-12-20)
+
+
+### BREAKING CHANGES
+
+* init returns ApmServer instance instead of ServiceFactory
+
+
 <a name="0.1.1"></a>
 ## [0.1.1](https://github.com/jahtalab/apm-agent-js-base/compare/v0.1.0...v0.1.1) (2017-12-20)
 
