@@ -3,6 +3,10 @@
   "version": "0.2.0",
   "description": "",
   "main": "dist/bundles/elastic-apm-js-base.umd.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elastic/apm-agent-js-base.git"
+  },
   "scripts": {
     "prepare-patch": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release patch && npm run build && npm run push-release",
     "prepare-minor": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release minor && npm run build && npm run push-release",
