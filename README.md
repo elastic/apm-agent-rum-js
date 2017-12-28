@@ -8,6 +8,8 @@
 
 **Warning: This project is currently in alpha. Use it at your own risk.**
 
+Note: Currently only compatible with master branch of [apm-server](https://github.com/elastic/apm-server).
+
 This is the official JavaScript agent for Frontend applications.
 
 ## Quick start
