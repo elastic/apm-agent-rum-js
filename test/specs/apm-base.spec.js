@@ -12,11 +12,10 @@ describe('ApmBase', function () {
         return Promise.resolve()
       }
     }
-    var errorLogging = apmBase.serviceFactory.getService('ErrorLogging')
     try {
       throw new Error('ApmBase test error')
     } catch(error) {
-      var promise = errorLogging.logErrorEvent({error: error})
+      var promise = apmBase.captureError(error)
       promise.then(function () {
         done()
       })

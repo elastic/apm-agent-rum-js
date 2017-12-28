@@ -55,10 +55,16 @@ class ApmBase {
   config (config) {
     this.configService.setConfig(config)
   }
+
   // Should call this method before 'load' event on window is fired
   setInitialPageLoadName (name) {
     var transactionService = this.serviceFactory.getService('TransactionService')
     transactionService.initialPageLoadName = name
+  }
+
+  captureError (error) {
+    var errorLogging = this.serviceFactory.getService('ErrorLogging')
+    return errorLogging.logError(error)
   }
 }
 
