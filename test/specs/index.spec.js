@@ -1,7 +1,6 @@
-var ApmBase = require('../../src/apm-base.js')
+var apmBase = require('../../src/index.js').apmBase
 describe('ApmBase', function () {
   it('should init ApmBase', function (done) {
-    var apmBase = new ApmBase()
     apmBase.init({
       serverUrl: 'http://localhost:8200',
       serviceName: 'apm-agent-js-base-test'

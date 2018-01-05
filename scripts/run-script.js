@@ -18,6 +18,34 @@ function serveE2e (servingPath, port) {
   console.log('serving on: ' , staticPath , port)
 }
 
+function runJasmine (cb) {
+  var JasmineRunner = require('jasmine')
+  var jrunner = new JasmineRunner()
+
+  var specFiles = ['test/node/*.node-spec.js']
+
+  jrunner.configureDefaultReporter({showColors: true})
+
+  jrunner.onComplete(function (passed) {
+    if (!passed) {
+      var err = new Error('Jasmine node tests failed.')
+      // The stack is not useful in this context.
+      err.showStack = false
+      cb(err)
+    } else {
+      cb()
+    }
+  })
+  jrunner.print = function (value) {
+    process.stdout.write(value)
+  }
+  jrunner.addReporter(new JasmineRunner.ConsoleReporter(jrunner))
+  jrunner.projectBaseDir = projectDirectory
+  jrunner.specDir = ''
+  jrunner.addSpecFiles(specFiles)
+  jrunner.execute()
+}
+
 var scripts = {
   runUnitTests: runUnitTests,
   startSelenium: testUtils.startSelenium,
@@ -26,6 +54,11 @@ var scripts = {
       serveE2e('./', 8000)
     }
     testUtils.runE2eTests(path.join(__dirname , './../wdio.conf.js'), runSelenium != 'false')
+  },
+  runNodeTests: function () {
+    runJasmine(function (err) {
+      if (err) console.log('Node tests failed:', err)
+    })
   },
   buildE2eBundles: function (basePath) {
     basePath = basePath || './test/e2e'
