@@ -41,6 +41,15 @@ class ApmBase {
     configService.setConfig(config)
   }
 
+  setUserContext (userContext) {
+    var configService = this.serviceFactory.getService('ConfigService')
+    configService.setUserContext(userContext)
+  }
+  setCustomContext (customContext) {
+    var configService = this.serviceFactory.getService('ConfigService')
+    configService.setCustomContext(customContext)
+  }
+
   // Should call this method before 'load' event on window is fired
   setInitialPageLoadName (name) {
     if (this.isEnabled()) {

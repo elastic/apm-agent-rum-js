@@ -1,7 +1,7 @@
 var apmBase = require('../../src/index.js').apmBase
 var apmCore = require('elastic-apm-js-core')
 
-describe('ApmBase', function () {
+describe('index', function () {
   it('should init ApmBase', function (done) {
     apmBase.init({
       serverUrl: 'http://localhost:8200',
@@ -13,6 +13,10 @@ describe('ApmBase', function () {
         return Promise.resolve()
       }
     }
+
+    apmBase.setUserContext({usertest: 'usertest',id: 'userId',username: 'username',email: 'email'})
+    apmBase.setCustomContext({testContext: 'testContext'})
+
     try {
       throw new Error('ApmBase test error')
     } catch(error) {

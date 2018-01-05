@@ -9,6 +9,9 @@ var elasticApm = createApmBase({
 
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
 
+elasticApm.setUserContext({usertest: 'usertest',id: 'userId',username: 'username',email: 'email'})
+elasticApm.setCustomContext({testContext: 'testContext'})
+
 setTimeout(function () {
   throw new Error('timeout test error')
 }, 100)
