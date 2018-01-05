@@ -1,4 +1,6 @@
 var apmBase = require('../../src/index.js').apmBase
+var apmCore = require('elastic-apm-js-core')
+
 describe('ApmBase', function () {
   it('should init ApmBase', function (done) {
     apmBase.init({
@@ -15,9 +17,14 @@ describe('ApmBase', function () {
       throw new Error('ApmBase test error')
     } catch(error) {
       var promise = apmBase.captureError(error)
-      promise.then(function () {
+      if (apmCore.utils.isPlatformSupported()) {
+        promise.then(function () {
+          done()
+        })
+      } else {
+        expect(promise).toBeUndefined()
         done()
-      })
+      }
     }
   })
 })
