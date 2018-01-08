@@ -14,14 +14,14 @@
     "build": "node node_modules/webpack/bin/webpack.js",
     "karma": "node node_modules/karma/bin/karma start",
     "serve-e2e": "node node_modules/http-server/bin/http-server ./ -p 8000",
-    "build-docs": "../docs/build_docs.pl --doc ./docs/index.asciidoc --open",
+    "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
     "build-dev": "node node_modules/webpack/bin/webpack.js -w",
     "build-tests": "node node_modules/webpack/bin/webpack.js --context ./test/e2e/general-usecase --config ./test/e2e/general-usecase/webpack.config.js -w",
     "runUnitTests": "node ./scripts/run-script.js runUnitTests",
     "runNodeTests": "node ./scripts/run-script.js runNodeTests",
     "buildE2eBundles": "node ./scripts/run-script.js buildE2eBundles",
     "run-e2e": "npm run build && npm run buildE2eBundles && node ./scripts/run-script.js runE2eTests",
-    "test": "node node_modules/standard/bin/cmd.js src/**/* && npm run runNodeTests && npm run runUnitTests && npm run run-e2e",
+    "test": "node node_modules/standard/bin/cmd.js src/**/* && npm run runNodeTests && npm run runUnitTests && npm run run-e2e && npm run build-docs",
     "run-script": "node ./scripts/run-script.js"
   },
   "files": [
