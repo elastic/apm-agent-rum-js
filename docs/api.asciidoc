@@ -9,7 +9,7 @@ var apm = require('elastic-apm-js-base').init(...)
 ----
 
 
-
+[float]
 [[apm-set-user-context]]
 === `apm.setUserContext()`
 
@@ -30,7 +30,7 @@ The given `context` argument must be an object and can contain the following pro
 The provided user context is stored under `context.user` in Elasticsearch on both errors and transactions.
 
 
-
+[float]
 [[apm-set-custom-context]]
 === `apm.setCustomContext()`
 
