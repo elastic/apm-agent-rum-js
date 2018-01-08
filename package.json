@@ -58,6 +58,6 @@
   },
   "dependencies": {
     "elastic-apm-js-core": "0.1.5",
-    "elastic-apm-js-zone": "0.8.12-prm"
+    "elastic-apm-js-zone": "0.8.19-tskdt"
   }
 }
