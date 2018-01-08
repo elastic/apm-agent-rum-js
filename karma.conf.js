@@ -8,9 +8,7 @@ module.exports = function (config) {
       useMocks: false,
       agentConfig: {
         serverUrl: 'http://localhost:8200',
-        serviceName: 'test',
-        agentName: 'apm-js-base',
-        agentVersion: '0.0.1'
+        serviceName: 'test'
       }
     },
     testConfig: testUtils.getTestEnvironmentVariables()

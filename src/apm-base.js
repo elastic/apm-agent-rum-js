@@ -8,7 +8,7 @@ class ApmBase {
     if (this.isEnabled()) {
       var configService = this.serviceFactory.getService('ConfigService')
       configService.setConfig({
-        agentName: 'elastic-apm-js-base',
+        agentName: 'js-base',
         agentVersion: '%%agent-version%%'
       })
       configService.setConfig(config)
