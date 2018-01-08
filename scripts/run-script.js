@@ -62,7 +62,36 @@ var scripts = {
   },
   buildE2eBundles: function (basePath) {
     basePath = basePath || './test/e2e'
-    testUtils.buildE2eBundles(path.join(projectDirectory , basePath))
+    var fs = require('fs')
+    var testConfig = testUtils.getTestEnvironmentVariables()
+    function callback (err) {
+      if (err) {
+        var exitCode = 2
+        process.exit(exitCode)
+      } else {
+        if (!testConfig.sauceLabs) {
+          console.log('Uploading sourcemaps')
+          var request = require('request')
+          // curl http://localhost:8200/v1/client-side/sourcemaps -X POST -F sourcemap=@app.e2e-bundle.js.map -F service_version=0.0.1 -F bundle_filepath="/test/e2e/general-usecase/app.e2e-bundle.js" -F service_name="apm-agent-js-base-test-e2e-general-usecase"
+          var filepath = path.join(basePath, 'general-usecase/app.e2e-bundle.js.map')
+          var formData = {
+            sourcemap: fs.createReadStream(filepath),
+            service_version: '0.0.1',
+            bundle_filepath: 'http://localhost:8000/test/e2e/general-usecase/app.e2e-bundle.js',
+            service_name: 'apm-agent-js-base-test-e2e-general-usecase'
+          }
+          var req = request.post({url: 'http://localhost:8200/v1/client-side/sourcemaps',formData: formData}, function (err, resp, body) {
+            if (err) {
+              console.log('Error while uploading sourcemaps!', err)
+            } else {
+              console.log('Sourcemaps uploaded!')
+            }
+          })
+        }
+      }
+    }
+
+    testUtils.buildE2eBundles(path.join(projectDirectory , basePath), callback)
   },
   serveE2e: serveE2e
 }

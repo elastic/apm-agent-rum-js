@@ -4,7 +4,8 @@ var createApmBase = require('../e2e')
 var elasticApm = createApmBase({
   debug: true,
   serverUrl: 'http://localhost:8200',
-  serviceName: 'apm-agent-js-base-test-e2e-general-usecase'
+  serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
+  serviceVersion: '0.0.1'
 })
 
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
