@@ -1,0 +1,46 @@
+[[api]]
+== API Reference
+
+You can access agent API after initializing the agent: 
+
+[source,js]
+----
+var apm = require('elastic-apm-js-base').init(...)
+----
+
+
+
+[[apm-set-user-context]]
+=== `apm.setUserContext()`
+
+[source,js]
+----
+apm.setUserContext(context)
+----
+
+Call this method to enrich collected performance data and errors with information about the user.
+
+The given `context` argument must be an object and can contain the following properties (all optional):
+
+* `id` - The users ID
+* `username` - The users username
+* `email` - The users e-mail
+
+
+The provided user context is stored under `context.user` in Elasticsearch on both errors and transactions.
+
+
+
+[[apm-set-custom-context]]
+=== `apm.setCustomContext()`
+
+[source,js]
+----
+apm.setCustomContext(context)
+----
+
+Call this to enrich collected errors and transactions with any information that you think will help you debug performance issues or errors.
+
+The provided custom context is stored under `context.custom` in Elasticsearch on both errors and transactions.
+
+The given `context` argument must be an object and can contain any property that can be JSON encoded.

@@ -1,0 +1,37 @@
+[[intro]]
+== Introduction
+
+Welcome to the APM Frontend JavaScript Agent documentation.
+
+The Elastic APM Frontend JavaScript agent sends performance metrics and errors to the APM Server.
+The agent is only one of multiple components you need to get started with APM.
+Please also have a look at the documentation for
+
+ * https://www.elastic.co/guide/en/apm/server/current/index.html[APM Server]
+ * https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html[Elasticsearch]
+
+
+[[getting-started]]
+== Getting started
+
+Add the `elastic-apm-js-base` module as a dependency to your application:
+
+[source,bash]
+----
+npm install elastic-apm-js-base --save
+----
+
+Initialize APM
+
+[source,js]
+----
+import { init as initApm } from 'elastic-apm-js-base'
+
+var apm = initApm({
+  // Set custom APM Server URL (default: http://localhost:8200)
+  serverUrl: 'http://localhost:8200', 
+
+  // Set required service name
+  serviceName: 'service-name'
+})
+----
