@@ -1,8 +1,7 @@
 node_modules
 .DS_Store
 
-*.e2e-bundle.js
-*.e2e-bundle.js.map
+*.e2e-bundle.*
 
 dist
 tmp
