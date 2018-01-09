@@ -10,7 +10,8 @@ if (globalConfigs.testConfig.sauceLabs) {
   globalConfigs.useMocks = true
 }
 console.log(globalConfigs)
-module.exports = {
+
+var base = {
   entry: path.join(__dirname, './app.js'),
   output: {
     filename: 'app.e2e-bundle.js',
@@ -21,3 +22,22 @@ module.exports = {
     new webpack.DefinePlugin({'globalConfigs': JSON.stringify(globalConfigs)})
   ]
 }
+
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+
+var optimized = {
+  entry: base.entry,
+  output: {
+    filename: 'app.e2e-bundle.min.js',
+    path: base.output.path
+  },
+  devtool: base.devtool,
+  plugins: [
+    new webpack.DefinePlugin({'globalConfigs': JSON.stringify(globalConfigs)}),
+    new UglifyJSPlugin({
+      sourceMap: true,
+      extractComments: false
+    })
+  ]
+}
+module.exports = [base, optimized]

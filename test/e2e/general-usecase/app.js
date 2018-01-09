@@ -13,9 +13,15 @@ elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
 elasticApm.setUserContext({usertest: 'usertest',id: 'userId',username: 'username',email: 'email'})
 elasticApm.setCustomContext({testContext: 'testContext'})
 
-setTimeout(function () {
+function generateError () {
   throw new Error('timeout test error')
+}
+
+setTimeout(function () {
+  generateError()
 }, 100)
+
+generateError.tmp = 'tmp'
 
 var appEl = document.getElementById('app')
 var testEl = document.createElement('h2')
