@@ -7,8 +7,9 @@ exports.config = {
   capabilities: [
     {
       maxInstances: 1,
-      browserName: 'chrome',
+      browserName: 'firefox',
       'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
+      // args: ['--no-sandbox'],
     // before: function () {
     //   browser.timeoutsAsyncScript(10000)
     // }
