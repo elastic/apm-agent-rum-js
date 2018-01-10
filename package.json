@@ -16,7 +16,6 @@
     "serve-e2e": "node node_modules/http-server/bin/http-server ./ -p 8000",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
     "build-dev": "node node_modules/webpack/bin/webpack.js -w",
-    "build-tests": "node node_modules/webpack/bin/webpack.js --context ./test/e2e/general-usecase --config ./test/e2e/general-usecase/webpack.config.js -w",
     "runUnitTests": "node ./scripts/run-script.js runUnitTests",
     "runNodeTests": "node ./scripts/run-script.js runNodeTests",
     "buildE2eBundles": "node ./scripts/run-script.js buildE2eBundles",
@@ -58,7 +57,7 @@
     "webpack": "^3.5.6"
   },
   "dependencies": {
-    "elastic-apm-js-core": "0.1.6",
+    "elastic-apm-js-core": "0.1.7",
     "elastic-apm-js-zone": "0.8.19-tskdt"
   }
 }
