@@ -1,3 +1,20 @@
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/elastic/apm-agent-js-base/compare/v0.2.0...v0.3.0) (2018-01-11)
+
+
+### Bug Fixes
+
+* **ApmBase:** Disable the module if running on nodejs ([2bf4199](https://github.com/elastic/apm-agent-js-base/commit/2bf4199))
+* upgrade to elastic-apm-js-core 0.1.7 ([325a918](https://github.com/elastic/apm-agent-js-base/commit/325a918))
+
+
+### Features
+
+* add captureError to ApmBase ([04436b4](https://github.com/elastic/apm-agent-js-base/commit/04436b4))
+* add setUserContext and setCustomContext ([86b4ccc](https://github.com/elastic/apm-agent-js-base/commit/86b4ccc))
+
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/jahtalab/apm-agent-js-base/compare/v0.1.1...v0.2.0) (2017-12-20)
 
