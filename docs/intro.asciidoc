@@ -14,24 +14,27 @@ Please also have a look at the documentation for
 [[getting-started]]
 == Getting started
 
-Add the `elastic-apm-js-base` module as a dependency to your application:
+Install the APM agent for JavaScript as a dependency to your application:
 
 [source,bash]
 ----
 npm install elastic-apm-js-base --save
 ----
 
-Initialize APM
+Configure the agent:
 
 [source,js]
 ----
 import { init as initApm } from 'elastic-apm-js-base'
-
 var apm = initApm({
+  
   // Set custom APM Server URL (default: http://localhost:8200)
-  serverUrl: 'http://localhost:8200', 
-
+  serverUrl: 'http://localhost:8200',
+  
   // Set required service name
-  serviceName: 'service-name'
+  serviceName: 'service-name',
+  
+  // Set service version (required for sourcemap feature)
+  serviceVersion: 'service-version'
 })
 ----
