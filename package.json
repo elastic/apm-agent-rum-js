@@ -13,7 +13,7 @@
     "push-release": "git push origin master --follow-tags && npm publish",
     "build": "node node_modules/webpack/bin/webpack.js",
     "karma": "node node_modules/karma/bin/karma start",
-    "serve-e2e": "node node_modules/http-server/bin/http-server ./ -p 8000",
+    "serve": "node ./scripts/run-script.js serveE2e ./ 8000",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
     "build-dev": "node node_modules/webpack/bin/webpack.js -w",
     "runUnitTests": "node ./scripts/run-script.js runUnitTests",
