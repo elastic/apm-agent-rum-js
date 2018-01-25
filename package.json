@@ -52,6 +52,7 @@
     "sauce-connect-launcher": "^1.2.3",
     "selenium-standalone": "^6.12.0",
     "serve-index": "^1.9.1",
+    "source-map": "^0.7.0",
     "standard": "^10.0.3",
     "string-replace-loader": "^1.3.0",
     "uglifyjs-webpack-plugin": "^1.0.1",
