@@ -1,5 +1,6 @@
 var path = require('path')
 var agentVersion = require('./package.json').version
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 var baseOptions = {
   entry: './src/index.js',
@@ -50,6 +51,13 @@ var optimizeConfig = {
     new UglifyJSPlugin({
       sourceMap: true,
       extractComments: true
+    }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      reportFilename: path.resolve(__dirname, 'reports', 'bundle-analyzer.html'),
+      generateStatsFile: true,
+      statsFilename: path.resolve(__dirname, 'reports', 'bundle-analyzer.json'),
+      openAnalyzer: false
     })
   ]
 }
