@@ -10,9 +10,11 @@ function runUnitTests () {
 
 function serveE2e (servingPath, port) {
   const express = require('express')
+  const serveIndex = require('serve-index')
+
   const app = express()
   var staticPath = path.join(__dirname, '../', servingPath)
-  app.use(express.static(staticPath))
+  app.use(express.static(staticPath), serveIndex(staticPath, {'icons': false}))
   app.listen(port)
 
   console.log('serving on: ' , staticPath , port)
