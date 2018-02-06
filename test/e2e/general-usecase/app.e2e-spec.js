@@ -9,14 +9,18 @@ describe('general-usercase', function () {
 
     var result = browser.executeAsync(function (done) {
       var apmServerMock = window.elasticApm.serviceFactory.getService('ApmServer')
-      apmServerMock.subscription.subscribe(function () {
+
+      function checkCalls () {
         var serverCalls = apmServerMock.calls
         var validCalls = serverCalls.sendErrors && serverCalls.sendErrors.length && serverCalls.sendTransactions && serverCalls.sendTransactions.length
 
         if (validCalls) {
           done(serverCalls)
         }
-      })
+      }
+
+      checkCalls()
+      apmServerMock.subscription.subscribe(checkCalls)
     })
     expect(result.value).toBeTruthy()
     var serverCalls = result.value
@@ -28,6 +32,5 @@ describe('general-usercase', function () {
     var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('general-usecase-initial-page-load')
-
   })
 })
