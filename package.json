@@ -59,7 +59,7 @@
     "webpack-bundle-analyzer": "2.9.2"
   },
   "dependencies": {
-    "elastic-apm-js-core": "0.2.0",
+    "elastic-apm-js-core": "0.2.1",
     "elastic-apm-js-zone": "0.8.19-tskdt"
   }
 }

@@ -24,20 +24,8 @@ exports.config = {
   framework: 'jasmine',
   reporters: ['dot', 'spec'],
   jasmineNodeOpts: {
-    defaultTimeoutInterval: 60000,
-    expectationResultHandler: function (passed, assertion) {
-      if (passed) {
-        return
-      }
-
-      var title = assertion.message.replace(/\s/g, '-')
-      browser.saveScreenshot(('./errorShots/assertionError_' + title + '.png'))
-      fail()
-    }
+    defaultTimeoutInterval: 60000
   },
-  // afterCommand: function (commandName, args, result, error) {
-  //   console.log('command', arguments)
-  // },
   before: function () {
     // browser.timeoutsAsyncScript(30000)
     // browser.timeouts({
