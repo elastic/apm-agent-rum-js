@@ -1,3 +1,16 @@
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/elastic/apm-agent-js-base/compare/v0.3.0...v0.4.0) (2018-02-07)
+
+
+### Features
+
+* Remove elastic-apm-js-zone dependency (Reducing the size of the bundle)
+* Use es6-promise
+* Queue Errors and Transactions before sending
+* Throttle adding Errors and Transactions
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/elastic/apm-agent-js-base/compare/v0.2.0...v0.3.0) (2018-01-11)
 
