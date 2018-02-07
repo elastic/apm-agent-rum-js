@@ -8,6 +8,8 @@ The agent is only one of multiple components you need to get started with APM.
 Please also have a look at the documentation for
 
  * https://www.elastic.co/guide/en/apm/server/current/index.html[APM Server]
+ ** APM JavaScript agent is compatible with APM Server v6.2+.
+ ** For APM Server 6.2, Please https://www.elastic.co/guide/en/apm/server/6.2/frontend.html[enable frontend support in the configuration].
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html[Elasticsearch]
 
 
