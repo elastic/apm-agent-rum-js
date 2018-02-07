@@ -6,13 +6,11 @@ function createApmBase (config) {
   var gc = globalConfigs || {}
   console.log(gc)
   var apmServer
-  if (!gc.useMocks) {
-    apmServer = apmBase.serviceFactory.getService('ApmServer')
-  }
+  apmServer = apmBase.serviceFactory.getService('ApmServer')
   if (gc.serverUrl) {
     config.serverUrl = gc.serverUrl
   }
-  var serverMock = new ApmServerMock(apmServer)
+  var serverMock = new ApmServerMock(apmServer, gc.useMocks)
   apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
 
   elasticApm = initElasticApm(config)
