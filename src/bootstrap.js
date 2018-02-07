@@ -8,7 +8,7 @@ module.exports = function bootstrap () {
 
   var apmCore = require('elastic-apm-js-core')
   if (apmCore.utils.isPlatformSupported()) {
-    require('elastic-apm-js-zone')
+    require('es6-promise/auto')
     apmCore.patchCommon()
     enabled = true
   } else {

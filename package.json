@@ -60,6 +60,6 @@
   },
   "dependencies": {
     "elastic-apm-js-core": "0.2.1",
-    "elastic-apm-js-zone": "0.8.19-tskdt"
+    "es6-promise": "4.2.4"
   }
 }
