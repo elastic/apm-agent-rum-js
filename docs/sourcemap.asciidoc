@@ -7,12 +7,12 @@ you can generate source maps for your bundles and upload them to the APM server.
 
 Here is an example to generate source maps with webpack and configure the JavaScript agent accordingly.
 
-First you need to configure webpack to generate source map and provide the app version to your app:
+First you need to configure webpack to generate source map and provide the service version to your app:
 
 [source,js]
 ----
 var webpack = require('webpack')
-var appVersion = require("./package.json").version
+var serviceVersion = require("./package.json").version
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 module.exports = {
   entry: 'app.js',
@@ -22,7 +22,7 @@ module.exports = {
   },
   devtool: 'source-map',
   plugins: [
-    new webpack.DefinePlugin({'appVersion': JSON.stringify(appVersion)}),
+    new webpack.DefinePlugin({'serviceVersion': JSON.stringify(serviceVersion)}),
     new UglifyJSPlugin({
       sourceMap: true
     })
@@ -36,7 +36,7 @@ Or you can use current git commit hash:
 ----
 var webpack = require('webpack')
 var git = require('git-rev-sync')
-var appVersion = git.short()
+var serviceVersion = git.short()
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 module.exports = {
   entry: 'app.js',
@@ -46,7 +46,7 @@ module.exports = {
   },
   devtool: 'source-map',
   plugins: [
-    new webpack.DefinePlugin({'appVersion': JSON.stringify(appVersion)}),
+    new webpack.DefinePlugin({'serviceVersion': JSON.stringify(serviceVersion)}),
     new UglifyJSPlugin({
       sourceMap: true
     })
@@ -54,7 +54,7 @@ module.exports = {
 }
 ----
 
-Then you can use the provided app version to set the "serviceVersion" configuration:
+Then you can use the provided service version to set the "serviceVersion" configuration:
 
 [source,js]
 ----
@@ -64,7 +64,7 @@ var apm = initApm({
   serviceName: 'service-name',
   
   // Set service version (required for source map feature)
-  serviceVersion: appVersion
+  serviceVersion: serviceVersion
 })
 ----
 
@@ -97,10 +97,10 @@ You can also use `curl` command:
 
 [source,sh]
 ----
-APPVERSION=`node -e "console.log(require('./package.json').version);"` && \
+SERVICEVERSION=`node -e "console.log(require('./package.json').version);"` && \
 curl http://localhost:8200/v1/client-side/sourcemaps -X POST \
     -F sourcemap=@./dist/app.min.js.map \
-    -F service_version="$APPVERSION" \
+    -F service_version="$SERVICEVERSION" \
     -F bundle_filepath="http://localhost/app.min.js" \
     -F service_name="service-name"
 ----
@@ -109,10 +109,10 @@ Or use current git commit hash:
 
 [source,sh]
 ----
-APPVERSION=`git rev-parse --short HEAD` && \
+SERVICEVERSION=`git rev-parse --short HEAD` && \
 curl http://localhost:8200/v1/client-side/sourcemaps -X POST \
     -F sourcemap=@./dist/app.min.js.map \
-    -F service_version="$APPVERSION" \
+    -F service_version="$SERVICEVERSION" \
     -F bundle_filepath="http://localhost/app.min.js" \
     -F service_name="service-name"
 ----
