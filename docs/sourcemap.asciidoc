@@ -1,5 +1,5 @@
 [[sourcemap]]
-== Source Map
+== Source Maps
 
 It is a common practice to minify JavaScript bundles,
 However debugging minified files is inherently difficult. To resolve this issue,
@@ -7,11 +7,12 @@ you can generate source maps for your bundles and upload them to the APM server.
 
 Here is an example to generate source maps with webpack and configure the JavaScript agent accordingly.
 
-First you need to configure webpack to generate source map and provide the app version to your app:
+First you need to configure webpack to generate source map and provide the service version to your app:
 
 [source,js]
 ----
 var webpack = require('webpack')
+var serviceVersion = require("./package.json").version
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 module.exports = {
   entry: 'app.js',
@@ -21,7 +22,7 @@ module.exports = {
   },
   devtool: 'source-map',
   plugins: [
-    new webpack.DefinePlugin({'appVersion': JSON.stringify(require("./package.json").version)}),
+    new webpack.DefinePlugin({'serviceVersion': JSON.stringify(serviceVersion)}),
     new UglifyJSPlugin({
       sourceMap: true
     })
@@ -29,7 +30,31 @@ module.exports = {
 }
 ----
 
-Then you can use the provided app version to set the "serviceVersion" configuration:
+Or you can use current git commit hash:
+
+[source,js]
+----
+var webpack = require('webpack')
+var git = require('git-rev-sync')
+var serviceVersion = git.short()
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+module.exports = {
+  entry: 'app.js',
+  output: {
+    filename: 'app.min.js',
+    path: './dist'
+  },
+  devtool: 'source-map',
+  plugins: [
+    new webpack.DefinePlugin({'serviceVersion': JSON.stringify(serviceVersion)}),
+    new UglifyJSPlugin({
+      sourceMap: true
+    })
+  ]
+}
+----
+
+Then you can use the provided service version to set the "serviceVersion" configuration:
 
 [source,js]
 ----
@@ -39,11 +64,11 @@ var apm = initApm({
   serviceName: 'service-name',
   
   // Set service version (required for source map feature)
-  serviceVersion: appVersion
+  serviceVersion: serviceVersion
 })
 ----
 
-Make sure to upload the generated source map file to APM server with the same "serviceVersion" 
+NOTE: Make sure to upload the generated source map file to APM server with the same "serviceVersion" 
 and "serviceName".
 
 Here is a Node.js example of uploading source map file to the APM server:
@@ -52,10 +77,10 @@ Here is a Node.js example of uploading source map file to the APM server:
 ----
 console.log('Uploading sourcemaps!')
 var request = require('request')
-var filepath = './dist/app.min.js'
+var filepath = './dist/app.min.js.map'
 var formData = {
   sourcemap: fs.createReadStream(filepath),
-  service_version: require("./package.json").version,
+  service_version: require("./package.json").version, // Or use 'git-rev-sync' for git commit hash
   bundle_filepath: 'http://localhost/app.min.js',
   service_name: 'service-name'
 }
@@ -66,4 +91,28 @@ request.post({url: 'http://localhost:8200/v1/client-side/sourcemaps',formData: f
     console.log('Sourcemaps uploaded!')
   }
 })
+----
+
+You can also use `curl` command:
+
+[source,sh]
+----
+SERVICEVERSION=`node -e "console.log(require('./package.json').version);"` && \
+curl http://localhost:8200/v1/client-side/sourcemaps -X POST \
+    -F sourcemap=@./dist/app.min.js.map \
+    -F service_version="$SERVICEVERSION" \
+    -F bundle_filepath="http://localhost/app.min.js" \
+    -F service_name="service-name"
+----
+
+Or use current git commit hash:
+
+[source,sh]
+----
+SERVICEVERSION=`git rev-parse --short HEAD` && \
+curl http://localhost:8200/v1/client-side/sourcemaps -X POST \
+    -F sourcemap=@./dist/app.min.js.map \
+    -F service_version="$SERVICEVERSION" \
+    -F bundle_filepath="http://localhost/app.min.js" \
+    -F service_name="service-name"
 ----
