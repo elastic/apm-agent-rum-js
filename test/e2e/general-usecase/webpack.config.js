@@ -1,14 +1,10 @@
 var testUtils = require('elastic-apm-js-core/dev-utils/test.js')
 var path = require('path')
 var webpack = require('webpack')
-var testConfig = testUtils.getTestEnvironmentVariables()
-var globalConfigs = {
-  testConfig,
-  serverUrl: 'http://localhost:8200'
-}
-if (globalConfigs.testConfig.sauceLabs) {
-  globalConfigs.useMocks = true
-}
+
+var testConfig = require('../../../test.config')
+var globalConfigs = testConfig
+
 console.log(globalConfigs)
 
 var base = {

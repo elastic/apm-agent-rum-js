@@ -3,18 +3,10 @@ var testUtils = require('elastic-apm-js-core/dev-utils/test.js')
 
 module.exports = function (config) {
   config.set(karmaUtils.baseConfig)
+  var testConfig = require('./test.config')
   var customeConfig = {
-    globalConfigs: {
-      useMocks: false,
-      agentConfig: {
-        serverUrl: 'http://localhost:8200',
-        serviceName: 'test'
-      }
-    },
-    testConfig: testUtils.getTestEnvironmentVariables()
-  }
-  if (customeConfig.testConfig.sauceLabs) {
-    customeConfig.globalConfigs.useMocks = true
+    globalConfigs: testConfig,
+    testConfig: testConfig.env
   }
   console.log('customeConfig:', customeConfig)
   config.set(customeConfig)
