@@ -12,3 +12,4 @@ html_docs
 build
 reports
 package-lock.json
+coverage
