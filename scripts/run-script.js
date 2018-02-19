@@ -1,11 +1,16 @@
 var testUtils = require('elastic-apm-js-core/dev-utils/test')
+var saucelabs = require('elastic-apm-js-core/dev-utils/saucelabs')
 var path = require('path')
 var projectDirectory = path.join(__dirname, './../')
 
-function runUnitTests () {
+function runUnitTests (launchSauceConnect) {
   var testConfig = testUtils.getTestEnvironmentVariables()
   testConfig.karmaConfigFile = __dirname + './../karma.conf.js'
-  return testUtils.runUnitTests(testConfig)
+  if (launchSauceConnect != 'false') {
+    return testUtils.runUnitTests(testConfig)
+  } else {
+    testUtils.runKarma(testConfig.karmaConfigFile)
+  }
 }
 
 function serveE2e (servingPath, port) {
@@ -101,7 +106,13 @@ var scripts = {
 
     testUtils.buildE2eBundles(path.join(projectDirectory , basePath), callback)
   },
-  serveE2e: serveE2e
+  serveE2e: serveE2e,
+  launchSauceConnect: function launchSauceConnect () {
+    var testConfig = require('../test.config')
+    saucelabs.launchSauceConnect(testConfig.env.sauceLabs, function () {
+      console.log('Launched SauceConnect!')
+    })
+  }
 }
 
 module.exports = scripts
