@@ -18,18 +18,29 @@ class ApmBase {
       var performanceMonitoring = this.serviceFactory.getService('PerformanceMonitoring')
       performanceMonitoring.init()
 
-      var transactionService = this.serviceFactory.getService('TransactionService')
-      window.addEventListener('load', function (event) {
-        // to make sure PerformanceTiming.loadEventEnd has a value
-        setTimeout(function () {
-          // need to delegate sending navigation timing to the router liberay
-          if (!configService.get('hasRouterLibrary')) {
-            transactionService.sendPageLoadMetrics()
-          }
-        })
-      })
+      this._sendPageLoadMetrics()
     }
     return this
+  }
+
+  _sendPageLoadMetrics () {
+    var transactionService = this.serviceFactory.getService('TransactionService')
+    var configService = this.serviceFactory.getService('ConfigService')
+    var sendPageLoadMetrics = function sendPageLoadMetrics () {
+      // to make sure PerformanceTiming.loadEventEnd has a value
+      setTimeout(function () {
+        // need to delegate sending navigation timing to the router liberay
+        if (!configService.get('hasRouterLibrary')) {
+          transactionService.sendPageLoadMetrics()
+        }
+      })
+    }
+
+    if (document.readyState === 'complete') {
+      sendPageLoadMetrics()
+    } else {
+      window.addEventListener('load', sendPageLoadMetrics)
+    }
   }
 
   isEnabled () {
