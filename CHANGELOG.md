@@ -1,3 +1,19 @@
+<a name="0.4.1"></a>
+## [0.4.1](https://github.com/elastic/apm-agent-js-base/compare/v0.4.0...v0.4.1) (2018-02-20)
+
+
+### Bug Fixes
+
+* send page load metrics even after load event ([abe3680](https://github.com/elastic/apm-agent-js-base/commit/abe3680))
+
+
+### Features
+
+* upgrade to elastic-apm-js-core 0.2.2 ([c2a6469](https://github.com/elastic/apm-agent-js-base/commit/c2a6469))
+  * enforce server string limit
+  * set descriptive names for navigation timing spans
+
+
 <a name="0.4.0"></a>
 # [0.4.0](https://github.com/elastic/apm-agent-js-base/compare/v0.3.0...v0.4.0) (2018-02-07)
 
