@@ -34,7 +34,8 @@ var baseOptions = {
 var bundleConfig = {
   entry: baseOptions.entry,
   output: baseOptions.output,
-  module: baseOptions.module
+  module: baseOptions.module,
+  node: false
 }
 
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
@@ -47,6 +48,7 @@ var optimizeConfig = {
   },
   module: baseOptions.module,
   devtool: 'source-map',
+  node: false,
   plugins: [
     new UglifyJSPlugin({
       sourceMap: true,
