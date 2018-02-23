@@ -20,7 +20,6 @@
     "runUnitTests": "node ./scripts/run-script.js runUnitTests",
     "runNodeTests": "node ./scripts/run-script.js runNodeTests",
     "buildE2eBundles": "node ./scripts/run-script.js buildE2eBundles",
-    "testSauce": "MODE=saucelabs SAUCE_USERNAME=elastic-apm-base SAUCE_ACCESS_KEY=4b6720f1-ecdc-448d-85be-ebf947e14507 npm run runUnitTests",
     "run-e2e": "npm run build && npm run buildE2eBundles && node ./scripts/run-script.js runE2eTests",
     "test": "node node_modules/standard/bin/cmd.js src/**/* && npm run runNodeTests && npm run runUnitTests && npm run run-e2e && npm run build-docs",
     "run-script": "node ./scripts/run-script.js"
