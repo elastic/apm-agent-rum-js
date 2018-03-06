@@ -27,14 +27,12 @@ describe('index', function () {
     try {
       throw new Error('ApmBase test error')
     } catch(error) {
+      debugger
       apmBase.captureError(error)
       if (apmCore.utils.isPlatformSupported()) {
-        expect(apmServer.errorQueue.items.length).toBe(1)
-        apmServer.errorQueue.flush()
-        expect(apmServer.errorQueue.items.length).toBe(0)
-        expect(apmServer.sendErrors).toHaveBeenCalled()
+        expect(apmServer.errorQueue).toBeUndefined()
+        expect(apmServer.sendErrors).not.toHaveBeenCalled()
         expect(apmServer._postJson).not.toHaveBeenCalled()
-        apmServer.sendErrors.calls.reset()
       }
     }
     apmBase.init({
