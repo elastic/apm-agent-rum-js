@@ -11,6 +11,7 @@ elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
 
 elasticApm.setUserContext({usertest: 'usertest',id: 'userId',username: 'username',email: 'email'})
 elasticApm.setCustomContext({testContext: 'testContext'})
+elasticApm.setTags({'testTagKey': 'testTagValue'})
 
 function generateError () {
   throw new Error('timeout test error')

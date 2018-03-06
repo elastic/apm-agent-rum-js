@@ -43,6 +43,7 @@ describe('index', function () {
 
     apmBase.setUserContext({usertest: 'usertest',id: 'userId',username: 'username',email: 'email'})
     apmBase.setCustomContext({testContext: 'testContext'})
+    apmBase.setTags({'testTagKey': 'testTagValue'})
 
     try {
       throw new Error('ApmBase test error')

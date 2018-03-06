@@ -44,3 +44,23 @@ Call this to enrich collected errors and transactions with any information that 
 The provided custom context is stored under `context.custom` in Elasticsearch on both errors and transactions.
 
 The given `context` argument must be an object and can contain any property that can be JSON encoded.
+
+
+[float]
+[[apm-set-tags]]
+=== `apm.setTags()`
+
+[source,js]
+----
+apm.setTags(tags)
+----
+
+Set tags on transactions and errors.
+
+Tags are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via `setCustomContext()`). You can set multiple tags.
+
+Arguments:
+
+* `tags` - Any key/value object with the following specifications:
+** key - Any string. Must not contain periods (`.`) as those have special meaning in Elasticsearch
+** value - Any string. If a non-string data type is given, it's converted to a string before being sent to the APM Server.

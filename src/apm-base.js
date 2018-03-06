@@ -12,6 +12,7 @@ class ApmBase {
         agentVersion: '%%agent-version%%'
       })
       configService.setConfig(config)
+      this.serviceFactory.init()
       var errorLogging = this.serviceFactory.getService('ErrorLogging')
       errorLogging.registerGlobalEventListener()
 
@@ -56,9 +57,15 @@ class ApmBase {
     var configService = this.serviceFactory.getService('ConfigService')
     configService.setUserContext(userContext)
   }
+
   setCustomContext (customContext) {
     var configService = this.serviceFactory.getService('ConfigService')
     configService.setCustomContext(customContext)
+  }
+
+  setTags (tags) {
+    var configService = this.serviceFactory.getService('ConfigService')
+    configService.setTags(tags)
   }
 
   // Should call this method before 'load' event on window is fired
