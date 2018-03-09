@@ -24,7 +24,7 @@ exports.config = {
   framework: 'jasmine',
   reporters: ['dot', 'spec'],
   jasmineNodeOpts: {
-    defaultTimeoutInterval: 60000
+    defaultTimeoutInterval: 90000
   },
   before: function () {
     // browser.timeoutsAsyncScript(30000)
