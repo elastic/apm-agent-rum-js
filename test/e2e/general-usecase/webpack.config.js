@@ -5,7 +5,9 @@ var webpack = require('webpack')
 var testConfig = require('../../../test.config')
 var globalConfigs = testConfig
 
-console.log(globalConfigs)
+var configJson = JSON.stringify(globalConfigs, undefined, 2)
+var env = {'globalConfigs': configJson}
+console.log(configJson)
 
 var base = {
   entry: path.join(__dirname, './app.js'),
@@ -15,7 +17,7 @@ var base = {
   },
   devtool: 'source-map',
   plugins: [
-    new webpack.DefinePlugin({'globalConfigs': JSON.stringify(globalConfigs)})
+    new webpack.DefinePlugin(env)
   ]
 }
 
@@ -29,7 +31,7 @@ var optimized = {
   },
   devtool: base.devtool,
   plugins: [
-    new webpack.DefinePlugin({'globalConfigs': JSON.stringify(globalConfigs)}),
+    new webpack.DefinePlugin(env),
     new UglifyJSPlugin({
       sourceMap: true,
       extractComments: false
