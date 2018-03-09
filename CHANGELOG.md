@@ -1,3 +1,14 @@
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/elastic/apm-agent-js-base/compare/v0.4.1...v0.5.0) (2018-03-09)
+
+
+### Features
+
+* add apm.setTags ([523280a](https://github.com/elastic/apm-agent-js-base/commit/523280a))
+* update to elastic-apm-js-core 0.3.0 ([a436334](https://github.com/elastic/apm-agent-js-base/commit/a436334))
+
+
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://github.com/elastic/apm-agent-js-base/compare/v0.4.0...v0.4.1) (2018-02-20)
 
