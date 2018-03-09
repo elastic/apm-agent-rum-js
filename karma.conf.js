@@ -4,6 +4,7 @@ var testUtils = require('elastic-apm-js-core/dev-utils/test.js')
 module.exports = function (config) {
   // temporarily set firefox version to 44 due to apm-server#676 issue
   karmaUtils.baseConfig.customLaunchers.SL_FIREFOX.version = '44'
+  karmaUtils.baseConfig.browserNoActivityTimeout = 120000
 
   config.set(karmaUtils.baseConfig)
   var testConfig = require('./test.config')
