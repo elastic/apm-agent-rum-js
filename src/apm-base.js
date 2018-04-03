@@ -82,6 +82,11 @@ class ApmBase {
       return errorLogging.logError(error)
     }
   }
+
+  addFilter (fn) {
+    var configService = this.serviceFactory.getService('ConfigService')
+    configService.addFilter(fn)
+  }
 }
 
 module.exports = ApmBase
