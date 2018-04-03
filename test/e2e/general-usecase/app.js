@@ -13,8 +13,31 @@ elasticApm.setUserContext({usertest: 'usertest',id: 'userId',username: 'username
 elasticApm.setCustomContext({testContext: 'testContext'})
 elasticApm.setTags({'testTagKey': 'testTagValue'})
 
+elasticApm.addFilter(function (payload) {
+  if (payload.errors) {
+    payload.errors.forEach(function (error) {
+      error.exception.message = error.exception.message.replace('secret', '[REDACTED]')
+    })
+  }
+  if (payload.transactions) {
+    payload.transactions.forEach(function (tr) {
+      tr.spans.forEach(function (span) {
+        if (span.context && span.context.http && span.context.http.url) {
+          var url = new URL(span.context.http.url.raw)
+          if (url.searchParams.get('token')) {
+            url.searchParams.set('token', 'REDACTED')
+          }
+          span.context.http.url.raw = url.toString()
+        }
+      })
+    })
+  }
+  // Make sure to return the payload
+  return payload
+})
+
 function generateError () {
-  throw new Error('timeout test error')
+  throw new Error('timeout test error with a secret')
 }
 
 setTimeout(function () {

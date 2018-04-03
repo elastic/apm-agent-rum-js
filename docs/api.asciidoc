@@ -64,3 +64,39 @@ Arguments:
 * `tags` - Any key/value object with the following specifications:
 ** key - Any string. Must not contain periods (`.`) as those have special meaning in Elasticsearch
 ** value - Any string. If a non-string data type is given, it's converted to a string before being sent to the APM Server.
+
+
+[float]
+[[apm-add-filter]]
+=== `apm.addFilter()`
+
+A filter can be used to modify the APM payload before it is sent to the apm-server.
+This can be useful in for example redacting sensitive information from the payload:
+
+[source,js]
+----
+apm.addFilter(function (payload) {
+  if (payload.errors) {
+    payload.errors.forEach(function (error) {
+      error.exception.message = error.exception.message.replace('secret', '[REDACTED]')
+    })
+  }
+  if (payload.transactions) {
+    payload.transactions.forEach(function (tr) {
+      tr.spans.forEach(function (span) {
+        if (span.context && span.context.http && span.context.http.url) {
+          var url = new URL(span.context.http.url.raw)
+          if (url.searchParams.get('token')) {
+            url.searchParams.set('token', 'REDACTED')
+          }
+          span.context.http.url.raw = url.toString()
+        }
+      })
+    })
+  }
+  // Make sure to return the payload
+  return payload
+})
+----
+
+NOTE: The payload will be dropped if one of the filters return a falsy value.
