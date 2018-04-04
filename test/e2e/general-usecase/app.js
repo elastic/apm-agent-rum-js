@@ -1,7 +1,11 @@
 var initElasticApm = require('../../..').init
 // import init as initElasticApm from '../../..'
 var createApmBase = require('../e2e')
+
+var active = Math.random() < 1
+
 var elasticApm = createApmBase({
+  active: active,
   debug: true,
   serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
   serviceVersion: '0.0.1'
