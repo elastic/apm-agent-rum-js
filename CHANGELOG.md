@@ -1,3 +1,13 @@
+<a name="0.6.1"></a>
+## [0.6.1](https://github.com/elastic/apm-agent-js-base/compare/v0.6.0...v0.6.1) (2018-04-10)
+
+
+### Bug Fixes
+
+* update to elastic-apm-js-core 0.4.3 ([1e307ac](https://github.com/elastic/apm-agent-js-base/commit/1e307ac))
+
+
+
 <a name="0.6.0"></a>
 # [0.6.0](https://github.com/elastic/apm-agent-js-base/compare/v0.5.0...v0.6.0) (2018-04-04)
 
