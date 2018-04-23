@@ -12,7 +12,7 @@ describe('ApmBase', function () {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     var trService = serviceFactory.getService('TransactionService')
     spyOn(trService, 'sendPageLoadMetrics')
-    
+
     apmBase._sendPageLoadMetrics()
     window.addEventListener('load', function () {
       setTimeout(() => {
@@ -27,5 +27,34 @@ describe('ApmBase', function () {
         })
       })
     })
+  })
+
+  it('should provider public api', function () {
+    var apmBase = new ApmBase(serviceFactory, !enabled)
+    apmBase.init({})
+    apmBase.setInitialPageLoadName('test')
+    var trService = serviceFactory.getService('TransactionService')
+    expect(trService.initialPageLoadName).toBe('test')
+
+    var tr = apmBase.startTransaction('test-transaction', 'test-type')
+    expect(tr).toBeDefined()
+    expect(tr.name).toBe('test-transaction')
+    expect(tr.type).toBe('test-type')
+
+    spyOn(tr, 'startSpan').and.callThrough()
+    apmBase.startSpan('test-span', 'test-type')
+    expect(tr.startSpan).toHaveBeenCalledWith('test-span', 'test-type')
+
+    expect(apmBase.getCurrentTransaction()).toBe(tr)
+    expect(apmBase.getTransactionService()).toBe(trService)
+
+    var filter = function (payload) {}
+    apmBase.addFilter(filter)
+    var configService = serviceFactory.getService('ConfigService')
+    expect(configService.filters.length).toBe(1)
+    expect(configService.filters[0]).toBe(filter)
+
+    apmBase.config({testConfig: 'test'})
+    expect(configService.config.testConfig).toBe('test')
   })
 })
