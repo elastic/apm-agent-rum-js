@@ -100,3 +100,46 @@ apm.addFilter(function (payload) {
 ----
 
 NOTE: The payload will be dropped if one of the filters return a falsy value.
+
+
+[float]
+[[apm-start-transaction]]
+=== `apm.startTransaction()`
+
+[source,js]
+----
+apm.startTransaction(name, type)
+----
+
+
+Starts and returns a new transaction.
+
+Arguments:
+
+* `name` - The name of the transsaction (string).
+* `type` - The type of the transsaction (string).
+
+
+Use this method to create a custom transaction.
+
+NOTE: Calling this method would result in ending the current transaction and replacing it with the new transaction.
+
+NOTE: This method returns `undefined` if apm is disabled or if `isActive` is set to `false`.
+
+[float]
+[[apm-start-span]]
+=== `apm.startSpan()`
+
+[source,js]
+----
+apm.startSpan(name, type)
+----
+
+Starts and returns a new span on the current transaction.
+
+Arguments:
+
+* `name` - The name of the span (string).
+* `type` - The type of the span (string).
+
+NOTE: This method returns `undefined` if apm is disabled or if `isActive` is set to `false`.
