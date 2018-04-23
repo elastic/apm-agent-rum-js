@@ -68,7 +68,7 @@
     "webpack-bundle-analyzer": "2.9.2"
   },
   "dependencies": {
-    "elastic-apm-js-core": "0.4.3",
+    "elastic-apm-js-core": "0.5.0",
     "es6-promise": "4.2.4"
   }
 }
