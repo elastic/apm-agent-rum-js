@@ -27,7 +27,6 @@ describe('index', function () {
     try {
       throw new Error('ApmBase test error')
     } catch(error) {
-      debugger
       apmBase.captureError(error)
       if (apmCore.utils.isPlatformSupported()) {
         expect(apmServer.errorQueue).toBeUndefined()
