@@ -17,7 +17,8 @@ var exports = {
   default: apmBase.init.bind(apmBase),
   init: apmBase.init.bind(apmBase),
   ApmBase: ApmBase,
-  apmBase: apmBase
+  apmBase: apmBase,
+  apm: apmBase
 }
 
 module.exports = exports

@@ -76,6 +76,34 @@ class ApmBase {
     }
   }
 
+  startTransaction (name, type) {
+    if (this.isEnabled()) {
+      var transactionService = this.serviceFactory.getService('TransactionService')
+      return transactionService.startTransaction(name, type)
+    }
+  }
+
+  startSpan (name, type) {
+    if (this.isEnabled()) {
+      var transactionService = this.serviceFactory.getService('TransactionService')
+      return transactionService.startSpan(name, type)
+    }
+  }
+
+  getCurrentTransaction () {
+    if (this.isEnabled()) {
+      var transactionService = this.serviceFactory.getService('TransactionService')
+      return transactionService.getCurrentTransaction()
+    }
+  }
+
+  getTransactionService () {
+    if (this.isEnabled()) {
+      var transactionService = this.serviceFactory.getService('TransactionService')
+      return transactionService
+    }
+  }
+
   captureError (error) {
     if (this.isEnabled()) {
       var errorLogging = this.serviceFactory.getService('ErrorLogging')
