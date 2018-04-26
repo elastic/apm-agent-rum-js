@@ -1,29 +1,22 @@
 import { init as initApm } from '../../..'
 var createApmBase = require('../e2e')
 var apm = createApmBase({
-
-  // Set required service name (allowed characters: a-z, A-Z, 0-9, -, _, and space)
   serviceName: 'manual-timing',
-
-  // Set custom APM Server URL (default: http://localhost:8200)
-  // serverUrl: '',
   hasRouterLibrary: true,
   sendNavigationTimingTransaction: false,
-  operationMode: 'manual',
-// Set service version (required for sourcemap feature)
-// serviceVersion: ''
+  operationMode: 'manual'
 })
 
-var tr = apm.startTransaction('tr-name1', 'tr-type')
-tr.addTask('load-event')
+var transaction = apm.startTransaction('transaction-name', 'transaction-type')
+transaction.addTask('load-event')
 window.addEventListener('load', function () {
   setTimeout(() => {
-    tr.addNavigationTimingMarks()
-    tr.removeTask('load-event')
+    transaction.addNavigationTimingMarks()
+    transaction.removeTask('load-event')
   })
 })
 
-var span = tr.startSpan('span-name', 'span-type')
+var span = transaction.startSpan('span-name', 'span-type')
 
 var appEl = document.getElementById('app')
 var testEl = document.createElement('h2')
@@ -46,8 +39,11 @@ setTimeout(function () {
 }, 100)
 
 var url = '/test/e2e/react/data.json?test=hamid'
-var httpSpan = tr.startSpan('FETCH ' + url, 'http')
+var httpSpan = transaction.startSpan('FETCH ' + url, 'http')
 fetch(url)
-  .then(() => {
+  .then((resp) => {
+    if (!resp.ok) {
+      apm.captureError(new Error(`fetch failed with status ${resp.status} ${resp.statusText}`))
+    }
     httpSpan.end()
   })
