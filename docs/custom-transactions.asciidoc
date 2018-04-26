@@ -1,0 +1,40 @@
+[[custom-transactions]]
+== Custom Transactions
+
+This is an example of how to use custom transactions and custom spans. 
+Please also see <<api, API documentation>>.
+
+
+Elastic APM uses the concept of transactions and spans to collect performance data. Spans are used to measure an operation and spans
+are grouped into what transactions.
+
+By default Elastic APM JS agent collects some transactions (`page-load` transaction for example) and send them to apm-server, however
+if the current instrumentation doesn't provide what you need, you can create custom transactions to fill the gaps.
+
+Here is an example application using custom transactions:
+
+[source,js]
+----
+import { init as initApm } from 'elastic-apm-js-base'
+var apm = initApm({
+  serviceName: 'service-name',
+  serverUrl: 'http://localhost:8200'
+})
+
+var transaction = apm.startTransaction('Application start', 'custom')
+var url = 'http://example.com/data.json'
+var httpSpan = transaction.startSpan('FETCH ' + url, 'http')
+fetch(url)
+  .then((resp) => {
+    if (!resp.ok) {
+      apm.captureError(new Error(`fetch failed with status ${resp.status} ${resp.statusText}`))
+    }
+    httpSpan.end()
+    transaction.end()
+  })
+----
+
+
+NOTE: There can only be one active transaction at any time.
+ 
+NOTE: Transactions are queued and sent together automatically after `Transaction.end` is called.

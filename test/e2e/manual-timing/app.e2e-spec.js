@@ -58,7 +58,7 @@ describe('manual-timing', function () {
 
     expect(serverCalls.sendTransactions.length).toBe(1)
     var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
-    expect(transactionPayload.type).toBe('tr-type')
-    expect(transactionPayload.name).toBe('tr-name1')
+    expect(transactionPayload.name).toBe('transaction-name')
+    expect(transactionPayload.type).toBe('transaction-type')
   })
 })

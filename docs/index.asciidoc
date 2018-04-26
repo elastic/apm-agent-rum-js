@@ -10,3 +10,5 @@ include::./intro.asciidoc[]
 include::./sourcemap.asciidoc[]
 
 include::./api.asciidoc[]
+
+include::./custom-transactions.asciidoc[]
