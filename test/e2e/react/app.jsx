@@ -11,7 +11,7 @@ var elasticApm = createApmBase({
   debug: true,
   serviceName: 'apm-agent-js-base-test-e2e-react',
   serviceVersion: '0.0.1',
-  hasRouterLibrary: true
+  sendPageLoadTransaction: false
 })
 
 elasticApm.setInitialPageLoadName('react-initial-page-load')
