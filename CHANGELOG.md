@@ -1,3 +1,13 @@
+<a name="0.7.0"></a>
+# [0.7.0](https://github.com/elastic/apm-agent-js-base/compare/v0.6.1...v0.7.0) (2018-04-30)
+
+
+### Features
+
+* exposed api initial draft ([9187726](https://github.com/elastic/apm-agent-js-base/commit/9187726))
+
+
+
 <a name="0.6.1"></a>
 ## [0.6.1](https://github.com/elastic/apm-agent-js-base/compare/v0.6.0...v0.6.1) (2018-04-10)
 
