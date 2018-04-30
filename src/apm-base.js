@@ -31,7 +31,7 @@ class ApmBase {
       // to make sure PerformanceTiming.loadEventEnd has a value
       setTimeout(function () {
         // need to delegate sending navigation timing to the router liberay
-        if (!configService.get('hasRouterLibrary')) {
+        if (configService.get('sendPageLoadTransaction')) {
           transactionService.sendPageLoadMetrics()
         }
       })

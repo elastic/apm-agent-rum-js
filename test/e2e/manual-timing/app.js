@@ -2,8 +2,7 @@ import { init as initApm } from '../../..'
 var createApmBase = require('../e2e')
 var apm = createApmBase({
   serviceName: 'manual-timing',
-  hasRouterLibrary: true,
-  sendNavigationTimingTransaction: false,
+  sendPageLoadTransaction: false,
   operationMode: 'manual'
 })
 

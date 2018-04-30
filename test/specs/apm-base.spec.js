@@ -11,6 +11,11 @@ describe('ApmBase', function () {
   it('should send page load metrics before or after load event', function (done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     var trService = serviceFactory.getService('TransactionService')
+    var configService = serviceFactory.getService('ConfigService')
+    configService.setConfig({
+      sendPageLoadTransaction: true
+    })
+
     spyOn(trService, 'sendPageLoadMetrics')
 
     apmBase._sendPageLoadMetrics()
@@ -29,7 +34,7 @@ describe('ApmBase', function () {
     })
   })
 
-  it('should provider public api', function () {
+  it('should provide the public api', function () {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({})
     apmBase.setInitialPageLoadName('test')
