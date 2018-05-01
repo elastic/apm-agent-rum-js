@@ -9,7 +9,7 @@ exports.config = {
       maxInstances: 1,
       browserName: 'chrome',
       'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
-      // args: ['--no-sandbox'],
+    // args: ['--no-sandbox'],
     // before: function () {
     //   browser.timeoutsAsyncScript(10000)
     // }
@@ -25,6 +25,13 @@ exports.config = {
   reporters: ['dot', 'spec'],
   jasmineNodeOpts: {
     defaultTimeoutInterval: 90000
+  },
+  afterTest: function (test) {
+    browser.execute('1+1')
+    var response = browser.log('browser')
+    var browserLogs = response.value
+    console.log('afterTest:', JSON.stringify(test, undefined, 2))
+    console.log('browser.log:', JSON.stringify(browserLogs, undefined, 2))
   },
   before: function () {
     // browser.timeoutsAsyncScript(30000)
