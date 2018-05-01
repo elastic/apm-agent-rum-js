@@ -10,5 +10,7 @@
 
 This is the official JavaScript agent for Frontend applications.
 
-See our [Documentation](https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html) to get started.
+See our [Documentation](https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html) to get started. 
+
+We'd love to hear your feedback, please take a minute to fill out our [survey](https://goo.gl/forms/nLCXGCvziqalzjlP2).
 
