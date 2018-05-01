@@ -1,3 +1,5 @@
+var utils = require('elastic-apm-js-core/dev-utils/webdriver')
+
 describe('general-usercase', function () {
   it('should run the general usecase', function () {
     browser.timeouts('script', 10000)
@@ -60,5 +62,7 @@ describe('general-usercase', function () {
     var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('general-usecase-initial-page-load')
+
+    return utils.allowSomeBrowserErrors(['timeout test error with a secret'])
   })
 })

@@ -1,3 +1,5 @@
+var utils = require('elastic-apm-js-core/dev-utils/webdriver')
+
 describe('manual-timing', function () {
   it('should run manual timing', function () {
     browser.timeouts('script', 10000)
@@ -60,5 +62,7 @@ describe('manual-timing', function () {
     var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
     expect(transactionPayload.name).toBe('transaction-name')
     expect(transactionPayload.type).toBe('transaction-type')
+
+    return utils.verifyNoBrowserErrors()
   })
 })

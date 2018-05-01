@@ -7,7 +7,7 @@ exports.config = {
   capabilities: [
     {
       maxInstances: 1,
-      browserName: 'firefox',
+      browserName: 'chrome',
       'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
       // args: ['--no-sandbox'],
     // before: function () {
