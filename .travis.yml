@@ -1,11 +1,14 @@
-sudo: false
+sudo: required
 language: node_js
+services:
+  - docker
 node_js:
 - '6'
 env:
   global:
   - SAUCE_USERNAME=elastic-apm-base
   - SAUCE_ACCESS_KEY=4b6720f1-ecdc-448d-85be-ebf947e14507
+  - STACK_VERSION=6.2.4
   matrix:
   - MODE=saucelabs
 cache:
@@ -17,6 +20,8 @@ addons:
     packages:
      - xsltproc
      - libxml2-utils
+before_install:
+  - docker-compose -f ./test/docker-compose.yml up -d apm-server
 before_script:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
