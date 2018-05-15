@@ -28,7 +28,7 @@ elasticApm.addFilter(function (payload) {
       tr.spans.forEach(function (span) {
         if (span.context && span.context.http && span.context.http.url) {
           var url = new URL(span.context.http.url.raw)
-          if (url.searchParams.get('token')) {
+          if (url.searchParams && url.searchParams.get('token')) {
             url.searchParams.set('token', 'REDACTED')
           }
           span.context.http.url.raw = url.toString()
