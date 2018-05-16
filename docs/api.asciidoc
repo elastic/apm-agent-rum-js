@@ -143,3 +143,19 @@ Arguments:
 * `type` - The type of the span (string).
 
 NOTE: This method returns `undefined` if apm is disabled or if `isActive` is set to `false`.
+
+
+[float]
+[[set-initial-page-load-name]]
+=== `apm.setInitialPageLoadName()`
+
+[source,js]
+----
+apm.setInitialPageLoadName(name)
+----
+
+Arguments:
+
+* `name` - The name of the page-load transaction (string).
+
+Use this method to set the name of the `page-load` transaction that is sent automatically on page load event.
