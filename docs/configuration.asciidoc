@@ -1,0 +1,129 @@
+[[configuration]]
+== Configuration
+
+While initializing the agent you can provide the following configuration options:
+
+[float]
+[[service-name]]
+=== `serviceName`
+
+* *Type:* String
+* *Required*
+
+Your Elastic APM service name.
+
+[float]
+[[server-url]]
+=== `serverUrl`
+
+* *Type:* String
+* *Default:* `http://localhost:8200`
+
+The URL used to make requests to the APM Server.
+
+[float]
+[[service-version]]
+=== `serviceVersion`
+
+* *Type:* String
+
+
+The version of the app.
+This could be the version from your `package.json` file,
+a git commit reference,
+or any other string that might help you pinpoint a specific version. 
+Furthermore this option is used on the APM Server to find the right sourcemap file to apply to the stack trace.
+
+
+[float]
+[[active]]
+=== `active`
+
+* *Type:* Boolean
+* *Default:* `true`
+
+A boolean specifying if the agent should be active or not.
+If active,
+the agent will send APM transactions and track errors.
+This option can be used to deactivate the agent in your staging environment.
+It can also be used to sample a number of clients, here is an example to sample 10% of the page loads:
+
+
+[source,js]
+----
+var options = {
+  active: Math.random() < 0.1
+}
+----
+
+[float]
+[[log-level]]
+=== `logLevel`
+
+* *Type:* String
+* *Default:* `'warn'`
+
+
+Set the verbosity level for the agent.
+Note that this does not have any influence on the types of errors that are sent to the APM Server.
+This option is useful when you want to report an issue with the agent to us.
+
+Possible levels are: `trace`, `debug`, `info`, `warn`, `error`.
+
+
+[float]
+[[flush-interval]]
+=== `flushInterval`
+
+* *Type:* Number
+* *Default:* `500`
+
+The agent maintains two in-memory queues to record transactions and errors when they are added.
+This option sets the flush interval in *milliseconds* for these queues.
+
+NOTE: After each flush of the queue, the next flush isn't scheduled until an item is added to the queue.
+
+[float]
+[[error-throttling]]
+=== Error throttling
+
+To throttle the number of errors send to the APM Server, you can use the following options:
+
+[float]
+[[error-throttle-limit]]
+==== `errorThrottleLimit`
+
+* *Type:* Number
+* *Default:* `20`
+
+[float]
+[[error-throttle-interval]]
+==== `errorThrottleInterval`
+
+* *Type:* Number
+* *Default:* `30000`
+
+By default the agent can only send (up to) `20` errors every `30000` milliseconds.
+
+
+[float]
+[[transaction-throttling]]
+=== Transaction throttling
+
+[float]
+[[transaction-throttle-limit]]
+==== `transactionThrottleLimit`
+
+* *Type:* Number
+* *Default:* `20`
+
+[float]
+[[transaction-throttle-interval]]
+==== `transactionThrottleInterval`
+
+* *Type:* Number
+* *Default:* `30000`
+
+By default the agent can only send (up to) `20` transactions every `30000` milliseconds.
+
+
