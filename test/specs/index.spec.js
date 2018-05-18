@@ -6,7 +6,7 @@ describe('index', function () {
 
   beforeEach(function () {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000
   })
 
   afterEach(function () {
