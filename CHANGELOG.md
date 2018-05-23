@@ -1,3 +1,11 @@
+<a name="0.8.0"></a>
+# [0.8.0](https://github.com/elastic/apm-agent-js-base/compare/v0.7.0...v0.8.0) (2018-05-23)
+
+### BREAKING CHANGES
+
+* rename hasRouterLibrary to sendPageLoadTransaction
+
+
 <a name="0.7.0"></a>
 # [0.7.0](https://github.com/elastic/apm-agent-js-base/compare/v0.6.1...v0.7.0) (2018-04-30)
 
