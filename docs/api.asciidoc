@@ -1,6 +1,10 @@
 [[api]]
 == API Reference
 
+
+[float]
+[[agent-api]]
+=== Agent API
 You can access agent API after initializing the agent: 
 
 [source,js]
@@ -11,7 +15,7 @@ var apm = require('elastic-apm-js-base').init(...)
 
 [float]
 [[apm-set-user-context]]
-=== `apm.setUserContext()`
+==== `apm.setUserContext()`
 
 [source,js]
 ----
@@ -32,7 +36,7 @@ The provided user context is stored under `context.user` in Elasticsearch on bot
 
 [float]
 [[apm-set-custom-context]]
-=== `apm.setCustomContext()`
+==== `apm.setCustomContext()`
 
 [source,js]
 ----
@@ -48,7 +52,7 @@ The given `context` argument must be an object and can contain any property that
 
 [float]
 [[apm-set-tags]]
-=== `apm.setTags()`
+==== `apm.setTags()`
 
 [source,js]
 ----
@@ -68,7 +72,7 @@ Arguments:
 
 [float]
 [[apm-add-filter]]
-=== `apm.addFilter()`
+==== `apm.addFilter()`
 
 A filter can be used to modify the APM payload before it is sent to the apm-server.
 This can be useful in for example redacting sensitive information from the payload:
@@ -104,7 +108,7 @@ NOTE: The payload will be dropped if one of the filters return a falsy value.
 
 [float]
 [[apm-start-transaction]]
-=== `apm.startTransaction()`
+==== `apm.startTransaction()`
 
 [source,js]
 ----
@@ -128,7 +132,7 @@ NOTE: This method returns `undefined` if apm is disabled or if `isActive` is set
 
 [float]
 [[apm-start-span]]
-=== `apm.startSpan()`
+==== `apm.startSpan()`
 
 [source,js]
 ----
@@ -147,7 +151,7 @@ NOTE: This method returns `undefined` if apm is disabled or if `isActive` is set
 
 [float]
 [[set-initial-page-load-name]]
-=== `apm.setInitialPageLoadName()`
+==== `apm.setInitialPageLoadName()`
 
 [source,js]
 ----
@@ -159,3 +163,63 @@ Arguments:
 * `name` - The name of the page-load transaction (string).
 
 Use this method to set the name of the `page-load` transaction that is sent automatically on page load event.
+
+
+[float]
+[[transaction-api]]
+=== Transaction API
+
+A transaction groups multiple spans in a logical group.
+
+To start a transaction,
+you need to call <<apm-start-transaction,`apm.startTransaction()`>>.
+
+To see an example of using custom transactions,
+see the <<custom-transactions,Custom Transactions>> article.
+
+[float]
+[[transaction-name]]
+==== `transaction.name`
+
+* *Type:* String
+* *Default:* `Unknown`
+
+The name of the transaction.
+
+Can be used to set or overwrite the name of the transaction (visible in the performance monitoring breakdown).
+
+
+[float]
+[[transaction-type]]
+==== `transaction.type`
+
+* *Type:* String
+* *Default:* `custom`
+
+The type of the transaction.
+
+
+[float]
+[[transaction-end]]
+==== `transaction.end()`
+
+[source,js]
+----
+transaction.end()
+----
+
+Ends the transaction. If the transaction has already ended,
+nothing happens.
+
+
+[float]
+[[transaction-mark]]
+==== `transaction.mark(key)`
+
+[source,js]
+----
+transaction.mark(key)
+----
+
+Marks the current point in time relative to the start of the transaction.
+Use this method to mark significant events that happen while the transaction is active.
