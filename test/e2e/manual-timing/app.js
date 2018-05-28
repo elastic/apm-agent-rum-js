@@ -9,6 +9,7 @@ var apm = createApmBase({
 var transaction = apm.startTransaction('transaction-name', 'transaction-type')
 transaction.addTask('load-event')
 window.addEventListener('load', function () {
+  transaction.mark('load-event')
   setTimeout(() => {
     transaction.addNavigationTimingMarks()
     transaction.removeTask('load-event')
