@@ -1,3 +1,13 @@
+<a name="0.8.1"></a>
+## [0.8.1](https://github.com/elastic/apm-agent-js-base/compare/v0.8.0...v0.8.1) (2018-05-28)
+
+
+### Features
+
+* add transaction custom marks API ([4d2b71b](https://github.com/elastic/apm-agent-js-base/commit/4d2b71b))
+
+
+
 <a name="0.8.0"></a>
 # [0.8.0](https://github.com/elastic/apm-agent-js-base/compare/v0.7.0...v0.8.0) (2018-05-23)
 
