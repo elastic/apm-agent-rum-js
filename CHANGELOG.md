@@ -1,3 +1,14 @@
+<a name="0.8.2"></a>
+## [0.8.2](https://github.com/elastic/apm-agent-js-base/compare/v0.8.1...v0.8.2) (2018-06-12)
+
+
+### Bug Fixes
+
+* update elastic-apm-js-core 0.6.2 ([b3807e0](https://github.com/elastic/apm-agent-js-base/commit/b3807e0))
+* remove marks before fetchStart to align with resource spans
+* spans generated from navigation and resource timing apis
+
+
 <a name="0.8.1"></a>
 ## [0.8.1](https://github.com/elastic/apm-agent-js-base/compare/v0.8.0...v0.8.1) (2018-05-28)
 
