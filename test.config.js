@@ -2,8 +2,8 @@ var testUtils = require('elastic-apm-js-core/dev-utils/test.js')
 
 var env = testUtils.getTestEnvironmentVariables()
 var serverUrl = 'http://localhost:8200'
-if (env.isTravis) {
-  serverUrl = 'http://localhost:8001'
+if (env.serverUrl) {
+  serverUrl = env.serverUrl
 }
 
 var config = {
