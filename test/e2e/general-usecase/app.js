@@ -27,11 +27,11 @@ elasticApm.addFilter(function (payload) {
     payload.transactions.forEach(function (tr) {
       tr.spans.forEach(function (span) {
         if (span.context && span.context.http && span.context.http.url) {
-          var url = new URL(span.context.http.url.raw)
+          var url = new URL(span.context.http.url)
           if (url.searchParams && url.searchParams.get('token')) {
             url.searchParams.set('token', 'REDACTED')
           }
-          span.context.http.url.raw = url.toString()
+          span.context.http.url = url.toString()
         }
       })
     })
