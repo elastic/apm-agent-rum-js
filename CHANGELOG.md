@@ -1,3 +1,18 @@
+<a name="0.9.0"></a>
+# [0.9.0](https://github.com/elastic/apm-agent-js-base/compare/v0.8.2...v0.9.0) (2018-06-15)
+
+
+### BREAKING CHANGES
+
+* update elastic-apm-js-core to 0.7.0
+* remove timestamp on error and transaction payload
+* supporting apm-server 6.3
+
+### Bug Fixes
+
+* update span.context.http.url structure ([40d6bb2](https://github.com/elastic/apm-agent-js-core/commit/40d6bb2))
+
+
 <a name="0.8.2"></a>
 ## [0.8.2](https://github.com/elastic/apm-agent-js-base/compare/v0.8.1...v0.8.2) (2018-06-12)
 
