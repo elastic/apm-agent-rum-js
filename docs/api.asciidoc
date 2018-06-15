@@ -89,11 +89,11 @@ apm.addFilter(function (payload) {
     payload.transactions.forEach(function (tr) {
       tr.spans.forEach(function (span) {
         if (span.context && span.context.http && span.context.http.url) {
-          var url = new URL(span.context.http.url.raw)
+          var url = new URL(span.context.http.url)
           if (url.searchParams.get('token')) {
             url.searchParams.set('token', 'REDACTED')
           }
-          span.context.http.url.raw = url.toString()
+          span.context.http.url = url.toString()
         }
       })
     })
@@ -197,6 +197,19 @@ Can be used to set or overwrite the name of the transaction (visible in the perf
 * *Default:* `custom`
 
 The type of the transaction.
+
+
+[float]
+[[transaction-timestamp]]
+==== `transaction.timestamp`
+
+* *Type:* String
+* *Default:* `undefined`
+
+The timestamp of the transaction. 
+If the transaction timestamp is not provided (the default behaviour), it will be set by the apm-server (v6.3+).
+You can, however, set the timestamp on the client (using `new Date().toISOString()`), but you should be aware that the timestamp will reflect the client's local time
+which might not always be accurate.
 
 
 [float]
