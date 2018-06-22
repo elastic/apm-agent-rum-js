@@ -1,3 +1,13 @@
+<a name="0.9.1"></a>
+## [0.9.1](https://github.com/elastic/apm-agent-js-base/compare/v0.9.0...v0.9.1) (2018-06-22)
+
+
+### Bug Fixes
+
+* update elastic-apm-js-core to 0.7.1
+* consolidate Transaction and Error contexts
+
+
 <a name="0.9.0"></a>
 # [0.9.0](https://github.com/elastic/apm-agent-js-base/compare/v0.8.2...v0.9.0) (2018-06-15)
 
