@@ -27,7 +27,7 @@ elasticApm.addFilter(function (payload) {
     payload.transactions.forEach(function (tr) {
       tr.spans.forEach(function (span) {
         if (span.context && span.context.http && span.context.http.url) {
-          var url = new URL(span.context.http.url)
+          var url = new URL(span.context.http.url,window.location.origin)
           if (url.searchParams && url.searchParams.get('token')) {
             url.searchParams.set('token', 'REDACTED')
           }
@@ -47,6 +47,15 @@ function generateError () {
 setTimeout(function () {
   generateError()
 }, 100)
+
+var url = '/test/e2e/common/data.json?test=hamid'
+var req = new window.XMLHttpRequest()
+req.open('GET', url, false)
+req.addEventListener("load", function () {
+  console.log('got data!')
+});
+
+req.send()
 
 generateError.tmp = 'tmp'
 
