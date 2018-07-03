@@ -23,7 +23,8 @@
     "buildE2eBundles": "node ./scripts/run-script.js buildE2eBundles",
     "run-e2e": "npm run build && npm run buildE2eBundles && node ./scripts/run-script.js runE2eTests",
     "test": "node node_modules/standard/bin/cmd.js src/**/* && npm run runNodeTests && npm run runUnitTests && npm run run-e2e && npm run build-docs",
-    "run-script": "node ./scripts/run-script.js"
+    "run-script": "node ./scripts/run-script.js",
+    "format": "prettier-standard 'src/**/*.js'"
   },
   "files": [
     "src/**/*.js",
@@ -52,6 +53,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.31",
     "karma-webpack": "^2.0.4",
+    "prettier-standard": "8.0.1",
     "react": "16.2.0",
     "react-dom": "16.2.0",
     "react-router": "4.2.0",
