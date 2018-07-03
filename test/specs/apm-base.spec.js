@@ -53,13 +53,54 @@ describe('ApmBase', function () {
     expect(apmBase.getCurrentTransaction()).toBe(tr)
     expect(apmBase.getTransactionService()).toBe(trService)
 
-    var filter = function (payload) {}
+    var filter = function (payload) { }
     apmBase.addFilter(filter)
     var configService = serviceFactory.getService('ConfigService')
     expect(configService.filters.length).toBe(1)
     expect(configService.filters[0]).toBe(filter)
 
-    apmBase.config({testConfig: 'test'})
+    apmBase.config({ testConfig: 'test' })
     expect(configService.config.testConfig).toBe('test')
+    apmBase.cancelPatchSub()
+  })
+
+  it('should instrument xhr', function (done) {
+    var apmBase = new ApmBase(serviceFactory, !enabled)
+    apmBase.init({})
+    var tr = apmBase.startTransaction('test-transaction', 'test-type')
+    expect(tr).toBeDefined()
+
+    var req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+    req.addEventListener("load", function () {
+      setTimeout(() => {
+        expect(tr.spans.length).toBe(1)
+        expect(tr.spans[0].signature).toBe('GET /')
+        apmBase.cancelPatchSub()
+        done()
+      });
+    });
+
+    req.send()
+  })
+
+
+  it('should instrument sync xhr', function (done) {
+    var apmBase = new ApmBase(serviceFactory, !enabled)
+    apmBase.init({})
+    var tr = apmBase.startTransaction('test-transaction', 'test-type')
+    expect(tr).toBeDefined()
+
+    var req = new window.XMLHttpRequest()
+    req.open('GET', '/', false)
+    req.addEventListener("load", function () {
+      done()
+    });
+
+    req.send()
+
+    expect(tr.spans.length).toBe(1)
+    expect(tr.spans[0].signature).toBe('GET /')
+    apmBase.cancelPatchSub()
   })
 })

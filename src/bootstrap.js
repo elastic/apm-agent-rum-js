@@ -9,7 +9,7 @@ module.exports = function bootstrap () {
   var apmCore = require('elastic-apm-js-core')
   if (apmCore.utils.isPlatformSupported()) {
     require('es6-promise/auto')
-    apmCore.patchCommon()
+    apmCore.patching.patchAll()
     enabled = true
   } else {
     console.log('APM: Platform is not supported!')

@@ -12,7 +12,7 @@ describe('general-usercase', function () {
     var result = browser.executeAsync(function (done) {
       var apmServerMock = window.elasticApm.serviceFactory.getService('ApmServer')
 
-      function checkCalls () {
+      function checkCalls() {
         var serverCalls = apmServerMock.calls
         var validCalls = serverCalls.sendErrors && serverCalls.sendErrors.length && serverCalls.sendTransactions && serverCalls.sendTransactions.length
 
@@ -21,24 +21,24 @@ describe('general-usercase', function () {
           Promise.all([serverCalls.sendErrors[0].returnValue, serverCalls.sendTransactions[0].returnValue])
             .then(function () {
               try {
-                function mapCall (c) {
-                  return {args: c.args,mocked: c.mocked}
+                function mapCall(c) {
+                  return { args: c.args, mocked: c.mocked }
                 }
                 var calls = {
                   sendErrors: serverCalls.sendErrors.map(mapCall),
                   sendTransactions: serverCalls.sendTransactions.map(mapCall)
                 }
                 done(calls)
-              } catch(e) {
+              } catch (e) {
                 throw e
               }
             })
             .catch(function (reason) {
               console.log('reason', reason)
               try {
-                done({error: reason.message || JSON.stringify(reason)})
+                done({ error: reason.message || JSON.stringify(reason) })
               } catch (e) {
-                done({error: 'Failed serializing rejection reason: ' + e.message})
+                done({ error: 'Failed serializing rejection reason: ' + e.message })
               }
             })
         }
@@ -62,6 +62,9 @@ describe('general-usercase', function () {
     var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('general-usecase-initial-page-load')
+    expect(transactionPayload.spans.length).toBeGreaterThan(3)
+    var span = transactionPayload.spans.find(function (s) { return s.name == 'GET /test/e2e/common/data.json?test=hamid' })
+    expect(span).toBeDefined()
 
     return utils.allowSomeBrowserErrors(['timeout test error with a secret'])
   })

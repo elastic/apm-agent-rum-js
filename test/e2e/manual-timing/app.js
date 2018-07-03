@@ -38,7 +38,7 @@ setTimeout(function () {
   }
 }, 100)
 
-var url = '/test/e2e/react/data.json?test=hamid'
+var url = '/test/e2e/common/data.json?test=hamid'
 var httpSpan = transaction.startSpan('FETCH ' + url, 'http')
 fetch(url)
   .then((resp) => {
@@ -47,3 +47,14 @@ fetch(url)
     }
     httpSpan.end()
   })
+
+  
+var tid = transaction.addTask()
+var req = new window.XMLHttpRequest()
+req.open('GET', url)
+req.addEventListener("load", function () {
+  console.log('got data!')
+  transaction.removeTask(tid)
+});
+
+req.send()
