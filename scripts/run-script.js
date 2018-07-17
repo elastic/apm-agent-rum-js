@@ -3,7 +3,7 @@ var saucelabs = require('elastic-apm-js-core/dev-utils/saucelabs')
 var path = require('path')
 var projectDirectory = path.join(__dirname, './../')
 
-function runUnitTests (launchSauceConnect) {
+function runUnitTests(launchSauceConnect) {
   var testConfig = testUtils.getTestEnvironmentVariables()
   testConfig.karmaConfigFile = __dirname + './../karma.conf.js'
   if (launchSauceConnect != 'false') {
@@ -13,25 +13,36 @@ function runUnitTests (launchSauceConnect) {
   }
 }
 
-function serveE2e (servingPath, port) {
+var runIntegrationTest = require('../test/e2e/integration-test').runIntegrationTest
+function serveE2e(servingPath, port) {
   const express = require('express')
   const serveIndex = require('serve-index')
 
   const app = express()
   var staticPath = path.join(__dirname, '../', servingPath)
-  app.use(express.static(staticPath), serveIndex(staticPath, {'icons': false}))
+
+  app.get('/healthcheck', function (req, res) {
+    res.send("OK");
+  });
+
+  app.get('/run_integration_test', async function (req, res) {
+    var result = await runIntegrationTest('http://localhost:8000/test/e2e/general-usecase/')
+    res.send(result);
+  });
+
+  app.use(express.static(staticPath), serveIndex(staticPath, { 'icons': false }))
   app.listen(port)
 
-  console.log('serving on: ' , staticPath , port)
+  console.log('serving on: ', staticPath, port)
 }
 
-function runJasmine (cb) {
+function runJasmine(cb) {
   var JasmineRunner = require('jasmine')
   var jrunner = new JasmineRunner()
 
   var specFiles = ['test/node/*.node-spec.js']
 
-  jrunner.configureDefaultReporter({showColors: true})
+  jrunner.configureDefaultReporter({ showColors: true })
 
   jrunner.onComplete(function (passed) {
     if (!passed) {
@@ -60,7 +71,7 @@ var scripts = {
     if (serve != 'false') {
       serveE2e('./', 8000)
     }
-    testUtils.runE2eTests(path.join(__dirname , './../wdio.conf.js'), runSelenium != 'false')
+    testUtils.runE2eTests(path.join(__dirname, './../wdio.conf.js'), runSelenium != 'false')
   },
   runNodeTests: function () {
     runJasmine(function (err) {
@@ -71,7 +82,7 @@ var scripts = {
     basePath = basePath || './test/e2e'
     var fs = require('fs')
     var testConfig = require('../test.config')
-    function callback (err) {
+    function callback(err) {
       if (err) {
         var exitCode = 2
         process.exit(exitCode)
@@ -104,10 +115,10 @@ var scripts = {
       }
     }
 
-    testUtils.buildE2eBundles(path.join(projectDirectory , basePath), callback)
+    testUtils.buildE2eBundles(path.join(projectDirectory, basePath), callback)
   },
   serveE2e: serveE2e,
-  launchSauceConnect: function launchSauceConnect () {
+  launchSauceConnect: function launchSauceConnect() {
     var testConfig = require('../test.config')
     saucelabs.launchSauceConnect(testConfig.env.sauceLabs, function () {
       console.log('Launched SauceConnect!')
@@ -117,12 +128,12 @@ var scripts = {
 
 module.exports = scripts
 
-function runScript () {
+function runScript() {
   var scriptName = process.argv[2]
   if (scriptName) {
     var scriptArgs = [].concat(process.argv)
     scriptArgs.splice(0, 3)
-    var message = `Running: ${scriptName}(${scriptArgs.map(a=>'\''+a+'\'').join(', ')}) \n`
+    var message = `Running: ${scriptName}(${scriptArgs.map(a => '\'' + a + '\'').join(', ')}) \n`
     console.log(message)
     if (typeof scripts[scriptName] === 'function') {
       return scripts[scriptName].apply(this, scriptArgs)

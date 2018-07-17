@@ -54,6 +54,7 @@
     "karma-spec-reporter": "0.0.31",
     "karma-webpack": "^2.0.4",
     "prettier-standard": "8.0.1",
+    "puppeteer": "1.6.0",
     "react": "16.2.0",
     "react-dom": "16.2.0",
     "react-router": "4.2.0",
