@@ -30,6 +30,16 @@ function serveE2e(servingPath, port) {
     res.send(result);
   });
 
+  app.get('/test-config.js', async function (req, res) {
+    var config = require('../test.config')
+    var result = `
+      window.globalConfigs = ${JSON.stringify(config)}
+    `
+    res.setHeader('Content-Type', 'text/javascript')
+    res.setHeader('Content-Length', Buffer.byteLength(result))
+    res.send(result);
+  });
+
   app.use(express.static(staticPath), serveIndex(staticPath, { 'icons': false }))
   app.listen(port)
 
