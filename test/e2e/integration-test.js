@@ -13,6 +13,7 @@ async function runIntegrationTest(pageUrl) {
 
         await page.goto(pageUrl, { timeout: 30000 });
         const transactionResponse = await page.waitForResponse(response => {
+            console.log(`${response.request().method()} ${response.url()} ${response.status()}`)
             return response.url().indexOf('v1/client-side/transactions') > -1 && response.status() === 202 && response.request().method() == 'POST'
         });
 
