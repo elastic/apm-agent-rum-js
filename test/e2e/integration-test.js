@@ -1,7 +1,7 @@
 const puppeteer = require("puppeteer");
 
 async function runIntegrationTest(pageUrl) {
-    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--remote-debugging-port=9222'] });
     var result = {}
     try {
         const page = await browser.newPage();
