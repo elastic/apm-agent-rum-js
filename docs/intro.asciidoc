@@ -9,7 +9,7 @@ Please also have a look at the documentation for
 
  * {apm-server-ref}[APM Server]
  ** APM JavaScript agent is compatible with APM Server v6.3+.
- ** {apm-server-ref}/frontend.html[enable frontend endpoints in the apm-server configuration].
+ ** {apm-server-ref}/rum.html[enable frontend endpoints in the apm-server configuration].
  * {ref}[Elasticsearch]
 
 
