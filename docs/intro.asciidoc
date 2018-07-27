@@ -1,9 +1,9 @@
 [[intro]]
 == Introduction
 
-Welcome to the APM Frontend JavaScript Agent documentation.
+Welcome to the APM Real User Monitoring (RUM) JavaScript Agent documentation.
 
-The Elastic APM Frontend JavaScript agent sends performance metrics and errors to the APM Server.
+The Elastic APM RUM JavaScript agent sends performance metrics and errors to the APM Server.
 The agent is only one of multiple components you need to get started with APM.
 Please also have a look at the documentation for
 
