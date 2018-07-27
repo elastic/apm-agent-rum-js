@@ -1,4 +1,4 @@
-# Elastic APM JavaScript agent (Beta)
+# Elastic APM Real User Monitoring (RUM) JavaScript agent (Beta)
 
 [![Build status](https://travis-ci.org/elastic/apm-agent-js-base.svg?branch=master)](https://travis-ci.org/elastic/apm-agent-js-base)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
@@ -8,9 +8,9 @@
 
 **Warning: This project is currently in beta. Use it at your own risk.**
 
-This is the official JavaScript agent for Frontend applications.
+This is the official Real User Monitoring JavaScript agent.
 
-See our [Documentation](https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html) to get started. 
+See our [Documentation](https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html) to get started.
 
 We'd love to hear your feedback, please take a minute to fill out our [survey](https://goo.gl/forms/nLCXGCvziqalzjlP2).
 
