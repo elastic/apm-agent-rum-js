@@ -26,8 +26,13 @@ function serveE2e(servingPath, port) {
   });
 
   app.get('/run_integration_test', async function (req, res) {
+    var echo = req.query.echo
     var result = await runIntegrationTest('http://localhost:8000/test/e2e/general-usecase/')
-    res.send(result);
+    if (echo) {
+      res.send(echo)
+    } else {
+      res.send(result);
+    }
   });
 
   app.get('/test-config.js', async function (req, res) {
