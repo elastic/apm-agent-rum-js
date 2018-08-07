@@ -1,3 +1,13 @@
+<a name="0.10.0"></a>
+# [0.10.0](https://github.com/elastic/apm-agent-js-base/compare/v0.9.1...v0.10.0) (2018-08-07)
+
+
+### Features
+
+* instrument XHR ([3c6a9e5](https://github.com/elastic/apm-agent-js-base/commit/3c6a9e5))
+
+
+
 <a name="0.9.1"></a>
 ## [0.9.1](https://github.com/elastic/apm-agent-js-base/compare/v0.9.0...v0.9.1) (2018-06-22)
 
