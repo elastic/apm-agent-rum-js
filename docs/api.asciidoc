@@ -164,6 +164,26 @@ Arguments:
 
 Use this method to set the name of the `page-load` transaction that is sent automatically on page load event.
 
+[float]
+[[capture-error]]
+==== `apm.captureError()`
+
+[source,js]
+----
+apm.captureError(error)
+----
+
+Arguments:
+
+* `error` - An instance of `Error`.
+
+Use this method to manually send an error to APM Server:
+
+[source,js]
+----
+apm.captureError(new Error('<error-message>'))
+----
+
 
 [float]
 [[transaction-api]]
