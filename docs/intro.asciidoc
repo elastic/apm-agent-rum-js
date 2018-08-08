@@ -40,3 +40,16 @@ var apm = initApm({
   serviceVersion: ''
 })
 ----
+
+Alternatively, you can use a script element and the `elasticApm` global object to load and initialize the agent:
+
+[source,html]
+----
+<script src="elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.js"></script>
+<script>
+  elasticApm.init({
+    serviceName: '',
+    serverUrl: 'http://localhost:8200',
+  })
+</script>
+----
