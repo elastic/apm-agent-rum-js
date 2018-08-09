@@ -1,0 +1,25 @@
+[[troubleshooting]]
+== Troubleshooting
+
+[float]
+[[no-stack-trace-available]]
+=== No stack trace available in the Span detail view
+The RUM JS agent does not support stack traces for spans due to performance concerns related to gathering stack information.
+
+[float]
+[[debugging]]
+=== Debugging
+
+In order to debug the agent consider performing the following steps:
+
+1. Add `logLevel: 'debug'` to the agent configuration
+2. Reload the application
+3. Wait at least 5 seconds after the page has loaded
+4. Monitor the Console and Network panel in your browsers developer tools
+
+[float]
+[[the-discuss-forum]]
+=== The discuss forum
+
+If the issue persists, please create a new topic in the https://discuss.elastic.co/c/apm[Elastic APM discuss forum] and
+include as much information as possible. See <<debugging, Debugging>> for how to gather debugging information.
