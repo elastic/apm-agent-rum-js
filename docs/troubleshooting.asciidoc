@@ -2,6 +2,20 @@
 == Troubleshooting
 
 [float]
+[[errors-originating-from-agent]]
+=== Some errors in the application appear to be originating form the agent's JavaScript file
+In some cases when you look at the stack trace of an error, it appears to be originating from
+the agent's JavaScript file. However, since we need to patch some browser APIs in order to provide
+some of the core functionalities of the agent, our JavaScript file appears in the error stack trace.
+Often, the error is generated from another part your application, you can follow the stack trace
+further to identify the offending code.
+
+
+Of course, there are errors that might have been caused by the agent itself and we appreciate it if
+you <<get-in-touch, report them back to us>>.
+
+
+[float]
 [[no-stack-trace-available]]
 === No stack trace available in the Span detail view
 The RUM JS agent does not support stack traces for spans due to performance concerns related to gathering stack information.
@@ -17,9 +31,12 @@ In order to debug the agent consider performing the following steps:
 3. Wait at least 5 seconds after the page has loaded
 4. Monitor the Console and Network panel in your browsers developer tools
 
-[float]
-[[the-discuss-forum]]
-=== The discuss forum
 
-If the issue persists, please create a new topic in the https://discuss.elastic.co/c/apm[Elastic APM discuss forum] and
-include as much information as possible. See <<debugging, Debugging>> for how to gather debugging information.
+[float]
+[[get-in-touch]]
+=== Get in touch
+
+If you have any questions, please create a new topic in the https://discuss.elastic.co/c/apm[Elastic APM discuss forum].
+
+For bug reports and feature requests, please https://github.com/elastic/apm-agent-js-base/issues/new[create an issue] on our https://github.com/elastic/apm-agent-js-base[github repo]
+and include as much information as possible. See <<debugging, Debugging>> for how to gather debugging information.
