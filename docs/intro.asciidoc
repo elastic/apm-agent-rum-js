@@ -53,3 +53,5 @@ Alternatively, you can use a script element and the `elasticApm` global object t
   })
 </script>
 ----
+
+NOTE: Currently our minified JavaScript bundle is about 15KB (gzipped).
