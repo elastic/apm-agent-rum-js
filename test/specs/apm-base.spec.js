@@ -84,6 +84,49 @@ describe('ApmBase', function () {
     req.send()
   })
 
+  it('should instrument xhr when no transaction was started', function (done) {
+    var apmBase = new ApmBase(serviceFactory, !enabled)
+    apmBase.init({ capturePageLoad: false })
+
+    var tr
+
+    var req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+    req.addEventListener("load", function () {
+      setTimeout(() => {
+        expect(tr.spans.length).toBe(1)
+        expect(tr.spans[0].signature).toBe('GET /')
+        apmBase.cancelPatchSub()
+        done()
+      });
+    });
+
+    req.send()
+    tr = apmBase.getCurrentTransaction()
+    expect(tr).toBeDefined()
+    expect(tr.name).toBe('ZoneTransaction')
+  })
+
+  it('should instrument xhr when not active', function (done) {
+    var apmBase = new ApmBase(serviceFactory, !enabled)
+    apmBase.init({ capturePageLoad: false, active:false })
+
+    var tr
+
+    var req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+    req.addEventListener("load", function () {
+      setTimeout(() => {
+        apmBase.cancelPatchSub()
+        done()
+      });
+    });
+
+    req.send()
+    tr = apmBase.getCurrentTransaction()
+    expect(tr).toBeUndefined()
+  })
+
 
   it('should instrument sync xhr', function (done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
