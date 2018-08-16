@@ -1,3 +1,13 @@
+<a name="0.10.2"></a>
+## [0.10.2](https://github.com/elastic/apm-agent-js-base/compare/v0.10.1...v0.10.2) (2018-08-16)
+
+
+### Bug Fixes
+
+* check for undefined span when the agent is not active ([3613b01](https://github.com/elastic/apm-agent-js-base/commit/3613b01))
+
+
+
 <a name="0.10.1"></a>
 ## [0.10.1](https://github.com/elastic/apm-agent-js-base/compare/v0.10.0...v0.10.1) (2018-08-14)
 
