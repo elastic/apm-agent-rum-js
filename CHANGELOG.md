@@ -1,3 +1,17 @@
+<a name="0.10.3"></a>
+## [0.10.3](https://github.com/elastic/apm-agent-js-base/compare/v0.10.2...v0.10.3) (2018-08-20)
+
+
+### Bug Fixes
+
+* check marks are greater than fetchStart ([6d35eaa](https://github.com/elastic/apm-agent-js-core/commit/6d35eaa))
+
+
+### Features
+
+* add transactionDurationThreshold config option ([67f5c5d](https://github.com/elastic/apm-agent-js-core/commit/67f5c5d))
+
+
 <a name="0.10.2"></a>
 ## [0.10.2](https://github.com/elastic/apm-agent-js-base/compare/v0.10.1...v0.10.2) (2018-08-16)
 
