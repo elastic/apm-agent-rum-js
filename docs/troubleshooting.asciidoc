@@ -3,7 +3,7 @@
 
 [float]
 [[errors-originating-from-agent]]
-=== Some errors in the application appear to be originating form the agent's JavaScript file
+=== Some errors in the application appear to be originating from the agent's JavaScript file
 In some cases when you look at the stack trace of an error, it appears to be originating from
 the agent's JavaScript file. However, since we need to patch some browser APIs in order to provide
 some of the core functionalities of the agent, our JavaScript file appears in the error stack trace.
