@@ -8,11 +8,12 @@ env:
   global:
   - SAUCE_USERNAME=elastic-apm-base
   - SAUCE_ACCESS_KEY=4b6720f1-ecdc-448d-85be-ebf947e14507
-  - STACK_VERSION=6.3.0
   - APM_SERVER_PORT=8001
   - APM_SERVER_URL=http://localhost:8001
-  matrix:
   - MODE=saucelabs
+  matrix:
+  - STACK_VERSION=6.3.0
+  - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
 cache:
   directories:
   - node_modules
