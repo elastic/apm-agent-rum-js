@@ -10,6 +10,7 @@
   "scripts": {
     "prepare-patch": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release patch && npm run build && npm run push-release",
     "prepare-minor": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release minor && npm run build && npm run push-release",
+    "prepare-major": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release major && npm run build && npm run push-release",
     "push-release": "git push origin master --follow-tags && npm publish",
     "build": "node node_modules/webpack/bin/webpack.js",
     "karma": "node node_modules/karma/bin/karma start",
