@@ -12,7 +12,7 @@ env:
   - APM_SERVER_URL=http://localhost:8001
   - MODE=saucelabs
   matrix:
-  - STACK_VERSION=6.4.0-SNAPSHOT
+  - STACK_VERSION=6.4.0
   - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
 cache:
   directories:
