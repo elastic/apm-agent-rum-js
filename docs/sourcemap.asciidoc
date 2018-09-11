@@ -117,3 +117,23 @@ curl http://localhost:8200/v1/rum/sourcemaps -X POST \
     -F bundle_filepath="http://localhost/app.min.js" \
     -F service_name="service-name"
 ----
+
+
+[float]
+[[secret-token]]
+=== Using a secret token
+
+You can {apm-server-ref}/securing-apm-server.html#secret-token[configure a secret token on APM Server] to restrict uploading sourcemaps.
+
+Here's how to add the secret token to a curl command:
+
+[source,sh]
+----
+SERVICEVERSION=`git rev-parse --short HEAD` && \
+curl http://localhost:8200/v1/rum/sourcemaps -X POST \
+    -F sourcemap=@./dist/app.min.js.map \
+    -F service_version="$SERVICEVERSION" \
+    -F bundle_filepath="http://localhost/app.min.js" \
+    -F service_name="service-name" \
+    -H "Authorization: Bearer <token>"
+----
