@@ -22,8 +22,8 @@
     "runUnitTests": "node ./scripts/run-script.js runUnitTests",
     "runNodeTests": "node ./scripts/run-script.js runNodeTests",
     "buildE2eBundles": "node ./scripts/run-script.js buildE2eBundles",
-    "run-e2e": "npm run build && npm run buildE2eBundles && node ./scripts/run-script.js runE2eTests",
-    "test": "node node_modules/standard/bin/cmd.js src/**/* && npm run runNodeTests && npm run runUnitTests && npm run run-e2e && npm run build-docs",
+    "run-e2e": "node ./scripts/run-script.js runE2eTests",
+    "test": "node node_modules/standard/bin/cmd.js src/**/* && npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e && npm run build-docs",
     "run-script": "node ./scripts/run-script.js",
     "format": "prettier-standard 'src/**/*.js'"
   },
