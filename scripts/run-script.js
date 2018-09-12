@@ -46,9 +46,10 @@ function serveE2e(servingPath, port) {
   });
 
   app.use(express.static(staticPath), serveIndex(staticPath, { 'icons': false }))
-  app.listen(port)
+  var server = app.listen(port)
 
   console.log('serving on: ', staticPath, port)
+  return server
 }
 
 function runJasmine(cb) {
@@ -89,7 +90,9 @@ var scripts = {
     testUtils.runE2eTests(path.join(__dirname, './../wdio.conf.js'), runSelenium != 'false')
   },
   runNodeTests: function () {
+    var server = serveE2e('./', 8000)
     runJasmine(function (err) {
+      server.close()
       if (err) {
         console.log('Node tests failed:', err)
         var exitCode = 2
