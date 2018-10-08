@@ -1,5 +1,3 @@
-var patchingSub = require('elastic-apm-js-core').patching.subscription
-
 class ApmBase {
   constructor (serviceFactory, disable) {
     this._disable = disable
@@ -23,26 +21,6 @@ class ApmBase {
       var performanceMonitoring = this.serviceFactory.getService('PerformanceMonitoring')
       performanceMonitoring.init()
 
-      var self = this
-      this.cancelPatchSub = patchingSub.subscribe(function (event, task) {
-        if (event === 'schedule' && task.source === 'XMLHttpRequest.send' && task.data) {
-          var spanName = task.data.method + ' ' + task.data.url
-          var span = self.startSpan(spanName, 'ext.HttpRequest')
-          if (span) {
-            span.setContext({
-              http: {
-                method: task.data.method,
-                url: task.data.url,
-                sync: task.data.sync
-              }
-            })
-            task.data.span = span
-          }
-        } else if (event === 'invoke' && task.data && task.data.span) {
-          task.data.span.setContext({ http: { status: task.data.target.status } })
-          task.data.span.end()
-        }
-      })
       this._sendPageLoadMetrics()
     }
     return this

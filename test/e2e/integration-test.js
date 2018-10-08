@@ -14,14 +14,23 @@ async function runIntegrationTest(pageUrl) {
         await page.goto(pageUrl, { timeout: 30000 });
         const transactionResponse = await page.waitForResponse(response => {
             console.log(`${response.request().method()} ${response.url()} ${response.status()}`)
-            return response.url().indexOf('/transactions') > -1 && response.status() === 202 && response.request().method() == 'POST'
+            var request = response.request()
+            var data = request.postData()
+            var transactionData = false
+            if (data) {
+                var payloads = data.split('\n').map(p => p && JSON.parse(p))
+                if (payloads[1].hasOwnProperty('transaction')) {
+                    transactionData = true
+                }
+            }
+            return transactionData && response.url().indexOf('/rum/events') > -1 && response.status() === 202 && response.request().method() == 'POST'
         });
 
         var transactionRequest = transactionResponse.request()
         result.request = {
             url: transactionResponse.url(),
             method: transactionRequest.method(),
-            body: JSON.parse(transactionRequest.postData())
+            body: transactionRequest.postData()
         }
         result.response = {
             status: transactionResponse.status()
