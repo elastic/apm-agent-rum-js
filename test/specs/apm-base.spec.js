@@ -39,6 +39,8 @@ describe('ApmBase', function () {
     apmBase.init({})
     apmBase.setInitialPageLoadName('test')
     var trService = serviceFactory.getService('TransactionService')
+    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+
     expect(trService.initialPageLoadName).toBe('test')
 
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
@@ -61,7 +63,7 @@ describe('ApmBase', function () {
 
     apmBase.config({ testConfig: 'test' })
     expect(configService.config.testConfig).toBe('test')
-    apmBase.cancelPatchSub()
+    performanceMonitoring.cancelPatchSub()
   })
 
   it('should instrument xhr', function (done) {
@@ -69,6 +71,7 @@ describe('ApmBase', function () {
     apmBase.init({})
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     expect(tr).toBeDefined()
+    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -76,7 +79,7 @@ describe('ApmBase', function () {
       setTimeout(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].signature).toBe('GET /')
-        apmBase.cancelPatchSub()
+        performanceMonitoring.cancelPatchSub()
         done()
       });
     });
@@ -87,16 +90,16 @@ describe('ApmBase', function () {
   it('should instrument xhr when no transaction was started', function (done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ capturePageLoad: false })
+    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
 
     var tr
-
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     req.addEventListener("load", function () {
       setTimeout(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].signature).toBe('GET /')
-        apmBase.cancelPatchSub()
+        performanceMonitoring.cancelPatchSub()
         done()
       });
     });
@@ -110,6 +113,7 @@ describe('ApmBase', function () {
   it('should instrument xhr when not active', function (done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ capturePageLoad: false, active:false })
+    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
 
     var tr
 
@@ -117,7 +121,7 @@ describe('ApmBase', function () {
     req.open('GET', '/', true)
     req.addEventListener("load", function () {
       setTimeout(() => {
-        apmBase.cancelPatchSub()
+        performanceMonitoring.cancelPatchSub()
         done()
       });
     });
@@ -132,6 +136,8 @@ describe('ApmBase', function () {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({})
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
+    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+
     expect(tr).toBeDefined()
 
     var req = new window.XMLHttpRequest()
@@ -144,6 +150,6 @@ describe('ApmBase', function () {
 
     expect(tr.spans.length).toBe(1)
     expect(tr.spans[0].signature).toBe('GET /')
-    apmBase.cancelPatchSub()
+    performanceMonitoring.cancelPatchSub()
   })
 })
