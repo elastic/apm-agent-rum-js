@@ -8,7 +8,8 @@ var elasticApm = createApmBase({
   active: active,
   debug: true,
   serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
-  serviceVersion: '0.0.1'
+  serviceVersion: '0.0.1',
+  distributedTracingOrigins:['http://localhost:8002']
 })
 
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
@@ -53,6 +54,15 @@ var req = new window.XMLHttpRequest()
 req.open('GET', url, false)
 req.addEventListener("load", function () {
   console.log('got data!')
+});
+
+req.send()
+
+
+req = new window.XMLHttpRequest()
+req.open('POST', 'http://localhost:8002/data', false)
+req.addEventListener("load", function () {
+  console.log('new data!')
 });
 
 req.send()

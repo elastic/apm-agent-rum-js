@@ -14,6 +14,41 @@ function runUnitTests(launchSauceConnect) {
 }
 
 var runIntegrationTest = require('../test/e2e/integration-test').runIntegrationTest
+
+function createBackendAgentServer() {
+  const express = require('express')
+  const app = express()
+
+
+  app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    if (req.method == 'OPTIONS') {
+      res.header("Access-Control-Allow-Headers", "Origin, elastic-apm-traceparent, Content-Type, Accept");
+    }
+    next();
+  });
+
+  app.post('/data', function (req, res) {
+    var header = req.headers['elastic-apm-traceparent']
+    var splited = header.split('-')
+
+    console.log('elastic-apm-traceparent:', header)
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify({
+      version: splited[0],
+      traceId: splited[1],
+      parentId: splited[2],
+      flags: splited[3]
+    }));
+  });
+
+  var port = 8002
+  var server = app.listen(port)
+
+  console.log('serving on: ', port)
+  return server
+}
+
 function serveE2e(servingPath, port) {
   const express = require('express')
   const serveIndex = require('serve-index')
@@ -86,6 +121,7 @@ var scripts = {
   runE2eTests: function (runSelenium, serve) {
     if (serve != 'false') {
       serveE2e('./', 8000)
+      createBackendAgentServer()
     }
     testUtils.runE2eTests(path.join(__dirname, './../wdio.conf.js'), runSelenium != 'false')
   },
