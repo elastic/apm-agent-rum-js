@@ -30,16 +30,21 @@ function createBackendAgentServer() {
 
   app.post('/data', function (req, res) {
     var header = req.headers['elastic-apm-traceparent']
-    var splited = header.split('-')
+    var payload = { noHeader: true }
+    if (header) {
+      var splited = header.split('-')
+      payload = {
+        version: splited[0],
+        traceId: splited[1],
+        parentId: splited[2],
+        flags: splited[3]
+      }
+      console.log('elastic-apm-traceparent:', header)
+    }
 
-    console.log('elastic-apm-traceparent:', header)
+
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify({
-      version: splited[0],
-      traceId: splited[1],
-      parentId: splited[2],
-      flags: splited[3]
-    }));
+    res.send(JSON.stringify(payload));
   });
 
   var port = 8002
@@ -84,7 +89,8 @@ function serveE2e(servingPath, port) {
   var server = app.listen(port)
 
   console.log('serving on: ', staticPath, port)
-  return server
+  var backendAgentServer = createBackendAgentServer()
+  return [server, backendAgentServer]
 }
 
 function runJasmine(cb) {
@@ -121,14 +127,13 @@ var scripts = {
   runE2eTests: function (runSelenium, serve) {
     if (serve != 'false') {
       serveE2e('./', 8000)
-      createBackendAgentServer()
     }
     testUtils.runE2eTests(path.join(__dirname, './../wdio.conf.js'), runSelenium != 'false')
   },
   runNodeTests: function () {
-    var server = serveE2e('./', 8000)
+    var servers = serveE2e('./', 8000)
     runJasmine(function (err) {
-      server.close()
+      servers.forEach(server => server.close())
       if (err) {
         console.log('Node tests failed:', err)
         var exitCode = 2

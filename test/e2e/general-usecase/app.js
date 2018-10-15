@@ -9,14 +9,14 @@ var elasticApm = createApmBase({
   debug: true,
   serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
   serviceVersion: '0.0.1',
-  distributedTracingOrigins:['http://localhost:8002']
+  distributedTracingOrigins: ['http://localhost:8002']
 })
 
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
 
-elasticApm.setUserContext({usertest: 'usertest',id: 'userId',username: 'username',email: 'email'})
-elasticApm.setCustomContext({testContext: 'testContext'})
-elasticApm.setTags({'testTagKey': 'testTagValue'})
+elasticApm.setUserContext({ usertest: 'usertest', id: 'userId', username: 'username', email: 'email' })
+elasticApm.setCustomContext({ testContext: 'testContext' })
+elasticApm.setTags({ 'testTagKey': 'testTagValue' })
 
 elasticApm.addFilter(function (payload) {
   if (payload.errors) {
@@ -28,7 +28,7 @@ elasticApm.addFilter(function (payload) {
     payload.transactions.forEach(function (tr) {
       tr.spans.forEach(function (span) {
         if (span.context && span.context.http && span.context.http.url) {
-          var url = new URL(span.context.http.url,window.location.origin)
+          var url = new URL(span.context.http.url, window.location.origin)
           if (url.searchParams && url.searchParams.get('token')) {
             url.searchParams.set('token', 'REDACTED')
           }
@@ -41,7 +41,7 @@ elasticApm.addFilter(function (payload) {
   return payload
 })
 
-function generateError () {
+function generateError() {
   throw new Error('timeout test error with a secret')
 }
 
@@ -62,7 +62,11 @@ req.send()
 req = new window.XMLHttpRequest()
 req.open('POST', 'http://localhost:8002/data', false)
 req.addEventListener("load", function () {
-  console.log('new data!')
+  var payload = JSON.parse(req.responseText)
+  console.log('distributed tracing data', payload)
+  if (typeof payload.traceId !== 'string') {
+    throw new Error('Wrong distributed tracing payload: ' + req.responseText)
+  }
 });
 
 req.send()
