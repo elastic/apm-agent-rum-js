@@ -78,7 +78,7 @@ describe('ApmBase', function () {
     req.addEventListener("load", function () {
       setTimeout(() => {
         expect(tr.spans.length).toBe(1)
-        expect(tr.spans[0].signature).toBe('GET /')
+        expect(tr.spans[0].name).toBe('GET /')
         performanceMonitoring.cancelPatchSub()
         done()
       });
@@ -98,7 +98,7 @@ describe('ApmBase', function () {
     req.addEventListener("load", function () {
       setTimeout(() => {
         expect(tr.spans.length).toBe(1)
-        expect(tr.spans[0].signature).toBe('GET /')
+        expect(tr.spans[0].name).toBe('GET /')
         performanceMonitoring.cancelPatchSub()
         done()
       });
@@ -149,7 +149,7 @@ describe('ApmBase', function () {
     req.send()
 
     expect(tr.spans.length).toBe(1)
-    expect(tr.spans[0].signature).toBe('GET /')
+    expect(tr.spans[0].name).toBe('GET /')
     performanceMonitoring.cancelPatchSub()
   })
 })
