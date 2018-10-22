@@ -120,8 +120,8 @@ Starts and returns a new transaction.
 
 Arguments:
 
-* `name` - The name of the transsaction (string).
-* `type` - The type of the transsaction (string).
+* `name` - The name of the transaction (string).
+* `type` - The type of the transaction (string).
 
 
 Use this method to create a custom transaction.
@@ -227,7 +227,7 @@ The type of the transaction.
 * *Default:* `undefined`
 
 The timestamp of the transaction. 
-If the transaction timestamp is not provided (the default behaviour), it will be set by the apm-server (v6.3+).
+If the transaction timestamp is not provided (the default behavior), it will be set by the apm-server (v6.3+).
 You can, however, set the timestamp on the client (using `new Date().toISOString()`), but you should be aware that the timestamp will reflect the client's local time
 which might not always be accurate.
 
