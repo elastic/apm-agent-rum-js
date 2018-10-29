@@ -127,3 +127,41 @@ By default the agent can only send (up to) `20` errors every `30000` millisecond
 By default the agent can only send (up to) `20` transactions every `30000` milliseconds.
 
 
+[float]
+[[transaction-sample-rate]]
+==== `transactionSampleRate`
+
+* *Type:* Number
+* *Default:* `1.0`
+
+A number between `0.0` and `1.0` that specifies the sample rate of transactions, by default all transactions are sampled.
+
+
+[float]
+[[distributed-tracing]]
+==== `distributedTracing`
+
+* *Type:* Boolean
+* *Default:* `true`
+
+Distributed tracing is enabled by default, however you can use this configuration to disable it.
+
+
+[float]
+[[distributed-tracing-origins]]
+==== `distributedTracingOrigins`
+
+* *Type:* Array
+* *Default:* `[]`
+
+This option is an array of strings and determines which origins should be monitored as part of distributed tracing.
+More specificly this option is consulted when the agent is about to add distributed tracing http header (`elastic-apm-traceparent`) to a request.
+Please note that each item in the array should be a valid url and at least include the origin part (other parts of the url are ignored).
+
+[source,js]
+----
+var options = {
+  distributedTracingOrigins: ['https://example.com']
+}
+----
+
