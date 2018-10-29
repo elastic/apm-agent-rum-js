@@ -19,3 +19,5 @@ include::./configuration.asciidoc[]
 include::./custom-transactions.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
+
+include::./distributed-tracing-guide.asciidoc[]
