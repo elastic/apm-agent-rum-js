@@ -120,8 +120,8 @@ Starts and returns a new transaction.
 
 Arguments:
 
-* `name` - The name of the transsaction (string).
-* `type` - The type of the transsaction (string).
+* `name` - The name of the transaction (string).
+* `type` - The type of the transaction (string).
 
 
 Use this method to create a custom transaction.
