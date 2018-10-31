@@ -1,16 +1,18 @@
 [[distributed-tracing-guide]]
 == Distributed Tracing
 
-If you use a distributed architecture for your application, you can use our distributed tracing feature to monitor
-traces through out your application. Distributed tracing is enabled by default in the RUM agent, however, 
-it only includes request made to the same origin. In order to include cross-origin 
-requests you need to set `distributedTracingOrigins` configuration option.
+Elastic APM supports distributed tracing to enable you to analyze performance through your microservices
+architecture by tracing all the requests from the initial web request to your front-end service,
+to queries made to your back-end services all in one view.
 
+Distributed tracing is enabled by default in the RUM agent, however, 
+it only includes requests made to the same origin. In order to include cross-origin 
+requests you must set the `distributedTracingOrigins` configuration option.
 
-For example let's consider an application that is served from `https://example.com`, 
-by default all the http requests made to `https://example.com` 
-will be included in the trace. To include requests made to `https://api.example.com` 
-you need to add the following configuration:
+For example, consider an application that is served from: `https://example.com`. 
+By default, all of the HTTP requests made to `https://example.com` will be included in the trace.
+To also include requests made to: `https://api.example.com`,
+you would need to add the following configuration:
 
 
 [source,js]
@@ -22,7 +24,7 @@ var apm = initApm({
 ----
 
 
-This effectively tells the agent to add the distributed tracing http header (`elastic-apm-traceparent`) 
+This effectively tells the agent to add the distributed tracing HTTP header (`elastic-apm-traceparent`) 
 to requests made to `https://api.example.com`.
 
 [float]
@@ -32,7 +34,7 @@ to requests made to `https://api.example.com`.
 The RUM agent is only one of the components in a distributed trace, therefore,
 you need to properly configure other components in order to use distributed tracing.
 In our example above you need to make sure `https://api.example.com` 
-can respond to requests that include distributed tracing header.
+can respond to requests that include the distributed tracing header.
 
 Specifically, `https://api.example.com` will receive an `OPTIONS` request with the following headers:
 
@@ -51,12 +53,12 @@ Access-Control-Allow-Methods: [allowed-methods]
 Access-Control-Allow-Origin: [request-origin]
 ----
 
-NOTE: `Access-Control-Request-Headers` might include more headers than just `elastic-apm-traceparent` 
-and the response should include all of them if the server wishes to let the browser send the original request.
+NOTE: `Access-Control-Request-Headers` might include more headers than just `elastic-apm-traceparent`.
+The response should include all headers if the server wishes to let the browser send the original request.
 
-To read more about cross-origin requests and why this process is necessary
- please see https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing].
+To read more about cross-origin requests and why this process is necessary,
+please see the MDN page on https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing].
 
 
 NOTE: To make sure all components in a distributed trace are included,
- the sampling rate of backend agents might be affected by the sampling rate of the RUM agent.
+the sampling rate of backend agents might be affected by the sampling rate of the RUM agent.
