@@ -138,6 +138,33 @@ A number between `0.0` and `1.0` that specifies the sample rate of transactions,
 
 
 [float]
+[[page-load-trace-id]]
+==== `pageLoadTraceId`
+
+* *Type:* String
+
+Use this option to override the page load transaction's trace ID.
+
+
+[float]
+[[page-load-sampled]]
+==== `pageLoadSampled`
+
+* *Type:* String
+
+Use this option to override the page load transaction's sampled property.
+
+
+[float]
+[[page-load-span-id]]
+==== `pageLoadSpanId`
+
+* *Type:* String
+
+This option overrides the ID of the span that is generated for receiving the initial document.
+
+
+[float]
 [[distributed-tracing]]
 ==== `distributedTracing`
 
