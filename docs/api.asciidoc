@@ -164,6 +164,18 @@ Arguments:
 
 Use this method to set the name of the `page-load` transaction that is sent automatically on page load event.
 
+
+[float]
+[[get-current-transaction]]
+==== `apm.getCurrentTransaction()`
+
+[source,js]
+----
+apm.getCurrentTransaction()
+----
+
+Use this method to get the current active transaction. If there is no active transaction it will return `undefined`.
+
 [float]
 [[capture-error]]
 ==== `apm.captureError()`
