@@ -45,9 +45,10 @@ describe('ApmBase', function () {
     apmBase.init({})
     apmBase.setInitialPageLoadName('test')
     var trService = serviceFactory.getService('TransactionService')
+    var configService = serviceFactory.getService('ConfigService')
     var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
 
-    expect(trService.initialPageLoadName).toBe('test')
+    expect(configService.get('pageLoadTransactionName')).toBe('test')
 
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     expect(tr).toBeDefined()
