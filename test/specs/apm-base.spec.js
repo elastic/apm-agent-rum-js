@@ -16,18 +16,24 @@ describe('ApmBase', function () {
       sendPageLoadTransaction: true
     })
 
-    spyOn(trService, 'sendPageLoadMetrics')
-
     apmBase._sendPageLoadMetrics()
+    var tr = trService.getCurrentTransaction()
+    expect(tr.name).toBe('Unknown')
+    expect(tr.type).toBe('page-load')
+    spyOn(tr, 'detectFinish')
     window.addEventListener('load', function () {
       setTimeout(() => {
-        expect(trService.sendPageLoadMetrics).toHaveBeenCalled()
-        trService.sendPageLoadMetrics.calls.reset()
-        expect(trService.sendPageLoadMetrics).not.toHaveBeenCalled()
+        expect(tr.detectFinish).toHaveBeenCalled()
+        apmBase.setInitialPageLoadName('new page load')
         expect(document.readyState).toBe('complete')
+
         apmBase._sendPageLoadMetrics()
+        tr = trService.getCurrentTransaction()
+        expect(tr.name).toBe('new page load')
+        expect(tr.type).toBe('page-load')
+        spyOn(tr, 'detectFinish')
         setTimeout(() => {
-          expect(trService.sendPageLoadMetrics).toHaveBeenCalled()
+          expect(tr.detectFinish).toHaveBeenCalled()
           done()
         })
       })
@@ -91,6 +97,8 @@ describe('ApmBase', function () {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ capturePageLoad: false })
     var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var transactionService = serviceFactory.getService('TransactionService')
+    transactionService.currentTransaction = undefined
 
     var tr
     var req = new window.XMLHttpRequest()
@@ -103,7 +111,6 @@ describe('ApmBase', function () {
         done()
       });
     });
-
     req.send()
     tr = apmBase.getCurrentTransaction()
     expect(tr).toBeDefined()
@@ -112,7 +119,7 @@ describe('ApmBase', function () {
 
   it('should instrument xhr when not active', function (done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ capturePageLoad: false, active:false })
+    apmBase.init({ capturePageLoad: false, active: false })
     var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
 
     var tr

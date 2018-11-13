@@ -9,7 +9,10 @@ var elasticApm = createApmBase({
   debug: true,
   serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
   serviceVersion: '0.0.1',
-  distributedTracingOrigins: ['http://localhost:8002']
+  distributedTracingOrigins: ['http://localhost:8002'],
+  pageLoadTraceId: '286ac3ad697892c406528f13c82e0ce1',
+  pageLoadSpanId: 'bbd8bcc3be14d814',
+  pageLoadSampled: true,
 })
 
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')

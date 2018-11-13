@@ -21,20 +21,25 @@ class ApmBase {
       var performanceMonitoring = this.serviceFactory.getService('PerformanceMonitoring')
       performanceMonitoring.init()
 
-      this._sendPageLoadMetrics()
+      if (configService.get('sendPageLoadTransaction')) {
+        this._sendPageLoadMetrics()
+      }
     }
     return this
   }
 
   _sendPageLoadMetrics () {
     var transactionService = this.serviceFactory.getService('TransactionService')
-    var configService = this.serviceFactory.getService('ConfigService')
+
+    var tr = transactionService.startTransaction(
+      transactionService.initialPageLoadName,
+      'page-load'
+    )
     var sendPageLoadMetrics = function sendPageLoadMetrics () {
       // to make sure PerformanceTiming.loadEventEnd has a value
       setTimeout(function () {
-        // need to delegate sending navigation timing to the router liberay
-        if (configService.get('sendPageLoadTransaction')) {
-          transactionService.sendPageLoadMetrics()
+        if (tr) {
+          tr.detectFinish()
         }
       })
     }
