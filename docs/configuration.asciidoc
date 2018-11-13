@@ -163,6 +163,14 @@ Use this option to override the page load transaction's sampled property.
 
 This option overrides the ID of the span that is generated for receiving the initial document.
 
+[float]
+[[page-load-transaction-name]]
+==== `pageLoadTransactionName`
+
+* *Type:* String
+
+This option sets the name for the page load transaction.
+
 
 [float]
 [[distributed-tracing]]

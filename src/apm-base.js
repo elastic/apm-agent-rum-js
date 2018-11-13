@@ -30,9 +30,10 @@ class ApmBase {
 
   _sendPageLoadMetrics () {
     var transactionService = this.serviceFactory.getService('TransactionService')
+    var configService = this.serviceFactory.getService('ConfigService')
 
     var tr = transactionService.startTransaction(
-      transactionService.initialPageLoadName,
+      configService.get('pageLoadTransactionName'),
       'page-load'
     )
     var sendPageLoadMetrics = function sendPageLoadMetrics () {
@@ -78,8 +79,10 @@ class ApmBase {
   // Should call this method before 'load' event on window is fired
   setInitialPageLoadName (name) {
     if (this.isEnabled()) {
-      var transactionService = this.serviceFactory.getService('TransactionService')
-      transactionService.initialPageLoadName = name
+      var configService = this.serviceFactory.getService('ConfigService')
+      configService.setConfig({
+        pageLoadTransactionName: name
+      })
     }
   }
 
