@@ -1,3 +1,43 @@
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/elastic/apm-agent-js-base/compare/v1.0.0...v2.0.0) (2018-11-14)
+
+
+
+### BREAKING CHANGES
+* use apm-server intake/v2 (APM Server v6.5+)
+
+
+### Bug Fixes
+
+* start page load transaction immediately after init ([3b80bdb](https://github.com/elastic/apm-agent-js-base/commit/3b80bdb))
+* use pageLoadTransactionName config option ([d3d3587](https://github.com/elastic/apm-agent-js-base/commit/d3d3587))
+* adopt the w3c dt header flag proposal ([ff0fdfc](https://github.com/elastic/apm-agent-js-core/commit/ff0fdfc))
+* don't startSpan after transaction has ended ([137bd63](https://github.com/elastic/apm-agent-js-core/commit/137bd63))
+* filter out invalid spans ([c9fb0e1](https://github.com/elastic/apm-agent-js-core/commit/c9fb0e1))
+* ignore apm-server xhrs ([5527cca](https://github.com/elastic/apm-agent-js-core/commit/5527cca))
+* merging two spans related to fetching the initial document ([6ee4108](https://github.com/elastic/apm-agent-js-core/commit/6ee4108))
+* set pageLoadTraceId on page load transacton start ([c6510ca](https://github.com/elastic/apm-agent-js-core/commit/c6510ca))
+* set the sync property on xhr spans ([4283e85](https://github.com/elastic/apm-agent-js-core/commit/4283e85))
+* shorten page load config options ([2550c24](https://github.com/elastic/apm-agent-js-core/commit/2550c24))
+* truncate active spans on transaction end ([a28759c](https://github.com/elastic/apm-agent-js-core/commit/a28759c))
+* validate DT header ([5aa1cc1](https://github.com/elastic/apm-agent-js-core/commit/5aa1cc1))
+
+
+### Features
+
+* add allowed origins for distributed tracing ([0812ff7](https://github.com/elastic/apm-agent-js-core/commit/0812ff7))
+* add DT header to same origin http requests ([a60d6d9](https://github.com/elastic/apm-agent-js-core/commit/a60d6d9))
+* add DT page load trace id config option ([149ebaa](https://github.com/elastic/apm-agent-js-core/commit/149ebaa))
+* add pageLoadTransactionName config option ([a2644df](https://github.com/elastic/apm-agent-js-core/commit/a2644df))
+* add parent_id to spans ([21934b3](https://github.com/elastic/apm-agent-js-core/commit/21934b3))
+* add sampling for transactions ([8105e0c](https://github.com/elastic/apm-agent-js-core/commit/8105e0c))
+* generate random ids based on DT guidelines ([8fd2581](https://github.com/elastic/apm-agent-js-core/commit/8fd2581))
+* provide span_count.started ([f3effcf](https://github.com/elastic/apm-agent-js-core/commit/f3effcf))
+* use correct id format for transactions and spans ([d44592e](https://github.com/elastic/apm-agent-js-core/commit/d44592e))
+
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/elastic/apm-agent-js-base/compare/v0.10.3...v1.0.0) (2018-08-23)
 
