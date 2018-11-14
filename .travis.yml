@@ -12,7 +12,8 @@ env:
   - APM_SERVER_URL=http://localhost:8001
   - MODE=saucelabs
   matrix:
-  - STACK_VERSION=7.0.0-alpha1-SNAPSHOT APM_SERVER_BRANCH=v2 APM_SERVER_REPO=elastic/apm-server
+  - STACK_VERSION=6.5.0
+  - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
 cache:
   directories:
   - node_modules
@@ -24,7 +25,7 @@ addons:
      - xsltproc
      - libxml2-utils
 before_install:
-  - docker-compose -f ./test/docker-compose.yml up -d apm-server-dev
+  - docker-compose -f ./test/docker-compose.yml up -d apm-server
 before_script:
 - "sudo chown root /opt/google/chrome/chrome-sandbox"
 - "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
