@@ -28,7 +28,7 @@ function createBackendAgentServer() {
     next();
   });
 
-  app.post('/data', function (req, res) {
+  function dTRespond(req, res) {
     var header = req.headers['elastic-apm-traceparent']
     var payload = { noHeader: true }
     if (header) {
@@ -45,7 +45,9 @@ function createBackendAgentServer() {
 
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(payload));
-  });
+  }
+  app.post('/data', dTRespond);
+  app.post('/fetch', dTRespond);
 
   var port = 8002
   var server = app.listen(port)

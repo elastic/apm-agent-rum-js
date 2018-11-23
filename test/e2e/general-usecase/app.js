@@ -61,18 +61,28 @@ req.addEventListener("load", function () {
 
 req.send()
 
+function checkDtInfo(payload) {
+  console.log('distributed tracing data', payload)
+  if (typeof payload.traceId !== 'string') {
+    throw new Error('Wrong distributed tracing payload: ' + req.responseText)
+  }
+}
 
 req = new window.XMLHttpRequest()
 req.open('POST', 'http://localhost:8002/data', false)
 req.addEventListener("load", function () {
   var payload = JSON.parse(req.responseText)
-  console.log('distributed tracing data', payload)
-  if (typeof payload.traceId !== 'string') {
-    throw new Error('Wrong distributed tracing payload: ' + req.responseText)
-  }
+  checkDtInfo(payload)
 });
 
 req.send()
+
+fetch('http://localhost:8002/fetch', { method: 'POST' })
+  .then(function (response) {
+    response.json().then(function (payload) {
+      checkDtInfo(payload)
+    })
+  })
 
 generateError.tmp = 'tmp'
 
