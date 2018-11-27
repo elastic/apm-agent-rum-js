@@ -4,14 +4,17 @@
 Welcome to the APM Real User Monitoring (RUM) JavaScript Agent documentation.
 
 The Elastic APM RUM JavaScript agent sends performance metrics and errors to the APM Server.
-The agent is only one of multiple components you need to get started with APM.
-Please also have a look at the documentation for
 
- * {apm-server-ref}[APM Server]
- ** APM JavaScript agent is compatible with APM Server v6.5+.
- ** {apm-server-ref}/rum.html[enable frontend endpoints in the apm-server configuration].
- * {ref}[Elasticsearch]
+NOTE: The APM JavaScript agent is compatible with APM Server v6.5+.
 
+[float]
+[[additional-components]]
+=== Additional Components
+
+APM Agents work in conjunction with the {apm-server-ref}/index.html[APM Server], {ref}/index.html[Elasticsearch], and {kibana-ref}/index.html[Kibana].
+Please view the {apm-get-started-ref}/index.html[APM Overview] for details on how these components work together.
+
+You will also need to {apm-server-ref}/rum.html[enable frontend endpoints in the `apm-server` configuration].
 
 [[getting-started]]
 == Getting started
