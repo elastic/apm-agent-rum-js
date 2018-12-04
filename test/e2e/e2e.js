@@ -2,7 +2,7 @@ var elasticApm = require('../..')
 var apmBase = elasticApm.apmBase
 
 var ApmServerMock = require('elastic-apm-js-core/test/utils/apm-server-mock.js')
-function createApmBase(config) {
+function createApmBase (config) {
   // config.serverUrl = 'http://localhost:8200'
   var envConfig = globalConfigs
   if (!window.globalConfigs) {
