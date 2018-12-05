@@ -1,3 +1,17 @@
+<a name="2.1.1"></a>
+## [2.1.1](https://github.com/elastic/apm-agent-js-base/compare/v2.1.0...v2.1.1) (2018-12-05)
+
+
+### Bug Fixes
+
+* use dist package for url-parse to avoid packaging issues ([#10](https://github.com/elastic/apm-agent-js-core/issues/10)) ([9018a8d](https://github.com/elastic/apm-agent-js-core/commit/9018a8d))
+
+
+### Features
+
+* introduce subtype and action in Spans ([#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7](https://github.com/elastic/apm-agent-js-core/commit/5fd4af7))
+
+
 <a name="2.1.0"></a>
 # [2.1.0](https://github.com/elastic/apm-agent-js-base/compare/v2.0.0...v2.1.0) (2018-12-03)
 
