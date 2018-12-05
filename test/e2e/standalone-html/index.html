@@ -10,13 +10,35 @@
 
 <body>
 </body>
-<script src="https://unpkg.com/elastic-apm-js-base@1.0.0/dist/bundles/elastic-apm-js-base.umd.min.js"></script>
+<div id="app"></div>
+<script src="/dist/bundles/elastic-apm-js-base.umd.min.js"></script>
 <script>
-  var active = Math.random() < 0.1
   elasticApm.init({
-    active: active,
-    serviceName: 'test'
+    serviceName: 'standalone-html',
+    distributedTracingOrigins: ['http://localhost:8002'],
   })
+
+  function checkDtInfo(payload) {
+    console.log('distributed tracing data', payload)
+    if (typeof payload.traceId !== 'string') {
+      throw new Error('Wrong distributed tracing payload: ' + req.responseText)
+    }
+  }
+
+  req = new window.XMLHttpRequest()
+  req.open('POST', 'http://localhost:8002/data', false)
+  req.addEventListener("load", function () {
+    var payload = JSON.parse(req.responseText)
+    checkDtInfo(payload)
+
+    var appEl = document.getElementById('app')
+    var testEl = document.createElement('h2')
+    testEl.setAttribute('id', 'test-element')
+    testEl.innerHTML = 'Passed'
+    appEl.appendChild(testEl)
+  });
+
+  req.send()
 </script>
 
 </html>
