@@ -16,7 +16,7 @@ describe('Sourcemaps', function () {
       service_name: 'apm-agent-js-base-test-e2e-general-usecase'
     }
 
-    var req = request.post(
+    request.post(
       {
         url: testConfig.serverUrl + '/v1/rum/sourcemaps',
         formData: formData

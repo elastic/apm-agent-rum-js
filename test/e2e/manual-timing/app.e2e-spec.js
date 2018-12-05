@@ -15,15 +15,14 @@ describe('manual-timing', function () {
       function checkCalls () {
         var serverCalls = apmServerMock.calls
         var validCalls = serverCalls.sendErrors && serverCalls.sendErrors.length && serverCalls.sendTransactions && serverCalls.sendTransactions.length
-
         if (validCalls) {
           console.log('calls', serverCalls)
           Promise.all([serverCalls.sendErrors[0].returnValue, serverCalls.sendTransactions[0].returnValue])
             .then(function () {
+              function mapCall (c) {
+                return {args: c.args, mocked: c.mocked}
+              }
               try {
-                function mapCall (c) {
-                  return {args: c.args, mocked: c.mocked}
-                }
                 var calls = {
                   sendErrors: serverCalls.sendErrors.map(mapCall),
                   sendTransactions: serverCalls.sendTransactions.map(mapCall)

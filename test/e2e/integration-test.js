@@ -6,11 +6,11 @@ async function runIntegrationTest (pageUrl) {
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--remote-debugging-port=9222']
   })
   var result = {}
+  function handleError (error) {
+    console.log(`Error on ${pageUrl}:\n ${String(error)}`)
+  }
   try {
     const page = await browser.newPage()
-    function handleError (error) {
-      console.log(`Error on ${pageUrl}:\n ${String(error)}`)
-    }
     page.on('error', handleError)
     page.on('pageerror', handleError)
 
@@ -30,7 +30,7 @@ async function runIntegrationTest (pageUrl) {
         transactionData &&
         response.url().indexOf('/rum/events') > -1 &&
         response.status() === 202 &&
-        response.request().method() == 'POST'
+        response.request().method() === 'POST'
       )
     })
 

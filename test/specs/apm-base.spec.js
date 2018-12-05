@@ -64,7 +64,6 @@ describe('ApmBase', function () {
 
     var filter = function (payload) {}
     apmBase.addFilter(filter)
-    var configService = serviceFactory.getService('ConfigService')
     expect(configService.filters.length).toBe(1)
     expect(configService.filters[0]).toBe(filter)
 

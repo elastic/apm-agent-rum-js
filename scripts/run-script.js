@@ -1,12 +1,12 @@
+var path = require('path')
 var testUtils = require('elastic-apm-js-core/dev-utils/test')
 var saucelabs = require('elastic-apm-js-core/dev-utils/saucelabs')
-var path = require('path')
 var projectDirectory = path.join(__dirname, './../')
 
 function runUnitTests (launchSauceConnect) {
   var testConfig = testUtils.getTestEnvironmentVariables()
-  testConfig.karmaConfigFile = __dirname + './../karma.conf.js'
-  if (launchSauceConnect != 'false') {
+  testConfig.karmaConfigFile = path.join(__dirname, './../karma.conf.js')
+  if (launchSauceConnect !== 'false') {
     return testUtils.runUnitTests(testConfig)
   } else {
     testUtils.runKarma(testConfig.karmaConfigFile)
@@ -21,7 +21,7 @@ function createBackendAgentServer () {
 
   app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
-    if (req.method == 'OPTIONS') {
+    if (req.method === 'OPTIONS') {
       res.header('Access-Control-Allow-Headers', 'Origin, elastic-apm-traceparent, Content-Type, Accept')
     }
     next()
@@ -125,10 +125,10 @@ var scripts = {
   runUnitTests: runUnitTests,
   startSelenium: testUtils.startSelenium,
   runE2eTests: function (runSelenium, serve) {
-    if (serve != 'false') {
+    if (serve !== 'false') {
       serveE2e('./', 8000)
     }
-    testUtils.runE2eTests(path.join(__dirname, './../wdio.conf.js'), runSelenium != 'false')
+    testUtils.runE2eTests(path.join(__dirname, './../wdio.conf.js'), runSelenium !== 'false')
   },
   runNodeTests: function () {
     var servers = serveE2e('./', 8000)

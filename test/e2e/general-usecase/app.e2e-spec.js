@@ -20,10 +20,10 @@ describe('general-usercase', function () {
           console.log('calls', serverCalls)
           Promise.all([serverCalls.sendErrors[0].returnValue, serverCalls.sendTransactions[0].returnValue])
             .then(function () {
+              function mapCall (c) {
+                return { args: c.args, mocked: c.mocked }
+              }
               try {
-                function mapCall (c) {
-                  return { args: c.args, mocked: c.mocked }
-                }
                 var calls = {
                   sendErrors: serverCalls.sendErrors.map(mapCall),
                   sendTransactions: serverCalls.sendTransactions.map(mapCall)
@@ -63,7 +63,7 @@ describe('general-usercase', function () {
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('general-usecase-initial-page-load')
     expect(transactionPayload.spans.length).toBeGreaterThan(3)
-    var span = transactionPayload.spans.find(function (s) { return s.name == 'GET /test/e2e/common/data.json?test=hamid' })
+    var span = transactionPayload.spans.find(function (s) { return s.name === 'GET /test/e2e/common/data.json?test=hamid' })
     expect(span).toBeDefined()
 
     return utils.allowSomeBrowserErrors(['timeout test error with a secret'])

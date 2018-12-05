@@ -1,10 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-
-var initElasticApm = require('../../..').init
-var createApmBase = require('../e2e')
-
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import MainComponent from './main-component.jsx'
+
+var createApmBase = require('../e2e')
 
 var elasticApm = createApmBase({
   debug: true,
@@ -15,8 +14,7 @@ var elasticApm = createApmBase({
 
 elasticApm.setInitialPageLoadName('react-initial-page-load')
 
-import MainComponent from './main-component.jsx'
-
+// eslint-disable-next-line
 class CompositeComponent extends React.Component {
   render () {
     return (
@@ -25,16 +23,13 @@ class CompositeComponent extends React.Component {
   }
 }
 
+// eslint-disable-next-line
 class ES6Component extends React.Component {
   render () {
     return (
       <span id='ES6Component' onClick={() => render()}>es6 component</span>
     )
   }
-}
-
-var handleOnEnter = () => {
-  console.log('onEnter', arguments)
 }
 
 var tr = elasticApm.startTransaction('App Load', 'page-load')

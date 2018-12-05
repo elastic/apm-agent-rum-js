@@ -1,5 +1,3 @@
-var initElasticApm = require('../../..').init
-// import init as initElasticApm from '../../..'
 var createApmBase = require('../e2e')
 
 var active = Math.random() < 1
@@ -17,7 +15,12 @@ var elasticApm = createApmBase({
 
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
 
-elasticApm.setUserContext({ usertest: 'usertest', id: 'userId', username: 'username', email: 'email' })
+elasticApm.setUserContext({
+  usertest: 'usertest',
+  id: 'userId',
+  username: 'username',
+  email: 'email'
+})
 elasticApm.setCustomContext({ testContext: 'testContext' })
 elasticApm.setTags({ 'testTagKey': 'testTagValue' })
 

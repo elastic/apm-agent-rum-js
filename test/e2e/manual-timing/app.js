@@ -1,4 +1,3 @@
-import { init as initApm } from '../../..'
 var createApmBase = require('../e2e')
 var apm = createApmBase({
   serviceName: 'manual-timing',
