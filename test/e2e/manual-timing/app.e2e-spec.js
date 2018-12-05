@@ -8,7 +8,7 @@ describe('manual-timing', function () {
     browser.waitUntil(function () {
       return browser.getText('#test-element') === 'Passed'
     }, 5000, 'expected element #test-element')
-    
+
     var result = browser.executeAsync(function (done) {
       var apmServerMock = window.elasticApm.serviceFactory.getService('ApmServer')
 
@@ -22,14 +22,14 @@ describe('manual-timing', function () {
             .then(function () {
               try {
                 function mapCall (c) {
-                  return {args: c.args,mocked: c.mocked}
+                  return {args: c.args, mocked: c.mocked}
                 }
                 var calls = {
                   sendErrors: serverCalls.sendErrors.map(mapCall),
                   sendTransactions: serverCalls.sendTransactions.map(mapCall)
                 }
                 done(calls)
-              } catch(e) {
+              } catch (e) {
                 throw e
               }
             })
@@ -47,7 +47,7 @@ describe('manual-timing', function () {
       checkCalls()
       apmServerMock.subscription.subscribe(checkCalls)
     })
-    
+
     expect(result.value).toBeTruthy()
     var serverCalls = result.value
     console.log(JSON.stringify(serverCalls, null, 2))

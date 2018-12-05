@@ -12,7 +12,7 @@ var elasticApm = createApmBase({
   distributedTracingOrigins: ['http://localhost:8002'],
   pageLoadTraceId: '286ac3ad697892c406528f13c82e0ce1',
   pageLoadSpanId: 'bbd8bcc3be14d814',
-  pageLoadSampled: true,
+  pageLoadSampled: true
 })
 
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
@@ -44,7 +44,7 @@ elasticApm.addFilter(function (payload) {
   return payload
 })
 
-function generateError() {
+function generateError () {
   throw new Error('timeout test error with a secret')
 }
 
@@ -55,13 +55,13 @@ setTimeout(function () {
 var url = '/test/e2e/common/data.json?test=hamid'
 var req = new window.XMLHttpRequest()
 req.open('GET', url, false)
-req.addEventListener("load", function () {
+req.addEventListener('load', function () {
   console.log('got data!')
-});
+})
 
 req.send()
 
-function checkDtInfo(payload) {
+function checkDtInfo (payload) {
   console.log('distributed tracing data', payload)
   if (typeof payload.traceId !== 'string') {
     throw new Error('Wrong distributed tracing payload: ' + req.responseText)
@@ -70,10 +70,10 @@ function checkDtInfo(payload) {
 
 req = new window.XMLHttpRequest()
 req.open('POST', 'http://localhost:8002/data', false)
-req.addEventListener("load", function () {
+req.addEventListener('load', function () {
   var payload = JSON.parse(req.responseText)
   checkDtInfo(payload)
-});
+})
 
 req.send()
 

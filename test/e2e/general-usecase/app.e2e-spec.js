@@ -12,7 +12,7 @@ describe('general-usercase', function () {
     var result = browser.executeAsync(function (done) {
       var apmServerMock = window.elasticApm.serviceFactory.getService('ApmServer')
 
-      function checkCalls() {
+      function checkCalls () {
         var serverCalls = apmServerMock.calls
         var validCalls = serverCalls.sendErrors && serverCalls.sendErrors.length && serverCalls.sendTransactions && serverCalls.sendTransactions.length
 
@@ -21,7 +21,7 @@ describe('general-usercase', function () {
           Promise.all([serverCalls.sendErrors[0].returnValue, serverCalls.sendTransactions[0].returnValue])
             .then(function () {
               try {
-                function mapCall(c) {
+                function mapCall (c) {
                   return { args: c.args, mocked: c.mocked }
                 }
                 var calls = {

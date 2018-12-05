@@ -22,7 +22,7 @@ describe('Sourcemaps', function () {
         formData: formData
       },
       function (err, resp, body) {
-        if (err || (resp.statusCode != 200 && resp.statusCode != 202)) {
+        if (err || (resp.statusCode !== 200 && resp.statusCode !== 202)) {
           var message = `Error while uploading sourcemaps, error: ${err}, response: ${resp &&
             resp.statusCode}, body: ${body}`
           fail(message)

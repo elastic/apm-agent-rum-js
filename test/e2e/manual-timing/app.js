@@ -48,13 +48,12 @@ fetch(url)
     httpSpan.end()
   })
 
-  
 var tid = transaction.addTask()
 var req = new window.XMLHttpRequest()
 req.open('GET', url)
-req.addEventListener("load", function () {
+req.addEventListener('load', function () {
   console.log('got data!')
   transaction.removeTask(tid)
-});
+})
 
 req.send()
