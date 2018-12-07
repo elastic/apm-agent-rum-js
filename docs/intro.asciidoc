@@ -11,10 +11,10 @@ NOTE: The APM JavaScript agent is compatible with APM Server v6.5+.
 [[additional-components]]
 === Additional Components
 
-APM Agents work in conjunction with the {apm-server-ref}/index.html[APM Server], {ref}/index.html[Elasticsearch], and {kibana-ref}/index.html[Kibana].
-Please view the {apm-get-started-ref}/index.html[APM Overview] for details on how these components work together.
+APM Agents work in conjunction with the {apm-server-ref-v}/index.html[APM Server], {ref}/index.html[Elasticsearch], and {kibana-ref}/index.html[Kibana].
+Please view the {apm-overview-ref-v}/index.html[APM Overview] for details on how these components work together.
 
-You will also need to {apm-server-ref}/rum.html[enable frontend endpoints in the `apm-server` configuration].
+You will also need to {apm-server-ref-v}/rum.html[enable frontend endpoints in the `apm-server` configuration].
 
 [[getting-started]]
 == Getting started
