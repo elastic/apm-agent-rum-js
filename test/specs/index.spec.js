@@ -26,7 +26,7 @@ describe('index', function () {
 
     try {
       throw new Error('ApmBase test error')
-    } catch(error) {
+    } catch (error) {
       apmBase.captureError(error)
       if (apmCore.utils.isPlatformSupported()) {
         expect(apmServer.errorQueue).toBeUndefined()
@@ -40,13 +40,18 @@ describe('index', function () {
       flushInterval: 100
     })
 
-    apmBase.setUserContext({usertest: 'usertest',id: 'userId',username: 'username',email: 'email'})
-    apmBase.setCustomContext({testContext: 'testContext'})
-    apmBase.setTags({'testTagKey': 'testTagValue'})
+    apmBase.setUserContext({
+      usertest: 'usertest',
+      id: 'userId',
+      username: 'username',
+      email: 'email'
+    })
+    apmBase.setCustomContext({ testContext: 'testContext' })
+    apmBase.setTags({ testTagKey: 'testTagValue' })
 
     try {
       throw new Error('ApmBase test error')
-    } catch(error) {
+    } catch (error) {
       apmBase.captureError(error)
       expect(apmServer.sendErrors).not.toHaveBeenCalled()
       if (apmCore.utils.isPlatformSupported()) {
@@ -54,17 +59,20 @@ describe('index', function () {
         setTimeout(() => {
           expect(apmServer.sendErrors).toHaveBeenCalled()
           var callData = apmServer.sendErrors.calls.mostRecent()
-          callData.returnValue.then(() => {
-            // Wait before ending the test to make sure the result are processed by the agent.
-            // Karma changes the iframe src when the tests finish and Chrome would cancel any
-            // request that was made by an iframe that got removed or had it's src changed
-            // and the agent would recieved http status 0
-            setTimeout(() => {
-              done()
-            }, 100);
-          }, (reason) => {
-            fail('Failed sending error:', reason)
-          })
+          callData.returnValue.then(
+            () => {
+              // Wait before ending the test to make sure the result are processed by the agent.
+              // Karma changes the iframe src when the tests finish and Chrome would cancel any
+              // request that was made by an iframe that got removed or had it's src changed
+              // and the agent would recieved http status 0
+              setTimeout(() => {
+                done()
+              }, 100)
+            },
+            reason => {
+              fail('Failed sending error:', reason)
+            }
+          )
         }, 200)
       } else {
         done()

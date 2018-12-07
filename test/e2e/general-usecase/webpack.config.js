@@ -1,4 +1,3 @@
-var testUtils = require('elastic-apm-js-core/dev-utils/test.js')
 var path = require('path')
 var webpack = require('webpack')
 

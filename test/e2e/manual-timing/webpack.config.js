@@ -1,14 +1,12 @@
 var path = require('path')
 var webpack = require('webpack')
 
-
 var testConfig = require('../../../test.config')
 var globalConfigs = testConfig
 
 var configJson = JSON.stringify(globalConfigs, undefined, 2)
 var env = {'globalConfigs': configJson}
 console.log(configJson)
-
 
 module.exports = {
   entry: path.resolve(__dirname, './app.js'),

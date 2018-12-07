@@ -1,18 +1,16 @@
 exports.config = {
-  specs: [
-    './test/e2e/**/*.e2e-spec.js'
-  ],
+  specs: ['./test/e2e/**/*.e2e-spec.js'],
   maxInstances: 1,
 
   capabilities: [
     {
       maxInstances: 1,
       browserName: 'chrome',
-      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
-    // args: ['--no-sandbox'],
-    // before: function () {
-    //   browser.timeoutsAsyncScript(10000)
-    // }
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+      // args: ['--no-sandbox'],
+      // before: function () {
+      //   browser.timeoutsAsyncScript(10000)
+      // }
     }
   ],
   // sync: false,
@@ -38,7 +36,6 @@ exports.config = {
     // browser.timeouts({
     //   "script": 30000
     // })
-
     // check if the environment contains a specific angular version
     // that we will be testing for
     // // console.log('Environment ANGULAR_VERSION: ' + process.env.ANGULAR_VERSION)
@@ -51,7 +48,6 @@ exports.config = {
     //     patch: parseInt(versionArray[2], 10),
     //     full: versionString
     //   }
-
     //   browser.expectedAngularVersion = version
     // } else {
     //   // otherwise we manually set the version to the latest major/minor combination

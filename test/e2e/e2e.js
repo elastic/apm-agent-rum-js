@@ -2,8 +2,12 @@ var elasticApm = require('../..')
 var apmBase = elasticApm.apmBase
 
 var ApmServerMock = require('elastic-apm-js-core/test/utils/apm-server-mock.js')
-function createApmBase(config) {
-  // config.serverUrl = 'http://localhost:8200'
+function createApmBase (config) {
+  /**
+   * globalConfigs - environment variable injected by webpack
+   * during e2e build process
+   */
+  // eslint-disable-next-line
   var envConfig = globalConfigs
   if (!window.globalConfigs) {
     window.globalConfigs = envConfig
@@ -18,8 +22,7 @@ function createApmBase(config) {
   var serverMock = new ApmServerMock(apmServer, gc.useMocks)
   apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
 
-  elasticApm = elasticApm.init(config)
-  return elasticApm
+  return elasticApm.init(config)
 }
 
 module.exports = createApmBase

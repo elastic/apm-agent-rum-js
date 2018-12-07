@@ -1,12 +1,12 @@
+var path = require('path')
 var testUtils = require('elastic-apm-js-core/dev-utils/test')
 var saucelabs = require('elastic-apm-js-core/dev-utils/saucelabs')
-var path = require('path')
 var projectDirectory = path.join(__dirname, './../')
 
-function runUnitTests(launchSauceConnect) {
+function runUnitTests (launchSauceConnect) {
   var testConfig = testUtils.getTestEnvironmentVariables()
-  testConfig.karmaConfigFile = __dirname + './../karma.conf.js'
-  if (launchSauceConnect != 'false') {
+  testConfig.karmaConfigFile = path.join(__dirname, './../karma.conf.js')
+  if (launchSauceConnect !== 'false') {
     return testUtils.runUnitTests(testConfig)
   } else {
     testUtils.runKarma(testConfig.karmaConfigFile)
@@ -15,20 +15,19 @@ function runUnitTests(launchSauceConnect) {
 
 var runIntegrationTest = require('../test/e2e/integration-test').runIntegrationTest
 
-function createBackendAgentServer() {
+function createBackendAgentServer () {
   const express = require('express')
   const app = express()
 
-
   app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    if (req.method == 'OPTIONS') {
-      res.header("Access-Control-Allow-Headers", "Origin, elastic-apm-traceparent, Content-Type, Accept");
+    res.header('Access-Control-Allow-Origin', '*')
+    if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Headers', 'Origin, elastic-apm-traceparent, Content-Type, Accept')
     }
-    next();
-  });
+    next()
+  })
 
-  function dTRespond(req, res) {
+  function dTRespond (req, res) {
     var header = req.headers['elastic-apm-traceparent']
     var payload = { noHeader: true }
     if (header) {
@@ -42,12 +41,11 @@ function createBackendAgentServer() {
       console.log('elastic-apm-traceparent:', header)
     }
 
-
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(payload));
+    res.setHeader('Content-Type', 'application/json')
+    res.send(JSON.stringify(payload))
   }
-  app.post('/data', dTRespond);
-  app.post('/fetch', dTRespond);
+  app.post('/data', dTRespond)
+  app.post('/fetch', dTRespond)
 
   var port = 8002
   var server = app.listen(port)
@@ -56,7 +54,7 @@ function createBackendAgentServer() {
   return server
 }
 
-function serveE2e(servingPath, port) {
+function serveE2e (servingPath, port) {
   const express = require('express')
   const serveIndex = require('serve-index')
 
@@ -64,8 +62,8 @@ function serveE2e(servingPath, port) {
   var staticPath = path.join(__dirname, '../', servingPath)
 
   app.get('/healthcheck', function (req, res) {
-    res.send("OK");
-  });
+    res.send('OK')
+  })
 
   app.get('/run_integration_test', async function (req, res) {
     var echo = req.query.echo
@@ -73,9 +71,9 @@ function serveE2e(servingPath, port) {
     if (echo) {
       res.send(echo)
     } else {
-      res.send(result);
+      res.send(result)
     }
-  });
+  })
 
   app.get('/test-config.js', async function (req, res) {
     var config = require('../test.config')
@@ -84,8 +82,8 @@ function serveE2e(servingPath, port) {
     `
     res.setHeader('Content-Type', 'text/javascript')
     res.setHeader('Content-Length', Buffer.byteLength(result))
-    res.send(result);
-  });
+    res.send(result)
+  })
 
   app.use(express.static(staticPath), serveIndex(staticPath, { 'icons': false }))
   var server = app.listen(port)
@@ -95,7 +93,7 @@ function serveE2e(servingPath, port) {
   return [server, backendAgentServer]
 }
 
-function runJasmine(cb) {
+function runJasmine (cb) {
   var JasmineRunner = require('jasmine')
   var jrunner = new JasmineRunner()
 
@@ -127,10 +125,10 @@ var scripts = {
   runUnitTests: runUnitTests,
   startSelenium: testUtils.startSelenium,
   runE2eTests: function (runSelenium, serve) {
-    if (serve != 'false') {
+    if (serve !== 'false') {
       serveE2e('./', 8000)
     }
-    testUtils.runE2eTests(path.join(__dirname, './../wdio.conf.js'), runSelenium != 'false')
+    testUtils.runE2eTests(path.join(__dirname, './../wdio.conf.js'), runSelenium !== 'false')
   },
   runNodeTests: function () {
     var servers = serveE2e('./', 8000)
@@ -145,7 +143,7 @@ var scripts = {
   },
   buildE2eBundles: function (basePath) {
     basePath = basePath || './test/e2e'
-    function callback(err) {
+    function callback (err) {
       if (err) {
         var exitCode = 2
         process.exit(exitCode)
@@ -155,7 +153,7 @@ var scripts = {
     testUtils.buildE2eBundles(path.join(projectDirectory, basePath), callback)
   },
   serveE2e: serveE2e,
-  launchSauceConnect: function launchSauceConnect() {
+  launchSauceConnect: function launchSauceConnect () {
     var testConfig = require('../test.config')
     saucelabs.launchSauceConnect(testConfig.env.sauceLabs, function () {
       console.log('Launched SauceConnect!')
@@ -165,7 +163,7 @@ var scripts = {
 
 module.exports = scripts
 
-function runScript() {
+function runScript () {
   var scriptName = process.argv[2]
   if (scriptName) {
     var scriptArgs = [].concat(process.argv)
