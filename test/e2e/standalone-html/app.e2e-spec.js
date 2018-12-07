@@ -9,7 +9,6 @@ describe('standalone-html', function () {
       return browser.getText('#test-element') === 'Passed'
     }, 10000, 'expected element #test-element')
 
-
     return utils.allowSomeBrowserErrors(['timeout test error with a secret'])
   })
 })

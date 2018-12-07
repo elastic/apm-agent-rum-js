@@ -3,7 +3,7 @@ import React from 'react'
 import { apm } from '../../..'
 
 class MainComponent extends React.Component {
-  constructor(props, state) {
+  constructor (props, state) {
     super(props, state)
     var path = this.props.match.path
     this.state = {
@@ -13,7 +13,7 @@ class MainComponent extends React.Component {
     apm.startTransaction('Main - ' + path, 'route-change')
     this.fetchData()
   }
-  fetchData() {
+  fetchData () {
     var transactionService = apm.getTransactionService()
     var url = '/test/e2e/react/data.json'
     var span = transactionService.startSpan('Fetching ' + url, 'xhr')
@@ -29,7 +29,7 @@ class MainComponent extends React.Component {
         transactionService.detectFinish()
       })
   }
-  render() {
+  render () {
     return (
       <div>
         <h3>

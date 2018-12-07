@@ -62,9 +62,8 @@ describe('ApmBase', function () {
     expect(apmBase.getCurrentTransaction()).toBe(tr)
     expect(apmBase.getTransactionService()).toBe(trService)
 
-    var filter = function (payload) { }
+    var filter = function (payload) {}
     apmBase.addFilter(filter)
-    var configService = serviceFactory.getService('ConfigService')
     expect(configService.filters.length).toBe(1)
     expect(configService.filters[0]).toBe(filter)
 
@@ -82,14 +81,14 @@ describe('ApmBase', function () {
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener("load", function () {
+    req.addEventListener('load', function () {
       setTimeout(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].name).toBe('GET /')
         performanceMonitoring.cancelPatchSub()
         done()
-      });
-    });
+      })
+    })
 
     req.send()
   })
@@ -104,14 +103,14 @@ describe('ApmBase', function () {
     var tr
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener("load", function () {
+    req.addEventListener('load', function () {
       setTimeout(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].name).toBe('GET /')
         performanceMonitoring.cancelPatchSub()
         done()
-      });
-    });
+      })
+    })
     req.send()
     tr = apmBase.getCurrentTransaction()
     expect(tr).toBeDefined()
@@ -127,18 +126,17 @@ describe('ApmBase', function () {
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener("load", function () {
+    req.addEventListener('load', function () {
       setTimeout(() => {
         performanceMonitoring.cancelPatchSub()
         done()
-      });
-    });
+      })
+    })
 
     req.send()
     tr = apmBase.getCurrentTransaction()
     expect(tr).toBeUndefined()
   })
-
 
   it('should instrument sync xhr', function (done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
@@ -150,9 +148,9 @@ describe('ApmBase', function () {
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', false)
-    req.addEventListener("load", function () {
+    req.addEventListener('load', function () {
       done()
-    });
+    })
 
     req.send()
 

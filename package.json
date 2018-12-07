@@ -12,24 +12,24 @@
     "prepare-minor": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release minor && npm run build && npm run push-release",
     "prepare-major": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release major && npm run build && npm run push-release",
     "push-release": "git push origin master --follow-tags && npm publish",
-    "build": "node node_modules/webpack/bin/webpack.js",
-    "karma": "node node_modules/karma/bin/karma start",
-    "karma-coverage": "node node_modules/karma/bin/karma start --coverage",
-    "serve": "node ./scripts/run-script.js serveE2e ./ 8000",
+    "build": "webpack",
+    "build-dev": "webpack -w",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
-    "changelog": "node node_modules/conventional-changelog-cli/cli.js  -p angular -i CHANGELOG.md -s",
-    "build-dev": "node node_modules/webpack/bin/webpack.js -w",
+    "karma": "karma start",
+    "karma-coverage": "karma start --coverage",
+    "serve": "node ./scripts/run-script.js serveE2e ./ 8000",
+    "changelog": "conventional-changelog-cli  -p angular -i CHANGELOG.md -s",
     "runUnitTests": "node ./scripts/run-script.js runUnitTests",
     "runNodeTests": "node ./scripts/run-script.js runNodeTests",
     "buildE2eBundles": "node ./scripts/run-script.js buildE2eBundles",
     "run-e2e": "node ./scripts/run-script.js runE2eTests",
-    "test": "node node_modules/standard/bin/cmd.js src/**/* && npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e && npm run build-docs",
     "run-script": "node ./scripts/run-script.js",
-    "format": "prettier-standard 'src/**/*.js'"
+    "test": "npm run lint && npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e && npm run build-docs",
+    "lint": "standard",
+    "format": "prettier-standard src/**/*.js test/**/*.js"
   },
   "files": [
     "src/**/*.js",
-    "test/**/*.js",
     "dist"
   ],
   "author": "",
@@ -76,5 +76,12 @@
   "dependencies": {
     "elastic-apm-js-core": "^2.2.0",
     "es6-promise": "^4.2.4"
+  },
+  "standard": {
+    "env": ["jasmine", "browser"],
+    "globals": ["browser"],
+    "ignore": [
+      "test/e2e/sourcemap/"
+    ]
   }
 }

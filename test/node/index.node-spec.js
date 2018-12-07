@@ -8,7 +8,7 @@ describe('ApmBase', function () {
     })
     try {
       throw new Error('ApmBase test error')
-    } catch(error) {
+    } catch (error) {
       var result = apmBase.captureError(error)
       expect(result).toBeUndefined()
     }

@@ -1,4 +1,3 @@
-import { init as initApm } from '../../..'
 var createApmBase = require('../e2e')
 var apm = createApmBase({
   serviceName: 'manual-timing',
@@ -48,13 +47,12 @@ fetch(url)
     httpSpan.end()
   })
 
-  
 var tid = transaction.addTask()
 var req = new window.XMLHttpRequest()
 req.open('GET', url)
-req.addEventListener("load", function () {
+req.addEventListener('load', function () {
   console.log('got data!')
   transaction.removeTask(tid)
-});
+})
 
 req.send()
