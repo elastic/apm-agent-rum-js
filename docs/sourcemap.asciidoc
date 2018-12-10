@@ -6,7 +6,7 @@ However, debugging minified files is inherently difficult. To resolve this issue
 you can generate source maps for your bundles and upload them to the APM server.
 
 Here is an example to generate source maps with webpack and configure the JavaScript agent accordingly.
-For a detailed description of APM Server source map endpoint see {apm-server-ref}/sourcemaps.html[our documentation].
+For a detailed description of APM Server source map endpoint see {apm-server-ref-v}/sourcemaps.html[our documentation].
 
 First you need to configure webpack to generate source map and provide the service version to your app:
 
@@ -123,7 +123,7 @@ curl http://localhost:8200/v1/rum/sourcemaps -X POST \
 [[secret-token]]
 === Using a secret token
 
-You can {apm-server-ref}/securing-apm-server.html#secret-token[configure a secret token on APM Server] to restrict uploading sourcemaps.
+You can {apm-server-ref-v}/securing-apm-server.html#secret-token[configure a secret token on APM Server] to restrict uploading sourcemaps.
 
 Here's how to add the secret token to a curl command:
 
