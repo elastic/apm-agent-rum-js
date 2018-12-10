@@ -48,7 +48,7 @@ Alternatively, you can use a script element and the `elasticApm` global object t
 
 [source,html]
 ----
-<script src="elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.js"></script>
+<script src="https://unpkg.com/elastic-apm-js-base@2/dist/bundles/elastic-apm-js-base.umd.min.js" crossorigin></script>
 <script>
   elasticApm.init({
     serviceName: '',
@@ -56,5 +56,7 @@ Alternatively, you can use a script element and the `elasticApm` global object t
   })
 </script>
 ----
+
+NOTE: For production usage, we recommend hosting the file `elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.js` in your CDN for better performance.
 
 NOTE: Currently our minified JavaScript bundle is about 15KB (gzipped).
