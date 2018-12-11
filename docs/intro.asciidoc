@@ -31,7 +31,7 @@ Configure the agent:
 [source,js]
 ----
 import { init as initApm } from 'elastic-apm-js-base'
-var apm = initApm({
+const apm = initApm({
   
   // Set required service name (allowed characters: a-z, A-Z, 0-9, -, _, and space)
   serviceName: '',
@@ -44,11 +44,13 @@ var apm = initApm({
 })
 ----
 
-Alternatively, you can use a script element and the `elasticApm` global object to load and initialize the agent:
+Alternatively, you can add a <script> tag to the HTML page and use the `elasticApm` global object to load and initialize the agent:
+
+NOTE: Please use the latest version of JS agent from `https://unpkg.com/elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.js` and host the file in your CDN before deploying to production.
 
 [source,html]
 ----
-<script src="https://unpkg.com/elastic-apm-js-base@2/dist/bundles/elastic-apm-js-base.umd.min.js" crossorigin></script>
+<script src="https://your-cdn-host.com/path/to/elastic-apm-js-base.umd.min.js" crossorigin></script>
 <script>
   elasticApm.init({
     serviceName: '',
@@ -56,7 +58,5 @@ Alternatively, you can use a script element and the `elasticApm` global object t
   })
 </script>
 ----
-
-NOTE: For production usage, we recommend hosting the file `elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.js` in your CDN for better performance.
 
 NOTE: Currently our minified JavaScript bundle is about 15KB (gzipped).
