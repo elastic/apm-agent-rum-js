@@ -1,40 +1,47 @@
-var path = require('path')
-var webpack = require('webpack')
-
-var testConfig = require('../../../test.config')
-var globalConfigs = testConfig
-
-var configJson = JSON.stringify(globalConfigs, undefined, 2)
-var env = {'globalConfigs': configJson}
-console.log(configJson)
-
-var base = {
-  entry: path.join(__dirname, './app.js'),
-  output: {
-    filename: 'app.e2e-bundle.js',
-    path: path.resolve(__dirname)
-  },
-  devtool: 'source-map',
-  plugins: [
-    new webpack.DefinePlugin(env)
-  ]
-}
-
+const path = require('path')
+const webpack = require('webpack')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
-var optimized = {
-  entry: base.entry,
-  output: {
-    filename: 'app.e2e-bundle.min.js',
-    path: base.output.path
-  },
-  devtool: base.devtool,
-  plugins: [
-    new webpack.DefinePlugin(env),
-    new UglifyJSPlugin({
-      sourceMap: true,
-      extractComments: false
-    })
-  ]
-}
-module.exports = [base, optimized]
+const testConfig = require('../../../test.config')
+const globalConfigs = testConfig
+
+const configJson = JSON.stringify(globalConfigs, undefined, 2)
+const env = { globalConfigs: configJson }
+console.log(configJson)
+
+const optimized = Object.assign(
+  {},
+  {
+    entry: path.join(__dirname, './app.js'),
+    output: {
+      filename: 'app.e2e-bundle.min.js',
+      path: path.resolve(__dirname)
+    },
+    devtool: 'source-map',
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          use: {
+            loader: 'babel',
+            options: {
+              presets: ['es2015']
+            }
+          }
+        }
+      ]
+    },
+    mode: 'production',
+    optimization: {
+      minimizer: [
+        new UglifyJSPlugin({
+          sourceMap: true,
+          extractComments: true
+        })
+      ]
+    },
+    plugins: [new webpack.DefinePlugin(env)]
+  }
+)
+
+module.exports = optimized
