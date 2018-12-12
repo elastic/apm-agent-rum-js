@@ -1,5 +1,5 @@
 [[custom-transactions]]
-== Custom Transactions
+=== Custom Transactions
 
 This is an example of how to use custom transactions and custom spans. 
 Please also see <<api, API documentation>>.
