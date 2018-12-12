@@ -15,7 +15,7 @@ function createRelease (token) {
     method: 'POST',
     headers: {
       'Authorization': `token ${token}`,
-      'User-Agent': 'apm js agent' + version
+      'User-Agent': 'APM RUM JS agent' + version
     }
   })
   /**
