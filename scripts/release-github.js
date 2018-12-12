@@ -22,10 +22,11 @@ function createRelease (token) {
    * To match the package version with tags
    */
   const tagVersion = 'v' + version
+  const changelogUrl = `https://github.com/elastic/apm-agent-js-base/blob/master/CHANGELOG.md`
   const postBody = {
     tag_name: tagVersion,
     name: tagVersion,
-    body: 'Please check the changelog https://github.com/elastic/apm-agent-js-base/blob/master/CHANGELOG.md',
+    body: `Please check the changelog - ${changelogUrl}`,
     draft: false,
     prerelease: false
   }
@@ -71,9 +72,10 @@ function uploadAssets (uploadUrl, token) {
     if (!token) {
       throw new Error('Please provide GITHUB_TOKEN=`token` for creating release')
     }
+    console.log('creating release for the tag - ', version)
     const response = await createRelease(token)
-    console.log('created release for the tag - ', version)
     const parsedResponse = JSON.parse(response)
+    console.log('release created', parsedResponse.url)
     const uploadUrl = parsedResponse['upload_url']
     await uploadAssets(uploadUrl, token)
     console.log('uploaded all assets to the release')
