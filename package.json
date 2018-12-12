@@ -30,7 +30,8 @@
   },
   "files": [
     "src/**/*.js",
-    "dist"
+    "dist",
+    "package-lock.json"
   ],
   "author": "",
   "license": "MIT",
