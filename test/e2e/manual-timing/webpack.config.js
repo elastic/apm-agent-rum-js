@@ -19,7 +19,7 @@ module.exports = {
         test: /.jsx?$/,
         include: [__dirname, path.resolve(__dirname)],
         use: {
-          loader: 'babel-loader',
+          loader: 'babel',
           options: {
             presets: ['es2015']
           }
