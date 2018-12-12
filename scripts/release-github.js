@@ -50,7 +50,13 @@ function createRelease (token) {
 }
 
 function uploadAssets (uploadUrl, token) {
+  /**
+   * Exclude the files that are not required for releasing
+   *
+   * TODO: Remove this filtering logic once we revisit bundling steps
+   */
   const assets = fs.readdirSync(BUILD_DIR)
+    .filter(file => file.endsWith('.js'))
     .map(file => path.join(BUILD_DIR, file))
   return new Promise((resolve, reject) => {
     releaseAssets({
