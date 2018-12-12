@@ -19,6 +19,8 @@ You will also need to {apm-server-ref}/rum.html[enable frontend endpoints in the
 [[getting-started]]
 == Getting started
 
+=== Using Package Managers
+
 Install the APM agent for JavaScript as a dependency to your application:
 
 [source,bash]
@@ -44,9 +46,12 @@ const apm = initApm({
 })
 ----
 
-Alternatively, you can add a <script> tag to the HTML page and use the `elasticApm` global object to load and initialize the agent:
+=== Using Script Tags
 
-NOTE: Please use the latest version of JS agent from `https://unpkg.com/elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.js` and host the file in your CDN before deploying to production.
+Add a <script> tag to the HTML page and use the `elasticApm` global object to load and initialize the agent:
+
+NOTE: Please download the latest version of JavaScript agent from `https://github.com/elastic/apm-agent-js-base/releases/latest` or
+`https://unpkg.com/elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.js` and host the file in your Server/CDN before deploying to production.
 
 [source,html]
 ----
