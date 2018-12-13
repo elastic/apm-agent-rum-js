@@ -16,13 +16,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /.jsx?$/,
-        include: [__dirname, path.resolve(__dirname)],
+        test: /.js?$/,
         use: {
-          loader: 'babel',
-          options: {
-            presets: ['es2015']
-          }
+          loader: 'babel-loader'
         }
       }
     ]

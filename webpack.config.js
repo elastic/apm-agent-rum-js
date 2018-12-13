@@ -20,17 +20,14 @@ const baseConfig = {
       {
         test: /\.js$/,
         use: {
-          loader: 'babel',
-          options: {
-            presets: ['es2015']
-          }
+          loader: 'babel-loader'
         }
       },
       {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'string-replace',
+          loader: 'string-replace-loader',
           options: {
             search: '%%agent-version%%',
             replace: agentVersion
