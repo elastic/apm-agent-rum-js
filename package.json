@@ -8,10 +8,12 @@
     "url": "https://github.com/elastic/apm-agent-js-base.git"
   },
   "scripts": {
-    "prepare-patch": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release patch && npm run build && npm run push-release",
-    "prepare-minor": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release minor && npm run build && npm run push-release",
-    "prepare-major": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release major && npm run build && npm run push-release",
-    "push-release": "git push origin master --follow-tags && npm publish",
+    "prepare-patch": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release patch && npm run build && npm run release",
+    "prepare-minor": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release minor && npm run build && npm run release",
+    "prepare-major": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release major && npm run build && npm run release",
+    "release": "npm run push-tags && npm publish && npm run github-release",
+    "push-tags": "git push origin master --follow-tags",
+    "github-release": "node ./scripts/release-github.js",
     "build": "webpack",
     "build-dev": "webpack -w",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
@@ -42,6 +44,7 @@
     "babel-preset-react": "^6.24.1",
     "conventional-changelog-cli": "^1.3.22",
     "express": "^4.16.2",
+    "gh-release-assets": "^1.1.2",
     "http-server": "^0.10.0",
     "jasmine": "^2.8.0",
     "karma": "^3.0.0",
@@ -78,8 +81,13 @@
     "es6-promise": "^4.2.4"
   },
   "standard": {
-    "env": ["jasmine", "browser"],
-    "globals": ["browser"],
+    "env": [
+      "jasmine",
+      "browser"
+    ],
+    "globals": [
+      "browser"
+    ],
     "ignore": [
       "test/e2e/sourcemap/"
     ]
