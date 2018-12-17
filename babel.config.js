@@ -9,7 +9,8 @@ module.exports = function (api) {
             ie: '10'
           },
           useBuiltIns: false,
-          modules: false
+          modules: false,
+          loose: true
         }
       ]
     ]

@@ -20,7 +20,7 @@
     "karma": "karma start",
     "karma-coverage": "karma start --coverage",
     "serve": "node ./scripts/run-script.js serveE2e ./ 8000",
-    "changelog": "conventional-changelog-cli  -p angular -i CHANGELOG.md -s",
+    "changelog": "node node_modules/conventional-changelog-cli/cli.js  -p angular -i CHANGELOG.md -s",
     "runUnitTests": "node ./scripts/run-script.js runUnitTests",
     "runNodeTests": "node ./scripts/run-script.js runNodeTests",
     "buildE2eBundles": "node ./scripts/run-script.js buildE2eBundles",
@@ -78,7 +78,7 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
-    "elastic-apm-js-core": "^2.2.0",
+    "elastic-apm-js-core": "^2.3.0",
     "es6-promise": "^4.2.4"
   },
   "standard": {
