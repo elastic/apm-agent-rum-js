@@ -1,0 +1,8 @@
+[[advanced-topics]]
+== Advanced Topics
+
+* <<custom-transactions, Custom Transactions>>
+* <<custom-transaction-name, Initial page load transaction names>>
+
+include::./custom-transactions.asciidoc[Custom Transactions]
+include::./custom-transaction-name.asciidoc[Initial page load transaction names]

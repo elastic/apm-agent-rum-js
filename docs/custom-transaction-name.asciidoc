@@ -1,0 +1,56 @@
+[[custom-transaction-name]]
+=== Custom initial page load transaction names
+
+Correctly setting initial page load transaction names is vital to ensuring the best experience when viewing application performance metrics in the Kibana UI.
+
+Let's look at an example to understand why. Here are a few URLs you might find on elastic.co:
+
+[source,js]
+----
+// Blog Posts
+https://www.elastic.co/blog/reflections-on-three-years-in-the-elastic-public-sector
+https://www.elastic.co/blog/say-heya-to-the-elastic-search-awards
+https://www.elastic.co/blog/and-the-winner-of-the-elasticon-2018-training-subscription-drawing-is
+
+// Documentation
+https://www.elastic.co/guide/en/elastic-stack/current/index.html
+https://www.elastic.co/guide/en/apm/get-started/current/index.html
+https://www.elastic.co/guide/en/infrastructure/guide/current/index.html
+----
+
+By default, <<transaction-name,`transaction.name`>> is set to `Unknown`.
+This means that when viewing transactions in the Kibana UI,
+all transactions will be grouped under the common transaction name of `Unknown`.
+Grouping every transaction (especially unrelated ones) into one group doesn't make much sense.
+To fix this, you can use the API to change the default initial page load transaction name with the <<page-load-transaction-name,`pageLoadTransactionName`>> configuration option.
+
+A common (and easy) way to set transaction names,
+is to use the <<page-load-transaction-name,`pageLoadTransactionName`>> configuration option to set the transaction name to the page URL.
+However, this solution won't be helpful as-is.
+Most URLs include unique names - like blog post titles, or query strings.
+As a result, you'll end up with a large number of different transaction names.
+For this solution to work, you'll need to strip away unique information and find commonality between your URLs.
+Looking at the URLs above, all elastic.co blog posts have `/blog/` in the URL, and all docs have `/guide/` in the URL.
+We can use these paths to set the initial page load transaction names to either `blog` or `guide`.
+This process can then be expanded across your site to ensure common transactions are grouped correctly.
+
+Based on our example URLs above, here's a code snippet to illustrate this process:
+
+[source,js]
+----
+var parts = window.location.pathname.split('/'); <1>
+var pageName = window.location.pathname; <2>
+if (parts.length > 0) {
+    pageName = parts[1] <3>
+}
+elasticApm.init({
+    serviceName: "service-name",
+    serverUrl: "server-url",
+    pageLoadTransactionName: pageName <4>
+})
+----
+
+<1> Grab the URL path and split it
+<2> Set a default `pageName`
+<3> Set the `pageName` to the first part of the pathname (in this example: `guide` or `blog`)
+<4> Pass the `pageName` into the APM agent as a configuration option

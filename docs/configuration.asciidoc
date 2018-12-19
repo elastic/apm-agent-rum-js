@@ -170,6 +170,7 @@ This option overrides the ID of the span that is generated for receiving the ini
 * *Type:* String
 
 This option sets the name for the page load transaction.
+See the <<custom-transaction-name,custom initial page load transaction names>> documentation for strategies on using this method.
 
 
 [float]

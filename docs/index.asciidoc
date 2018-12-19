@@ -17,7 +17,7 @@ include::./api.asciidoc[]
 
 include::./configuration.asciidoc[]
 
-include::./custom-transactions.asciidoc[]
+include::./advanced-topics.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
