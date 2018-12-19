@@ -163,6 +163,7 @@ Arguments:
 * `name` - The name of the page-load transaction (string).
 
 Use this method to set the name of the `page-load` transaction that is sent automatically on page load event.
+See the <<custom-transaction-name,custom initial page load transaction names>> documentation for strategies on using this method.
 
 
 [float]
