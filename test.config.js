@@ -17,8 +17,8 @@ const config = {
   env: env
 }
 
-if (env.sauceLabs) {
-  config.useMocks = true
-}
+// if (env.sauceLabs) {
+//   config.useMocks = true
+// }
 
 module.exports = config
