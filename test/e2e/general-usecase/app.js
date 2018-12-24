@@ -3,7 +3,7 @@ var createApmBase = require('../e2e')
 var active = Math.random() < 1
 
 var elasticApm = createApmBase({
-  active: active,
+  active,
   debug: true,
   serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
   serviceVersion: '0.0.1',
@@ -22,7 +22,7 @@ elasticApm.setUserContext({
   email: 'email'
 })
 elasticApm.setCustomContext({ testContext: 'testContext' })
-elasticApm.setTags({ 'testTagKey': 'testTagValue' })
+elasticApm.setTags({ testTagKey: 'testTagValue' })
 
 elasticApm.addFilter(function (payload) {
   if (payload.errors) {
@@ -80,12 +80,11 @@ req.addEventListener('load', function () {
 
 req.send()
 
-fetch('http://localhost:8002/fetch', { method: 'POST' })
-  .then(function (response) {
-    response.json().then(function (payload) {
-      checkDtInfo(payload)
-    })
+fetch('http://localhost:8002/fetch', { method: 'POST' }).then(function (response) {
+  response.json().then(function (payload) {
+    checkDtInfo(payload)
   })
+})
 
 generateError.tmp = 'tmp'
 

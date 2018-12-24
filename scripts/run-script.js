@@ -1,7 +1,8 @@
-var path = require('path')
-var testUtils = require('elastic-apm-js-core/dev-utils/test')
-var saucelabs = require('elastic-apm-js-core/dev-utils/saucelabs')
-var projectDirectory = path.join(__dirname, './../')
+const path = require('path')
+const { Launcher } = require('webdriverio')
+const testUtils = require('elastic-apm-js-core/dev-utils/test')
+const projectDirectory = path.join(__dirname, './../')
+const runIntegrationTest = require('../test/e2e/integration-test').runIntegrationTest
 
 function runUnitTests (launchSauceConnect) {
   var testConfig = testUtils.getTestEnvironmentVariables()
@@ -13,8 +14,6 @@ function runUnitTests (launchSauceConnect) {
   }
 }
 
-var runIntegrationTest = require('../test/e2e/integration-test').runIntegrationTest
-
 function createBackendAgentServer () {
   const express = require('express')
   const app = express()
@@ -22,7 +21,10 @@ function createBackendAgentServer () {
   app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
     if (req.method === 'OPTIONS') {
-      res.header('Access-Control-Allow-Headers', 'Origin, elastic-apm-traceparent, Content-Type, Accept')
+      res.header(
+        'Access-Control-Allow-Headers',
+        'Origin, elastic-apm-traceparent, Content-Type, Accept'
+      )
     }
     next()
   })
@@ -85,7 +87,7 @@ function serveE2e (servingPath, port) {
     res.send(result)
   })
 
-  app.use(express.static(staticPath), serveIndex(staticPath, { 'icons': false }))
+  app.use(express.static(staticPath), serveIndex(staticPath, { icons: false }))
   var server = app.listen(port)
 
   console.log('serving on: ', staticPath, port)
@@ -121,15 +123,47 @@ function runJasmine (cb) {
   jrunner.execute()
 }
 
-var scripts = {
-  runUnitTests: runUnitTests,
-  startSelenium: testUtils.startSelenium,
-  runE2eTests: function (runSelenium, serve) {
-    if (serve !== 'false') {
-      serveE2e('./', 8000)
+function runLauncher (file, override) {
+  const wdio = new Launcher(file, override)
+  return wdio.run().then(
+    code => {
+      process.exit(code)
+    },
+    error => {
+      console.error('Launcher failed to start the test', error)
+      process.exit(1)
     }
-    testUtils.runE2eTests(path.join(__dirname, './../wdio.conf.js'), runSelenium !== 'false')
-  },
+  )
+}
+
+function runE2eTests () {
+  serveE2e('./', 8000)
+
+  const file = path.join(projectDirectory, 'wdio.conf.js')
+  runLauncher(file)
+}
+
+function runE2eLocal () {
+  serveE2e('./', 8000)
+
+  const file = path.join(projectDirectory, 'wdio.conf.js')
+  const sauceConnectOpts = {
+    sauceConnect: true,
+    sauceConnectOpts: {
+      logger: console.log,
+      noSslBumpDomains: 'all',
+      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+    }
+  }
+
+  runLauncher(file, sauceConnectOpts)
+}
+
+const scripts = {
+  runUnitTests,
+  startSelenium: testUtils.startSelenium,
+  runE2eTests,
+  runE2eLocal,
   runNodeTests: function () {
     var servers = serveE2e('./', 8000)
     runJasmine(function (err) {
@@ -152,13 +186,7 @@ var scripts = {
 
     testUtils.buildE2eBundles(path.join(projectDirectory, basePath), callback)
   },
-  serveE2e: serveE2e,
-  launchSauceConnect: function launchSauceConnect () {
-    var testConfig = require('../test.config')
-    saucelabs.launchSauceConnect(testConfig.env.sauceLabs, function () {
-      console.log('Launched SauceConnect!')
-    })
-  }
+  serveE2e
 }
 
 module.exports = scripts
@@ -168,7 +196,7 @@ function runScript () {
   if (scriptName) {
     var scriptArgs = [].concat(process.argv)
     scriptArgs.splice(0, 3)
-    var message = `Running: ${scriptName}(${scriptArgs.map(a => '\'' + a + '\'').join(', ')}) \n`
+    var message = `Running: ${scriptName}(${scriptArgs.map(a => "'" + a + "'").join(', ')}) \n`
     console.log(message)
     if (typeof scripts[scriptName] === 'function') {
       return scripts[scriptName].apply(this, scriptArgs)
