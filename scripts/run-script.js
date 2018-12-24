@@ -116,6 +116,7 @@ function runJasmine (cb) {
   jrunner.print = function (value) {
     process.stdout.write(value)
   }
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
   jrunner.addReporter(new JasmineRunner.ConsoleReporter(jrunner))
   jrunner.projectBaseDir = projectDirectory
   jrunner.specDir = ''
