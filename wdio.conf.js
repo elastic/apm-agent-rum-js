@@ -3,9 +3,15 @@ const path = require('path')
 exports.config = {
   specs: [path.join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
   maxInstances: 1,
+  services: ['sauce'],
   user: process.env.SAUCE_USERNAME,
   key: process.env.SAUCE_ACCESS_KEY,
-  services: ['sauce'],
+  sauceConnect: true,
+  sauceConnectOpts: {
+    logger: console.log,
+    noSslBumpDomains: 'all',
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+  },
   capabilities: [
     {
       maxInstances: 1,

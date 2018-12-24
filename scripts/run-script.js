@@ -1,5 +1,4 @@
 const path = require('path')
-const { Launcher } = require('webdriverio')
 const testUtils = require('elastic-apm-js-core/dev-utils/test')
 const projectDirectory = path.join(__dirname, './../')
 const runIntegrationTest = require('../test/e2e/integration-test').runIntegrationTest
@@ -116,7 +115,6 @@ function runJasmine (cb) {
   jrunner.print = function (value) {
     process.stdout.write(value)
   }
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
   jrunner.addReporter(new JasmineRunner.ConsoleReporter(jrunner))
   jrunner.projectBaseDir = projectDirectory
   jrunner.specDir = ''
@@ -124,47 +122,17 @@ function runJasmine (cb) {
   jrunner.execute()
 }
 
-function runLauncher (file, override) {
-  const wdio = new Launcher(file, override)
-  return wdio.run().then(
-    code => {
-      process.exit(code)
-    },
-    error => {
-      console.error('Launcher failed to start the test', error)
-      process.exit(1)
-    }
-  )
-}
-
 function runE2eTests () {
   serveE2e('./', 8000)
 
   const file = path.join(projectDirectory, 'wdio.conf.js')
-  runLauncher(file)
-}
-
-function runE2eLocal () {
-  serveE2e('./', 8000)
-
-  const file = path.join(projectDirectory, 'wdio.conf.js')
-  const sauceConnectOpts = {
-    sauceConnect: true,
-    sauceConnectOpts: {
-      logger: console.log,
-      noSslBumpDomains: 'all',
-      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-    }
-  }
-
-  runLauncher(file, sauceConnectOpts)
+  testUtils.runE2eTests(file, false)
 }
 
 const scripts = {
   runUnitTests,
   startSelenium: testUtils.startSelenium,
   runE2eTests,
-  runE2eLocal,
   runNodeTests: function () {
     var servers = serveE2e('./', 8000)
     runJasmine(function (err) {
