@@ -1,4 +1,5 @@
 const path = require('path')
+const { baseLaunchers } = require('elastic-apm-js-core/dev-utils/karma')
 
 exports.config = {
   specs: [path.join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
@@ -12,13 +13,7 @@ exports.config = {
     noSslBumpDomains: 'all',
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
   },
-  capabilities: [
-    {
-      maxInstances: 1,
-      browserName: 'chrome',
-      'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
-    }
-  ],
+  capabilities: Object.values(baseLaunchers),
   logLevel: 'command',
   screenshotPath: path.join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',
