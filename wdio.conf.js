@@ -50,16 +50,5 @@ exports.config = {
   reporters: ['dot', 'spec'],
   jasmineNodeOpts: {
     defaultTimeoutInterval: 90000
-  },
-  afterTest: function (test) {
-    /** Logs api is only available in Chrome */
-    const browserName = browser.desiredCapabilities.browserName.toLowerCase()
-    if (browserName.indexOf('chrome') !== -1) {
-      browser.execute('1+1')
-      var response = browser.log('browser')
-      var browserLogs = response.value
-      console.log('browser.log:', JSON.stringify(browserLogs, undefined, 2))
-    }
-    console.log('afterTest:', JSON.stringify(test, undefined, 2))
   }
 }
