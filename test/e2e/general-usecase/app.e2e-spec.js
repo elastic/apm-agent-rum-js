@@ -1,4 +1,5 @@
-var utils = require('elastic-apm-js-core/dev-utils/webdriver')
+const utils = require('elastic-apm-js-core/dev-utils/webdriver')
+const { isChrome } = require('../webdriver-utils')
 
 describe('general-usercase', function () {
   it('should run the general usecase', function () {
@@ -79,6 +80,8 @@ describe('general-usercase', function () {
     })
     expect(span).toBeDefined()
 
-    return utils.allowSomeBrowserErrors(['timeout test error with a secret'])
+    if (isChrome()) {
+      return utils.allowSomeBrowserErrors(['timeout test error with a secret'])
+    }
   })
 })
