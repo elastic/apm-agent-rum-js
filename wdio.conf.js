@@ -1,5 +1,6 @@
 const path = require('path')
-const { baseLaunchers } = require('elastic-apm-js-core/dev-utils/karma')
+// TODO - Run on all platforms
+// const { baseLaunchers } = require('elastic-apm-js-core/dev-utils/karma')
 
 exports.config = {
   specs: [path.join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
@@ -13,7 +14,30 @@ exports.config = {
     noSslBumpDomains: 'all',
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
   },
-  capabilities: Object.values(baseLaunchers),
+  capabilities: [
+    {
+      browserName: 'chrome',
+      version: '62'
+    },
+    {
+      browserName: 'firefox',
+      version: '52'
+    }
+    // {
+    //   browserName: 'internet explorer',
+    //   version: '10'
+    // },
+    // {
+    //   browserName: 'MicrosoftEdge',
+    //   platform: 'Windows 10',
+    //   version: '16.16299'
+    // },
+    // {
+    //   browserName: 'Safari',
+    //   platform: 'OS X 10.11',
+    //   version: '9.0'
+    // }
+  ],
   logLevel: 'command',
   screenshotPath: path.join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',

@@ -1,7 +1,7 @@
 const path = require('path')
 const testUtils = require('elastic-apm-js-core/dev-utils/test')
-const projectDirectory = path.join(__dirname, './../')
 const runIntegrationTest = require('../test/e2e/integration-test').runIntegrationTest
+const projectDirectory = path.join(__dirname, './../')
 
 function runUnitTests (launchSauceConnect) {
   var testConfig = testUtils.getTestEnvironmentVariables()
