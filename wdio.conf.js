@@ -2,6 +2,8 @@ const path = require('path')
 // TODO - Run on all platforms
 // const { baseLaunchers } = require('elastic-apm-js-core/dev-utils/karma')
 
+const tunnelIdentifier = process.env.TRAVIS_JOB_NUMBER
+
 exports.config = {
   specs: [path.join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
   maxInstances: 1,
@@ -11,18 +13,19 @@ exports.config = {
   sauceConnect: true,
   sauceConnectOpts: {
     logger: console.log,
-    verbose: true,
     noSslBumpDomains: 'all',
-    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
+    'tunnel-identifier': tunnelIdentifier
   },
   capabilities: [
     {
       browserName: 'chrome',
-      version: '62'
+      version: '62',
+      'tunnel-identifier': tunnelIdentifier
     },
     {
       browserName: 'firefox',
-      version: '57'
+      version: '57',
+      'tunnel-identifier': tunnelIdentifier
     }
     // {
     //   browserName: 'internet explorer',

@@ -61,6 +61,7 @@ describe('general-usercase', function () {
 
     expect(result.value).toBeTruthy()
     var serverCalls = result.value
+    console.log(JSON.stringify(serverCalls, null, 2))
     if (serverCalls.error) {
       fail(serverCalls.error)
     }
