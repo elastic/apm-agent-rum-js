@@ -11,6 +11,7 @@ exports.config = {
   sauceConnect: true,
   sauceConnectOpts: {
     logger: console.log,
+    verbose: true,
     noSslBumpDomains: 'all',
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
   },
@@ -21,7 +22,7 @@ exports.config = {
     },
     {
       browserName: 'firefox',
-      version: '52'
+      version: '57'
     }
     // {
     //   browserName: 'internet explorer',
@@ -48,10 +49,14 @@ exports.config = {
     defaultTimeoutInterval: 90000
   },
   afterTest: function (test) {
-    browser.execute('1+1')
-    var response = browser.log('browser')
-    var browserLogs = response.value
+    /** Logs api is only available in Chrome */
+    const browserName = browser.desiredCapabilities.browserName.toLowerCase()
+    if (browserName.indexOf('chrome') !== -1) {
+      browser.execute('1+1')
+      var response = browser.log('browser')
+      var browserLogs = response.value
+      console.log('browser.log:', JSON.stringify(browserLogs, undefined, 2))
+    }
     console.log('afterTest:', JSON.stringify(test, undefined, 2))
-    console.log('browser.log:', JSON.stringify(browserLogs, undefined, 2))
   }
 }
