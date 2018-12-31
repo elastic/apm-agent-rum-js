@@ -1,5 +1,5 @@
 var utils = require('elastic-apm-js-core/dev-utils/webdriver')
-const { isChrome } = require('../webdriver-utils')
+const { isChrome } = require('../e2e-utils')
 
 describe('standalone-html', function () {
   it('should run the usecase', function () {

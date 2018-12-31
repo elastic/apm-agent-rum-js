@@ -1,7 +1,5 @@
 const path = require('path')
-const { isChrome } = require('./test/e2e/webdriver-utils')
-// TODO - Run on all platforms
-// const { baseLaunchers } = require('elastic-apm-js-core/dev-utils/karma')
+const { isChrome } = require('./test/e2e/e2e-utils')
 
 const tunnelIdentifier = process.env.TRAVIS_JOB_NUMBER
 
@@ -29,13 +27,13 @@ exports.config = {
       'tunnel-identifier': tunnelIdentifier
     },
     {
-      browserName: 'MicrosoftEdge',
+      browserName: 'internet explorer',
       platform: 'Windows 10',
-      version: '16',
+      version: '11',
       'tunnel-identifier': tunnelIdentifier
     }
   ],
-  logLevel: 'command',
+  logLevel: 'silent',
   screenshotPath: path.join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',
   waitforTimeout: 30000,
@@ -44,7 +42,7 @@ exports.config = {
   jasmineNodeOpts: {
     defaultTimeoutInterval: 90000
   },
-  afterTest: function (test) {
+  afterTest: function () {
     /** Log api is only available in Chrome */
     if (isChrome()) {
       browser.execute('1+1')
@@ -52,6 +50,5 @@ exports.config = {
       var browserLogs = response.value
       console.log('browser.log:', JSON.stringify(browserLogs, undefined, 2))
     }
-    console.log('afterTest:', JSON.stringify(test, undefined, 2))
   }
 }

@@ -58,6 +58,7 @@ setTimeout(function () {
 var url = '/test/e2e/common/data.json?test=hamid'
 var req = new window.XMLHttpRequest()
 req.open('GET', url, false)
+
 req.addEventListener('load', function () {
   console.log('got data!')
 })
@@ -78,13 +79,19 @@ req.addEventListener('load', function () {
   checkDtInfo(payload)
 })
 
-req.send()
+req.onerror = function (err) {
+  console.log('XHR Error', err)
+}
 
-fetch('http://localhost:8002/fetch', { method: 'POST' }).then(function (response) {
-  response.json().then(function (payload) {
-    checkDtInfo(payload)
+req.send(null)
+
+if ('fetch' in window) {
+  fetch('http://localhost:8002/fetch', { method: 'POST' }).then(function (response) {
+    response.json().then(function (payload) {
+      checkDtInfo(payload)
+    })
   })
-})
+}
 
 generateError.tmp = 'tmp'
 

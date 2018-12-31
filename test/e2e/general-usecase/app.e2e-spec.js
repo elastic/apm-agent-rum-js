@@ -1,5 +1,5 @@
 const utils = require('elastic-apm-js-core/dev-utils/webdriver')
-const { isChrome } = require('../webdriver-utils')
+const { isChrome } = require('../e2e-utils')
 
 describe('general-usercase', function () {
   it('should run the general usecase', function () {
