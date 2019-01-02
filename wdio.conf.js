@@ -5,7 +5,7 @@ const tunnelIdentifier = process.env.TRAVIS_JOB_NUMBER
 
 exports.config = {
   specs: [path.join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
-  maxInstancesPerCapability: 3,
+  maxInstances: 1,
   services: ['sauce'],
   user: process.env.SAUCE_USERNAME,
   key: process.env.SAUCE_ACCESS_KEY,
