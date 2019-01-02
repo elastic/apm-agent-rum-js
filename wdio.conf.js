@@ -12,11 +12,11 @@ const browserList = [
     browserName: 'firefox',
     version: '57'
   },
-  {
-    browserName: 'internet explorer',
-    version: '11',
-    iedriverVersion: '2.48.0'
-  },
+  // {
+  //   browserName: 'internet explorer',
+  //   version: '11',
+  //   iedriverVersion: '2.48.0'
+  // },
   {
     browserName: 'microsoftedge',
     platform: 'Windows 10',
