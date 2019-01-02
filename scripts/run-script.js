@@ -122,8 +122,10 @@ function runJasmine (cb) {
   jrunner.execute()
 }
 
-function runE2eTests () {
-  serveE2e('./', 8000)
+function runE2eTests (serve) {
+  if (serve !== 'false') {
+    serveE2e('./', 8000)
+  }
 
   const file = path.join(projectDirectory, 'wdio.conf.js')
   testUtils.runE2eTests(file, false)

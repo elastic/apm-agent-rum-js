@@ -14,8 +14,8 @@ const browserList = [
   },
   {
     browserName: 'internet explorer',
-    platform: 'Windows 8.1',
-    version: '11'
+    version: '11',
+    iedriverVersion: '2.48.0'
   },
   {
     browserName: 'microsoftedge',
