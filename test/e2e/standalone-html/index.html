@@ -10,9 +10,11 @@
     <div id="app"></div>
     <script src="/dist/bundles/elastic-apm-js-base.umd.min.js"></script>
     <script>
-      var serverUrl = 'http://localhost:8003'
+      var serverUrl = 'http://localhost:8003',
+        apmServerUrl = 'http://localhost:8001'
       elasticApm.init({
         serviceName: 'standalone-html',
+        serverUrl: apmServerUrl,
         distributedTracingOrigins: [serverUrl]
       })
 
