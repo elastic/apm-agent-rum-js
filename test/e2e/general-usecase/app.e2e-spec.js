@@ -68,7 +68,7 @@ describe('general-usercase', function () {
     }
     expect(serverCalls.sendErrors.length).toBe(1)
     var errorPayload = serverCalls.sendErrors[0].args[0][0]
-    expect(errorPayload.exception.message.indexOf('timeout test error') > 0).toBeTruthy()
+    expect(errorPayload.exception.message.indexOf('timeout test error') >= 0).toBeTruthy()
 
     expect(serverCalls.sendTransactions.length).toBe(1)
     var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
