@@ -17,6 +17,11 @@ env:
 cache:
   directories:
   - node_modules
+addons:
+  apt:
+    packages:
+     - xsltproc
+     - libxml2-utils
 before_install:
   - docker-compose -f ./test/docker-compose.yml up -d apm-server
   
