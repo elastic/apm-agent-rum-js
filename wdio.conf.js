@@ -18,6 +18,7 @@ exports.config = {
   capabilities: [
     {
       browserName: 'chrome',
+      maxInstances: 1,
       version: '62',
       'tunnel-identifier': tunnelIdentifier
     },
