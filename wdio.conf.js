@@ -14,7 +14,7 @@ const browserList = [
   },
   {
     browserName: 'internet explorer',
-    platform: 'Windows 10',
+    platform: 'Windows 8.1',
     version: '11'
   },
   {
