@@ -3,9 +3,44 @@ const { isChrome } = require('./test/e2e/e2e-utils')
 
 const tunnelIdentifier = process.env.TRAVIS_JOB_NUMBER
 
+const browserList = [
+  {
+    browserName: 'chrome',
+    version: '62'
+  },
+  {
+    browserName: 'firefox',
+    version: '57'
+  },
+  {
+    browserName: 'internet explorer',
+    platform: 'Windows 10',
+    version: '11'
+  },
+  {
+    browserName: 'microsoftedge',
+    platform: 'Windows 10',
+    version: '17'
+  },
+  {
+    browserName: 'safari',
+    platform: 'OS X 10.11',
+    version: '9.0'
+  },
+  {
+    browserName: 'android',
+    platform: 'Linux',
+    version: '5.0'
+  }
+].map(list =>
+  Object.assign({}, list, {
+    'tunnel-identifier': tunnelIdentifier
+  })
+)
+
 exports.config = {
   specs: [path.join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
-  maxInstances: 1,
+  maxInstancesPerCapability: 3,
   services: ['sauce'],
   user: process.env.SAUCE_USERNAME,
   key: process.env.SAUCE_ACCESS_KEY,
@@ -15,25 +50,7 @@ exports.config = {
     noSslBumpDomains: 'all',
     'tunnel-identifier': tunnelIdentifier
   },
-  capabilities: [
-    {
-      browserName: 'chrome',
-      maxInstances: 1,
-      version: '62',
-      'tunnel-identifier': tunnelIdentifier
-    },
-    {
-      browserName: 'firefox',
-      version: '57',
-      'tunnel-identifier': tunnelIdentifier
-    },
-    {
-      browserName: 'internet explorer',
-      platform: 'Windows 10',
-      version: '11',
-      'tunnel-identifier': tunnelIdentifier
-    }
-  ],
+  capabilities: browserList,
   logLevel: 'silent',
   screenshotPath: path.join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',

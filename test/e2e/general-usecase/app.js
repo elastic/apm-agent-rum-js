@@ -1,13 +1,14 @@
 var createApmBase = require('../e2e')
 
 var active = Math.random() < 1
+var serverUrl = 'http://localhost:8003'
 
 var elasticApm = createApmBase({
   active,
   debug: true,
   serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
   serviceVersion: '0.0.1',
-  distributedTracingOrigins: ['http://localhost:8002'],
+  distributedTracingOrigins: [serverUrl],
   pageLoadTraceId: '286ac3ad697892c406528f13c82e0ce1',
   pageLoadSpanId: 'bbd8bcc3be14d814',
   pageLoadSampled: true
@@ -73,25 +74,15 @@ function checkDtInfo (payload) {
 }
 
 req = new window.XMLHttpRequest()
-req.open('POST', 'http://localhost:8002/data', false)
+req.open('POST', serverUrl + '/data', false)
 req.addEventListener('load', function () {
   var payload = JSON.parse(req.responseText)
   checkDtInfo(payload)
 })
-
 req.onerror = function (err) {
   console.log('XHR Error', err)
 }
-
-req.send(null)
-
-if ('fetch' in window) {
-  fetch('http://localhost:8002/fetch', { method: 'POST' }).then(function (response) {
-    response.json().then(function (payload) {
-      checkDtInfo(payload)
-    })
-  })
-}
+req.send()
 
 generateError.tmp = 'tmp'
 

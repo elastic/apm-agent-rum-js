@@ -10,9 +10,10 @@
     <div id="app"></div>
     <script src="/dist/bundles/elastic-apm-js-base.umd.min.js"></script>
     <script>
+      var serverUrl = 'http://localhost:8003'
       elasticApm.init({
         serviceName: 'standalone-html',
-        distributedTracingOrigins: ['http://localhost:8002']
+        distributedTracingOrigins: [serverUrl]
       })
 
       function checkDtInfo(payload) {
@@ -26,7 +27,7 @@
       req.onerror = function(err) {
         console.log('[XHR Error]', err)
       }
-      req.open('POST', 'http://localhost:8002/data', false)
+      req.open('POST', serverUrl + '/data', false)
       req.addEventListener('load', function() {
         var payload = JSON.parse(req.responseText)
         checkDtInfo(payload)

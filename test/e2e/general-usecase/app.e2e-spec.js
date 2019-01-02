@@ -3,7 +3,7 @@ const { isChrome } = require('../e2e-utils')
 
 describe('general-usercase', function () {
   it('should run the general usecase', function () {
-    browser.timeouts('script', 60000)
+    browser.timeouts('script', 30000)
     browser.url('/test/e2e/general-usecase/index.html')
 
     browser.waitUntil(
