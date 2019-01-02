@@ -1,59 +1,63 @@
-var path = require('path')
-var agentVersion = require('./package.json').version
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const path = require('path')
+const { version: agentVersion } = require('./package.json')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
-var baseOptions = {
+const OUTPUT_DIR = path.join(__dirname, 'dist', 'bundles')
+
+const baseConfig = {
   entry: './src/index.js',
   output: {
     filename: 'elastic-apm-js-base.umd.js',
-    path: path.resolve(__dirname, 'dist', 'bundles'),
+    path: OUTPUT_DIR,
     library: 'elastic-apm-js-base',
     libraryTarget: 'umd'
   },
+  mode: 'development',
+  node: false,
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['babel-preset-es2015'].map(require.resolve)
+        use: {
+          loader: 'babel-loader'
         }
       },
       {
         test: /\.js$/,
-        loader: 'string-replace-loader',
-        query: {
-          search: '%%agent-version%%',
-          replace: agentVersion
+        exclude: /node_modules/,
+        use: {
+          loader: 'string-replace-loader',
+          options: {
+            search: '%%agent-version%%',
+            replace: agentVersion
+          }
         }
       }
     ]
   }
 }
 
-var bundleConfig = {
-  entry: baseOptions.entry,
-  output: baseOptions.output,
-  module: baseOptions.module,
-  node: false
-}
-
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
-
-var optimizeConfig = {
-  entry: baseOptions.entry,
+const optimizeConfig = Object.assign({}, baseConfig, {
   output: {
     filename: 'elastic-apm-js-base.umd.min.js',
-    path: baseOptions.output.path
+    path: OUTPUT_DIR
   },
-  module: baseOptions.module,
+  mode: 'production',
   devtool: 'source-map',
-  node: false,
+  optimization: {
+    minimizer: [
+      new UglifyJSPlugin({
+        sourceMap: true,
+        extractComments: true
+      })
+    ]
+  },
+  performance: {
+    hints: 'warning',
+    maxAssetSize: 65 * 1024 // 65 kB
+  },
   plugins: [
-    new UglifyJSPlugin({
-      sourceMap: true,
-      extractComments: true
-    }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',
       reportFilename: path.resolve(__dirname, 'reports', 'bundle-analyzer.html'),
@@ -62,6 +66,6 @@ var optimizeConfig = {
       openAnalyzer: false
     })
   ]
-}
+})
 
-module.exports = [bundleConfig, optimizeConfig]
+module.exports = [baseConfig, optimizeConfig]

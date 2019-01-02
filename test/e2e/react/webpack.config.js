@@ -1,25 +1,23 @@
 var path = require('path')
 var webpack = require('webpack')
 
-var env = {'globalConfigs': {}}
+var env = { globalConfigs: {} }
 
 module.exports = {
   entry: path.resolve(__dirname, './app.jsx'),
   output: { path: __dirname, filename: 'app.e2e-bundle.js' },
   devtool: 'source-map',
+  mode: 'development',
   module: {
-    loaders: [
+    rules: [
       {
         test: /.jsx?$/,
         include: [__dirname, path.resolve(__dirname)],
-        loader: 'babel-loader',
-        query: {
-          presets: ['es2015', 'react']
+        use: {
+          loader: 'babel-loader'
         }
       }
     ]
   },
-  plugins: [
-    new webpack.DefinePlugin(env)
-  ]
+  plugins: [new webpack.DefinePlugin(env)]
 }
