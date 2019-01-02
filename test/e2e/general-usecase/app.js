@@ -84,6 +84,14 @@ req.onerror = function (err) {
 }
 req.send()
 
+if ('fetch' in window) {
+  fetch('http://localhost:8002/fetch', { method: 'POST' }).then(function (response) {
+    response.json().then(function (payload) {
+      checkDtInfo(payload)
+    })
+  })
+}
+
 generateError.tmp = 'tmp'
 
 var appEl = document.getElementById('app')
