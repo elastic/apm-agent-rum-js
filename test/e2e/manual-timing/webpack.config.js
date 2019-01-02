@@ -1,30 +1,27 @@
-var path = require('path')
-var webpack = require('webpack')
+const path = require('path')
+const webpack = require('webpack')
 
-var testConfig = require('../../../test.config')
-var globalConfigs = testConfig
+const testConfig = require('../../../test.config')
+const globalConfigs = testConfig
 
-var configJson = JSON.stringify(globalConfigs, undefined, 2)
-var env = {'globalConfigs': configJson}
+const configJson = JSON.stringify(globalConfigs, undefined, 2)
+const env = { globalConfigs: configJson }
 console.log(configJson)
 
 module.exports = {
   entry: path.resolve(__dirname, './app.js'),
   output: { path: __dirname, filename: 'app.e2e-bundle.js' },
   devtool: 'source-map',
+  mode: 'development',
   module: {
-    loaders: [
+    rules: [
       {
-        test: /.jsx?$/,
-        include: [__dirname, path.resolve(__dirname)],
-        loader: 'babel-loader',
-        query: {
-          presets: ['es2015']
+        test: /.js?$/,
+        use: {
+          loader: 'babel-loader'
         }
       }
     ]
   },
-  plugins: [
-    new webpack.DefinePlugin(env)
-  ]
+  plugins: [new webpack.DefinePlugin(env)]
 }
