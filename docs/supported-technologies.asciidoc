@@ -1,0 +1,26 @@
+[[supported-technologies]]
+== Supported Technologies
+
+The Elastic APM RUM JavaScript agent will automatically instrument the following to give you detailed performance metrics of your web page
+
+* Page load metrics
+* Load time of Static Assets
+* API requests (XMLHttpRequest and Fetch)
+
+The agent uses the https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API[Navigation Timing API] and [Resource Timing API] available in the browsers to instrument the page load performance and static assets load times.
+
+The agent uses <<custom-transactions, Custom Transactions API>> to instrument all the outgoing XHR and Fetch API requests from the web page to the backend servers and also adds support for <<distributed-tracing-guide, Distributed Tracing>>.
+
+[float]
+[[frameworks]]
+=== Frameworks
+
+The agent is not framework agnostic and therefore will not instrument metrics related to rendering time or mounting time of components. If you are interested in measuring custom timings on frameworks like React, Angular, vue etc., please use the <<apm-start-span, Span API>> and create custom spans instead.
+
+[float]
+[[spa]]
+=== Single Page Applications
+
+In the context of Single Page Applications, the route changes do not trigger the browser navigation event and thus the agent does not instrument them by default. 
+
+However, you can instrument your application using <<custom-transactions, Custom Transactions API>> and add the corresponding network requests as spans to the created transaction. 

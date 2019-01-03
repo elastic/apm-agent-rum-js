@@ -11,6 +11,8 @@ endif::[]
 
 include::./intro.asciidoc[]
 
+include::./supported-technologies.asciidoc[]
+
 include::./sourcemap.asciidoc[]
 
 include::./api.asciidoc[]
