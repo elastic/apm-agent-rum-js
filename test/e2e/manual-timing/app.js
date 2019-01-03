@@ -39,13 +39,17 @@ setTimeout(function () {
 
 var url = '/test/e2e/common/data.json?test=hamid'
 var httpSpan = transaction.startSpan('FETCH ' + url, 'http')
-fetch(url)
-  .then((resp) => {
+
+var isFetchSupported = 'fetch' in window
+
+if (isFetchSupported) {
+  fetch(url).then(resp => {
     if (!resp.ok) {
       apm.captureError(new Error(`fetch failed with status ${resp.status} ${resp.statusText}`))
     }
     httpSpan.end()
   })
+}
 
 var tid = transaction.addTask()
 var req = new window.XMLHttpRequest()
@@ -53,6 +57,7 @@ req.open('GET', url)
 req.addEventListener('load', function () {
   console.log('got data!')
   transaction.removeTask(tid)
+  !isFetchSupported && httpSpan.end()
 })
 
 req.send()
