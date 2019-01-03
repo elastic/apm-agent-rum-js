@@ -1,13 +1,14 @@
 var createApmBase = require('../e2e')
 
 var active = Math.random() < 1
+var serverUrl = 'http://localhost:8003'
 
 var elasticApm = createApmBase({
-  active: active,
+  active,
   debug: true,
   serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
   serviceVersion: '0.0.1',
-  distributedTracingOrigins: ['http://localhost:8002'],
+  distributedTracingOrigins: [serverUrl],
   pageLoadTraceId: '286ac3ad697892c406528f13c82e0ce1',
   pageLoadSpanId: 'bbd8bcc3be14d814',
   pageLoadSampled: true
@@ -22,7 +23,7 @@ elasticApm.setUserContext({
   email: 'email'
 })
 elasticApm.setCustomContext({ testContext: 'testContext' })
-elasticApm.setTags({ 'testTagKey': 'testTagValue' })
+elasticApm.setTags({ testTagKey: 'testTagValue' })
 
 elasticApm.addFilter(function (payload) {
   if (payload.errors) {
@@ -58,6 +59,7 @@ setTimeout(function () {
 var url = '/test/e2e/common/data.json?test=hamid'
 var req = new window.XMLHttpRequest()
 req.open('GET', url, false)
+
 req.addEventListener('load', function () {
   console.log('got data!')
 })
@@ -72,20 +74,23 @@ function checkDtInfo (payload) {
 }
 
 req = new window.XMLHttpRequest()
-req.open('POST', 'http://localhost:8002/data', false)
+req.open('POST', serverUrl + '/data', false)
 req.addEventListener('load', function () {
   var payload = JSON.parse(req.responseText)
   checkDtInfo(payload)
 })
-
+req.onerror = function (err) {
+  console.log('XHR Error', err)
+}
 req.send()
 
-fetch('http://localhost:8002/fetch', { method: 'POST' })
-  .then(function (response) {
+if ('fetch' in window) {
+  fetch(serverUrl + '/fetch', { method: 'POST' }).then(function (response) {
     response.json().then(function (payload) {
       checkDtInfo(payload)
     })
   })
+}
 
 generateError.tmp = 'tmp'
 
