@@ -24,3 +24,5 @@ include::./advanced-topics.asciidoc[]
 include::./troubleshooting.asciidoc[]
 
 include::./distributed-tracing-guide.asciidoc[]
+
+include::./opentracing.asciidoc[]
