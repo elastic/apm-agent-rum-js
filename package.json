@@ -28,7 +28,7 @@
     "run-script": "node ./scripts/run-script.js",
     "test": "npm run lint && npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e && npm run build-docs",
     "lint": "standard",
-    "format": "prettier-standard src/**/*.js test/**/*.js"
+    "format": "prettier-standard 'src/**/*.js' test/**/*.js"
   },
   "files": [
     "src/**/*.js",
