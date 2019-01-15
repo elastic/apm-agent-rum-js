@@ -8,7 +8,7 @@
 
   <body>
     <div id="app"></div>
-    <script src="/dist/bundles/elastic-apm-js-base.umd.min.js"></script>
+    <script src="/dist/bundles/elastic-apm-opentracing.umd.min.js"></script>
     <script>
       var serverUrl = 'http://localhost:8003',
         apmServerUrl = 'http://localhost:8001'
@@ -26,6 +26,10 @@
           throw new Error('Wrong distributed tracing payload: ')
         }
       }
+
+      var tracer = elasticApm.createTracer()
+      var span = tracer.startSpan('Opentracing span')
+      span.finish(Date.now() + 100)
 
       req = new window.XMLHttpRequest()
       req.onerror = function(err) {
