@@ -77,7 +77,7 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
-    "elastic-apm-js-core": "^2.3.0",
+    "elastic-apm-js-core": "^2.4.0",
     "es6-promise": "^4.2.4"
   },
   "standard": {

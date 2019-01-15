@@ -74,9 +74,9 @@ describe('general-usercase', function () {
     var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('general-usecase-initial-page-load')
-    expect(transactionPayload.spans.length).toBeGreaterThan(3)
+    expect(transactionPayload.spans.length).toBeGreaterThan(2)
     var span = transactionPayload.spans.find(function (s) {
-      return s.name === 'GET /test/e2e/common/data.json?test=hamid'
+      return s.name === 'GET /test/e2e/common/data.json'
     })
     expect(span).toBeDefined()
 
