@@ -1,6 +1,31 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2017-present, Elasticsearch BV
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
 const path = require('path')
 const testUtils = require('elastic-apm-js-core/dev-utils/test')
-const runIntegrationTest = require('../test/e2e/integration-test').runIntegrationTest
+const { runIntegrationTest } = require('../test/e2e/integration-test')
 const projectDirectory = path.join(__dirname, './../')
 
 function runUnitTests (launchSauceConnect) {
@@ -68,7 +93,9 @@ function serveE2e (servingPath, port) {
 
   app.get('/run_integration_test', async function (req, res) {
     var echo = req.query.echo
-    var result = await runIntegrationTest('http://localhost:8000/test/e2e/general-usecase/')
+    var result = await runIntegrationTest(
+      'http://localhost:8000/test/e2e/general-usecase/'
+    )
     if (echo) {
       res.send(echo)
     } else {
@@ -167,7 +194,9 @@ function runScript () {
   if (scriptName) {
     var scriptArgs = [].concat(process.argv)
     scriptArgs.splice(0, 3)
-    var message = `Running: ${scriptName}(${scriptArgs.map(a => "'" + a + "'").join(', ')}) \n`
+    var message = `Running: ${scriptName}(${scriptArgs
+      .map(a => "'" + a + "'")
+      .join(', ')}) \n`
     console.log(message)
     if (typeof scripts[scriptName] === 'function') {
       return scripts[scriptName].apply(this, scriptArgs)
