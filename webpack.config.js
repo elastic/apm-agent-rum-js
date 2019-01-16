@@ -6,11 +6,14 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const OUTPUT_DIR = path.join(__dirname, 'dist', 'bundles')
 
 const baseConfig = {
-  entry: './src/index.js',
+  entry: {
+    'elastic-apm-js-base': './src/index.js',
+    'elastic-apm-opentracing': './src/opentracing-entry.js'
+  },
   output: {
-    filename: 'elastic-apm-js-base.umd.js',
+    filename: '[name].umd.js',
     path: OUTPUT_DIR,
-    library: 'elastic-apm-js-base',
+    library: '[name]',
     libraryTarget: 'umd'
   },
   mode: 'development',
@@ -40,7 +43,7 @@ const baseConfig = {
 
 const optimizeConfig = Object.assign({}, baseConfig, {
   output: {
-    filename: 'elastic-apm-js-base.umd.min.js',
+    filename: '[name].umd.min.js',
     path: OUTPUT_DIR
   },
   mode: 'production',

@@ -57,7 +57,7 @@ describe('ApmBase', function () {
 
     spyOn(tr, 'startSpan').and.callThrough()
     apmBase.startSpan('test-span', 'test-type')
-    expect(tr.startSpan).toHaveBeenCalledWith('test-span', 'test-type')
+    expect(tr.startSpan).toHaveBeenCalledWith('test-span', 'test-type', undefined)
 
     expect(apmBase.getCurrentTransaction()).toBe(tr)
     expect(apmBase.getTransactionService()).toBe(trService)
