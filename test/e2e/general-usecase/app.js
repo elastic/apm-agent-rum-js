@@ -14,6 +14,13 @@ var elasticApm = createApmBase({
   pageLoadSampled: true
 })
 
+const { createTracer } = require('../../../src/opentracing')
+var tracer = createTracer(elasticApm)
+
+var otSpan = tracer.startSpan('OpenTracing span')
+
+otSpan.finish(Date.now() + 200)
+
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
 
 elasticApm.setUserContext({
