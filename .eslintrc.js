@@ -1,7 +1,7 @@
 const { readFileSync } = require('fs')
 const { join } = require('path')
 /**
- * Helps with using custom eslint rules
+ * Helps with using custom eslint rules without creating and publishing as plugin
  */
 const rulesDirPlugin = require('eslint-plugin-rulesdir')
 rulesDirPlugin.RULES_DIR = join(__dirname, 'scripts/eslint-rules')
@@ -16,10 +16,11 @@ const LICENSE_HEADER =
 
 module.exports = {
   env: {
-    es6: true
+    es6: true,
+    browser: true
   },
   parser: 'babel-eslint',
-  plugins: ['rulesdir'],
+  plugins: ['prettier', 'standard', 'rulesdir'],
   rules: {
     'max-len': ['error', { code: 100, ignoreComments: true }],
     'no-unused-vars': 'error',

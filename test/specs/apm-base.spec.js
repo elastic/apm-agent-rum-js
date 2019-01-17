@@ -71,7 +71,9 @@ describe('ApmBase', function () {
     apmBase.setInitialPageLoadName('test')
     var trService = serviceFactory.getService('TransactionService')
     var configService = serviceFactory.getService('ConfigService')
-    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
 
     expect(configService.get('pageLoadTransactionName')).toBe('test')
 
@@ -82,12 +84,16 @@ describe('ApmBase', function () {
 
     spyOn(tr, 'startSpan').and.callThrough()
     apmBase.startSpan('test-span', 'test-type')
-    expect(tr.startSpan).toHaveBeenCalledWith('test-span', 'test-type', undefined)
+    expect(tr.startSpan).toHaveBeenCalledWith(
+      'test-span',
+      'test-type',
+      undefined
+    )
 
     expect(apmBase.getCurrentTransaction()).toBe(tr)
     expect(apmBase.getTransactionService()).toBe(trService)
 
-    var filter = function (payload) {}
+    var filter = function () {}
     apmBase.addFilter(filter)
     expect(configService.filters.length).toBe(1)
     expect(configService.filters[0]).toBe(filter)
@@ -102,7 +108,9 @@ describe('ApmBase', function () {
     apmBase.init({})
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     expect(tr).toBeDefined()
-    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -121,7 +129,9 @@ describe('ApmBase', function () {
   it('should instrument xhr when no transaction was started', function (done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ capturePageLoad: false })
-    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
     var transactionService = serviceFactory.getService('TransactionService')
     transactionService.currentTransaction = undefined
 
@@ -145,7 +155,9 @@ describe('ApmBase', function () {
   it('should instrument xhr when not active', function (done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ capturePageLoad: false, active: false })
-    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
 
     var tr
 
@@ -167,7 +179,9 @@ describe('ApmBase', function () {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({})
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
-    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
 
     expect(tr).toBeDefined()
 

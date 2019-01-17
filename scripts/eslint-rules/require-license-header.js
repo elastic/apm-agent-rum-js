@@ -30,12 +30,8 @@ function normalizeWhitespace (string) {
   return string.replace(/\s+/g, ' ')
 }
 
-function isHashbang (text) {
-  return text.trim().startsWith('#!') && !text.trim().includes('\n')
-}
-
 /**
- * Based on Eslint rule from Kibana
+ * Based on ESlint rule from Kibana
  * https://github.com/elastic/kibana/blob/bdf66a4db80bae3207a1ba7d19130ab0a150da71/packages/kbn-eslint-plugin-license-header/rules/require_license_header.js
  */
 module.exports = {
@@ -89,12 +85,6 @@ module.exports = {
               end: { line: 1, column: sourceCode.lines[0].length - 1 }
             },
             fix (fixer) {
-              console.log(sourceCode.lines[0], isHashbang(sourceCode.lines[0]))
-
-              if (isHashbang(sourceCode.lines[0])) {
-                return undefined
-              }
-
               return fixer.replaceTextRange([0, 0], license.source + '\n\n')
             }
           })
@@ -105,7 +95,7 @@ module.exports = {
         const sourceBeforeNode = sourceCode
           .getText()
           .slice(0, sourceCode.getIndexFromLoc(comment.loc.start))
-        if (sourceBeforeNode.length && !isHashbang(sourceBeforeNode)) {
+        if (sourceBeforeNode.length) {
           context.report({
             node: comment,
             message: 'License header must be at the very beginning of the file',
