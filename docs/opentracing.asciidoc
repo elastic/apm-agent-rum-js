@@ -2,10 +2,10 @@
 == OpenTracing
 
 Elastic APM RUM agent provides an implementation for the https://opentracing.io/[OpenTracing API].
-The `ElasticApmTracer` translates calls to OpenTracing APIs to Elastic APM and thus allows for reusing existing instrumentation.
+The `ElasticApmTracer` translates OpenTracing API calls to Elastic APM, which allows the reuse of existing instrumentation.
 
 The first span of a service will be converted to an Elastic APM `Transaction`,
-subsequent spans are mapped to Elastic APM `Span`.
+and subsequent spans are mapped to Elastic APM `Span`.
 
 
 [float]
@@ -55,11 +55,12 @@ but are relevant in the context of Elastic APM.
 
 
 The following tags are relevant only to the root spans, which are
-translated to Elastic APM transactions:
+translated to Elastic APM transactions.
+These tags appear in the "User" tab on the transaction details page in the Elastic APM UI.
 
-- `user.id` - sets the user id, which appears in the "User" tab in the transaction details in the Elastic APM UI
-- `user.email` - sets the user email, appears in the "User" tab in the transaction details in the Elastic APM UI
-- `user.username` - sets the user name, appears in the "User" tab in the transaction details in the Elastic APM UI
+- `user.id` - sets the user id
+- `user.email` - sets the user email
+- `user.username` - sets the user name
 
 
 [float]
@@ -72,14 +73,14 @@ Some of the OpenTracing features are not fully supported by Elastic APM RUM agen
 [[opentracing-propagation]]
 ==== Context propagation
 
-Currently only `FORMAT_HTTP_HEADERS` and `FORMAT_TEXT_MAP` carrier formats are supported.
+Currently, the only carrier formats supported are `FORMAT_HTTP_HEADERS` and `FORMAT_TEXT_MAP`.
 `FORMAT_BINARY` is not supported.
 
 [float]
 [[opentracing-references]]
 ==== Span References
 Currently, the Elastic APM Tracer supports `REFERENCE_CHILD_OF` references.
-However , only the first `REFERENCE_CHILD_OF` reference is recorded and the rest are ignored.
+However, only the first `REFERENCE_CHILD_OF` reference is recorded and the rest are ignored.
 Other references, e.g. `follows_from`, are currently not supported.
 
 
