@@ -1,3 +1,28 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2017-present, Elasticsearch BV
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
 var ApmBase = require('../../src/apm-base')
 var apmCore = require('elastic-apm-js-core')
 var enabled = require('../../src/bootstrap')()
@@ -46,7 +71,9 @@ describe('ApmBase', function () {
     apmBase.setInitialPageLoadName('test')
     var trService = serviceFactory.getService('TransactionService')
     var configService = serviceFactory.getService('ConfigService')
-    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
 
     expect(configService.get('pageLoadTransactionName')).toBe('test')
 
@@ -57,12 +84,16 @@ describe('ApmBase', function () {
 
     spyOn(tr, 'startSpan').and.callThrough()
     apmBase.startSpan('test-span', 'test-type')
-    expect(tr.startSpan).toHaveBeenCalledWith('test-span', 'test-type', undefined)
+    expect(tr.startSpan).toHaveBeenCalledWith(
+      'test-span',
+      'test-type',
+      undefined
+    )
 
     expect(apmBase.getCurrentTransaction()).toBe(tr)
     expect(apmBase.getTransactionService()).toBe(trService)
 
-    var filter = function (payload) {}
+    var filter = function () {}
     apmBase.addFilter(filter)
     expect(configService.filters.length).toBe(1)
     expect(configService.filters[0]).toBe(filter)
@@ -77,7 +108,9 @@ describe('ApmBase', function () {
     apmBase.init({})
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     expect(tr).toBeDefined()
-    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -96,7 +129,9 @@ describe('ApmBase', function () {
   it('should instrument xhr when no transaction was started', function (done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ capturePageLoad: false })
-    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
     var transactionService = serviceFactory.getService('TransactionService')
     transactionService.currentTransaction = undefined
 
@@ -120,7 +155,9 @@ describe('ApmBase', function () {
   it('should instrument xhr when not active', function (done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ capturePageLoad: false, active: false })
-    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
 
     var tr
 
@@ -142,7 +179,9 @@ describe('ApmBase', function () {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({})
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
-    var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
 
     expect(tr).toBeDefined()
 

@@ -1,3 +1,28 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2017-present, Elasticsearch BV
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
 const path = require('path')
 const url = require('url')
 const fs = require('fs')
@@ -14,7 +39,7 @@ function createRelease (token) {
   const options = Object.assign({}, urlObj, {
     method: 'POST',
     headers: {
-      'Authorization': `token ${token}`,
+      Authorization: `token ${token}`,
       'User-Agent': 'APM RUM JS agent' + version
     }
   })
@@ -43,7 +68,7 @@ function createRelease (token) {
         resolve(chunks)
       })
     })
-    request.on('error', (err) => reject(err))
+    request.on('error', err => reject(err))
     request.write(JSON.stringify(postBody))
     request.end()
   })
@@ -55,28 +80,34 @@ function uploadAssets (uploadUrl, token) {
    *
    * TODO: Remove this filtering logic once we revisit bundling steps
    */
-  const assets = fs.readdirSync(BUILD_DIR)
+  const assets = fs
+    .readdirSync(BUILD_DIR)
     .filter(file => file.endsWith('.js'))
     .map(file => path.join(BUILD_DIR, file))
   return new Promise((resolve, reject) => {
-    releaseAssets({
-      url: uploadUrl,
-      token,
-      assets
-    }, (err, assets) => {
-      if (err) {
-        return reject(err)
+    releaseAssets(
+      {
+        url: uploadUrl,
+        token,
+        assets
+      },
+      (err, assets) => {
+        if (err) {
+          return reject(err)
+        }
+        resolve(assets)
       }
-      resolve(assets)
-    })
+    )
   })
 }
 
-(async function startRelease () {
+;(async function startRelease () {
   try {
     var token = process.env['GITHUB_TOKEN']
     if (!token) {
-      throw new Error('Please provide GITHUB_TOKEN=`token` for creating release')
+      throw new Error(
+        'Please provide GITHUB_TOKEN=`token` for creating release'
+      )
     }
     console.log('creating release for the tag - ', version)
     const response = await createRelease(token)
