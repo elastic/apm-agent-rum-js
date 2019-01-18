@@ -1,0 +1,6 @@
+build
+docs
+coverage
+dist
+*.e2e-bundle.*
+test/e2e/sourcemap
