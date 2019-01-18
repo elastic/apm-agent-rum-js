@@ -1,0 +1,98 @@
+[[opentracing]]
+== OpenTracing
+
+Elastic APM RUM agent provides an implementation for the https://opentracing.io/[OpenTracing API].
+The `ElasticApmTracer` translates OpenTracing API calls to Elastic APM, which allows the reuse of existing instrumentation.
+
+The first span of a service will be converted to an Elastic APM `Transaction`,
+and subsequent spans are mapped to Elastic APM `Span`.
+
+
+[float]
+[[opentracing-getting-started]]
+=== Getting started
+
+In order to use OpenTracing API with Elastic APM, you need to first create a Tracer:
+
+[source,js]
+----
+const { init: initApm, createTracer } = require('elastic-apm-js-base/dist/bundles/elastic-apm-opentracing.umd.js')
+const elasticApm = initApm({
+    // ...
+})
+const elasticTracer = createTracer(elasticApm)
+----
+
+At this point you can either use `elasticTracer` directly, or register it as a global tracer:
+
+[source,js]
+----
+const opentracing = require('opentracing-javascript')
+opentracing.initGlobalTracer(elasticTracer);
+
+// ... 
+
+const tracer = opentracing.globalTracer();
+----
+
+Please refer to https://github.com/opentracing/opentracing-javascript/[opentracing-javascript] documentation for more detail 
+on OpenTracing API.
+
+NOTE: If you are loading the RUM agent using a script tag, please make sure to use our OpenTracing bundle 
+(`elastic-apm-js-base/dist/bundles/elastic-apm-opentracing.umd.js`) in your scripts instead, then you can create a tracer
+using `window.elasticApm.createTracer()`.
+
+
+[float]
+[[opentracing-apm-tags]]
+=== Elastic APM specific tags
+
+Elastic APM defines some tags which are not included in the OpenTracing specification,
+but are relevant in the context of Elastic APM.
+
+- `type` - sets the type of the transaction or span, e.g. "page-load", or "ext.http".
+           If `type` is not specified, `custom` would be set instead.
+
+
+The following tags are relevant only to the root spans, which are
+translated to Elastic APM transactions.
+These tags appear in the "User" tab on the transaction details page in the Elastic APM UI.
+
+- `user.id` - sets the user id
+- `user.email` - sets the user email
+- `user.username` - sets the user name
+
+
+[float]
+[[opentracing-caveats]]
+=== Caveats
+Some of the OpenTracing features are not fully supported by Elastic APM RUM agent.
+
+
+[float]
+[[opentracing-propagation]]
+==== Context propagation
+
+Currently, the only carrier formats supported are `FORMAT_HTTP_HEADERS` and `FORMAT_TEXT_MAP`.
+`FORMAT_BINARY` is not supported.
+
+[float]
+[[opentracing-references]]
+==== Span References
+Currently, the Elastic APM Tracer supports `REFERENCE_CHILD_OF` references.
+However, only the first `REFERENCE_CHILD_OF` reference is recorded and the rest are ignored.
+Other references, e.g. `follows_from`, are currently not supported.
+
+
+[float]
+[[opentracing-baggage]]
+==== Baggage
+The `Span.setBaggageItem` method is not supported.
+Baggage items are silently dropped.
+
+[float]
+[[opentracing-logs]]
+==== Logs
+
+Only Error logging is supported.
+Logging an Error on the OpenTracing span will create an Elastic APM Error.
