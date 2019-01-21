@@ -27,6 +27,7 @@ const path = require('path')
 const testUtils = require('elastic-apm-js-core/dev-utils/test')
 const { runIntegrationTest } = require('../test/e2e/integration-test')
 const projectDirectory = path.join(__dirname, './../')
+const { generateNotice } = require('elastic-apm-js-core/dev-utils/dep-info')
 
 function runUnitTests (launchSauceConnect) {
   var testConfig = testUtils.getTestEnvironmentVariables()
@@ -184,7 +185,8 @@ const scripts = {
 
     testUtils.buildE2eBundles(path.join(projectDirectory, basePath), callback)
   },
-  serveE2e
+  serveE2e,
+  generateNotice
 }
 
 module.exports = scripts
