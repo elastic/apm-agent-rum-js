@@ -27,7 +27,7 @@
     "run-e2e": "node ./scripts/run-script.js runE2eTests",
     "run-script": "node ./scripts/run-script.js",
     "test": "npm run lint && npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e && npm run build-docs",
-    "lint": "eslint .",
+    "lint": "eslint . && node scripts/license-checker",
     "format": "eslint . --fix"
   },
   "files": [
@@ -62,6 +62,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "^0.0.31",
     "karma-webpack": "^2.0.4",
+    "license-checker": "^25.0.1",
     "puppeteer": "^1.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
