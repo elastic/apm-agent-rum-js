@@ -72,7 +72,7 @@ describe('index', function () {
       email: 'email'
     })
     apmBase.setCustomContext({ testContext: 'testContext' })
-    apmBase.setTags({ testTagKey: 'testTagValue' })
+    apmBase.addTags({ testTagKey: 'testTagValue' })
 
     try {
       throw new Error('ApmBase test error')

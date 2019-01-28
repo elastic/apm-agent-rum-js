@@ -43,7 +43,9 @@ class ApmBase {
       var errorLogging = this.serviceFactory.getService('ErrorLogging')
       errorLogging.registerGlobalEventListener()
 
-      var performanceMonitoring = this.serviceFactory.getService('PerformanceMonitoring')
+      var performanceMonitoring = this.serviceFactory.getService(
+        'PerformanceMonitoring'
+      )
       performanceMonitoring.init()
 
       if (configService.get('sendPageLoadTransaction')) {
@@ -54,7 +56,9 @@ class ApmBase {
   }
 
   _sendPageLoadMetrics () {
-    var transactionService = this.serviceFactory.getService('TransactionService')
+    var transactionService = this.serviceFactory.getService(
+      'TransactionService'
+    )
     var configService = this.serviceFactory.getService('ConfigService')
 
     var tr = transactionService.startTransaction(
@@ -96,9 +100,9 @@ class ApmBase {
     configService.setCustomContext(customContext)
   }
 
-  setTags (tags) {
+  addTags (tags) {
     var configService = this.serviceFactory.getService('ConfigService')
-    configService.setTags(tags)
+    configService.addTags(tags)
   }
 
   // Should call this method before 'load' event on window is fired
@@ -113,28 +117,36 @@ class ApmBase {
 
   startTransaction (name, type) {
     if (this.isEnabled()) {
-      var transactionService = this.serviceFactory.getService('TransactionService')
+      var transactionService = this.serviceFactory.getService(
+        'TransactionService'
+      )
       return transactionService.startTransaction(name, type)
     }
   }
 
   startSpan (name, type) {
     if (this.isEnabled()) {
-      var transactionService = this.serviceFactory.getService('TransactionService')
+      var transactionService = this.serviceFactory.getService(
+        'TransactionService'
+      )
       return transactionService.startSpan(name, type)
     }
   }
 
   getCurrentTransaction () {
     if (this.isEnabled()) {
-      var transactionService = this.serviceFactory.getService('TransactionService')
+      var transactionService = this.serviceFactory.getService(
+        'TransactionService'
+      )
       return transactionService.getCurrentTransaction()
     }
   }
 
   getTransactionService () {
     if (this.isEnabled()) {
-      var transactionService = this.serviceFactory.getService('TransactionService')
+      var transactionService = this.serviceFactory.getService(
+        'TransactionService'
+      )
       return transactionService
     }
   }

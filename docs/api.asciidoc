@@ -51,12 +51,12 @@ The given `context` argument must be an object and can contain any property that
 
 
 [float]
-[[apm-set-tags]]
-==== `apm.setTags()`
+[[apm-add-tags]]
+==== `apm.addTags()`
 
 [source,js]
 ----
-apm.setTags(tags)
+apm.addTags(tags)
 ----
 
 Set tags on transactions and errors.
