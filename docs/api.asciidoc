@@ -272,4 +272,4 @@ Use this method to mark significant events that happen while the transaction is 
 
 Arguments:
 
-* `key` -  Any string. Any periods (.), asterisks (*), or double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
+* `key` -  Any string. All periods (.), asterisks (*), and double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
