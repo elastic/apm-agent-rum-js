@@ -1,6 +1,6 @@
 {
   "name": "elastic-apm-js-base",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "Elastic APM JavaScript agent",
   "main": "dist/bundles/elastic-apm-js-base.umd.js",
   "repository": {

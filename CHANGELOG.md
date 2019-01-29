@@ -1,3 +1,36 @@
+<a name="3.0.0"></a>
+# [3.0.0](https://github.com/elastic/apm-agent-js-base/compare/v2.3.0...v3.0.0) (2019-01-29)
+
+### BREAKING CHANGE
+
+* remove setTags in favor of addTags API ([#28](https://github.com/elastic/apm-agent-js-core/issues/28))
+* introduce subtype and action in Spans ([#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7](https://github.com/elastic/apm-agent-js-core/commit/5fd4af7))
+
+
+### Features
+
+* add OpenTracing support ([#138](https://github.com/elastic/apm-agent-js-base/issues/138)) ([0cff389](https://github.com/elastic/apm-agent-js-base/commit/0cff389))
+* include transaction flags on error ([#29](https://github.com/elastic/apm-agent-js-core/issues/29)) ([36c13f3](https://github.com/elastic/apm-agent-js-core/commit/36c13f3))
+* send span sync field to apm server ([#17](https://github.com/elastic/apm-agent-js-core/issues/17)) ([abad58b](https://github.com/elastic/apm-agent-js-core/commit/abad58b))
+* add addContext and addTags to Spans and Transactions ([#16](https://github.com/elastic/apm-agent-js-core/issues/16)) ([de0d72b](https://github.com/elastic/apm-agent-js-core/commit/de0d72b))
+* add paint timing mark to page-load transaction ([#14](https://github.com/elastic/apm-agent-js-core/issues/14)) ([544530a](https://github.com/elastic/apm-agent-js-core/commit/544530a))
+
+
+### Bug Fixes
+
+* propagate transaction ID for unsampled transactions ([#30](https://github.com/elastic/apm-agent-js-core/issues/30)) ([3884806](https://github.com/elastic/apm-agent-js-core/commit/3884806))
+* remove invalid chars in span tags and marks ([#34](https://github.com/elastic/apm-agent-js-core/issues/34)) ([9bdc575](https://github.com/elastic/apm-agent-js-core/commit/9bdc575))
+* Bundling -  moving to webpack 4 and babel 7 ([#123](https://github.com/elastic/apm-agent-js-base/issues/123)) ([0ae3f53](https://github.com/elastic/apm-agent-js-base/commit/0ae3f53))
+* remove query strings from xhr and fetch span name ([#24](https://github.com/elastic/apm-agent-js-core/issues/24)) ([cc82e92](https://github.com/elastic/apm-agent-js-core/commit/cc82e92))
+* set pageLoadTransactionName when transaction ends from configs ([#25](https://github.com/elastic/apm-agent-js-core/issues/25)) ([afdacee](https://github.com/elastic/apm-agent-js-core/commit/afdacee))
+
+
+
+### Performance Improvements
+
+* introduce minimal url parser to reduce bundle size ([#32](https://github.com/elastic/apm-agent-js-core/issues/32)) ([2000ee2](https://github.com/elastic/apm-agent-js-core/commit/2000ee2))
+
+
 <a name="2.2.0"></a>
 # [2.2.0](https://github.com/elastic/apm-agent-js-base/compare/v2.1.1...v2.2.0) (2018-12-05)
 
