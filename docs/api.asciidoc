@@ -66,7 +66,7 @@ Tags are key/value pairs that are indexed by Elasticsearch and therefore searcha
 Arguments:
 
 * `tags` - Any key/value object with the following specifications:
-** key - Any string. Must not contain periods (`.`) as those have special meaning in Elasticsearch
+** key - Any string. All periods (.), asterisks (*), and double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
 ** value - Any string. If a non-string data type is given, it's converted to a string before being sent to the APM Server.
 
 
@@ -269,3 +269,7 @@ transaction.mark(key)
 
 Marks the current point in time relative to the start of the transaction.
 Use this method to mark significant events that happen while the transaction is active.
+
+Arguments:
+
+* `key` -  Any string. All periods (.), asterisks (*), and double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
