@@ -1,6 +1,6 @@
 {
   "name": "elastic-apm-js-base",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "",
   "main": "dist/bundles/elastic-apm-js-base.umd.js",
   "repository": {
@@ -74,7 +74,7 @@
     "webpack-bundle-analyzer": "^2.9.2"
   },
   "dependencies": {
-    "elastic-apm-js-core": "^2.1.1",
+    "elastic-apm-js-core": "^2.2.0",
     "es6-promise": "^4.2.4"
   }
 }
