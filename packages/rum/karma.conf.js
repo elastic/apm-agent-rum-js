@@ -31,7 +31,7 @@ module.exports = function (config) {
   karmaUtils.baseConfig.browserNoActivityTimeout = 120000
 
   config.set(karmaUtils.baseConfig)
-  var testConfig = require('./test.config')
+  var testConfig = require('../../test.config')
   var customeConfig = {
     globalConfigs: testConfig,
     testConfig: testConfig.env
