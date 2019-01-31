@@ -1,0 +1,57 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2017-present, Elasticsearch BV
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
+function launchSauceConnect (userConfig, done) {
+  var sauceConnectLauncher = require('sauce-connect-launcher')
+
+  var config = {
+    username: userConfig && (userConfig.username || process.env.SAUCE_USERNAME),
+    accessKey: userConfig && (userConfig.accessKey || process.env.SAUCE_ACCESS_KEY),
+    logger: console.log,
+    noSslBumpDomains: 'all'
+  }
+
+  var tryConnect = function (maxAttempts, currAttempts, done) {
+    sauceConnectLauncher(config, function (err) {
+      if (err) {
+        console.error(err.message)
+        if (currAttempts <= maxAttempts) {
+          console.log('Retrying... (attempt ' + currAttempts + ' of ' + maxAttempts + ')')
+          tryConnect(maxAttempts, ++currAttempts, done)
+        } else {
+          return process.exit(1)
+        }
+      } else {
+        console.log('Sauce Connect ready')
+        done()
+      }
+    })
+  }
+
+  tryConnect(3, 1, done)
+}
+module.exports = {
+  launchSauceConnect
+}

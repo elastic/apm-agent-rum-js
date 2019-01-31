@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# set -e
+
+if [[ $# -lt 1 || "$1" != "patch" && "$1" != "minor" && "$1" != "major" ]];
+then
+    echo "Usage: $0 <version_type - [patch | minor | major]>"
+    exit 1
+fi
+
+git diff-index --quiet HEAD
+GITSTATUS=$?
+if [ $GITSTATUS -ne 0 ];
+then
+    echo "Git working directory is not clean. Aborting.";
+    exit 1
+fi
+
+git checkout master
+git remote update
+
+if [[ `git rev-parse HEAD` != `git rev-parse origin/master` ]]
+then
+    echo "Different state between local and origin. Aborting.";
+    exit 1
+fi
+
+npm test
+TEST_RESULT=$?
+if [[ TEST_RESULT -ne 0 ]];
+then
+    echo "Test failed. Aborting.";
+    exit 1
+fi
+
+VERSION_TYPE="$1"
+echo "$VERSION_TYPE"
+
+npm version $VERSION_TYPE --no-git-tag-version
+PACKAGE_VERSION=`node -e "console.log(require('./package.json').version);"`
+TAG_NAME="v$PACKAGE_VERSION"
+
+{
+    npm run changelog
+} || {
+    read -r -p "Could not generate changelog. Please write it manually and press ENTER." TRASH
+}
+
+git diff
+
+read -r -p "Are these changes OK (edit if necessary)? [y/N] " RESPONSE
+echo " "
+
+if ! [[ $RESPONSE =~ ^([yY][eE][sS]|[yY])$ ]];
+then
+    echo "Rolling back changes."
+    git checkout -- package.json CHANGELOG.md package-lock.json
+    exit 1
+fi
+
+# todo: check travis status
+# BRANCH_NAME="release-$TAG_NAME"
+# git checkout -b $BRANCH_NAME
+
+git add package.json CHANGELOG.md package-lock.json
+git commit -m "chore: version $PACKAGE_VERSION"
+git tag -a $TAG_NAME -m "version $PACKAGE_VERSION"
+
+# git push origin $BRANCH_NAME
+
+echo "All done. ($TAG_NAME)"
+exit 0
