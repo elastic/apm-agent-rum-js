@@ -11,7 +11,8 @@
     "lint": "eslint . && node scripts/license-checker",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
     "format": "eslint . --fix",
-    "test": "npm run lint && lerna bootstrap && lerna run test --stream && npm run build-docs"
+    "bootstrap": "lerna bootstrap",
+    "test": "npm run lint && lerna run test --stream && npm run build-docs"
   },
   "author": "",
   "license": "MIT",

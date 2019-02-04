@@ -25,9 +25,7 @@
     "buildE2eBundles": "npm run script buildE2eBundles",
     "run-e2e": "npm run script runE2eTests",
     "script": "node ./run-script.js",
-    "test": "npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e",
-    "lint": "eslint . && node scripts/license-checker",
-    "format": "eslint . --fix"
+    "test": "npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e"
   },
   "files": [
     "src/**/*.js",

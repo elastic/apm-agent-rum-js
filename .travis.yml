@@ -25,4 +25,7 @@ addons:
      - libxml2-utils
 before_install:
   - docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
+script:
+  - npm run bootstrap
+  - npm run test
   
