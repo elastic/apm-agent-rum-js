@@ -162,6 +162,7 @@ describe('ApmServer', function () {
     trs.forEach(apmServer.addTransaction.bind(apmServer))
     expect(apmServer._throttledMakeRequest).toHaveBeenCalled()
     expect(loggingService.warn).toHaveBeenCalledWith(
+      // eslint-disable-next-line
       'ElasticAPM: Dropped request to http://localhost:8200/v1/client-side/transactions due to throttling!'
     )
     expect(apmServer._makeHttpRequest).not.toHaveBeenCalled()
@@ -364,6 +365,7 @@ describe('ApmServer', function () {
     var trs = generateTransaction(3)
     trs = performanceMonitoring.convertTransactionsToServerModel(trs)
     var result = apmServer.ndjsonTransactions(trs)
+    /* eslint-disable max-len */
     var expected = [
       '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","subType":"NA","action":"NA","sync":false,"start":10,"duration":10}}\n',
       '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","subType":"NA","action":"NA","sync":false,"start":10,"duration":10}}\n',

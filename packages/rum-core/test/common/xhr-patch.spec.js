@@ -139,22 +139,23 @@ describe('xhrPatch', function () {
     expect(events.map(e => e.event)).toEqual(['schedule', 'clear'])
   })
 
-  it('should work properly when send request multiple times on single xmlRequest instance', function (done) {
-    const req = new XMLHttpRequest()
-    req.open('get', '/', true)
-    req.send()
-    req.onload = function () {
-      req.onload = null
+  it('should work properly when send request multiple times on single xmlRequest instance',
+    function (done) {
+      const req = new XMLHttpRequest()
       req.open('get', '/', true)
+      req.send()
       req.onload = function () {
-        expect(events.map(e => e.event)).toEqual(['schedule', 'invoke', 'schedule', 'invoke'])
-        done()
+        req.onload = null
+        req.open('get', '/', true)
+        req.onload = function () {
+          expect(events.map(e => e.event)).toEqual(['schedule', 'invoke', 'schedule', 'invoke'])
+          done()
+        }
+        expect(() => {
+          req.send()
+        }).not.toThrow()
       }
-      expect(() => {
-        req.send()
-      }).not.toThrow()
-    }
-  })
+    })
 
   it('should preserve static constants', function () {
     expect(XMLHttpRequest.UNSENT).toEqual(0)
@@ -164,19 +165,20 @@ describe('xhrPatch', function () {
     expect(XMLHttpRequest.DONE).toEqual(4)
   })
 
-  it('should work correctly when abort was called multiple times before request is done', function (done) {
-    const req = new XMLHttpRequest()
-    req.open('get', '/', true)
-    req.send()
-    req.addEventListener('readystatechange', function () {
-      if (req.readyState >= 2) {
-        expect(() => {
-          req.abort()
-        }).not.toThrow()
-        done()
-      }
+  it('should work correctly when abort was called multiple times before request is done',
+    function (done) {
+      const req = new XMLHttpRequest()
+      req.open('get', '/', true)
+      req.send()
+      req.addEventListener('readystatechange', function () {
+        if (req.readyState >= 2) {
+          expect(() => {
+            req.abort()
+          }).not.toThrow()
+          done()
+        }
+      })
     })
-  })
 
   it('should return null when access ontimeout first time without error', function () {
     let req = new XMLHttpRequest()
@@ -215,14 +217,15 @@ describe('xhrPatch', function () {
     }
   })
 
-  it('should not throw error when get XMLHttpRequest.prototype.onreadystatechange the first time', function () {
-    const func = function () {
-      const req = new XMLHttpRequest()
-      // eslint-disable-next-line
-      req.onreadystatechange
-    }
-    expect(func).not.toThrow()
-  })
+  it('should not throw error when get XMLHttpRequest.prototype.onreadystatechange the first time',
+    function () {
+      const func = function () {
+        const req = new XMLHttpRequest()
+        // eslint-disable-next-line
+        req.onreadystatechange
+      }
+      expect(func).not.toThrow()
+    })
 
   it('should consider xhr ignore', function (done) {
     var req = new window.XMLHttpRequest()

@@ -23,6 +23,7 @@
  *
  */
 
+ /* eslint-disable max-len */
 module.exports = [
   {
     name: 'should not be seen',

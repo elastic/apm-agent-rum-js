@@ -53,6 +53,7 @@ class Tracer extends otTracer {
       } else if (options.references && options.references.length > 0) {
         if (options.references.length > 1) {
           this.loggingService.debug(
+            // eslint-disable-next-line
             'Elastic APM OpenTracing: Unsupported number of references, only the first childOf reference will be recorded.'
           )
         }
