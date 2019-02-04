@@ -3,10 +3,7 @@
   "version": "3.0.0",
   "description": "Elastic APM JavaScript agent",
   "main": "dist/bundles/elastic-apm-js-base.umd.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/elastic/apm-agent-js-base.git"
-  },
+  "repository": "https://github.com/elastic/apm-agent-js-base/tree/master/packages/rum",
   "scripts": {
     "prepare-patch": "sh ../../prepare-release patch && npm run build && npm run release",
     "prepare-minor": "sh ../../prepare-release minor && npm run build && npm run release",
@@ -19,7 +16,6 @@
     "karma": "karma start",
     "karma-coverage": "karma start --coverage",
     "serve": "npm run script serveE2e ./ 8000",
-    "changelog": "node node_modules/conventional-changelog-cli/cli.js  -p angular -i CHANGELOG.md -s",
     "runUnitTests": "npm run script runUnitTests",
     "runNodeTests": "npm run script runNodeTests",
     "buildE2eBundles": "npm run script buildE2eBundles",
@@ -28,7 +24,7 @@
     "test": "npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e"
   },
   "files": [
-    "src/**/*.js",
+    "src",
     "dist"
   ],
   "author": "",

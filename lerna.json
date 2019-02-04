@@ -2,5 +2,14 @@
   "packages": [
     "packages/*"
   ],
-  "version": "independent"
+  "version": "independent",
+  "registry": "https://registry.npmjs.org",
+  "command": {
+    "publish": {
+      "ignoreChanges": [
+        "*.md",
+        "test"
+      ]
+    }
+  }
 }
