@@ -27,7 +27,7 @@ var path = require('path')
 var request = require('request')
 var fs = require('fs')
 
-var basePath = './test/e2e'
+var basePath = path.join(__dirname, '../e2e')
 var testConfig = require('../../test.config')
 
 describe('Sourcemaps', function () {

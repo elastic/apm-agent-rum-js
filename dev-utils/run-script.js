@@ -28,9 +28,9 @@ const testUtils = require('./test')
 const saucelabs = require('./saucelabs')
 const { generateNotice } = require('./dep-info')
 
-function runUnitTests (launchSauceConnect) {
+function runUnitTests (launchSauceConnect, directory) {
   var testConfig = testUtils.getTestEnvironmentVariables()
-  testConfig.karmaConfigFile = path.join(__dirname, './../karma.conf.js')
+  testConfig.karmaConfigFile = path.join(__dirname,'..', directory, './karma.conf.js')
   if (launchSauceConnect !== 'false') {
     return testUtils.runUnitTests(testConfig)
   } else {

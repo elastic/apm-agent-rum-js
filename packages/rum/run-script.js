@@ -24,14 +24,14 @@
  */
 
 const path = require('path')
-const testUtils = require('elastic-apm-js-core/dev-utils/test')
-const { runIntegrationTest } = require('../test/e2e/integration-test')
-const projectDirectory = path.join(__dirname, './../')
-const { generateNotice } = require('elastic-apm-js-core/dev-utils/dep-info')
+const testUtils = require('../../dev-utils/test')
+const { runIntegrationTest } = require('./test/e2e/integration-test')
+const projectDirectory = path.join(__dirname, './')
+const { generateNotice } = require('../../dev-utils/dep-info')
 
 function runUnitTests (launchSauceConnect) {
   var testConfig = testUtils.getTestEnvironmentVariables()
-  testConfig.karmaConfigFile = path.join(__dirname, './../karma.conf.js')
+  testConfig.karmaConfigFile = path.join(__dirname, './karma.conf.js')
   if (launchSauceConnect !== 'false') {
     return testUtils.runUnitTests(testConfig)
   } else {
@@ -86,7 +86,7 @@ function serveE2e (servingPath, port) {
   const serveIndex = require('serve-index')
 
   const app = express()
-  var staticPath = path.join(__dirname, '../', servingPath)
+  var staticPath = path.join(__dirname, servingPath)
 
   app.get('/healthcheck', function (req, res) {
     res.send('OK')
@@ -105,7 +105,7 @@ function serveE2e (servingPath, port) {
   })
 
   app.get('/test-config.js', async function (req, res) {
-    var config = require('../test.config')
+    var config = require('./test.config')
     var result = `
       window.globalConfigs = ${JSON.stringify(config)}
     `

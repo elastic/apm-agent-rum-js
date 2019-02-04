@@ -23,8 +23,8 @@
  *
  */
 
-var karmaUtils = require('./dev-utils/karma.js')
-var testUtils = require('./dev-utils/test.js')
+var karmaUtils = require('../../dev-utils/karma.js')
+var testUtils = require('../../dev-utils/test.js')
 
 module.exports = function (config) {
   config.set(karmaUtils.baseConfig)

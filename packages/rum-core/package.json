@@ -17,8 +17,8 @@
     "karma": "karma start",
     "karma-bench": "karma start karma.bench.conf.js",
     "karma-coverage": "karma start --coverage",
-    "runUnitTests": "node ./dev-utils/run-script.js runUnitTests",
-    "test": "npm run lint && npm run runUnitTests",
+    "runUnitTests": "node ../../dev-utils/run-script.js runUnitTests true packages/rum-core",
+    "test": "npm run runUnitTests",
     "lint": "standard",
     "format": "prettier-standard 'dev-utils/**/*.js' src/**/*.js test/**/*.js"
   },
@@ -33,7 +33,9 @@
     "stack-generator": "^1.0.7",
     "uuid": "^3.1.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "es6-promise": "^4.2.4"
+  },
   "standard": {
     "env": [
       "jasmine",
