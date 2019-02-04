@@ -30,7 +30,12 @@ const { generateNotice } = require('./dep-info')
 
 function runUnitTests (launchSauceConnect, directory) {
   var testConfig = testUtils.getTestEnvironmentVariables()
-  testConfig.karmaConfigFile = path.join(__dirname,'..', directory, './karma.conf.js')
+  testConfig.karmaConfigFile = path.join(
+    __dirname,
+    '..',
+    directory,
+    './karma.conf.js'
+  )
   if (launchSauceConnect !== 'false') {
     return testUtils.runUnitTests(testConfig)
   } else {
@@ -40,7 +45,9 @@ function runUnitTests (launchSauceConnect, directory) {
 
 function runScript (scripts, scriptName, scriptArgs) {
   if (scriptName) {
-    var message = `Running: ${scriptName}(${scriptArgs.map(a => "'" + a + "'").join(', ')}) \n`
+    var message = `Running: ${scriptName}(${scriptArgs
+      .map(a => "'" + a + "'")
+      .join(', ')}) \n`
     console.log(message)
     if (typeof scripts[scriptName] === 'function') {
       return scripts[scriptName].apply(this, scriptArgs)

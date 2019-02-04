@@ -28,4 +28,3 @@ before_install:
 script:
   - npm run bootstrap
   - npm run test
-  
