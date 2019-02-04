@@ -23,7 +23,7 @@
  *
  */
 
-const testUtils = require('elastic-apm-js-core/dev-utils/test.js')
+const testUtils = require('./dev-utils/test.js')
 
 const env = testUtils.getTestEnvironmentVariables()
 let serverUrl = 'http://localhost:8200'

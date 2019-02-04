@@ -23,7 +23,7 @@
  * 
  */
 
-var utils = require('elastic-apm-js-core/dev-utils/webdriver')
+var utils = require('../../../../../dev-utils/webdriver')
 const { isChrome } = require('../e2e-utils')
 
 describe('standalone-html', function () {

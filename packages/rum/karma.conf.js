@@ -23,7 +23,7 @@
  *
  */
 
-var karmaUtils = require('elastic-apm-js-core/dev-utils/karma.js')
+var karmaUtils = require('../../dev-utils/karma.js')
 
 module.exports = function (config) {
   // temporarily set firefox version to 44 due to apm-server#676 issue

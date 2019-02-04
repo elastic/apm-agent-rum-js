@@ -23,7 +23,7 @@
  * 
  */
 
-const utils = require('elastic-apm-js-core/dev-utils/webdriver')
+const utils = require('../../../../../dev-utils/webdriver')
 const { isChrome } = require('../e2e-utils')
 
 describe('manual-timing', function () {
