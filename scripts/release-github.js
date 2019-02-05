@@ -28,9 +28,9 @@ const url = require('url')
 const fs = require('fs')
 const https = require('https')
 const releaseAssets = require('gh-release-assets')
-const { version } = require('../package.json')
+const { version } = require('../packages/rum/package.json')
 
-const BUILD_DIR = path.resolve(__dirname, '../dist/bundles')
+const BUILD_DIR = path.join(__dirname, '../packages/rum/dist/bundles')
 const GITHUB_URL = 'https://api.github.com/repos/elastic/apm-agent-js-base'
 
 function createRelease (token) {
