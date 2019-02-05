@@ -6,17 +6,15 @@
   "registry": "https://registry.npmjs.org",
   "command": {
     "version": {
-      "conventionalCommits": true,
-      "gitRemote": "origin",
-      "allowBranch": "*"
-    },
-    "publish": {
-      "ignoreChanges": [
-        "*.md",
-        "test"
-      ],
       "allowBranch": "master",
-      "gitRemote": "upstream"
-    }
+      "conventionalCommits": true,
+      "gitRemote": "upstream",
+      "message": "chore(release): %s"
+    },
+    "ignoreChanges": [
+      "**/*.md",
+      "**/test/**",
+      "docs"
+    ]
   }
 }
