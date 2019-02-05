@@ -23,27 +23,11 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
-
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+module.exports = function () {
+  return window.globalConfigs && (window.globalConfigs.agentConfig || {
+    serverUrl: 'http://localhost:8200',
+    serviceName: 'test',
+    agentName: 'apm-js-core',
+    agentVersion: '0.0.1'
+  })
 }
-
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config

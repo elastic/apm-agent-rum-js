@@ -1,39 +1,19 @@
 {
-  "name": "elastic-apm-js-base",
+  "name": "elastic-apm-rum",
+  "private": true,
   "version": "3.0.0",
-  "description": "Elastic APM JavaScript agent",
-  "main": "dist/bundles/elastic-apm-js-base.umd.js",
+  "description": "Elastic APM RUM agent",
   "repository": {
     "type": "git",
     "url": "https://github.com/elastic/apm-agent-js-base.git"
   },
   "scripts": {
-    "prepare-patch": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release patch && npm run build && npm run release",
-    "prepare-minor": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release minor && npm run build && npm run release",
-    "prepare-major": "sh ./node_modules/elastic-apm-js-core/dev-utils/prepare-release major && npm run build && npm run release",
-    "release": "npm run push-tags && npm publish && npm run github-release",
-    "push-tags": "git push origin master --follow-tags",
-    "github-release": "node ./scripts/release-github.js",
-    "build": "webpack",
-    "build-dev": "webpack -w",
-    "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
-    "karma": "karma start",
-    "karma-coverage": "karma start --coverage",
-    "serve": "node ./scripts/run-script.js serveE2e ./ 8000",
-    "changelog": "node node_modules/conventional-changelog-cli/cli.js  -p angular -i CHANGELOG.md -s",
-    "runUnitTests": "node ./scripts/run-script.js runUnitTests",
-    "runNodeTests": "node ./scripts/run-script.js runNodeTests",
-    "buildE2eBundles": "node ./scripts/run-script.js buildE2eBundles",
-    "run-e2e": "node ./scripts/run-script.js runE2eTests",
-    "run-script": "node ./scripts/run-script.js",
-    "test": "npm run lint && npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e && npm run build-docs",
     "lint": "eslint . && node scripts/license-checker",
-    "format": "eslint . --fix"
+    "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
+    "format": "eslint . --fix",
+    "bootstrap": "lerna bootstrap",
+    "test": "npm run lint && lerna run test --stream && npm run build-docs"
   },
-  "files": [
-    "src/**/*.js",
-    "dist"
-  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
@@ -62,6 +42,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "^0.0.31",
     "karma-webpack": "^2.0.4",
+    "lerna": "^3.10.7",
     "license-checker": "^25.0.1",
     "puppeteer": "^1.6.0",
     "react": "^16.2.0",
@@ -80,8 +61,5 @@
     "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.1.2"
   },
-  "dependencies": {
-    "elastic-apm-js-core": "^3.0.1",
-    "es6-promise": "^4.2.4"
-  }
+  "dependencies": {}
 }

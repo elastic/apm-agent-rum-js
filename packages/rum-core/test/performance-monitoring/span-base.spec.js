@@ -23,27 +23,17 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+var SpanBase = require('../../src/performance-monitoring/span-base')
+describe('SpanBase', function () {
+  it('should addTags', function () {
+    var span = new SpanBase()
+    span.addTags({ test: 'passed', 'test.new': 'new' })
+    expect(span.context).toEqual({ tags: { test: 'passed', test_new: 'new' } })
+  })
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
-}
-
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config
+  it('should addContext', function () {
+    var span = new SpanBase()
+    span.addContext({ test: { ctx: 'hamid' } })
+    expect(span.context).toEqual({ test: { ctx: 'hamid' } })
+  })
+})

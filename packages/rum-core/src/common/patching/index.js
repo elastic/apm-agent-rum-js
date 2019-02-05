@@ -23,27 +23,25 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
-
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+var patchXMLHttpRequest = require('./xhr-patch').patchXMLHttpRequest
+var patchFetch = require('./fetch-patch').patchFetch
+var Subscription = require('../subscription')
+var subscription = new Subscription()
+var alreadyPatched = false
+function patchAll () {
+  if (!alreadyPatched) {
+    alreadyPatched = true
+    patchXMLHttpRequest(function (event, task) {
+      subscription.applyAll(this, [event, task])
+    })
+    patchFetch(function (event, task) {
+      subscription.applyAll(this, [event, task])
+    })
+  }
+  return subscription
 }
 
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
+module.exports = {
+  patchAll,
+  subscription
 }
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config

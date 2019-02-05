@@ -23,27 +23,22 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+const BaseSpan = require('./span-base')
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+class Span extends BaseSpan {
+  constructor (name, type, options) {
+    super(name, type, options)
+    this.parentId = this.options.parentId
+    this.subType = undefined
+    this.action = undefined
+    if (this.type.indexOf('.') !== -1) {
+      var fields = this.type.split('.', 3)
+      this.type = fields[0]
+      this.subType = fields[1]
+      this.action = fields[2]
+    }
+    this.sync = this.options.sync
+  }
 }
 
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config
+module.exports = Span

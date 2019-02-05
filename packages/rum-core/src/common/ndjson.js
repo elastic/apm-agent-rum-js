@@ -23,27 +23,10 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
-
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+class NDJSON {
+  static stringify (object) {
+    return JSON.stringify(object) + '\n'
+  }
 }
 
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config
+module.exports = NDJSON

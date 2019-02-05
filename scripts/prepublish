@@ -1,0 +1,6 @@
+#!/bin/bash
+
+read -r -p "Please specify the type of release you want to make (You should not bump the version it will be done as a part of this process)? (minor/patch) " RESPONSE
+echo " "
+
+sh ./scripts/prepare-release $RESPONSE

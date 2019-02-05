@@ -23,27 +23,23 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+// export public core APIs.
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
-}
+var ErrorLogging = require('./error-logging')
+var PerformanceMonitoring = require('./performance-monitoring')
 
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
+var ServiceFactory = require('./common/service-factory')
+var utils = require('./common/utils')
+var patching = require('./common/patching')
+module.exports = {
+  createServiceFactory: function () {
+    var serviceFactory = new ServiceFactory()
+    serviceFactory.registerCoreServices()
+    ErrorLogging.registerServices(serviceFactory)
+    PerformanceMonitoring.registerServices(serviceFactory)
+    return serviceFactory
   },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
+  ServiceFactory: ServiceFactory,
+  patching: patching,
+  utils: utils
 }
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config

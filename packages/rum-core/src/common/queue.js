@@ -23,27 +23,44 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+class Queue {
+  constructor (onFlush, opts) {
+    if (!opts) opts = {}
+    this.onFlush = onFlush
+    this.items = []
+    this.queueLimit = opts.queueLimit || -1
+    this.flushInterval = opts.flushInterval || 0
+    this.timeoutId = undefined
+  }
+  _setTimer () {
+    this.timeoutId = setTimeout(() => {
+      this.flush()
+    }, this.flushInterval)
+  }
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+  flush () {
+    this.onFlush(this.items)
+    this._clear()
+  }
+
+  _clear () {
+    if (typeof this.timeoutId !== 'undefined') {
+      clearTimeout(this.timeoutId)
+      this.timeoutId = undefined
+    }
+    this.items = []
+  }
+
+  add (item) {
+    this.items.push(item)
+    if (this.queueLimit !== -1 && this.items.length >= this.queueLimit) {
+      this.flush()
+    } else {
+      if (typeof this.timeoutId === 'undefined') {
+        this._setTimer()
+      }
+    }
+  }
 }
 
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config
+module.exports = Queue

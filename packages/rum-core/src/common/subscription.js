@@ -23,27 +23,31 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+class Subscription {
+  constructor () {
+    this.subscriptions = []
+  }
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+  subscribe (fn) {
+    this.subscriptions.push(fn)
+
+    return () => {
+      var index = this.subscriptions.indexOf(fn)
+      if (index > -1) {
+        this.subscriptions.splice(index, 1)
+      }
+    }
+  }
+
+  applyAll (applyTo, applyWith) {
+    this.subscriptions.forEach(fn => {
+      try {
+        fn.apply(applyTo, applyWith)
+      } catch (error) {
+        console.log(error, error.stack)
+      }
+    }, this)
+  }
 }
 
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config
+module.exports = Subscription
