@@ -8,7 +8,7 @@
     "url": "https://github.com/elastic/apm-agent-js-base.git"
   },
   "scripts": {
-    "publish": "lerna publish",
+    "release": "lerna publish",
     "lint": "eslint . && node scripts/license-checker",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
     "format": "eslint . --fix",
