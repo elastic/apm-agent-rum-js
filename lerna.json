@@ -5,11 +5,17 @@
   "version": "independent",
   "registry": "https://registry.npmjs.org",
   "command": {
+    "version": {
+      "conventionalCommits": true,
+      "gitRemote": "origin"
+    },
     "publish": {
       "ignoreChanges": [
         "*.md",
         "test"
-      ]
+      ],
+      "allowBranch": "master",
+      "gitRemote": "upstream"
     }
   }
 }
