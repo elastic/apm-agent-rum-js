@@ -23,27 +23,25 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+var StackTraceService = require('../../src/error-logging/stack-trace-service')
+var createServiceFactory = require('..').createServiceFactory
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
-}
-
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config
+describe('StackTraceService', function () {
+  it('should produce correct number of frames', function (done) {
+    var serviceFactory = createServiceFactory()
+    var configService = serviceFactory.getService('ConfigService')
+    var stackTraceService = new StackTraceService(configService)
+    function generateError () {
+      throw new Error('test error')
+    }
+    setTimeout(function () {
+      try {
+        generateError()
+      } catch (error) {
+        var stackTraces = stackTraceService.createStackTraces({ error })
+        expect(stackTraces.length).toBeGreaterThan(1)
+        done()
+      }
+    }, 1)
+  })
+})

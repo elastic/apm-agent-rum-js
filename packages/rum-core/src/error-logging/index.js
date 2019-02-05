@@ -23,27 +23,17 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+const ErrorLogging = require('./error-logging')
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+module.exports = {
+  ErrorLogging: ErrorLogging,
+  registerServices: function registerServices (serviceFactory) {
+    serviceFactory.registerServiceCreator('ErrorLogging', function () {
+      const apmService = serviceFactory.getService('ApmServer')
+      const configService = serviceFactory.getService('ConfigService')
+      const loggingService = serviceFactory.getService('LoggingService')
+      const transactionService = serviceFactory.getService('TransactionService')
+      return new ErrorLogging(apmService, configService, loggingService, transactionService)
+    })
+  }
 }
-
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config

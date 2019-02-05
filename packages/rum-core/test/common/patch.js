@@ -23,27 +23,22 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+var patchAll = require('../../src/common/patching/').patchAll
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+if (!window['__patchSubscription']) {
+  var nativeFetch = window.fetch
+  if (nativeFetch) {
+    window.fetch = function () {
+      var delegate = window['__fetchDelegate']
+      if (typeof delegate === 'function') {
+        return delegate.apply(this, arguments)
+      } else {
+        return nativeFetch.apply(this, arguments)
+      }
+    }
+  }
+  console.log('patchservice')
+  window['__patchSubscription'] = patchAll()
 }
 
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config
+module.exports = window['__patchSubscription']

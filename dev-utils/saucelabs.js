@@ -23,27 +23,35 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+function launchSauceConnect (userConfig, done) {
+  var sauceConnectLauncher = require('sauce-connect-launcher')
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+  var config = {
+    username: userConfig && (userConfig.username || process.env.SAUCE_USERNAME),
+    accessKey: userConfig && (userConfig.accessKey || process.env.SAUCE_ACCESS_KEY),
+    logger: console.log,
+    noSslBumpDomains: 'all'
+  }
+
+  var tryConnect = function (maxAttempts, currAttempts, done) {
+    sauceConnectLauncher(config, function (err) {
+      if (err) {
+        console.error(err.message)
+        if (currAttempts <= maxAttempts) {
+          console.log('Retrying... (attempt ' + currAttempts + ' of ' + maxAttempts + ')')
+          tryConnect(maxAttempts, ++currAttempts, done)
+        } else {
+          return process.exit(1)
+        }
+      } else {
+        console.log('Sauce Connect ready')
+        done()
+      }
+    })
+  }
+
+  tryConnect(3, 1, done)
 }
-
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
+module.exports = {
+  launchSauceConnect
 }
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config

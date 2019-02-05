@@ -23,27 +23,37 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+/**
+ * Task States
+ */
+const SCHEDULE = 'schedule'
+const INVOKE = 'invoke'
+const CLEAR = 'clear'
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+/**
+ * Request Sources
+ */
+const FETCH_SOURCE = 'fetch'
+const XMLHTTPREQUEST_SOURCE = 'XMLHttpRequest.send'
+
+/**
+ * Event listener methods
+ */
+const ADD_EVENT_LISTENER_STR = 'addEventListener'
+const REMOVE_EVENT_LISTENER_STR = 'removeEventListener'
+
+/**
+ * Others
+ */
+const serverStringLimit = 1024
+
+module.exports = {
+  SCHEDULE,
+  INVOKE,
+  CLEAR,
+  FETCH_SOURCE,
+  XMLHTTPREQUEST_SOURCE,
+  ADD_EVENT_LISTENER_STR,
+  REMOVE_EVENT_LISTENER_STR,
+  serverStringLimit
 }
-
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config

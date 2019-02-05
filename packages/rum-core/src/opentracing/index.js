@@ -23,27 +23,19 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+const Tracer = require('./tracer')
+const Span = require('./span')
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+function createTracer (serviceFactory) {
+  var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+  var transactionService = serviceFactory.getService('TransactionService')
+  var errorLogging = serviceFactory.getService('ErrorLogging')
+  var loggingService = serviceFactory.getService('LoggingService')
+  return new Tracer(performanceMonitoring, transactionService, loggingService, errorLogging)
 }
 
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
+module.exports = {
+  Span,
+  Tracer,
+  createTracer
 }
-
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
-
-module.exports = config

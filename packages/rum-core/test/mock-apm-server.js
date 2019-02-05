@@ -23,27 +23,30 @@
  *
  */
 
-const testUtils = require('./dev-utils/test.js')
+const express = require('express')
 
-const env = testUtils.getTestEnvironmentVariables()
-let serverUrl = 'http://localhost:8200'
-if (env.serverUrl) {
-  serverUrl = env.serverUrl
+const app = express()
+var port = 8201
+
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  next()
+})
+
+app.get('/healthcheck', function (req, res) {
+  res.send('OK')
+})
+
+function respondSuccess (req, res) {
+  res.status(202).end()
 }
 
-const config = {
-  agentConfig: {
-    serverUrl,
-    serviceName: 'apm-agent-js-base/test'
-  },
-  useMocks: false,
-  mockApmServer: false,
-  serverUrl,
-  env: env
-}
+// app.post('/v1/client-side/*', respondSuccess)
+app.post('/v1/client-side/transactions', respondSuccess)
+app.post('/v1/client-side/errors', respondSuccess)
+app.post('/v1/rum/*', respondSuccess)
 
-// if (env.sauceLabs) {
-//   config.useMocks = true
-// }
+app.listen(port)
 
-module.exports = config
+console.log('serving MockApmServer on: ', port)
