@@ -27,7 +27,7 @@ var PerformanceMonitoring = require('./performance-monitoring')
 var TransactionService = require('./transaction-service')
 
 module.exports = {
-  PerformanceMonitoring: PerformanceMonitoring,
+  PerformanceMonitoring,
   registerServices: function registerServices (serviceFactory) {
     serviceFactory.registerServiceCreator('TransactionService', function () {
       var configService = serviceFactory.getService('ConfigService')

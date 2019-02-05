@@ -34,7 +34,7 @@ function TransportMock (transport) {
 }
 
 TransportMock.prototype.sendTransaction = function (data, headers) {
-  var transactinData = { data: data, headers: headers }
+  var transactinData = { data, headers }
   this.transactions.push(transactinData)
   var trMock = this
   if (typeof trMock.transactionInterceptor === 'function') {
@@ -61,7 +61,7 @@ TransportMock.prototype.subscribe = function (fn) {
 }
 
 TransportMock.prototype.sendError = function (data, headers) {
-  var errorData = { data: data, headers: headers }
+  var errorData = { data, headers }
   this.errors.push(errorData)
   this.subscription.applyAll(this, ['sendError', errorData])
 }

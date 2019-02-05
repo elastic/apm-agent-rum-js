@@ -65,12 +65,12 @@ module.exports = function (config) {
     },
     benchmarkJsonReporter: {
       pathToJson: 'reports/benchmark-results.json',
-      formatOutput: function (results) {
+      formatOutput (results) {
         var summary = results.map(r => {
           return { name: `${r.suite}.${r.name}`, mean: r.mean, hz: r.hz }
         })
         console.log(JSON.stringify(summary, undefined, 2))
-        return { results: results }
+        return { results }
       }
     }
   })

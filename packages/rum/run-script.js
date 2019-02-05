@@ -163,7 +163,7 @@ const scripts = {
   runUnitTests,
   startSelenium: testUtils.startSelenium,
   runE2eTests,
-  runNodeTests: function () {
+  runNodeTests () {
     var servers = serveE2e('./', 8000)
     runJasmine(function (err) {
       servers.forEach(server => server.close())
@@ -174,7 +174,7 @@ const scripts = {
       }
     })
   },
-  buildE2eBundles: function (basePath) {
+  buildE2eBundles (basePath) {
     basePath = basePath || './test/e2e'
     function callback (err) {
       if (err) {

@@ -125,7 +125,7 @@ describe('throttle', function () {
       },
       {
         limit: 3,
-        countFn: function (i) {
+        countFn (i) {
           return i
         }
       }

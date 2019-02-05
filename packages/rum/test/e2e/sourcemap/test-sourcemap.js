@@ -36,7 +36,7 @@ function testMap (map, stacktrace) {
     sourceMap.SourceMapConsumer.with(map, null, consumer => {
       var result = stacktrace.map((stack) => {
         var mapped = consumer.originalPositionFor({ line: stack.lineno, column: stack.colno })
-        return {original: stack,mapped: mapped}
+        return {original: stack,mapped}
       })
       resolve(result)
     })
