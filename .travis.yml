@@ -32,13 +32,11 @@ stages:
     if: branch = master
 
 jobs:
-  fast_finish: true
   include:
     - stage: lint
       script: npm run lint
     - stage: test
-      script:
-        - docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
-        - npm run test
+      before_script: docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
+      script: npm run test
     - stage: build-docs
       script: npm run build-docs
