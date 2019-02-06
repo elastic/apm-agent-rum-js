@@ -5,6 +5,8 @@ services:
 node_js:
 - '8'
 
+cache: npm
+
 env:
   global:
   - SAUCE_USERNAME=elastic-apm-base
@@ -59,9 +61,6 @@ jobs:
         - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
         - SCOPE=elastic-apm-js-base
 
-cache:
-  directories:
-  - node_modules
 addons:
   apt:
     packages:
