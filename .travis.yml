@@ -21,8 +21,6 @@ addons:
     packages:
      - xsltproc
      - libxml2-utils
-before_install:
-  - docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
 
 before_script:
   - npm run bootstrap
@@ -37,5 +35,7 @@ jobs:
   include:
     - stage: lint
       script: npm run lint
+    - stage: test
+      script: docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server && npm run test
     - stage: build-docs
       script: npm run build-docs
