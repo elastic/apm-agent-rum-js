@@ -4,6 +4,9 @@ services:
   - docker
 node_js:
 - '8'
+cache:
+  directories:
+  - node_modules
 env:
   global:
   - SAUCE_USERNAME=elastic-apm-base
@@ -15,9 +18,6 @@ env:
   - STACK_VERSION=6.5.0
   - STACK_VERSION=6.6.0
   - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
-cache:
-  directories:
-  - node_modules
 addons:
   apt:
     packages:
@@ -25,7 +25,19 @@ addons:
      - libxml2-utils
 before_install:
   - docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
-script:
+
+before_script:
   - npm run bootstrap
-  - npm run test
-  
+
+stages:
+  - lint
+  - test
+  - name: build-docs
+    if: branch = master
+
+jobs:
+  include:
+    - stage: lint
+      script: npm run lint
+    - stage: build-docs
+      script: npm run build-docs
