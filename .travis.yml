@@ -4,9 +4,7 @@ services:
   - docker
 node_js:
 - '8'
-cache:
-  directories:
-  - node_modules
+cache: npm
 env:
   global:
   - SAUCE_USERNAME=elastic-apm-base
