@@ -12,7 +12,8 @@
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
     "format": "eslint . --fix",
     "bootstrap": "lerna bootstrap",
-    "test": "npm run lint && lerna run test --stream && npm run build-docs"
+    "test": "lerna run test --stream --scope=$SCOPE",
+    "serve": "lerna run serve"
   },
   "author": "",
   "license": "MIT",

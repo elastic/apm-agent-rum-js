@@ -4,28 +4,70 @@ services:
   - docker
 node_js:
 - '8'
+
+cache: npm
+
 env:
   global:
-  - SAUCE_USERNAME=elastic-apm-base
-  - SAUCE_ACCESS_KEY=4b6720f1-ecdc-448d-85be-ebf947e14507
   - APM_SERVER_PORT=8001
   - APM_SERVER_URL=http://localhost:8001
   - MODE=saucelabs
-  matrix:
-  - STACK_VERSION=6.5.0
-  - STACK_VERSION=6.6.0
-  - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
-cache:
-  directories:
-  - node_modules
+
+stages:
+  - lint
+  - test
+  - docs
+
+jobs:
+  include:
+    -
+      stage: docs
+      script: npm run build-docs
+      name: "Build Docs"
+    -
+      stage: lint
+      script: npm run lint
+      name: "Lint"    
+    -
+      stage: test
+      env:
+        - STACK_VERSION=6.5.0
+        - SCOPE=elastic-apm-js-core
+    -
+      stage: test
+      env:
+        - STACK_VERSION=6.5.0
+        - SCOPE=elastic-apm-js-base
+    -
+      stage: test
+      env:
+        - STACK_VERSION=6.6.0
+        - SCOPE=elastic-apm-js-core
+    -
+      stage: test
+      env:
+        - STACK_VERSION=6.6.0
+        - SCOPE=elastic-apm-js-base
+    -
+      stage: test
+      env:
+        - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
+        - SCOPE=elastic-apm-js-core
+    -
+      stage: test
+      env:
+        - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
+        - SCOPE=elastic-apm-js-base
+
 addons:
   apt:
     packages:
      - xsltproc
      - libxml2-utils
-before_install:
-  - docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
+
 script:
+  - source ./scripts/export-saucelabs-account
+  - docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
   - npm run bootstrap
   - npm run test
   
