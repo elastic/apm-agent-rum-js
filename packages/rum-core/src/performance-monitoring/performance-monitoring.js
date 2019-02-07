@@ -225,7 +225,7 @@ class PerformanceMonitoring {
         sync: span.sync,
         start: span._start - transactionStart,
         duration: span.duration(),
-        context: context
+        context
       }
     })
 
@@ -236,8 +236,8 @@ class PerformanceMonitoring {
       name: sanitizeString(transaction.name, stringLimit, false),
       type: sanitizeString(transaction.type, stringLimit, true),
       duration: transaction.duration(),
-      spans: spans,
-      context: context,
+      spans,
+      context,
       marks: transaction.marks,
       span_count: {
         started: spans.length

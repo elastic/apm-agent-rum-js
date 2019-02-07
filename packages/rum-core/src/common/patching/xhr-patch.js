@@ -150,7 +150,7 @@ function patchXMLHttpRequest (callback) {
             method: self[XHR_METHOD],
             sync: self[XHR_SYNC],
             url: self[XHR_URL],
-            args: args,
+            args,
             aborted: false
           }
         }
@@ -182,5 +182,5 @@ function patchXMLHttpRequest (callback) {
 }
 
 module.exports = {
-  patchXMLHttpRequest: patchXMLHttpRequest
+  patchXMLHttpRequest
 }

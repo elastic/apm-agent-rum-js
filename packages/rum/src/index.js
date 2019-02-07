@@ -41,8 +41,8 @@ var exports = {
   __esModule: true,
   default: apmBase.init.bind(apmBase),
   init: apmBase.init.bind(apmBase),
-  ApmBase: ApmBase,
-  apmBase: apmBase,
+  ApmBase,
+  apmBase,
   apm: apmBase
 }
 

@@ -171,13 +171,13 @@ function startSelenium (callback, manualStop) {
   selenium.install(
     {
       logger: console.log,
-      drivers: drivers
+      drivers
     },
     function (installError) {
       if (installError) {
         console.log('Error while installing selenium:', installError)
       }
-      selenium.start({ drivers: drivers }, function (startError, child) {
+      selenium.start({ drivers }, function (startError, child) {
         function killSelenium () {
           child.kill()
           console.log('Just killed selenium!')
@@ -226,11 +226,11 @@ function runE2eTests (configFilePath, runSelenium) {
 }
 
 module.exports = {
-  runUnitTests: runUnitTests,
-  getTestEnvironmentVariables: getTestEnvironmentVariables,
-  runKarma: runKarma,
-  buildE2eBundles: buildE2eBundles,
-  startSelenium: startSelenium,
-  runE2eTests: runE2eTests,
+  runUnitTests,
+  getTestEnvironmentVariables,
+  runKarma,
+  buildE2eBundles,
+  startSelenium,
+  runE2eTests,
   dirWalkSync: walkSync
 }

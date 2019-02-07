@@ -91,7 +91,7 @@ class ErrorLogging {
         stacktrace: frames,
         type: utils.sanitizeString(errorType, stringLimit, false)
       },
-      context: context
+      context
     }
 
     var currentTransaction = this._transactionService.getCurrentTransaction()
@@ -134,9 +134,9 @@ class ErrorLogging {
         errorEvent = {
           message: messageOrEvent,
           filename: source,
-          lineno: lineno,
-          colno: colno,
-          error: error
+          lineno,
+          colno,
+          error
         }
       }
       errorLogging.logErrorEvent(errorEvent)

@@ -87,7 +87,7 @@ describe('lib/utils', function () {
         {
           string: 'string',
           null: null,
-          undefined: undefined,
+          undefined,
           number: 1,
           object: {
             string: 'string'
@@ -99,7 +99,7 @@ describe('lib/utils', function () {
       expect(result).toEqual({
         string: 'str',
         null: null,
-        undefined: undefined,
+        undefined,
         number: 1,
         object: {
           string: 'str'

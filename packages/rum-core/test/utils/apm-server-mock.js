@@ -50,7 +50,7 @@ class ApmServerMock {
         result = mockFn.apply(this, args)
         mocked = true
       }
-      var call = { args: args, mocked: mocked }
+      var call = { args, mocked }
       captureFn(methodName, call)
       return result
     }
@@ -59,7 +59,7 @@ class ApmServerMock {
       var _orig = service[methodName]
       return (service[methodName] = function () {
         var args = Array.prototype.slice.call(arguments).map(a => JSON.parse(JSON.stringify(a)))
-        var call = { args: args, mocked: false }
+        var call = { args, mocked: false }
         if (mockFn) {
           call.mocked = true
           call.returnValue = mockFn.apply(service, arguments)

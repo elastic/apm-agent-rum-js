@@ -80,5 +80,5 @@ async function runIntegrationTest (pageUrl) {
 // })();
 
 module.exports = {
-  runIntegrationTest: runIntegrationTest
+  runIntegrationTest
 }

@@ -122,8 +122,8 @@ class ApmServer {
     var queueLimit = this._configService.get('queueLimit')
     var flushInterval = this._configService.get('flushInterval')
     return new Queue(onFlush, {
-      queueLimit: queueLimit,
-      flushInterval: flushInterval
+      queueLimit,
+      flushInterval
     })
   }
 
@@ -150,8 +150,8 @@ class ApmServer {
         apmServer._loggingService.warn('Dropped error due to throttling!')
       },
       {
-        limit: limit,
-        interval: interval
+        limit,
+        interval
       }
     )
   }
@@ -179,8 +179,8 @@ class ApmServer {
         apmServer._loggingService.warn('Dropped transaction due to throttling!')
       },
       {
-        limit: limit,
-        interval: interval
+        limit,
+        interval
       }
     )
   }
@@ -214,7 +214,7 @@ class ApmServer {
 
   ndjsonErrors (errors) {
     return errors.map(function (error) {
-      return NDJSON.stringify({ error: error })
+      return NDJSON.stringify({ error })
     })
   }
 
@@ -223,7 +223,7 @@ class ApmServer {
       if (errors && errors.length > 0) {
         var payload = {
           service: this.createServiceObject(),
-          errors: errors
+          errors
         }
 
         payload = this._configService.applyFilters(payload)
@@ -264,7 +264,7 @@ class ApmServer {
       if (transactions && transactions.length > 0) {
         var payload = {
           service: this.createServiceObject(),
-          transactions: transactions
+          transactions
         }
         payload = this._configService.applyFilters(payload)
         if (payload) {
