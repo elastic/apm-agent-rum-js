@@ -288,7 +288,9 @@ describe('ApmServer', function () {
     errors.forEach(apmServer.addError.bind(apmServer))
     expect(apmServer.errorQueue.items.length).toBe(5)
     expect(apmServer.sendErrors).not.toHaveBeenCalled()
-    expect(loggingService.warn).toHaveBeenCalledWith('Dropped error due to throttling!')
+    expect(loggingService.warn).toHaveBeenCalledWith(
+      'Dropped error due to throttling!'
+    )
 
     setTimeout(() => {
       expect(apmServer.errorQueue.items.length).toBe(0)
@@ -317,7 +319,9 @@ describe('ApmServer', function () {
     transactions.forEach(apmServer.addTransaction.bind(apmServer))
     expect(apmServer.transactionQueue.items.length).toBe(5)
     expect(apmServer.sendTransactions).not.toHaveBeenCalled()
-    expect(loggingService.warn).toHaveBeenCalledWith('Dropped transaction due to throttling!')
+    expect(loggingService.warn).toHaveBeenCalledWith(
+      'Dropped transaction due to throttling!'
+    )
 
     setTimeout(() => {
       expect(apmServer.transactionQueue.items.length).toBe(0)

@@ -36,7 +36,12 @@ const { getTimeOrigin, find } = require('../common/utils')
 const Span = require('./span')
 
 class Tracer extends otTracer {
-  constructor (performanceMonitoring, transactionService, loggingService, errorLogging) {
+  constructor (
+    performanceMonitoring,
+    transactionService,
+    loggingService,
+    errorLogging
+  ) {
     super()
     this.performanceMonitoring = performanceMonitoring
     this.transactionService = transactionService
@@ -73,7 +78,11 @@ class Tracer extends otTracer {
     if (currentTransaction && !currentTransaction.ended) {
       span = this.transactionService.startSpan(name, undefined, spanOptions)
     } else {
-      span = this.transactionService.startTransaction(name, undefined, spanOptions)
+      span = this.transactionService.startTransaction(
+        name,
+        undefined,
+        spanOptions
+      )
     }
 
     if (!span) {

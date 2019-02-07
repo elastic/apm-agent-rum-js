@@ -105,7 +105,7 @@ function serveE2e (servingPath, port) {
   })
 
   app.get('/test-config.js', async function (req, res) {
-    var config = require('./test.config')
+    var config = testUtils.getConfig()
     var result = `
       window.globalConfigs = ${JSON.stringify(config)}
     `

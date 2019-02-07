@@ -70,4 +70,3 @@ script:
   - docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
   - npm run bootstrap
   - npm run test
-  
