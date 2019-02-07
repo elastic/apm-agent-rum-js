@@ -23,10 +23,10 @@
  *
  */
 
-var elasticApm = require('../..')
-var apmBase = elasticApm.apmBase
+const elasticApm = require('../..')
+const apmBase = elasticApm.apmBase
 
-var ApmServerMock = require('elastic-apm-js-core/test/utils/apm-server-mock.js')
+const ApmServerMock = require('../../../rum-core/test/utils/apm-server-mock')
 function createApmBase (config) {
   /**
    * globalConfigs - environment variable injected by webpack

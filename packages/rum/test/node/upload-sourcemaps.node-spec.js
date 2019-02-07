@@ -28,16 +28,21 @@ var request = require('request')
 var fs = require('fs')
 
 var basePath = path.join(__dirname, '../e2e')
-var testConfig = require('../../test.config')
+const { getConfig } = require('../../../../dev-utils/test')
+const testConfig = getConfig()
 
 describe('Sourcemaps', function () {
   it('should upload sourcemaps', function (done) {
     // curl http://localhost:8200/v1/rum/sourcemaps -X POST -F sourcemap=@app.e2e-bundle.js.map -F service_version=0.0.1 -F bundle_filepath="/test/e2e/general-usecase/app.e2e-bundle.js" -F service_name="apm-agent-js-base-test-e2e-general-usecase"
-    var filepath = path.join(basePath, 'general-usecase/app.e2e-bundle.min.js.map')
+    var filepath = path.join(
+      basePath,
+      'general-usecase/app.e2e-bundle.min.js.map'
+    )
     var formData = {
       sourcemap: fs.createReadStream(filepath),
       service_version: '0.0.1',
-      bundle_filepath: 'http://localhost:8000/test/e2e/general-usecase/app.e2e-bundle.min.js',
+      bundle_filepath:
+        'http://localhost:8000/test/e2e/general-usecase/app.e2e-bundle.min.js',
       service_name: 'apm-agent-js-base-test-e2e-general-usecase'
     }
 

@@ -23,8 +23,10 @@
  *
  */
 
-var apmBase = require('../../src/index.js').apmBase
-var testConfig = require('../../test.config')
+const { apmBase } = require('../../src/index.js')
+const { getConfig } = require('../../../../dev-utils/test')
+const testConfig = getConfig()
+
 describe('ApmBase', function () {
   it('should not init ApmBase', function () {
     apmBase.init({

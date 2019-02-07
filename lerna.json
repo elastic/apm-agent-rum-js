@@ -2,5 +2,18 @@
   "packages": [
     "packages/*"
   ],
-  "version": "independent"
+  "version": "independent",
+  "registry": "https://registry.npmjs.org",
+  "command": {
+    "version": {
+      "allowBranch": "master",
+      "conventionalCommits": true,
+      "gitRemote": "upstream"
+    },
+    "ignoreChanges": [
+      "**/*.md",
+      "**/test/**",
+      "docs"
+    ]
+  }
 }

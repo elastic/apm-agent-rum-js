@@ -23,10 +23,10 @@
  *
  */
 
-var path = require('path')
-var fs = require('fs')
-var karmaUtils = require('./karma')
-var saucelabsUtils = require('./saucelabs')
+const path = require('path')
+const fs = require('fs')
+const karmaUtils = require('./karma')
+const saucelabsUtils = require('./saucelabs')
 
 function runKarma (configFile) {
   function karmaCallback (exitCode) {
@@ -68,7 +68,7 @@ function getTestEnvironmentVariables () {
   return envVars
 }
 
-var walkSync = function (dir, filter, filelist) {
+function walkSync (dir, filter, filelist) {
   var files = fs.readdirSync(dir)
   filelist = filelist || []
   files.forEach(function (file) {
@@ -225,12 +225,36 @@ function runE2eTests (configFilePath, runSelenium) {
   }
 }
 
+function getConfig () {
+  const env = getTestEnvironmentVariables()
+  let serverUrl = 'http://localhost:8200'
+  if (env.serverUrl) {
+    serverUrl = env.serverUrl
+  }
+
+  const config = {
+    agentConfig: {
+      serverUrl,
+      serviceName: 'apm-agent-js-base/test'
+    },
+    useMocks: false,
+    mockApmServer: false,
+    serverUrl,
+    env
+  }
+  // if (env.sauceLabs) {
+  //   config.useMocks = true
+  // }
+  return config
+}
+
 module.exports = {
   runUnitTests,
-  getTestEnvironmentVariables,
+  runE2eTests,
   runKarma,
+  getTestEnvironmentVariables,
+  getConfig,
   buildE2eBundles,
   startSelenium,
-  runE2eTests,
   dirWalkSync: walkSync
 }

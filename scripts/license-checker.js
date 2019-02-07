@@ -71,10 +71,7 @@ function generateInvalidMessage (name, path, licenses) {
 
 function runLicenseChecker () {
   return new Promise((resolve, reject) => {
-    licenseChecker.init({
-      start: ROOT_REPO,
-      json: true,
-    }, (err, packages) => {
+    licenseChecker.init({ start: ROOT_REPO, json: true }, (err, packages) => {
       if (err) {
         reject(err)
         return
@@ -84,7 +81,7 @@ function runLicenseChecker () {
   })
 }
 
-; (async function () {
+;(async function () {
   const packagesList = await runLicenseChecker()
   const errors = []
 
