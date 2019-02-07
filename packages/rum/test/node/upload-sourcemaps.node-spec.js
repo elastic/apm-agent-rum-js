@@ -44,7 +44,7 @@ describe('Sourcemaps', function () {
     request.post(
       {
         url: testConfig.serverUrl + '/v1/rum/sourcemaps',
-        formData: formData
+        formData
       },
       function (err, resp, body) {
         if (err || (resp.statusCode !== 200 && resp.statusCode !== 202)) {

@@ -150,7 +150,7 @@ describe('ConfigService', function () {
       no: 1,
       'test.test': 'test',
       obj: { just: 'object' },
-      date: date
+      date
     })
     var tags = configService.get('context.tags')
     expect(tags).toEqual({
@@ -166,7 +166,7 @@ describe('ConfigService', function () {
       no: 1,
       'test.test': 'test',
       obj: { just: 'object' },
-      date: date
+      date
     })
     tags = configService.get('context.tags')
     expect(tags).toEqual({

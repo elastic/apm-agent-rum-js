@@ -32,14 +32,14 @@ var ServiceFactory = require('./common/service-factory')
 var utils = require('./common/utils')
 var patching = require('./common/patching')
 module.exports = {
-  createServiceFactory: function () {
+  createServiceFactory () {
     var serviceFactory = new ServiceFactory()
     serviceFactory.registerCoreServices()
     ErrorLogging.registerServices(serviceFactory)
     PerformanceMonitoring.registerServices(serviceFactory)
     return serviceFactory
   },
-  ServiceFactory: ServiceFactory,
-  patching: patching,
-  utils: utils
+  ServiceFactory,
+  patching,
+  utils
 }

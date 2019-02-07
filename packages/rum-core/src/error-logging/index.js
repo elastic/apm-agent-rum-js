@@ -26,7 +26,7 @@
 const ErrorLogging = require('./error-logging')
 
 module.exports = {
-  ErrorLogging: ErrorLogging,
+  ErrorLogging,
   registerServices: function registerServices (serviceFactory) {
     serviceFactory.registerServiceCreator('ErrorLogging', function () {
       const apmService = serviceFactory.getService('ApmServer')

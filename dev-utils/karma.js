@@ -232,7 +232,7 @@ var karma = require('karma')
 function singleRunKarma (configFile, done) {
   new karma.Server(
     {
-      configFile: configFile,
+      configFile,
       singleRun: true
     },
     done
@@ -240,8 +240,8 @@ function singleRunKarma (configFile, done) {
 }
 
 module.exports = {
-  prepareConfig: prepareConfig,
-  baseConfig: baseConfig,
-  baseLaunchers: baseLaunchers,
-  singleRunKarma: singleRunKarma
+  prepareConfig,
+  baseConfig,
+  baseLaunchers,
+  singleRunKarma
 }

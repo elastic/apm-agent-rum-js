@@ -86,7 +86,7 @@ exports.config = {
   jasmineNodeOpts: {
     defaultTimeoutInterval: 90000
   },
-  afterTest: function () {
+  afterTest () {
     /** Log api is only available in Chrome */
     if (isChrome()) {
       browser.execute('1+1')

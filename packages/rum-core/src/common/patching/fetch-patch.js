@@ -71,7 +71,7 @@ function patchFetch (callback) {
         target: request,
         method: request.method,
         sync: false,
-        url: url,
+        url,
         args: arguments,
         aborted: false
       }
@@ -109,5 +109,5 @@ function patchFetch (callback) {
 }
 
 module.exports = {
-  patchFetch: patchFetch
+  patchFetch
 }

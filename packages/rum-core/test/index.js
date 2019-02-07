@@ -25,7 +25,7 @@
 
 var createServiceFactory = require('..').createServiceFactory
 module.exports = {
-  createServiceFactory: function () {
+  createServiceFactory () {
     var serviceFactory = createServiceFactory()
     if (window.globalConfigs && window.globalConfigs.useMocks) {
       var apmServer = serviceFactory.getService('ApmServer')

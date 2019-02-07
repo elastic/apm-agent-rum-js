@@ -25,6 +25,7 @@ module.exports = {
     'max-len': ['error', { code: 100, ignoreComments: true }],
     'no-unused-vars': 'error',
     'space-before-function-paren': 'error',
+    "object-shorthand": "error",
     'rulesdir/require-license-header': [
       'error',
       {

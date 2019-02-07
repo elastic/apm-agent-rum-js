@@ -39,7 +39,7 @@ const config = {
   useMocks: false,
   mockApmServer: false,
   serverUrl,
-  env: env
+  env
 }
 
 // if (env.sauceLabs) {
