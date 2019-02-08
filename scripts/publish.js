@@ -37,6 +37,10 @@ function checkValidPackages (packages) {
   return packages.some(({ name }) => name === packageName)
 }
 
+/**
+ * We override the Lerna prepration command which takes of
+ * building the package graph for publishing packages
+ */
 Command.prototype.runPreparations = async function () {
   /**
    * List of packages that are present under /packages/ folder
@@ -46,9 +50,11 @@ Command.prototype.runPreparations = async function () {
   if (!checkValidPackages(packages)) {
     const message = `
     Error: Please provide a valid package name
-    Valid pacakges: ${packages.map(pkg => pkg.name).join(' ')}
+
+    Valid pacakges: ${packages.map(pkg => pkg.name).join(', ')}
     `
-    throw new Error(message)
+    console.error(message)
+    process.exit(1)
   }
 
   const filteredPackages = packages.filter(({ name }) => name === packageName)
