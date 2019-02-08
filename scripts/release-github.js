@@ -28,7 +28,7 @@ const url = require('url')
 const fs = require('fs')
 const https = require('https')
 const releaseAssets = require('gh-release-assets')
-const { version } = require('../packages/rum/package.json')
+const { name, version } = require('../packages/rum/package.json')
 
 const BUILD_DIR = path.join(__dirname, '../packages/rum/dist/bundles')
 const GITHUB_URL = 'https://api.github.com/repos/elastic/apm-agent-js-base'
@@ -46,7 +46,7 @@ function createRelease (token) {
   /**
    * To match the package version with tags
    */
-  const tagVersion = 'v' + version
+  const tagVersion = `${name}@${version}`
   const changelogUrl = `https://github.com/elastic/apm-agent-js-base/blob/master/CHANGELOG.md`
   const postBody = {
     tag_name: tagVersion,
