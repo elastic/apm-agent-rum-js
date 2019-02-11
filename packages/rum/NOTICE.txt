@@ -1,22 +1,22 @@
 
-  elastic-apm-js-base
-  Copyright (c) 2017-present, Elasticsearch BV
+elastic-apm-js-base
+Copyright (c) 2017-present, Elasticsearch BV
 
-  
-  ---
-  This product relies on elastic-apm-js-core
 
-  
+---
+This product relies on elastic-apm-js-core
 
-  
-  elastic-apm-js-core
-  Copyright (c) 2017-present, Elasticsearch BV
 
-  
-  ---
-  This product relies on error-stack-parser
 
-  This is free and unencumbered software released into the public domain.
+
+elastic-apm-js-core
+Copyright (c) 2017-present, Elasticsearch BV
+
+
+---
+This product relies on error-stack-parser
+
+This is free and unencumbered software released into the public domain.
 
 Anyone is free to copy, modify, publish, use, compile, sell, or
 distribute this software, either in source code form or as a compiled
@@ -42,11 +42,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org>
 
 
-  
-  ---
-  This product relies on opentracing
 
-  Copyright (c) 2016 Resonance Labs, Inc
+---
+This product relies on opentracing
+
+Copyright (c) 2016 Resonance Labs, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -67,11 +67,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-  
-  ---
-  This product relies on stack-generator
 
-  This is free and unencumbered software released into the public domain.
+---
+This product relies on stack-generator
+
+This is free and unencumbered software released into the public domain.
 
 Anyone is free to copy, modify, publish, use, compile, sell, or
 distribute this software, either in source code form or as a compiled
@@ -97,11 +97,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org>
 
 
-  
-  ---
-  This product relies on uuid
 
-  The MIT License (MIT)
+---
+This product relies on uuid
+
+The MIT License (MIT)
 
 Copyright (c) 2010-2016 Robert Kieffer and other contributors
 
@@ -124,11 +124,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-  
-  ---
-  This product relies on es6-promise
 
-  Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors
+---
+This product relies on es6-promise
+
+Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -149,4 +149,3 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-  

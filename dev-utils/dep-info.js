@@ -26,7 +26,7 @@
 const { join } = require('path')
 const { readFileSync, writeFileSync, readdirSync } = require('fs')
 
-function getFileContent (directory, filename) {
+function getFileContent(directory, filename) {
   var files = readdirSync(directory)
   var licenseFile = files.find(f => f.toLowerCase().startsWith(filename.toLowerCase()))
   if (licenseFile) {
@@ -35,7 +35,7 @@ function getFileContent (directory, filename) {
   }
 }
 
-function generateDependencyInfo (deps, modulesPath) {
+function generateDependencyInfo(deps, modulesPath) {
   var allLicenses = []
   deps.forEach(d => {
     var modulePath = join(modulesPath, d)
@@ -56,7 +56,7 @@ function generateDependencyInfo (deps, modulesPath) {
   return allLicenses
 }
 
-function generateNotice () {
+function generateNotice() {
   const packagesDir = join(__dirname, '../packages')
   const packageList = readdirSync(packagesDir).reverse()
 
@@ -70,19 +70,19 @@ function generateNotice () {
       join(packageDir, 'node_modules')
     )
     let allLicenses = `
-  ${name}
-  Copyright (c) 2017-present, Elasticsearch BV
+${name}
+Copyright (c) 2017-present, Elasticsearch BV
 
-  `
+`
     depInfo.forEach(d => {
       if (d.license || d.notice) {
         allLicenses += `
-  ---
-  This product relies on ${d.name}
+---
+This product relies on ${d.name}
 
-  ${d.license ? d.license : ''}
+${d.license ? d.license : ''}
 
-  ${d.notice ? d.notice : ''}`
+${d.notice ? d.notice : ''}`
       }
     })
     writeFileSync(join(packageDir, './NOTICE.txt'), allLicenses)
