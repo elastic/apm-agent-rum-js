@@ -8,6 +8,7 @@
     "version": {
       "allowBranch": "master",
       "conventionalCommits": true,
+      "message": "chore(release): publish",
       "gitRemote": "upstream"
     },
     "ignoreChanges": [
