@@ -15,7 +15,7 @@ To publish all the packages run `npm run release`. It will run `lerna publish`(w
 - Generating `CHANGELOG.md` using conventional commit messages.
 - Publishing the packages via `npm publish`
 
-**Note: To override the semantic version bumb, use `npm run release -- (minor|patch|major)`**
+**Note: To override the semantic version bump, use `npm run release -- (minor|patch|major)`**
 
 ### Releasing single package
 
