@@ -43,6 +43,20 @@ const ADD_EVENT_LISTENER_STR = 'addEventListener'
 const REMOVE_EVENT_LISTENER_STR = 'removeEventListener'
 
 /**
+ * Resource Timing initiator types that will be captured as spans
+ */
+const RESOURCE_INITIATOR_TYPES = [
+  'link',
+  'css',
+  'script',
+  'img',
+  'xmlhttprequest',
+  'fetch',
+  'beacon',
+  'iframe'
+]
+
+/**
  * Others
  */
 const serverStringLimit = 1024
@@ -55,5 +69,6 @@ module.exports = {
   XMLHTTPREQUEST_SOURCE,
   ADD_EVENT_LISTENER_STR,
   REMOVE_EVENT_LISTENER_STR,
+  RESOURCE_INITIATOR_TYPES,
   serverStringLimit
 }

@@ -23,15 +23,8 @@
  *
  */
 
- /* eslint-disable max-len */
+/* eslint-disable max-len */
 module.exports = [
-  {
-    name: 'should not be seen',
-    initiatorType: null,
-    entryType: 'resource',
-    startTime: 25.220000000000002,
-    responseEnd: 168.25
-  },
   {
     name: null,
     initiatorType: 'script',
@@ -86,6 +79,20 @@ module.exports = [
     initiatorType: 'script',
     entryType: 'resource',
     startTime: Number(new Date()),
+    responseEnd: 168.25
+  },
+  {
+    name: 'http://ajax-filter.test',
+    initiatorType: null,
+    entryType: 'resource',
+    startTime: 25.220000000000002,
+    responseEnd: 168.25
+  },
+  {
+    name: 'http://beacon.test',
+    initiatorType: 'beacon',
+    entryType: 'resource',
+    startTime: 25.220000000000002,
     responseEnd: 168.25
   },
   {
@@ -170,7 +177,8 @@ module.exports = [
     serverTiming: []
   },
   {
-    name: 'http://localhost:9876/base/tmp/globals.js?2bb0399ca4cd37090f3846e0b277f280c8e3e9fe',
+    name:
+      'http://localhost:9876/base/tmp/globals.js?2bb0399ca4cd37090f3846e0b277f280c8e3e9fe',
     entryType: 'resource',
     startTime: 25.640000000000004,
     duration: 149.69,
