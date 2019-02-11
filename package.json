@@ -9,7 +9,7 @@
   },
   "scripts": {
     "release": "lerna publish",
-    "release-package": "node ./scripts/publish",
+    "release-package": "node scripts/publish",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
     "bootstrap": "lerna bootstrap",
     "clean": "lerna clean",

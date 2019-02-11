@@ -15,9 +15,11 @@ To publish all the packages run `npm run release`. It will run `lerna publish`(w
 - Generating `CHANGELOG.md` using conventional commit messages.
 - Publishing the packages via `npm publish`
 
+**Note: To override the semantic version bumb, use `npm run release -- (minor|patch|major)`**
+
 ### Releasing single package
 
-To publish a single package, run `npm run release-package -- elastic-apm-js-base` which uses `lerna publish` under the hood to publish a single package to NPM
+To publish a single package, run `npm run release-package -- elastic-apm-js-base` which uses `lerna publish` under the hood to publish single package to NPM
 
 ### Releasing artifacts to GitHub
 
