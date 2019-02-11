@@ -9,10 +9,12 @@
   },
   "scripts": {
     "release": "lerna publish",
-    "lint": "eslint . && node scripts/license-checker",
+    "release-package": "node scripts/publish",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
-    "format": "eslint . --fix",
     "bootstrap": "lerna bootstrap",
+    "clean": "lerna clean",
+    "lint": "eslint . && node scripts/license-checker",
+    "format": "eslint . --fix",
     "test": "lerna run test --stream --scope=$SCOPE",
     "serve": "lerna run serve"
   },
