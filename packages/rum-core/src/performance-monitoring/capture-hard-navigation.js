@@ -24,11 +24,11 @@
  */
 
 const Span = require('./span')
-const Url = require('../common/url')
 const {
   RESOURCE_INITIATOR_TYPES,
   SPAN_THRESHOLD
 } = require('../common/constants')
+const { stripQueryStringFromUrl } = require('../common/utils')
 
 /**
  * Navigation Timing Spans
@@ -102,15 +102,17 @@ function createResourceTimingSpan(name, initiatorType, start, end) {
   if (initiatorType) {
     kind += '.' + initiatorType
   }
+  const spanName = stripQueryStringFromUrl(name)
+  const span = new Span(spanName, kind)
+  /**
+   * Add context information when the span name and entry name are different
+   */
+  if (spanName !== name) {
+    span.addContext({
+      http: { url: name }
+    })
+  }
 
-  const parsedUrl = new Url(name)
-  const spanName = parsedUrl.origin + parsedUrl.path
-  const span = new Span(spanName || name, kind)
-  span.addContext({
-    http: {
-      url: name
-    }
-  })
   span._start = start
   span.ended = true
   span._end = end

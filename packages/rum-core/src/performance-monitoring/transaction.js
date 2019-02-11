@@ -54,10 +54,10 @@ class Transaction extends SpanBase {
   }
 
   addNavigationTimingMarks() {
-    var marks = getNavigationTimingMarks()
-    var paintMarks = getPaintTimingMarks()
+    const marks = getNavigationTimingMarks()
+    const paintMarks = getPaintTimingMarks()
     if (marks) {
-      var agent = {
+      const agent = {
         timeToFirstByte: marks.responseStart,
         domInteractive: marks.domInteractive,
         domComplete: marks.domComplete
@@ -74,9 +74,9 @@ class Transaction extends SpanBase {
   }
 
   mark(key) {
-    var skey = removeInvalidChars(key)
-    var now = window.performance.now() - this._start
-    var custom = {}
+    const skey = removeInvalidChars(key)
+    const now = window.performance.now() - this._start
+    const custom = {}
     custom[skey] = now
     this.addMarks({ custom })
   }
@@ -91,11 +91,10 @@ class Transaction extends SpanBase {
     if (this.ended) {
       return
     }
-    var transaction = this
-    var opts = extend({}, options)
+    const opts = extend({}, options)
 
-    opts.onEnd = function(trc) {
-      transaction._onSpanEnd(trc)
+    opts.onEnd = trc => {
+      this._onSpanEnd(trc)
     }
     opts.traceId = this.traceId
     opts.sampled = this.sampled
@@ -104,15 +103,14 @@ class Transaction extends SpanBase {
       opts.parentId = this.id
     }
 
-    var span = new Span(name, type, opts)
+    const span = new Span(name, type, opts)
     this._activeSpans[span.id] = span
 
     return span
   }
 
   isFinished() {
-    var scheduledTasks = Object.keys(this._scheduledTasks)
-    return scheduledTasks.length === 0
+    return Object.keys(this._scheduledTasks).length === 0
   }
 
   detectFinish() {
@@ -126,13 +124,13 @@ class Transaction extends SpanBase {
     this.ended = true
     this._end = window.performance.now()
     // truncate active spans
-    for (var sid in this._activeSpans) {
-      var span = this._activeSpans[sid]
+    for (let sid in this._activeSpans) {
+      const span = this._activeSpans[sid]
       span.type = span.type + '.truncated'
       span.end()
     }
 
-    var metadata = getPageMetadata()
+    const metadata = getPageMetadata()
     this.addContext(metadata)
 
     this._adjustStartToEarliestSpan()
@@ -169,15 +167,15 @@ class Transaction extends SpanBase {
   }
 
   _adjustEndToLatestSpan() {
-    var latestSpan = findLatestNonXHRSpan(this.spans)
+    const latestSpan = findLatestNonXHRSpan(this.spans)
 
     if (latestSpan) {
       this._end = latestSpan._end
 
       // set all spans that now are longer than the transaction to
       // be truncated spans
-      for (var i = 0; i < this.spans.length; i++) {
-        var span = this.spans[i]
+      for (let i = 0; i < this.spans.length; i++) {
+        const span = this.spans[i]
         if (span._end > this._end) {
           span._end = this._end
           span.type = span.type + '.truncated'
@@ -190,7 +188,7 @@ class Transaction extends SpanBase {
   }
 
   _adjustStartToEarliestSpan() {
-    var span = getEarliestSpan(this.spans)
+    const span = getEarliestSpan(this.spans)
 
     if (span && span._start < this._start) {
       this._start = span._start
@@ -199,9 +197,9 @@ class Transaction extends SpanBase {
 }
 
 function findLatestNonXHRSpan(spans) {
-  var latestSpan = null
-  for (var i = 0; i < spans.length; i++) {
-    var span = spans[i]
+  let latestSpan = null
+  for (let i = 0; i < spans.length; i++) {
+    const span = spans[i]
     if (
       span.type &&
       span.type.indexOf('ext') === -1 &&
@@ -215,7 +213,7 @@ function findLatestNonXHRSpan(spans) {
 }
 
 function getEarliestSpan(spans) {
-  var earliestSpan = null
+  let earliestSpan = null
 
   spans.forEach(function(span) {
     if (!earliestSpan) {
