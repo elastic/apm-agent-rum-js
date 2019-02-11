@@ -46,6 +46,8 @@ Once your changes are ready to submit for review:
     add them as separate commits.
     This makes them easier to review.
     As a final step before merging we will either ask you to squash all commits yourself or we'll do it for you.
+    Don't forget to correctly format your commit messages.
+    We follow [conventional commits](https://www.conventionalcommits.org/en/v1.0.0-beta.3/).
 
 4. Submit a pull request
 
@@ -76,4 +78,4 @@ should "Squash and merge".
 
 ### Releasing
 
-// To do: Release process
+See [RELEASE.md](RELEASE.md) for details on releasing.
