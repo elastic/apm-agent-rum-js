@@ -29,7 +29,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "elastic-apm-js-core": "^3.0.1",
+    "elastic-apm-js-core": "file:../rum-core",
     "es6-promise": "^4.2.4"
   },
   "bundlesize": [
