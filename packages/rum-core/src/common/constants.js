@@ -57,6 +57,11 @@ const RESOURCE_INITIATOR_TYPES = [
 ]
 
 /**
+ * Maximum duration of the span that is used to decide if the span is valid - 300 secs / 5 mins
+ */
+const SPAN_THRESHOLD = 5 * 60 * 1000
+
+/**
  * Others
  */
 const serverStringLimit = 1024
@@ -70,5 +75,6 @@ module.exports = {
   ADD_EVENT_LISTENER_STR,
   REMOVE_EVENT_LISTENER_STR,
   RESOURCE_INITIATOR_TYPES,
+  SPAN_THRESHOLD,
   serverStringLimit
 }

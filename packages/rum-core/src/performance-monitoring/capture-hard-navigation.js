@@ -25,7 +25,10 @@
 
 const Span = require('./span')
 const Url = require('../common/url')
-const { RESOURCE_INITIATOR_TYPES } = require('../common/constants')
+const {
+  RESOURCE_INITIATOR_TYPES,
+  SPAN_THRESHOLD
+} = require('../common/constants')
 
 /**
  * Navigation Timing Spans
@@ -50,10 +53,6 @@ const eventPairs = [
   ],
   ['loadEventStart', 'loadEventEnd', 'Fire "load" event']
 ]
-/**
- * Maximum duration of the span that is used to decide if the span is valid - 30 seconds
- */
-const SPAN_THRESHOLD = 5 * 60 * 1000
 
 function isValidSpan (transaction, span) {
   const duration = span.duration()
@@ -133,10 +132,12 @@ function createResourceTimingSpans (entries, filterUrls) {
       continue
     } else if (!isValidPerformanceTiming(startTime, responseEnd)) {
       continue
-    } else if (RESOURCE_INITIATOR_TYPES.indexOf(initiatorType) !== -1) {
-      /**
-       * Create spans for all known resource initiator types
-       */
+    }
+
+    /**
+     * Create spans for all known resource initiator types
+     */
+    if (RESOURCE_INITIATOR_TYPES.indexOf(initiatorType) !== -1) {
       spans.push(
         createResourceTimingSpan(name, initiatorType, startTime, responseEnd)
       )
@@ -163,15 +164,14 @@ function createResourceTimingSpans (entries, filterUrls) {
           break
         }
       }
-      if (foundAjaxReq) {
-        continue
-      }
       /**
        * Create span if its not an ajax request
        */
-      spans.push(
-        createResourceTimingSpan(name, initiatorType, startTime, responseEnd)
-      )
+      if (!foundAjaxReq) {
+        spans.push(
+          createResourceTimingSpan(name, initiatorType, startTime, responseEnd)
+        )
+      }
     }
   }
   return spans
