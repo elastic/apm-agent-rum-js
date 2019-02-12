@@ -7,7 +7,7 @@
   "scripts": {
     "build": "webpack",
     "build-dev": "webpack -w",
-    "bundlesize": "bundlesize",
+    "bundlesize": "npm run build && bundlesize",
     "karma": "karma start",
     "karma-coverage": "karma start --coverage",
     "serve": "npm run script serveE2e ./ 8000",
