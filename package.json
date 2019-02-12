@@ -10,6 +10,7 @@
   "scripts": {
     "release": "lerna publish",
     "release-package": "node scripts/publish",
+    "release-github": "lerna run --scope elastic-apm-js-base test && node scripts/release-github",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
     "bootstrap": "lerna bootstrap",
     "clean": "lerna clean",

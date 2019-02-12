@@ -5,7 +5,6 @@
   "main": "dist/bundles/elastic-apm-js-base.umd.js",
   "repository": "https://github.com/elastic/apm-agent-js-base/tree/master/packages/rum",
   "scripts": {
-    "github-release": "node ./scripts/release-github.js",
     "build": "webpack",
     "build-dev": "webpack -w",
     "karma": "karma start",
