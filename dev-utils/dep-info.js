@@ -58,11 +58,13 @@ function generateDependencyInfo(deps, modulesPath) {
   return allLicenses
 }
 
-function getInternalPackageNames (packageList, packagesDir) {
+function getInternalPackageNames(packageList, packagesDir) {
   const internalPackages = []
   for (const packageName of packageList) {
     const packageDir = join(packagesDir, packageName)
-    const { name } = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8'))
+    const { name } = JSON.parse(
+      readFileSync(join(packageDir, 'package.json'), 'utf8')
+    )
 
     internalPackages.push(name)
   }
@@ -70,7 +72,7 @@ function getInternalPackageNames (packageList, packagesDir) {
   return internalPackages
 }
 
-function generateNotice (rootDir = '../', packagesDir = 'packages') {
+function generateNotice(rootDir = '../', packagesDir = 'packages') {
   /**
    * Resolve in context of the file
    */

@@ -282,7 +282,7 @@ describe('navigationTiming', function() {
     // console.log(spans.map(s => `${s._start}, ${s._end}, ${s.duration()}, ${s.name}`).join('\n'))
   })
 
-  it('should createResourceTimingSpans', function () {
+  it('should createResourceTimingSpans', function() {
     const spans = navigationTiming.createResourceTimingSpans(resourceEntries, [
       'http://ajax-filter.test'
     ])
