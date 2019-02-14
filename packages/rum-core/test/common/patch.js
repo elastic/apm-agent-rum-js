@@ -28,7 +28,7 @@ var patchAll = require('../../src/common/patching/').patchAll
 if (!window['__patchSubscription']) {
   var nativeFetch = window.fetch
   if (nativeFetch) {
-    window.fetch = function () {
+    window.fetch = function() {
       var delegate = window['__fetchDelegate']
       if (typeof delegate === 'function') {
         return delegate.apply(this, arguments)

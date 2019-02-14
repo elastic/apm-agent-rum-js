@@ -28,17 +28,20 @@ const express = require('express')
 const app = express()
 var port = 8201
 
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  )
   next()
 })
 
-app.get('/healthcheck', function (req, res) {
+app.get('/healthcheck', function(req, res) {
   res.send('OK')
 })
 
-function respondSuccess (req, res) {
+function respondSuccess(req, res) {
   res.status(202).end()
 }
 

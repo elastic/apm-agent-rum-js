@@ -30,12 +30,12 @@ const spanSnapshot = require('../fixtures/navigation-timing-span-snapshot').map(
   mapSpan
 )
 
-function mapSpan (s) {
+function mapSpan(s) {
   return { name: s.name, _end: s._end, _start: s._start }
 }
 
-describe('navigationTiming', function () {
-  it('should createNavigationTimingSpans', function () {
+describe('navigationTiming', function() {
+  it('should createNavigationTimingSpans', function() {
     var timings = {
       navigationStart: 1528373292350,
       unloadEventStart: 1528373293147,
@@ -289,7 +289,7 @@ describe('navigationTiming', function () {
     expect(spans.map(mapSpan)).toEqual(spanSnapshot)
   })
 
-  it('should captureHardNavigation', function () {
+  it('should captureHardNavigation', function() {
     var tr = new Transaction('test', 'test')
     tr.isHardNavigation = true
     tr.end()

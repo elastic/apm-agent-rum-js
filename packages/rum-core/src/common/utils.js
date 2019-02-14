@@ -28,7 +28,7 @@ const slice = [].slice
 const Url = require('../common/url')
 const rng = require('uuid/lib/rng-browser')
 
-function isCORSSupported () {
+function isCORSSupported() {
   var xhr = new window.XMLHttpRequest()
   return 'withCredentials' in xhr
 }
@@ -38,7 +38,7 @@ for (var i = 0; i < 256; ++i) {
   byteToHex[i] = (i + 0x100).toString(16).substr(1)
 }
 
-function bytesToHex (buf, offset) {
+function bytesToHex(buf, offset) {
   var i = offset || 0
   var bth = byteToHex
   // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
@@ -62,7 +62,7 @@ function bytesToHex (buf, offset) {
   ].join('')
 }
 
-function getDtHeaderValue (span) {
+function getDtHeaderValue(span) {
   const dtVersion = '00'
   const dtUnSampledFlags = '00'
   // 00000001 ->  '01' -> recorded
@@ -78,8 +78,10 @@ function getDtHeaderValue (span) {
   }
 }
 
-function parseDtHeaderValue (value) {
-  var parsed = /^([\da-f]{2})-([\da-f]{32})-([\da-f]{16})-([\da-f]{2})$/.exec(value)
+function parseDtHeaderValue(value) {
+  var parsed = /^([\da-f]{2})-([\da-f]{32})-([\da-f]{16})-([\da-f]{2})$/.exec(
+    value
+  )
   if (parsed) {
     var flags = parsed[4]
     var sampled = flags !== '00'
@@ -91,7 +93,7 @@ function parseDtHeaderValue (value) {
   }
 }
 
-function isDtHeaderValid (header) {
+function isDtHeaderValid(header) {
   return (
     /^[\da-f]{2}-[\da-f]{32}-[\da-f]{16}-[\da-f]{2}$/.test(header) &&
     header.slice(3, 35) !== '00000000000000000000000000000000' &&
@@ -99,14 +101,14 @@ function isDtHeaderValid (header) {
   )
 }
 
-function checkSameOrigin (source, target) {
+function checkSameOrigin(source, target) {
   let isSame = false
   if (typeof target === 'string') {
     const src = new Url(source)
     const tar = new Url(target)
     isSame = src.origin === tar.origin
   } else if (Array.isArray(target)) {
-    target.forEach(function (t) {
+    target.forEach(function(t) {
       if (!isSame) {
         isSame = checkSameOrigin(source, t)
       }
@@ -115,12 +117,12 @@ function checkSameOrigin (source, target) {
   return isSame
 }
 
-function generateRandomId (length) {
+function generateRandomId(length) {
   var id = bytesToHex(rng())
   return id.substr(0, length)
 }
 
-function isPlatformSupported () {
+function isPlatformSupported() {
   return (
     typeof window !== 'undefined' &&
     typeof Array.prototype.forEach === 'function' &&
@@ -132,7 +134,7 @@ function isPlatformSupported () {
   )
 }
 
-function sanitizeString (value, limit, required, placeholder) {
+function sanitizeString(value, limit, required, placeholder) {
   if (typeof value === 'number') {
     value = String(value)
   }
@@ -146,20 +148,20 @@ function sanitizeString (value, limit, required, placeholder) {
   }
 }
 
-function setTag (key, value, obj) {
+function setTag(key, value, obj) {
   if (!obj || !key) return
   var skey = removeInvalidChars(key)
   obj[skey] = sanitizeString(value, constants.serverStringLimit)
   return obj
 }
 
-function sanitizeObjectStrings (obj, limit, required, placeholder) {
+function sanitizeObjectStrings(obj, limit, required, placeholder) {
   if (!obj) return obj
   if (typeof obj === 'string') {
     return sanitizeString(obj, limit, required, placeholder)
   }
   var keys = Object.keys(obj)
-  keys.forEach(function (k) {
+  keys.forEach(function(k) {
     var value = obj[k]
     if (typeof value === 'string') {
       value = sanitizeString(obj[k], limit, required, placeholder)
@@ -190,11 +192,11 @@ const navigationTimingKeys = [
   'loadEventEnd'
 ]
 
-function getNavigationTimingMarks () {
+function getNavigationTimingMarks() {
   var timing = window.performance.timing
   var fetchStart = timing.fetchStart
   var marks = {}
-  navigationTimingKeys.forEach(function (timingKey) {
+  navigationTimingKeys.forEach(function(timingKey) {
     var m = timing[timingKey]
     if (m && m >= fetchStart) {
       marks[timingKey] = m - fetchStart
@@ -207,7 +209,7 @@ function getNavigationTimingMarks () {
  * Paint Timing Metrics that is available during page load
  * https://www.w3.org/TR/paint-timing/
  */
-function getPaintTimingMarks () {
+function getPaintTimingMarks() {
   var paints = {}
   var perf = window.performance
   if (perf.getEntriesByType) {
@@ -220,7 +222,8 @@ function getPaintTimingMarks () {
       var unloadDiff = timings.fetchStart - timings.navigationStart
       for (var i = 0; i < entries.length; i++) {
         var data = entries[i]
-        var calcPaintTime = unloadDiff >= 0 ? data.startTime - unloadDiff : data.startTime
+        var calcPaintTime =
+          unloadDiff >= 0 ? data.startTime - unloadDiff : data.startTime
         paints[data.name] = calcPaintTime
       }
     }
@@ -228,11 +231,11 @@ function getPaintTimingMarks () {
   return paints
 }
 
-function getTimeOrigin () {
+function getTimeOrigin() {
   return window.performance.timing.fetchStart
 }
 
-function getPageMetadata () {
+function getPageMetadata() {
   return {
     page: {
       referer: document.referrer,
@@ -241,20 +244,20 @@ function getPageMetadata () {
   }
 }
 
-function stripQueryStringFromUrl (url) {
+function stripQueryStringFromUrl(url) {
   return url && url.split('?')[0]
 }
 
-function isObject (value) {
+function isObject(value) {
   // http://jsperf.com/isobject4
   return value !== null && typeof value === 'object'
 }
 
-function isFunction (value) {
+function isFunction(value) {
   return typeof value === 'function'
 }
 
-function baseExtend (dst, objs, deep) {
+function baseExtend(dst, objs, deep) {
   for (var i = 0, ii = objs.length; i < ii; ++i) {
     var obj = objs[i]
     if (!isObject(obj) && !isFunction(obj)) continue
@@ -275,7 +278,7 @@ function baseExtend (dst, objs, deep) {
   return dst
 }
 
-function getElasticScript () {
+function getElasticScript() {
   if (typeof document !== 'undefined') {
     var scripts = document.getElementsByTagName('script')
     for (var i = 0, l = scripts.length; i < l; i++) {
@@ -287,7 +290,7 @@ function getElasticScript () {
   }
 }
 
-function getCurrentScript () {
+function getCurrentScript() {
   if (typeof document !== 'undefined') {
     // Source http://www.2ality.com/2014/05/current-script.html
     var currentScript = document.currentScript
@@ -298,21 +301,21 @@ function getCurrentScript () {
   }
 }
 
-function extend (dst) {
+function extend(dst) {
   return baseExtend(dst, slice.call(arguments, 1), false)
 }
 
-function merge (dst) {
+function merge(dst) {
   return baseExtend(dst, slice.call(arguments, 1), true)
 }
 
-function isUndefined (obj) {
+function isUndefined(obj) {
   return typeof obj === 'undefined'
 }
 
-function noop () {}
+function noop() {}
 
-function find (array, predicate, thisArg) {
+function find(array, predicate, thisArg) {
   // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
   if (array == null) {
     throw new TypeError('array is null or not defined')
@@ -338,7 +341,7 @@ function find (array, predicate, thisArg) {
   return undefined
 }
 
-function removeInvalidChars (key) {
+function removeInvalidChars(key) {
   return key.replace(/[.*"]/g, '_')
 }
 

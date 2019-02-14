@@ -25,16 +25,16 @@
 
 var throttle = require('../../src/common/throttle')
 
-describe('throttle', function () {
-  it('should throttle', function (done) {
+describe('throttle', function() {
+  it('should throttle', function(done) {
     var counter = 0
     var throttled = 0
     var fn = throttle(
-      function () {
+      function() {
         counter++
         return 'fn_result'
       },
-      function () {
+      function() {
         throttled++
         return 'throttle_result'
       },
@@ -75,15 +75,15 @@ describe('throttle', function () {
     }, 200)
   })
 
-  it('should throttle 1 request per execution cycle', function (done) {
+  it('should throttle 1 request per execution cycle', function(done) {
     var counter = 0
     var throttled = 0
     var fn = throttle(
-      function () {
+      function() {
         counter++
         return 'fn_result'
       },
-      function () {
+      function() {
         throttled++
       },
       {
@@ -112,20 +112,20 @@ describe('throttle', function () {
     }, 10)
   })
 
-  it('should accept countFn', function () {
+  it('should accept countFn', function() {
     var counter = 0
     var throttled = 0
     var fn = throttle(
-      function () {
+      function() {
         counter++
         return 'fn_result'
       },
-      function () {
+      function() {
         throttled++
       },
       {
         limit: 3,
-        countFn (i) {
+        countFn(i) {
           return i
         }
       }

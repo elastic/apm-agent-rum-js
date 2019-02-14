@@ -26,7 +26,7 @@
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
 const { getConfig } = require('../../dev-utils/test')
 
-module.exports = function (config) {
+module.exports = function(config) {
   // temporarily set firefox version to 44 due to apm-server#676 issue
   baseConfig.customLaunchers.SL_FIREFOX.version = '44'
   baseConfig.browserNoActivityTimeout = 120000

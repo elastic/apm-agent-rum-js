@@ -62,7 +62,7 @@ const LICENSE_WHITELIST = [
  */
 const IGNORE_LIST = ['colors@0.6.2', 'elastic-apm-rum@3.0.0']
 
-function generateInvalidMessage (name, path, licenses) {
+function generateInvalidMessage(name, path, licenses) {
   return `
   name: ${name}
   path: ${path}
@@ -70,7 +70,7 @@ function generateInvalidMessage (name, path, licenses) {
 `
 }
 
-function runLicenseChecker () {
+function runLicenseChecker() {
   return new Promise((resolve, reject) => {
     licenseChecker.init({ start: ROOT_REPO, json: true }, (err, packages) => {
       if (err) {
@@ -82,7 +82,7 @@ function runLicenseChecker () {
   })
 }
 
-;(async function () {
+;(async function() {
   const packagesList = await runLicenseChecker()
   const errors = []
 

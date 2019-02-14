@@ -25,12 +25,12 @@
 
 var Subscription = require('../../src/common/subscription')
 class ApmServerMock {
-  constructor (apmServer, useMocks) {
+  constructor(apmServer, useMocks) {
     var subscription = (this.subscription = new Subscription())
     var _apmServer = (this._apmServer = apmServer)
     var calls = (this.calls = {})
 
-    function captureCall (methodName, call) {
+    function captureCall(methodName, call) {
       if (calls[methodName]) {
         calls[methodName].push(call)
       } else {
@@ -55,10 +55,12 @@ class ApmServerMock {
       return result
     }
 
-    function spyOn (service, methodName, mockFn) {
+    function spyOn(service, methodName, mockFn) {
       var _orig = service[methodName]
-      return (service[methodName] = function () {
-        var args = Array.prototype.slice.call(arguments).map(a => JSON.parse(JSON.stringify(a)))
+      return (service[methodName] = function() {
+        var args = Array.prototype.slice
+          .call(arguments)
+          .map(a => JSON.parse(JSON.stringify(a)))
         var call = { args, mocked: false }
         if (mockFn) {
           call.mocked = true
@@ -76,9 +78,9 @@ class ApmServerMock {
       _apmServer,
       'sendErrors',
       useMocks
-        ? function () {
-          return Promise.resolve()
-        }
+        ? function() {
+            return Promise.resolve()
+          }
         : undefined
     )
 
@@ -86,16 +88,16 @@ class ApmServerMock {
       _apmServer,
       'sendTransactions',
       useMocks
-        ? function () {
-          return Promise.resolve()
-        }
+        ? function() {
+            return Promise.resolve()
+          }
         : undefined
     )
 
     this.addError = _apmServer.addError.bind(_apmServer)
     this.addTransaction = _apmServer.addTransaction.bind(_apmServer)
   }
-  init () {}
+  init() {}
 }
 
 module.exports = ApmServerMock

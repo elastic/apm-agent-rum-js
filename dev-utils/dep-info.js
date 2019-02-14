@@ -26,16 +26,18 @@
 const { join } = require('path')
 const { readFileSync, writeFileSync, readdirSync } = require('fs')
 
-function getFileContent (directory, filename) {
+function getFileContent(directory, filename) {
   var files = readdirSync(directory)
-  var licenseFile = files.find(f => f.toLowerCase().startsWith(filename.toLowerCase()))
+  var licenseFile = files.find(f =>
+    f.toLowerCase().startsWith(filename.toLowerCase())
+  )
   if (licenseFile) {
     var license = readFileSync(join(directory, licenseFile), 'utf8')
     return license
   }
 }
 
-function generateDependencyInfo (deps, modulesPath, rootLicense) {
+function generateDependencyInfo(deps, modulesPath) {
   var allLicenses = []
   deps.forEach(d => {
     var modulePath = join(modulesPath, d)

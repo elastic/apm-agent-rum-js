@@ -23,7 +23,11 @@
  *
  */
 
-const { XHR_IGNORE, XHR_METHOD, XHR_URL } = require('../../src/common/patching/patch-utils')
+const {
+  XHR_IGNORE,
+  XHR_METHOD,
+  XHR_URL
+} = require('../../src/common/patching/patch-utils')
 
 var urlSympbol = XHR_URL
 var methodSymbol = XHR_METHOD
@@ -31,12 +35,12 @@ var xhrIgnore = XHR_IGNORE
 
 var patchSubscription = require('./patch')
 
-describe('xhrPatch', function () {
+describe('xhrPatch', function() {
   var events = []
   var cancelFn
 
-  beforeAll(function () {
-    cancelFn = patchSubscription.subscribe(function (event, task) {
+  beforeAll(function() {
+    cancelFn = patchSubscription.subscribe(function(event, task) {
       events.push({
         event,
         task
@@ -44,30 +48,30 @@ describe('xhrPatch', function () {
     })
   })
 
-  afterAll(function () {
+  afterAll(function() {
     cancelFn()
   })
 
-  function mapEvent (event) {
+  function mapEvent(event) {
     delete event.task.data.target
     event.task.data.args = [].slice.call(event.task.data.args)
     return event
   }
 
-  beforeEach(function () {
+  beforeEach(function() {
     events = []
   })
-  it('should have correct url and method', function () {
+  it('should have correct url and method', function() {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     expect(req[urlSympbol]).toBe('/')
     expect(req[methodSymbol]).toBe('GET')
   })
 
-  it('should produce events', function (done) {
+  it('should produce events', function(done) {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener('load', function () {
+    req.addEventListener('load', function() {
       expect(events.map(mapEvent)).toEqual([
         {
           event: 'schedule',
@@ -108,10 +112,10 @@ describe('xhrPatch', function () {
     req.send()
   })
 
-  it('should work with synchronous xhr', function (done) {
+  it('should work with synchronous xhr', function(done) {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', false)
-    req.addEventListener('load', function () {
+    req.addEventListener('load', function() {
       done()
     })
 
@@ -119,10 +123,10 @@ describe('xhrPatch', function () {
     expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
   })
 
-  it('should work with failing xhr', function (done) {
+  it('should work with failing xhr', function(done) {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/test.json', true)
-    req.addEventListener('load', function () {
+    req.addEventListener('load', function() {
       expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
       done()
     })
@@ -130,7 +134,7 @@ describe('xhrPatch', function () {
     req.send()
   })
 
-  it('should work with aborted xhr', function () {
+  it('should work with aborted xhr', function() {
     var req = new XMLHttpRequest()
     req.open('GET', '/', true)
 
@@ -139,25 +143,29 @@ describe('xhrPatch', function () {
     expect(events.map(e => e.event)).toEqual(['schedule', 'clear'])
   })
 
-  it('should work properly when send request multiple times on single xmlRequest instance',
-    function (done) {
-      const req = new XMLHttpRequest()
+  it('should work properly when send request multiple times on single xmlRequest instance', function(done) {
+    const req = new XMLHttpRequest()
+    req.open('get', '/', true)
+    req.send()
+    req.onload = function() {
+      req.onload = null
       req.open('get', '/', true)
-      req.send()
-      req.onload = function () {
-        req.onload = null
-        req.open('get', '/', true)
-        req.onload = function () {
-          expect(events.map(e => e.event)).toEqual(['schedule', 'invoke', 'schedule', 'invoke'])
-          done()
-        }
-        expect(() => {
-          req.send()
-        }).not.toThrow()
+      req.onload = function() {
+        expect(events.map(e => e.event)).toEqual([
+          'schedule',
+          'invoke',
+          'schedule',
+          'invoke'
+        ])
+        done()
       }
-    })
+      expect(() => {
+        req.send()
+      }).not.toThrow()
+    }
+  })
 
-  it('should preserve static constants', function () {
+  it('should preserve static constants', function() {
     expect(XMLHttpRequest.UNSENT).toEqual(0)
     expect(XMLHttpRequest.OPENED).toEqual(1)
     expect(XMLHttpRequest.HEADERS_RECEIVED).toEqual(2)
@@ -165,34 +173,33 @@ describe('xhrPatch', function () {
     expect(XMLHttpRequest.DONE).toEqual(4)
   })
 
-  it('should work correctly when abort was called multiple times before request is done',
-    function (done) {
-      const req = new XMLHttpRequest()
-      req.open('get', '/', true)
-      req.send()
-      req.addEventListener('readystatechange', function () {
-        if (req.readyState >= 2) {
-          expect(() => {
-            req.abort()
-          }).not.toThrow()
-          done()
-        }
-      })
+  it('should work correctly when abort was called multiple times before request is done', function(done) {
+    const req = new XMLHttpRequest()
+    req.open('get', '/', true)
+    req.send()
+    req.addEventListener('readystatechange', function() {
+      if (req.readyState >= 2) {
+        expect(() => {
+          req.abort()
+        }).not.toThrow()
+        done()
+      }
     })
+  })
 
-  it('should return null when access ontimeout first time without error', function () {
+  it('should return null when access ontimeout first time without error', function() {
     let req = new XMLHttpRequest()
     expect(req.ontimeout).toBe(null)
   })
 
-  it('should allow aborting an XMLHttpRequest after its completed', function (done) {
+  it('should allow aborting an XMLHttpRequest after its completed', function(done) {
     let req
 
     req = new XMLHttpRequest()
-    req.onreadystatechange = function () {
+    req.onreadystatechange = function() {
       if (req.readyState === XMLHttpRequest.DONE) {
         if (req.status !== 0) {
-          setTimeout(function () {
+          setTimeout(function() {
             req.abort()
             done()
           }, 0)
@@ -204,7 +211,7 @@ describe('xhrPatch', function () {
     req.send()
   })
 
-  it('should preserve other setters', function () {
+  it('should preserve other setters', function() {
     const req = new XMLHttpRequest()
     req.open('get', '/', true)
     req.send()
@@ -217,21 +224,20 @@ describe('xhrPatch', function () {
     }
   })
 
-  it('should not throw error when get XMLHttpRequest.prototype.onreadystatechange the first time',
-    function () {
-      const func = function () {
-        const req = new XMLHttpRequest()
-        // eslint-disable-next-line
+  it('should not throw error when get XMLHttpRequest.prototype.onreadystatechange the first time', function() {
+    const func = function() {
+      const req = new XMLHttpRequest()
+      // eslint-disable-next-line
         req.onreadystatechange
-      }
-      expect(func).not.toThrow()
-    })
+    }
+    expect(func).not.toThrow()
+  })
 
-  it('should consider xhr ignore', function (done) {
+  it('should consider xhr ignore', function(done) {
     var req = new window.XMLHttpRequest()
     req[xhrIgnore] = true
     req.open('GET', '/')
-    req.addEventListener('load', function () {
+    req.addEventListener('load', function() {
       done()
     })
 

@@ -31,22 +31,22 @@ const patchUtils = require('./patching/patch-utils')
 const utils = require('./utils')
 
 class ServiceFactory {
-  constructor () {
+  constructor() {
     this._serviceCreators = {}
     this._serviceInstances = {}
     this.initialized = false
   }
 
-  registerCoreServices () {
+  registerCoreServices() {
     var serviceFactory = this
 
-    this.registerServiceCreator('ConfigService', function () {
+    this.registerServiceCreator('ConfigService', function() {
       return new ConfigService()
     })
-    this.registerServiceCreator('LoggingService', function () {
+    this.registerServiceCreator('LoggingService', function() {
       return new LoggingService()
     })
-    this.registerServiceCreator('ApmServer', function () {
+    this.registerServiceCreator('ApmServer', function() {
       return new ApmServer(
         serviceFactory.getService('ConfigService'),
         serviceFactory.getService('LoggingService')
@@ -56,7 +56,7 @@ class ServiceFactory {
     this.registerServiceInstance('PatchUtils', patchUtils)
     this.registerServiceInstance('Utils', utils)
   }
-  init () {
+  init() {
     if (this.initialized) {
       return
     }
@@ -67,8 +67,11 @@ class ServiceFactory {
     configService.init()
     var loggingService = serviceFactory.getService('LoggingService')
 
-    function setLogLevel (loggingService, configService) {
-      if (configService.get('debug') === true && configService.config.logLevel !== 'trace') {
+    function setLogLevel(loggingService, configService) {
+      if (
+        configService.get('debug') === true &&
+        configService.config.logLevel !== 'trace'
+      ) {
         loggingService.setLevel('debug', false)
       } else {
         loggingService.setLevel(configService.get('logLevel'), false)
@@ -76,7 +79,7 @@ class ServiceFactory {
     }
 
     setLogLevel(loggingService, configService)
-    configService.subscribeToChange(function () {
+    configService.subscribeToChange(function() {
       setLogLevel(loggingService, configService)
     })
 
@@ -84,15 +87,15 @@ class ServiceFactory {
     apmServer.init()
   }
 
-  registerServiceCreator (name, creator) {
+  registerServiceCreator(name, creator) {
     this._serviceCreators[name] = creator
   }
 
-  registerServiceInstance (name, instance) {
+  registerServiceInstance(name, instance) {
     this._serviceInstances[name] = instance
   }
 
-  getService (name) {
+  getService(name) {
     if (!this._serviceInstances[name]) {
       if (typeof this._serviceCreators[name] === 'function') {
         this._serviceInstances[name] = this._serviceCreators[name](this)

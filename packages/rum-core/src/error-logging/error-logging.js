@@ -28,16 +28,19 @@ var StackTraceService = require('./stack-trace-service')
 var utils = require('../common/utils')
 
 class ErrorLogging {
-  constructor (apmServer, configService, loggingService, transactionService) {
+  constructor(apmServer, configService, loggingService, transactionService) {
     this._apmServer = apmServer
     this._configService = configService
     this._loggingService = loggingService
     this._transactionService = transactionService
-    this._stackTraceService = new StackTraceService(configService, loggingService)
+    this._stackTraceService = new StackTraceService(
+      configService,
+      loggingService
+    )
   }
 
   // errorEvent = {message, filename, lineno, colno, error}
-  createErrorDataModel (errorEvent) {
+  createErrorDataModel(errorEvent) {
     var filePath = this._stackTraceService.cleanFilePath(errorEvent.filename)
     var fileName = this._stackTraceService.filePathToFileName(filePath)
     var culprit
@@ -60,7 +63,8 @@ class ErrorLogging {
       culprit = fileName
     }
 
-    var message = errorEvent.message || (errorEvent.error && errorEvent.error.message)
+    var message =
+      errorEvent.message || (errorEvent.error && errorEvent.error.message)
     var errorType = errorEvent.error ? errorEvent.error.name : undefined
     if (!errorType) {
       /**
@@ -107,7 +111,7 @@ class ErrorLogging {
     return errorObject
   }
 
-  logErrorEvent (errorEvent, sendImmediately) {
+  logErrorEvent(errorEvent, sendImmediately) {
     if (this._configService.isActive()) {
       if (typeof errorEvent === 'undefined') {
         return
@@ -124,11 +128,14 @@ class ErrorLogging {
     }
   }
 
-  registerGlobalEventListener () {
+  registerGlobalEventListener() {
     var errorLogging = this
-    window.onerror = function (messageOrEvent, source, lineno, colno, error) {
+    window.onerror = function(messageOrEvent, source, lineno, colno, error) {
       var errorEvent
-      if (typeof messageOrEvent !== 'undefined' && typeof messageOrEvent !== 'string') {
+      if (
+        typeof messageOrEvent !== 'undefined' &&
+        typeof messageOrEvent !== 'string'
+      ) {
         errorEvent = messageOrEvent
       } else {
         errorEvent = {
@@ -143,7 +150,7 @@ class ErrorLogging {
     }
   }
 
-  logError (messageOrError) {
+  logError(messageOrError) {
     var errorEvent = {}
     if (typeof messageOrError === 'string') {
       errorEvent.message = messageOrError
@@ -153,9 +160,9 @@ class ErrorLogging {
     return this.logErrorEvent(errorEvent)
   }
 
-  _getErrorProperties (error) {
+  _getErrorProperties(error) {
     var properties = {}
-    Object.keys(error).forEach(function (key) {
+    Object.keys(error).forEach(function(key) {
       if (key === 'stack') return
       var val = error[key]
       if (val === null) return // null is typeof object and well break the switch below

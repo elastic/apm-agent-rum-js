@@ -29,7 +29,7 @@ const Subscription = require('../common/subscription')
 const { captureHardNavigation } = require('./capture-hard-navigation')
 
 class TransactionService {
-  constructor (logger, config) {
+  constructor(logger, config) {
     if (typeof config === 'undefined') {
       logger.debug('TransactionService: config is not provided')
     }
@@ -42,11 +42,11 @@ class TransactionService {
     this._alreadyCapturedPageLoad = false
   }
 
-  shouldCreateTransaction () {
+  shouldCreateTransaction() {
     return this._config.isActive()
   }
 
-  getOrCreateCurrentTransaction () {
+  getOrCreateCurrentTransaction() {
     if (!this.shouldCreateTransaction()) {
       return
     }
@@ -57,15 +57,15 @@ class TransactionService {
     return this.createZoneTransaction()
   }
 
-  getCurrentTransaction () {
+  getCurrentTransaction() {
     return this.currentTransaction
   }
 
-  setCurrentTransaction (value) {
+  setCurrentTransaction(value) {
     this.currentTransaction = value
   }
 
-  createTransaction (name, type, options) {
+  createTransaction(name, type, options) {
     var perfOptions = options
     if (utils.isUndefined(perfOptions)) {
       perfOptions = this._config.config
@@ -81,19 +81,19 @@ class TransactionService {
     }
     return tr
   }
-  createZoneTransaction () {
+  createZoneTransaction() {
     return this.createTransaction('ZoneTransaction', 'transaction')
   }
 
-  startCounter (transaction) {
+  startCounter(transaction) {
     transaction.browserResponsivenessCounter = 0
     var interval = this._config.get('browserResponsivenessInterval')
     if (typeof interval === 'undefined') {
       this._logger.debug('browserResponsivenessInterval is undefined!')
       return
     }
-    this.runOuter(function () {
-      var id = setInterval(function () {
+    this.runOuter(function() {
+      var id = setInterval(function() {
         if (transaction.ended) {
           window.clearInterval(id)
         } else {
@@ -103,13 +103,13 @@ class TransactionService {
     })
   }
 
-  sendPageLoadMetrics (name) {
+  sendPageLoadMetrics(name) {
     var tr = this.startTransaction(name, 'page-load')
     tr.detectFinish()
     return tr
   }
 
-  capturePageLoadMetrics (tr) {
+  capturePageLoadMetrics(tr) {
     var self = this
     var capturePageLoad = self._config.get('capturePageLoad')
     if (
@@ -124,7 +124,7 @@ class TransactionService {
     }
   }
 
-  startTransaction (name, type, options) {
+  startTransaction(name, type, options) {
     var self = this
     var config = self._config.config
 
@@ -178,8 +178,8 @@ class TransactionService {
     }
 
     this._logger.debug('TransactionService.startTransaction', tr)
-    tr.onEnd = function () {
-      self.applyAsync(function () {
+    tr.onEnd = function() {
+      self.applyAsync(function() {
         self._logger.debug('TransactionService transaction finished', tr)
         if (!self.shouldIgnoreTransaction(tr.name)) {
           if (type === 'page-load') {
@@ -202,20 +202,20 @@ class TransactionService {
     return tr
   }
 
-  applyAsync (fn, applyThis, applyArgs) {
-    return this.runOuter(function () {
+  applyAsync(fn, applyThis, applyArgs) {
+    return this.runOuter(function() {
       return Promise.resolve().then(
-        function () {
+        function() {
           return fn.apply(applyThis, applyArgs)
         },
-        function (reason) {
+        function(reason) {
           console.log(reason)
         }
       )
     })
   }
 
-  shouldIgnoreTransaction (transactionName) {
+  shouldIgnoreTransaction(transactionName) {
     var ignoreList = this._config.get('ignoreTransactions')
 
     for (var i = 0; i < ignoreList.length; i++) {
@@ -231,7 +231,7 @@ class TransactionService {
     return false
   }
 
-  startSpan (name, type, options) {
+  startSpan(name, type, options) {
     var trans = this.getOrCreateCurrentTransaction()
 
     if (trans) {
@@ -241,7 +241,7 @@ class TransactionService {
     }
   }
 
-  add (transaction) {
+  add(transaction) {
     if (!this._config.isActive()) {
       return
     }
@@ -250,11 +250,11 @@ class TransactionService {
     this._logger.debug('TransactionService.add', transaction)
   }
 
-  subscribe (fn) {
+  subscribe(fn) {
     return this._subscription.subscribe(fn)
   }
 
-  addTask (taskId) {
+  addTask(taskId) {
     var tr = this.getOrCreateCurrentTransaction()
     if (tr) {
       tr.addTask(taskId)
@@ -263,7 +263,7 @@ class TransactionService {
     return taskId
   }
 
-  removeTask (taskId) {
+  removeTask(taskId) {
     var tr = this.getCurrentTransaction()
     if (!utils.isUndefined(tr) && !tr.ended) {
       tr.removeTask(taskId)
@@ -271,7 +271,7 @@ class TransactionService {
     }
   }
 
-  detectFinish () {
+  detectFinish() {
     var tr = this.getCurrentTransaction()
     if (!utils.isUndefined(tr) && !tr.ended) {
       tr.detectFinish()
@@ -279,7 +279,7 @@ class TransactionService {
     }
   }
 
-  runOuter (fn, applyThis, applyArgs) {
+  runOuter(fn, applyThis, applyArgs) {
     return fn.apply(applyThis, applyArgs)
   }
 }

@@ -34,7 +34,7 @@ var logLevels = {
 
 var debugMode = false
 var debugLevel = logLevels.INFO.value
-function assertNoBrowserErrors (whitelist) {
+function assertNoBrowserErrors(whitelist) {
   return new Promise((resolve, reject) => {
     // TODO: Bug in ChromeDriver: Need to execute at least one command
     // so that the browser logs can be read out!
@@ -67,7 +67,9 @@ function assertNoBrowserErrors (whitelist) {
     if (failureEntries.length > 0) {
       reject(
         new Error(
-          'Expected no errors in the browserLog but got ' + failureEntries.length + ' error(s)'
+          'Expected no errors in the browserLog but got ' +
+            failureEntries.length +
+            ' error(s)'
         )
       )
     } else {
@@ -76,7 +78,7 @@ function assertNoBrowserErrors (whitelist) {
   })
 }
 
-function isLogEntryATestFailure (entry, whitelist) {
+function isLogEntryATestFailure(entry, whitelist) {
   var result = false
   if (logLevels[entry.level].value > logLevels.WARNING.value) {
     result = true
@@ -92,7 +94,7 @@ function isLogEntryATestFailure (entry, whitelist) {
   return result
 }
 module.exports = {
-  allowSomeBrowserErrors: function allowSomeBrowserErrors (whitelist, done) {
+  allowSomeBrowserErrors: function allowSomeBrowserErrors(whitelist, done) {
     if (typeof done === 'function') {
       assertNoBrowserErrors(whitelist).then(() => {
         done()
@@ -101,7 +103,7 @@ module.exports = {
       return assertNoBrowserErrors(whitelist)
     }
   },
-  verifyNoBrowserErrors: function verifyNoBrowserErrors (done) {
+  verifyNoBrowserErrors: function verifyNoBrowserErrors(done) {
     if (typeof done === 'function') {
       assertNoBrowserErrors([]).then(() => {
         done()
@@ -110,8 +112,8 @@ module.exports = {
       return assertNoBrowserErrors([])
     }
   },
-  handleError: function handleError (done) {
-    return function (error) {
+  handleError: function handleError(done) {
+    return function(error) {
       console.log(error, error.stack)
       if (error.message.indexOf('received Inspector.detached event') === -1) {
         done.fail(error)
