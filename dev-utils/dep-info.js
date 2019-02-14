@@ -23,23 +23,23 @@
  *
  */
 
-const path = require('path')
+const { join } = require('path')
 const { readFileSync, writeFileSync, readdirSync } = require('fs')
 
 function getFileContent (directory, filename) {
   var files = readdirSync(directory)
   var licenseFile = files.find(f => f.toLowerCase().startsWith(filename.toLowerCase()))
   if (licenseFile) {
-    var license = readFileSync(path.join(directory, licenseFile), 'utf8')
+    var license = readFileSync(join(directory, licenseFile), 'utf8')
     return license
   }
 }
 
-function generateDependencyInfo (deps, modulesPath) {
+function generateDependencyInfo (deps, modulesPath, rootLicense) {
   var allLicenses = []
   deps.forEach(d => {
-    var modulePath = path.join(modulesPath, d)
-    var license = getFileContent(modulePath, 'LICENSE')
+    var modulePath = join(modulesPath, d)
+    var license = getFileContent(modulePath, 'LICENSE') || rootLicense
     var dep = {
       name: d
     }
@@ -56,32 +56,66 @@ function generateDependencyInfo (deps, modulesPath) {
   return allLicenses
 }
 
-function generateNotice (rootDir) {
-  if (!rootDir) rootDir = './'
-  const { dependencies, name } = JSON.parse(
-    readFileSync(path.join(rootDir, './package.json'), 'utf8')
-  )
-  var depInfo = generateDependencyInfo(
-    Object.keys(dependencies),
-    path.join(rootDir, './node_modules')
-  )
-  var allLicenses = `
+function getInternalPackageNames (packageList, packagesDir) {
+  const internalPackages = []
+  for (const packageName of packageList) {
+    const packageDir = join(packagesDir, packageName)
+    const { name } = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8'))
+
+    internalPackages.push(name)
+  }
+
+  return internalPackages
+}
+
+function generateNotice (rootDir = '../', packagesDir = 'packages') {
+  /**
+   * Resolve in context of the file
+   */
+  rootDir = join(__dirname, rootDir)
+  packagesDir = join(rootDir, packagesDir)
+
+  const packageList = readdirSync(packagesDir).reverse()
+
+  const internalPackages = getInternalPackageNames(packageList, packagesDir)
+
+  for (const packageName of packageList) {
+    const packageDir = join(packagesDir, packageName)
+    const { dependencies = {}, name } = JSON.parse(
+      readFileSync(join(packageDir, 'package.json'), 'utf8')
+    )
+    /**
+     * For internal packages, we use the root level license info
+     * instead of package level
+     */
+    let rootLicense = ''
+    if (internalPackages.indexOf(name) > -1) {
+      rootLicense = getFileContent(rootDir, 'LICENSE')
+    }
+
+    const depInfo = generateDependencyInfo(
+      Object.keys(dependencies),
+      join(packageDir, 'node_modules'),
+      rootLicense
+    )
+    let allLicenses = `
 ${name}
 Copyright (c) 2017-present, Elasticsearch BV
 
 `
-  depInfo.forEach(d => {
-    if (d.license || d.notice) {
-      allLicenses += `
+    depInfo.forEach(d => {
+      if (d.license || d.notice) {
+        allLicenses += `
 ---
 This product relies on ${d.name}
 
 ${d.license ? d.license : ''}
 
 ${d.notice ? d.notice : ''}`
-    }
-  })
-  writeFileSync(path.join(rootDir, './NOTICE.txt'), allLicenses)
+      }
+    })
+    writeFileSync(join(packageDir, './NOTICE.txt'), allLicenses)
+  }
 }
 
 module.exports = {

@@ -12,3 +12,6 @@ html_docs
 build
 reports
 coverage
+
+# ignore lerna-debug and npm-debug logs
+*debug.log
