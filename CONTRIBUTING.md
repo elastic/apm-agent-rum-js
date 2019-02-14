@@ -117,7 +117,7 @@ We use [prettier](https://github.com/prettier/prettier) for formatting code and 
 $ npm run lint
 ```
 
-To fix formatting and other auto-fixable eslint errors,
+To fix formatting and other auto-fixable eslint errors:
 
 ```
 $ npm run format
