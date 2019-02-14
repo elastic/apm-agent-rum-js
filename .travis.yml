@@ -25,7 +25,7 @@ jobs:
       script: npm run build-docs
       name: 'Build Docs'
     - stage: bundlesize
-      script: npm run bundlesize
+      script: npm run bootstrap && npm run bundlesize
       name: 'Analyse size of JS bundles'
     - stage: lint
       script: npm run lint
