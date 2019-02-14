@@ -90,7 +90,7 @@ Tests fall under unit, integration and end-to-end tests. To run all tests
 $ npm test
 ```
 
-To run tests for a specific package,
+To run tests for a specific package:
 
 ```sh
 $ SCOPE=elastic-apm-js-base npm test
