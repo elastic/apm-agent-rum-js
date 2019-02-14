@@ -7,6 +7,7 @@
   "scripts": {
     "build": "webpack",
     "build-dev": "webpack -w",
+    "bundlesize": "npm run build && bundlesize",
     "karma": "karma start",
     "karma-coverage": "karma start --coverage",
     "serve": "npm run script serveE2e ./ 8000",
@@ -26,5 +27,15 @@
   "dependencies": {
     "elastic-apm-js-core": "^3.0.1",
     "es6-promise": "^4.2.4"
-  }
+  },
+  "bundlesize": [
+    {
+      "path": "./dist/bundles/elastic-apm-js-base*.min.js",
+      "maxSize": "16 kB"
+    },
+    {
+      "path": "./dist/bundles/elastic-apm-opentracing*.min.js",
+      "maxSize": "18kB"
+    }
+  ]
 }
