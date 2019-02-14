@@ -96,7 +96,7 @@ To run tests for a specific package:
 $ SCOPE=elastic-apm-js-base npm test
 ```
 
-To run unit/integration/end-to-end tests for packages,
+To run unit/integration/end-to-end tests for packages:
 
 ```sh
 // Unit tests
