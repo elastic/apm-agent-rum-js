@@ -3,58 +3,54 @@ language: node_js
 services:
   - docker
 node_js:
-- '8'
+  - '8'
 
 cache: npm
 
 env:
   global:
-  - APM_SERVER_PORT=8001
-  - APM_SERVER_URL=http://localhost:8001
-  - MODE=saucelabs
+    - APM_SERVER_PORT=8001
+    - APM_SERVER_URL=http://localhost:8001
+    - MODE=saucelabs
 
 stages:
   - lint
   - test
+  - bundlesize
   - docs
 
 jobs:
   include:
-    -
-      stage: docs
+    - stage: docs
       script: npm run build-docs
-      name: "Build Docs"
-    -
-      stage: lint
+      name: 'Build Docs'
+    - stage: bundlesize
+      script: npm run bootstrap && npm run bundlesize
+      name: 'Analyse size of JS bundles'
+    - stage: lint
       script: npm run lint
-      name: "Lint"    
-    -
-      stage: test
+      name: 'Lint'
+    - stage: test
       env:
         - STACK_VERSION=6.5.0
         - SCOPE=elastic-apm-js-core
-    -
-      stage: test
+    - stage: test
       env:
         - STACK_VERSION=6.5.0
         - SCOPE=elastic-apm-js-base
-    -
-      stage: test
+    - stage: test
       env:
         - STACK_VERSION=6.6.0
         - SCOPE=elastic-apm-js-core
-    -
-      stage: test
+    - stage: test
       env:
         - STACK_VERSION=6.6.0
         - SCOPE=elastic-apm-js-base
-    -
-      stage: test
+    - stage: test
       env:
         - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
         - SCOPE=elastic-apm-js-core
-    -
-      stage: test
+    - stage: test
       env:
         - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
         - SCOPE=elastic-apm-js-base
@@ -62,8 +58,8 @@ jobs:
 addons:
   apt:
     packages:
-     - xsltproc
-     - libxml2-utils
+      - xsltproc
+      - libxml2-utils
 
 script:
   - source ./scripts/export-saucelabs-account
