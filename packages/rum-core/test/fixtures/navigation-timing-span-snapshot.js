@@ -25,6 +25,13 @@
 
 module.exports = [
   {
+    name: 'http://beacon.test',
+    type: 'resource.beacon',
+    ended: true,
+    _end: 168.25,
+    _start: 25.220000000000002
+  },
+  {
     name: 'http://testing.com',
     type: 'resource.script',
     ended: true,
@@ -39,7 +46,8 @@ module.exports = [
     _start: 25.385
   },
   {
-    name: 'http://localhost:9876/base/node_modules/karma-jasmine/lib/adapter.js',
+    name:
+      'http://localhost:9876/base/node_modules/karma-jasmine/lib/adapter.js',
     type: 'resource.script',
     ended: true,
     _end: 174.04500000000002,
@@ -53,7 +61,8 @@ module.exports = [
     _start: 25.640000000000004
   },
   {
-    name: 'http://localhost:9876/base/node_modules/elastic-apm-js-zone/dist/zone.js',
+    name:
+      'http://localhost:9876/base/node_modules/elastic-apm-js-zone/dist/zone.js',
     type: 'resource.script',
     ended: true,
     _end: 176.12000000000003,
@@ -102,35 +111,40 @@ module.exports = [
     _start: 26.520000000000003
   },
   {
-    name: 'http://localhost:9876/base/test/error-logging/stack-trace-service.spec.js',
+    name:
+      'http://localhost:9876/base/test/error-logging/stack-trace-service.spec.js',
     type: 'resource.script',
     ended: true,
     _end: 350.44000000000005,
     _start: 26.635
   },
   {
-    name: 'http://localhost:9876/base/test/performance-monitoring/performance-monitoring.spec.js',
+    name:
+      'http://localhost:9876/base/test/performance-monitoring/performance-monitoring.spec.js',
     type: 'resource.script',
     ended: true,
     _end: 351.72,
     _start: 26.755000000000003
   },
   {
-    name: 'http://localhost:9876/base/test/performance-monitoring/transaction-service.spec.js',
+    name:
+      'http://localhost:9876/base/test/performance-monitoring/transaction-service.spec.js',
     type: 'resource.script',
     ended: true,
     _end: 257.22,
     _start: 26.875000000000004
   },
   {
-    name: 'http://localhost:9876/base/test/performance-monitoring/transaction.spec.js',
+    name:
+      'http://localhost:9876/base/test/performance-monitoring/transaction.spec.js',
     type: 'resource.script',
     ended: true,
     _end: 187.60500000000002,
     _start: 27.035000000000004
   },
   {
-    name: 'http://localhost:9876/base/test/performance-monitoring/zone-service.spec.js',
+    name:
+      'http://localhost:9876/base/test/performance-monitoring/zone-service.spec.js',
     type: 'resource.script',
     ended: true,
     _end: 188.72000000000003,

@@ -23,11 +23,11 @@
  *
  */
 
-var Transaction = require('./transaction')
-var utils = require('../common/utils')
-var Subscription = require('../common/subscription')
+const Transaction = require('./transaction')
+const utils = require('../common/utils')
+const Subscription = require('../common/subscription')
+const { captureHardNavigation } = require('./capture-hard-navigation')
 
-var captureHardNavigation = require('./capture-hard-navigation').captureHardNavigation
 class TransactionService {
   constructor (logger, config) {
     if (typeof config === 'undefined') {
@@ -112,7 +112,11 @@ class TransactionService {
   capturePageLoadMetrics (tr) {
     var self = this
     var capturePageLoad = self._config.get('capturePageLoad')
-    if (capturePageLoad && !self._alreadyCapturedPageLoad && tr.isHardNavigation) {
+    if (
+      capturePageLoad &&
+      !self._alreadyCapturedPageLoad &&
+      tr.isHardNavigation
+    ) {
       tr.addMarks(self.marks)
       captureHardNavigation(tr)
       self._alreadyCapturedPageLoad = true
@@ -179,7 +183,10 @@ class TransactionService {
         self._logger.debug('TransactionService transaction finished', tr)
         if (!self.shouldIgnoreTransaction(tr.name)) {
           if (type === 'page-load') {
-            if (tr.name === 'Unknown' && self._config.get('pageLoadTransactionName')) {
+            if (
+              tr.name === 'Unknown' &&
+              self._config.get('pageLoadTransactionName')
+            ) {
               tr.name = self._config.get('pageLoadTransactionName')
             }
             var captured = self.capturePageLoadMetrics(tr)
