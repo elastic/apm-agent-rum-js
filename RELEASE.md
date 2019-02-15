@@ -2,8 +2,6 @@
 
 Before releasing a new version of packages to the NPM and GitHub, Its advisable to follow the below steps in order
 
-- Update the dependencies `npm run clean`
-- Bootstrap the deps using `npm run bootstrap`
 - Make sure all tests passes `npm run test`
 
 ### Releasing all packages
@@ -11,7 +9,7 @@ Before releasing a new version of packages to the NPM and GitHub, Its advisable 
 To publish all the packages run `npm run release`. It will run `lerna publish`(we use --independent) so it will prompt the version number for every package.
 
 - Automatically determining a semantic version bump (based on the types of commits landed)
-- Creating annonated Git tags for all the packages that has changed since last release
+- Creating annotated Git tags for all the packages that has changed since last release
 - Generating `CHANGELOG.md` using conventional commit messages.
 - Publishing the packages via `npm publish`
 
