@@ -24,13 +24,13 @@
  */
 
 class ApmBase {
-  constructor (serviceFactory, disable) {
+  constructor(serviceFactory, disable) {
     this._disable = disable
     this.serviceFactory = serviceFactory
     this._initialized = false
   }
 
-  init (config) {
+  init(config) {
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
       var configService = this.serviceFactory.getService('ConfigService')
@@ -55,7 +55,7 @@ class ApmBase {
     return this
   }
 
-  _sendPageLoadMetrics () {
+  _sendPageLoadMetrics() {
     var transactionService = this.serviceFactory.getService(
       'TransactionService'
     )
@@ -65,9 +65,9 @@ class ApmBase {
       configService.get('pageLoadTransactionName'),
       'page-load'
     )
-    var sendPageLoadMetrics = function sendPageLoadMetrics () {
+    var sendPageLoadMetrics = function sendPageLoadMetrics() {
       // to make sure PerformanceTiming.loadEventEnd has a value
-      setTimeout(function () {
+      setTimeout(function() {
         if (tr) {
           tr.detectFinish()
         }
@@ -81,32 +81,32 @@ class ApmBase {
     }
   }
 
-  isEnabled () {
+  isEnabled() {
     return !this._disable
   }
 
-  config (config) {
+  config(config) {
     var configService = this.serviceFactory.getService('ConfigService')
     configService.setConfig(config)
   }
 
-  setUserContext (userContext) {
+  setUserContext(userContext) {
     var configService = this.serviceFactory.getService('ConfigService')
     configService.setUserContext(userContext)
   }
 
-  setCustomContext (customContext) {
+  setCustomContext(customContext) {
     var configService = this.serviceFactory.getService('ConfigService')
     configService.setCustomContext(customContext)
   }
 
-  addTags (tags) {
+  addTags(tags) {
     var configService = this.serviceFactory.getService('ConfigService')
     configService.addTags(tags)
   }
 
   // Should call this method before 'load' event on window is fired
-  setInitialPageLoadName (name) {
+  setInitialPageLoadName(name) {
     if (this.isEnabled()) {
       var configService = this.serviceFactory.getService('ConfigService')
       configService.setConfig({
@@ -115,7 +115,7 @@ class ApmBase {
     }
   }
 
-  startTransaction (name, type) {
+  startTransaction(name, type) {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
         'TransactionService'
@@ -124,7 +124,7 @@ class ApmBase {
     }
   }
 
-  startSpan (name, type) {
+  startSpan(name, type) {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
         'TransactionService'
@@ -133,7 +133,7 @@ class ApmBase {
     }
   }
 
-  getCurrentTransaction () {
+  getCurrentTransaction() {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
         'TransactionService'
@@ -142,7 +142,7 @@ class ApmBase {
     }
   }
 
-  getTransactionService () {
+  getTransactionService() {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
         'TransactionService'
@@ -151,14 +151,14 @@ class ApmBase {
     }
   }
 
-  captureError (error) {
+  captureError(error) {
     if (this.isEnabled()) {
       var errorLogging = this.serviceFactory.getService('ErrorLogging')
       return errorLogging.logError(error)
     }
   }
 
-  addFilter (fn) {
+  addFilter(fn) {
     var configService = this.serviceFactory.getService('ConfigService')
     configService.addFilter(fn)
   }

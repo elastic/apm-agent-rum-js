@@ -54,7 +54,7 @@ const RULES = [
 const PROTOCOL_REGEX = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i
 
 class Url {
-  constructor (url) {
+  constructor(url) {
     let { protocol, address, slashes } = this.extractProtocol(url || '')
     const relative = !protocol && !slashes
     const location = this.getLocation()
@@ -81,7 +81,8 @@ class Url {
       /**
        * Default values for all keys from location if url is relative
        */
-      this[key] = this[key] || (relative && instruction[2] ? location[key] || '' : '')
+      this[key] =
+        this[key] || (relative && instruction[2] ? location[key] || '' : '')
       /**
        * host should be lowercased so they can be used to
        * create a proper `origin`.
@@ -97,7 +98,7 @@ class Url {
         : 'null'
   }
 
-  getLocation () {
+  getLocation() {
     var globalVar = {}
     if (typeof window !== 'undefined') {
       globalVar = window
@@ -106,7 +107,7 @@ class Url {
     return globalVar.location
   }
 
-  extractProtocol (url) {
+  extractProtocol(url) {
     const match = PROTOCOL_REGEX.exec(url)
     return {
       protocol: match[1] ? match[1].toLowerCase() : '',

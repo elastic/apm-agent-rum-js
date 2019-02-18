@@ -25,13 +25,17 @@
 
 const puppeteer = require('puppeteer')
 
-async function runIntegrationTest (pageUrl) {
+async function runIntegrationTest(pageUrl) {
   const browser = await puppeteer.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--remote-debugging-port=9222']
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--remote-debugging-port=9222'
+    ]
   })
   var result = {}
-  function handleError (error) {
+  function handleError(error) {
     console.log(`Error on ${pageUrl}:\n ${String(error)}`)
   }
   try {
@@ -41,7 +45,9 @@ async function runIntegrationTest (pageUrl) {
 
     await page.goto(pageUrl, { timeout: 30000 })
     const transactionResponse = await page.waitForResponse(response => {
-      console.log(`${response.request().method()} ${response.url()} ${response.status()}`)
+      console.log(
+        `${response.request().method()} ${response.url()} ${response.status()}`
+      )
       var request = response.request()
       var data = request.postData()
       var transactionData = false

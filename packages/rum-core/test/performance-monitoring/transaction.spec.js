@@ -26,10 +26,10 @@
 var Transaction = require('../../src/performance-monitoring/transaction')
 var Span = require('../../src/performance-monitoring/span')
 
-describe('transaction.Transaction', function () {
-  beforeEach(function () {})
+describe('transaction.Transaction', function() {
+  beforeEach(function() {})
 
-  it('should contain correct number of spans in the end', function (done) {
+  it('should contain correct number of spans in the end', function(done) {
     var firstSpan = new Span('first-span-name', 'first-span')
     firstSpan.end()
 
@@ -46,12 +46,12 @@ describe('transaction.Transaction', function () {
     done()
   })
 
-  it('should adjust rootSpan to earliest span', function (done) {
+  it('should adjust rootSpan to earliest span', function(done) {
     var firstSpan = new Span('first-span-name', 'first-span')
     firstSpan.end()
 
     var transaction = new Transaction('/', 'transaction', {})
-    transaction.onEnd = function () {
+    transaction.onEnd = function() {
       expect(transaction._start).toBe(firstSpan._start)
       expect(transaction._end >= lastSpan._end).toBeTruthy()
       done()
@@ -65,7 +65,7 @@ describe('transaction.Transaction', function () {
     transaction.detectFinish()
   })
 
-  it('should adjust rootSpan to latest span', function (done) {
+  it('should adjust rootSpan to latest span', function(done) {
     var transaction = new Transaction('/', 'transaction', {})
     var rootSpanStart = transaction._start
 
@@ -77,11 +77,11 @@ describe('transaction.Transaction', function () {
     var lastSpan = transaction.startSpan('last-span-name', 'last-span')
     lastSpan.end()
 
-    setTimeout(function () {
+    setTimeout(function() {
       longSpan.end()
       transaction.detectFinish()
 
-      setTimeout(function () {
+      setTimeout(function() {
         expect(transaction._start).toBe(rootSpanStart)
         expect(transaction._end).toEqual(longSpan._end)
         done()
@@ -89,12 +89,12 @@ describe('transaction.Transaction', function () {
     }, 500)
   })
 
-  xit('should not start any spans after transaction has been added to queue', function () {
+  xit('should not start any spans after transaction has been added to queue', function() {
     var transaction = new Transaction('/', 'transaction', {})
     transaction.end()
     var firstSpan = transaction.startSpan('first-span-name', 'first-span')
     firstSpan.end()
-    setTimeout(function () {
+    setTimeout(function() {
       // todo: transaction has already been added to the queue, shouldn't accept more spans
 
       var lastSpan = transaction.startSpan('last-span-name', 'last-span')
@@ -105,9 +105,9 @@ describe('transaction.Transaction', function () {
     })
   })
 
-  it('should not generate stacktrace if the option is not passed', function (done) {
+  it('should not generate stacktrace if the option is not passed', function(done) {
     var tr = new Transaction('/', 'transaction')
-    tr.onEnd = function () {
+    tr.onEnd = function() {
       expect(firstSpan.frames).toBeUndefined()
       expect(secondSpan.frames).toBeUndefined()
       done()
@@ -121,14 +121,14 @@ describe('transaction.Transaction', function () {
     tr.end()
   })
 
-  it('should store context.page.url', function () {
+  it('should store context.page.url', function() {
     var tr = new Transaction('/', 'transaction')
     tr.detectFinish()
     var location = tr.context.page.url
     expect(location).toBe(window.location.href)
   })
 
-  it('should redefine transaction', function () {
+  it('should redefine transaction', function() {
     var tr = new Transaction('/', 'transaction')
     tr.redefine('name', 'type', { test: 'test' })
     expect(tr.name).toBe('name')
@@ -136,7 +136,7 @@ describe('transaction.Transaction', function () {
     expect(tr.options).toEqual({ test: 'test' })
   })
 
-  it('should add and remove tasks', function () {
+  it('should add and remove tasks', function() {
     var tr = new Transaction('/', 'transaction')
     expect(tr._scheduledTasks).toEqual({})
     tr.addTask('task1')
@@ -145,7 +145,7 @@ describe('transaction.Transaction', function () {
     expect(tr._scheduledTasks).toEqual({})
   })
 
-  it('should mark events', function () {
+  it('should mark events', function() {
     var transaction = new Transaction('transaction', 'transaction')
     transaction.mark('new.mark')
     transaction.mark('mark')
@@ -153,14 +153,14 @@ describe('transaction.Transaction', function () {
     expect(typeof transaction.marks.custom.mark).toBe('number')
   })
 
-  it('should not start spans after end', function () {
+  it('should not start spans after end', function() {
     var transaction = new Transaction('transaction', 'transaction')
     transaction.end()
     var span = transaction.startSpan('test', 'test')
     expect(span).toBe(undefined)
   })
 
-  it('should not produce negative durations while adjusting to the spans', function () {
+  it('should not produce negative durations while adjusting to the spans', function() {
     var transaction = new Transaction('transaction', 'transaction')
     var span = transaction.startSpan('test', 'test')
     span.end()
@@ -174,7 +174,7 @@ describe('transaction.Transaction', function () {
     expect(span.duration()).toBe(0)
   })
 
-  it('should truncate active spans', function () {
+  it('should truncate active spans', function() {
     var transaction = new Transaction('transaction', 'transaction')
     var span = transaction.startSpan('test', 'test')
     expect(transaction.spans.length).toBe(0)
@@ -185,7 +185,7 @@ describe('transaction.Transaction', function () {
     expect(span.type).toContain('.truncated')
   })
 
-  it('should always set span parentId', function () {
+  it('should always set span parentId', function() {
     var transaction = new Transaction('transaction', 'transaction')
 
     var span = transaction.startSpan('name', 'type')

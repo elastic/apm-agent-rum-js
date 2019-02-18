@@ -26,16 +26,18 @@
 const { join } = require('path')
 const { readFileSync, writeFileSync, readdirSync } = require('fs')
 
-function getFileContent (directory, filename) {
+function getFileContent(directory, filename) {
   var files = readdirSync(directory)
-  var licenseFile = files.find(f => f.toLowerCase().startsWith(filename.toLowerCase()))
+  var licenseFile = files.find(f =>
+    f.toLowerCase().startsWith(filename.toLowerCase())
+  )
   if (licenseFile) {
     var license = readFileSync(join(directory, licenseFile), 'utf8')
     return license
   }
 }
 
-function generateDependencyInfo (deps, modulesPath, rootLicense) {
+function generateDependencyInfo(deps, modulesPath) {
   var allLicenses = []
   deps.forEach(d => {
     var modulePath = join(modulesPath, d)
@@ -56,11 +58,13 @@ function generateDependencyInfo (deps, modulesPath, rootLicense) {
   return allLicenses
 }
 
-function getInternalPackageNames (packageList, packagesDir) {
+function getInternalPackageNames(packageList, packagesDir) {
   const internalPackages = []
   for (const packageName of packageList) {
     const packageDir = join(packagesDir, packageName)
-    const { name } = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8'))
+    const { name } = JSON.parse(
+      readFileSync(join(packageDir, 'package.json'), 'utf8')
+    )
 
     internalPackages.push(name)
   }
@@ -68,7 +72,7 @@ function getInternalPackageNames (packageList, packagesDir) {
   return internalPackages
 }
 
-function generateNotice (rootDir = '../', packagesDir = 'packages') {
+function generateNotice(rootDir = '../', packagesDir = 'packages') {
   /**
    * Resolve in context of the file
    */

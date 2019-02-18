@@ -26,11 +26,11 @@
 var errorStackParser = require('error-stack-parser')
 
 class StackTraceService {
-  constructor (configService, loggingService) {
+  constructor(configService, loggingService) {
     this._configService = configService
     this._loggingService = loggingService
   }
-  createStackTraces (errorEvent) {
+  createStackTraces(errorEvent) {
     var stackTraceService = this
     var error = errorEvent.error
 
@@ -55,7 +55,7 @@ class StackTraceService {
 
     stackTraces = ErrorStackNormalizer(stackTraces)
 
-    stackTraces = stackTraces.map(function (stack) {
+    stackTraces = stackTraces.map(function(stack) {
       if (!stack.fileName && !stack.lineNumber) {
         return {}
       }
@@ -82,17 +82,20 @@ class StackTraceService {
     return stackTraces
   }
 
-  filterInvalidFrames (frames) {
+  filterInvalidFrames(frames) {
     var result = []
     if (Array.isArray(frames)) {
-      result = frames.filter(function (f) {
-        return typeof f['filename'] !== 'undefined' && typeof f['lineno'] !== 'undefined'
+      result = frames.filter(function(f) {
+        return (
+          typeof f['filename'] !== 'undefined' &&
+          typeof f['lineno'] !== 'undefined'
+        )
       })
     }
     return result
   }
 
-  filePathToFileName (fileUrl) {
+  filePathToFileName(fileUrl) {
     var origin =
       window.location.origin ||
       window.location.protocol +
@@ -107,7 +110,7 @@ class StackTraceService {
     return fileUrl
   }
 
-  cleanFilePath (filePath) {
+  cleanFilePath(filePath) {
     if (!filePath) {
       filePath = ''
     }
@@ -118,7 +121,7 @@ class StackTraceService {
 
     return filePath
   }
-  isFileInline (fileUrl) {
+  isFileInline(fileUrl) {
     if (fileUrl) {
       return window.location.href.indexOf(fileUrl) === 0
     } else {
@@ -127,8 +130,8 @@ class StackTraceService {
   }
 }
 
-function ErrorStackNormalizer (stackFrames) {
-  return stackFrames.map(function (frame) {
+function ErrorStackNormalizer(stackFrames) {
+  return stackFrames.map(function(frame) {
     if (frame.functionName) {
       frame.functionName = normalizeFunctionName(frame.functionName)
     }
@@ -136,7 +139,7 @@ function ErrorStackNormalizer (stackFrames) {
   })
 }
 
-function normalizeFunctionName (fnName) {
+function normalizeFunctionName(fnName) {
   // SpinderMonkey name convetion (https://developer.mozilla.org/en-US/docs/Tools/Debugger-API/Debugger.Object#Accessor_Properties_of_the_Debugger.Object_prototype)
 
   // We use a/b to refer to the b defined within a

@@ -88,7 +88,11 @@ const optimizeConfig = Object.assign({}, baseConfig, {
   plugins: [
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',
-      reportFilename: path.resolve(__dirname, 'reports', 'bundle-analyzer.html'),
+      reportFilename: path.resolve(
+        __dirname,
+        'reports',
+        'bundle-analyzer.html'
+      ),
       generateStatsFile: true,
       statsFilename: path.resolve(__dirname, 'reports', 'bundle-analyzer.json'),
       openAnalyzer: false

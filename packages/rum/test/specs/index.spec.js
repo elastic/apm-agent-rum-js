@@ -26,22 +26,22 @@
 var apmBase = require('../../src/index.js').apmBase
 var apmCore = require('elastic-apm-js-core')
 
-describe('index', function () {
+describe('index', function() {
   var originalTimeout
 
-  beforeEach(function () {
+  beforeEach(function() {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000
   })
 
-  afterEach(function () {
+  afterEach(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
-  it('should init ApmBase', function (done) {
+  it('should init ApmBase', function(done) {
     var apmServer = apmBase.serviceFactory.getService('ApmServer')
     if (window.globalConfigs && window.globalConfigs.useMocks) {
-      apmServer._makeHttpRequest = function () {
+      apmServer._makeHttpRequest = function() {
         return Promise.resolve()
       }
     }

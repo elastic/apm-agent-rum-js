@@ -29,7 +29,7 @@ const { runIntegrationTest } = require('./test/e2e/integration-test')
 const projectDirectory = path.join(__dirname, './')
 const { generateNotice } = require('../../dev-utils/dep-info')
 
-function runUnitTests (launchSauceConnect) {
+function runUnitTests(launchSauceConnect) {
   var testConfig = testUtils.getTestEnvironmentVariables()
   testConfig.karmaConfigFile = path.join(__dirname, './karma.conf.js')
   if (launchSauceConnect !== 'false') {
@@ -39,11 +39,11 @@ function runUnitTests (launchSauceConnect) {
   }
 }
 
-function createBackendAgentServer () {
+function createBackendAgentServer() {
   const express = require('express')
   const app = express()
 
-  app.use(function (req, res, next) {
+  app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
     if (req.method === 'OPTIONS') {
       res.header(
@@ -54,7 +54,7 @@ function createBackendAgentServer () {
     next()
   })
 
-  function dTRespond (req, res) {
+  function dTRespond(req, res) {
     var header = req.headers['elastic-apm-traceparent']
     var payload = { noHeader: true }
     if (header) {
@@ -81,18 +81,18 @@ function createBackendAgentServer () {
   return server
 }
 
-function serveE2e (servingPath, port) {
+function serveE2e(servingPath, port) {
   const express = require('express')
   const serveIndex = require('serve-index')
 
   const app = express()
   var staticPath = path.join(__dirname, servingPath)
 
-  app.get('/healthcheck', function (req, res) {
+  app.get('/healthcheck', function(req, res) {
     res.send('OK')
   })
 
-  app.get('/run_integration_test', async function (req, res) {
+  app.get('/run_integration_test', async function(req, res) {
     var echo = req.query.echo
     var result = await runIntegrationTest(
       'http://localhost:8000/test/e2e/general-usecase/'
@@ -104,7 +104,7 @@ function serveE2e (servingPath, port) {
     }
   })
 
-  app.get('/test-config.js', async function (req, res) {
+  app.get('/test-config.js', async function(req, res) {
     var config = testUtils.getConfig()
     var result = `
       window.globalConfigs = ${JSON.stringify(config)}
@@ -122,7 +122,7 @@ function serveE2e (servingPath, port) {
   return [server, backendAgentServer]
 }
 
-function runJasmine (cb) {
+function runJasmine(cb) {
   var JasmineRunner = require('jasmine')
   var jrunner = new JasmineRunner()
 
@@ -130,7 +130,7 @@ function runJasmine (cb) {
 
   jrunner.configureDefaultReporter({ showColors: true })
 
-  jrunner.onComplete(function (passed) {
+  jrunner.onComplete(function(passed) {
     if (!passed) {
       var err = new Error('Jasmine node tests failed.')
       // The stack is not useful in this context.
@@ -140,7 +140,7 @@ function runJasmine (cb) {
       cb()
     }
   })
-  jrunner.print = function (value) {
+  jrunner.print = function(value) {
     process.stdout.write(value)
   }
   jrunner.addReporter(new JasmineRunner.ConsoleReporter(jrunner))
@@ -150,7 +150,7 @@ function runJasmine (cb) {
   jrunner.execute()
 }
 
-function runE2eTests (serve) {
+function runE2eTests(serve) {
   if (serve !== 'false') {
     serveE2e('./', 8000)
   }
@@ -163,9 +163,9 @@ const scripts = {
   runUnitTests,
   startSelenium: testUtils.startSelenium,
   runE2eTests,
-  runNodeTests () {
+  runNodeTests() {
     var servers = serveE2e('./', 8000)
-    runJasmine(function (err) {
+    runJasmine(function(err) {
       servers.forEach(server => server.close())
       if (err) {
         console.log('Node tests failed:', err)
@@ -174,9 +174,9 @@ const scripts = {
       }
     })
   },
-  buildE2eBundles (basePath) {
+  buildE2eBundles(basePath) {
     basePath = basePath || './test/e2e'
-    function callback (err) {
+    function callback(err) {
       if (err) {
         var exitCode = 2
         process.exit(exitCode)
@@ -191,7 +191,7 @@ const scripts = {
 
 module.exports = scripts
 
-function runScript () {
+function runScript() {
   var scriptName = process.argv[2]
   if (scriptName) {
     var scriptArgs = [].concat(process.argv)

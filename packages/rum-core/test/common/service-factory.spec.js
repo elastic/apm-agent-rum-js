@@ -23,12 +23,12 @@
  *
  */
 
-describe('ServiceFactory', function () {
+describe('ServiceFactory', function() {
   var ServiceFactory = require('../../src/common/service-factory')
 
   var configService
   var loggingService
-  beforeEach(function () {
+  beforeEach(function() {
     var serviceFactory = new ServiceFactory()
     serviceFactory.registerCoreServices()
     serviceFactory.init()
@@ -38,7 +38,7 @@ describe('ServiceFactory', function () {
     spyOn(loggingService, 'debug')
   })
 
-  it('should set correct log level', function () {
+  it('should set correct log level', function() {
     expect(configService.get('debug')).toBe(false)
     expect(configService.get('logLevel')).toBe('warn')
     expect(loggingService.level).toBe('warn')

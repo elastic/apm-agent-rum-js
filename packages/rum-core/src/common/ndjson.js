@@ -24,7 +24,7 @@
  */
 
 class NDJSON {
-  static stringify (object) {
+  static stringify(object) {
     return JSON.stringify(object) + '\n'
   }
 }

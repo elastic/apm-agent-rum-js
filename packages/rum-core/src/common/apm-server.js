@@ -30,7 +30,7 @@ const NDJSON = require('./ndjson')
 const { XHR_IGNORE } = require('./patching/patch-utils')
 
 class ApmServer {
-  constructor (configService, loggingService) {
+  constructor(configService, loggingService) {
     this._configService = configService
     this._loggingService = loggingService
     this.logMessages = {
@@ -47,7 +47,7 @@ class ApmServer {
     this.ndjsonSpan = {}
   }
 
-  init () {
+  init() {
     if (this.initialized) {
       return
     }
@@ -57,7 +57,7 @@ class ApmServer {
     this.initTransactionQueue()
   }
 
-  createServiceObject () {
+  createServiceObject() {
     var cfg = this._configService
     var stringLimit = cfg.get('serverStringLimit')
 
@@ -75,14 +75,14 @@ class ApmServer {
     return serviceObject
   }
 
-  _postJson (endPoint, payload) {
+  _postJson(endPoint, payload) {
     return this._makeHttpRequest('POST', endPoint, payload, {
       'Content-Type': 'application/x-ndjson'
     })
   }
 
-  _makeHttpRequest (method, url, payload, headers) {
-    return new Promise(function (resolve, reject) {
+  _makeHttpRequest(method, url, payload, headers) {
+    return new Promise(function(resolve, reject) {
       var xhr = new window.XMLHttpRequest()
       xhr[XHR_IGNORE] = true
       xhr.open(method, url, true)
@@ -96,7 +96,7 @@ class ApmServer {
         }
       }
 
-      xhr.onreadystatechange = function () {
+      xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
           var status = xhr.status
           if (status === 0 || (status > 399 && status < 600)) {
@@ -110,7 +110,7 @@ class ApmServer {
         }
       }
 
-      xhr.onerror = function (err) {
+      xhr.onerror = function(err) {
         reject(err)
       }
 
@@ -118,7 +118,7 @@ class ApmServer {
     })
   }
 
-  _createQueue (onFlush) {
+  _createQueue(onFlush) {
     var queueLimit = this._configService.get('queueLimit')
     var flushInterval = this._configService.get('flushInterval')
     return new Queue(onFlush, {
@@ -127,15 +127,15 @@ class ApmServer {
     })
   }
 
-  initErrorQueue () {
+  initErrorQueue() {
     var apmServer = this
     if (this.errorQueue) {
       this.errorQueue.flush()
     }
-    this.errorQueue = this._createQueue(function (errors) {
+    this.errorQueue = this._createQueue(function(errors) {
       var p = apmServer.sendErrors(errors)
       if (p) {
-        p.then(undefined, function (reason) {
+        p.then(undefined, function(reason) {
           apmServer._loggingService.warn('Failed sending errors!', reason)
         })
       }
@@ -146,7 +146,7 @@ class ApmServer {
 
     this.throttleAddError = throttle(
       this.errorQueue.add.bind(this.errorQueue),
-      function () {
+      function() {
         apmServer._loggingService.warn('Dropped error due to throttling!')
       },
       {
@@ -156,15 +156,15 @@ class ApmServer {
     )
   }
 
-  initTransactionQueue () {
+  initTransactionQueue() {
     var apmServer = this
     if (this.transactionQueue) {
       this.transactionQueue.flush()
     }
-    this.transactionQueue = this._createQueue(function (transactions) {
+    this.transactionQueue = this._createQueue(function(transactions) {
       var p = apmServer.sendTransactions(transactions)
       if (p) {
-        p.then(undefined, function (reason) {
+        p.then(undefined, function(reason) {
           apmServer._loggingService.warn('Failed sending transactions!', reason)
         })
       }
@@ -175,7 +175,7 @@ class ApmServer {
 
     this.throttleAddTransaction = throttle(
       this.transactionQueue.add.bind(this.transactionQueue),
-      function () {
+      function() {
         apmServer._loggingService.warn('Dropped transaction due to throttling!')
       },
       {
@@ -185,7 +185,7 @@ class ApmServer {
     )
   }
 
-  addError (error) {
+  addError(error) {
     if (this._configService.isActive()) {
       if (!this.errorQueue) {
         this.initErrorQueue()
@@ -194,7 +194,7 @@ class ApmServer {
     }
   }
 
-  addTransaction (transaction) {
+  addTransaction(transaction) {
     if (this._configService.isActive()) {
       if (!this.transactionQueue) {
         this.initTransactionQueue()
@@ -203,7 +203,7 @@ class ApmServer {
     }
   }
 
-  warnOnce (logObject) {
+  warnOnce(logObject) {
     if (logObject.level === 'warn') {
       logObject.level = 'debug'
       this._loggingService.warn(logObject.message)
@@ -212,13 +212,13 @@ class ApmServer {
     }
   }
 
-  ndjsonErrors (errors) {
-    return errors.map(function (error) {
+  ndjsonErrors(errors) {
+    return errors.map(function(error) {
       return NDJSON.stringify({ error })
     })
   }
 
-  sendErrors (errors) {
+  sendErrors(errors) {
     if (this._configService.isValid() && this._configService.isActive()) {
       if (errors && errors.length > 0) {
         var payload = {
@@ -230,7 +230,9 @@ class ApmServer {
         if (payload) {
           var endPoint = this._configService.getEndpointUrl('errors')
           var ndjson = this.ndjsonErrors(payload.errors)
-          ndjson.unshift(NDJSON.stringify({ metadata: { service: payload.service } }))
+          ndjson.unshift(
+            NDJSON.stringify({ metadata: { service: payload.service } })
+          )
           var ndjsonPayload = ndjson.join('')
           return this._postJson(endPoint, ndjsonPayload)
         } else {
@@ -242,13 +244,13 @@ class ApmServer {
     }
   }
 
-  ndjsonTransactions (transactions) {
+  ndjsonTransactions(transactions) {
     var ndjsonSpan = this.ndjsonSpan
-    return transactions.map(function (tr) {
+    return transactions.map(function(tr) {
       var spans = ''
       if (tr.spans) {
         spans = tr.spans
-          .map(function (sp) {
+          .map(function(sp) {
             ndjsonSpan.span = sp
             return NDJSON.stringify(ndjsonSpan)
           })
@@ -259,7 +261,7 @@ class ApmServer {
     })
   }
 
-  sendTransactions (transactions) {
+  sendTransactions(transactions) {
     if (this._configService.isValid() && this._configService.isActive()) {
       if (transactions && transactions.length > 0) {
         var payload = {
@@ -270,7 +272,9 @@ class ApmServer {
         if (payload) {
           var endPoint = this._configService.getEndpointUrl('transactions')
           var ndjson = this.ndjsonTransactions(payload.transactions)
-          ndjson.unshift(NDJSON.stringify({ metadata: { service: payload.service } }))
+          ndjson.unshift(
+            NDJSON.stringify({ metadata: { service: payload.service } })
+          )
           var ndjsonPayload = ndjson.join('')
           return this._postJson(endPoint, ndjsonPayload)
         } else {

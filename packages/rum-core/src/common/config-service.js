@@ -27,13 +27,13 @@ const { getCurrentScript, sanitizeString, setTag, merge } = require('./utils')
 const Subscription = require('../common/subscription')
 const constants = require('./constants')
 
-function getConfigFromScript () {
+function getConfigFromScript() {
   var script = getCurrentScript()
   var config = getDataAttributesFromNode(script)
   return config
 }
 
-function getDataAttributesFromNode (node) {
+function getDataAttributesFromNode(node) {
   if (!node) {
     return {}
   }
@@ -49,7 +49,9 @@ function getDataAttributesFromNode (node) {
       var camelCasedkey = key
         .split('-')
         .map((value, index) => {
-          return index > 0 ? value.charAt(0).toUpperCase() + value.substring(1) : value
+          return index > 0
+            ? value.charAt(0).toUpperCase() + value.substring(1)
+            : value
         })
         .join('')
 
@@ -61,7 +63,7 @@ function getDataAttributesFromNode (node) {
 }
 
 class Config {
-  constructor () {
+  constructor() {
     this.config = {}
     this.defaults = {
       serviceName: '',
@@ -115,23 +117,23 @@ class Config {
     this.filters = []
   }
 
-  init () {
+  init() {
     var scriptData = getConfigFromScript()
     this.setConfig(scriptData)
   }
 
-  isActive () {
+  isActive() {
     return this.get('active')
   }
 
-  addFilter (cb) {
+  addFilter(cb) {
     if (typeof cb !== 'function') {
       throw new Error('Argument to must be function')
     }
     this.filters.push(cb)
   }
 
-  applyFilters (data) {
+  applyFilters(data) {
     for (var i = 0; i < this.filters.length; i++) {
       data = this.filters[i](data)
       if (!data) {
@@ -141,18 +143,18 @@ class Config {
     return data
   }
 
-  get (key) {
+  get(key) {
     return key.split('.').reduce((obj, objKey) => {
       return obj && obj[objKey]
     }, this.config)
   }
 
-  getEndpointUrl () {
+  getEndpointUrl() {
     var url = this.get('serverUrl') + this.get('serverUrlPrefix')
     return url
   }
 
-  set (key, value) {
+  set(key, value) {
     var levels = key.split('.')
     var maxLevel = levels.length - 1
     var target = this.config
@@ -172,7 +174,7 @@ class Config {
     }
   }
 
-  setUserContext (userContext) {
+  setUserContext(userContext) {
     var context = {}
     if (typeof userContext.id === 'number') {
       context.id = userContext.id
@@ -181,21 +183,27 @@ class Config {
       context.id = sanitizeString(userContext.id, this.get('serverStringLimit'))
     }
     if (typeof userContext.username === 'string') {
-      context.username = sanitizeString(userContext.username, this.get('serverStringLimit'))
+      context.username = sanitizeString(
+        userContext.username,
+        this.get('serverStringLimit')
+      )
     }
     if (typeof userContext.email === 'string') {
-      context.email = sanitizeString(userContext.email, this.get('serverStringLimit'))
+      context.email = sanitizeString(
+        userContext.email,
+        this.get('serverStringLimit')
+      )
     }
     this.set('context.user', context)
   }
 
-  setCustomContext (customContext) {
+  setCustomContext(customContext) {
     if (customContext && typeof customContext === 'object') {
       this.set('context.custom', customContext)
     }
   }
 
-  setTag (key, value) {
+  setTag(key, value) {
     if (!key) return
     if (!this.config.context.tags) {
       this.config.context.tags = {}
@@ -204,25 +212,25 @@ class Config {
     setTag(key, value, this.config.context.tags)
   }
 
-  addTags (tags) {
+  addTags(tags) {
     var keys = Object.keys(tags)
     keys.forEach(k => {
       this.setTag(k, tags[k])
     })
   }
 
-  setConfig (properties) {
+  setConfig(properties) {
     properties = properties || {}
     this.config = merge({}, this.defaults, this.config, properties)
 
     this._changeSubscription.applyAll(this, [this.config])
   }
 
-  subscribeToChange (fn) {
+  subscribeToChange(fn) {
     return this._changeSubscription.subscribe(fn)
   }
 
-  isValid () {
+  isValid() {
     const requiredKeys = ['serviceName', 'serverUrl']
 
     for (let i = 0; i < requiredKeys.length; i++) {

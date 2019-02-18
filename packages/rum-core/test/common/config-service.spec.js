@@ -25,13 +25,13 @@
 
 var ConfigService = require('../../src/common/config-service')
 
-describe('ConfigService', function () {
+describe('ConfigService', function() {
   var configService
-  beforeEach(function () {
+  beforeEach(function() {
     configService = new ConfigService()
     configService.init()
   })
-  it('should merge configs with already set configs', function () {
+  it('should merge configs with already set configs', function() {
     expect(configService.get('debug')).toBe(false)
     expect(configService.get('serviceName')).toBe('')
 
@@ -58,7 +58,7 @@ describe('ConfigService', function () {
     expect(configService.get('serviceName')).toBe(null)
   })
 
-  it('should return undefined if the config does not exists', function () {
+  it('should return undefined if the config does not exists', function() {
     expect(configService.get('context')).toEqual({})
     expect(configService.get('context.user')).toBe(undefined)
     configService.set('context.user', { test: 'test' })
@@ -67,17 +67,17 @@ describe('ConfigService', function () {
     expect(configService.get('context.nonexisting.nonexisting')).toBe(undefined)
   })
 
-  it('should addFilter correctly', function () {
-    expect(function () {
+  it('should addFilter correctly', function() {
+    expect(function() {
       configService.addFilter('test')
     }).toThrow()
 
-    configService.addFilter(function (testArg) {
+    configService.addFilter(function(testArg) {
       expect(testArg).toBe('hamid-test')
       return 'hamid-test-1'
     })
 
-    configService.addFilter(function (testArg) {
+    configService.addFilter(function(testArg) {
       expect(testArg).toBe('hamid-test-1')
       return 'hamid-test-2'
     })
@@ -85,8 +85,8 @@ describe('ConfigService', function () {
     var result = configService.applyFilters('hamid-test')
     expect(result).toBe('hamid-test-2')
 
-    configService.addFilter(function () {})
-    configService.addFilter(function () {
+    configService.addFilter(function() {})
+    configService.addFilter(function() {
       throw new Error('Out of reach!')
     })
 
@@ -94,7 +94,7 @@ describe('ConfigService', function () {
     expect(result).toBeUndefined()
   })
 
-  it('should set userContext and customContext', function () {
+  it('should set userContext and customContext', function() {
     configService.setCustomContext({ test: 'test' })
     var customContext = configService.get('context.custom')
     expect(customContext).toEqual({ test: 'test' })
@@ -106,9 +106,18 @@ describe('ConfigService', function () {
       email: 'email'
     })
     var userContext = configService.get('context.user')
-    expect(userContext).toEqual({ id: 'userId', username: 'username', email: 'email' })
+    expect(userContext).toEqual({
+      id: 'userId',
+      username: 'username',
+      email: 'email'
+    })
 
-    configService.setUserContext({ test: 'test', id: 1, username: 1, email: 'email' })
+    configService.setUserContext({
+      test: 'test',
+      id: 1,
+      username: 1,
+      email: 'email'
+    })
     userContext = configService.get('context.user')
     expect(userContext).toEqual({ id: 1, email: 'email' })
 
@@ -117,7 +126,7 @@ describe('ConfigService', function () {
     expect(userContext).toEqual({})
   })
 
-  it('should check config validity', function () {
+  it('should check config validity', function() {
     var result = configService.isValid()
     expect(result).toBe(false)
 
@@ -134,7 +143,7 @@ describe('ConfigService', function () {
     expect(result).toBe(true)
   })
 
-  it('should setTag', function () {
+  it('should setTag', function() {
     configService.setTag('', 'test')
     configService.setTag('test', 'test')
     configService.setTag('test.key', 'test value')
@@ -143,7 +152,7 @@ describe('ConfigService', function () {
     expect(tags).toEqual({ test: 'test', test_key: 'test value', newKey: '' })
   })
 
-  it('should addTags', function () {
+  it('should addTags', function() {
     var date = new Date()
     configService.addTags({
       test: 'test',

@@ -36,7 +36,7 @@ const {
 } = require('../common/utils')
 
 class Transaction extends SpanBase {
-  constructor (name, type, options) {
+  constructor(name, type, options) {
     super(name, type, options)
     this.traceId = generateRandomId()
     this.marks = undefined
@@ -53,7 +53,7 @@ class Transaction extends SpanBase {
     this.sampled = Math.random() <= this.options.transactionSampleRate
   }
 
-  addNavigationTimingMarks () {
+  addNavigationTimingMarks() {
     var marks = getNavigationTimingMarks()
     var paintMarks = getPaintTimingMarks()
     if (marks) {
@@ -69,11 +69,11 @@ class Transaction extends SpanBase {
     }
   }
 
-  addMarks (obj) {
+  addMarks(obj) {
     this.marks = merge(this.marks || {}, obj)
   }
 
-  mark (key) {
+  mark(key) {
     var skey = removeInvalidChars(key)
     var now = window.performance.now() - this._start
     var custom = {}
@@ -81,20 +81,20 @@ class Transaction extends SpanBase {
     this.addMarks({ custom })
   }
 
-  redefine (name, type, options) {
+  redefine(name, type, options) {
     this.name = name
     this.type = type
     this.options = options
   }
 
-  startSpan (name, type, options) {
+  startSpan(name, type, options) {
     if (this.ended) {
       return
     }
     var transaction = this
     var opts = extend({}, options)
 
-    opts.onEnd = function (trc) {
+    opts.onEnd = function(trc) {
       transaction._onSpanEnd(trc)
     }
     opts.traceId = this.traceId
@@ -110,16 +110,16 @@ class Transaction extends SpanBase {
     return span
   }
 
-  isFinished () {
+  isFinished() {
     var scheduledTasks = Object.keys(this._scheduledTasks)
     return scheduledTasks.length === 0
   }
 
-  detectFinish () {
+  detectFinish() {
     if (this.isFinished()) this.end()
   }
 
-  end () {
+  end() {
     if (this.ended) {
       return
     }
@@ -140,7 +140,7 @@ class Transaction extends SpanBase {
     this.callOnEnd()
   }
 
-  addTask (taskId) {
+  addTask(taskId) {
     // todo: should not accept more tasks if the transaction is alreadyFinished]
     if (typeof taskId === 'undefined') {
       taskId = 'autoId' + this.nextAutoTaskId++
@@ -149,26 +149,26 @@ class Transaction extends SpanBase {
     return taskId
   }
 
-  removeTask (taskId) {
+  removeTask(taskId) {
     delete this._scheduledTasks[taskId]
     this.detectFinish()
   }
 
-  addEndedSpans (existingSpans) {
+  addEndedSpans(existingSpans) {
     this.spans = this.spans.concat(existingSpans)
   }
 
-  resetSpans () {
+  resetSpans() {
     this.spans = []
   }
 
-  _onSpanEnd (span) {
+  _onSpanEnd(span) {
     this.spans.push(span)
     // Remove span from _activeSpans
     delete this._activeSpans[span.id]
   }
 
-  _adjustEndToLatestSpan () {
+  _adjustEndToLatestSpan() {
     var latestSpan = findLatestNonXHRSpan(this.spans)
 
     if (latestSpan) {
@@ -189,7 +189,7 @@ class Transaction extends SpanBase {
     }
   }
 
-  _adjustStartToEarliestSpan () {
+  _adjustStartToEarliestSpan() {
     var span = getEarliestSpan(this.spans)
 
     if (span && span._start < this._start) {
@@ -198,7 +198,7 @@ class Transaction extends SpanBase {
   }
 }
 
-function findLatestNonXHRSpan (spans) {
+function findLatestNonXHRSpan(spans) {
   var latestSpan = null
   for (var i = 0; i < spans.length; i++) {
     var span = spans[i]
@@ -214,10 +214,10 @@ function findLatestNonXHRSpan (spans) {
   return latestSpan
 }
 
-function getEarliestSpan (spans) {
+function getEarliestSpan(spans) {
   var earliestSpan = null
 
-  spans.forEach(function (span) {
+  spans.forEach(function(span) {
     if (!earliestSpan) {
       earliestSpan = span
     }

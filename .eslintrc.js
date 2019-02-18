@@ -19,13 +19,13 @@ module.exports = {
     es6: true,
     browser: true
   },
+  extends: ['plugin:prettier/recommended'],
   parser: 'babel-eslint',
-  plugins: ['prettier', 'standard', 'rulesdir'],
+  plugins: ['standard', 'rulesdir'],
   rules: {
-    'max-len': ['error', { code: 100, ignoreComments: true }],
     'no-unused-vars': 'error',
-    'space-before-function-paren': 'error',
-    "object-shorthand": "error",
+    'prettier/prettier': ['error', { singleQuote: true, semi: false }],
+    'object-shorthand': 'error',
     'rulesdir/require-license-header': [
       'error',
       {

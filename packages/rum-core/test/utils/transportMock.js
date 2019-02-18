@@ -25,7 +25,7 @@
 
 var Subscription = require('../../src/common/subscription')
 
-function TransportMock (transport) {
+function TransportMock(transport) {
   this._transport = transport
   this.transactions = []
   this.subscription = new Subscription()
@@ -33,7 +33,7 @@ function TransportMock (transport) {
   this.transactionInterceptor = undefined
 }
 
-TransportMock.prototype.sendTransaction = function (data, headers) {
+TransportMock.prototype.sendTransaction = function(data, headers) {
   var transactinData = { data, headers }
   this.transactions.push(transactinData)
   var trMock = this
@@ -41,26 +41,26 @@ TransportMock.prototype.sendTransaction = function (data, headers) {
     return trMock.transactionInterceptor(data, headers)
   } else if (this._transport) {
     return this._transport.sendTransaction(data, headers).then(
-      function () {
+      function() {
         trMock.subscription.applyAll(this, ['sendTransaction', transactinData])
       },
-      function (reason) {
+      function(reason) {
         console.log('Failed to send to apm server: ', reason)
       }
     )
   } else {
     this.subscription.applyAll(this, ['sendTransaction', transactinData])
-    return new Promise(function (resolve) {
+    return new Promise(function(resolve) {
       resolve()
     })
   }
 }
 
-TransportMock.prototype.subscribe = function (fn) {
+TransportMock.prototype.subscribe = function(fn) {
   return this.subscription.subscribe(fn)
 }
 
-TransportMock.prototype.sendError = function (data, headers) {
+TransportMock.prototype.sendError = function(data, headers) {
   var errorData = { data, headers }
   this.errors.push(errorData)
   this.subscription.applyAll(this, ['sendError', errorData])
