@@ -5,7 +5,9 @@ services:
 node_js:
   - '8'
 
-cache: npm
+cache:
+  directories:
+    - $HOME/.npm
 
 env:
   global:
