@@ -22,19 +22,20 @@
  * THE SOFTWARE.
  *
  */
+const sauceConnectLauncher = require('sauce-connect-launcher')
+
+const sauceConnectOpts = {
+  username: process.env.SAUCE_USERNAME,
+  accessKey: process.env.SAUCE_ACCESS_KEY,
+  logger: console.log,
+  noSslBumpDomains: 'all',
+  tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+}
 
 function launchSauceConnect(userConfig, done) {
-  var sauceConnectLauncher = require('sauce-connect-launcher')
+  const config = Object.assign({}, sauceConnectOpts, userConfig)
 
-  var config = {
-    username: userConfig && (userConfig.username || process.env.SAUCE_USERNAME),
-    accessKey:
-      userConfig && (userConfig.accessKey || process.env.SAUCE_ACCESS_KEY),
-    logger: console.log,
-    noSslBumpDomains: 'all'
-  }
-
-  var tryConnect = function(maxAttempts, currAttempts, done) {
+  const tryConnect = function(maxAttempts, currAttempts, done) {
     sauceConnectLauncher(config, function(err) {
       if (err) {
         console.error(err.message)
@@ -55,6 +56,4 @@ function launchSauceConnect(userConfig, done) {
 
   tryConnect(3, 1, done)
 }
-module.exports = {
-  launchSauceConnect
-}
+module.exports = { launchSauceConnect, sauceConnectOpts }

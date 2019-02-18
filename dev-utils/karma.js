@@ -23,9 +23,12 @@
  *
  */
 
-// dependencies
 // npm i --save-dev jasmine karma karma-sauce-launcher karma-failed-reporter karma-jasmine karma-spec-reporter webpack karma-webpack karma-chrome-launcher karma-sourcemap-loader babel-core babel-loader babel-preset-es2015 babel-plugin-istanbul
-var baseLaunchers = {
+
+const karma = require('karma')
+const fs = require('fs')
+
+const baseLaunchers = {
   SL_CHROME: {
     base: 'SauceLabs',
     browserName: 'chrome',
@@ -103,6 +106,7 @@ var baseConfig = {
   ],
   webpack: {
     mode: 'none',
+    stats: 'errors-only',
     module: {
       rules: [
         {
@@ -207,13 +211,13 @@ function prepareConfig(defaultConfig) {
       defaultConfig.sauceLabs.tags = ['master']
       console.log('saucelabs.build:', buildId)
     }
+    defaultConfig.sauceLabs.tunnelIdentifier = process.env.TRAVIS_JOB_NUMBER
     defaultConfig.reporters = ['dots', 'saucelabs']
     defaultConfig.browsers = Object.keys(defaultConfig.customLaunchers)
     defaultConfig.transports = ['polling']
   }
 
   if (defaultConfig.globalConfigs) {
-    var fs = require('fs')
     var dir = './tmp'
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir)
@@ -231,7 +235,6 @@ function prepareConfig(defaultConfig) {
   return defaultConfig
 }
 
-var karma = require('karma')
 function singleRunKarma(configFile, done) {
   new karma.Server(
     {
