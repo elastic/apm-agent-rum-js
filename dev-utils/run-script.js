@@ -28,7 +28,7 @@ const testUtils = require('./test')
 const saucelabs = require('./saucelabs')
 const { generateNotice } = require('./dep-info')
 
-function runUnitTests (launchSauceConnect, directory) {
+function runUnitTests(launchSauceConnect, directory) {
   var testConfig = testUtils.getTestEnvironmentVariables()
   testConfig.karmaConfigFile = path.join(
     __dirname,
@@ -43,7 +43,7 @@ function runUnitTests (launchSauceConnect, directory) {
   }
 }
 
-function runScript (scripts, scriptName, scriptArgs) {
+function runScript(scripts, scriptName, scriptArgs) {
   if (scriptName) {
     var message = `Running: ${scriptName}(${scriptArgs
       .map(a => "'" + a + "'")
@@ -60,9 +60,9 @@ function runScript (scripts, scriptName, scriptArgs) {
 var scripts = {
   runUnitTests,
   generateNotice,
-  launchSauceConnect: function launchSauceConnect () {
+  launchSauceConnect: function launchSauceConnect() {
     var env = testUtils.getTestEnvironmentVariables()
-    saucelabs.launchSauceConnect(env.sauceLabs, function () {
+    saucelabs.launchSauceConnect(env.sauceLabs, function() {
       console.log('Launched SauceConnect!')
     })
   }

@@ -26,7 +26,7 @@
 var karmaUtils = require('./dev-utils/karma.js')
 var testUtils = require('./dev-utils/test.js')
 
-module.exports = function (config) {
+module.exports = function(config) {
   config.set(karmaUtils.baseConfig)
   var env = testUtils.getTestEnvironmentVariables()
   var customConfig = {
@@ -65,7 +65,7 @@ module.exports = function (config) {
     },
     benchmarkJsonReporter: {
       pathToJson: 'reports/benchmark-results.json',
-      formatOutput (results) {
+      formatOutput(results) {
         var summary = results.map(r => {
           return { name: `${r.suite}.${r.name}`, mean: r.mean, hz: r.hz }
         })

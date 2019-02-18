@@ -27,11 +27,11 @@ var globalState = {
   fetchInProgress: false
 }
 
-function apmSymbol (name) {
+function apmSymbol(name) {
   return '__apm_symbol__' + name
 }
 
-function isPropertyWritable (propertyDesc) {
+function isPropertyWritable(propertyDesc) {
   if (!propertyDesc) {
     return true
   }
@@ -40,14 +40,17 @@ function isPropertyWritable (propertyDesc) {
     return false
   }
 
-  return !(typeof propertyDesc.get === 'function' && typeof propertyDesc.set === 'undefined')
+  return !(
+    typeof propertyDesc.get === 'function' &&
+    typeof propertyDesc.set === 'undefined'
+  )
 }
 
-function attachOriginToPatched (patched, original) {
+function attachOriginToPatched(patched, original) {
   patched[apmSymbol('OriginalDelegate')] = original
 }
 
-function patchMethod (target, name, patchFn) {
+function patchMethod(target, name, patchFn) {
   var proto = target
   while (proto && !proto.hasOwnProperty(name)) {
     proto = Object.getPrototypeOf(proto)
@@ -66,7 +69,7 @@ function patchMethod (target, name, patchFn) {
     const desc = proto && Object.getOwnPropertyDescriptor(proto, name)
     if (isPropertyWritable(desc)) {
       const patchDelegate = patchFn(delegate, delegateName, name)
-      proto[name] = function () {
+      proto[name] = function() {
         return patchDelegate(this, arguments)
       }
       attachOriginToPatched(proto[name], delegate)

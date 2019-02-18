@@ -26,7 +26,7 @@
 var createServiceFactory = require('..').createServiceFactory
 var Transaction = require('../../src/performance-monitoring/transaction')
 
-function generateTransaction () {
+function generateTransaction() {
   var tr = new Transaction('transaction1', 'transaction1type')
   var span = tr.startSpan('span1', 'span1type')
   span.end()
@@ -38,7 +38,7 @@ function generateTransaction () {
   return tr
 }
 
-suite('PerformanceMonitoring', function () {
+suite('PerformanceMonitoring', function() {
   var serviceFactory = createServiceFactory()
   var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   var apmServer = serviceFactory.getService('ApmServer')
@@ -48,16 +48,16 @@ suite('PerformanceMonitoring', function () {
   var apmTestConfig = require('../apm-test-config')()
   configService.setConfig(apmTestConfig)
 
-  benchmark('createTransactionPayload', function () {
+  benchmark('createTransactionPayload', function() {
     var tr = generateTransaction()
     performanceMonitoring.createTransactionPayload(tr)
   })
 
-  function ResolvedPromise () {
+  function ResolvedPromise() {
     return Promise.resolve()
   }
 
-  benchmark('sendTransactions-no-json', function () {
+  benchmark('sendTransactions-no-json', function() {
     apmServer._postJson = ResolvedPromise
     var tr = generateTransaction()
     performanceMonitoring.sendTransactions([tr])
@@ -65,7 +65,7 @@ suite('PerformanceMonitoring', function () {
 
   benchmark(
     'sendTransactions',
-    function () {
+    function() {
       apmServer._postJson = _postJson
       var tr = generateTransaction()
       performanceMonitoring.sendTransactions([tr])
@@ -74,14 +74,16 @@ suite('PerformanceMonitoring', function () {
   )
 })
 
-suite.skip('PerformanceMonitoring - Defered', function () {
+suite.skip('PerformanceMonitoring - Defered', function() {
   var serviceFactory = createServiceFactory()
   var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   var configService = serviceFactory.getService('ConfigService')
-  configService.setConfig({ serviceName: 'benchmark-send-transactions-defered' })
+  configService.setConfig({
+    serviceName: 'benchmark-send-transactions-defered'
+  })
   benchmark(
     'sendTransactions - Defered',
-    function (deferred) {
+    function(deferred) {
       var tr = generateTransaction()
 
       performanceMonitoring.sendTransactions([tr]).then(() => {

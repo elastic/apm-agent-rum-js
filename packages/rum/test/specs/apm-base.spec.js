@@ -27,13 +27,13 @@ var ApmBase = require('../../src/apm-base')
 var apmCore = require('elastic-apm-js-core')
 var enabled = require('../../src/bootstrap')()
 
-describe('ApmBase', function () {
+describe('ApmBase', function() {
   var serviceFactory
-  beforeEach(function () {
+  beforeEach(function() {
     serviceFactory = apmCore.createServiceFactory()
   })
 
-  it('should send page load metrics before or after load event', function (done) {
+  it('should send page load metrics before or after load event', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     var trService = serviceFactory.getService('TransactionService')
     var configService = serviceFactory.getService('ConfigService')
@@ -46,7 +46,7 @@ describe('ApmBase', function () {
     expect(tr.name).toBe('Unknown')
     expect(tr.type).toBe('page-load')
     spyOn(tr, 'detectFinish')
-    window.addEventListener('load', function () {
+    window.addEventListener('load', function() {
       setTimeout(() => {
         expect(tr.detectFinish).toHaveBeenCalled()
         apmBase.setInitialPageLoadName('new page load')
@@ -65,7 +65,7 @@ describe('ApmBase', function () {
     })
   })
 
-  it('should provide the public api', function () {
+  it('should provide the public api', function() {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({})
     apmBase.setInitialPageLoadName('test')
@@ -93,7 +93,7 @@ describe('ApmBase', function () {
     expect(apmBase.getCurrentTransaction()).toBe(tr)
     expect(apmBase.getTransactionService()).toBe(trService)
 
-    var filter = function () {}
+    var filter = function() {}
     apmBase.addFilter(filter)
     expect(configService.filters.length).toBe(1)
     expect(configService.filters[0]).toBe(filter)
@@ -103,7 +103,7 @@ describe('ApmBase', function () {
     performanceMonitoring.cancelPatchSub()
   })
 
-  it('should instrument xhr', function (done) {
+  it('should instrument xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({})
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
@@ -114,7 +114,7 @@ describe('ApmBase', function () {
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener('load', function () {
+    req.addEventListener('load', function() {
       setTimeout(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].name).toBe('GET /')
@@ -126,7 +126,7 @@ describe('ApmBase', function () {
     req.send()
   })
 
-  it('should instrument xhr when no transaction was started', function (done) {
+  it('should instrument xhr when no transaction was started', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ capturePageLoad: false })
     var performanceMonitoring = serviceFactory.getService(
@@ -138,7 +138,7 @@ describe('ApmBase', function () {
     var tr
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener('load', function () {
+    req.addEventListener('load', function() {
       setTimeout(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].name).toBe('GET /')
@@ -152,7 +152,7 @@ describe('ApmBase', function () {
     expect(tr.name).toBe('ZoneTransaction')
   })
 
-  it('should instrument xhr when not active', function (done) {
+  it('should instrument xhr when not active', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ capturePageLoad: false, active: false })
     var performanceMonitoring = serviceFactory.getService(
@@ -163,7 +163,7 @@ describe('ApmBase', function () {
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener('load', function () {
+    req.addEventListener('load', function() {
       setTimeout(() => {
         performanceMonitoring.cancelPatchSub()
         done()
@@ -175,7 +175,7 @@ describe('ApmBase', function () {
     expect(tr).toBeUndefined()
   })
 
-  it('should instrument sync xhr', function (done) {
+  it('should instrument sync xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({})
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
@@ -187,7 +187,7 @@ describe('ApmBase', function () {
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', false)
-    req.addEventListener('load', function () {
+    req.addEventListener('load', function() {
       done()
     })
 

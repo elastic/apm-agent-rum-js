@@ -57,9 +57,9 @@ elasticApm.setUserContext({
 elasticApm.setCustomContext({ testContext: 'testContext' })
 elasticApm.addTags({ testTagKey: 'testTagValue' })
 
-elasticApm.addFilter(function (payload) {
+elasticApm.addFilter(function(payload) {
   if (payload.errors) {
-    payload.errors.forEach(function (error) {
+    payload.errors.forEach(function(error) {
       error.exception.message = error.exception.message.replace(
         'secret',
         '[REDACTED]'
@@ -67,8 +67,8 @@ elasticApm.addFilter(function (payload) {
     })
   }
   if (payload.transactions) {
-    payload.transactions.forEach(function (tr) {
-      tr.spans.forEach(function (span) {
+    payload.transactions.forEach(function(tr) {
+      tr.spans.forEach(function(span) {
         if (span.context && span.context.http && span.context.http.url) {
           var url = new URL(span.context.http.url, window.location.origin)
           if (url.searchParams && url.searchParams.get('token')) {
@@ -83,11 +83,11 @@ elasticApm.addFilter(function (payload) {
   return payload
 })
 
-function generateError () {
+function generateError() {
   throw new Error('timeout test error with a secret')
 }
 
-setTimeout(function () {
+setTimeout(function() {
   generateError()
 }, 100)
 
@@ -95,13 +95,13 @@ var url = '/test/e2e/common/data.json?test=hamid'
 var req = new window.XMLHttpRequest()
 req.open('GET', url, false)
 
-req.addEventListener('load', function () {
+req.addEventListener('load', function() {
   console.log('got data!')
 })
 
 req.send()
 
-function checkDtInfo (payload) {
+function checkDtInfo(payload) {
   console.log('distributed tracing data', payload)
   if (typeof payload.traceId !== 'string') {
     throw new Error('Wrong distributed tracing payload: ' + req.responseText)
@@ -110,18 +110,18 @@ function checkDtInfo (payload) {
 
 req = new window.XMLHttpRequest()
 req.open('POST', serverUrl + '/data', false)
-req.addEventListener('load', function () {
+req.addEventListener('load', function() {
   var payload = JSON.parse(req.responseText)
   checkDtInfo(payload)
 })
-req.onerror = function (err) {
+req.onerror = function(err) {
   console.log('XHR Error', err)
 }
 req.send()
 
 if ('fetch' in window) {
-  fetch(serverUrl + '/fetch', { method: 'POST' }).then(function (response) {
-    response.json().then(function (payload) {
+  fetch(serverUrl + '/fetch', { method: 'POST' }).then(function(response) {
+    response.json().then(function(payload) {
       checkDtInfo(payload)
     })
   })

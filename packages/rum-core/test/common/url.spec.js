@@ -25,8 +25,8 @@
 
 const Url = require('../../src/common/url')
 
-describe('Url parser', function () {
-  it('should parse relative url', function () {
+describe('Url parser', function() {
+  it('should parse relative url', function() {
     var result = new Url(
       '/path?param=value&param2=value2&0=zero&foo&empty=&key=double=double&undefined'
     )
@@ -41,7 +41,7 @@ describe('Url parser', function () {
     )
   })
 
-  it('should parse absolute url', function () {
+  it('should parse absolute url', function() {
     var result = new Url('http://test.com/path.js?param=value')
     expect(result).toEqual(
       jasmine.objectContaining({
@@ -55,7 +55,7 @@ describe('Url parser', function () {
     )
   })
 
-  it('should parse url with fragment part', function () {
+  it('should parse url with fragment part', function() {
     var result = new Url('http://test.com/path?param=value#fragment')
     expect(result).toEqual(
       jasmine.objectContaining({
@@ -66,7 +66,7 @@ describe('Url parser', function () {
     )
   })
 
-  it('should parse url with fragment before query string', function () {
+  it('should parse url with fragment before query string', function() {
     var result = new Url('http://test.com/path#fragment?param=value')
     expect(result).toEqual(
       jasmine.objectContaining({
@@ -77,7 +77,7 @@ describe('Url parser', function () {
     )
   })
 
-  it('should parse url with leading &', function () {
+  it('should parse url with leading &', function() {
     var result = new Url('/path/?&param=value')
     expect(result).toEqual(
       jasmine.objectContaining({
@@ -87,7 +87,7 @@ describe('Url parser', function () {
     )
   })
 
-  it('should parse url with not querystring', function () {
+  it('should parse url with not querystring', function() {
     var result = new Url('/path')
     expect(result).toEqual(
       jasmine.objectContaining({
@@ -97,7 +97,7 @@ describe('Url parser', function () {
     )
   })
 
-  it('should parse url with only the querystring', function () {
+  it('should parse url with only the querystring', function() {
     var result = new Url('?param=value')
     expect(result).toEqual(
       jasmine.objectContaining({

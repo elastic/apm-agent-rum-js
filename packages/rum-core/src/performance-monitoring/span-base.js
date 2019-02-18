@@ -23,11 +23,16 @@
  *
  */
 
-const { isUndefined, generateRandomId, setTag, merge } = require('../common/utils')
+const {
+  isUndefined,
+  generateRandomId,
+  setTag,
+  merge
+} = require('../common/utils')
 class SpanBase {
   // context
 
-  constructor (name, type, options) {
+  constructor(name, type, options) {
     this.options = options || {}
     this.name = name || this.options.name || 'Unknown'
     this.type = type || this.options.type || 'custom'
@@ -41,31 +46,31 @@ class SpanBase {
     this.onEnd = this.options.onEnd
   }
 
-  ensureContext () {
+  ensureContext() {
     if (!this.context) {
       this.context = {}
     }
   }
 
-  addTags (tags) {
+  addTags(tags) {
     this.ensureContext()
     var ctx = this.context
     if (!ctx.tags) {
       ctx.tags = {}
     }
     var keys = Object.keys(tags)
-    keys.forEach(function (k) {
+    keys.forEach(function(k) {
       setTag(k, tags[k], ctx.tags)
     })
   }
 
-  addContext (context) {
+  addContext(context) {
     if (!context) return
     this.ensureContext()
     merge(this.context, context)
   }
 
-  end () {
+  end() {
     if (this.ended) {
       return
     }
@@ -75,13 +80,13 @@ class SpanBase {
     this.callOnEnd()
   }
 
-  callOnEnd () {
+  callOnEnd() {
     if (typeof this.onEnd === 'function') {
       this.onEnd(this)
     }
   }
 
-  duration () {
+  duration() {
     if (isUndefined(this._end) || isUndefined(this._start)) {
       return null
     }

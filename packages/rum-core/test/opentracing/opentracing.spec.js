@@ -30,7 +30,7 @@ const Transaction = require('../../src/performance-monitoring/transaction')
 const Span = require('../../src/performance-monitoring/span')
 const { Reference, REFERENCE_CHILD_OF } = require('opentracing')
 
-function createTracer (config) {
+function createTracer(config) {
   var serviceFactory = createServiceFactory()
   var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   var transactionService = serviceFactory.getService('TransactionService')
@@ -38,7 +38,12 @@ function createTracer (config) {
   var loggingService = serviceFactory.getService('LoggingService')
   var configService = serviceFactory.getService('ConfigService')
   configService.setConfig(config)
-  return new ElasticTracer(performanceMonitoring, transactionService, loggingService, errorLogging)
+  return new ElasticTracer(
+    performanceMonitoring,
+    transactionService,
+    loggingService,
+    errorLogging
+  )
 }
 
 apiCompatibilityChecks(
@@ -59,12 +64,15 @@ apiCompatibilityChecks(
   { skipBaggageChecks: true }
 )
 
-describe('OpenTracing API', function () {
-  it('should create spans', function () {
+describe('OpenTracing API', function() {
+  it('should create spans', function() {
     var tracer = createTracer({
       active: true
     })
-    var span = tracer.startSpan('test-name', { tags: { type: 'test-type' }, startTime: Date.now() })
+    var span = tracer.startSpan('test-name', {
+      tags: { type: 'test-type' },
+      startTime: Date.now()
+    })
 
     expect(span.span instanceof Transaction).toBe(true)
     expect(span.span.name).toBe('test-name')
@@ -98,7 +106,9 @@ describe('OpenTracing API', function () {
 
     tracer.errorLogging.logError.calls.reset()
     span.log({ event: 'error', message: 'OpenTracing error test message' })
-    expect(tracer.errorLogging.logError).toHaveBeenCalledWith('OpenTracing error test message')
+    expect(tracer.errorLogging.logError).toHaveBeenCalledWith(
+      'OpenTracing error test message'
+    )
 
     var childSpan = tracer.startSpan('span-name', {
       tags: { type: 'span-type' },

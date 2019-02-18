@@ -31,12 +31,15 @@ var errorPayload = require('./sample-error-request.json')
 var minfiedBundleMap = require('./app.bundle.min.js.map.json')
 var minifiedErrorPayload = require('./sample-error-request-min.json')
 
-function testMap (map, stacktrace) {
+function testMap(map, stacktrace) {
   return new Promise(resolve => {
     sourceMap.SourceMapConsumer.with(map, null, consumer => {
-      var result = stacktrace.map((stack) => {
-        var mapped = consumer.originalPositionFor({ line: stack.lineno, column: stack.colno })
-        return {original: stack,mapped}
+      var result = stacktrace.map(stack => {
+        var mapped = consumer.originalPositionFor({
+          line: stack.lineno,
+          column: stack.colno
+        })
+        return { original: stack, mapped }
       })
       resolve(result)
     })

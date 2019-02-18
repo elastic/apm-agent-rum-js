@@ -32,11 +32,11 @@ var LoggingService = require('../../src/common/logging-service')
 var resourceEntries = require('../fixtures/resource-entries')
 var paintEntries = require('../fixtures/paint-entries')
 
-describe('TransactionService', function () {
+describe('TransactionService', function() {
   var transactionService
   var config
   var logger
-  beforeEach(function () {
+  beforeEach(function() {
     logger = new LoggingService()
     spyOn(logger, 'debug')
 
@@ -45,54 +45,60 @@ describe('TransactionService', function () {
     transactionService = new TransactionService(logger, config)
   })
 
-  it('should not start span when there is no current transaction', function () {
+  it('should not start span when there is no current transaction', function() {
     transactionService.startSpan('test-span', 'test-span')
     expect(logger.debug).toHaveBeenCalled()
   })
 
-  it('should call startSpan on current Transaction', function () {
+  it('should call startSpan on current Transaction', function() {
     var tr = new Transaction('transaction', 'transaction')
     spyOn(tr, 'startSpan').and.callThrough()
     transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span', { test: 'passed' })
-    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith(
-      'test-span',
-      'test-span',
-      { test: 'passed' }
-    )
+    expect(
+      transactionService.getCurrentTransaction().startSpan
+    ).toHaveBeenCalledWith('test-span', 'test-span', { test: 'passed' })
   })
 
-  it('should not start span when performance monitoring is disabled', function () {
+  it('should not start span when performance monitoring is disabled', function() {
     config.set('active', false)
     transactionService = new TransactionService(logger, config)
     var tr = new Transaction('transaction', 'transaction')
     spyOn(tr, 'startSpan').and.callThrough()
     transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(transactionService.getCurrentTransaction().startSpan).not.toHaveBeenCalled()
+    expect(
+      transactionService.getCurrentTransaction().startSpan
+    ).not.toHaveBeenCalled()
   })
 
-  it('should not start transaction when performance monitoring is disabled', function () {
+  it('should not start transaction when performance monitoring is disabled', function() {
     config.set('active', false)
     transactionService = new TransactionService(logger, config)
 
-    var result = transactionService.startTransaction('transaction', 'transaction')
+    var result = transactionService.startTransaction(
+      'transaction',
+      'transaction'
+    )
 
     expect(result).toBeUndefined()
   })
 
-  it('should start transaction', function (done) {
+  it('should start transaction', function(done) {
     config.set('active', true)
     config.set('browserResponsivenessInterval', true)
     transactionService = new TransactionService(logger, config)
 
-    var result = transactionService.startTransaction('transaction1', 'transaction')
+    var result = transactionService.startTransaction(
+      'transaction1',
+      'transaction'
+    )
     expect(result).toBeDefined()
     result = transactionService.startTransaction('transaction2', 'transaction')
     expect(result.name).toBe('transaction2')
 
     var origCb = result.onEnd
-    result.onEnd = function () {
+    result.onEnd = function() {
       var r = origCb.apply(this, arguments)
       done()
       return r
@@ -108,7 +114,7 @@ describe('TransactionService', function () {
     expect(result.onEnd).toHaveBeenCalled()
   })
 
-  it('should create a zone transaction on the first span', function () {
+  it('should create a zone transaction on the first span', function() {
     config.set('active', true)
     transactionService = new TransactionService(logger, config)
 
@@ -119,14 +125,18 @@ describe('TransactionService', function () {
     expect(trans.name).toBe('transaction')
   })
 
-  it('should not create transaction if performance is not enabled', function () {
+  it('should not create transaction if performance is not enabled', function() {
     config.set('active', false)
     transactionService = new TransactionService(logger, config)
-    var result = transactionService.createTransaction('test', 'test', config.get('performance'))
+    var result = transactionService.createTransaction(
+      'test',
+      'test',
+      config.get('performance')
+    )
     expect(result).toBeUndefined()
   })
 
-  it('should capture page load on first transaction', function (done) {
+  it('should capture page load on first transaction', function(done) {
     // todo: can't test hard navigation metrics since karma runs tests inside an iframe
     config.set('active', true)
     config.set('capturePageLoad', true)
@@ -134,10 +144,10 @@ describe('TransactionService', function () {
 
     var tr1 = transactionService.startTransaction('transaction1', 'transaction')
     var tr1DoneFn = tr1.onEnd
-    tr1.onEnd = function () {
+    tr1.onEnd = function() {
       tr1DoneFn()
       expect(tr1.isHardNavigation).toBe(true)
-      tr1.spans.forEach(function (t) {
+      tr1.spans.forEach(function(t) {
         expect(t.duration()).toBeLessThan(5 * 60 * 1000)
         expect(t.duration()).toBeGreaterThan(-1)
       })
@@ -149,7 +159,7 @@ describe('TransactionService', function () {
     var tr2 = transactionService.startTransaction('transaction2', 'transaction')
     expect(tr2.isHardNavigation).toBe(false)
     var tr2DoneFn = tr2.onEnd
-    tr2.onEnd = function () {
+    tr2.onEnd = function() {
       tr2DoneFn()
       expect(tr2.isHardNavigation).toBe(false)
       done()
@@ -157,13 +167,13 @@ describe('TransactionService', function () {
     tr2.detectFinish()
   })
 
-  it('should sendPageLoadMetrics', function (done) {
+  it('should sendPageLoadMetrics', function(done) {
     config.set('active', true)
     config.set('capturePageLoad', true)
 
     transactionService = new TransactionService(logger, config)
 
-    transactionService.subscribe(function () {
+    transactionService.subscribe(function() {
       expect(tr.isHardNavigation).toBe(true)
       expect(tr.marks.agent).toBeDefined()
       expect(tr.marks.navigationTiming).toBeDefined()
@@ -180,7 +190,7 @@ describe('TransactionService', function () {
     expect(pageLoadTr).toBe(zoneTr)
   })
 
-  it('should consider initial page load name or use location.pathname', function () {
+  it('should consider initial page load name or use location.pathname', function() {
     transactionService = new TransactionService(logger, config)
     var tr
 
@@ -195,7 +205,7 @@ describe('TransactionService', function () {
     expect(tr.name).toBe('hamid-test')
   })
 
-  xit('should not add duplicate resource spans', function () {
+  xit('should not add duplicate resource spans', function() {
     config.set('active', true)
     config.set('capturePageLoad', true)
     transactionService = new TransactionService(logger, config)
@@ -207,14 +217,16 @@ describe('TransactionService', function () {
 
     if (window.performance.getEntriesByType) {
       if (window.fetch) {
-        window.fetch(testUrl + queryString).then(function () {
-          var entries = window.performance.getEntriesByType('resource').filter(function (entry) {
-            return entry.name.indexOf(testUrl + queryString) > -1
-          })
+        window.fetch(testUrl + queryString).then(function() {
+          var entries = window.performance
+            .getEntriesByType('resource')
+            .filter(function(entry) {
+              return entry.name.indexOf(testUrl + queryString) > -1
+            })
           expect(entries.length).toBe(1)
 
-          tr.donePromise.then(function () {
-            var filtered = tr.spans.filter(function (span) {
+          tr.donePromise.then(function() {
+            var filtered = tr.spans.filter(function(span) {
               return span.name.indexOf(testUrl) > -1
             })
             expect(filtered.length).toBe(1)
@@ -222,7 +234,10 @@ describe('TransactionService', function () {
             fail()
           })
 
-          var xhrTask = { source: 'XMLHttpRequest.send', XHR: { url: testUrl, method: 'GET' } }
+          var xhrTask = {
+            source: 'XMLHttpRequest.send',
+            XHR: { url: testUrl, method: 'GET' }
+          }
           var spanName = xhrTask.XHR.method + ' ' + testUrl
           var span = transactionService.startSpan(spanName, 'external.http')
           span.end()
@@ -231,10 +246,10 @@ describe('TransactionService', function () {
     }
   })
 
-  it('should capture resources from navigation timing', function (done) {
+  it('should capture resources from navigation timing', function(done) {
     var _getEntriesByType = window.performance.getEntriesByType
 
-    window.performance.getEntriesByType = function (type) {
+    window.performance.getEntriesByType = function(type) {
       expect(['resource', 'paint']).toContain(type)
       if (type === 'resource') {
         return resourceEntries
@@ -246,7 +261,7 @@ describe('TransactionService', function () {
     config.set('capturePageLoad', true)
 
     var transactionService = new TransactionService(logger, config)
-    transactionService.subscribe(function () {
+    transactionService.subscribe(function() {
       expect(tr.isHardNavigation).toBe(true)
       window.performance.getEntriesByType = _getEntriesByType
       done()
@@ -259,20 +274,26 @@ describe('TransactionService', function () {
     var tr = transactionService.sendPageLoadMetrics('resource-test')
   })
 
-  it('should ignore transactions that match the list', function () {
+  it('should ignore transactions that match the list', function() {
     config.set('ignoreTransactions', ['transaction1', /transaction2/])
     transactionService = new TransactionService(logger, config)
 
-    expect(transactionService.shouldIgnoreTransaction('dont-ignore')).toBeFalsy()
-    expect(transactionService.shouldIgnoreTransaction('transaction1')).toBeTruthy()
     expect(
-      transactionService.shouldIgnoreTransaction('something-transaction2-something')
+      transactionService.shouldIgnoreTransaction('dont-ignore')
+    ).toBeFalsy()
+    expect(
+      transactionService.shouldIgnoreTransaction('transaction1')
+    ).toBeTruthy()
+    expect(
+      transactionService.shouldIgnoreTransaction(
+        'something-transaction2-something'
+      )
     ).toBeTruthy()
 
     config.set('ignoreTransactions', [])
   })
 
-  it('should apply sampling to transactions', function () {
+  it('should apply sampling to transactions', function() {
     var transactionSampleRate = config.get('transactionSampleRate')
     expect(transactionSampleRate).toBe(1.0)
     var tr = transactionService.startTransaction('test', 'test')
@@ -287,14 +308,14 @@ describe('TransactionService', function () {
     expect(span.sampled).toBe(false)
   })
 
-  it('should consider page load traceId and spanId', function (done) {
+  it('should consider page load traceId and spanId', function(done) {
     config.setConfig({
       pageLoadTraceId: 'test-trace-id',
       pageLoadSpanId: 'test-span-id',
       pageLoadSampled: true
     })
 
-    window.performance.getEntriesByType = function (type) {
+    window.performance.getEntriesByType = function(type) {
       expect(['resource', 'paint']).toContain(type)
       if (type === 'resource') {
         return resourceEntries
@@ -308,7 +329,7 @@ describe('TransactionService', function () {
     expect(tr.sampled).toBe(true)
 
     setTimeout(() => {
-      var spans = tr.spans.filter(function (span) {
+      var spans = tr.spans.filter(function(span) {
         return span.pageResponse
       })
       if (spans.length > 0) {

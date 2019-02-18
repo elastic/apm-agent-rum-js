@@ -149,7 +149,7 @@ var baseConfig = {
     }
   }
 }
-function prepareConfig (defaultConfig) {
+function prepareConfig(defaultConfig) {
   defaultConfig.preprocessors = {}
   defaultConfig.preprocessors[specPattern] = ['webpack', 'sourcemap']
 
@@ -189,7 +189,10 @@ function prepareConfig (defaultConfig) {
 
       defaultConfig.coverageReporter = {
         includeAllSources: true,
-        reporters: [{ type: 'html', dir: 'coverage/' }, { type: 'text-summary' }],
+        reporters: [
+          { type: 'html', dir: 'coverage/' },
+          { type: 'text-summary' }
+        ],
         dir: 'coverage/'
       }
       defaultConfig.reporters.push('coverage')
@@ -229,7 +232,7 @@ function prepareConfig (defaultConfig) {
 }
 
 var karma = require('karma')
-function singleRunKarma (configFile, done) {
+function singleRunKarma(configFile, done) {
   new karma.Server(
     {
       configFile,

@@ -33,7 +33,7 @@ const { name, version } = require('../packages/rum/package.json')
 const BUILD_DIR = path.join(__dirname, '../packages/rum/dist/bundles')
 const GITHUB_URL = 'https://api.github.com/repos/elastic/apm-agent-js-base'
 
-function createRelease (token) {
+function createRelease(token) {
   const releaseUrl = `${GITHUB_URL}/releases`
   const urlObj = url.parse(releaseUrl, false)
   const options = Object.assign({}, urlObj, {
@@ -74,7 +74,7 @@ function createRelease (token) {
   })
 }
 
-function uploadAssets (uploadUrl, token) {
+function uploadAssets(uploadUrl, token) {
   /**
    * Exclude the files that are not required for releasing
    *
@@ -101,7 +101,7 @@ function uploadAssets (uploadUrl, token) {
   })
 }
 
-;(async function startRelease () {
+;(async function startRelease() {
   try {
     var token = process.env['GITHUB_TOKEN']
     if (!token) {

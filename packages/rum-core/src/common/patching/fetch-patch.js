@@ -28,7 +28,7 @@ const { SCHEDULE, INVOKE, FETCH_SOURCE } = require('../constants')
 
 var alreadyPatched = false
 
-function patchFetch (callback) {
+function patchFetch(callback) {
   if (alreadyPatched) {
     return
   }
@@ -38,18 +38,18 @@ function patchFetch (callback) {
     return
   }
 
-  function scheduleTask (task) {
+  function scheduleTask(task) {
     task.state = SCHEDULE
     callback(SCHEDULE, task)
   }
 
-  function invokeTask (task) {
+  function invokeTask(task) {
     task.state = INVOKE
     callback(INVOKE, task)
   }
 
   var nativeFetch = window.fetch
-  window.fetch = function (input, init) {
+  window.fetch = function(input, init) {
     var fetchSelf = this
     var args = arguments
     var request, url
@@ -77,7 +77,7 @@ function patchFetch (callback) {
       }
     }
 
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       globalState.fetchInProgress = true
       scheduleTask(task)
       var promise
@@ -92,12 +92,12 @@ function patchFetch (callback) {
       }
 
       promise.then(
-        function (response) {
+        function(response) {
           resolve(response)
           task.data.response = response
           invokeTask(task)
         },
-        function (error) {
+        function(error) {
           reject(error)
           task.data.error = error
           invokeTask(task)

@@ -26,13 +26,13 @@
 var createServiceFactory = require('..').createServiceFactory
 var apmTestConfig = require('../apm-test-config')()
 
-describe('ErrorLogging', function () {
+describe('ErrorLogging', function() {
   var testErrorMessage = 'errorevent_test_error_message'
   var configService
   var apmServer
   var errorLogging
   var transactionService
-  beforeEach(function () {
+  beforeEach(function() {
     var serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
     configService.setConfig(apmTestConfig)
@@ -41,7 +41,7 @@ describe('ErrorLogging', function () {
     transactionService = serviceFactory.getService('TransactionService')
   })
 
-  it('should send error', function (done) {
+  it('should send error', function(done) {
     var errorObject
     try {
       throw new Error('test error')
@@ -49,16 +49,16 @@ describe('ErrorLogging', function () {
       errorObject = errorLogging.createErrorDataModel({ error })
     }
     apmServer.sendErrors([errorObject]).then(
-      function () {
+      function() {
         done()
       },
-      function (reason) {
+      function(reason) {
         fail('Failed to send errors to the server, reason: ' + reason)
       }
     )
   })
 
-  it('should process errors', function (done) {
+  it('should process errors', function(done) {
     spyOn(apmServer, 'sendErrors').and.callThrough()
 
     // in IE 10, Errors are given a stack once they're thrown.
@@ -71,10 +71,10 @@ describe('ErrorLogging', function () {
       var obj = { test: 'test' }
       obj.obj = obj
       error.anObject = obj
-      error.aFunction = function noop () {}
+      error.aFunction = function noop() {}
       error.null = null
       errorLogging.logErrorEvent({ error }, true).then(
-        function () {
+        function() {
           expect(apmServer.sendErrors).toHaveBeenCalled()
           var errors = apmServer.sendErrors.calls.argsFor(0)[0]
           expect(errors.length).toBe(1)
@@ -86,7 +86,7 @@ describe('ErrorLogging', function () {
           expect(errorData.context.null).toBeUndefined()
           done()
         },
-        function (reason) {
+        function(reason) {
           fail(reason)
         }
       )
@@ -119,7 +119,7 @@ describe('ErrorLogging', function () {
     }
   })
 
-  function createErrorEvent (message) {
+  function createErrorEvent(message) {
     var errorEvent
     var errorEventData = {
       type: 'error',
@@ -137,19 +137,21 @@ describe('ErrorLogging', function () {
     try {
       errorEvent = new ErrorEvent('error', errorEventData)
     } catch (e) {
-      console.log("Doesn't support creating ErrorEvent, using pure object instead.")
+      console.log(
+        "Doesn't support creating ErrorEvent, using pure object instead."
+      )
       errorEvent = errorEventData
     }
     return errorEvent
   }
 
-  it('should support ErrorEvent', function (done) {
+  it('should support ErrorEvent', function(done) {
     spyOn(apmServer, 'sendErrors').and.callThrough()
 
     var errorEvent = createErrorEvent(testErrorMessage)
 
     errorLogging.logErrorEvent(errorEvent, true).then(
-      function () {
+      function() {
         expect(apmServer.sendErrors).toHaveBeenCalled()
         var errors = apmServer.sendErrors.calls.argsFor(0)[0]
         expect(errors.length).toBe(1)
@@ -160,16 +162,16 @@ describe('ErrorLogging', function () {
         expect(errorData.exception.stacktrace.length).toBeGreaterThan(0)
         done()
       },
-      function (reason) {
+      function(reason) {
         fail('Failed to send errors to the server, reason: ' + reason)
       }
     )
   })
 
-  it('should install onerror and accept ErrorEvents', function (done) {
+  it('should install onerror and accept ErrorEvents', function(done) {
     var count = 0
     var numberOfErrors = 7
-    spyOn(apmServer, 'sendErrors').and.callFake(function (errors) {
+    spyOn(apmServer, 'sendErrors').and.callFake(function(errors) {
       expect(errors.length).toBe(numberOfErrors)
       var error = errors[0]
       expect(error.exception.message).toContain(testErrorMessage)
@@ -196,18 +198,24 @@ describe('ErrorLogging', function () {
     apmOnError(testErrorMessage, 'filename', 1, 2, testErrorMessage) // throw "test";
     apmOnError(testErrorMessage, undefined, undefined, undefined, undefined)
     apmOnError('Test:' + testErrorMessage, 'filename', 1, 2, undefined)
-    apmOnError('Script error.' + testErrorMessage, undefined, undefined, undefined, undefined)
+    apmOnError(
+      'Script error.' + testErrorMessage,
+      undefined,
+      undefined,
+      undefined,
+      undefined
+    )
     apmOnError(createErrorEvent(testErrorMessage))
   })
 
-  it('should handle edge cases', function (done) {
+  it('should handle edge cases', function(done) {
     var resultPromises = []
     resultPromises.push(errorLogging.logErrorEvent(), true)
     resultPromises.push(errorLogging.logErrorEvent({}), true)
     resultPromises.push(errorLogging.logErrorEvent(undefined), true)
 
     Promise.all(resultPromises).then(
-      function () {
+      function() {
         done()
       },
       reason => {
@@ -216,7 +224,7 @@ describe('ErrorLogging', function () {
     )
   })
 
-  it('should add error to queue', function () {
+  it('should add error to queue', function() {
     configService.setConfig({
       serviceName: 'serviceName'
     })
@@ -234,7 +242,7 @@ describe('ErrorLogging', function () {
     }
   })
 
-  it('should check isActive', function () {
+  it('should check isActive', function() {
     configService.setConfig({
       active: false
     })

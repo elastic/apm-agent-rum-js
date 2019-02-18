@@ -31,8 +31,8 @@ var basePath = path.join(__dirname, '../e2e')
 const { getConfig } = require('../../../../dev-utils/test')
 const testConfig = getConfig()
 
-describe('Sourcemaps', function () {
-  it('should upload sourcemaps', function (done) {
+describe('Sourcemaps', function() {
+  it('should upload sourcemaps', function(done) {
     // curl http://localhost:8200/v1/rum/sourcemaps -X POST -F sourcemap=@app.e2e-bundle.js.map -F service_version=0.0.1 -F bundle_filepath="/test/e2e/general-usecase/app.e2e-bundle.js" -F service_name="apm-agent-js-base-test-e2e-general-usecase"
     var filepath = path.join(
       basePath,
@@ -51,7 +51,7 @@ describe('Sourcemaps', function () {
         url: testConfig.serverUrl + '/v1/rum/sourcemaps',
         formData
       },
-      function (err, resp, body) {
+      function(err, resp, body) {
         if (err || (resp.statusCode !== 200 && resp.statusCode !== 202)) {
           var message = `Error while uploading sourcemaps, error: ${err}, response: ${resp &&
             resp.statusCode}, body: ${body}`

@@ -26,7 +26,7 @@
 const assert = require('assert')
 const { parse } = require('babel-eslint')
 
-function normalizeWhitespace (string) {
+function normalizeWhitespace(string) {
   return string.replace(/\s+/g, ' ')
 }
 
@@ -51,7 +51,7 @@ module.exports = {
   },
   create: context => {
     return {
-      Program () {
+      Program() {
         const options = context.options[0] || {}
         const licenseToBeAdded = options.license
         assert(!!licenseToBeAdded, '"license" option is required')
@@ -84,7 +84,7 @@ module.exports = {
               start: { line: 1, column: 0 },
               end: { line: 1, column: sourceCode.lines[0].length - 1 }
             },
-            fix (fixer) {
+            fix(fixer) {
               return fixer.replaceTextRange([0, 0], license.source + '\n\n')
             }
           })
@@ -99,7 +99,7 @@ module.exports = {
           context.report({
             node: comment,
             message: 'License header must be at the very beginning of the file',
-            fix (fixer) {
+            fix(fixer) {
               // replace leading whitespace if possible
               if (sourceBeforeNode.trim() === '') {
                 return fixer.replaceTextRange([0, sourceBeforeNode.length], '')

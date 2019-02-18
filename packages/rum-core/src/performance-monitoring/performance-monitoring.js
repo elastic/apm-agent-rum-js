@@ -35,40 +35,50 @@ const {
 } = require('../common/utils')
 const patchingSub = require('../common/patching').subscription
 const { globalState } = require('../common/patching/patch-utils')
-const { SCHEDULE, INVOKE, XMLHTTPREQUEST_SOURCE, FETCH_SOURCE } = require('../common/constants')
+const {
+  SCHEDULE,
+  INVOKE,
+  XMLHTTPREQUEST_SOURCE,
+  FETCH_SOURCE
+} = require('../common/constants')
 
 class PerformanceMonitoring {
-  constructor (apmServer, configService, loggingService, transactionService) {
+  constructor(apmServer, configService, loggingService, transactionService) {
     this._apmServer = apmServer
     this._configService = configService
     this._logginService = loggingService
     this._transactionService = transactionService
   }
 
-  init () {
+  init() {
     var performanceMonitoring = this
-    this._transactionService.subscribe(function (tr) {
+    this._transactionService.subscribe(function(tr) {
       var payload = performanceMonitoring.createTransactionPayload(tr)
       if (payload) {
         performanceMonitoring._apmServer.addTransaction(payload)
       }
     })
 
-    var patchSubFn = this.getXhrPatchSubFn(this._configService, this._transactionService)
+    var patchSubFn = this.getXhrPatchSubFn(
+      this._configService,
+      this._transactionService
+    )
     this.cancelPatchSub = patchingSub.subscribe(patchSubFn)
   }
 
-  getXhrPatchSubFn () {
+  getXhrPatchSubFn() {
     var configService = this._configService
     var transactionService = this._transactionService
     var pm = this
-    return function (event, task) {
+    return function(event, task) {
       if (
-        (task.source === XMLHTTPREQUEST_SOURCE && !globalState.fetchInProgress) ||
+        (task.source === XMLHTTPREQUEST_SOURCE &&
+          !globalState.fetchInProgress) ||
         task.source === FETCH_SOURCE
       ) {
         if (event === SCHEDULE && task.data) {
-          var spanName = task.data.method + ' ' + stripQueryStringFromUrl(task.data.url)
+          var spanName =
+            task.data.method + ' ' + stripQueryStringFromUrl(task.data.url)
           var span = transactionService.startSpan(spanName, 'external.http')
           if (span) {
             var isDtEnabled = configService.get('distributedTracing')
@@ -91,9 +101,13 @@ class PerformanceMonitoring {
           }
         } else if (event === INVOKE && task.data && task.data.span) {
           if (typeof task.data.target.status !== 'undefined') {
-            task.data.span.addContext({ http: { status_code: task.data.target.status } })
+            task.data.span.addContext({
+              http: { status_code: task.data.target.status }
+            })
           } else if (task.data.response) {
-            task.data.span.addContext({ http: { status_code: task.data.response.status } })
+            task.data.span.addContext({
+              http: { status_code: task.data.response.status }
+            })
           }
           task.data.span.end()
         }
@@ -101,10 +115,12 @@ class PerformanceMonitoring {
     }
   }
 
-  injectDtHeader (span, target) {
+  injectDtHeader(span, target) {
     var configService = this._configService
     var headerName = configService.get('distributedTracingHeaderName')
-    var headerValueCallback = configService.get('distributedTracingHeaderValueCallback')
+    var headerValueCallback = configService.get(
+      'distributedTracingHeaderValueCallback'
+    )
     if (typeof headerValueCallback !== 'function') {
       headerValueCallback = getDtHeaderValue
     }
@@ -114,7 +130,10 @@ class PerformanceMonitoring {
     if (headerName && headerValue && isHeaderValid) {
       if (typeof target.setRequestHeader === 'function') {
         target.setRequestHeader(headerName, headerValue)
-      } else if (target.headers && typeof target.headers.append === 'function') {
+      } else if (
+        target.headers &&
+        typeof target.headers.append === 'function'
+      ) {
         target.headers.append(headerName, headerValue)
       } else {
         target[headerName] = headerValue
@@ -122,7 +141,7 @@ class PerformanceMonitoring {
     }
   }
 
-  extractDtHeader (target) {
+  extractDtHeader(target) {
     var configService = this._configService
     var headerName = configService.get('distributedTracingHeaderName')
     if (target) {
@@ -130,18 +149,24 @@ class PerformanceMonitoring {
     }
   }
 
-  setTransactionContext (transaction) {
+  setTransactionContext(transaction) {
     var context = this._configService.get('context')
     if (context) {
       transaction.addContext(context)
     }
   }
 
-  filterTransaction (tr) {
+  filterTransaction(tr) {
     var performanceMonitoring = this
-    var transactionDurationThreshold = this._configService.get('transactionDurationThreshold')
+    var transactionDurationThreshold = this._configService.get(
+      'transactionDurationThreshold'
+    )
     var duration = tr.duration()
-    if (!duration || duration > transactionDurationThreshold || !tr.spans.length) {
+    if (
+      !duration ||
+      duration > transactionDurationThreshold ||
+      !tr.spans.length
+    ) {
       return false
     }
 
@@ -153,11 +178,17 @@ class PerformanceMonitoring {
       tr.resetSpans()
     }
 
-    var browserResponsivenessInterval = this._configService.get('browserResponsivenessInterval')
-    var checkBrowserResponsiveness = this._configService.get('checkBrowserResponsiveness')
+    var browserResponsivenessInterval = this._configService.get(
+      'browserResponsivenessInterval'
+    )
+    var checkBrowserResponsiveness = this._configService.get(
+      'checkBrowserResponsiveness'
+    )
 
     if (checkBrowserResponsiveness && !tr.isHardNavigation) {
-      var buffer = performanceMonitoring._configService.get('browserResponsivenessBuffer')
+      var buffer = performanceMonitoring._configService.get(
+        'browserResponsivenessBuffer'
+      )
 
       var wasBrowserResponsive = performanceMonitoring.checkBrowserResponsiveness(
         tr,
@@ -180,17 +211,20 @@ class PerformanceMonitoring {
     return true
   }
 
-  prepareTransaction (transaction) {
-    transaction.spans.sort(function (spanA, spanB) {
+  prepareTransaction(transaction) {
+    transaction.spans.sort(function(spanA, spanB) {
       return spanA._start - spanB._start
     })
 
     if (this._configService.get('groupSimilarSpans')) {
       var similarSpanThreshold = this._configService.get('similarSpanThreshold')
-      transaction.spans = this.groupSmallContinuouslySimilarSpans(transaction, similarSpanThreshold)
+      transaction.spans = this.groupSmallContinuouslySimilarSpans(
+        transaction,
+        similarSpanThreshold
+      )
     }
 
-    transaction.spans = transaction.spans.filter(function (span) {
+    transaction.spans = transaction.spans.filter(function(span) {
       return (
         span.duration() > 0 &&
         span._start >= transaction._start &&
@@ -203,12 +237,12 @@ class PerformanceMonitoring {
     this.setTransactionContext(transaction)
   }
 
-  createTransactionDataModel (transaction) {
+  createTransactionDataModel(transaction) {
     var configContext = this._configService.get('context')
     var stringLimit = this._configService.get('serverStringLimit')
     var transactionStart = transaction._start
 
-    var spans = transaction.spans.map(function (span) {
+    var spans = transaction.spans.map(function(span) {
       var context
       if (span.context) {
         context = sanitizeObjectStrings(span.context, stringLimit)
@@ -246,7 +280,7 @@ class PerformanceMonitoring {
     }
   }
 
-  createTransactionPayload (transaction) {
+  createTransactionPayload(transaction) {
     this.prepareTransaction(transaction)
     var filtered = this.filterTransaction(transaction)
     if (filtered) {
@@ -254,26 +288,31 @@ class PerformanceMonitoring {
     }
   }
 
-  sendTransactions (transactions) {
-    var payload = transactions.map(this.createTransactionPayload.bind(this)).filter(function (tr) {
-      return tr
-    })
-    this._logginService.debug('Sending Transactions to apm server.', transactions.length)
+  sendTransactions(transactions) {
+    var payload = transactions
+      .map(this.createTransactionPayload.bind(this))
+      .filter(function(tr) {
+        return tr
+      })
+    this._logginService.debug(
+      'Sending Transactions to apm server.',
+      transactions.length
+    )
 
     // todo: check if transactions are already being sent
     var promise = this._apmServer.sendTransactions(payload)
     return promise
   }
 
-  convertTransactionsToServerModel (transactions) {
+  convertTransactionsToServerModel(transactions) {
     return transactions.map(this.createTransactionDataModel.bind(this))
   }
 
-  groupSmallContinuouslySimilarSpans (transaction, threshold) {
+  groupSmallContinuouslySimilarSpans(transaction, threshold) {
     var transDuration = transaction.duration()
     var spans = []
     var lastCount = 1
-    transaction.spans.forEach(function (span, index) {
+    transaction.spans.forEach(function(span, index) {
       if (spans.length === 0) {
         spans.push(span)
       } else {
@@ -307,7 +346,7 @@ class PerformanceMonitoring {
     return spans
   }
 
-  checkBrowserResponsiveness (transaction, interval, buffer) {
+  checkBrowserResponsiveness(transaction, interval, buffer) {
     var counter = transaction.browserResponsivenessCounter
     if (typeof interval === 'undefined' || typeof counter === 'undefined') {
       return true

@@ -28,8 +28,8 @@ const fs = require('fs')
 const karmaUtils = require('./karma')
 const saucelabsUtils = require('./saucelabs')
 
-function runKarma (configFile) {
-  function karmaCallback (exitCode) {
+function runKarma(configFile) {
+  function karmaCallback(exitCode) {
     if (exitCode) {
       return process.exit(exitCode)
     } else {
@@ -40,7 +40,7 @@ function runKarma (configFile) {
   karmaUtils.singleRunKarma(configFile, karmaCallback)
 }
 
-function runUnitTests (testConfig) {
+function runUnitTests(testConfig) {
   if (testConfig.sauceLabs) {
     saucelabsUtils.launchSauceConnect(
       testConfig.sauceLabs,
@@ -51,7 +51,7 @@ function runUnitTests (testConfig) {
   }
 }
 
-function getTestEnvironmentVariables () {
+function getTestEnvironmentVariables() {
   var envVars = {
     branch: process.env.TRAVIS_BRANCH,
     mode: process.env.MODE,
@@ -68,10 +68,10 @@ function getTestEnvironmentVariables () {
   return envVars
 }
 
-function walkSync (dir, filter, filelist) {
+function walkSync(dir, filter, filelist) {
   var files = fs.readdirSync(dir)
   filelist = filelist || []
-  files.forEach(function (file) {
+  files.forEach(function(file) {
     var filename = path.join(dir, file)
     var stat = fs.statSync(filename)
     if (stat.isDirectory()) {
@@ -89,10 +89,10 @@ function walkSync (dir, filter, filelist) {
   return filelist
 }
 
-function buildE2eBundles (basePath, callback) {
+function buildE2eBundles(basePath, callback) {
   var cb =
     callback ||
-    function (err) {
+    function(err) {
       if (err) {
         var exitCode = 2
         process.exit(exitCode)
@@ -101,7 +101,7 @@ function buildE2eBundles (basePath, callback) {
 
   var webpack = require('webpack')
   var fileList = walkSync(basePath, /webpack\.config\.js$/)
-  fileList = fileList.map(function (file) {
+  fileList = fileList.map(function(file) {
     return path.relative(__dirname, file)
   })
   var configs = fileList
@@ -128,7 +128,7 @@ function buildE2eBundles (basePath, callback) {
     var jsonStats = stats.toJson()
     console.log(stats.toString())
     if (jsonStats.errors.length > 0) {
-      jsonStats.errors.forEach(function (error) {
+      jsonStats.errors.forEach(function(error) {
         console.log('Error:', error)
       })
       cb(jsonStats.errors)
@@ -138,8 +138,8 @@ function buildE2eBundles (basePath, callback) {
   })
 }
 
-function onExit (callback) {
-  function exitHandler (err) {
+function onExit(callback) {
+  function exitHandler(err) {
     try {
       callback(err)
     } finally {
@@ -154,8 +154,8 @@ function onExit (callback) {
   process.on('uncaughtException', exitHandler)
 }
 
-function startSelenium (callback, manualStop) {
-  callback = callback || function () {}
+function startSelenium(callback, manualStop) {
+  callback = callback || function() {}
   var selenium = require('selenium-standalone')
   var drivers = {
     chrome: {
@@ -173,12 +173,12 @@ function startSelenium (callback, manualStop) {
       logger: console.log,
       drivers
     },
-    function (installError) {
+    function(installError) {
       if (installError) {
         console.log('Error while installing selenium:', installError)
       }
-      selenium.start({ drivers }, function (startError, child) {
-        function killSelenium () {
+      selenium.start({ drivers }, function(startError, child) {
+        function killSelenium() {
           child.kill()
           console.log('Just killed selenium!')
         }
@@ -199,18 +199,18 @@ function startSelenium (callback, manualStop) {
   )
 }
 
-function runE2eTests (configFilePath, runSelenium) {
+function runE2eTests(configFilePath, runSelenium) {
   // npm i -D selenium-standalone webdriverio wdio-jasmine-framework
   var Launcher = require('webdriverio').Launcher
   var wdio = new Launcher(configFilePath)
-  function runWdio () {
+  function runWdio() {
     wdio.run().then(
-      function (code) {
+      function(code) {
         process.stdin.pause()
         process.nextTick(() => process.exit(code))
         // process.exit(code)
       },
-      function (error) {
+      function(error) {
         console.error('Launcher failed to start the test', error)
         process.stdin.pause()
         process.nextTick(() => process.exit())
@@ -225,7 +225,7 @@ function runE2eTests (configFilePath, runSelenium) {
   }
 }
 
-function getConfig () {
+function getConfig() {
   const env = getTestEnvironmentVariables()
   let serverUrl = 'http://localhost:8200'
   if (env.serverUrl) {

@@ -25,11 +25,11 @@
 
 var Queue = require('../../src/common/queue')
 
-describe('Queue', function () {
-  it('should work for default options', function (done) {
+describe('Queue', function() {
+  it('should work for default options', function(done) {
     var flushCounter = 0
     var items = []
-    var queue = new Queue(function (qitems) {
+    var queue = new Queue(function(qitems) {
       expect(qitems).toEqual(items)
       flushCounter++
     })
@@ -43,11 +43,11 @@ describe('Queue', function () {
     }, 100)
   })
 
-  it('should flush when reaching queueLimit', function (done) {
+  it('should flush when reaching queueLimit', function(done) {
     var flushCounter = 0
     var items = []
     var queue = new Queue(
-      function (qitems) {
+      function(qitems) {
         flushCounter++
         if (flushCounter > 5) {
           expect(qitems.length).toBe(5)
@@ -70,11 +70,11 @@ describe('Queue', function () {
     }, 100)
   })
 
-  it('should flush according to the interval', function (done) {
+  it('should flush according to the interval', function(done) {
     var flushCounter = 0
     var items = []
     var queue = new Queue(
-      function (qitems) {
+      function(qitems) {
         expect(qitems).toEqual(items)
         flushCounter++
       },

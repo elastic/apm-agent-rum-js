@@ -36,7 +36,7 @@ const { getTimeOrigin, find } = require('../common/utils')
 const Span = require('./span')
 
 class Tracer extends otTracer {
-  constructor (
+  constructor(
     performanceMonitoring,
     transactionService,
     loggingService,
@@ -49,7 +49,7 @@ class Tracer extends otTracer {
     this.errorLogging = errorLogging
   }
 
-  _startSpan (name, options) {
+  _startSpan(name, options) {
     var spanOptions = {}
     if (options) {
       spanOptions.timestamp = options.startTime
@@ -63,7 +63,7 @@ class Tracer extends otTracer {
           )
         }
 
-        var childRef = find(options.references, function (ref) {
+        var childRef = find(options.references, function(ref) {
           return ref.type() === REFERENCE_CHILD_OF
         })
         if (childRef) {
@@ -99,7 +99,7 @@ class Tracer extends otTracer {
     return otSpan
   }
 
-  _inject (spanContext, format, carrier) {
+  _inject(spanContext, format, carrier) {
     switch (format) {
       case FORMAT_TEXT_MAP:
       case FORMAT_HTTP_HEADERS:
@@ -113,7 +113,7 @@ class Tracer extends otTracer {
     }
   }
 
-  _extract (format, carrier) {
+  _extract(format, carrier) {
     var ctx
     switch (format) {
       case FORMAT_TEXT_MAP:

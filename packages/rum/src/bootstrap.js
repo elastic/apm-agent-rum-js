@@ -25,7 +25,7 @@
 
 var alreadyBootstrap = false
 var enabled = false
-module.exports = function bootstrap () {
+module.exports = function bootstrap() {
   if (alreadyBootstrap) {
     return enabled
   }

@@ -35,14 +35,14 @@ const { globalState } = require('../../src/common/patching/patch-utils')
 const { SCHEDULE } = require('../../src/common/constants')
 const patchSub = require('../common/patch')
 
-describe('PerformanceMonitoring', function () {
+describe('PerformanceMonitoring', function() {
   var serviceFactory
   var apmServer
   var performanceMonitoring
   var configService
   var logger
 
-  beforeEach(function () {
+  beforeEach(function() {
     serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
     logger = serviceFactory.getService('LoggingService')
@@ -51,7 +51,7 @@ describe('PerformanceMonitoring', function () {
     apmServer = serviceFactory.getService('ApmServer')
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   })
-  it('should send performance monitoring data to apm-server', function (done) {
+  it('should send performance monitoring data to apm-server', function(done) {
     var tr = new Transaction('tr-name', 'tr-type', configService.config)
     var span1 = new Span('span 1', 'test-span')
     span1.end()
@@ -61,16 +61,16 @@ describe('PerformanceMonitoring', function () {
     var promise = apmServer.sendTransactions(payload)
     expect(promise).toBeDefined()
     promise.then(
-      function () {
+      function() {
         done()
       },
-      function (reason) {
+      function(reason) {
         fail('Failed sending transactions to the server, reason: ' + reason)
       }
     )
   })
 
-  it('should group small continuously similar spans up until the last one', function () {
+  it('should group small continuously similar spans up until the last one', function() {
     var tr = new Transaction('transaction', 'transaction')
     var span1 = tr.startSpan('name', 'type')
     span1.end()
@@ -103,10 +103,13 @@ describe('PerformanceMonitoring', function () {
     span5._start = 61
     span5._end = 70
 
-    tr.spans.sort(function (spanA, spanB) {
+    tr.spans.sort(function(spanA, spanB) {
       return spanA._start - spanB._start
     })
-    var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(tr, 0.05)
+    var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(
+      tr,
+      0.05
+    )
 
     expect(grouped.length).toBe(3)
     expect(grouped[0].name).toBe('2x name')
@@ -114,7 +117,7 @@ describe('PerformanceMonitoring', function () {
     expect(grouped[2].name).toBe('2x name')
   })
 
-  it('should group small continuously similar spans', function () {
+  it('should group small continuously similar spans', function() {
     var tr = new Transaction('transaction', 'transaction')
     var span1 = tr.startSpan('name', 'type')
     span1.end()
@@ -147,18 +150,21 @@ describe('PerformanceMonitoring', function () {
     span5._start = 60
     span5._end = 70
 
-    tr.spans.sort(function (spanA, spanB) {
+    tr.spans.sort(function(spanA, spanB) {
       return spanA._start - spanB._start
     })
 
-    var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(tr, 0.05)
+    var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(
+      tr,
+      0.05
+    )
 
     expect(grouped.length).toBe(2)
     expect(grouped[0].name).toBe('4x name')
     expect(grouped[1].name).toBe('another-name')
   })
 
-  it('should calculate browser responsiveness', function () {
+  it('should calculate browser responsiveness', function() {
     var tr = new Transaction('transaction', 'transaction', {})
     tr.end()
 
@@ -185,9 +191,11 @@ describe('PerformanceMonitoring', function () {
     expect(resp).toBe(false)
   })
 
-  it('should sendTransactionInterval', function () {
+  it('should sendTransactionInterval', function() {
     expect(configService.isValid()).toBe(true)
-    var tr = new Transaction('test transaction', 'transaction', { transactionSampleRate: 1 })
+    var tr = new Transaction('test transaction', 'transaction', {
+      transactionSampleRate: 1
+    })
     var span = tr.startSpan('test span', 'test span thype')
     span.end()
     span._end += 10
@@ -200,7 +208,7 @@ describe('PerformanceMonitoring', function () {
     expect(result).toBeDefined()
   })
 
-  it('should filter transactions', function () {
+  it('should filter transactions', function() {
     configService.setConfig({
       browserResponsivenessInterval: 500,
       checkBrowserResponsiveness: true,
@@ -208,7 +216,9 @@ describe('PerformanceMonitoring', function () {
     })
     spyOn(logger, 'debug').and.callThrough()
     expect(logger.debug).not.toHaveBeenCalled()
-    var tr = new Transaction('transaction', 'transaction', { transactionSampleRate: 1 })
+    var tr = new Transaction('transaction', 'transaction', {
+      transactionSampleRate: 1
+    })
     var span = tr.startSpan('test span', 'test span type')
     span.end()
     tr.end()
@@ -229,7 +239,7 @@ describe('PerformanceMonitoring', function () {
     )
   })
 
-  xit('should initialize', function (done) {
+  xit('should initialize', function(done) {
     performanceMonitoring.init()
     spyOn(apmServer, 'addTransaction').and.callThrough()
 
@@ -253,8 +263,10 @@ describe('PerformanceMonitoring', function () {
     }, 10)
   })
 
-  it('should create correct payload', function () {
-    var tr = new Transaction('transaction1', 'transaction1type', { transactionSampleRate: 1 })
+  it('should create correct payload', function() {
+    var tr = new Transaction('transaction1', 'transaction1type', {
+      transactionSampleRate: 1
+    })
     var span = tr.startSpan('span1', 'span1type')
     span.end()
     span._end += 10
@@ -275,10 +287,10 @@ describe('PerformanceMonitoring', function () {
     expect(payload.spans[0].duration).toBe(span._end - span._start)
   })
 
-  it('should sendPageLoadMetrics', function (done) {
+  it('should sendPageLoadMetrics', function(done) {
     var _getEntriesByType = window.performance.getEntriesByType
 
-    window.performance.getEntriesByType = function (type) {
+    window.performance.getEntriesByType = function(type) {
       expect(['resource', 'paint']).toContain(type)
       if (type === 'resource') {
         return resourceEntries
@@ -288,17 +300,17 @@ describe('PerformanceMonitoring', function () {
 
     var transactionService = serviceFactory.getService('TransactionService')
 
-    transactionService.subscribe(function (tr) {
+    transactionService.subscribe(function(tr) {
       expect(tr.isHardNavigation).toBe(true)
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
       expect(promise).toBeDefined()
       promise.then(
-        function () {
+        function() {
           window.performance.getEntriesByType = _getEntriesByType
           done()
         },
-        function (reason) {
+        function(reason) {
           fail('Failed sending transactions to the server, reason: ' + reason)
         }
       )
@@ -306,10 +318,10 @@ describe('PerformanceMonitoring', function () {
     transactionService.sendPageLoadMetrics('resource-test')
   })
 
-  it('should contain agent marks in page load transaction', function () {
+  it('should contain agent marks in page load transaction', function() {
     var _getEntriesByType = window.performance.getEntriesByType
 
-    window.performance.getEntriesByType = function (type) {
+    window.performance.getEntriesByType = function(type) {
       expect(['resource', 'paint']).toContain(type)
       if (type === 'resource') {
         return resourceEntries
@@ -319,16 +331,21 @@ describe('PerformanceMonitoring', function () {
     var tr = new Transaction('test', 'test')
     tr.addNavigationTimingMarks()
 
-    var agentMarks = ['timeToFirstByte', 'domInteractive', 'domComplete', 'firstContentfulPaint']
+    var agentMarks = [
+      'timeToFirstByte',
+      'domInteractive',
+      'domComplete',
+      'firstContentfulPaint'
+    ]
 
     expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
-    agentMarks.forEach(function (mark) {
+    agentMarks.forEach(function(mark) {
       expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
     })
     window.performance.getEntriesByType = _getEntriesByType
   })
 
-  it('should filter out empty transactions', function () {
+  it('should filter out empty transactions', function() {
     var tr = new Transaction('test', 'test', { transactionSampleRate: 1 })
     var result = performanceMonitoring.filterTransaction(tr)
     expect(tr.spans.length).toBe(0)
@@ -351,8 +368,10 @@ describe('PerformanceMonitoring', function () {
     expect(result).toBe(true)
   })
 
-  it('should not filter unsampled transactions with spans', function () {
-    const tr = new Transaction('unsampled', 'test', { transactionSampleRate: 0 })
+  it('should not filter unsampled transactions with spans', function() {
+    const tr = new Transaction('unsampled', 'test', {
+      transactionSampleRate: 0
+    })
     tr.end()
     if (tr._end && tr._end === tr._start) {
       tr._end += 100
@@ -361,7 +380,9 @@ describe('PerformanceMonitoring', function () {
     expect(tr.spans.length).toBe(0)
     expect(performanceMonitoring.filterTransaction(tr)).toBe(false)
 
-    const tr2 = new Transaction('unsampled', 'test', { transactionSampleRate: 0 })
+    const tr2 = new Transaction('unsampled', 'test', {
+      transactionSampleRate: 0
+    })
     tr2.startSpan('span1', 'type1').end()
     tr2.end()
     if (tr2._end && tr2._end === tr2._start) {
@@ -372,9 +393,13 @@ describe('PerformanceMonitoring', function () {
     expect(tr2.spans.length).toBe(0)
   })
 
-  it('should filter the transactions with duration above threshold', function () {
+  it('should filter the transactions with duration above threshold', function() {
     var threshold = configService.get('transactionDurationThreshold')
-    var tr = new Transaction('/test/outlier', 'page-load-slow', configService.config)
+    var tr = new Transaction(
+      '/test/outlier',
+      'page-load-slow',
+      configService.config
+    )
     var span1 = new Span('span 1', 'test-span')
     span1.end()
     tr.spans.push(span1)
@@ -387,7 +412,7 @@ describe('PerformanceMonitoring', function () {
     expect(promise).toBeUndefined()
   })
 
-  it('should correctly use xhr patch', function (done) {
+  it('should correctly use xhr patch', function(done) {
     var fn = performanceMonitoring.getXhrPatchSubFn()
     expect(typeof fn).toBe('function')
     var req = new window.XMLHttpRequest()
@@ -399,7 +424,7 @@ describe('PerformanceMonitoring', function () {
         target: req
       }
     }
-    req.addEventListener('readystatechange', function () {
+    req.addEventListener('readystatechange', function() {
       if (req.readyState === req.DONE) {
         fn('invoke', task)
         expect(task.data.span.ended).toBeTruthy()
@@ -415,7 +440,7 @@ describe('PerformanceMonitoring', function () {
     expect(req.setRequestHeader).toHaveBeenCalledWith(headerName, headerValue)
   })
 
-  it('should consider fetchInProgress to avoid duplicate spans', function (done) {
+  it('should consider fetchInProgress to avoid duplicate spans', function(done) {
     var fn = performanceMonitoring.getXhrPatchSubFn()
     expect(typeof fn).toBe('function')
     var req = new window.XMLHttpRequest()
@@ -427,7 +452,7 @@ describe('PerformanceMonitoring', function () {
       }
     }
 
-    req.addEventListener('readystatechange', function () {
+    req.addEventListener('readystatechange', function() {
       if (req.readyState === req.DONE) {
         fn('invoke', task)
         expect(task.data.span.ended).toBeTruthy()
@@ -447,10 +472,13 @@ describe('PerformanceMonitoring', function () {
   })
 
   if (window.fetch) {
-    it('should create fetch spans', function (done) {
+    it('should create fetch spans', function(done) {
       var fn = performanceMonitoring.getXhrPatchSubFn()
       var dTHeaderValue
-      performanceMonitoring.cancelPatchSub = patchSub.subscribe(function (event, task) {
+      performanceMonitoring.cancelPatchSub = patchSub.subscribe(function(
+        event,
+        task
+      ) {
         fn(event, task)
         if (event === SCHEDULE) {
           dTHeaderValue = task.data.target.headers.get(
@@ -459,10 +487,13 @@ describe('PerformanceMonitoring', function () {
         }
       })
       var transactionService = performanceMonitoring._transactionService
-      var tr = transactionService.startTransaction('fetch transaction', 'custom')
+      var tr = transactionService.startTransaction(
+        'fetch transaction',
+        'custom'
+      )
       spyOn(transactionService, 'startSpan').and.callThrough()
 
-      window.fetch('/?a=b&c=d').then(function () {
+      window.fetch('/?a=b&c=d').then(function() {
         setTimeout(() => {
           expect(tr.spans.length).toBe(1)
           expect(tr.spans[0].name).toBe('GET /')
@@ -478,23 +509,29 @@ describe('PerformanceMonitoring', function () {
           done()
         })
       })
-      expect(transactionService.startSpan).toHaveBeenCalledWith('GET /', 'external.http')
+      expect(transactionService.startSpan).toHaveBeenCalledWith(
+        'GET /',
+        'external.http'
+      )
     })
 
-    it('should not duplicate xhr spans if fetch is a polyfill', function (done) {
+    it('should not duplicate xhr spans if fetch is a polyfill', function(done) {
       var fn = performanceMonitoring.getXhrPatchSubFn()
 
       var events = []
-      performanceMonitoring.cancelPatchSub = patchSub.subscribe(function (event, task) {
+      performanceMonitoring.cancelPatchSub = patchSub.subscribe(function(
+        event,
+        task
+      ) {
         events.push({ event, source: task.source })
         fn(event, task)
       })
 
-      window['__fetchDelegate'] = function (url) {
-        return new Promise(function (resolve) {
+      window['__fetchDelegate'] = function(url) {
+        return new Promise(function(resolve) {
           var req = new window.XMLHttpRequest()
           req.open('GET', url, true)
-          req.addEventListener('readystatechange', function () {
+          req.addEventListener('readystatechange', function() {
             // to guarantee the order of event execution
             setTimeout(() => {
               if (req.readyState === req.DONE) {
@@ -510,11 +547,14 @@ describe('PerformanceMonitoring', function () {
         })
       }
       var transactionService = performanceMonitoring._transactionService
-      var tr = transactionService.startTransaction('fetch transaction', 'custom')
+      var tr = transactionService.startTransaction(
+        'fetch transaction',
+        'custom'
+      )
 
       var promise = window.fetch('/')
       expect(promise).toBeDefined()
-      promise.then(function (response) {
+      promise.then(function(response) {
         setTimeout(() => {
           expect(response).toBeDefined()
           expect(tr.spans.length).toBe(1)
