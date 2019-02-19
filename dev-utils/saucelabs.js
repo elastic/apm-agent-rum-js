@@ -29,31 +29,23 @@ const sauceConnectOpts = {
   accessKey: process.env.SAUCE_ACCESS_KEY,
   logger: console.log,
   noSslBumpDomains: 'all',
-  tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+  tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+  connectRetries: 3,
+  noRemoveCollidingTunnels: true
 }
 
 function launchSauceConnect(userConfig, done) {
   const config = Object.assign({}, sauceConnectOpts, userConfig)
 
-  const tryConnect = function(maxAttempts, currAttempts, done) {
-    sauceConnectLauncher(config, function(err) {
-      if (err) {
-        console.error(err.message)
-        if (currAttempts <= maxAttempts) {
-          console.log(
-            'Retrying... (attempt ' + currAttempts + ' of ' + maxAttempts + ')'
-          )
-          tryConnect(maxAttempts, ++currAttempts, done)
-        } else {
-          return process.exit(1)
-        }
-      } else {
-        console.log('Sauce Connect ready')
-        done()
-      }
-    })
-  }
-
-  tryConnect(3, 1, done)
+  sauceConnectLauncher(config, function(err) {
+    if (err) {
+      console.error(err.message)
+      return process.exit(1)
+    } else {
+      console.log('Sauce Connect ready')
+      done()
+    }
+  })
 }
+
 module.exports = { launchSauceConnect, sauceConnectOpts }
