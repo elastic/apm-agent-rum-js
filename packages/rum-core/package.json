@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/elastic/apm-agent-js-base.git",
+    "url": "https://github.com/elastic/apm-agent-js-base.git",
     "directory": "packages/rum-core"
   },
   "scripts": {
