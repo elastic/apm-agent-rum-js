@@ -4,7 +4,11 @@
   "description": "Elastic apm core",
   "license": "MIT",
   "main": "src/index.js",
-  "repository": "https://github.com/elastic/apm-agent-js-base/tree/master/packages/rum-core",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elastic/apm-agent-js-base.git",
+    "directory": "packages/rum-core"
+  },
   "scripts": {
     "karma": "karma start",
     "karma-bench": "karma start karma.bench.conf.js",

@@ -3,7 +3,11 @@
   "version": "3.0.0",
   "description": "Elastic APM JavaScript agent",
   "main": "dist/bundles/elastic-apm-js-base.umd.js",
-  "repository": "https://github.com/elastic/apm-agent-js-base/tree/master/packages/rum",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elastic/apm-agent-js-base.git",
+    "directory": "packages/rum"
+  },
   "scripts": {
     "build": "webpack",
     "build-dev": "webpack -w",
