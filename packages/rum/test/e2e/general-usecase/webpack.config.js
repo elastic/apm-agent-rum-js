@@ -32,7 +32,6 @@ const globalConfigs = getConfig()
 
 const configJson = JSON.stringify(globalConfigs, undefined, 2)
 const env = { globalConfigs: configJson }
-console.log(configJson)
 
 const optimized = {
   entry: path.join(__dirname, './app.js'),

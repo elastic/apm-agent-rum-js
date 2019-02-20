@@ -26,7 +26,10 @@
 // npm i --save-dev jasmine karma karma-sauce-launcher karma-failed-reporter karma-jasmine karma-spec-reporter webpack karma-webpack karma-chrome-launcher karma-sourcemap-loader babel-core babel-loader babel-preset-es2015 babel-plugin-istanbul
 
 const karma = require('karma')
+const { resolve, join } = require('path')
 const fs = require('fs')
+
+const babelConfigFile = join(__dirname, '../packages/rum/babel.config.js')
 
 const baseLaunchers = {
   SL_CHROME: {
@@ -96,6 +99,9 @@ var baseConfig = {
   exclude: ['e2e/**/*.*'],
   files: [specPattern],
   frameworks: ['jasmine'],
+  preprocessors: {
+    [specPattern]: ['webpack', 'sourcemap']
+  },
   plugins: [
     'karma-sauce-launcher',
     'karma-failed-reporter',
@@ -106,29 +112,14 @@ var baseConfig = {
   ],
   webpack: {
     mode: 'none',
-    stats: 'errors-only',
     module: {
       rules: [
         {
           test: /\.js$/,
           loader: 'babel-loader',
           options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                {
-                  targets: {
-                    ie: '10'
-                  },
-                  /**
-                   * Enabling loose mode due to IE 10 transformation logic in babel
-                   * https://github.com/babel/babel/pull/3527
-                   */
-                  loose: true,
-                  useBuiltIns: false
-                }
-              ]
-            ]
+            configFile: resolve(babelConfigFile),
+            plugins: []
           }
         }
       ]
@@ -154,17 +145,13 @@ var baseConfig = {
   }
 }
 function prepareConfig(defaultConfig) {
-  defaultConfig.preprocessors = {}
-  defaultConfig.preprocessors[specPattern] = ['webpack', 'sourcemap']
-
-  var testConfig = defaultConfig.testConfig || {}
-  var isTravis = process.env.TRAVIS
-  var isSauce = testConfig.sauceLabs
-  var version = '' // userConfig.packageVersion || ''
-  var buildId = 'ApmJs@' + version
+  const testConfig = defaultConfig.testConfig || {}
+  const isTravis = testConfig.isTravis
+  const isSauce = testConfig.sauceLabs
+  let buildId = 'ApmJs@'
 
   if (testConfig.mode) {
-    console.log('mode: ' + testConfig.mode)
+    console.log('TESTING MODE: ' + testConfig.mode)
   }
 
   if (isTravis) {
@@ -175,7 +162,6 @@ function prepareConfig(defaultConfig) {
       ' (' +
       process.env.TRAVIS_BUILD_ID +
       ')'
-    // 'karma-chrome-launcher',
     defaultConfig.plugins.push('karma-firefox-launcher')
     defaultConfig.browsers.push('Firefox')
   } else {
@@ -186,9 +172,7 @@ function prepareConfig(defaultConfig) {
       // istanbul code coverage
       defaultConfig.plugins.push('karma-coverage')
 
-      var babelPlugins =
-        defaultConfig.webpack.module.rules[0].options.plugins ||
-        (defaultConfig.webpack.module.rules[0].options.plugins = [])
+      var babelPlugins = defaultConfig.webpack.module.rules[0].options.plugins
       babelPlugins.push('istanbul')
 
       defaultConfig.coverageReporter = {
@@ -223,8 +207,7 @@ function prepareConfig(defaultConfig) {
       fs.mkdirSync(dir)
     }
 
-    // console.log('globalConfigs:', defaultConfig.globalConfigs)
-    var globalConfigs = defaultConfig.globalConfigs
+    const { globalConfigs } = defaultConfig
     fs.writeFileSync(
       dir + '/globals.js',
       'window.globalConfigs = ' + JSON.stringify(globalConfigs) + ';',

@@ -125,8 +125,7 @@ function buildE2eBundles(basePath, callback) {
     }
     if (stats.hasErrors()) console.log('There were errors while building')
 
-    var jsonStats = stats.toJson()
-    console.log(stats.toString())
+    const jsonStats = stats.toJson('minimal')
     if (jsonStats.errors.length > 0) {
       jsonStats.errors.forEach(function(error) {
         console.log('Error:', error)

@@ -33,7 +33,7 @@ module.exports = function(config) {
     globalConfigs: {
       useMocks: false,
       agentConfig: {
-        serverUrl: 'http://localhost:8200',
+        serverUrl: env.serverUrl || 'http://localhost:8200',
         serviceName: 'test',
         serviceVersion: 'test-version',
         agentName: 'apm-js-core',
@@ -41,10 +41,6 @@ module.exports = function(config) {
       }
     },
     testConfig: env
-  }
-
-  if (env.serverUrl) {
-    customConfig.globalConfigs.agentConfig.serverUrl = env.serverUrl
   }
 
   console.log('customConfig:', JSON.stringify(customConfig, undefined, 2))

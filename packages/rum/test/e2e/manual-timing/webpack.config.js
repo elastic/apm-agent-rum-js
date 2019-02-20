@@ -31,7 +31,6 @@ const globalConfigs = getConfig()
 
 const configJson = JSON.stringify(globalConfigs, undefined, 2)
 const env = { globalConfigs: configJson }
-console.log(configJson)
 
 module.exports = {
   entry: path.resolve(__dirname, './app.js'),

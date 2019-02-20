@@ -27,18 +27,14 @@ const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
 const { getConfig } = require('../../dev-utils/test')
 
 module.exports = function(config) {
-  // temporarily set firefox version to 44 due to apm-server#676 issue
-  baseConfig.customLaunchers.SL_FIREFOX.version = '44'
-  baseConfig.browserNoActivityTimeout = 120000
-
   config.set(baseConfig)
-  var testConfig = getConfig()
-  var customeConfig = {
+  const testConfig = getConfig()
+  const customConfig = {
     globalConfigs: testConfig,
     testConfig: testConfig.env
   }
-  console.log('customeConfig:', customeConfig)
-  config.set(customeConfig)
-  var cfg = prepareConfig(config)
+  console.log('Custom Config:', customConfig)
+  config.set(customConfig)
+  const cfg = prepareConfig(config)
   config.set(cfg)
 }
