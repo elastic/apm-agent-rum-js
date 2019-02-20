@@ -1,19 +1,18 @@
 {
   "name": "elastic-apm-rum",
   "private": true,
-  "version": "3.0.0",
+  "version": "0.0.0-monorepo",
   "description": "Elastic APM RUM agent",
   "repository": {
     "type": "git",
     "url": "https://github.com/elastic/apm-agent-js-base.git"
   },
   "scripts": {
+    "prerelease": "npm test",
     "release": "lerna publish",
     "release-package": "node scripts/publish",
     "release-github": "lerna run --scope elastic-apm-js-base test && node scripts/release-github",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
-    "bootstrap": "lerna bootstrap",
-    "clean": "lerna clean",
     "lint": "eslint . && node scripts/license-checker",
     "format": "eslint . --fix",
     "test": "lerna run test --stream --scope=$SCOPE",
@@ -31,6 +30,7 @@
     "babel-loader": "^8.0.4",
     "babel-plugin-istanbul": "^4.1.5",
     "bundlesize": "^0.17.1",
+    "es6-promise": "^4.2.4",
     "eslint": "^5.12.0",
     "eslint-config-prettier": "^4.0.0",
     "eslint-plugin-prettier": "^3.0.1",
@@ -69,5 +69,9 @@
     "webpack": "^4.27.1",
     "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "elastic-apm-js-base": "file:packages/rum",
+    "elastic-apm-js-core": "file:packages/rum-core"
   }
 }

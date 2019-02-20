@@ -23,13 +23,13 @@
  *
  */
 
-var karmaUtils = require('../../dev-utils/karma.js')
-var testUtils = require('../../dev-utils/test.js')
+const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
+const { getTestEnvironmentVariables } = require('../../dev-utils/test.js')
 
 module.exports = function(config) {
-  config.set(karmaUtils.baseConfig)
-  var env = testUtils.getTestEnvironmentVariables()
-  var customConfig = {
+  config.set(baseConfig)
+  const env = getTestEnvironmentVariables()
+  const customConfig = {
     globalConfigs: {
       useMocks: false,
       agentConfig: {
@@ -50,10 +50,15 @@ module.exports = function(config) {
   console.log('customConfig:', JSON.stringify(customConfig, undefined, 2))
   config.set(customConfig)
   config.files.unshift('test/utils/polyfill.js')
-  config.files.unshift('node_modules/es6-promise/dist/es6-promise.auto.js')
+  /**
+   * Common dependencies are hoisted to root node modules
+   */
+  config.files.unshift(
+    '../../node_modules/es6-promise/dist/es6-promise.auto.js'
+  )
   // config.files.push({ pattern: 'test/exceptions/data/*.js', included: false, watched: false })
   config.files.push({ pattern: 'src/**/*.js', included: false, watched: true })
 
-  var cfg = karmaUtils.prepareConfig(config)
+  var cfg = prepareConfig(config)
   config.set(cfg)
 }
