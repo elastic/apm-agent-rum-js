@@ -93,9 +93,12 @@ const baseLaunchers = {
   }
 }
 
-var specPattern = 'test/{*.spec.js,!(e2e)/*.spec.js}'
+const specPattern = 'test/{*.spec.js,!(e2e)/*.spec.js}'
 
-var baseConfig = {
+/**
+ * Common base config for all the mono repo packages
+ */
+const baseConfig = {
   exclude: ['e2e/**/*.*'],
   files: [specPattern],
   frameworks: ['jasmine'],
@@ -126,6 +129,9 @@ var baseConfig = {
     },
     devtool: 'inline-source-map'
   },
+  webpackMiddleware: {
+    stats: 'errors-only'
+  },
   browserNoActivityTimeout: 120000,
   customLaunchers: baseLaunchers,
   browsers: [],
@@ -137,13 +143,14 @@ var baseConfig = {
     recordVideo: false,
     recordScreenshots: true,
     options: {
-      'selenium-version': '2.48.2',
-      'command-timeout': 600,
-      'idle-timeout': 600,
-      'max-duration': 5400
+      seleniumVersion: '2.48.2',
+      commandTimeout: 600,
+      idleTimeout: 600,
+      maxDuration: 5400
     }
   }
 }
+
 function prepareConfig(defaultConfig) {
   const testConfig = defaultConfig.testConfig || {}
   const isTravis = testConfig.isTravis

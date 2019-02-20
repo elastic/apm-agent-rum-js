@@ -42,6 +42,10 @@ const baseConfig = {
     libraryTarget: 'umd'
   },
   mode: 'development',
+  stats: {
+    assets: true,
+    modules: false
+  },
   node: false,
   module: {
     rules: [

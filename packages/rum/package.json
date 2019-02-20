@@ -9,7 +9,7 @@
     "directory": "packages/rum"
   },
   "scripts": {
-    "build": "webpack --colors",
+    "build": "webpack",
     "build-dev": "webpack -w",
     "bundlesize": "npm run build && bundlesize",
     "karma": "karma start",

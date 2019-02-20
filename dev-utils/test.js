@@ -52,20 +52,13 @@ function runUnitTests(testConfig) {
 }
 
 function getTestEnvironmentVariables() {
-  var envVars = {
+  return {
     branch: process.env.TRAVIS_BRANCH,
     mode: process.env.MODE,
     sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
     isTravis: process.env.TRAVIS,
     serverUrl: process.env.APM_SERVER_URL
   }
-  if (envVars.sauceLabs) {
-    envVars.sauceLabs = {
-      username: process.env.SAUCE_USERNAME,
-      accessKey: process.env.SAUCE_ACCESS_KEY
-    }
-  }
-  return envVars
 }
 
 function walkSync(dir, filter, filelist) {
@@ -126,6 +119,7 @@ function buildE2eBundles(basePath, callback) {
     if (stats.hasErrors()) console.log('There were errors while building')
 
     const jsonStats = stats.toJson('minimal')
+    console.log(stats.toString('minimal'))
     if (jsonStats.errors.length > 0) {
       jsonStats.errors.forEach(function(error) {
         console.log('Error:', error)
@@ -226,10 +220,7 @@ function runE2eTests(configFilePath, runSelenium) {
 
 function getConfig() {
   const env = getTestEnvironmentVariables()
-  let serverUrl = 'http://localhost:8200'
-  if (env.serverUrl) {
-    serverUrl = env.serverUrl
-  }
+  let serverUrl = env.serverUrl || 'http://localhost:8200'
 
   const config = {
     agentConfig: {
@@ -241,6 +232,9 @@ function getConfig() {
     serverUrl,
     env
   }
+  /**
+   * Use this for testing locally
+   */
   // if (env.sauceLabs) {
   //   config.useMocks = true
   // }

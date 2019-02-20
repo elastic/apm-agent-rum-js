@@ -30,14 +30,13 @@ const sauceConnectOpts = {
   logger: console.log,
   noSslBumpDomains: 'all',
   tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-  connectRetries: 3,
-  noRemoveCollidingTunnels: true
+  connectRetries: 3
 }
 
 function launchSauceConnect(userConfig, done) {
   const config = Object.assign({}, sauceConnectOpts, userConfig)
 
-  sauceConnectLauncher(config, function(err) {
+  sauceConnectLauncher(config, err => {
     if (err) {
       console.error(err.message)
       return process.exit(1)
