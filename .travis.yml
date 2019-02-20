@@ -5,7 +5,12 @@ services:
 node_js:
   - '8'
 
-cache: npm
+before_install:
+  - nvm install-latest-npm
+
+cache:
+  directories:
+    - $HOME/.npm
 
 env:
   global:
@@ -25,7 +30,7 @@ jobs:
       script: npm run build-docs
       name: 'Build Docs'
     - stage: bundlesize
-      script: npm run bootstrap && npm run bundlesize
+      script: npm run bundlesize
       name: 'Analyse size of JS bundles'
     - stage: lint
       script: npm run lint
@@ -64,5 +69,4 @@ addons:
 script:
   - source ./scripts/export-saucelabs-account
   - docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
-  - npm run bootstrap
   - npm run test
