@@ -289,7 +289,9 @@ class PerformanceMonitoring {
   }
 
   sendTransactions(transactions) {
-    const payload = transactions.map(tr => this.createTransactionPayload(tr))
+    const payload = transactions
+      .map(tr => this.createTransactionPayload(tr))
+      .filter(tr => tr)
 
     this._logginService.debug(
       'Sending Transactions to apm server.',
