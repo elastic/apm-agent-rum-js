@@ -28,6 +28,7 @@
 const karma = require('karma')
 const { resolve, join } = require('path')
 const fs = require('fs')
+const { getSauceConnectOptions } = require('./test')
 
 const babelConfigFile = join(__dirname, '../packages/rum/babel.config.js')
 
@@ -157,10 +158,6 @@ function prepareConfig(defaultConfig) {
   const isSauce = testConfig.sauceLabs
   let buildId = 'ApmJs@'
 
-  if (testConfig.mode) {
-    console.log('TESTING MODE: ' + testConfig.mode)
-  }
-
   if (isTravis) {
     buildId =
       buildId +
@@ -202,7 +199,8 @@ function prepareConfig(defaultConfig) {
       defaultConfig.sauceLabs.tags = ['master']
       console.log('saucelabs.build:', buildId)
     }
-    defaultConfig.sauceLabs.tunnelIdentifier = process.env.TRAVIS_JOB_NUMBER
+    defaultConfig.sauceLabs.startConnect = true
+    defaultConfig.sauceLabs.connectOpts = getSauceConnectOptions()
     defaultConfig.reporters = ['dots', 'saucelabs']
     defaultConfig.browsers = Object.keys(defaultConfig.customLaunchers)
     defaultConfig.transports = ['polling']

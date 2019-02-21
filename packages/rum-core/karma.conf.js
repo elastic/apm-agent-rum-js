@@ -52,9 +52,8 @@ module.exports = function(config) {
   config.files.unshift(
     '../../node_modules/es6-promise/dist/es6-promise.auto.js'
   )
-  // config.files.push({ pattern: 'test/exceptions/data/*.js', included: false, watched: false })
   config.files.push({ pattern: 'src/**/*.js', included: false, watched: true })
 
-  var cfg = prepareConfig(config)
+  const cfg = prepareConfig(config)
   config.set(cfg)
 }

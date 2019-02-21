@@ -93,6 +93,12 @@ function isLogEntryATestFailure(entry, whitelist) {
   }
   return result
 }
+
+function isChrome() {
+  const browserName = browser.desiredCapabilities.browserName.toLowerCase()
+  return browserName.indexOf('chrome') !== -1
+}
+
 module.exports = {
   allowSomeBrowserErrors: function allowSomeBrowserErrors(whitelist, done) {
     if (typeof done === 'function') {
@@ -120,5 +126,6 @@ module.exports = {
       }
       // done()
     }
-  }
+  },
+  isChrome
 }

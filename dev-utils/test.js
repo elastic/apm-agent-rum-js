@@ -25,29 +25,15 @@
 
 const path = require('path')
 const fs = require('fs')
-const karmaUtils = require('./karma')
-const saucelabsUtils = require('./saucelabs')
 
-function runKarma(configFile) {
-  function karmaCallback(exitCode) {
-    if (exitCode) {
-      return process.exit(exitCode)
-    } else {
-      console.log('Karma finished.')
-      return process.exit(0)
-    }
-  }
-  karmaUtils.singleRunKarma(configFile, karmaCallback)
-}
-
-function runUnitTests(testConfig) {
-  if (testConfig.sauceLabs) {
-    saucelabsUtils.launchSauceConnect(
-      testConfig.sauceLabs,
-      runKarma.bind(this, testConfig.karmaConfigFile)
-    )
-  } else {
-    runKarma(testConfig.karmaConfigFile)
+function getSauceConnectOptions() {
+  return {
+    username: process.env.SAUCE_USERNAME,
+    accessKey: process.env.SAUCE_ACCESS_KEY,
+    logger: console.log,
+    noSslBumpDomains: 'all',
+    tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+    connectRetries: 3
   }
 }
 
@@ -59,6 +45,29 @@ function getTestEnvironmentVariables() {
     isTravis: process.env.TRAVIS,
     serverUrl: process.env.APM_SERVER_URL
   }
+}
+
+function getConfig() {
+  const env = getTestEnvironmentVariables()
+  let serverUrl = env.serverUrl || 'http://localhost:8200'
+
+  const config = {
+    agentConfig: {
+      serverUrl,
+      serviceName: 'apm-agent-js-base/test'
+    },
+    useMocks: false,
+    mockApmServer: false,
+    serverUrl,
+    env
+  }
+  /**
+   * Use this for testing locally
+   */
+  // if (env.sauceLabs) {
+  //   config.useMocks = true
+  // }
+  return config
 }
 
 function walkSync(dir, filter, filelist) {
@@ -218,36 +227,12 @@ function runE2eTests(configFilePath, runSelenium) {
   }
 }
 
-function getConfig() {
-  const env = getTestEnvironmentVariables()
-  let serverUrl = env.serverUrl || 'http://localhost:8200'
-
-  const config = {
-    agentConfig: {
-      serverUrl,
-      serviceName: 'apm-agent-js-base/test'
-    },
-    useMocks: false,
-    mockApmServer: false,
-    serverUrl,
-    env
-  }
-  /**
-   * Use this for testing locally
-   */
-  // if (env.sauceLabs) {
-  //   config.useMocks = true
-  // }
-  return config
-}
-
 module.exports = {
-  runUnitTests,
-  runE2eTests,
-  runKarma,
-  getTestEnvironmentVariables,
   getConfig,
+  getSauceConnectOptions,
+  getTestEnvironmentVariables,
   buildE2eBundles,
+  runE2eTests,
   startSelenium,
   dirWalkSync: walkSync
 }

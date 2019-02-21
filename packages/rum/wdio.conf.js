@@ -25,7 +25,7 @@
 
 const path = require('path')
 const { isChrome } = require('./test/e2e/e2e-utils')
-const { sauceConnectOpts } = require('../../dev-utils/saucelabs')
+const { getSauceConnectOptions } = require('../../dev-utils/test')
 
 const browserList = [
   {
@@ -66,7 +66,7 @@ exports.config = {
   user: process.env.SAUCE_USERNAME,
   key: process.env.SAUCE_ACCESS_KEY,
   sauceConnect: true,
-  sauceConnectOpts,
+  sauceConnectOpts: getSauceConnectOptions(),
   capabilities: browserList,
   logLevel: 'silent',
   screenshotPath: path.join(__dirname, 'error-screenshot'),

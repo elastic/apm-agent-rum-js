@@ -15,7 +15,7 @@
     "karma": "karma start",
     "karma-coverage": "karma start --coverage",
     "serve": "npm run script serveE2e ./ 8000",
-    "runUnitTests": "npm run script runUnitTests",
+    "runUnitTests": "karma start --single-run",
     "runNodeTests": "npm run script runNodeTests",
     "buildE2eBundles": "npm run script buildE2eBundles",
     "run-e2e": "npm run script runE2eTests",
