@@ -31,11 +31,6 @@ const { generateNotice } = require('../../dev-utils/dep-info')
 
 const PROJECT_DIR = path.join(__dirname, './')
 
-function runUnitTests() {
-  const karmaConfig = path.join(__dirname, './karma.conf.js')
-  testUtils.runKarma(karmaConfig)
-}
-
 function createBackendAgentServer() {
   const express = require('express')
   const app = express()
@@ -102,9 +97,9 @@ function serveE2e(servingPath, port) {
   })
 
   app.get('/test-config.js', async function(req, res) {
-    var config = testUtils.getConfig()
-    var result = `
-      window.globalConfigs = ${JSON.stringify(config)}
+    const { globalConfig } = testUtils.getTestConfig()
+    const result = `
+      window.globalConfigs = ${JSON.stringify(globalConfig)}
     `
     res.setHeader('Content-Type', 'text/javascript')
     res.setHeader('Content-Length', Buffer.byteLength(result))
@@ -152,7 +147,6 @@ function runE2eTests(serve) {
 }
 
 const scripts = {
-  runUnitTests,
   startSelenium: testUtils.startSelenium,
   runE2eTests,
   runNodeTests() {

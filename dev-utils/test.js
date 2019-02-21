@@ -43,31 +43,34 @@ function getTestEnvironmentVariables() {
     mode: process.env.MODE,
     sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
     isTravis: process.env.TRAVIS,
-    serverUrl: process.env.APM_SERVER_URL
+    serverUrl: process.env.APM_SERVER_URL || 'http://localhost:8200'
   }
 }
 
-function getConfig() {
+function getTestConfig(packageName = 'rum') {
   const env = getTestEnvironmentVariables()
-  let serverUrl = env.serverUrl || 'http://localhost:8200'
-
-  const config = {
+  const globalConfigs = {
     agentConfig: {
-      serverUrl,
-      serviceName: 'apm-agent-js-base/test'
+      serverUrl: env.serverUrl,
+      serviceName: `test`,
+      agentName: `${packageName}`,
+      agentVersion: '0.0.1'
     },
     useMocks: false,
-    mockApmServer: false,
-    serverUrl,
-    env
+    mockApmServer: false
   }
+
   /**
    * Use this for testing locally
    */
   // if (env.sauceLabs) {
-  //   config.useMocks = true
+  //   globalConfigs.useMocks = true
   // }
-  return config
+
+  return {
+    globalConfigs,
+    testConfig: env
+  }
 }
 
 function walkSync(dir, filter, filelist) {
@@ -228,7 +231,7 @@ function runE2eTests(configFilePath, runSelenium) {
 }
 
 module.exports = {
-  getConfig,
+  getTestConfig,
   getSauceConnectOptions,
   getTestEnvironmentVariables,
   buildE2eBundles,

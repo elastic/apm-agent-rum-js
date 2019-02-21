@@ -24,13 +24,14 @@
  */
 
 const { apmBase } = require('../../src/index.js')
-const { getConfig } = require('../../../../dev-utils/test')
-const testConfig = getConfig()
+const { getTestConfig } = require('../../../../dev-utils/test')
+
+const { globalConfigs } = getTestConfig()
 
 describe('ApmBase', function() {
   it('should not init ApmBase', function() {
     apmBase.init({
-      serverUrl: testConfig.serverUrl,
+      serverUrl: globalConfigs.agentConfig.serverUrl,
       serviceName: 'apm-agent-js-base-test'
     })
     try {

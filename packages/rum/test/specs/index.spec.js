@@ -59,9 +59,10 @@ describe('index', function() {
         expect(apmServer._postJson).not.toHaveBeenCalled()
       }
     }
+    var agentConfig = window.globalConfigs.agentConfig
     apmBase.init({
-      serverUrl: window.globalConfigs.serverUrl,
-      serviceName: 'apm-agent-js-base-test',
+      serverUrl: agentConfig.serverUrl,
+      serviceName: agentConfig.serviceName,
       flushInterval: 100
     })
 

@@ -24,26 +24,13 @@
  */
 
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
-const { getTestEnvironmentVariables } = require('../../dev-utils/test.js')
+const { getTestConfig } = require('../../dev-utils/test.js')
 
 module.exports = function(config) {
   config.set(baseConfig)
-  const env = getTestEnvironmentVariables()
-  const customConfig = {
-    globalConfigs: {
-      useMocks: false,
-      agentConfig: {
-        serverUrl: env.serverUrl || 'http://localhost:8200',
-        serviceName: 'test',
-        serviceVersion: 'test-version',
-        agentName: 'apm-js-core',
-        agentVersion: '0.0.1'
-      }
-    },
-    testConfig: env
-  }
+  const customConfig = getTestConfig('js-core')
 
-  console.log('customConfig:', JSON.stringify(customConfig, undefined, 2))
+  console.log('Custom Test Config:', JSON.stringify(customConfig, null, 2))
   config.set(customConfig)
   config.files.unshift('test/utils/polyfill.js')
   /**
