@@ -104,15 +104,7 @@ function createResourceTimingSpan(name, initiatorType, start, end) {
   }
   const spanName = stripQueryStringFromUrl(name)
   const span = new Span(spanName, kind)
-  /**
-   * Add context information when the span name and entry name are different
-   */
-  if (spanName !== name) {
-    span.addContext({
-      http: { url: name }
-    })
-  }
-
+  span.addContext({ http: { url: name } })
   span._start = start
   span.ended = true
   span._end = end
