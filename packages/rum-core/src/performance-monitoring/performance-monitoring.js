@@ -238,12 +238,12 @@ class PerformanceMonitoring {
   }
 
   createTransactionDataModel(transaction) {
-    var configContext = this._configService.get('context')
-    var stringLimit = this._configService.get('serverStringLimit')
-    var transactionStart = transaction._start
+    const configContext = this._configService.get('context')
+    const stringLimit = this._configService.get('serverStringLimit')
+    const transactionStart = transaction._start
 
-    var spans = transaction.spans.map(function(span) {
-      var context
+    const spans = transaction.spans.map(function(span) {
+      let context
       if (span.context) {
         context = sanitizeObjectStrings(span.context, stringLimit)
       }
@@ -282,30 +282,29 @@ class PerformanceMonitoring {
 
   createTransactionPayload(transaction) {
     this.prepareTransaction(transaction)
-    var filtered = this.filterTransaction(transaction)
+    const filtered = this.filterTransaction(transaction)
     if (filtered) {
       return this.createTransactionDataModel(transaction)
     }
   }
 
   sendTransactions(transactions) {
-    var payload = transactions
-      .map(this.createTransactionPayload.bind(this))
-      .filter(function(tr) {
-        return tr
-      })
+    const payload = transactions
+      .map(tr => this.createTransactionPayload(tr))
+      .filter(tr => tr)
+
     this._logginService.debug(
       'Sending Transactions to apm server.',
       transactions.length
     )
 
     // todo: check if transactions are already being sent
-    var promise = this._apmServer.sendTransactions(payload)
+    const promise = this._apmServer.sendTransactions(payload)
     return promise
   }
 
   convertTransactionsToServerModel(transactions) {
-    return transactions.map(this.createTransactionDataModel.bind(this))
+    return transactions.map(tr => this.createTransactionDataModel(tr))
   }
 
   groupSmallContinuouslySimilarSpans(transaction, threshold) {
