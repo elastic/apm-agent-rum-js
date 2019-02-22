@@ -38,9 +38,8 @@ function createApmBase(config) {
     window.globalConfigs = envConfig
   }
   var gc = window.globalConfigs
-  console.log(gc)
-  var apmServer
-  apmServer = apmBase.serviceFactory.getService('ApmServer')
+  console.log('E2E Global Configs', JSON.stringify(gc, null, 2))
+  var apmServer = apmBase.serviceFactory.getService('ApmServer')
   if (gc.serverUrl) {
     config.serverUrl = gc.serverUrl
   }
