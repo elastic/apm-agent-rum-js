@@ -121,10 +121,7 @@ class ApmServer {
   _createQueue(onFlush) {
     var queueLimit = this._configService.get('queueLimit')
     var flushInterval = this._configService.get('flushInterval')
-    return new Queue(onFlush, {
-      queueLimit,
-      flushInterval
-    })
+    return new Queue(onFlush, { queueLimit, flushInterval })
   }
 
   initErrorQueue() {
@@ -149,10 +146,7 @@ class ApmServer {
       function() {
         apmServer._loggingService.warn('Dropped error due to throttling!')
       },
-      {
-        limit,
-        interval
-      }
+      { limit, interval }
     )
   }
 
@@ -178,10 +172,7 @@ class ApmServer {
       function() {
         apmServer._loggingService.warn('Dropped transaction due to throttling!')
       },
-      {
-        limit,
-        interval
-      }
+      { limit, interval }
     )
   }
 
@@ -221,19 +212,18 @@ class ApmServer {
   sendErrors(errors) {
     if (this._configService.isValid() && this._configService.isActive()) {
       if (errors && errors.length > 0) {
-        var payload = {
+        const payload = {
           service: this.createServiceObject(),
           errors
         }
-
-        payload = this._configService.applyFilters(payload)
-        if (payload) {
-          var endPoint = this._configService.getEndpointUrl('errors')
-          var ndjson = this.ndjsonErrors(payload.errors)
+        const filteredPayload = this._configService.applyFilters(payload)
+        if (filteredPayload) {
+          const endPoint = this._configService.getEndpointUrl('errors')
+          const ndjson = this.ndjsonErrors(filteredPayload.errors)
           ndjson.unshift(
-            NDJSON.stringify({ metadata: { service: payload.service } })
+            NDJSON.stringify({ metadata: { service: filteredPayload.service } })
           )
-          var ndjsonPayload = ndjson.join('')
+          const ndjsonPayload = ndjson.join('')
           return this._postJson(endPoint, ndjsonPayload)
         } else {
           this._loggingService.warn('Dropped payload due to filtering!')
@@ -264,18 +254,18 @@ class ApmServer {
   sendTransactions(transactions) {
     if (this._configService.isValid() && this._configService.isActive()) {
       if (transactions && transactions.length > 0) {
-        var payload = {
+        const payload = {
           service: this.createServiceObject(),
           transactions
         }
-        payload = this._configService.applyFilters(payload)
-        if (payload) {
-          var endPoint = this._configService.getEndpointUrl('transactions')
-          var ndjson = this.ndjsonTransactions(payload.transactions)
+        const filteredPayload = this._configService.applyFilters(payload)
+        if (filteredPayload) {
+          const endPoint = this._configService.getEndpointUrl('transactions')
+          const ndjson = this.ndjsonTransactions(filteredPayload.transactions)
           ndjson.unshift(
-            NDJSON.stringify({ metadata: { service: payload.service } })
+            NDJSON.stringify({ metadata: { service: filteredPayload.service } })
           )
-          var ndjsonPayload = ndjson.join('')
+          const ndjsonPayload = ndjson.join('')
           return this._postJson(endPoint, ndjsonPayload)
         } else {
           this._loggingService.warn('Dropped payload due to filtering!')
