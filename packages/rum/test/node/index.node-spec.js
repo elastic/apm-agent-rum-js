@@ -26,13 +26,13 @@
 const { apmBase } = require('../../src/index.js')
 const { getTestConfig } = require('../../../../dev-utils/test')
 
-const { globalConfigs } = getTestConfig()
+const { agentConfig } = getTestConfig().globalConfigs
 
 describe('ApmBase', function() {
   it('should not init ApmBase', function() {
     apmBase.init({
-      serverUrl: globalConfigs.agentConfig.serverUrl,
-      serviceName: 'apm-agent-js-base-test'
+      serverUrl: agentConfig.serverUrl,
+      serviceName: agentConfig.serviceName
     })
     try {
       throw new Error('ApmBase test error')

@@ -24,8 +24,8 @@
  */
 
 const path = require('path')
-const { isChrome } = require('./test/e2e/e2e-utils')
 const { getSauceConnectOptions } = require('../../dev-utils/test')
+const { isChrome } = require('../../dev-utils/webdriver')
 
 const browserList = [
   {

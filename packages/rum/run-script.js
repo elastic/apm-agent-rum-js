@@ -25,6 +25,8 @@
 
 const path = require('path')
 const JasmineRunner = require('jasmine')
+const express = require('express')
+const serveIndex = require('serve-index')
 const testUtils = require('../../dev-utils/test')
 const { runIntegrationTest } = require('./test/e2e/integration-test')
 const { generateNotice } = require('../../dev-utils/dep-info')
@@ -74,9 +76,6 @@ function createBackendAgentServer() {
 }
 
 function serveE2e(servingPath, port) {
-  const express = require('express')
-  const serveIndex = require('serve-index')
-
   const app = express()
   var staticPath = path.join(__dirname, servingPath)
 
@@ -97,9 +96,9 @@ function serveE2e(servingPath, port) {
   })
 
   app.get('/test-config.js', async function(req, res) {
-    const { globalConfig } = testUtils.getTestConfig()
+    const { globalConfigs } = testUtils.getTestConfig()
     const result = `
-      window.globalConfigs = ${JSON.stringify(globalConfig)}
+      window.globalConfigs = ${JSON.stringify(globalConfigs)}
     `
     res.setHeader('Content-Type', 'text/javascript')
     res.setHeader('Content-Length', Buffer.byteLength(result))
