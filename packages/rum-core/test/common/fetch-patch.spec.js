@@ -56,8 +56,10 @@ describe('xhrPatch', function() {
       expect(events.map(e => e.event)).toEqual(['schedule'])
       promise.then(function(resp) {
         expect(resp).toBeDefined()
-        expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-        done()
+        setTimeout(() => {
+          expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+          done()
+        })
       })
     })
 

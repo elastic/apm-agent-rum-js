@@ -257,7 +257,7 @@ class TransactionService {
   addTask(taskId) {
     var tr = this.getOrCreateCurrentTransaction()
     if (tr) {
-      tr.addTask(taskId)
+      var taskId = tr.addTask(taskId)
       this._logger.debug('TransactionService.addTask', taskId)
     }
     return taskId
