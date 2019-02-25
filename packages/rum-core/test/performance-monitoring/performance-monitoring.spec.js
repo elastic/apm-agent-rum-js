@@ -528,8 +528,14 @@ describe('PerformanceMonitoring', function() {
         fn(event, task)
       })
 
-      window['__fetchDelegate'] = function(url) {
+      window['__fetchDelegate'] = function(request) {
         return new Promise(function(resolve) {
+          var url
+          if (typeof request === 'string') {
+            url = request
+          } else {
+            url = request.url
+          }
           var req = new window.XMLHttpRequest()
           req.open('GET', url, true)
           req.addEventListener('readystatechange', function() {

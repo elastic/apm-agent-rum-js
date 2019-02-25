@@ -94,15 +94,16 @@ function patchFetch(callback) {
       promise.then(
         function(response) {
           resolve(response)
+
           // invokeTask in the next execution cycle to let the promise resolution complete
-          setTimeout(() => {
+          Promise.resolve().then(() => {
             task.data.response = response
             invokeTask(task)
           })
         },
         function(error) {
           reject(error)
-          setTimeout(() => {
+          Promise.resolve().then(() => {
             task.data.error = error
             invokeTask(task)
           })

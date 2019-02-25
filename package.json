@@ -26,6 +26,7 @@
   "homepage": "https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html",
   "devDependencies": {
     "@babel/core": "^7.2.0",
+    "@babel/plugin-transform-destructuring": "^7.3.2",
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.1",
@@ -71,7 +72,8 @@
     "webdriverio": "^4.13.2",
     "webpack": "^4.27.1",
     "webpack-bundle-analyzer": "^3.0.3",
-    "webpack-cli": "^3.1.2"
+    "webpack-cli": "^3.1.2",
+    "whatwg-fetch": "^3.0.0"
   },
   "dependencies": {
     "elastic-apm-js-base": "file:packages/rum",

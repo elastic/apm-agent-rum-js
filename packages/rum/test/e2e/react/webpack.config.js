@@ -36,9 +36,23 @@ module.exports = {
     rules: [
       {
         test: /.jsx?$/,
-        include: [__dirname, path.resolve(__dirname)],
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              [
+                '@babel/preset-env',
+                {
+                  targets: {
+                    ie: '10'
+                  },
+                  loose: true,
+                  useBuiltIns: false
+                }
+              ]
+            ],
+            plugins: ['@babel/plugin-transform-destructuring']
+          }
         }
       }
     ]

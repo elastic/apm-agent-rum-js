@@ -45,4 +45,4 @@ class MainComponent extends React.Component {
   }
 }
 
-module.exports = MainComponent
+export default MainComponent
