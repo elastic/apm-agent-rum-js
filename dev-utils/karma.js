@@ -24,6 +24,7 @@
  */
 
 const fs = require('fs')
+const webpack = require('webpack')
 const { getSauceConnectOptions } = require('./test-config')
 
 const BABEL_CONFIG_FILE = require.resolve('elastic-apm-js-base/babel.config.js')
@@ -124,6 +125,7 @@ const baseConfig = {
         }
       ]
     },
+    plugins: [new webpack.EnvironmentPlugin(['NODE_ENV', 'APM_SERVER_URL'])],
     devtool: 'inline-source-map'
   },
   webpackMiddleware: {
