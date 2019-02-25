@@ -24,26 +24,20 @@
  */
 
 const elasticApm = require('../..')
-const apmBase = elasticApm.apmBase
-
+const { getGlobalConfig } = require('../../../../dev-utils/test-config')
 const ApmServerMock = require('../../../rum-core/test/utils/apm-server-mock')
+
+const apmBase = elasticApm.apmBase
+const { globalConfigs } = getGlobalConfig()
+
 function createApmBase(config) {
-  /**
-   * globalConfigs - environment variable injected by webpack
-   * during e2e build process
-   */
-  // eslint-disable-next-line
-  var envConfig = globalConfigs
-  if (!window.globalConfigs) {
-    window.globalConfigs = envConfig
-  }
-  var gc = window.globalConfigs
-  console.log('E2E Global Configs', JSON.stringify(gc, null, 2))
+  console.log('E2E Global Configs', JSON.stringify(globalConfigs, null, 2))
   var apmServer = apmBase.serviceFactory.getService('ApmServer')
-  if (gc.serverUrl) {
-    config.serverUrl = gc.serverUrl
+  const { serverUrl } = globalConfigs.agentConfig
+  if (serverUrl) {
+    config.serverUrl = serverUrl
   }
-  var serverMock = new ApmServerMock(apmServer, gc.useMocks)
+  var serverMock = new ApmServerMock(apmServer, globalConfigs.useMocks)
   apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
 
   return elasticApm.init(config)

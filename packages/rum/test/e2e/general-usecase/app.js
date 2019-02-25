@@ -23,12 +23,12 @@
  *
  */
 
-var createApmBase = require('../e2e')
+const createApmBase = require('../e2e')
+const { createTracer } = require('../../../src/opentracing')
 
-var active = Math.random() < 1
-var serverUrl = 'http://localhost:8003'
-
-var elasticApm = createApmBase({
+const active = Math.random() < 1
+const serverUrl = 'http://localhost:8003'
+const elasticApm = createApmBase({
   active,
   debug: true,
   serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
@@ -39,11 +39,8 @@ var elasticApm = createApmBase({
   pageLoadSampled: true
 })
 
-const { createTracer } = require('../../../src/opentracing')
-var tracer = createTracer(elasticApm)
-
-var otSpan = tracer.startSpan('OpenTracing span')
-
+const tracer = createTracer(elasticApm)
+const otSpan = tracer.startSpan('OpenTracing span')
 otSpan.finish(Date.now() + 200)
 
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')

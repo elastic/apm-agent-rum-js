@@ -30,10 +30,7 @@ const { agentConfig } = getGlobalConfig().globalConfigs
 
 describe('ApmBase', function() {
   it('should not init ApmBase', function() {
-    apmBase.init({
-      serverUrl: agentConfig.serverUrl,
-      serviceName: agentConfig.serviceName
-    })
+    apmBase.init(agentConfig)
     try {
       throw new Error('ApmBase test error')
     } catch (error) {

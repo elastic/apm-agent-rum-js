@@ -23,7 +23,6 @@
  *
  */
 
-const fs = require('fs')
 const webpack = require('webpack')
 const { getSauceConnectOptions } = require('./test-config')
 
@@ -205,20 +204,6 @@ function prepareConfig(defaultConfig) {
     defaultConfig.transports = ['polling']
   }
 
-  if (defaultConfig.globalConfigs) {
-    var dir = './tmp'
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir)
-    }
-
-    const { globalConfigs } = defaultConfig
-    fs.writeFileSync(
-      dir + '/globals.js',
-      'window.globalConfigs = ' + JSON.stringify(globalConfigs) + ';',
-      'utf8'
-    )
-    defaultConfig.files.unshift('tmp/globals.js')
-  }
   return defaultConfig
 }
 
