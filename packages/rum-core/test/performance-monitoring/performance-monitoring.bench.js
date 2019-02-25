@@ -23,8 +23,10 @@
  *
  */
 
-var createServiceFactory = require('..').createServiceFactory
-var Transaction = require('../../src/performance-monitoring/transaction')
+const { createServiceFactory } = require('../')
+const Transaction = require('../../src/performance-monitoring/transaction')
+const { getGlobalConfig } = require('../../../../dev-utils/test-config')
+const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
 function generateTransaction() {
   var tr = new Transaction('transaction1', 'transaction1type')
@@ -45,8 +47,7 @@ suite('PerformanceMonitoring', function() {
   var _postJson = apmServer._postJson
   var configService = serviceFactory.getService('ConfigService')
   configService.setConfig({ serviceName: 'benchmark-send-transactions' })
-  var apmTestConfig = require('../apm-test-config')()
-  configService.setConfig(apmTestConfig)
+  configService.setConfig(agentConfig)
 
   benchmark('createTransactionPayload', function() {
     var tr = generateTransaction()

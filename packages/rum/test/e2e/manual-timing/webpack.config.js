@@ -25,9 +25,9 @@
 
 const path = require('path')
 const webpack = require('webpack')
-const { getTestConfig } = require('../../../../../dev-utils/test')
+const { getGlobalConfig } = require('../../../../../dev-utils/test-config')
 
-const { globalConfigs } = getTestConfig()
+const { globalConfigs } = getGlobalConfig()
 
 const configJson = JSON.stringify(globalConfigs, undefined, 2)
 const env = { globalConfigs: configJson }

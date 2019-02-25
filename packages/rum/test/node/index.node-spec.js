@@ -23,10 +23,10 @@
  *
  */
 
-const { apmBase } = require('../../src/index.js')
-const { getTestConfig } = require('../../../../dev-utils/test')
+const { apmBase } = require('../../src')
+const { getGlobalConfig } = require('../../../../dev-utils/test-config')
 
-const { agentConfig } = getTestConfig().globalConfigs
+const { agentConfig } = getGlobalConfig().globalConfigs
 
 describe('ApmBase', function() {
   it('should not init ApmBase', function() {

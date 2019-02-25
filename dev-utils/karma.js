@@ -23,14 +23,10 @@
  *
  */
 
-// npm i --save-dev jasmine karma karma-sauce-launcher karma-failed-reporter karma-jasmine karma-spec-reporter webpack karma-webpack karma-chrome-launcher karma-sourcemap-loader babel-core babel-loader babel-preset-es2015 babel-plugin-istanbul
-
-const karma = require('karma')
-const { resolve, join } = require('path')
 const fs = require('fs')
-const { getSauceConnectOptions } = require('./test')
+const { getSauceConnectOptions } = require('./test-config')
 
-const babelConfigFile = join(__dirname, '../packages/rum/babel.config.js')
+const BABEL_CONFIG_FILE = require.resolve('elastic-apm-js-base/babel.config.js')
 
 const baseLaunchers = {
   SL_CHROME: {
@@ -122,7 +118,7 @@ const baseConfig = {
           test: /\.js$/,
           loader: 'babel-loader',
           options: {
-            configFile: resolve(babelConfigFile),
+            configFile: BABEL_CONFIG_FILE,
             plugins: []
           }
         }
@@ -224,19 +220,8 @@ function prepareConfig(defaultConfig) {
   return defaultConfig
 }
 
-function singleRunKarma(configFile, done) {
-  new karma.Server(
-    {
-      configFile,
-      singleRun: true
-    },
-    done
-  ).start()
-}
-
 module.exports = {
   prepareConfig,
   baseConfig,
-  baseLaunchers,
-  singleRunKarma
+  baseLaunchers
 }

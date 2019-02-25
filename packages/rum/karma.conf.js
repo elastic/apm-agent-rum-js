@@ -24,11 +24,11 @@
  */
 
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
-const { getTestConfig } = require('../../dev-utils/test')
+const { getGlobalConfig } = require('../../dev-utils/test-config')
 
 module.exports = function(config) {
   config.set(baseConfig)
-  const testConfig = getTestConfig()
+  const testConfig = getGlobalConfig()
   console.log('Custom Test Config:', testConfig)
   config.set(testConfig)
   const cfg = prepareConfig(config)

@@ -25,53 +25,8 @@
 
 const path = require('path')
 const fs = require('fs')
-
-function getSauceConnectOptions() {
-  return {
-    username: process.env.SAUCE_USERNAME,
-    accessKey: process.env.SAUCE_ACCESS_KEY,
-    logger: console.log,
-    noSslBumpDomains: 'all',
-    tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-    connectRetries: 3
-  }
-}
-
-function getTestEnvironmentVariables() {
-  return {
-    branch: process.env.TRAVIS_BRANCH,
-    mode: process.env.MODE,
-    sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
-    isTravis: process.env.TRAVIS,
-    serverUrl: process.env.APM_SERVER_URL || 'http://localhost:8200'
-  }
-}
-
-function getTestConfig(packageName = 'rum') {
-  const env = getTestEnvironmentVariables()
-  const globalConfigs = {
-    agentConfig: {
-      serverUrl: env.serverUrl,
-      serviceName: `test`,
-      agentName: `${packageName}`,
-      agentVersion: '0.0.1'
-    },
-    useMocks: false,
-    mockApmServer: false
-  }
-
-  /**
-   * Use this for testing locally
-   */
-  // if (env.sauceLabs) {
-  //   globalConfigs.useMocks = true
-  // }
-
-  return {
-    globalConfigs,
-    testConfig: env
-  }
-}
+const webpack = require('webpack')
+const { Launcher } = require('webdriverio')
 
 function walkSync(dir, filter, filelist) {
   var files = fs.readdirSync(dir)
@@ -104,7 +59,6 @@ function buildE2eBundles(basePath, callback) {
       }
     }
 
-  var webpack = require('webpack')
   var fileList = walkSync(basePath, /webpack\.config\.js$/)
   fileList = fileList.map(function(file) {
     return path.relative(__dirname, file)
@@ -205,9 +159,7 @@ function startSelenium(callback, manualStop) {
 }
 
 function runE2eTests(configFilePath, runSelenium) {
-  // npm i -D selenium-standalone webdriverio wdio-jasmine-framework
-  var Launcher = require('webdriverio').Launcher
-  var wdio = new Launcher(configFilePath)
+  const wdio = new Launcher(configFilePath)
   function runWdio() {
     wdio.run().then(
       function(code) {
@@ -231,9 +183,6 @@ function runE2eTests(configFilePath, runSelenium) {
 }
 
 module.exports = {
-  getTestConfig,
-  getSauceConnectOptions,
-  getTestEnvironmentVariables,
   buildE2eBundles,
   runE2eTests,
   startSelenium,

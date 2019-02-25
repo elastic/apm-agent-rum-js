@@ -27,7 +27,8 @@ const path = require('path')
 const JasmineRunner = require('jasmine')
 const express = require('express')
 const serveIndex = require('serve-index')
-const testUtils = require('../../dev-utils/test')
+const testUtils = require('../../dev-utils/test-utils')
+const { getGlobalConfig } = require('../../dev-utils/test-config')
 const { runIntegrationTest } = require('./test/e2e/integration-test')
 const { generateNotice } = require('../../dev-utils/dep-info')
 
@@ -96,7 +97,7 @@ function serveE2e(servingPath, port) {
   })
 
   app.get('/test-config.js', async function(req, res) {
-    const { globalConfigs } = testUtils.getTestConfig()
+    const { globalConfigs } = getGlobalConfig()
     const result = `
       window.globalConfigs = ${JSON.stringify(globalConfigs)}
     `
@@ -131,7 +132,7 @@ function runJasmine(cb) {
   })
 
   jrunner.showColors(true)
-  jrunner.addReporter(JasmineRunner.ConsoleReporter())
+  jrunner.addReporter(JasmineRunner.ConsoleReporter(jrunner))
   jrunner.addSpecFiles(specFiles)
   jrunner.execute()
 }

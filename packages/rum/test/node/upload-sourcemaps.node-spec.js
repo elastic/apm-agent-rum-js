@@ -28,7 +28,9 @@ const request = require('request')
 const fs = require('fs')
 
 const basePath = path.join(__dirname, '../e2e')
-const { getTestEnvironmentVariables } = require('../../../../dev-utils/test')
+const {
+  getTestEnvironmentVariables
+} = require('../../../../dev-utils/test-config')
 const { serverUrl } = getTestEnvironmentVariables()
 
 describe('Sourcemaps', function() {

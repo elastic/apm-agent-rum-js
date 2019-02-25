@@ -24,7 +24,7 @@
  */
 
 const path = require('path')
-const { getSauceConnectOptions } = require('../../dev-utils/test')
+const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 const { isChrome } = require('../../dev-utils/webdriver')
 
 const browserList = [
