@@ -28,7 +28,6 @@ const JasmineRunner = require('jasmine')
 const express = require('express')
 const serveIndex = require('serve-index')
 const testUtils = require('../../dev-utils/test-utils')
-const { getGlobalConfig } = require('../../dev-utils/test-config')
 const { runIntegrationTest } = require('./test/e2e/integration-test')
 const { generateNotice } = require('../../dev-utils/dep-info')
 
@@ -94,16 +93,6 @@ function serveE2e(servingPath, port) {
     } else {
       res.send(result)
     }
-  })
-
-  app.get('/test-config.js', async function(req, res) {
-    const { globalConfigs } = getGlobalConfig()
-    const result = `
-      window.globalConfigs = ${JSON.stringify(globalConfigs)}
-    `
-    res.setHeader('Content-Type', 'text/javascript')
-    res.setHeader('Content-Length', Buffer.byteLength(result))
-    res.send(result)
   })
 
   app.use(express.static(staticPath), serveIndex(staticPath, { icons: false }))

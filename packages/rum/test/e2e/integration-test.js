@@ -38,6 +38,9 @@ async function runIntegrationTest(pageUrl) {
     const page = await browser.newPage()
     page.on('error', handleError)
     page.on('pageerror', handleError)
+    page.on('console', msg => {
+      console.log('Page Logs:', msg.text())
+    })
 
     await page.goto(pageUrl, { timeout: 30000 })
     const transactionResponse = await page.waitForResponse(response => {
