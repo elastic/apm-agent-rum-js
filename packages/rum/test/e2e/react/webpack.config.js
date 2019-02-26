@@ -23,10 +23,9 @@
  *
  */
 
-var path = require('path')
-var webpack = require('webpack')
-
-var env = { globalConfigs: {} }
+const path = require('path')
+const { EnvironmentPlugin } = require('webpack')
+const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 
 module.exports = {
   entry: path.resolve(__dirname, './app.jsx'),
@@ -44,5 +43,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [new webpack.DefinePlugin(env)]
+  plugins: [new EnvironmentPlugin(getWebpackEnv())]
 }

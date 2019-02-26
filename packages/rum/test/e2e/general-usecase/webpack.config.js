@@ -25,6 +25,8 @@
 
 const path = require('path')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const { EnvironmentPlugin } = require('webpack')
+const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 
 const optimized = {
   entry: path.join(__dirname, './app.js'),
@@ -51,7 +53,8 @@ const optimized = {
         extractComments: true
       })
     ]
-  }
+  },
+  plugins: [new EnvironmentPlugin(getWebpackEnv())]
 }
 
 module.exports = optimized

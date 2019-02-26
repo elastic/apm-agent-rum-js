@@ -27,6 +27,7 @@ const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
 const { Launcher } = require('webdriverio')
+const { singleRunKarma } = require('./karma')
 
 function walkSync(dir, filter, filelist) {
   var files = fs.readdirSync(dir)
@@ -158,6 +159,16 @@ function startSelenium(callback, manualStop) {
   )
 }
 
+function runKarma(configFile) {
+  singleRunKarma(configFile, exitCode => {
+    if (exitCode) {
+      return process.exit(exitCode)
+    }
+    console.log('Karma finished.')
+    return process.exit(0)
+  })
+}
+
 function runE2eTests(configFilePath, runSelenium) {
   const wdio = new Launcher(configFilePath)
   function runWdio() {
@@ -185,6 +196,7 @@ function runE2eTests(configFilePath, runSelenium) {
 module.exports = {
   buildE2eBundles,
   runE2eTests,
+  runKarma,
   startSelenium,
   dirWalkSync: walkSync
 }

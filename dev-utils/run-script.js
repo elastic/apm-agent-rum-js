@@ -23,24 +23,32 @@
  *
  */
 
-const path = require('path')
-const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
+const { join } = require('path')
+const { runKarma } = require('./test-utils')
+const { generateNotice } = require('./dep-info')
 
-module.exports = {
-  entry: path.resolve(__dirname, './app.js'),
-  output: { path: __dirname, filename: 'app.e2e-bundle.js' },
-  devtool: 'source-map',
-  mode: 'development',
-  module: {
-    rules: [
-      {
-        test: /.js?$/,
-        use: {
-          loader: 'babel-loader'
-        }
-      }
-    ]
-  },
-  plugins: [new EnvironmentPlugin(getWebpackEnv())]
+function runUnitTests(directory) {
+  const karmaConfigFile = join(__dirname, '..', directory, './karma.conf.js')
+  runKarma(karmaConfigFile)
 }
+
+function runScript(scripts, scriptName, scriptArgs) {
+  if (scriptName) {
+    const message = `Running: ${scriptName}(${scriptArgs
+      .map(a => "'" + a + "'")
+      .join(', ')}) \n`
+    console.log(message)
+    if (typeof scripts[scriptName] === 'function') {
+      return scripts[scriptName].apply(this, scriptArgs)
+    } else {
+      throw new Error('No script with name ' + scriptName)
+    }
+  }
+}
+
+const scripts = {
+  runUnitTests,
+  generateNotice
+}
+
+runScript(scripts, process.argv[2], [].concat(process.argv).slice(3))

@@ -13,7 +13,7 @@
     "karma": "karma start",
     "karma-bench": "karma start karma.bench.conf.js",
     "karma-coverage": "karma start --coverage",
-    "runUnitTests": "karma start --single-run",
+    "runUnitTests": "node ../../dev-utils/run-script.js runUnitTests packages/rum-core",
     "test": "npm run runUnitTests"
   },
   "files": [

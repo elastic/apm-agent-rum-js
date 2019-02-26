@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  *
  */
+const defaultApmServerUrl = 'http://localhost:8200'
 
 function getSauceConnectOptions() {
   return {
@@ -40,7 +41,7 @@ function getTestEnvironmentVariables() {
     mode: process.env.MODE,
     sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
     isTravis: process.env.TRAVIS,
-    serverUrl: process.env.APM_SERVER_URL || 'http://localhost:8200'
+    serverUrl: process.env.APM_SERVER_URL || defaultApmServerUrl
   }
 }
 
@@ -70,8 +71,18 @@ function getGlobalConfig(packageName = 'rum') {
   }
 }
 
+/**
+ * Used for injecting process.env across webpack bundles for testing
+ */
+function getWebpackEnv() {
+  return {
+    APM_SERVER_URL: defaultApmServerUrl
+  }
+}
+
 module.exports = {
   getSauceConnectOptions,
   getTestEnvironmentVariables,
-  getGlobalConfig
+  getGlobalConfig,
+  getWebpackEnv
 }

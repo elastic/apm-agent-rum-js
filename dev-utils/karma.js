@@ -23,8 +23,9 @@
  *
  */
 
-const webpack = require('webpack')
-const { getSauceConnectOptions } = require('./test-config')
+const { Server } = require('karma')
+const { EnvironmentPlugin } = require('webpack')
+const { getSauceConnectOptions, getWebpackEnv } = require('./test-config')
 
 const BABEL_CONFIG_FILE = require.resolve('elastic-apm-js-base/babel.config.js')
 
@@ -124,7 +125,7 @@ const baseConfig = {
         }
       ]
     },
-    plugins: [new webpack.EnvironmentPlugin(['NODE_ENV', 'APM_SERVER_URL'])],
+    plugins: [new EnvironmentPlugin(getWebpackEnv())],
     devtool: 'inline-source-map'
   },
   webpackMiddleware: {
@@ -207,8 +208,19 @@ function prepareConfig(defaultConfig) {
   return defaultConfig
 }
 
+function singleRunKarma(configFile, done) {
+  new Server(
+    {
+      configFile,
+      singleRun: true
+    },
+    done
+  ).start()
+}
+
 module.exports = {
   prepareConfig,
   baseConfig,
-  baseLaunchers
+  baseLaunchers,
+  singleRunKarma
 }
