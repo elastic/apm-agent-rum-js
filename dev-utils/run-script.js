@@ -24,12 +24,31 @@
  */
 
 const { join } = require('path')
-const { runKarma } = require('./test-utils')
+const { runKarma, runSauceConnect } = require('./test-utils')
+const {
+  getSauceConnectOptions,
+  getTestEnvironmentVariables
+} = require('./test-config')
 const { generateNotice } = require('./dep-info')
 
-function runUnitTests(directory) {
+const sauceConnectOpts = getSauceConnectOptions()
+const { sauceLabs } = getTestEnvironmentVariables()
+
+function runUnitTests(launchSauceConnect = false, directory) {
   const karmaConfigFile = join(__dirname, '..', directory, './karma.conf.js')
+  if (launchSauceConnect && sauceLabs) {
+    return runSauceConnect(sauceConnectOpts, () => runKarma(karmaConfigFile))
+  }
   runKarma(karmaConfigFile)
+}
+
+function launchSauceConnect() {
+  if (sauceLabs) {
+    return runSauceConnect(sauceConnectOpts, () => {
+      console.log('Launched SauceConnect!')
+    })
+  }
+  console.log('set MODE=saucelabs to launch sauce connect')
 }
 
 function runScript(scripts, scriptName, scriptArgs) {
@@ -48,6 +67,7 @@ function runScript(scripts, scriptName, scriptArgs) {
 
 const scripts = {
   runUnitTests,
+  launchSauceConnect,
   generateNotice
 }
 

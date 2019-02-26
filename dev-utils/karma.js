@@ -25,7 +25,7 @@
 
 const { Server } = require('karma')
 const { EnvironmentPlugin } = require('webpack')
-const { getSauceConnectOptions, getWebpackEnv } = require('./test-config')
+const { getWebpackEnv } = require('./test-config')
 
 const BABEL_CONFIG_FILE = require.resolve('elastic-apm-js-base/babel.config.js')
 
@@ -198,8 +198,6 @@ function prepareConfig(defaultConfig) {
       defaultConfig.sauceLabs.tags = ['master']
       console.log('saucelabs.build:', buildId)
     }
-    defaultConfig.sauceLabs.startConnect = true
-    defaultConfig.sauceLabs.connectOpts = getSauceConnectOptions()
     defaultConfig.reporters = ['dots', 'saucelabs']
     defaultConfig.browsers = Object.keys(defaultConfig.customLaunchers)
     defaultConfig.transports = ['polling']

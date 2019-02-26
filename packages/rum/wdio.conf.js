@@ -59,14 +59,16 @@ const browserList = [
   }
 ]
 
+const sauceConnectOpts = getSauceConnectOptions()
+
 exports.config = {
   specs: [path.join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
   maxInstancesPerCapability: 3,
   services: ['sauce'],
-  user: process.env.SAUCE_USERNAME,
-  key: process.env.SAUCE_ACCESS_KEY,
+  user: sauceConnectOpts.username,
+  key: sauceConnectOpts.accessKey,
   sauceConnect: true,
-  sauceConnectOpts: getSauceConnectOptions(),
+  sauceConnectOpts,
   capabilities: browserList,
   logLevel: 'silent',
   screenshotPath: path.join(__dirname, 'error-screenshot'),

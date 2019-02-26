@@ -27,6 +27,7 @@ const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
 const { Launcher } = require('webdriverio')
+const sauceConnectLauncher = require('sauce-connect-launcher')
 const { singleRunKarma } = require('./karma')
 
 function walkSync(dir, filter, filelist) {
@@ -159,6 +160,18 @@ function startSelenium(callback, manualStop) {
   )
 }
 
+function runSauceConnect(config, callback) {
+  return sauceConnectLauncher(config, err => {
+    if (err) {
+      console.error('Sauce connect Error', err)
+      return process.exit(1)
+    } else {
+      console.log('Sauce connect ready')
+      callback()
+    }
+  })
+}
+
 function runKarma(configFile) {
   singleRunKarma(configFile, exitCode => {
     if (exitCode) {
@@ -197,6 +210,7 @@ module.exports = {
   buildE2eBundles,
   runE2eTests,
   runKarma,
+  runSauceConnect,
   startSelenium,
   dirWalkSync: walkSync
 }
