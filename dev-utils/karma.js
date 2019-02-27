@@ -25,7 +25,7 @@
 
 const { Server } = require('karma')
 const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('./test-config')
+const { getWebpackEnv, getSauceConnectOptions } = require('./test-config')
 
 const BABEL_CONFIG_FILE = require.resolve('elastic-apm-js-base/babel.config.js')
 
@@ -92,6 +92,7 @@ const baseLaunchers = {
 }
 
 const specPattern = 'test/{*.spec.js,!(e2e)/*.spec.js}'
+const { tunnelIdentifier } = getSauceConnectOptions()
 
 /**
  * Common base config for all the mono repo packages
@@ -141,6 +142,7 @@ const baseConfig = {
     startConnect: false,
     recordVideo: false,
     recordScreenshots: true,
+    tunnelIdentifier,
     options: {
       seleniumVersion: '2.48.2',
       commandTimeout: 600,
