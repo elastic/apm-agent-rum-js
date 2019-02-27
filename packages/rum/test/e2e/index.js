@@ -23,33 +23,24 @@
  *
  */
 
-const createApmBase = require('../')
-const { renderTestElement } = require('../utils')
-const elasticApm = createApmBase({
-  debug: true,
-  serverUrl: 'http://localhost:8200',
-  serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
-  serviceVersion: '0.0.1'
-})
+const elasticApm = require('../../')
+const { getGlobalConfig } = require('../../../../dev-utils/test-config')
+const ApmServerMock = require('../../../rum-core/test/utils/apm-server-mock')
 
-elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
+const apmBase = elasticApm.apmBase
+const { globalConfigs } = getGlobalConfig()
 
-elasticApm.setUserContext({
-  usertest: 'usertest',
-  id: 'userId',
-  username: 'username',
-  email: 'email'
-})
-elasticApm.setCustomContext({ testContext: 'testContext' })
+function createApmBase(config) {
+  console.log('E2E Global Configs', JSON.stringify(globalConfigs, null, 2))
+  const apmServer = apmBase.serviceFactory.getService('ApmServer')
+  const { serverUrl } = globalConfigs.agentConfig
+  if (serverUrl) {
+    config.serverUrl = serverUrl
+  }
+  const serverMock = new ApmServerMock(apmServer, globalConfigs.useMocks)
+  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
 
-function generateError() {
-  throw new Error('timeout test error')
+  return elasticApm.init(config)
 }
 
-setTimeout(function() {
-  generateError()
-}, 100)
-
-generateError.tmp = 'tmp'
-
-renderTestElement()
+module.exports = createApmBase

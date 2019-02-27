@@ -41,15 +41,16 @@ function getTestEnvironmentVariables() {
     mode: process.env.MODE,
     sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
     isTravis: process.env.TRAVIS,
-    serverUrl: process.env.APM_SERVER_URL || defaultApmServerUrl
+    serverUrl: process.env.APM_SERVER_URL || defaultApmServerUrl,
+    mockBackendUrl: 'http://localhost:8003'
   }
 }
 
 function getGlobalConfig(packageName = 'rum') {
-  const env = getTestEnvironmentVariables()
+  const testEnv = getTestEnvironmentVariables()
   const globalConfigs = {
     agentConfig: {
-      serverUrl: env.serverUrl,
+      serverUrl: testEnv.serverUrl,
       serviceName: `test`,
       agentName: `${packageName}`,
       agentVersion: '0.0.1'
@@ -67,7 +68,7 @@ function getGlobalConfig(packageName = 'rum') {
 
   return {
     globalConfigs,
-    testConfig: env
+    testConfig: testEnv
   }
 }
 

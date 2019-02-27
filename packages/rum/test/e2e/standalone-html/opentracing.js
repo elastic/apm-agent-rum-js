@@ -23,33 +23,19 @@
  *
  */
 
-const createApmBase = require('../')
-const { renderTestElement } = require('../utils')
-const elasticApm = createApmBase({
-  debug: true,
-  serverUrl: 'http://localhost:8200',
-  serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
-  serviceVersion: '0.0.1'
+const { testXHR, renderTestElement } = require('../utils')
+const { getGlobalConfig } = require('../../../../../dev-utils/test-config')
+const { serverUrl, mockBackendUrl } = getGlobalConfig().testConfig
+
+window.elasticApm.init({
+  serviceName: 'standalone-html',
+  serverUrl,
+  distributedTracingOrigins: [mockBackendUrl],
+  pageLoadTransactionName: '/'
 })
 
-elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
+const tracer = window.elasticApm.createTracer()
+const span = tracer.startSpan('Opentracing span')
+span.finish(Date.now() + 100)
 
-elasticApm.setUserContext({
-  usertest: 'usertest',
-  id: 'userId',
-  username: 'username',
-  email: 'email'
-})
-elasticApm.setCustomContext({ testContext: 'testContext' })
-
-function generateError() {
-  throw new Error('timeout test error')
-}
-
-setTimeout(function() {
-  generateError()
-}, 100)
-
-generateError.tmp = 'tmp'
-
-renderTestElement()
+testXHR(mockBackendUrl, renderTestElement)

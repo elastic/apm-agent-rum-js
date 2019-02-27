@@ -23,24 +23,30 @@
  *
  */
 
-const elasticApm = require('../..')
-const { getGlobalConfig } = require('../../../../dev-utils/test-config')
-const ApmServerMock = require('../../../rum-core/test/utils/apm-server-mock')
+const path = require('path')
+const { EnvironmentPlugin } = require('webpack')
+const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 
-const apmBase = elasticApm.apmBase
-const { globalConfigs } = getGlobalConfig()
-
-function createApmBase(config) {
-  console.log('E2E Global Configs', JSON.stringify(globalConfigs, null, 2))
-  var apmServer = apmBase.serviceFactory.getService('ApmServer')
-  const { serverUrl } = globalConfigs.agentConfig
-  if (serverUrl) {
-    config.serverUrl = serverUrl
-  }
-  var serverMock = new ApmServerMock(apmServer, globalConfigs.useMocks)
-  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
-
-  return elasticApm.init(config)
+module.exports = {
+  entry: {
+    base: path.join(__dirname, 'base'),
+    opentracing: path.join(__dirname, 'opentracing')
+  },
+  output: {
+    path: path.resolve(__dirname),
+    filename: '[name].e2e-bundle.js'
+  },
+  target: 'web',
+  mode: 'none',
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: {
+          loader: 'babel-loader'
+        }
+      }
+    ]
+  },
+  plugins: [new EnvironmentPlugin(getWebpackEnv())]
 }
-
-module.exports = createApmBase

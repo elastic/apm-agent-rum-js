@@ -46,7 +46,7 @@ function assertNoBrowserErrors(whitelist) {
      * browser.log API is available only in chrome
      */
     if (!isChrome()) {
-      resolve()
+      return resolve()
     }
     // TODO: Bug in ChromeDriver: Need to execute at least one command
     // so that the browser logs can be read out!
@@ -77,16 +77,15 @@ function assertNoBrowserErrors(whitelist) {
     }
 
     if (failureEntries.length > 0) {
-      reject(
+      return reject(
         new Error(
           'Expected no errors in the browserLog but got ' +
             failureEntries.length +
             ' error(s)'
         )
       )
-    } else {
-      resolve()
     }
+    resolve()
   })
 }
 

@@ -23,33 +23,48 @@
  *
  */
 
-const createApmBase = require('../')
-const { renderTestElement } = require('../utils')
-const elasticApm = createApmBase({
-  debug: true,
-  serverUrl: 'http://localhost:8200',
-  serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
-  serviceVersion: '0.0.1'
-})
-
-elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
-
-elasticApm.setUserContext({
-  usertest: 'usertest',
-  id: 'userId',
-  username: 'username',
-  email: 'email'
-})
-elasticApm.setCustomContext({ testContext: 'testContext' })
-
-function generateError() {
-  throw new Error('timeout test error')
+function checkDtInfo(payload) {
+  console.log('distributed tracing data', payload)
+  if (typeof payload.traceId !== 'string') {
+    throw new Error('Wrong distributed tracing payload: ')
+  }
 }
 
-setTimeout(function() {
-  generateError()
-}, 100)
+function renderTestElement() {
+  const appEl = document.getElementById('app')
+  const testEl = document.createElement('h2')
+  testEl.setAttribute('id', 'test-element')
+  testEl.innerHTML = 'Passed'
+  appEl.appendChild(testEl)
+}
 
-generateError.tmp = 'tmp'
+function testXHR(backendUrl, callback = () => {}) {
+  const req = new window.XMLHttpRequest()
+  req.onerror = err => console.log('[XHR Error]', err)
+  req.open('POST', backendUrl + '/data', false)
+  req.addEventListener('load', function() {
+    const payload = JSON.parse(req.responseText)
+    checkDtInfo(payload)
+    callback()
+  })
 
-renderTestElement()
+  req.send()
+}
+
+function testFetch(backendUrl, callback = () => {}) {
+  if ('fetch' in window) {
+    fetch(backendUrl + '/fetch', { method: 'POST' }).then(response => {
+      response.json().then(function(payload) {
+        checkDtInfo(payload)
+        callback()
+      })
+    })
+  }
+}
+
+module.exports = {
+  checkDtInfo,
+  testXHR,
+  testFetch,
+  renderTestElement
+}
