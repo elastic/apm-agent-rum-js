@@ -23,21 +23,36 @@
  *
  */
 
-module.exports = function(api) {
-  api.cache(true)
-  return {
-    presets: [
-      [
-        '@babel/preset-env',
-        {
-          targets: {
-            ie: '11'
-          },
-          useBuiltIns: false,
-          modules: false,
-          loose: true
-        }
-      ]
-    ]
-  }
-}
+describe('standalone-html', function() {
+  it('should run application without errors for base bundle', function() {
+    browser.url('/test/e2e/standalone-html/index.html').waitUntil(
+      () => {
+        return browser.getText('#test-element') === 'Passed'
+      },
+      10000,
+      'expected element #test-element'
+    )
+
+    const { value: capturedErrors } = browser.execute(function() {
+      return window.capturedTestErrors
+    })
+    console.error('CapturedErrors', capturedErrors)
+    expect(capturedErrors.length).toEqual(0)
+  })
+
+  it('should run application without errors for opentracing bundle', function() {
+    browser.url('/test/e2e/standalone-html/opentracing.html').waitUntil(
+      function() {
+        return browser.getText('#test-element') === 'Passed'
+      },
+      10000,
+      'expected element #test-element'
+    )
+
+    const { value: capturedErrors } = browser.execute(function() {
+      return window.capturedTestErrors
+    })
+    console.error('CapturedErrors', capturedErrors)
+    expect(capturedErrors.length).toEqual(0)
+  })
+})

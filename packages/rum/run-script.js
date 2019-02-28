@@ -126,18 +126,22 @@ function runJasmine(cb) {
   jrunner.execute()
 }
 
-function runE2eTests(serve) {
-  if (serve !== 'false') {
-    serveE2e('./', 8000)
-  }
-
+function runE2eTests(serve = true) {
+  serve && serveE2e('./', 8000)
   const file = path.join(PROJECT_DIR, 'wdio.conf.js')
+  testUtils.runE2eTests(file, false)
+}
+
+function runE2eFailsafeTests(serve = true) {
+  serve && serveE2e('./', 8000)
+  const file = path.join(PROJECT_DIR, 'wdio-failsafe.conf.js')
   testUtils.runE2eTests(file, false)
 }
 
 const scripts = {
   startSelenium: testUtils.startSelenium,
   runE2eTests,
+  runE2eFailsafeTests,
   runNodeTests() {
     var servers = serveE2e('./', 8000)
     runJasmine(function(err) {

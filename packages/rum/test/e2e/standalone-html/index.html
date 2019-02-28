@@ -4,6 +4,15 @@
     <title>test</title>
     <meta charset="UTF-8" />
     <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+    <script type="application/javascript">
+      /**
+       * Used for testing errors on unsupported browsers
+       */
+      window.capturedTestErrors = []
+      window.onerror = function(err) {
+        window.capturedTestErrors.push(err)
+      }
+    </script>
   </head>
 
   <body>

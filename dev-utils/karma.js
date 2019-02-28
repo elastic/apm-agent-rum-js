@@ -57,23 +57,11 @@ const baseLaunchers = {
     platform: 'Windows 8.1',
     version: '11'
   },
-  SL_IE10: {
-    base: 'SauceLabs',
-    browserName: 'internet explorer',
-    platform: 'Windows 2012',
-    version: '10'
-  },
   SL_EDGE: {
     base: 'SauceLabs',
     browserName: 'microsoftedge',
     platform: 'Windows 10',
     version: '13'
-  },
-  'SL_ANDROID4.4': {
-    base: 'SauceLabs',
-    browserName: 'android',
-    platform: 'Linux',
-    version: '4.4'
   },
   SL_ANDROID: {
     base: 'SauceLabs',
