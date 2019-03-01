@@ -24,7 +24,6 @@
  */
 
 const utils = require('../../../../../dev-utils/webdriver')
-const { isChrome } = require('../e2e-utils')
 
 describe('react app', function() {
   it('should run the react app', function() {
@@ -109,8 +108,6 @@ describe('react app', function() {
     })
     expect(fetchDataSpan).toBeDefined()
 
-    if (isChrome()) {
-      return utils.allowSomeBrowserErrors()
-    }
+    return utils.allowSomeBrowserErrors()
   })
 })

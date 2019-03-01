@@ -23,7 +23,7 @@
  *
  */
 
-var createApmBase = require('../e2e')
+var createApmBase = require('../')
 
 var apm = createApmBase({
   debug: true,

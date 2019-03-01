@@ -23,9 +23,10 @@
  *
  */
 
+import "@babel/polyfill"
+import 'whatwg-fetch'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import 'whatwg-fetch'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import { withRouter } from 'react-router'
 import MainComponent from './main-component.jsx'
