@@ -24,9 +24,8 @@
  */
 
 const path = require('path')
-const { isChrome } = require('./test/e2e/e2e-utils')
-
-const tunnelIdentifier = process.env.TRAVIS_JOB_NUMBER
+const { getSauceConnectOptions } = require('../../dev-utils/test-config')
+const { isChrome } = require('../../dev-utils/webdriver')
 
 const browserList = [
   {
@@ -58,24 +57,18 @@ const browserList = [
     platform: 'Linux',
     version: '5.0'
   }
-].map(list =>
-  Object.assign({}, list, {
-    'tunnel-identifier': tunnelIdentifier
-  })
-)
+]
+
+const sauceConnectOpts = getSauceConnectOptions()
 
 exports.config = {
   specs: [path.join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
   maxInstancesPerCapability: 3,
   services: ['sauce'],
-  user: process.env.SAUCE_USERNAME,
-  key: process.env.SAUCE_ACCESS_KEY,
+  user: sauceConnectOpts.username,
+  key: sauceConnectOpts.accessKey,
   sauceConnect: true,
-  sauceConnectOpts: {
-    logger: console.log,
-    noSslBumpDomains: 'all',
-    'tunnel-identifier': tunnelIdentifier
-  },
+  sauceConnectOpts,
   capabilities: browserList,
   logLevel: 'silent',
   screenshotPath: path.join(__dirname, 'error-screenshot'),

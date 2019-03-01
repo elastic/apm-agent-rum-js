@@ -23,29 +23,37 @@
  *
  */
 
-const path = require('path')
-const testUtils = require('./test')
-const saucelabs = require('./saucelabs')
+const { join } = require('path')
+const { runKarma, runSauceConnect } = require('./test-utils')
+const {
+  getSauceConnectOptions,
+  getTestEnvironmentVariables
+} = require('./test-config')
 const { generateNotice } = require('./dep-info')
 
-function runUnitTests(launchSauceConnect, directory) {
-  var testConfig = testUtils.getTestEnvironmentVariables()
-  testConfig.karmaConfigFile = path.join(
-    __dirname,
-    '..',
-    directory,
-    './karma.conf.js'
-  )
-  if (launchSauceConnect !== 'false') {
-    return testUtils.runUnitTests(testConfig)
-  } else {
-    testUtils.runKarma(testConfig.karmaConfigFile)
+const sauceConnectOpts = getSauceConnectOptions()
+const { sauceLabs } = getTestEnvironmentVariables()
+
+function runUnitTests(launchSauceConnect = false, directory) {
+  const karmaConfigFile = join(__dirname, '..', directory, './karma.conf.js')
+  if (launchSauceConnect && sauceLabs) {
+    return runSauceConnect(sauceConnectOpts, () => runKarma(karmaConfigFile))
   }
+  runKarma(karmaConfigFile)
+}
+
+function launchSauceConnect() {
+  if (sauceLabs) {
+    return runSauceConnect(sauceConnectOpts, () => {
+      console.log('Launched SauceConnect!')
+    })
+  }
+  console.log('set MODE=saucelabs to launch sauce connect')
 }
 
 function runScript(scripts, scriptName, scriptArgs) {
   if (scriptName) {
-    var message = `Running: ${scriptName}(${scriptArgs
+    const message = `Running: ${scriptName}(${scriptArgs
       .map(a => "'" + a + "'")
       .join(', ')}) \n`
     console.log(message)
@@ -57,15 +65,10 @@ function runScript(scripts, scriptName, scriptArgs) {
   }
 }
 
-var scripts = {
+const scripts = {
   runUnitTests,
-  generateNotice,
-  launchSauceConnect: function launchSauceConnect() {
-    var env = testUtils.getTestEnvironmentVariables()
-    saucelabs.launchSauceConnect(env.sauceLabs, function() {
-      console.log('Launched SauceConnect!')
-    })
-  }
+  launchSauceConnect,
+  generateNotice
 }
 
 runScript(scripts, process.argv[2], [].concat(process.argv).slice(3))

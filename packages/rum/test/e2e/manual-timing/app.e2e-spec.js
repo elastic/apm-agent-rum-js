@@ -23,8 +23,7 @@
  *
  */
 
-const utils = require('../../../../../dev-utils/webdriver')
-const { isChrome } = require('../e2e-utils')
+const { verifyNoBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('manual-timing', function() {
   it('should run manual timing', function() {
@@ -105,8 +104,6 @@ describe('manual-timing', function() {
     expect(transactionPayload.name).toBe('transaction-name')
     expect(transactionPayload.type).toBe('transaction-type')
 
-    if (isChrome()) {
-      return utils.verifyNoBrowserErrors()
-    }
+    return verifyNoBrowserErrors()
   })
 })

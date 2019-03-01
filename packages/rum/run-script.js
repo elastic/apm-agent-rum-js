@@ -24,20 +24,14 @@
  */
 
 const path = require('path')
-const testUtils = require('../../dev-utils/test')
+const JasmineRunner = require('jasmine')
+const express = require('express')
+const serveIndex = require('serve-index')
+const testUtils = require('../../dev-utils/test-utils')
 const { runIntegrationTest } = require('./test/e2e/integration-test')
-const projectDirectory = path.join(__dirname, './')
 const { generateNotice } = require('../../dev-utils/dep-info')
 
-function runUnitTests(launchSauceConnect) {
-  var testConfig = testUtils.getTestEnvironmentVariables()
-  testConfig.karmaConfigFile = path.join(__dirname, './karma.conf.js')
-  if (launchSauceConnect !== 'false') {
-    return testUtils.runUnitTests(testConfig)
-  } else {
-    testUtils.runKarma(testConfig.karmaConfigFile)
-  }
-}
+const PROJECT_DIR = path.join(__dirname, './')
 
 function createBackendAgentServer() {
   const express = require('express')
@@ -82,9 +76,6 @@ function createBackendAgentServer() {
 }
 
 function serveE2e(servingPath, port) {
-  const express = require('express')
-  const serveIndex = require('serve-index')
-
   const app = express()
   var staticPath = path.join(__dirname, servingPath)
 
@@ -104,16 +95,6 @@ function serveE2e(servingPath, port) {
     }
   })
 
-  app.get('/test-config.js', async function(req, res) {
-    var config = testUtils.getConfig()
-    var result = `
-      window.globalConfigs = ${JSON.stringify(config)}
-    `
-    res.setHeader('Content-Type', 'text/javascript')
-    res.setHeader('Content-Length', Buffer.byteLength(result))
-    res.send(result)
-  })
-
   app.use(express.static(staticPath), serveIndex(staticPath, { icons: false }))
   var server = app.listen(port)
 
@@ -123,16 +104,14 @@ function serveE2e(servingPath, port) {
 }
 
 function runJasmine(cb) {
-  var JasmineRunner = require('jasmine')
-  var jrunner = new JasmineRunner()
-
-  var specFiles = ['test/node/*.node-spec.js']
-
-  jrunner.configureDefaultReporter({ showColors: true })
-
-  jrunner.onComplete(function(passed) {
+  const specFiles = ['test/node/*.node-spec.js']
+  const jrunner = new JasmineRunner({
+    projectBaseDir: PROJECT_DIR,
+    specDir: ''
+  })
+  jrunner.onComplete(passed => {
     if (!passed) {
-      var err = new Error('Jasmine node tests failed.')
+      const err = new Error('Jasmine node tests failed.')
       // The stack is not useful in this context.
       err.showStack = false
       cb(err)
@@ -140,12 +119,9 @@ function runJasmine(cb) {
       cb()
     }
   })
-  jrunner.print = function(value) {
-    process.stdout.write(value)
-  }
-  jrunner.addReporter(new JasmineRunner.ConsoleReporter(jrunner))
-  jrunner.projectBaseDir = projectDirectory
-  jrunner.specDir = ''
+
+  jrunner.showColors(true)
+  jrunner.addReporter(JasmineRunner.ConsoleReporter(jrunner))
   jrunner.addSpecFiles(specFiles)
   jrunner.execute()
 }
@@ -155,12 +131,11 @@ function runE2eTests(serve) {
     serveE2e('./', 8000)
   }
 
-  const file = path.join(projectDirectory, 'wdio.conf.js')
+  const file = path.join(PROJECT_DIR, 'wdio.conf.js')
   testUtils.runE2eTests(file, false)
 }
 
 const scripts = {
-  runUnitTests,
   startSelenium: testUtils.startSelenium,
   runE2eTests,
   runNodeTests() {
@@ -183,7 +158,7 @@ const scripts = {
       }
     }
 
-    testUtils.buildE2eBundles(path.join(projectDirectory, basePath), callback)
+    testUtils.buildE2eBundles(path.join(PROJECT_DIR, basePath), callback)
   },
   serveE2e,
   generateNotice

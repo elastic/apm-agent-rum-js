@@ -23,14 +23,48 @@
  *
  */
 
-module.exports = function() {
-  return (
-    window.globalConfigs &&
-    (window.globalConfigs.agentConfig || {
-      serverUrl: 'http://localhost:8200',
-      serviceName: 'test',
-      agentName: 'apm-js-core',
-      agentVersion: '0.0.1'
+function checkDtInfo(payload) {
+  console.log('distributed tracing data', payload)
+  if (typeof payload.traceId !== 'string') {
+    throw new Error('Wrong distributed tracing payload: ')
+  }
+}
+
+function renderTestElement() {
+  const appEl = document.getElementById('app')
+  const testEl = document.createElement('h2')
+  testEl.setAttribute('id', 'test-element')
+  testEl.innerHTML = 'Passed'
+  appEl.appendChild(testEl)
+}
+
+function testXHR(backendUrl, callback = () => {}) {
+  const req = new window.XMLHttpRequest()
+  req.onerror = err => console.log('[XHR Error]', err)
+  req.open('POST', backendUrl + '/data', false)
+  req.addEventListener('load', function() {
+    const payload = JSON.parse(req.responseText)
+    checkDtInfo(payload)
+    callback()
+  })
+
+  req.send()
+}
+
+function testFetch(backendUrl, callback = () => {}) {
+  if ('fetch' in window) {
+    fetch(backendUrl + '/fetch', { method: 'POST' }).then(response => {
+      response.json().then(function(payload) {
+        checkDtInfo(payload)
+        callback()
+      })
     })
-  )
+  }
+}
+
+module.exports = {
+  checkDtInfo,
+  testXHR,
+  testFetch,
+  renderTestElement
 }

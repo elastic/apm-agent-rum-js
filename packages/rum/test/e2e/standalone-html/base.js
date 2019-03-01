@@ -23,24 +23,15 @@
  *
  */
 
-const path = require('path')
-const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
+const { testXHR, renderTestElement } = require('../utils')
+const { getGlobalConfig } = require('../../../../../dev-utils/test-config')
+const { serverUrl, mockBackendUrl } = getGlobalConfig().testConfig
 
-module.exports = {
-  entry: path.resolve(__dirname, './app.js'),
-  output: { path: __dirname, filename: 'app.e2e-bundle.js' },
-  devtool: 'source-map',
-  mode: 'development',
-  module: {
-    rules: [
-      {
-        test: /.js?$/,
-        use: {
-          loader: 'babel-loader'
-        }
-      }
-    ]
-  },
-  plugins: [new EnvironmentPlugin(getWebpackEnv())]
-}
+window.elasticApm.init({
+  serviceName: 'standalone-html',
+  serverUrl,
+  distributedTracingOrigins: [mockBackendUrl],
+  pageLoadTransactionName: '/'
+})
+
+testXHR(mockBackendUrl, renderTestElement)

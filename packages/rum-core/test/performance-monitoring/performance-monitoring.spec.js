@@ -23,17 +23,18 @@
  *
  */
 
-const createServiceFactory = require('..').createServiceFactory
+const { createServiceFactory } = require('../')
 const Transaction = require('../../src/performance-monitoring/transaction')
 const Span = require('../../src/performance-monitoring/span')
-const apmTestConfig = require('../apm-test-config')()
-
+const { getGlobalConfig } = require('../../../../dev-utils/test-config')
 const resourceEntries = require('../fixtures/resource-entries')
 const paintEntries = require('../fixtures/paint-entries')
 const utils = require('../../src/common/utils')
 const { globalState } = require('../../src/common/patching/patch-utils')
 const { SCHEDULE } = require('../../src/common/constants')
 const patchSub = require('../common/patch')
+
+const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
 describe('PerformanceMonitoring', function() {
   var serviceFactory
@@ -46,7 +47,7 @@ describe('PerformanceMonitoring', function() {
     serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
     logger = serviceFactory.getService('LoggingService')
-    configService.setConfig(apmTestConfig)
+    configService.setConfig(agentConfig)
 
     apmServer = serviceFactory.getService('ApmServer')
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')

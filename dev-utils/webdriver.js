@@ -23,7 +23,7 @@
  *
  */
 
-var logLevels = {
+const logLevels = {
   ALL: { value: Number.MIN_VALUE },
   DEBUG: { value: 700 },
   INFO: { value: 800 },
@@ -32,10 +32,22 @@ var logLevels = {
   OFF: { value: Number.MAX_VALUE }
 }
 
-var debugMode = false
-var debugLevel = logLevels.INFO.value
+const debugMode = false
+const debugLevel = logLevels.INFO.value
+
+function isChrome() {
+  const browserName = browser.desiredCapabilities.browserName.toLowerCase()
+  return browserName.indexOf('chrome') !== -1
+}
+
 function assertNoBrowserErrors(whitelist) {
   return new Promise((resolve, reject) => {
+    /**
+     * browser.log API is available only in chrome
+     */
+    if (!isChrome()) {
+      return resolve()
+    }
     // TODO: Bug in ChromeDriver: Need to execute at least one command
     // so that the browser logs can be read out!
     browser.execute('1+1')
@@ -65,16 +77,15 @@ function assertNoBrowserErrors(whitelist) {
     }
 
     if (failureEntries.length > 0) {
-      reject(
+      return reject(
         new Error(
           'Expected no errors in the browserLog but got ' +
             failureEntries.length +
             ' error(s)'
         )
       )
-    } else {
-      resolve()
     }
+    resolve()
   })
 }
 
@@ -93,6 +104,7 @@ function isLogEntryATestFailure(entry, whitelist) {
   }
   return result
 }
+
 module.exports = {
   allowSomeBrowserErrors: function allowSomeBrowserErrors(whitelist, done) {
     if (typeof done === 'function') {
@@ -120,5 +132,6 @@ module.exports = {
       }
       // done()
     }
-  }
+  },
+  isChrome
 }

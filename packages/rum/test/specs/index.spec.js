@@ -23,8 +23,11 @@
  *
  */
 
-var apmBase = require('../../src/index.js').apmBase
-var apmCore = require('elastic-apm-js-core')
+const { apmBase } = require('../../src/')
+const apmCore = require('elastic-apm-js-core')
+const { getGlobalConfig } = require('../../../../dev-utils/test-config')
+
+const { globalConfigs } = getGlobalConfig()
 
 describe('index', function() {
   var originalTimeout
@@ -40,7 +43,7 @@ describe('index', function() {
 
   it('should init ApmBase', function(done) {
     var apmServer = apmBase.serviceFactory.getService('ApmServer')
-    if (window.globalConfigs && window.globalConfigs.useMocks) {
+    if (globalConfigs && globalConfigs.useMocks) {
       apmServer._makeHttpRequest = function() {
         return Promise.resolve()
       }
@@ -59,9 +62,10 @@ describe('index', function() {
         expect(apmServer._postJson).not.toHaveBeenCalled()
       }
     }
+    const { agentConfig } = globalConfigs
     apmBase.init({
-      serverUrl: window.globalConfigs.serverUrl,
-      serviceName: 'apm-agent-js-base-test',
+      serverUrl: agentConfig.serverUrl,
+      serviceName: agentConfig.serviceName,
       flushInterval: 100
     })
 

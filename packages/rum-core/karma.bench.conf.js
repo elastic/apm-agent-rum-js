@@ -23,34 +23,21 @@
  *
  */
 
-var karmaUtils = require('./dev-utils/karma.js')
-var testUtils = require('./dev-utils/test.js')
+const { baseConfig, prepareConfig } = require('../../dev-utils/karma')
+const { getGlobalConfig } = require('../../dev-utils/test-config')
 
 module.exports = function(config) {
-  config.set(karmaUtils.baseConfig)
-  var env = testUtils.getTestEnvironmentVariables()
-  var customConfig = {
-    globalConfigs: {
-      useMocks: false,
-      agentConfig: {
-        serverUrl: 'http://localhost:8200',
-        serviceName: 'test',
-        serviceVersion: 'test-version',
-        agentName: 'apm-js-core',
-        agentVersion: '0.0.1'
-      }
-    },
-    testConfig: env
-  }
+  config.set(baseConfig)
+  const customConfig = getGlobalConfig('rum-core')
 
-  if (env.serverUrl) {
-    customConfig.globalConfigs.agentConfig.serverUrl = env.serverUrl
-  }
-
-  console.log('customConfig:', JSON.stringify(customConfig, undefined, 2))
+  console.log(
+    'Custom test bench config:',
+    JSON.stringify(customConfig, null, 2)
+  )
   config.set(customConfig)
+  const specPattern = 'test/**/*.bench.js'
   config.set({
-    files: ['test/**/*.bench.js'],
+    files: [specPattern],
     frameworks: ['benchmark'],
     reporters: ['benchmark', 'benchmark-json'],
     plugins: [
@@ -61,12 +48,12 @@ module.exports = function(config) {
       'karma-benchmark-json-reporter'
     ],
     preprocessors: {
-      'test/**/*.bench.js': ['webpack', 'sourcemap']
+      specPattern: ['webpack', 'sourcemap']
     },
     benchmarkJsonReporter: {
       pathToJson: 'reports/benchmark-results.json',
       formatOutput(results) {
-        var summary = results.map(r => {
+        const summary = results.map(r => {
           return { name: `${r.suite}.${r.name}`, mean: r.mean, hz: r.hz }
         })
         console.log(JSON.stringify(summary, undefined, 2))
@@ -74,10 +61,7 @@ module.exports = function(config) {
       }
     }
   })
-  var cfg = karmaUtils.prepareConfig(config)
-  cfg.preprocessors = {
-    'test/**/*.bench.js': ['webpack', 'sourcemap']
-  }
+  const cfg = prepareConfig(config)
   cfg.browsers = ['ChromeHeadless']
   config.set(cfg)
 }
