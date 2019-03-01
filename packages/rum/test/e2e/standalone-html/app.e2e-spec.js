@@ -23,8 +23,7 @@
  *
  */
 
-var utils = require('../../../../../dev-utils/webdriver')
-const { isChrome } = require('../e2e-utils')
+const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('standalone-html', function() {
   it('should run the usecase', function() {
@@ -39,9 +38,7 @@ describe('standalone-html', function() {
       'expected element #test-element'
     )
 
-    if (isChrome()) {
-      return utils.allowSomeBrowserErrors(['timeout test error with a secret'])
-    }
+    return allowSomeBrowserErrors(['timeout test error with a secret'])
   })
 
   it('should run the opentracing use-case', function() {
@@ -56,8 +53,6 @@ describe('standalone-html', function() {
       'expected element #test-element'
     )
 
-    if (isChrome()) {
-      return utils.allowSomeBrowserErrors(['timeout test error with a secret'])
-    }
+    return allowSomeBrowserErrors(['timeout test error with a secret'])
   })
 })

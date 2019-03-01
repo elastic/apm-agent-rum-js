@@ -23,7 +23,8 @@
  *
  */
 
-var createServiceFactory = require('..').createServiceFactory
+const { createServiceFactory } = require('../src')
+
 module.exports = {
   createServiceFactory() {
     var serviceFactory = createServiceFactory()

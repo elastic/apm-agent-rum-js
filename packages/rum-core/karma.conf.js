@@ -23,31 +23,14 @@
  *
  */
 
-const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
-const { getTestEnvironmentVariables } = require('../../dev-utils/test.js')
+const { baseConfig, prepareConfig } = require('../../dev-utils/karma')
+const { getGlobalConfig } = require('../../dev-utils/test-config')
 
 module.exports = function(config) {
   config.set(baseConfig)
-  const env = getTestEnvironmentVariables()
-  const customConfig = {
-    globalConfigs: {
-      useMocks: false,
-      agentConfig: {
-        serverUrl: 'http://localhost:8200',
-        serviceName: 'test',
-        serviceVersion: 'test-version',
-        agentName: 'apm-js-core',
-        agentVersion: '0.0.1'
-      }
-    },
-    testConfig: env
-  }
+  const customConfig = getGlobalConfig('rum-core')
 
-  if (env.serverUrl) {
-    customConfig.globalConfigs.agentConfig.serverUrl = env.serverUrl
-  }
-
-  console.log('customConfig:', JSON.stringify(customConfig, undefined, 2))
+  console.log('Custom Test Config:', JSON.stringify(customConfig, null, 2))
   config.set(customConfig)
   config.files.unshift('test/utils/polyfill.js')
   /**
@@ -56,9 +39,8 @@ module.exports = function(config) {
   config.files.unshift(
     '../../node_modules/es6-promise/dist/es6-promise.auto.js'
   )
-  // config.files.push({ pattern: 'test/exceptions/data/*.js', included: false, watched: false })
   config.files.push({ pattern: 'src/**/*.js', included: false, watched: true })
 
-  var cfg = prepareConfig(config)
+  const cfg = prepareConfig(config)
   config.set(cfg)
 }

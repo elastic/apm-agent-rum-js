@@ -23,8 +23,7 @@
  *
  */
 
-const utils = require('../../../../../dev-utils/webdriver')
-const { isChrome } = require('../e2e-utils')
+const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('general-usercase', function() {
   it('should run the general usecase', function() {
@@ -111,8 +110,6 @@ describe('general-usercase', function() {
     })
     expect(span).toBeDefined()
 
-    if (isChrome()) {
-      return utils.allowSomeBrowserErrors(['timeout test error with a secret'])
-    }
+    return allowSomeBrowserErrors(['timeout test error with a secret'])
   })
 })

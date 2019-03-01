@@ -23,27 +23,26 @@
  *
  */
 
-var createApmBase = require('../e2e')
+const createApmBase = require('../')
+const { renderTestElement, testXHR, testFetch } = require('../utils')
+const { createTracer } = require('../../../src/opentracing')
+const { getGlobalConfig } = require('../../../../../dev-utils/test-config')
 
-var active = Math.random() < 1
-var serverUrl = 'http://localhost:8003'
-
-var elasticApm = createApmBase({
+const { mockBackendUrl } = getGlobalConfig().testConfig
+const active = Math.random() < 1
+const elasticApm = createApmBase({
   active,
   debug: true,
   serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
   serviceVersion: '0.0.1',
-  distributedTracingOrigins: [serverUrl],
+  distributedTracingOrigins: [mockBackendUrl],
   pageLoadTraceId: '286ac3ad697892c406528f13c82e0ce1',
   pageLoadSpanId: 'bbd8bcc3be14d814',
   pageLoadSampled: true
 })
 
-const { createTracer } = require('../../../src/opentracing')
-var tracer = createTracer(elasticApm)
-
-var otSpan = tracer.startSpan('OpenTracing span')
-
+const tracer = createTracer(elasticApm)
+const otSpan = tracer.startSpan('OpenTracing span')
 otSpan.finish(Date.now() + 200)
 
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
@@ -91,46 +90,18 @@ setTimeout(function() {
   generateError()
 }, 100)
 
-var url = '/test/e2e/common/data.json?test=hamid'
-var req = new window.XMLHttpRequest()
+const url = '/test/e2e/common/data.json?test=hamid'
+const req = new window.XMLHttpRequest()
 req.open('GET', url, false)
-
 req.addEventListener('load', function() {
   console.log('got data!')
 })
-
 req.send()
 
-function checkDtInfo(payload) {
-  console.log('distributed tracing data', payload)
-  if (typeof payload.traceId !== 'string') {
-    throw new Error('Wrong distributed tracing payload: ' + req.responseText)
-  }
-}
-
-req = new window.XMLHttpRequest()
-req.open('POST', serverUrl + '/data', false)
-req.addEventListener('load', function() {
-  var payload = JSON.parse(req.responseText)
-  checkDtInfo(payload)
-})
-req.onerror = function(err) {
-  console.log('XHR Error', err)
-}
-req.send()
-
-if ('fetch' in window) {
-  fetch(serverUrl + '/fetch', { method: 'POST' }).then(function(response) {
-    response.json().then(function(payload) {
-      checkDtInfo(payload)
-    })
-  })
-}
+testXHR(mockBackendUrl)
 
 generateError.tmp = 'tmp'
 
-var appEl = document.getElementById('app')
-var testEl = document.createElement('h2')
-testEl.setAttribute('id', 'test-element')
-testEl.innerHTML = 'Passed'
-appEl.appendChild(testEl)
+testFetch(mockBackendUrl)
+
+renderTestElement()

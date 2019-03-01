@@ -23,38 +23,19 @@
  *
  */
 
-function launchSauceConnect(userConfig, done) {
-  var sauceConnectLauncher = require('sauce-connect-launcher')
+const { testXHR, renderTestElement } = require('../utils')
+const { getGlobalConfig } = require('../../../../../dev-utils/test-config')
+const { serverUrl, mockBackendUrl } = getGlobalConfig().testConfig
 
-  var config = {
-    username: userConfig && (userConfig.username || process.env.SAUCE_USERNAME),
-    accessKey:
-      userConfig && (userConfig.accessKey || process.env.SAUCE_ACCESS_KEY),
-    logger: console.log,
-    noSslBumpDomains: 'all'
-  }
+window.elasticApm.init({
+  serviceName: 'standalone-html',
+  serverUrl,
+  distributedTracingOrigins: [mockBackendUrl],
+  pageLoadTransactionName: '/'
+})
 
-  var tryConnect = function(maxAttempts, currAttempts, done) {
-    sauceConnectLauncher(config, function(err) {
-      if (err) {
-        console.error(err.message)
-        if (currAttempts <= maxAttempts) {
-          console.log(
-            'Retrying... (attempt ' + currAttempts + ' of ' + maxAttempts + ')'
-          )
-          tryConnect(maxAttempts, ++currAttempts, done)
-        } else {
-          return process.exit(1)
-        }
-      } else {
-        console.log('Sauce Connect ready')
-        done()
-      }
-    })
-  }
+const tracer = window.elasticApm.createTracer()
+const span = tracer.startSpan('Opentracing span')
+span.finish(Date.now() + 100)
 
-  tryConnect(3, 1, done)
-}
-module.exports = {
-  launchSauceConnect
-}
+testXHR(mockBackendUrl, renderTestElement)

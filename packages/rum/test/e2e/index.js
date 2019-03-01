@@ -23,9 +23,24 @@
  *
  */
 
-function isChrome() {
-  const browserName = browser.desiredCapabilities.browserName.toLowerCase()
-  return browserName.indexOf('chrome') !== -1
+const elasticApm = require('../../')
+const { getGlobalConfig } = require('../../../../dev-utils/test-config')
+const ApmServerMock = require('../../../rum-core/test/utils/apm-server-mock')
+
+const apmBase = elasticApm.apmBase
+const { globalConfigs } = getGlobalConfig()
+
+function createApmBase(config) {
+  console.log('E2E Global Configs', JSON.stringify(globalConfigs, null, 2))
+  const apmServer = apmBase.serviceFactory.getService('ApmServer')
+  const { serverUrl } = globalConfigs.agentConfig
+  if (serverUrl) {
+    config.serverUrl = serverUrl
+  }
+  const serverMock = new ApmServerMock(apmServer, globalConfigs.useMocks)
+  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
+
+  return elasticApm.init(config)
 }
 
-module.exports = { isChrome }
+module.exports = createApmBase

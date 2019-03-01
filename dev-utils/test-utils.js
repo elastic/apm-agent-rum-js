@@ -25,48 +25,10 @@
 
 const path = require('path')
 const fs = require('fs')
-const karmaUtils = require('./karma')
-const saucelabsUtils = require('./saucelabs')
-
-function runKarma(configFile) {
-  function karmaCallback(exitCode) {
-    if (exitCode) {
-      return process.exit(exitCode)
-    } else {
-      console.log('Karma finished.')
-      return process.exit(0)
-    }
-  }
-  karmaUtils.singleRunKarma(configFile, karmaCallback)
-}
-
-function runUnitTests(testConfig) {
-  if (testConfig.sauceLabs) {
-    saucelabsUtils.launchSauceConnect(
-      testConfig.sauceLabs,
-      runKarma.bind(this, testConfig.karmaConfigFile)
-    )
-  } else {
-    runKarma(testConfig.karmaConfigFile)
-  }
-}
-
-function getTestEnvironmentVariables() {
-  var envVars = {
-    branch: process.env.TRAVIS_BRANCH,
-    mode: process.env.MODE,
-    sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
-    isTravis: process.env.TRAVIS,
-    serverUrl: process.env.APM_SERVER_URL
-  }
-  if (envVars.sauceLabs) {
-    envVars.sauceLabs = {
-      username: process.env.SAUCE_USERNAME,
-      accessKey: process.env.SAUCE_ACCESS_KEY
-    }
-  }
-  return envVars
-}
+const webpack = require('webpack')
+const { Launcher } = require('webdriverio')
+const sauceConnectLauncher = require('sauce-connect-launcher')
+const { singleRunKarma } = require('./karma')
 
 function walkSync(dir, filter, filelist) {
   var files = fs.readdirSync(dir)
@@ -99,7 +61,6 @@ function buildE2eBundles(basePath, callback) {
       }
     }
 
-  var webpack = require('webpack')
   var fileList = walkSync(basePath, /webpack\.config\.js$/)
   fileList = fileList.map(function(file) {
     return path.relative(__dirname, file)
@@ -125,8 +86,8 @@ function buildE2eBundles(basePath, callback) {
     }
     if (stats.hasErrors()) console.log('There were errors while building')
 
-    var jsonStats = stats.toJson()
-    console.log(stats.toString())
+    const jsonStats = stats.toJson('minimal')
+    console.log(stats.toString('minimal'))
     if (jsonStats.errors.length > 0) {
       jsonStats.errors.forEach(function(error) {
         console.log('Error:', error)
@@ -199,10 +160,30 @@ function startSelenium(callback, manualStop) {
   )
 }
 
+function runSauceConnect(config, callback) {
+  return sauceConnectLauncher(config, err => {
+    if (err) {
+      console.error('Sauce connect Error', err)
+      return process.exit(1)
+    } else {
+      console.log('Sauce connect ready')
+      callback()
+    }
+  })
+}
+
+function runKarma(configFile) {
+  singleRunKarma(configFile, exitCode => {
+    if (exitCode) {
+      return process.exit(exitCode)
+    }
+    console.log('Karma finished.')
+    return process.exit(0)
+  })
+}
+
 function runE2eTests(configFilePath, runSelenium) {
-  // npm i -D selenium-standalone webdriverio wdio-jasmine-framework
-  var Launcher = require('webdriverio').Launcher
-  var wdio = new Launcher(configFilePath)
+  const wdio = new Launcher(configFilePath)
   function runWdio() {
     wdio.run().then(
       function(code) {
@@ -225,36 +206,11 @@ function runE2eTests(configFilePath, runSelenium) {
   }
 }
 
-function getConfig() {
-  const env = getTestEnvironmentVariables()
-  let serverUrl = 'http://localhost:8200'
-  if (env.serverUrl) {
-    serverUrl = env.serverUrl
-  }
-
-  const config = {
-    agentConfig: {
-      serverUrl,
-      serviceName: 'apm-agent-js-base/test'
-    },
-    useMocks: false,
-    mockApmServer: false,
-    serverUrl,
-    env
-  }
-  // if (env.sauceLabs) {
-  //   config.useMocks = true
-  // }
-  return config
-}
-
 module.exports = {
-  runUnitTests,
+  buildE2eBundles,
   runE2eTests,
   runKarma,
-  getTestEnvironmentVariables,
-  getConfig,
-  buildE2eBundles,
+  runSauceConnect,
   startSelenium,
   dirWalkSync: walkSync
 }

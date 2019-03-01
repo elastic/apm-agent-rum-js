@@ -23,8 +23,9 @@
  *
  */
 
-var createServiceFactory = require('..').createServiceFactory
-var apmTestConfig = require('../apm-test-config')()
+const { createServiceFactory } = require('../')
+const { getGlobalConfig } = require('../../../../dev-utils/test-config')
+const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
 describe('ErrorLogging', function() {
   var testErrorMessage = 'errorevent_test_error_message'
@@ -35,7 +36,7 @@ describe('ErrorLogging', function() {
   beforeEach(function() {
     var serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
-    configService.setConfig(apmTestConfig)
+    configService.setConfig(agentConfig)
     apmServer = serviceFactory.getService('ApmServer')
     errorLogging = serviceFactory.getService('ErrorLogging')
     transactionService = serviceFactory.getService('TransactionService')

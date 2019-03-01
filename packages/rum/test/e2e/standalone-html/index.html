@@ -9,41 +9,6 @@
   <body>
     <div id="app"></div>
     <script src="/dist/bundles/elastic-apm-js-base.umd.min.js"></script>
-    <script>
-      var serverUrl = 'http://localhost:8003',
-        apmServerUrl = 'http://localhost:8001'
-        
-      elasticApm.init({
-        serviceName: 'standalone-html',
-        serverUrl: apmServerUrl,
-        distributedTracingOrigins: [serverUrl],
-        pageLoadTransactionName: '/'
-      })
-
-      function checkDtInfo(payload) {
-        console.log('distributed tracing data', payload)
-        if (typeof payload.traceId !== 'string') {
-          throw new Error('Wrong distributed tracing payload: ')
-        }
-      }
-
-      req = new window.XMLHttpRequest()
-      req.onerror = function(err) {
-        console.log('[XHR Error]', err)
-      }
-      req.open('POST', serverUrl + '/data', false)
-      req.addEventListener('load', function() {
-        var payload = JSON.parse(req.responseText)
-        checkDtInfo(payload)
-
-        var appEl = document.getElementById('app')
-        var testEl = document.createElement('h2')
-        testEl.setAttribute('id', 'test-element')
-        testEl.innerHTML = 'Passed'
-        appEl.appendChild(testEl)
-      })
-
-      req.send()
-    </script>
+    <script src="/test/e2e/standalone-html/base.e2e-bundle.js"></script>
   </body>
 </html>

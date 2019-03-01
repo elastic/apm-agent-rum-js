@@ -23,8 +23,9 @@
  *
  */
 
-var createApmBase = require('../e2e')
-var elasticApm = createApmBase({
+const createApmBase = require('../')
+const { renderTestElement } = require('../utils')
+const elasticApm = createApmBase({
   debug: true,
   serverUrl: 'http://localhost:8200',
   serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
@@ -51,8 +52,4 @@ setTimeout(function() {
 
 generateError.tmp = 'tmp'
 
-var appEl = document.getElementById('app')
-var testEl = document.createElement('h2')
-testEl.setAttribute('id', 'test-element')
-testEl.innerHTML = 'Passed'
-appEl.appendChild(testEl)
+renderTestElement()

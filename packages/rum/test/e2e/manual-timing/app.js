@@ -23,14 +23,15 @@
  *
  */
 
-var createApmBase = require('../e2e')
-var apm = createApmBase({
+const createApmBase = require('../')
+const { renderTestElement } = require('../utils')
+const apm = createApmBase({
   serviceName: 'manual-timing',
   sendPageLoadTransaction: false,
   operationMode: 'manual'
 })
 
-var transaction = apm.startTransaction('transaction-name', 'transaction-type')
+const transaction = apm.startTransaction('transaction-name', 'transaction-type')
 transaction.addTask('load-event')
 window.addEventListener('load', function() {
   transaction.mark('load-event')
@@ -40,13 +41,9 @@ window.addEventListener('load', function() {
   })
 })
 
-var span = transaction.startSpan('span-name', 'span-type')
+const span = transaction.startSpan('span-name', 'span-type')
 
-var appEl = document.getElementById('app')
-var testEl = document.createElement('h2')
-testEl.setAttribute('id', 'test-element')
-testEl.innerHTML = 'Passed'
-appEl.appendChild(testEl)
+renderTestElement()
 
 span.end()
 

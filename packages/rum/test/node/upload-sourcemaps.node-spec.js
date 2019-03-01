@@ -23,13 +23,15 @@
  *
  */
 
-var path = require('path')
-var request = require('request')
-var fs = require('fs')
+const path = require('path')
+const request = require('request')
+const fs = require('fs')
+const {
+  getTestEnvironmentVariables
+} = require('../../../../dev-utils/test-config')
 
-var basePath = path.join(__dirname, '../e2e')
-const { getConfig } = require('../../../../dev-utils/test')
-const testConfig = getConfig()
+const basePath = path.join(__dirname, '../e2e')
+const { serverUrl } = getTestEnvironmentVariables()
 
 describe('Sourcemaps', function() {
   it('should upload sourcemaps', function(done) {
@@ -48,7 +50,7 @@ describe('Sourcemaps', function() {
 
     request.post(
       {
-        url: testConfig.serverUrl + '/v1/rum/sourcemaps',
+        url: serverUrl + '/v1/rum/sourcemaps',
         formData
       },
       function(err, resp, body) {
