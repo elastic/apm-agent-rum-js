@@ -34,9 +34,9 @@ const { generateNotice } = require('./dep-info')
 const sauceConnectOpts = getSauceConnectOptions()
 const { sauceLabs } = getTestEnvironmentVariables()
 
-function runUnitTests(launchSauceConnect = false, directory) {
+function runUnitTests(launchSauceConnect = 'false', directory) {
   const karmaConfigFile = join(__dirname, '..', directory, './karma.conf.js')
-  if (launchSauceConnect && sauceLabs) {
+  if (launchSauceConnect === 'true' && sauceLabs) {
     return runSauceConnect(sauceConnectOpts, () => runKarma(karmaConfigFile))
   }
   runKarma(karmaConfigFile)
@@ -51,10 +51,17 @@ function launchSauceConnect() {
   console.log('set MODE=saucelabs to launch sauce connect')
 }
 
-function runScript(scripts, scriptName, scriptArgs) {
+const scripts = {
+  runUnitTests,
+  launchSauceConnect,
+  generateNotice
+}
+
+function runScript() {
+  const [, , scriptName, ...scriptArgs] = process.argv
   if (scriptName) {
-    const message = `Running: ${scriptName}(${scriptArgs
-      .map(a => "'" + a + "'")
+    var message = `Running: ${scriptName}(${scriptArgs
+      .map(a => a.trim())
       .join(', ')}) \n`
     console.log(message)
     if (typeof scripts[scriptName] === 'function') {
@@ -65,10 +72,4 @@ function runScript(scripts, scriptName, scriptArgs) {
   }
 }
 
-const scripts = {
-  runUnitTests,
-  launchSauceConnect,
-  generateNotice
-}
-
-runScript(scripts, process.argv[2], [].concat(process.argv).slice(3))
+runScript()

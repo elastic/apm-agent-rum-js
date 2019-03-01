@@ -61,7 +61,7 @@ exports.config = {
   services: ['sauce'],
   user: sauceConnectOpts.username,
   key: sauceConnectOpts.accessKey,
-  sauceConnect: true,
+  sauceConnect: false,
   sauceConnectOpts,
   capabilities: browserList,
   logLevel: 'silent',

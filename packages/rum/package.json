@@ -17,11 +17,12 @@
     "karma:coverage": "karma start --coverage",
     "script": "node ./run-script.js",
     "serve": "npm run script serveE2e ./ 8000",
-    "test:unit": "node ../../dev-utils/run-script.js runUnitTests true packages/rum",
     "test:integration": "npm run script runNodeTests",
-    "test:e2e": "npm run script runE2eTests",
-    "test:e2e:failsafe": "npm run script runE2eFailsafeTests",
-    "test": "npm run test:e2e && npm run test:e2e:failsafe"
+    "test:unit": "node ../../dev-utils/run-script.js runUnitTests false packages/rum",
+    "test:e2e:supported": "npm run script runE2eTests wdio.conf.js",
+    "test:e2e:failsafe": "npm run script runE2eTests wdio-failsafe.conf.js",
+    "test:sauce": "npm run script runSauceTests",
+    "test": "npm-run-all build build:e2e test:integration test:sauce"
   },
   "files": [
     "src",
