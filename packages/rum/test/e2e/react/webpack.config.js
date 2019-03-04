@@ -37,22 +37,7 @@ module.exports = {
       {
         test: /.jsx?$/,
         use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                {
-                  targets: {
-                    ie: '10'
-                  },
-                  loose: true,
-                  useBuiltIns: false
-                }
-              ]
-            ],
-            plugins: ['@babel/plugin-transform-destructuring']
-          }
+          loader: 'babel-loader'
         }
       }
     ]
