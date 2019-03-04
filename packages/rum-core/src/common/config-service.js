@@ -23,7 +23,7 @@
  *
  */
 
-const { getCurrentScript, sanitizeString, setTag, merge } = require('./utils')
+const { getCurrentScript, setTag, merge } = require('./utils')
 const Subscription = require('../common/subscription')
 const constants = require('./constants')
 
@@ -177,23 +177,17 @@ class Config {
 
   setUserContext(userContext) {
     var context = {}
-    if (typeof userContext.id === 'number') {
+    if (
+      typeof userContext.id === 'number' ||
+      typeof userContext.id === 'string'
+    ) {
       context.id = userContext.id
     }
-    if (typeof userContext.id === 'string') {
-      context.id = sanitizeString(userContext.id, this.get('serverStringLimit'))
-    }
     if (typeof userContext.username === 'string') {
-      context.username = sanitizeString(
-        userContext.username,
-        this.get('serverStringLimit')
-      )
+      context.username = userContext.username
     }
     if (typeof userContext.email === 'string') {
-      context.email = sanitizeString(
-        userContext.email,
-        this.get('serverStringLimit')
-      )
+      context.email = userContext.email
     }
     this.set('context.user', context)
   }

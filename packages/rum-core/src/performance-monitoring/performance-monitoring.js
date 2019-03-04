@@ -24,8 +24,6 @@
  */
 
 const {
-  sanitizeObjectStrings,
-  sanitizeString,
   checkSameOrigin,
   isDtHeaderValid,
   getDtHeaderValue,
@@ -41,6 +39,7 @@ const {
   XMLHTTPREQUEST_SOURCE,
   FETCH_SOURCE
 } = require('../common/constants')
+const { truncateSpan } = require('../common/truncate')
 
 class PerformanceMonitoring {
   constructor(apmServer, configService, loggingService, transactionService) {
@@ -251,32 +250,30 @@ class PerformanceMonitoring {
     const transactionStart = transaction._start
 
     const spans = transaction.spans.map(function(span) {
-      let context
-      if (span.context) {
-        context = sanitizeObjectStrings(span.context, stringLimit)
-      }
-      return {
+      const spanModel = {
         id: span.id,
         transaction_id: transaction.id,
         parent_id: span.parentId || transaction.id,
         trace_id: transaction.traceId,
-        name: sanitizeString(span.name, stringLimit, true),
-        type: sanitizeString(span.type, stringLimit, true),
-        subType: sanitizeString(span.subType, stringLimit, true),
-        action: sanitizeString(span.action, stringLimit, true),
+        name: span.name,
+        type: span.type,
+        subType: span.subType,
+        action: span.action,
         sync: span.sync,
         start: span._start - transactionStart,
         duration: span.duration(),
-        context
+        context: span.context
       }
+      return truncateSpan(spanModel, { stringLimit })
     })
 
     var context = merge({}, configContext, transaction.context)
-    return {
+
+    const transactionModel = {
       id: transaction.id,
       trace_id: transaction.traceId,
-      name: sanitizeString(transaction.name, stringLimit, false),
-      type: sanitizeString(transaction.type, stringLimit, true),
+      name: transaction.name,
+      type: transaction.type,
       duration: transaction.duration(),
       spans,
       context,
@@ -286,6 +283,7 @@ class PerformanceMonitoring {
       },
       sampled: transaction.sampled
     }
+    return truncateSpan(transactionModel, { stringLimit })
   }
 
   createTransactionPayload(transaction) {

@@ -23,9 +23,9 @@
  *
  */
 
-var StackTraceService = require('./stack-trace-service')
-
-var utils = require('../common/utils')
+const StackTraceService = require('./stack-trace-service')
+const utils = require('../common/utils')
+const { truncate } = require('../common/truncate')
 
 class ErrorLogging {
   constructor(apmServer, configService, loggingService, transactionService) {
@@ -89,11 +89,11 @@ class ErrorLogging {
 
     var errorObject = {
       id: utils.generateRandomId(),
-      culprit: utils.sanitizeString(culprit),
+      culprit: truncate(culprit),
       exception: {
-        message: utils.sanitizeString(message, undefined, true),
+        message: truncate(message, undefined, true),
         stacktrace: frames,
-        type: utils.sanitizeString(errorType, stringLimit, false)
+        type: truncate(errorType, stringLimit, false)
       },
       context
     }

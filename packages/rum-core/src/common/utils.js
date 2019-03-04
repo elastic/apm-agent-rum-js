@@ -23,7 +23,6 @@
  *
  */
 
-const { serverStringLimit } = require('./constants')
 const Url = require('../common/url')
 const rng = require('uuid/lib/rng-browser')
 
@@ -135,47 +134,13 @@ function isPlatformSupported() {
   )
 }
 
-function sanitizeString(
-  value,
-  limit = serverStringLimit,
-  required = false,
-  placeholder = 'NA'
-) {
-  if (typeof value === 'number') {
-    value = String(value)
-  }
-  if (required && !value) {
-    value = placeholder
-  }
-  if (value) {
-    return String(value).substr(0, limit)
-  } else {
-    return value
-  }
-}
-
 function setTag(key, value, obj) {
   if (!obj || !key) return
   var skey = removeInvalidChars(key)
-  obj[skey] = sanitizeString(value, serverStringLimit)
-  return obj
-}
-
-function sanitizeObjectStrings(obj, limit, required, placeholder) {
-  if (!obj) return obj
-  if (typeof obj === 'string') {
-    return sanitizeString(obj, limit, required, placeholder)
+  if (typeof value === 'object') {
+    value = String(value)
   }
-  var keys = Object.keys(obj)
-  keys.forEach(function(k) {
-    var value = obj[k]
-    if (typeof value === 'string') {
-      value = sanitizeString(obj[k], limit, required, placeholder)
-    } else if (typeof value === 'object') {
-      value = sanitizeObjectStrings(value, limit, required, placeholder)
-    }
-    obj[k] = value
-  })
+  obj[skey] = value
   return obj
 }
 
@@ -374,8 +339,6 @@ module.exports = {
   generateRandomId,
   rng,
   checkSameOrigin,
-  sanitizeString,
-  sanitizeObjectStrings,
   setTag,
   stripQueryStringFromUrl,
   find,

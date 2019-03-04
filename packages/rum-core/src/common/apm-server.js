@@ -25,9 +25,9 @@
 
 const Queue = require('./queue')
 const throttle = require('./throttle')
-const { sanitizeString } = require('./utils')
 const NDJSON = require('./ndjson')
 const { XHR_IGNORE } = require('./patching/patch-utils')
+const { truncateMetadata } = require('./truncate')
 
 class ApmServer {
   constructor(configService, loggingService) {
@@ -57,23 +57,22 @@ class ApmServer {
     this.initTransactionQueue()
   }
 
-  createServiceObject() {
+  createMetaData() {
     const cfg = this._configService
     const stringLimit = cfg.get('serverStringLimit')
-
-    const serviceObject = {
-      name: sanitizeString(cfg.get('serviceName'), stringLimit, true),
-      version: sanitizeString(cfg.get('serviceVersion'), stringLimit),
+    const service = {
+      name: cfg.get('serviceName'),
+      version: cfg.get('serviceVersion'),
       agent: {
-        name: sanitizeString(cfg.get('agentName'), stringLimit),
-        version: sanitizeString(cfg.get('agentVersion'), stringLimit)
+        name: cfg.get('agentName'),
+        version: cfg.get('agentVersion')
       },
       language: {
         name: 'javascript'
       },
-      environment: sanitizeString(cfg.get('environment'), stringLimit)
+      environment: cfg.get('environment')
     }
-    return serviceObject
+    return truncateMetadata({ service }, { stringLimit })
   }
 
   _postJson(endPoint, payload) {
@@ -213,10 +212,8 @@ class ApmServer {
   sendErrors(errors) {
     if (this._configService.isValid() && this._configService.isActive()) {
       if (errors && errors.length > 0) {
-        const payload = {
-          service: this.createServiceObject(),
-          errors
-        }
+        const { service } = this.createMetaData()
+        const payload = { service, errors }
         const filteredPayload = this._configService.applyFilters(payload)
         if (filteredPayload) {
           const endPoint = this._configService.getEndpointUrl('errors')
@@ -255,10 +252,8 @@ class ApmServer {
   sendTransactions(transactions) {
     if (this._configService.isValid() && this._configService.isActive()) {
       if (transactions && transactions.length > 0) {
-        const payload = {
-          service: this.createServiceObject(),
-          transactions
-        }
+        const { service } = this.createMetaData()
+        const payload = { service, transactions }
         const filteredPayload = this._configService.applyFilters(payload)
         if (filteredPayload) {
           const endPoint = this._configService.getEndpointUrl('transactions')
