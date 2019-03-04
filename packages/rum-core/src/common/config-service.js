@@ -68,6 +68,7 @@ class Config {
     this.defaults = {
       serviceName: '',
       serviceVersion: '',
+      environment: '',
       agentName: 'js-base',
       agentVersion: '%%agent-version%%',
       serverUrl: 'http://localhost:8200',

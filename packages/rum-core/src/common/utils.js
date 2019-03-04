@@ -23,10 +23,11 @@
  *
  */
 
-const constants = require('./constants')
-const slice = [].slice
+const { serverStringLimit } = require('./constants')
 const Url = require('../common/url')
 const rng = require('uuid/lib/rng-browser')
+
+const slice = [].slice
 
 function isCORSSupported() {
   var xhr = new window.XMLHttpRequest()
@@ -134,12 +135,17 @@ function isPlatformSupported() {
   )
 }
 
-function sanitizeString(value, limit, required, placeholder) {
+function sanitizeString(
+  value,
+  limit = serverStringLimit,
+  required = false,
+  placeholder = 'NA'
+) {
   if (typeof value === 'number') {
     value = String(value)
   }
   if (required && !value) {
-    value = placeholder || 'NA'
+    value = placeholder
   }
   if (value) {
     return String(value).substr(0, limit)
@@ -151,7 +157,7 @@ function sanitizeString(value, limit, required, placeholder) {
 function setTag(key, value, obj) {
   if (!obj || !key) return
   var skey = removeInvalidChars(key)
-  obj[skey] = sanitizeString(value, constants.serverStringLimit)
+  obj[skey] = sanitizeString(value, serverStringLimit)
   return obj
 }
 
