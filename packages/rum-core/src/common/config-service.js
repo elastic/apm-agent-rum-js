@@ -23,15 +23,8 @@
  *
  */
 
-import {
-  getCurrentScript,
-  sanitizeString,
-  setTag,
-  merge,
-  getDtHeaderValue
-} from './utils'
+import { getCurrentScript, setTag, merge, getDtHeaderValue } from './utils'
 import Subscription from '../common/subscription'
-import { serverStringLimit } from './constants'
 
 function getConfigFromScript() {
   var script = getCurrentScript()
@@ -99,8 +92,6 @@ class Config {
       flushInterval: 500,
 
       sendPageLoadTransaction: true,
-
-      serverStringLimit,
 
       distributedTracing: true,
       distributedTracingOrigins: [],
@@ -190,19 +181,15 @@ class Config {
   setUserContext(userContext = {}) {
     const context = {}
     const { id, username, email } = userContext
-    const serverStringLimit = this.get('serverStringLimit')
 
-    if (typeof id === 'number') {
+    if (typeof id === 'number' || typeof id === 'string') {
       context.id = id
     }
-    if (typeof id === 'string') {
-      context.id = sanitizeString(id, serverStringLimit)
-    }
     if (typeof username === 'string') {
-      context.username = sanitizeString(username, serverStringLimit)
+      context.username = username
     }
     if (typeof email === 'string') {
-      context.email = sanitizeString(email, serverStringLimit)
+      context.email = email
     }
     this.set('context.user', context)
   }

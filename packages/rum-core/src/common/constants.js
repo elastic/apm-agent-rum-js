@@ -64,7 +64,7 @@ const SPAN_THRESHOLD = 5 * 60 * 1000
 /**
  * Others
  */
-const serverStringLimit = 1024
+const KEYWORD_LIMIT = 1024
 
 export {
   SCHEDULE,
@@ -76,5 +76,5 @@ export {
   REMOVE_EVENT_LISTENER_STR,
   RESOURCE_INITIATOR_TYPES,
   SPAN_THRESHOLD,
-  serverStringLimit
+  KEYWORD_LIMIT
 }

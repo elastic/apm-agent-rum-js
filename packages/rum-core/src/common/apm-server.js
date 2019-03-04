@@ -25,7 +25,7 @@
 
 import Queue from './queue'
 import throttle from './throttle'
-import { sanitizeString } from './utils'
+import { truncateMetadata } from './truncate'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 
@@ -60,23 +60,21 @@ class ApmServer {
     this.initTransactionQueue()
   }
 
-  createServiceObject() {
+  createMetaData() {
     const cfg = this._configService
-    const stringLimit = cfg.get('serverStringLimit')
-
-    const serviceObject = {
-      name: sanitizeString(cfg.get('serviceName'), stringLimit, true),
-      version: sanitizeString(cfg.get('serviceVersion'), stringLimit),
+    const service = {
+      name: cfg.get('serviceName'),
+      version: cfg.get('serviceVersion'),
       agent: {
         name: 'js-base',
-        version: sanitizeString(cfg.version, stringLimit)
+        version: cfg.version
       },
       language: {
         name: 'javascript'
       },
-      environment: sanitizeString(cfg.get('environment'), stringLimit)
+      environment: cfg.get('environment')
     }
-    return serviceObject
+    return truncateMetadata({ service })
   }
 
   _postJson(endPoint, payload) {

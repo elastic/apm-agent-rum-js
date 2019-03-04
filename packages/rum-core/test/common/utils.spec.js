@@ -69,62 +69,6 @@ describe('lib/utils', function() {
     html.removeChild(script)
   })
 
-  describe('sanitizeString', function() {
-    it('should sanitize', function() {
-      expect(utils.sanitizeString()).toBe(undefined)
-      expect(utils.sanitizeString(null, 10)).toBe(null)
-      expect(utils.sanitizeString(null, 10, true)).toBe('NA')
-      expect(utils.sanitizeString(undefined, 10, true)).toBe('NA')
-      expect(utils.sanitizeString(undefined, 5, true, 'no string')).toBe(
-        'no st'
-      )
-      expect(utils.sanitizeString('justlong', 5, true, 'no string')).toBe(
-        'justl'
-      )
-      expect(
-        utils.sanitizeString('justlong', undefined, true, 'no string')
-      ).toBe('justlong')
-      expect(utils.sanitizeString('just', 5, true, 'no string')).toBe('just')
-      expect(
-        utils.sanitizeString(
-          { what: 'This is an object' },
-          5,
-          true,
-          'no string'
-        )
-      ).toBe('[obje')
-      expect(utils.sanitizeString(0, 5, true, 'no string')).toBe('0')
-      expect(utils.sanitizeString(1, 5, true, 'no string')).toBe('1')
-    })
-
-    it('should sanitize objects', function() {
-      var result = utils.sanitizeObjectStrings(
-        {
-          string: 'string',
-          null: null,
-          undefined,
-          number: 1,
-          object: {
-            string: 'string'
-          }
-        },
-        3
-      )
-
-      expect(result).toEqual({
-        string: 'str',
-        null: null,
-        undefined,
-        number: 1,
-        object: {
-          string: 'str'
-        }
-      })
-
-      expect(utils.sanitizeObjectStrings('test', 3)).toBe('tes')
-    })
-  })
-
   it('should getNavigationTimingMarks', function() {
     var marks = utils.getNavigationTimingMarks()
     expect(marks.fetchStart).toBeGreaterThanOrEqual(0)
