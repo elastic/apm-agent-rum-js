@@ -23,70 +23,62 @@
  *
  */
 
+import "@babel/polyfill"
+import 'whatwg-fetch'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { withRouter } from 'react-router'
 import MainComponent from './main-component.jsx'
 
-const createApmBase = require('../')
+import { apm } from './rum'
 
-var elasticApm = createApmBase({
-  debug: true,
-  serviceName: 'apm-agent-js-base-test-e2e-react',
-  serviceVersion: '0.0.1',
-  sendPageLoadTransaction: false
-})
-
-elasticApm.setInitialPageLoadName('react-initial-page-load')
-
-// eslint-disable-next-line
-class CompositeComponent extends React.Component {
-  render() {
-    return <span>Composite component</span>
-  }
-}
-
-// eslint-disable-next-line
-class ES6Component extends React.Component {
-  render() {
-    return (
-      <span id="ES6Component" onClick={() => render()}>
-        es6 component
-      </span>
-    )
-  }
-}
-
-var tr = elasticApm.startTransaction('App Load', 'page-load')
+var tr = apm.startTransaction('App Load', 'page-load')
 tr.isHardNavigation = true
 
-function render() {
-  ReactDOM.render(
-    <div>
-      <Router basename="/test/e2e/react/">
+
+class App extends React.Component {
+  render() {
+    return (
+      <div>
+
         <div>
           <ul>
             <li>
-              <Link to="/">Home</Link>
+              <Link to='/'>Home</Link>
             </li>
             <li>
-              <Link to="/about">About</Link>
+              <Link to='/about'>About</Link>
             </li>
             <li>
-              <Link to="/topics">Topics</Link>
+              <Link to='/topics'>Topics</Link>
+            </li>
+            <li>
+              <Link to='/topic/10'>Topic 10</Link>
             </li>
           </ul>
 
           <hr />
-
-          <Route exact path="/" component={MainComponent} />
-          <Route path="/about" component={MainComponent} />
-          <Route path="/topics" component={MainComponent} />
+          <Route exact path='/' component={MainComponent} />
+          <Route path='/about' component={MainComponent} />
+          <Route path='/topics' component={MainComponent} />
+          <Route path='/topic/:id' component={MainComponent} />
         </div>
+        <div id='test-element'>Passed</div>
+      </div>
+    )
+  }
+}
+
+App = withRouter(App)
+
+function render() {
+  ReactDOM.render(
+    (
+      <Router basename='/test/e2e/react/'>
+        <App />
       </Router>
-      {/* <MainComponent /> */}
-      {/* <CompositeComponent /> */}
-      {/* <ES6Component /> */}
-    </div>,
+    ),
     document.getElementById('app')
   )
 }

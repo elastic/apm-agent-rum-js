@@ -528,8 +528,14 @@ describe('PerformanceMonitoring', function() {
         fn(event, task)
       })
 
-      window['__fetchDelegate'] = function(url) {
+      window['__fetchDelegate'] = function(request) {
         return new Promise(function(resolve) {
+          var url
+          if (typeof request === 'string') {
+            url = request
+          } else {
+            url = request.url
+          }
           var req = new window.XMLHttpRequest()
           req.open('GET', url, true)
           req.addEventListener('readystatechange', function() {
@@ -584,4 +590,31 @@ describe('PerformanceMonitoring', function() {
       window['__fetchDelegate'] = undefined
     })
   }
+  it('should add xhr tasks', function(done) {
+    var fn = performanceMonitoring.getXhrPatchSubFn()
+    var transactionService = performanceMonitoring._transactionService
+    var tr = transactionService.startTransaction('task transaction', 'custom')
+    expect(typeof fn).toBe('function')
+    var req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+
+    var task = {
+      source: 'XMLHttpRequest.send',
+      data: {
+        target: req
+      }
+    }
+    req.addEventListener('readystatechange', function() {
+      if (req.readyState === req.DONE) {
+        fn('invoke', task)
+        expect(tr._scheduledTasks).toEqual([])
+        expect(tr.ended).toBeTruthy()
+        done()
+      }
+    })
+    fn('schedule', task)
+    expect(task.id).toBeDefined()
+    expect(tr._scheduledTasks).toEqual(['task1'])
+    req.send()
+  })
 })

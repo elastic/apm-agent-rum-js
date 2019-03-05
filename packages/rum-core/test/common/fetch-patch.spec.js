@@ -56,8 +56,10 @@ describe('xhrPatch', function() {
       expect(events.map(e => e.event)).toEqual(['schedule'])
       promise.then(function(resp) {
         expect(resp).toBeDefined()
-        expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-        done()
+        Promise.resolve().then(function() {
+          expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+          done()
+        })
       })
     })
 
@@ -102,8 +104,10 @@ describe('xhrPatch', function() {
       var promise = window.fetch('http://localhost:54321/')
       promise.catch(function(error) {
         expect(error).toBeDefined()
-        expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-        done()
+        Promise.resolve().then(function() {
+          expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+          done()
+        })
       })
     })
     it('should reset fetchInProgress global state', function() {
