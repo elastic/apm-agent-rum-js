@@ -44,9 +44,8 @@ class Transaction extends SpanBase {
     this.spans = []
     this._activeSpans = {}
 
-    this._scheduledTasks = {}
-
-    this.nextAutoTaskId = 0
+    this.nextAutoTaskId = 1
+    this._scheduledTasks = []
 
     this.isHardNavigation = false
 
@@ -110,7 +109,7 @@ class Transaction extends SpanBase {
   }
 
   isFinished() {
-    return Object.keys(this._scheduledTasks).length === 0
+    return this._scheduledTasks.length === 0
   }
 
   detectFinish() {
@@ -139,16 +138,20 @@ class Transaction extends SpanBase {
   }
 
   addTask(taskId) {
-    // todo: should not accept more tasks if the transaction is alreadyFinished]
     if (typeof taskId === 'undefined') {
-      taskId = 'autoId' + this.nextAutoTaskId++
+      taskId = 'task' + this.nextAutoTaskId++
     }
-    this._scheduledTasks[taskId] = taskId
-    return taskId
+    if (this._scheduledTasks.indexOf(taskId) == -1) {
+      this._scheduledTasks.push(taskId)
+      return taskId
+    }
   }
 
   removeTask(taskId) {
-    delete this._scheduledTasks[taskId]
+    let index = this._scheduledTasks.indexOf(taskId)
+    if (index > -1) {
+      this._scheduledTasks.splice(index, 1)
+    }
     this.detectFinish()
   }
 
