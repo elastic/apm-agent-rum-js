@@ -25,7 +25,7 @@
 
 const StackTraceService = require('./stack-trace-service')
 const utils = require('../common/utils')
-const { truncate } = require('../common/truncate')
+const { truncateError } = require('../common/truncate')
 
 class ErrorLogging {
   constructor(apmServer, configService, loggingService, transactionService) {
@@ -41,14 +41,13 @@ class ErrorLogging {
 
   // errorEvent = {message, filename, lineno, colno, error}
   createErrorDataModel(errorEvent) {
-    var filePath = this._stackTraceService.cleanFilePath(errorEvent.filename)
-    var fileName = this._stackTraceService.filePathToFileName(filePath)
-    var culprit
-    var frames = this._stackTraceService.createStackTraces(errorEvent)
-    frames = this._stackTraceService.filterInvalidFrames(frames)
+    const filePath = this._stackTraceService.cleanFilePath(errorEvent.filename)
+    const frames = this._stackTraceService.createStackTraces(errorEvent)
+    const filteredFrames = this._stackTraceService.filterInvalidFrames(frames)
+    let fileName = this._stackTraceService.filePathToFileName(filePath)
 
-    if (!fileName && frames.length) {
-      var lastFrame = frames[frames.length - 1]
+    if (!fileName && filteredFrames.length) {
+      var lastFrame = filteredFrames[filteredFrames.length - 1]
       if (lastFrame.filename) {
         fileName = lastFrame.filename
       } else {
@@ -57,15 +56,16 @@ class ErrorLogging {
       }
     }
 
+    let culprit
     if (this._stackTraceService.isFileInline(filePath)) {
       culprit = '(inline script)'
     } else {
       culprit = fileName
     }
 
-    var message =
+    const message =
       errorEvent.message || (errorEvent.error && errorEvent.error.message)
-    var errorType = errorEvent.error ? errorEvent.error.name : undefined
+    let errorType = errorEvent.error ? errorEvent.error.name : undefined
     if (!errorType) {
       /**
        * Try to extract type from message formatted like
@@ -78,27 +78,32 @@ class ErrorLogging {
       }
     }
 
-    var configContext = this._configService.get('context')
-    var stringLimit = this._configService.get('serverStringLimit')
-    var errorContext
-    if (errorEvent.error && typeof errorEvent.error === 'object') {
+    const configContext = this._configService.get('context')
+    const stringLimit = this._configService.get('serverStringLimit')
+    let errorContext
+    if (typeof errorEvent.error === 'object') {
       errorContext = this._getErrorProperties(errorEvent.error)
     }
-    var browserMetadata = utils.getPageMetadata()
-    var context = utils.merge({}, browserMetadata, configContext, errorContext)
+    const browserMetadata = utils.getPageMetadata()
+    const context = utils.merge(
+      {},
+      browserMetadata,
+      configContext,
+      errorContext
+    )
 
-    var errorObject = {
+    const errorObject = {
       id: utils.generateRandomId(),
-      culprit: truncate(culprit),
+      culprit,
       exception: {
-        message: truncate(message, undefined, true),
-        stacktrace: frames,
-        type: truncate(errorType, stringLimit, false)
+        message,
+        stacktrace: filteredFrames,
+        type: errorType
       },
       context
     }
 
-    var currentTransaction = this._transactionService.getCurrentTransaction()
+    const currentTransaction = this._transactionService.getCurrentTransaction()
     if (currentTransaction) {
       errorObject.trace_id = currentTransaction.traceId
       errorObject.parent_id = currentTransaction.id
@@ -108,7 +113,7 @@ class ErrorLogging {
         sampled: currentTransaction.sampled
       }
     }
-    return errorObject
+    return truncateError(errorObject, { stringLimit })
   }
 
   logErrorEvent(errorEvent, sendImmediately) {

@@ -186,9 +186,55 @@ function truncateTransaction(trans, opts) {
   })
 }
 
+function truncateError(error, opts) {
+  return breathFilter(error, (value, path) => {
+    if (typeof value !== 'string') {
+      return value
+    }
+
+    let limit
+    let required = false
+    switch (path[0]) {
+      case 'id':
+        limit = opts.stringLimit
+        required = true
+        break
+
+      case 'trace_id':
+      case 'transaction_id':
+      case 'parent_id':
+      case 'culprit':
+        limit = opts.stringLimit
+        break
+
+      case 'exception':
+        switch (path[1]) {
+          case 'type':
+            limit = opts.stringLimit
+            break
+        }
+        break
+
+      case 'transaction':
+        switch (path[1]) {
+          case 'type':
+            limit = opts.stringLimit
+            break
+        }
+        break
+
+      case 'context':
+        limit = contextLength(path, opts)
+        break
+    }
+    return truncate(value, limit, required)
+  })
+}
+
 module.exports = {
   truncate,
   truncateMetadata,
   truncateSpan,
-  truncateTransaction
+  truncateTransaction,
+  truncateError
 }

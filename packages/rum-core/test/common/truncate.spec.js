@@ -28,14 +28,14 @@ const { truncate, truncateMetadata } = require('../../src/common/truncate')
 describe('Truncate', () => {
   it('truncate values with options', () => {
     expect(truncate('', undefined, true)).toEqual('N/A')
-    const longString = 'a'.repeat('10')
-    expect(truncate(longString, 2)).toEqual('aa')
+    const longString = 'abcde'
+    expect(truncate(longString, 2)).toEqual('ab')
     const placeHolder = 'dummyplaceholder'
     expect(truncate('', undefined, true, placeHolder)).toEqual(placeHolder)
   })
 
-  it('truncate metadata with specifed limits', () => {
-    const longName = '0'.repeat('10')
+  it('truncate metadata', () => {
+    const longName = 'aaaaaaaa'
     const metadata = {
       service: {
         name: '',
@@ -48,16 +48,16 @@ describe('Truncate', () => {
       }
     }
 
-    const newMetadata = truncateMetadata(metadata, {
-      stringLimit: 5
+    const filtered = truncateMetadata(metadata, {
+      stringLimit: 3
     })
 
-    expect(newMetadata).toEqual({
+    expect(filtered).toEqual({
       service: {
         name: 'N/A',
         version: 2.0,
         agent: {
-          name: '00000',
+          name: 'aaa',
           version: 3
         },
         environment: 'dev'
