@@ -378,8 +378,7 @@ describe('ApmServer', function() {
       version: '0.0.1',
       environment: 'staging',
       agent: { name: 'rum', version: '3.0.0' },
-      language: { name: 'javascript' },
-      runtime: { name: 'browser', version: '' }
+      language: { name: 'javascript' }
     })
   })
 

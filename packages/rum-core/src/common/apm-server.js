@@ -71,11 +71,7 @@ class ApmServer {
       language: {
         name: 'javascript'
       },
-      environment: sanitizeString(cfg.get('environment'), stringLimit),
-      runtime: {
-        name: 'browser',
-        version: ''
-      }
+      environment: sanitizeString(cfg.get('environment'), stringLimit)
     }
     return serviceObject
   }
