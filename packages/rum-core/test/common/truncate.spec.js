@@ -23,25 +23,33 @@
  *
  */
 
-const { truncate, truncateMetadata } = require('../../src/common/truncate')
+const {
+  truncate,
+  truncateMetadata,
+  truncateTransaction,
+  truncateSpan,
+  truncateError
+} = require('../../src/common/truncate')
 
 describe('Truncate', () => {
+  function generateStr(ch, length) {
+    return new Array(length + 1).join(ch)
+  }
+
   it('truncate values with options', () => {
     expect(truncate('', undefined, true)).toEqual('N/A')
-    const longString = 'abcde'
-    expect(truncate(longString, 2)).toEqual('ab')
+    expect(truncate(generateStr('ab', 5), 2)).toEqual('ab')
     const placeHolder = 'dummyplaceholder'
     expect(truncate('', undefined, true, placeHolder)).toEqual(placeHolder)
   })
 
   it('truncate metadata', () => {
-    const longName = 'aaaaaaaa'
     const metadata = {
       service: {
         name: '',
         version: 2.0,
         agent: {
-          name: longName,
+          name: generateStr('a', 5),
           version: 3
         },
         environment: 'dev'
@@ -61,6 +69,190 @@ describe('Truncate', () => {
           version: 3
         },
         environment: 'dev'
+      }
+    })
+  })
+
+  it('truncate transaction', () => {
+    const keywordLen = 11
+    const transaction = {
+      id: 'abc123',
+      trace_id: generateStr('a', keywordLen),
+      name: generateStr('b', keywordLen),
+      type: generateStr('c', keywordLen),
+      duration: 200.5,
+      spans: [],
+      context: {
+        user: {
+          id: generateStr('d', keywordLen),
+          email: generateStr('e', keywordLen),
+          username: generateStr('f', keywordLen)
+        },
+        tags: {
+          pageload: true,
+          key: generateStr('g', keywordLen)
+        }
+      },
+      marks: {
+        agent: {
+          timeToFirstByte: 100,
+          domInteractive: 150,
+          domComplete: 200
+        }
+      },
+      span_count: {
+        started: 10
+      },
+      sampled: true
+    }
+
+    const stringLimit = 5
+    const filtered = truncateTransaction(transaction, { stringLimit })
+
+    expect(filtered).toEqual({
+      id: 'abc12',
+      trace_id: generateStr('a', stringLimit),
+      name: generateStr('b', stringLimit),
+      type: generateStr('c', stringLimit),
+      duration: 200.5,
+      spans: [],
+      context: {
+        user: {
+          id: generateStr('d', stringLimit),
+          email: generateStr('e', stringLimit),
+          username: generateStr('f', stringLimit)
+        },
+        tags: {
+          pageload: true,
+          key: generateStr('g', stringLimit)
+        }
+      },
+      marks: {
+        agent: {
+          timeToFirstByte: 100,
+          domInteractive: 150,
+          domComplete: 200
+        }
+      },
+      span_count: {
+        started: 10
+      },
+      sampled: true
+    })
+  })
+
+  it('truncate spans', () => {
+    const keywordLen = 11
+    const span = {
+      id: '123abc',
+      transaction_id: generateStr('a', keywordLen),
+      parent_id: generateStr('b', keywordLen),
+      trace_id: generateStr('c', keywordLen),
+      name: generateStr('d', keywordLen),
+      type: generateStr('e', keywordLen),
+      sync: false,
+      start: 500,
+      duration: 700.02,
+      context: {
+        user: {
+          id: generateStr('f', keywordLen),
+          email: generateStr('g', keywordLen),
+          username: generateStr('h', keywordLen)
+        },
+        page: {
+          referer: 'blah',
+          url: 'http://a.com/script.js'
+        }
+      }
+    }
+
+    const stringLimit = 7
+    const filtered = truncateSpan(span, { stringLimit })
+    expect(filtered).toEqual({
+      id: '123abc',
+      transaction_id: generateStr('a', stringLimit),
+      parent_id: generateStr('b', stringLimit),
+      trace_id: generateStr('c', stringLimit),
+      name: generateStr('d', stringLimit),
+      type: generateStr('e', stringLimit),
+      sync: false,
+      start: 500,
+      duration: 700.02,
+      context: {
+        user: {
+          id: generateStr('f', stringLimit),
+          email: generateStr('g', stringLimit),
+          username: generateStr('h', stringLimit)
+        },
+        page: {
+          referer: 'blah',
+          url: 'http://a.com/script.js'
+        }
+      }
+    })
+  })
+
+  it('truncate error', () => {
+    const keywordLen = 15
+
+    const error = {
+      id: '',
+      culprit: generateStr('a', keywordLen),
+      exception: {
+        message: generateStr('b', keywordLen),
+        stacktrace: [
+          {
+            filename: generateStr('c', keywordLen),
+            lineno: 123
+          },
+          {
+            filename: generateStr('d', keywordLen),
+            lineno: 200
+          }
+        ],
+        type: generateStr('e', keywordLen)
+      },
+      context: {
+        user: {
+          id: generateStr('f', keywordLen),
+          email: generateStr('g', keywordLen),
+          username: generateStr('h', keywordLen)
+        },
+        tags: {
+          foo: generateStr('i', keywordLen)
+        }
+      }
+    }
+
+    const stringLimit = 10
+    const filtered = truncateError(error, { stringLimit })
+
+    expect(filtered).toEqual({
+      id: 'N/A',
+      culprit: generateStr('a', stringLimit),
+      exception: {
+        message: generateStr('b', keywordLen),
+        stacktrace: [
+          {
+            filename: generateStr('c', keywordLen),
+            lineno: 123
+          },
+          {
+            filename: generateStr('d', keywordLen),
+            lineno: 200
+          }
+        ],
+        type: generateStr('e', stringLimit)
+      },
+      context: {
+        user: {
+          id: generateStr('f', stringLimit),
+          email: generateStr('g', stringLimit),
+          username: generateStr('h', stringLimit)
+        },
+        tags: {
+          foo: generateStr('i', stringLimit)
+        }
       }
     })
   })

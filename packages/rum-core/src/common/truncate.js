@@ -124,7 +124,7 @@ function contextLength(path, opts) {
       return opts.stringLimit
   }
 
-  return opts.stringLimit
+  return undefined
 }
 
 function truncateSpan(span, opts) {
@@ -158,8 +158,8 @@ function truncateSpan(span, opts) {
   })
 }
 
-function truncateTransaction(trans, opts) {
-  return breathFilter(trans, (value, path) => {
+function truncateTransaction(transaction, opts) {
+  return breathFilter(transaction, (value, path) => {
     if (typeof value !== 'string') {
       return value
     }
@@ -175,7 +175,7 @@ function truncateTransaction(trans, opts) {
         break
 
       case 'name':
-        limits = opts.stringLimit
+        limit = opts.stringLimit
         break
 
       case 'context':
