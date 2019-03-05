@@ -93,7 +93,6 @@ function truncateMetadata(metadata, opts) {
 
           case 'agent':
           case 'language':
-          case 'runtime':
             switch (path[2]) {
               case 'name':
               case 'version':
