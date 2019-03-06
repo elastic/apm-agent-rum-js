@@ -58,19 +58,20 @@ class ApmServer {
   }
 
   createServiceObject() {
-    var cfg = this._configService
-    var stringLimit = cfg.get('serverStringLimit')
+    const cfg = this._configService
+    const stringLimit = cfg.get('serverStringLimit')
 
-    var serviceObject = {
+    const serviceObject = {
       name: sanitizeString(cfg.get('serviceName'), stringLimit, true),
-      version: sanitizeString(cfg.get('serviceVersion'), stringLimit, false),
+      version: sanitizeString(cfg.get('serviceVersion'), stringLimit),
       agent: {
-        name: cfg.get('agentName'),
-        version: cfg.get('agentVersion')
+        name: sanitizeString(cfg.get('agentName'), stringLimit),
+        version: sanitizeString(cfg.get('agentVersion'), stringLimit)
       },
       language: {
         name: 'javascript'
-      }
+      },
+      environment: sanitizeString(cfg.get('environment'), stringLimit)
     }
     return serviceObject
   }
