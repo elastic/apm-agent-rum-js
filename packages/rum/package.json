@@ -5,7 +5,7 @@
   "main": "dist/bundles/elastic-apm-js-base.umd.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/elastic/apm-agent-js-base.git",
+    "url": "https://github.com/elastic/apm-agent-rum-js.git",
     "directory": "packages/rum"
   },
   "scripts": {

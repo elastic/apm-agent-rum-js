@@ -1,6 +1,6 @@
 # Elastic APM Real User Monitoring (RUM) JavaScript agent
 
-[![Build status](https://travis-ci.org/elastic/apm-agent-js-base.svg?branch=master)](https://travis-ci.org/elastic/apm-agent-js-base)
+[![Build status](https://travis-ci.org/elastic/apm-agent-rum-js.svg?branch=master)](https://travis-ci.org/elastic/apm-agent-rum-js)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
