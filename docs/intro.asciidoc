@@ -54,7 +54,7 @@ const apm = initApm({
 
 Add a <script> tag to the HTML page and use the `elasticApm` global object to load and initialize the agent:
 
-NOTE: Please download the latest version of JavaScript agent from https://github.com/elastic/apm-agent-js-base/releases/latest[GitHub] or
+NOTE: Please download the latest version of JavaScript agent from https://github.com/elastic/apm-agent-rum-js/releases/latest[GitHub] or
 https://unpkg.com/elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.js[UNPKG] and host the file in your Server/CDN before deploying to production.
 
 [source,html]

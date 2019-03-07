@@ -5,14 +5,14 @@
   "description": "Elastic APM RUM agent",
   "repository": {
     "type": "git",
-    "url": "https://github.com/elastic/apm-agent-js-base.git"
+    "url": "https://github.com/elastic/apm-agent-rum-js.git"
   },
   "scripts": {
     "prerelease": "npm test",
     "release": "lerna publish",
     "release-package": "node scripts/publish",
     "release-github": "lerna run --scope elastic-apm-js-base test && node scripts/release-github",
-    "build-docs": "sh ./scripts/build_docs.sh apm-agent-js-base ./docs ./build",
+    "build-docs": "sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
     "lint": "npm-run-all --silent -p lint:*",
     "lint:js": "eslint .",
     "lint:license": "node scripts/license-checker",

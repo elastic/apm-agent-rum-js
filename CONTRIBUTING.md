@@ -77,7 +77,7 @@ should "Squash and merge".
 The project structure follows a monorepo approach, all officially maintained modules are in the same repo. We use [Lerna](https://github.com/lerna/lerna) to achieve the same.
 
 ```sh
-$ git clone git@github.com:elastic/apm-agent-js-base.git && cd apm-agent-js-base
+$ git clone git@github.com:elastic/apm-agent-rum-js.git && cd apm-agent-rum-js
 $ npm install
 $ npm run bootstrap
 ```

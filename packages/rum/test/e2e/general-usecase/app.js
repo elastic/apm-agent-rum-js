@@ -33,7 +33,7 @@ const active = Math.random() < 1
 const elasticApm = createApmBase({
   active,
   debug: true,
-  serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
+  serviceName: 'apm-agent-rum-test-e2e-general-usecase',
   serviceVersion: '0.0.1',
   distributedTracingOrigins: [mockBackendUrl],
   pageLoadTraceId: '286ac3ad697892c406528f13c82e0ce1',
