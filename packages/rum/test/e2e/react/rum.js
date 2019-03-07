@@ -27,7 +27,7 @@ var createApmBase = require('../')
 
 var apm = createApmBase({
   debug: true,
-  serviceName: 'apm-agent-js-base-test-e2e-react',
+  serviceName: 'apm-agent-rum-test-e2e-react',
   serviceVersion: '0.0.1',
   sendPageLoadTransaction: false
 })

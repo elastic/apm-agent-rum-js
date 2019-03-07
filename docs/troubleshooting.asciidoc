@@ -38,5 +38,5 @@ In order to debug the agent consider performing the following steps:
 
 If you have any questions, please create a new topic in the https://discuss.elastic.co/c/apm[Elastic APM discuss forum].
 
-For bug reports and feature requests, please https://github.com/elastic/apm-agent-js-base/issues/new[create an issue] on our https://github.com/elastic/apm-agent-js-base[github repo]
+For bug reports and feature requests, please https://github.com/elastic/apm-agent-rum-js/issues/new[create an issue] on our https://github.com/elastic/apm-agent-rum-js[github repo]
 and include as much information as possible. See <<debugging, Debugging>> for how to gather debugging information.
