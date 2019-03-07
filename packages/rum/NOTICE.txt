@@ -1,10 +1,10 @@
 
-elastic-apm-js-base
+@elastic/apm-rum
 Copyright (c) 2017-present, Elasticsearch BV
 
 
 ---
-This product relies on elastic-apm-js-core
+This product relies on @elastic/apm-rum-core
 
 MIT License
 
@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 
 
-elastic-apm-js-core
+@elastic/apm-rum-core
 Copyright (c) 2017-present, Elasticsearch BV
 
 

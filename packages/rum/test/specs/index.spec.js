@@ -24,7 +24,7 @@
  */
 
 const { apmBase } = require('../../src/')
-const apmCore = require('elastic-apm-js-core')
+const apmCore = require('@elastic/apm-rum-core')
 const { getGlobalConfig } = require('../../../../dev-utils/test-config')
 
 const { globalConfigs } = getGlobalConfig()

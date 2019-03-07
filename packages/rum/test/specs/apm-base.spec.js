@@ -24,7 +24,7 @@
  */
 
 var ApmBase = require('../../src/apm-base')
-var apmCore = require('elastic-apm-js-core')
+var apmCore = require('@elastic/apm-rum-core')
 var enabled = require('../../src/bootstrap')()
 
 describe('ApmBase', function() {

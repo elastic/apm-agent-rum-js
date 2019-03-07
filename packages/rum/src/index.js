@@ -26,7 +26,7 @@
 var bootstrap = require('./bootstrap')
 var enabled = bootstrap()
 
-var apmCore = require('elastic-apm-js-core')
+var apmCore = require('@elastic/apm-rum-core')
 var ApmBase = require('./apm-base')
 
 var serviceFactory = apmCore.createServiceFactory()

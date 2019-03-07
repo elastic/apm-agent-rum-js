@@ -9,7 +9,7 @@ You can access agent API after initializing the agent:
 
 [source,js]
 ----
-var apm = require('elastic-apm-js-base').init(...)
+var apm = require('@elastic/apm-rum').init(...)
 ----
 
 
