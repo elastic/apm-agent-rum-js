@@ -57,6 +57,16 @@ var options = {
 ----
 
 [float]
+[[environment]]
+=== `environment`
+
+* *Type:* String
+* *Default:* ``
+
+Environment where the service being monitored is deployed, e.g. production/development/test
+
+
+[float]
 [[log-level]]
 === `logLevel`
 

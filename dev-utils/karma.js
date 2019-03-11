@@ -27,7 +27,7 @@ const { Server } = require('karma')
 const { EnvironmentPlugin } = require('webpack')
 const { getWebpackEnv, getSauceConnectOptions } = require('./test-config')
 
-const BABEL_CONFIG_FILE = require.resolve('elastic-apm-js-base/babel.config.js')
+const BABEL_CONFIG_FILE = require.resolve('@elastic/apm-rum/babel.config.js')
 
 const baseLaunchers = {
   SL_CHROME: {

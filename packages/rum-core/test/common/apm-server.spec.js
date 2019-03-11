@@ -23,10 +23,9 @@
  *
  */
 
-var ApmServer = require('../../src/common/apm-server')
-var Transaction = require('../../src/performance-monitoring/transaction')
-// var performanceMonitoring = require('../../src/performance-monitoring/performance-monitoring')
-var createServiceFactory = require('..').createServiceFactory
+const ApmServer = require('../../src/common/apm-server')
+const Transaction = require('../../src/performance-monitoring/transaction')
+const { createServiceFactory } = require('../')
 
 function generateTransaction(count) {
   var result = []
@@ -363,6 +362,24 @@ describe('ApmServer', function() {
     result = apmServer.sendTransactions([{ test: 'test' }])
     expect(result).toBeUndefined()
     expect(apmServer._postJson).not.toHaveBeenCalled()
+  })
+
+  it('should set service object from config along with defaults', () => {
+    configService.setConfig({
+      serviceName: 'test',
+      serviceVersion: '0.0.1',
+      environment: 'staging',
+      agentName: 'rum',
+      agentVersion: '3.0.0'
+    })
+
+    expect(apmServer.createServiceObject()).toEqual({
+      name: 'test',
+      version: '0.0.1',
+      environment: 'staging',
+      agent: { name: 'rum', version: '3.0.0' },
+      language: { name: 'javascript' }
+    })
   })
 
   it('should ndjson transactions', function() {

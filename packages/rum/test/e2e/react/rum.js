@@ -23,23 +23,16 @@
  *
  */
 
-const {
-  createTracer: createElasticTracer
-} = require('@elastic/apm-rum-core/src/opentracing')
+var createApmBase = require('../')
 
-function createTracer(apmBase) {
-  return createElasticTracer(apmBase.serviceFactory)
-}
+var apm = createApmBase({
+  debug: true,
+  serviceName: 'apm-agent-rum-test-e2e-react',
+  serviceVersion: '0.0.1',
+  sendPageLoadTransaction: false
+})
 
-if (window && window.elasticApm) {
-  window.elasticApm.createTracer = createTracer.bind(
-    window.elasticApm,
-    window.elasticApm
-  )
-}
-
+apm.setInitialPageLoadName('react-initial-page-load')
 module.exports = {
-  __esModule: true,
-  default: createTracer,
-  createTracer
+  apm
 }

@@ -31,7 +31,7 @@ module.exports = function bootstrap() {
   }
   alreadyBootstrap = true
 
-  var apmCore = require('elastic-apm-js-core')
+  var apmCore = require('@elastic/apm-rum-core')
   if (apmCore.utils.isPlatformSupported()) {
     require('es6-promise/auto')
     apmCore.patching.patchAll()

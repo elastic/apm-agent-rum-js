@@ -80,6 +80,8 @@ class PerformanceMonitoring {
           var spanName =
             task.data.method + ' ' + stripQueryStringFromUrl(task.data.url)
           var span = transactionService.startSpan(spanName, 'external.http')
+          var taskId = transactionService.addTask()
+
           if (span) {
             var isDtEnabled = configService.get('distributedTracing')
             var origins = configService.get('distributedTracingOrigins')
@@ -98,8 +100,10 @@ class PerformanceMonitoring {
             })
             span.sync = task.data.sync
             task.data.span = span
+            task.id = taskId
           }
-        } else if (event === INVOKE && task.data && task.data.span) {
+        }
+        if (event === INVOKE && task.data && task.data.span) {
           if (typeof task.data.target.status !== 'undefined') {
             task.data.span.addContext({
               http: { status_code: task.data.target.status }
@@ -110,6 +114,10 @@ class PerformanceMonitoring {
             })
           }
           task.data.span.end()
+        }
+
+        if (event === INVOKE && task.id) {
+          transactionService.removeTask(task.id)
         }
       }
     }

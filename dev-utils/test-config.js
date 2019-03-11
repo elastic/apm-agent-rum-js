@@ -76,8 +76,9 @@ function getGlobalConfig(packageName = 'rum') {
  * Used for injecting process.env across webpack bundles for testing
  */
 function getWebpackEnv() {
+  const { serverUrl } = getTestEnvironmentVariables()
   return {
-    APM_SERVER_URL: defaultApmServerUrl
+    APM_SERVER_URL: serverUrl
   }
 }
 

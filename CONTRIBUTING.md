@@ -77,7 +77,7 @@ should "Squash and merge".
 The project structure follows a monorepo approach, all officially maintained modules are in the same repo. We use [Lerna](https://github.com/lerna/lerna) to achieve the same.
 
 ```sh
-$ git clone git@github.com:elastic/apm-agent-js-base.git && cd apm-agent-js-base
+$ git clone git@github.com:elastic/apm-agent-rum-js.git && cd apm-agent-rum-js
 $ npm install
 $ npm run bootstrap
 ```
@@ -93,20 +93,20 @@ $ npm test
 To run tests for a specific package:
 
 ```sh
-$ SCOPE=elastic-apm-js-base npm test
+$ SCOPE=@elastic/apm-rum npm test
 ```
 
 To run unit/integration/end-to-end tests for packages:
 
 ```sh
 // Unit tests
-$ npx lerna run --scope elastic-apm-js-base runUnitTests
+$ npx lerna run --scope @elastic/apm-rum runUnitTests
 
 // Integration tests
-$ npx lerna run --scope elastic-apm-js-base runNodeTests
+$ npx lerna run --scope @elastic/apm-rum runNodeTests
 
 // End to end tests
-$ npx lerna run --scope elastic-apm-js-base run-e2e
+$ npx lerna run --scope @elastic/apm-rum run-e2e
 ```
 
 ### Linting

@@ -94,13 +94,19 @@ function patchFetch(callback) {
       promise.then(
         function(response) {
           resolve(response)
-          task.data.response = response
-          invokeTask(task)
+
+          // invokeTask in the next execution cycle to let the promise resolution complete
+          Promise.resolve().then(() => {
+            task.data.response = response
+            invokeTask(task)
+          })
         },
         function(error) {
           reject(error)
-          task.data.error = error
-          invokeTask(task)
+          Promise.resolve().then(() => {
+            task.data.error = error
+            invokeTask(task)
+          })
         }
       )
       globalState.fetchInProgress = false
