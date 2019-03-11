@@ -17,10 +17,10 @@ To publish all the packages run `npm run release`. It will run `lerna publish`(w
 
 ### Releasing single package
 
-To publish a single package, run `npm run release-package -- elastic-apm-js-base` which uses `lerna publish` under the hood to publish single package to NPM
+To publish a single package, run `npm run release-package -- @elastic/apm-rum` which uses `lerna publish` under the hood to publish single package to NPM
 
 ### Releasing artifacts to GitHub
 
-Use `npm run release-github` in the root directory, the script takes care of building, testing the `elastic-apm-js-base` package and creating a release in GitHub with the previous annonated tag.
+Use `npm run release-github` in the root directory, the script takes care of building, testing the `@elastic/apm-rum` package and creating a release in GitHub with the previous annonated tag.
 
 **Note: Make sure you pass the GITHUB_TOKEN (with push access) in your environment variable while releasing**

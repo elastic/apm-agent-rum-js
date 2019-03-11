@@ -59,7 +59,7 @@ Then you can use the provided service version to set the "serviceVersion" config
 
 [source,js]
 ----
-import { init as initApm } from 'elastic-apm-js-base'
+import { init as initApm } from '@elastic/apm-rum'
 var apm = initApm({
   // Set required service name
   serviceName: 'service-name',
