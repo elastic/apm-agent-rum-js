@@ -27,10 +27,7 @@ const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('standalone-html', function() {
   it('should run the usecase', function() {
-    browser.timeouts('script', 30000)
-    browser.url('/test/e2e/standalone-html/index.html')
-
-    browser.waitUntil(
+    browser.url('/test/e2e/standalone-html/index.html').waitUntil(
       function() {
         return browser.getText('#test-element') === 'Passed'
       },
@@ -42,10 +39,7 @@ describe('standalone-html', function() {
   })
 
   it('should run the opentracing use-case', function() {
-    browser.timeouts('script', 30000)
-    browser.url('/test/e2e/standalone-html/opentracing.html')
-
-    browser.waitUntil(
+    browser.url('/test/e2e/standalone-html/opentracing.html').waitUntil(
       function() {
         return browser.getText('#test-element') === 'Passed'
       },

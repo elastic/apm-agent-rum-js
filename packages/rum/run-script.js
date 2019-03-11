@@ -27,7 +27,9 @@ const path = require('path')
 const JasmineRunner = require('jasmine')
 const express = require('express')
 const serveIndex = require('serve-index')
+const runAll = require('npm-run-all')
 const testUtils = require('../../dev-utils/test-utils')
+const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 const { runIntegrationTest } = require('./test/e2e/integration-test')
 const { generateNotice } = require('../../dev-utils/dep-info')
 
@@ -49,10 +51,10 @@ function createBackendAgentServer() {
   })
 
   function dTRespond(req, res) {
-    var header = req.headers['elastic-apm-traceparent']
-    var payload = { noHeader: true }
+    const header = req.headers['elastic-apm-traceparent']
+    let payload = { noHeader: true }
     if (header) {
-      var splited = header.split('-')
+      const splited = header.split('-')
       payload = {
         version: splited[0],
         traceId: splited[1],
@@ -68,24 +70,24 @@ function createBackendAgentServer() {
   app.post('/data', dTRespond)
   app.post('/fetch', dTRespond)
 
-  var port = 8003
-  var server = app.listen(port)
+  const port = 8003
+  const server = app.listen(port)
 
-  console.log('serving on: ', port)
+  console.log('[Backend Server] - serving on: ', port)
   return server
 }
 
 function serveE2e(servingPath, port) {
   const app = express()
-  var staticPath = path.join(__dirname, servingPath)
+  const staticPath = path.join(__dirname, servingPath)
 
   app.get('/healthcheck', function(req, res) {
     res.send('OK')
   })
 
   app.get('/run_integration_test', async function(req, res) {
-    var echo = req.query.echo
-    var result = await runIntegrationTest(
+    const echo = req.query.echo
+    const result = await runIntegrationTest(
       'http://localhost:8000/test/e2e/general-usecase/'
     )
     if (echo) {
@@ -96,11 +98,12 @@ function serveE2e(servingPath, port) {
   })
 
   app.use(express.static(staticPath), serveIndex(staticPath, { icons: false }))
-  var server = app.listen(port)
+  const staticServer = app.listen(port)
 
-  console.log('serving on: ', staticPath, port)
-  var backendAgentServer = createBackendAgentServer()
-  return [server, backendAgentServer]
+  console.log('[Static Server] - serving on: ', staticPath, port)
+  const backendAgentServer = createBackendAgentServer()
+
+  return [staticServer, backendAgentServer]
 }
 
 function runJasmine(cb) {
@@ -126,39 +129,69 @@ function runJasmine(cb) {
   jrunner.execute()
 }
 
-function runE2eTests(serve) {
-  if (serve !== 'false') {
-    serveE2e('./', 8000)
-  }
+function runE2eTests(config) {
+  const webDriverConfig = path.join(PROJECT_DIR, config)
+  testUtils.runE2eTests(webDriverConfig, false)
+}
 
-  const file = path.join(PROJECT_DIR, 'wdio.conf.js')
-  testUtils.runE2eTests(file, false)
+function runSauceTests(serve = 'true') {
+  let servers = []
+  if (serve === 'true') {
+    servers = serveE2e('./', 8000)
+  }
+  /**
+   * Since there is no easy way to reuse the sauce connect tunnel even using same tunnel identifier,
+   * we launch the sauce connect tunnel before starting all the saucelab tests
+   *
+   * Unit tests are not run in parallel with E2E because of concurrency limit in saucelabs
+   */
+  const sauceConnectOpts = getSauceConnectOptions()
+  testUtils.runSauceConnect(sauceConnectOpts, () => {
+    runAll('test:unit', {
+      stdout: process.stdout,
+      stderr: process.stderr
+    })
+      .then(() =>
+        runAll(['test:e2e:supported', 'test:e2e:failsafe'], {
+          parallel: true,
+          aggregateOutput: true,
+          printLabel: true,
+          stdout: process.stdout,
+          stderr: process.stderr
+        })
+      )
+      .then(() => {
+        console.log('All Unit and E2E Sauce Tests done')
+      })
+      .catch(err => {
+        console.log('Sauce Tests Failed', err)
+      })
+      .then(() => {
+        servers.map(s => s.close())
+        process.exit(0)
+      })
+  })
 }
 
 const scripts = {
   startSelenium: testUtils.startSelenium,
+  runSauceTests,
   runE2eTests,
   runNodeTests() {
-    var servers = serveE2e('./', 8000)
+    const servers = serveE2e('./', 8000)
     runJasmine(function(err) {
       servers.forEach(server => server.close())
       if (err) {
         console.log('Node tests failed:', err)
-        var exitCode = 2
-        process.exit(exitCode)
+        process.exit(2)
       }
     })
   },
   buildE2eBundles(basePath) {
     basePath = basePath || './test/e2e'
-    function callback(err) {
-      if (err) {
-        var exitCode = 2
-        process.exit(exitCode)
-      }
-    }
-
-    testUtils.buildE2eBundles(path.join(PROJECT_DIR, basePath), callback)
+    testUtils.buildE2eBundles(path.join(PROJECT_DIR, basePath), err => {
+      err && process.exit(2)
+    })
   },
   serveE2e,
   generateNotice
@@ -167,12 +200,10 @@ const scripts = {
 module.exports = scripts
 
 function runScript() {
-  var scriptName = process.argv[2]
+  const [, , scriptName, ...scriptArgs] = process.argv
   if (scriptName) {
-    var scriptArgs = [].concat(process.argv)
-    scriptArgs.splice(0, 3)
     var message = `Running: ${scriptName}(${scriptArgs
-      .map(a => "'" + a + "'")
+      .map(a => a.trim())
       .join(', ')}) \n`
     console.log(message)
     if (typeof scripts[scriptName] === 'function') {

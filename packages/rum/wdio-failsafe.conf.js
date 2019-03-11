@@ -23,21 +23,23 @@
  *
  */
 
-module.exports = function(api) {
-  api.cache(true)
-  return {
-    presets: [
-      [
-        '@babel/preset-env',
-        {
-          targets: {
-            ie: '11'
-          },
-          useBuiltIns: false,
-          modules: false,
-          loose: true
-        }
-      ]
-    ]
+const { join } = require('path')
+const { config } = require('./wdio.conf')
+
+const browserList = [
+  {
+    browserName: 'internet explorer',
+    platform: 'Windows 7',
+    version: '10'
+  },
+  {
+    browserName: 'android',
+    platform: 'Linux',
+    version: '4.4'
   }
-}
+]
+
+exports.config = Object.assign({}, config, {
+  specs: join(__dirname, '/test/e2e/**/*failsafe.js'),
+  capabilities: browserList
+})

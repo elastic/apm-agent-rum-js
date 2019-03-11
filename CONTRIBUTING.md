@@ -100,13 +100,13 @@ To run unit/integration/end-to-end tests for packages:
 
 ```sh
 // Unit tests
-$ npx lerna run --scope @elastic/apm-rum runUnitTests
+$ npx lerna run --scope @elastic/apm-rum test:unit
 
 // Integration tests
-$ npx lerna run --scope @elastic/apm-rum runNodeTests
+$ npx lerna run --scope @elastic/apm-rum test:integration
 
 // End to end tests
-$ npx lerna run --scope @elastic/apm-rum run-e2e
+$ npx lerna run --scope @elastic/apm-rum test:e2e
 ```
 
 ### Linting
