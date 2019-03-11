@@ -18,13 +18,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **rum-core:** avoid url parsing on resource timing entries ([#174](https://github.com/elastic/apm-agent-rum-js/issues/174)) ([54ea6b9](https://github.com/elastic/apm-agent-rum-js/commit/54ea6b9))
 
 
-* BREAKING CHANGE: move IE 10 and Android 4 to unsupported list (#196) ([16f4440](https://github.com/elastic/apm-agent-rum-js/commit/16f4440)), closes [#196](https://github.com/elastic/apm-agent-rum-js/issues/196)
-
-
 ### BREAKING CHANGES
 
-* Dropping the support for IE 10 and android 4* versions. Bundling condigurations and testing environments are changed to reflect the same
-
-* parallelize the e2e tests and use single tunnel
-
-* update contributing.md
+* move IE 10 and Android 4 to unsupported list (#196) ([16f4440](https://github.com/elastic/apm-agent-rum-js/commit/16f4440)), closes [#196](https://github.com/elastic/apm-agent-rum-js/issues/196)
