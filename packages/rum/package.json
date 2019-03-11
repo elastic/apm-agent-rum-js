@@ -2,7 +2,7 @@
   "name": "@elastic/apm-rum",
   "version": "3.0.0",
   "description": "Elastic APM JavaScript agent",
-  "main": "dist/bundles/elastic-apm-rum.umd.js",
+  "main": "src/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/elastic/apm-agent-rum-js.git",
