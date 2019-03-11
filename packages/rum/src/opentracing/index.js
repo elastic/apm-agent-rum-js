@@ -25,7 +25,7 @@
 
 const {
   createTracer: createElasticTracer
-} = require('elastic-apm-js-core/src/opentracing')
+} = require('@elastic/apm-rum-core/src/opentracing')
 
 function createTracer(apmBase) {
   return createElasticTracer(apmBase.serviceFactory)

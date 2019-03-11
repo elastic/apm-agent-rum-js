@@ -1,8 +1,8 @@
 {
-  "name": "elastic-apm-js-base",
+  "name": "@elastic/apm-rum",
   "version": "3.0.0",
   "description": "Elastic APM JavaScript agent",
-  "main": "dist/bundles/elastic-apm-js-base.umd.js",
+  "main": "dist/bundles/elastic-apm-rum.umd.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/elastic/apm-agent-rum-js.git",
@@ -29,12 +29,12 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "elastic-apm-js-core": "file:../rum-core",
+    "@elastic/apm-rum-core": "file:../rum-core",
     "es6-promise": "^4.2.4"
   },
   "bundlesize": [
     {
-      "path": "./dist/bundles/elastic-apm-js-base*.min.js",
+      "path": "./dist/bundles/elastic-apm-rum*.min.js",
       "maxSize": "16 kB"
     },
     {
