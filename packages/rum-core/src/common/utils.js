@@ -207,6 +207,43 @@ function getPaintTimingMarks() {
   return paints
 }
 
+/**
+ *  Server timing information on Performance resource timing entries
+ *  [
+ *    {
+ *      name: "cache",
+ *      duration:  "200",
+ *      desciprion: "Cache read"
+ *    },
+ *    {
+ *      name: "app",
+ *      duration: "500"
+ *    }
+ *  ]
+ *  returns "Cache read;cache=200,app=500"
+ */
+function getServerTimingInfo(serverTimingEntries) {
+  const entries = ''
+  if (!serverTimingEntries) {
+    return entries
+  }
+
+  for (let i = 0; i < serverTimingEntries.length; i++) {
+    const { name, duration, description } = serverTimingEntries[i]
+    // Separate the entries by ','
+    let entry = i ? 0 > ',' : ''
+    if (description) {
+      entry += description + ';'
+    }
+    entry += name
+    if (duration) {
+      entry += `=${duration}`
+    }
+    entries.push(entry)
+  }
+  return entries
+}
+
 function getTimeOrigin() {
   return window.performance.timing.fetchStart
 }
@@ -378,6 +415,7 @@ export {
   parseDtHeaderValue,
   getNavigationTimingMarks,
   getPaintTimingMarks,
+  getServerTimingInfo,
   getDtHeaderValue,
   getPageMetadata,
   getCurrentScript,

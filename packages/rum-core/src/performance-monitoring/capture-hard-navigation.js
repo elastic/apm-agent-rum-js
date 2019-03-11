@@ -29,7 +29,7 @@ import {
   MAX_SPAN_DURATION,
   USER_TIMING_THRESHOLD
 } from '../common/constants'
-import { stripQueryStringFromUrl } from '../common/utils'
+import { stripQueryStringFromUrl, getServerTimingInfo } from '../common/utils'
 
 /**
  * Navigation Timing Spans
@@ -77,6 +77,21 @@ function shouldCreateSpan(start, end, baseTime, transactionEnd) {
   )
 }
 
+/**
+ * Both Navigation and Resource timing level 2 exposes these below information
+ *
+ * for CORS requests, transferSize & encodedBodySize will be 0
+ */
+function getResponseContext(perfTimingEntry) {
+  const { transferSize, encodedBodySize, serverTiming } = perfTimingEntry
+
+  return {
+    transfer_size: transferSize,
+    compressed_size: encodedBodySize,
+    server_timing: getServerTimingInfo(serverTiming)
+  }
+}
+
 function createNavigationTimingSpans(timings, baseTime, transactionEnd) {
   const spans = []
   for (let i = 0; i < eventPairs.length; i++) {
@@ -98,14 +113,23 @@ function createNavigationTimingSpans(timings, baseTime, transactionEnd) {
   return spans
 }
 
-function createResourceTimingSpan(name, initiatorType, start, end) {
+function createResourceTimingSpan(resourceTimingEntry) {
+  const { name, initiatorType, start, end } = resourceTimingEntry
   let kind = 'resource'
   if (initiatorType) {
     kind += '.' + initiatorType
   }
   const spanName = stripQueryStringFromUrl(name)
   const span = new Span(spanName, kind)
-  span.addContext({ http: { url: name } })
+  /**
+   * Add context information for spans
+   */
+  span.addContext({
+    http: {
+      url: name,
+      response: getResponseContext(resourceTimingEntry)
+    }
+  })
   span._start = start
   span.end()
   span._end = end
@@ -233,6 +257,9 @@ function captureHardNavigation(transaction) {
       transaction.spans.push(span)
     })
 
+    /**
+     * capture resource timing information as Spans during page load transaction
+     */
     if (typeof perf.getEntriesByType === 'function') {
       const resourceEntries = perf.getEntriesByType('resource')
 
@@ -255,6 +282,17 @@ function captureHardNavigation(transaction) {
       createUserTimingSpans(userEntries, transactionEnd).forEach(span =>
         transaction.spans.push(span)
       )
+
+      /**
+       * Add transaction context information from performance navigation timing entry level 2 API
+       */
+      let navigationEntry = perf.getEntriesByType('navigation')
+      if (navigationEntry && navigationEntry.length) {
+        navigationEntry = navigationEntry[0]
+        transaction.addContext({
+          response: getResponseContext(navigationEntry)
+        })
+      }
     }
   }
 }

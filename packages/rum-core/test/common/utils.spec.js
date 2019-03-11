@@ -286,4 +286,34 @@ describe('lib/utils', function() {
     )
     expect(utils.removeInvalidChars('invalid"')).toEqual('invalid_')
   })
+
+  it('get servertiming info from servertiming entries', () => {
+    const serverTimingStr = utils.getServerTimingInfo([
+      {
+        name: 'cache',
+        duration: '200',
+        description: 'Origin cache'
+      },
+      {
+        name: 'edge',
+        duration: '20',
+        description: 'Edge cache'
+      },
+      {
+        name: 'miss'
+      }
+    ])
+    expect(serverTimingStr).toEqual(
+      'Origin cache;cache=200,Edge Cache;edge=20,miss'
+    )
+    // Without description
+    expect(
+      utils.getServerTimingInfo([
+        {
+          name: 'app',
+          duration: '50'
+        }
+      ])
+    ).toEqual('app=50')
+  })
 })
