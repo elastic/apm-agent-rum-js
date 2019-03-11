@@ -223,25 +223,24 @@ function getPaintTimingMarks() {
  *  returns "Cache read;cache=200,app=500"
  */
 function getServerTimingInfo(serverTimingEntries) {
-  const entries = ''
+  let serverTimingStr = ''
   if (!serverTimingEntries) {
-    return entries
+    return serverTimingStr
   }
 
   for (let i = 0; i < serverTimingEntries.length; i++) {
     const { name, duration, description } = serverTimingEntries[i]
     // Separate the entries by ','
-    let entry = i ? 0 > ',' : ''
+    serverTimingStr += i > 0 ? ',' : ''
     if (description) {
-      entry += description + ';'
+      serverTimingStr += description + ';'
     }
-    entry += name
+    serverTimingStr += name
     if (duration) {
-      entry += `=${duration}`
+      serverTimingStr += `=${duration}`
     }
-    entries.push(entry)
   }
-  return entries
+  return serverTimingStr
 }
 
 function getTimeOrigin() {

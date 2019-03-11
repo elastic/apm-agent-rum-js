@@ -114,7 +114,7 @@ function createNavigationTimingSpans(timings, baseTime, transactionEnd) {
 }
 
 function createResourceTimingSpan(resourceTimingEntry) {
-  const { name, initiatorType, start, end } = resourceTimingEntry
+  const { name, initiatorType, startTime, responseEnd } = resourceTimingEntry
   let kind = 'resource'
   if (initiatorType) {
     kind += '.' + initiatorType
@@ -130,9 +130,9 @@ function createResourceTimingSpan(resourceTimingEntry) {
       response: getResponseContext(resourceTimingEntry)
     }
   })
-  span._start = start
+  span._start = startTime
   span.end()
-  span._end = end
+  span._end = responseEnd
   return span
 }
 

@@ -329,4 +329,39 @@ describe('TransactionService', function() {
     transactionService.startTransaction('test-name', 'test-type')
     expect(transactionService.createTransaction).toHaveBeenCalledTimes(1)
   })
+
+  it('should include size & server timing in page load context', done => {
+    const _getEntriesByType = window.performance.getEntriesByType
+
+    window.performance.getEntriesByType = function(type) {
+      expect(['resource', 'paint', 'navigation']).toContain(type)
+      if (type === 'navigation') {
+        return [
+          {
+            transferSize: 55555,
+            encodedBodySize: 58000,
+            serverTiming: [
+              {
+                name: 'a',
+                duration: 20,
+                description: 'test'
+              }
+            ]
+          }
+        ]
+      }
+      return []
+    }
+    transactionService = new TransactionService(logger, config)
+    transactionService.subscribe(function() {
+      expect(tr.context.response).toEqual({
+        transfer_size: 55555,
+        compressed_size: 58000,
+        server_timing: 'test;a=20'
+      })
+      window.performance.getEntriesByType = _getEntriesByType
+      done()
+    })
+    var tr = transactionService.sendPageLoadMetrics('test')
+  })
 })

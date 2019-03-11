@@ -304,7 +304,7 @@ describe('lib/utils', function() {
       }
     ])
     expect(serverTimingStr).toEqual(
-      'Origin cache;cache=200,Edge Cache;edge=20,miss'
+      'Origin cache;cache=200,Edge cache;edge=20,miss'
     )
     // Without description
     expect(
