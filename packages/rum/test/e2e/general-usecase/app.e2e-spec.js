@@ -27,10 +27,7 @@ const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('general-usercase', function() {
   it('should run the general usecase', function() {
-    browser.timeouts('script', 30000)
-    browser.url('/test/e2e/general-usecase/index.html')
-
-    browser.waitUntil(
+    browser.url('/test/e2e/general-usecase/index.html').waitUntil(
       function() {
         return browser.getText('#test-element') === 'Passed'
       },

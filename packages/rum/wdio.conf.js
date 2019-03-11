@@ -23,7 +23,7 @@
  *
  */
 
-const path = require('path')
+const { join } = require('path')
 const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 const { isChrome } = require('../../dev-utils/webdriver')
 
@@ -36,12 +36,6 @@ const browserList = [
     browserName: 'firefox',
     version: '57'
   },
-  // {
-  //   browserName: 'internet explorer',
-  //   platform: 'Windows 10',
-  //   version: '11',
-  //   iedriverVersion: 'x64_2.48.0'
-  // },
   {
     browserName: 'microsoftedge',
     platform: 'Windows 10',
@@ -62,16 +56,16 @@ const browserList = [
 const sauceConnectOpts = getSauceConnectOptions()
 
 exports.config = {
-  specs: [path.join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
+  specs: [join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
   maxInstancesPerCapability: 3,
   services: ['sauce'],
   user: sauceConnectOpts.username,
   key: sauceConnectOpts.accessKey,
-  sauceConnect: true,
+  sauceConnect: false,
   sauceConnectOpts,
   capabilities: browserList,
   logLevel: 'silent',
-  screenshotPath: path.join(__dirname, 'error-screenshot'),
+  screenshotPath: join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',
   waitforTimeout: 30000,
   framework: 'jasmine',

@@ -17,7 +17,7 @@
     "lint:js": "eslint .",
     "lint:license": "node scripts/license-checker",
     "format": "eslint . --fix",
-    "test": "lerna run test --stream --scope=$SCOPE",
+    "test": "lerna run test --stream --scope=$SCOPE --no-prefix",
     "serve": "lerna run serve",
     "bundlesize": "lerna run --scope @elastic/apm-rum bundlesize"
   },

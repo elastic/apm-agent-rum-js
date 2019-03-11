@@ -10,17 +10,19 @@
   },
   "scripts": {
     "build": "webpack",
-    "build-dev": "webpack -w",
+    "build:dev": "webpack -w",
+    "build:e2e": "npm run script buildE2eBundles",
     "bundlesize": "npm run build && bundlesize",
     "karma": "karma start",
-    "karma-coverage": "karma start --coverage",
-    "serve": "npm run script serveE2e ./ 8000",
-    "runUnitTests": "node ../../dev-utils/run-script.js runUnitTests true packages/rum",
-    "runNodeTests": "npm run script runNodeTests",
-    "buildE2eBundles": "npm run script buildE2eBundles",
-    "run-e2e": "npm run script runE2eTests",
+    "karma:coverage": "karma start --coverage",
     "script": "node ./run-script.js",
-    "test": "npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e"
+    "serve": "npm run script serveE2e ./ 8000",
+    "test:integration": "npm run script runNodeTests",
+    "test:unit": "node ../../dev-utils/run-script.js runUnitTests false packages/rum",
+    "test:e2e:supported": "npm run script runE2eTests wdio.conf.js",
+    "test:e2e:failsafe": "npm run script runE2eTests wdio-failsafe.conf.js",
+    "test:sauce": "npm run script runSauceTests",
+    "test": "npm-run-all build build:e2e test:integration test:sauce"
   },
   "files": [
     "src",
