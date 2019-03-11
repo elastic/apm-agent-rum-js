@@ -56,7 +56,7 @@ const browserList = [
 const sauceConnectOpts = getSauceConnectOptions()
 
 exports.config = {
-  specs: [join(__dirname, '/test/e2e/standalone-html/*.e2e-spec.js')],
+  specs: [join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
   maxInstancesPerCapability: 3,
   services: ['sauce'],
   user: sauceConnectOpts.username,
