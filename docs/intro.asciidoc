@@ -63,7 +63,7 @@ https://unpkg.com/elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.j
 <script>
   elasticApm.init({
     serviceName: '',
-    serverUrl: 'http://localhost:8200',
+    serverUrl: 'http://localhost:8200'
   })
 </script>
 ----
