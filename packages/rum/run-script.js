@@ -139,6 +139,10 @@ function runSauceTests(serve = 'true') {
   if (serve === 'true') {
     servers = serveE2e('./', 8000)
   }
+  const loggerOpts = {
+    stdout: process.stdout,
+    stderr: process.stderr
+  }
   /**
    * Since there is no easy way to reuse the sauce connect tunnel even using same tunnel identifier,
    * we launch the sauce connect tunnel before starting all the saucelab tests
@@ -147,28 +151,24 @@ function runSauceTests(serve = 'true') {
    */
   const sauceConnectOpts = getSauceConnectOptions()
   testUtils.runSauceConnect(sauceConnectOpts, () => {
-    runAll('test:unit', {
-      stdout: process.stdout,
-      stderr: process.stderr
-    })
-      .then(() =>
+    runAll('test:unit', loggerOpts)
+      .then(
         runAll(['test:e2e:supported', 'test:e2e:failsafe'], {
           parallel: true,
           aggregateOutput: true,
           printLabel: true,
-          stdout: process.stdout,
-          stderr: process.stderr
+          ...loggerOpts
         })
       )
       .then(() => {
         console.log('All Unit and E2E Sauce Tests done')
+        servers.map(s => s.close())
+        process.exit(0)
       })
       .catch(err => {
         console.log('Sauce Tests Failed', err)
-      })
-      .then(() => {
         servers.map(s => s.close())
-        process.exit(0)
+        process.exit(1)
       })
   })
 }

@@ -24,6 +24,7 @@
  */
 
 const { join } = require('path')
+const glob = require('glob')
 const { config } = require('./wdio.conf')
 
 const browserList = [
@@ -40,6 +41,6 @@ const browserList = [
 ]
 
 exports.config = Object.assign({}, config, {
-  specs: join(__dirname, '/test/e2e/**/*failsafe.js'),
+  specs: glob.sync(join(__dirname, '/test/e2e/**/*failsafe.js')),
   capabilities: browserList
 })

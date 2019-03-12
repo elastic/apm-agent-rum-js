@@ -24,6 +24,7 @@
  */
 
 const { join } = require('path')
+const glob = require('glob')
 const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 const { isChrome } = require('../../dev-utils/webdriver')
 
@@ -56,7 +57,8 @@ const browserList = [
 const sauceConnectOpts = getSauceConnectOptions()
 
 exports.config = {
-  specs: [join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
+  runner: 'local',
+  specs: glob.sync(join(__dirname, '/test/e2e/**/*.e2e-spec.js')),
   maxInstancesPerCapability: 3,
   services: ['sauce'],
   user: sauceConnectOpts.username,
@@ -65,6 +67,7 @@ exports.config = {
   sauceConnectOpts,
   capabilities: browserList,
   logLevel: 'silent',
+  bail: 1,
   screenshotPath: join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',
   waitforTimeout: 30000,
@@ -77,9 +80,8 @@ exports.config = {
     /** Log api is only available in Chrome */
     if (isChrome()) {
       browser.execute('1+1')
-      var response = browser.log('browser')
-      var browserLogs = response.value
-      console.log('browser.log:', JSON.stringify(browserLogs, undefined, 2))
+      const response = browser.getLogs('browser')
+      console.log('browser.log:', JSON.stringify(response, undefined, 2))
     }
   }
 }

@@ -23,22 +23,23 @@
  *
  */
 
-const utils = require('../../../../../dev-utils/webdriver')
+const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('react app', function() {
   it('should run the react app', function() {
-    browser.timeouts('script', 30000)
     browser.url('/test/e2e/react/')
-
+    browser.setTimeout({
+      script: 10000
+    })
     browser.waitUntil(
-      function() {
-        return browser.getText('#test-element') === 'Passed'
+      () => {
+        return $('#test-element').getText() === 'Passed'
       },
       5000,
       'expected element #test-element'
     )
 
-    var result = browser.executeAsync(function(done) {
+    const serverCalls = browser.executeAsync(function(done) {
       var apmServerMock = window.elasticApm.serviceFactory.getService(
         'ApmServer'
       )
@@ -49,7 +50,6 @@ describe('react app', function() {
           serverCalls.sendTransactions &&
           serverCalls.sendTransactions.length > 1
 
-        console.log('calls', serverCalls)
         if (validCalls) {
           Promise.all([
             serverCalls.sendTransactions[0].returnValue,
@@ -85,8 +85,7 @@ describe('react app', function() {
       apmServerMock.subscription.subscribe(checkCalls)
     })
 
-    expect(result.value).toBeTruthy()
-    var serverCalls = result.value
+    expect(serverCalls).toBeTruthy()
     console.log(JSON.stringify(serverCalls, null, 2))
     if (serverCalls.error) {
       fail(serverCalls.error)
@@ -108,6 +107,6 @@ describe('react app', function() {
     })
     expect(fetchDataSpan).toBeDefined()
 
-    return utils.allowSomeBrowserErrors()
+    return allowSomeBrowserErrors()
   })
 })

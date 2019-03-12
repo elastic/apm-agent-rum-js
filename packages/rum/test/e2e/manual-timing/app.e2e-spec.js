@@ -26,19 +26,20 @@
 const { verifyNoBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('manual-timing', function() {
-  it('should run manual timing', function() {
-    browser.timeouts('script', 10000)
+  it('should run manual timing', async function() {
     browser.url('/test/e2e/manual-timing/index.html')
-
+    browser.setTimeout({
+      script: 10000
+    })
     browser.waitUntil(
-      function() {
-        return browser.getText('#test-element') === 'Passed'
+      () => {
+        return $('#test-element').getText() === 'Passed'
       },
       5000,
       'expected element #test-element'
     )
 
-    var result = browser.executeAsync(function(done) {
+    const serverCalls = browser.executeAsync(function(done) {
       var apmServerMock = window.elasticApm.serviceFactory.getService(
         'ApmServer'
       )
@@ -87,8 +88,7 @@ describe('manual-timing', function() {
       apmServerMock.subscription.subscribe(checkCalls)
     })
 
-    expect(result.value).toBeTruthy()
-    var serverCalls = result.value
+    expect(serverCalls).toBeTruthy()
     console.log(JSON.stringify(serverCalls, null, 2))
     if (serverCalls.error) {
       fail(serverCalls.error)

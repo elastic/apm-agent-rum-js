@@ -27,9 +27,10 @@ const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('standalone-html', function() {
   it('should run the usecase', function() {
-    browser.url('/test/e2e/standalone-html/index.html').waitUntil(
-      function() {
-        return browser.getText('#test-element') === 'Passed'
+    browser.url('/test/e2e/standalone-html/index.html')
+    browser.waitUntil(
+      () => {
+        return $('#test-element').getText() === 'Passed'
       },
       10000,
       'expected element #test-element'
@@ -39,9 +40,10 @@ describe('standalone-html', function() {
   })
 
   it('should run the opentracing use-case', function() {
-    browser.url('/test/e2e/standalone-html/opentracing.html').waitUntil(
-      function() {
-        return browser.getText('#test-element') === 'Passed'
+    browser.url('/test/e2e/standalone-html/opentracing.html')
+    browser.waitUntil(
+      () => {
+        return $('#test-element').getText() === 'Passed'
       },
       10000,
       'expected element #test-element'

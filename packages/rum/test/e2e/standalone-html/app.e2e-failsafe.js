@@ -25,15 +25,16 @@
 
 describe('standalone-html', function() {
   it('should run application without errors for base bundle', function() {
-    browser.url('/test/e2e/standalone-html/index.html').waitUntil(
+    browser.url('/test/e2e/standalone-html/index.html')
+    browser.waitUntil(
       () => {
-        return browser.getText('#test-element') === 'Passed'
+        return $('#test-element').getText() === 'Passed'
       },
       10000,
       'expected element #test-element'
     )
 
-    const { value: capturedErrors } = browser.execute(function() {
+    const capturedErrors = browser.execute(function() {
       return window.capturedTestErrors
     })
     console.error('CapturedErrors', capturedErrors)
@@ -41,15 +42,16 @@ describe('standalone-html', function() {
   })
 
   it('should run application without errors for opentracing bundle', function() {
-    browser.url('/test/e2e/standalone-html/opentracing.html').waitUntil(
-      function() {
-        return browser.getText('#test-element') === 'Passed'
+    browser.url('/test/e2e/standalone-html/opentracing.html')
+    browser.waitUntil(
+      () => {
+        return $('#test-element').getText() === 'Passed'
       },
       10000,
       'expected element #test-element'
     )
 
-    const { value: capturedErrors } = browser.execute(function() {
+    const capturedErrors = browser.execute(function() {
       return window.capturedTestErrors
     })
     console.error('CapturedErrors', capturedErrors)
