@@ -152,7 +152,7 @@ function runSauceTests(serve = 'true') {
   const sauceConnectOpts = getSauceConnectOptions()
   testUtils.runSauceConnect(sauceConnectOpts, () => {
     runAll('test:unit', loggerOpts)
-      .then(
+      .then(() =>
         runAll(['test:e2e:supported', 'test:e2e:failsafe'], {
           parallel: true,
           aggregateOutput: true,
