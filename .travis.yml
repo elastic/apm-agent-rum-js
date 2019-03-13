@@ -19,22 +19,19 @@ env:
     - MODE=saucelabs
 
 stages:
-  - lint
+  - check
   - test
-  - bundlesize
-  - docs
 
 jobs:
+  allow_failures:
+    - script: npm run bundlesize
   include:
-    - stage: docs
-      script: npm run build-docs
-      name: 'Build Docs'
-    - stage: bundlesize
-      script: npm run bundlesize
-      name: 'Analyse size of JS bundles'
-    - stage: lint
+    - stage: check
       script: npm run lint
       name: 'Lint'
+    - stage: check
+      script: npm run bundlesize
+      name: 'Analyse size of JS bundles'
     - stage: test
       env:
         - STACK_VERSION=6.5.0
@@ -59,7 +56,9 @@ jobs:
       env:
         - STACK_VERSION=7.0.0-alpha1-SNAPSHOT
         - SCOPE=@elastic/apm-rum
-
+    - stage: test
+      script: npm run build-docs
+      name: 'Build Docs'
 addons:
   apt:
     packages:
