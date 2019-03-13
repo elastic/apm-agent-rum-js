@@ -151,15 +151,13 @@ function runSauceTests(serve = 'true') {
    * Since there is no easy way to reuse the sauce connect tunnel even using same tunnel identifier,
    * we launch the sauce connect tunnel before starting all the saucelab tests
    *
-   * Unit tests are not run in parallel with E2E because of concurrency limit in saucelabs
+   * Unit & E2E tests are executed in series because of concurrency limit in saucelabs
    */
   const sauceConnectOpts = getSauceConnectOptions()
   testUtils.runSauceConnect(sauceConnectOpts, async sauceConnectProcess => {
     try {
-      await runAll('test:unit', loggerOpts)
-      await runAll(['test:e2e:supported', 'test:e2e:failsafe'], {
-        parallel: true,
-        aggregateOutput: false,
+      await runAll(['test:unit', 'test:e2e:supported', 'test:e2e:failsafe'], {
+        parallel: false,
         printLabel: true,
         ...loggerOpts
       })
