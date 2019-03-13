@@ -28,6 +28,7 @@ const glob = require('glob')
 const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 const { isChrome } = require('../../dev-utils/webdriver')
 
+const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
 const browserList = [
   {
     browserName: 'chrome',
@@ -54,19 +55,16 @@ const browserList = [
     platformVersion: '5.0',
     platformName: 'android'
   }
-]
-
-const sauceConnectOpts = getSauceConnectOptions()
+].map(capability => ({ tunnelIdentifier, ...capability }))
 
 exports.config = {
   runner: 'local',
   specs: glob.sync(join(__dirname, '/test/e2e/**/*.e2e-spec.js')),
   maxInstancesPerCapability: 3,
   services: ['sauce'],
-  user: sauceConnectOpts.username,
-  key: sauceConnectOpts.accessKey,
+  user: username,
+  key: accessKey,
   sauceConnect: false,
-  sauceConnectOpts,
   capabilities: browserList,
   logLevel: 'silent',
   bail: 1,
