@@ -28,11 +28,19 @@ import { getGlobalConfig } from '../../../../../dev-utils/test-config'
 
 const { serverUrl, mockBackendUrl } = getGlobalConfig().testConfig
 
-window.elasticApm.init({
-  serviceName: 'standalone-html',
-  serverUrl,
-  distributedTracingOrigins: [mockBackendUrl],
-  pageLoadTransactionName: '/'
-})
+function initApm() {
+  window.elasticApm.init({
+    serviceName: 'standalone-html',
+    serverUrl,
+    distributedTracingOrigins: [mockBackendUrl],
+    pageLoadTransactionName: '/'
+  })
 
-testXHR(mockBackendUrl, renderTestElement)
+  testXHR(mockBackendUrl, renderTestElement)
+}
+
+if (window.elasticApm) {
+  initApm()
+} else {
+  window.initApm = initApm
+}

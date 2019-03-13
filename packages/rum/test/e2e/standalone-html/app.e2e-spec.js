@@ -39,6 +39,19 @@ describe('standalone-html', function() {
     return allowSomeBrowserErrors(['timeout test error with a secret'])
   })
 
+  it('should run the async usecase', function() {
+    browser.url('/test/e2e/standalone-html/index-async.html')
+    browser.waitUntil(
+      () => {
+        return $('#test-element').getText() === 'Passed'
+      },
+      10000,
+      'expected element #test-element'
+    )
+
+    return allowSomeBrowserErrors(['timeout test error with a secret'])
+  })
+
   it('should run the opentracing use-case', function() {
     browser.url('/test/e2e/standalone-html/opentracing.html')
     browser.waitUntil(
