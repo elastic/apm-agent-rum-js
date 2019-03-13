@@ -161,13 +161,13 @@ function startSelenium(callback, manualStop) {
 }
 
 function runSauceConnect(config, callback) {
-  return sauceConnectLauncher(config, err => {
+  return sauceConnectLauncher(config, (err, sauceConnectProcess) => {
     if (err) {
       console.error('Sauce connect Error', err)
       return process.exit(1)
     } else {
       console.log('Sauce connect ready')
-      callback()
+      callback(sauceConnectProcess)
     }
   })
 }

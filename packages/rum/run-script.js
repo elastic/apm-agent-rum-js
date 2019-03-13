@@ -139,6 +139,10 @@ function runSauceTests(serve = 'true') {
   if (serve === 'true') {
     servers = serveE2e('./', 8000)
   }
+  /**
+   * Decides the saucelabs test status
+   */
+  let exitCode = 0
   const loggerOpts = {
     stdout: process.stdout,
     stderr: process.stderr
@@ -150,26 +154,23 @@ function runSauceTests(serve = 'true') {
    * Unit tests are not run in parallel with E2E because of concurrency limit in saucelabs
    */
   const sauceConnectOpts = getSauceConnectOptions()
-  testUtils.runSauceConnect(sauceConnectOpts, () => {
-    runAll('test:unit', loggerOpts)
-      .then(() =>
-        runAll(['test:e2e:supported', 'test:e2e:failsafe'], {
-          parallel: true,
-          aggregateOutput: true,
-          printLabel: true,
-          ...loggerOpts
-        })
-      )
-      .then(() => {
-        console.log('All Unit and E2E Sauce Tests done')
-        servers.map(s => s.close())
-        process.exit(0)
+  testUtils.runSauceConnect(sauceConnectOpts, async sauceConnectProcess => {
+    try {
+      await runAll('test:unit', loggerOpts)
+      await runAll(['test:e2e:supported', 'test:e2e:failsafe'], {
+        parallel: true,
+        aggregateOutput: false,
+        printLabel: true,
+        ...loggerOpts
       })
-      .catch(err => {
-        console.log('Sauce Tests Failed', err)
-        servers.map(s => s.close())
-        process.exit(1)
-      })
+      console.log('All Unit and E2E Sauce Tests done')
+    } catch (err) {
+      console.log('Sauce Tests Failed', err)
+      exitCode = 1
+    } finally {
+      servers.map(s => s.close())
+      sauceConnectProcess.close(() => process.exit(exitCode))
+    }
   })
 }
 

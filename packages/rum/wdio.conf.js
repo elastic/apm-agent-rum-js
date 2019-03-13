@@ -69,7 +69,7 @@ exports.config = {
   sauceConnectOpts,
   capabilities: browserList,
   logLevel: 'silent',
-  bail: 0,
+  bail: 1,
   screenshotPath: join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',
   waitforTimeout: 30000,
