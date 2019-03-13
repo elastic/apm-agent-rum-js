@@ -48,9 +48,11 @@ const browserList = [
     version: '9.0'
   },
   {
-    browserName: 'android',
-    platform: 'Linux',
-    version: '5.0'
+    appiumVersion: '1.9.1',
+    deviceName: 'android emulator',
+    browserName: 'browser',
+    platformVersion: '5.0',
+    platformName: 'android'
   }
 ]
 
@@ -67,7 +69,7 @@ exports.config = {
   sauceConnectOpts,
   capabilities: browserList,
   logLevel: 'silent',
-  bail: 1,
+  bail: 0,
   screenshotPath: join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',
   waitforTimeout: 30000,

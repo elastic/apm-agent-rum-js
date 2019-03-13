@@ -34,9 +34,11 @@ const browserList = [
     version: '10'
   },
   {
-    browserName: 'android',
-    platform: 'Linux',
-    version: '4.4'
+    appiumVersion: '1.9.1',
+    deviceName: 'android emulator',
+    browserName: 'browser',
+    platformVersion: '4.4',
+    platformName: 'android'
   }
 ]
 

@@ -65,9 +65,11 @@ const baseLaunchers = {
   },
   SL_ANDROID: {
     base: 'SauceLabs',
-    browserName: 'android',
-    platform: 'Linux',
-    version: '5.0'
+    appiumVersion: '1.9.1',
+    deviceName: 'android emulator',
+    browserName: 'browser',
+    platformVersion: '5.0',
+    platformName: 'android'
   },
   SL_IOS9: {
     base: 'SauceLabs',
