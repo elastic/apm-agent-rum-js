@@ -87,13 +87,20 @@ function serveE2e(servingPath, port) {
 
   app.get('/run_integration_test', async function(req, res) {
     const echo = req.query.echo
-    const result = await runIntegrationTest(
-      'http://localhost:8000/test/e2e/general-usecase/'
-    )
-    if (echo) {
-      res.send(echo)
-    } else {
+    try {
+      const result = await runIntegrationTest(
+        'http://localhost:8000/test/e2e/general-usecase/'
+      )
+      if (echo) {
+        return res.send(echo)
+      }
       res.send(result)
+    } catch (err) {
+      /**
+       * This implies a failure in running the Integration test and we
+       * return 500 instead of success status code 200
+       */
+      res.status(500).send(err.message)
     }
   })
 
@@ -116,7 +123,7 @@ function runJasmine(cb) {
     if (!passed) {
       const err = new Error('Jasmine node tests failed.')
       // The stack is not useful in this context.
-      err.showStack = false
+      err.stack = ''
       cb(err)
     } else {
       cb()
@@ -182,7 +189,7 @@ const scripts = {
     runJasmine(function(err) {
       servers.forEach(server => server.close())
       if (err) {
-        console.log('Node tests failed:', err)
+        console.log('Node tests failed:', err.message)
         process.exit(2)
       }
     })

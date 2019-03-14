@@ -75,6 +75,7 @@ async function runIntegrationTest(pageUrl) {
     }
   } catch (err) {
     console.log('[Intgration Tests Error]', err)
+    throw err
   } finally {
     await browser.close()
   }
