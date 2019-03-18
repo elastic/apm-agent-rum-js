@@ -26,7 +26,7 @@
 const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
-const { Launcher } = require('webdriverio')
+const { default: Launcher } = require('@wdio/cli')
 const sauceConnectLauncher = require('sauce-connect-launcher')
 const { singleRunKarma } = require('./karma')
 
@@ -161,13 +161,13 @@ function startSelenium(callback, manualStop) {
 }
 
 function runSauceConnect(config, callback) {
-  return sauceConnectLauncher(config, err => {
+  return sauceConnectLauncher(config, (err, sauceConnectProcess) => {
     if (err) {
       console.error('Sauce connect Error', err)
       return process.exit(1)
     } else {
       console.log('Sauce connect ready')
-      callback()
+      callback(sauceConnectProcess)
     }
   })
 }
@@ -183,7 +183,7 @@ function runKarma(configFile) {
 }
 
 function runE2eTests(configFilePath, runSelenium) {
-  const wdio = new Launcher(configFilePath)
+  const wdio = new Launcher(configFilePath, {})
   function runWdio() {
     wdio.run().then(
       function(code) {
@@ -195,7 +195,6 @@ function runE2eTests(configFilePath, runSelenium) {
         console.error('Launcher failed to start the test', error)
         process.stdin.pause()
         process.nextTick(() => process.exit())
-        // process.exit(1)
       }
     )
   }
