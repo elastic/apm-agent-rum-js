@@ -36,10 +36,8 @@ describe('integration-test', function() {
           var message = `Integration test failed, error: ${err}, response: ${resp &&
             resp.statusCode}, body: ${body}`
           fail(message)
-          console.log(message)
-        } else {
-          done()
         }
+        done()
       }
     )
   })

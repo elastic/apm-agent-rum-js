@@ -73,6 +73,9 @@ async function runIntegrationTest(pageUrl) {
     result.response = {
       status: transactionResponse.status()
     }
+  } catch (err) {
+    console.log('[Intgration Tests Error]', err)
+    throw err
   } finally {
     await browser.close()
   }
