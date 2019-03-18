@@ -24,9 +24,11 @@
  */
 
 const { join } = require('path')
+const glob = require('glob')
 const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 const { isChrome } = require('../../dev-utils/webdriver')
 
+const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
 const browserList = [
   {
     browserName: 'chrome',
@@ -47,24 +49,25 @@ const browserList = [
     version: '9.0'
   },
   {
-    browserName: 'android',
-    platform: 'Linux',
-    version: '5.0'
+    appiumVersion: '1.9.1',
+    deviceName: 'android emulator',
+    browserName: 'browser',
+    platformVersion: '5.0',
+    platformName: 'android'
   }
-]
-
-const sauceConnectOpts = getSauceConnectOptions()
+].map(capability => ({ tunnelIdentifier, ...capability }))
 
 exports.config = {
-  specs: [join(__dirname, '/test/e2e/**/*.e2e-spec.js')],
+  runner: 'local',
+  specs: glob.sync(join(__dirname, '/test/e2e/**/*.e2e-spec.js')),
   maxInstancesPerCapability: 3,
   services: ['sauce'],
-  user: sauceConnectOpts.username,
-  key: sauceConnectOpts.accessKey,
+  user: username,
+  key: accessKey,
   sauceConnect: false,
-  sauceConnectOpts,
   capabilities: browserList,
   logLevel: 'silent',
+  bail: 1,
   screenshotPath: join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',
   waitforTimeout: 30000,
@@ -77,9 +80,8 @@ exports.config = {
     /** Log api is only available in Chrome */
     if (isChrome()) {
       browser.execute('1+1')
-      var response = browser.log('browser')
-      var browserLogs = response.value
-      console.log('browser.log:', JSON.stringify(browserLogs, undefined, 2))
+      const response = browser.getLogs('browser')
+      console.log('browser.log:', JSON.stringify(response, undefined, 2))
     }
   }
 }

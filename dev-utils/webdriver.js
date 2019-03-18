@@ -36,7 +36,7 @@ const debugMode = false
 const debugLevel = logLevels.INFO.value
 
 function isChrome() {
-  const browserName = browser.desiredCapabilities.browserName.toLowerCase()
+  const browserName = browser.capabilities.browserName.toLowerCase()
   return browserName.indexOf('chrome') !== -1
 }
 
@@ -51,10 +51,10 @@ function assertNoBrowserErrors(whitelist) {
     // TODO: Bug in ChromeDriver: Need to execute at least one command
     // so that the browser logs can be read out!
     browser.execute('1+1')
-    var response = browser.log('browser')
+    var response = browser.getLogs('browser')
     var failureEntries = []
     var debugLogs = []
-    var browserLog = response.value
+    var browserLog = response
 
     for (var i = 0; i < browserLog.length; i++) {
       var logEntry = browserLog[i]

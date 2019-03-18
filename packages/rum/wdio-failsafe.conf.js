@@ -24,8 +24,11 @@
  */
 
 const { join } = require('path')
+const glob = require('glob')
 const { config } = require('./wdio.conf')
+const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 
+const { tunnelIdentifier } = getSauceConnectOptions()
 const browserList = [
   {
     browserName: 'internet explorer',
@@ -33,13 +36,15 @@ const browserList = [
     version: '10'
   },
   {
-    browserName: 'android',
-    platform: 'Linux',
-    version: '4.4'
+    appiumVersion: '1.9.1',
+    deviceName: 'android emulator',
+    browserName: 'browser',
+    platformVersion: '4.4',
+    platformName: 'android'
   }
-]
+].map(capability => ({ tunnelIdentifier, ...capability }))
 
 exports.config = Object.assign({}, config, {
-  specs: join(__dirname, '/test/e2e/**/*failsafe.js'),
+  specs: glob.sync(join(__dirname, '/test/e2e/**/*failsafe.js')),
   capabilities: browserList
 })

@@ -27,15 +27,16 @@ const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('general-usercase', function() {
   it('should run the general usecase', function() {
-    browser.url('/test/e2e/general-usecase/index.html').waitUntil(
-      function() {
-        return browser.getText('#test-element') === 'Passed'
+    browser.url('/test/e2e/general-usecase/index.html')
+    browser.waitUntil(
+      () => {
+        return $('#test-element').getText() === 'Passed'
       },
       5000,
       'expected element #test-element'
     )
 
-    var result = browser.executeAsync(function(done) {
+    const serverCalls = browser.executeAsync(function(done) {
       var apmServerMock = window.elasticApm.serviceFactory.getService(
         'ApmServer'
       )
@@ -85,8 +86,7 @@ describe('general-usercase', function() {
       apmServerMock.subscription.subscribe(checkCalls)
     })
 
-    expect(result.value).toBeTruthy()
-    var serverCalls = result.value
+    expect(serverCalls).toBeTruthy()
     console.log(JSON.stringify(serverCalls, null, 2))
     if (serverCalls.error) {
       fail(serverCalls.error)
