@@ -85,7 +85,7 @@ var formData = {
   bundle_filepath: 'http://localhost/app.min.js',
   service_name: 'service-name'
 }
-request.post({url: 'http://localhost:8200/v1/rum/sourcemaps',formData: formData}, function (err, resp, body) {
+request.post({url: 'http://localhost:8200/assets/v1/sourcemaps',formData: formData}, function (err, resp, body) {
   if (err) {
     console.log('Error while uploading sourcemaps!', err)
   } else {
@@ -99,7 +99,7 @@ You can also use `curl` command:
 [source,sh]
 ----
 SERVICEVERSION=`node -e "console.log(require('./package.json').version);"` && \
-curl http://localhost:8200/v1/rum/sourcemaps -X POST \
+curl http://localhost:8200/assets/v1/sourcemaps -X POST \
     -F sourcemap=@./dist/app.min.js.map \
     -F service_version="$SERVICEVERSION" \
     -F bundle_filepath="http://localhost/app.min.js" \
@@ -111,7 +111,7 @@ Or use current git commit hash:
 [source,sh]
 ----
 SERVICEVERSION=`git rev-parse --short HEAD` && \
-curl http://localhost:8200/v1/rum/sourcemaps -X POST \
+curl http://localhost:8200/assets/v1/sourcemaps -X POST \
     -F sourcemap=@./dist/app.min.js.map \
     -F service_version="$SERVICEVERSION" \
     -F bundle_filepath="http://localhost/app.min.js" \
@@ -130,10 +130,14 @@ Here's how to add the secret token to a curl command:
 [source,sh]
 ----
 SERVICEVERSION=`git rev-parse --short HEAD` && \
-curl http://localhost:8200/v1/rum/sourcemaps -X POST \
+curl http://localhost:8200/assets/v1/sourcemaps -X POST \
     -F sourcemap=@./dist/app.min.js.map \
     -F service_version="$SERVICEVERSION" \
     -F bundle_filepath="http://localhost/app.min.js" \
     -F service_name="service-name" \
     -H "Authorization: Bearer <token>"
 ----
+
+
+NOTE: Please note that the previously provided endpoint (`/v1/rum/sourcemaps`) 
+has been deprecated and will be removed starting with APM Server version 7.0+.
