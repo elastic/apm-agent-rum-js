@@ -296,4 +296,17 @@ describe('navigationTiming', function() {
     navigationTiming.captureHardNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
   })
+
+  it('should fix custom marks when changing transaction._start', function() {
+    var tr = new Transaction('test', 'test')
+    tr.isHardNavigation = true
+    tr.mark('testMark')
+    const markValue = tr.marks.custom.testMark
+    const start = tr._start
+    expect(markValue).toBeGreaterThanOrEqual(0)
+    expect(start).toBeGreaterThan(0)
+    tr.end()
+    navigationTiming.captureHardNavigation(tr)
+    expect(tr.marks.custom.testMark).toEqual(start + markValue)
+  })
 })
