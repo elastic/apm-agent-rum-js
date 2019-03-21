@@ -68,14 +68,15 @@ const baseLaunchers = {
     appiumVersion: '1.9.1',
     deviceName: 'android emulator',
     browserName: 'browser',
-    platformVersion: '5.0',
+    platformVersion: '5.1',
     platformName: 'android'
   },
   SL_IOS9: {
     base: 'SauceLabs',
+    appiumVersion: '1.9.1',
     deviceName: 'iPhone Simulator',
     deviceOrientation: 'portrait',
-    platformVersion: '9.3',
+    platformVersion: '11.0',
     platformName: 'iOS',
     browserName: 'Safari'
   }
