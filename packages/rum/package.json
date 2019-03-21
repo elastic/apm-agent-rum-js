@@ -1,6 +1,6 @@
 {
   "name": "@elastic/apm-rum",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Elastic APM JavaScript agent",
   "main": "src/index.js",
   "repository": {
