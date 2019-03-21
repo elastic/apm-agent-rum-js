@@ -99,6 +99,7 @@ describe('general-usercase', function() {
 
     expect(serverCalls.sendTransactions.length).toBe(1)
     var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
+    expect(transactionPayload.marks.agent.domComplete).toBeDefined()
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('general-usecase-initial-page-load')
     expect(transactionPayload.spans.length).toBeGreaterThan(2)
