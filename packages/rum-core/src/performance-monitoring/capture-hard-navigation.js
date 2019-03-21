@@ -175,6 +175,13 @@ function captureHardNavigation(transaction) {
   const perf = window.performance
   if (transaction.isHardNavigation && perf && perf.timing) {
     const timings = perf.timing
+    if (transaction.marks && transaction.marks.custom) {
+      var customMarks = transaction.marks.custom
+      Object.keys(customMarks).forEach(key => {
+        customMarks[key] += transaction._start
+      })
+    }
+
     // must be zero otherwise the calculated relative _start time would be wrong
     transaction._start = 0
     transaction.type = 'page-load'
