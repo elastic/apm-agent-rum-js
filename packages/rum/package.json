@@ -8,6 +8,9 @@
     "url": "https://github.com/elastic/apm-agent-rum-js.git",
     "directory": "packages/rum"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "webpack",
     "build:dev": "webpack -w",

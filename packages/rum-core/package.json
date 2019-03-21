@@ -4,6 +4,9 @@
   "description": "Elastic apm core",
   "license": "MIT",
   "main": "src/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/elastic/apm-agent-rum-js.git",
