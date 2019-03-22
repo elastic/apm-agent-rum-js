@@ -23,7 +23,7 @@
  *
  */
 
-var patchAll = require('../../src/common/patching/').patchAll
+const { patchAll } = require('../../src/common/patching/')
 
 if (!window['__patchSubscription']) {
   var nativeFetch = window.fetch
@@ -37,7 +37,7 @@ if (!window['__patchSubscription']) {
       }
     }
   }
-  console.log('patchservice')
+  console.log('Pathching XHR and FETCH calls')
   window['__patchSubscription'] = patchAll()
 }
 

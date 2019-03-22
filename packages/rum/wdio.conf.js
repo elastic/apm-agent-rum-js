@@ -25,37 +25,17 @@
 
 const { join } = require('path')
 const glob = require('glob')
-const { getSauceConnectOptions } = require('../../dev-utils/test-config')
+const {
+  getSauceConnectOptions,
+  getBrowserList
+} = require('../../dev-utils/test-config')
 const { isChrome } = require('../../dev-utils/webdriver')
 
 const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
-const browserList = [
-  {
-    browserName: 'chrome',
-    version: '62'
-  },
-  {
-    browserName: 'firefox',
-    version: '57'
-  },
-  {
-    browserName: 'microsoftedge',
-    platform: 'Windows 10',
-    version: '17'
-  },
-  {
-    browserName: 'safari',
-    platform: 'OS X 10.11',
-    version: '9.0'
-  },
-  {
-    appiumVersion: '1.9.1',
-    deviceName: 'android emulator',
-    browserName: 'browser',
-    platformVersion: '5.1',
-    platformName: 'android'
-  }
-].map(capability => ({ tunnelIdentifier, ...capability }))
+const capabilities = getBrowserList().map(capability => ({
+  tunnelIdentifier,
+  ...capability
+}))
 
 exports.config = {
   runner: 'local',
@@ -65,7 +45,7 @@ exports.config = {
   user: username,
   key: accessKey,
   sauceConnect: false,
-  capabilities: browserList,
+  capabilities,
   logLevel: 'silent',
   bail: 1,
   screenshotPath: join(__dirname, 'error-screenshot'),
