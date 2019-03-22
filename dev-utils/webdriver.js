@@ -40,6 +40,11 @@ function isChrome() {
   return browserName.indexOf('chrome') !== -1
 }
 
+function isIOSDevice() {
+  const platformName = browser.capabilities.platformName.toLowerCase()
+  return platformName === 'ios'
+}
+
 function assertNoBrowserErrors(whitelist) {
   return new Promise((resolve, reject) => {
     /**
@@ -133,5 +138,6 @@ module.exports = {
       // done()
     }
   },
-  isChrome
+  isChrome,
+  isIOSDevice
 }
