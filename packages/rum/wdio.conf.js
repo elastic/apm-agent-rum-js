@@ -46,7 +46,7 @@ exports.config = {
   key: accessKey,
   sauceConnect: false,
   capabilities,
-  logLevel: 'silent',
+  logLevel: 'error',
   bail: 1,
   screenshotPath: join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',
