@@ -66,14 +66,23 @@ elasticApm.addFilter(function(payload) {
     })
   }
   if (payload.transactions) {
+    /**
+     * In IE 11 - window.URL is not supported but it exists as an object
+     * We have to ensure that it is indeed a native code
+     */
+    if (window.URL.toString().indexOf('native code') >= 0) {
+      return payload
+    }
     payload.transactions.forEach(function(tr) {
       tr.spans.forEach(function(span) {
         if (span.context && span.context.http && span.context.http.url) {
-          var url = new URL(span.context.http.url, window.location.origin)
-          if (url.searchParams && url.searchParams.get('token')) {
-            url.searchParams.set('token', 'REDACTED')
+          if (window.URL.toString().indexOf('native code') !== -1) {
+            var url = new URL(span.context.http.url, window.location.origin)
+            if (url.searchParams && url.searchParams.get('token')) {
+              url.searchParams.set('token', 'REDACTED')
+            }
+            span.context.http.url = url.toString()
           }
-          span.context.http.url = url.toString()
         }
       })
     })

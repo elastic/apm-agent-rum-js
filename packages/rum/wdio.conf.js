@@ -32,10 +32,17 @@ const {
 const { isChrome } = require('../../dev-utils/webdriver')
 
 const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
-const capabilities = getBrowserList().map(capability => ({
-  tunnelIdentifier,
-  ...capability
-}))
+
+/**
+ * Skip the ios platform on E2E tests because of script
+ * timeout issue in Appium
+ß */
+const capabilities = getBrowserList()
+  .filter(({ platformName }) => platformName !== 'iOS')
+  .map(capability => ({
+    tunnelIdentifier,
+    ...capability
+  }))
 
 exports.config = {
   runner: 'local',
@@ -55,6 +62,13 @@ exports.config = {
   reporters: ['dot', 'spec'],
   jasmineNodeOpts: {
     defaultTimeoutInterval: 90000
+  },
+  beforeTest() {
+    /**
+     * Sets timeout for scripts executed in the browser
+     * via browser.executeAsync method
+     */
+    browser.setTimeout({ script: 20000 })
   },
   afterTest() {
     /** Log api is only available in Chrome */
