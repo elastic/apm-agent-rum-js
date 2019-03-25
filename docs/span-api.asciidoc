@@ -1,0 +1,69 @@
+[[span-api]]
+
+=== `Span` API
+
+A span measures the duration of a single event.
+When a span is created it will measure the time until <<span-end,`span.end()`>> is called.
+
+To get a `Span` object,
+you need to call <<apm-start-span,`apm.startSpan()`>>.
+
+[float]
+[[span-name]]
+==== `span.name`
+
+* *Type:* String
+* *Default:* `Unknown`
+
+The name of the span.
+This can also be set via <<apm-start-span,`apm.startSpan()`>>.
+
+
+[float]
+[[span-type]]
+==== `span.type`
+
+* *Type:* String
+* *Default:* `custom`
+
+The type of span.
+This can also be set via <<apm-start-span,`apm.startSpan()`>>.
+
+The type is a hierarchical string used to group similar spans together.
+For instance, all outgoing AJAX requests are given the type `external.http`.
+
+In the above example, `external` is considered the type prefix.
+Though there are no naming restrictions for this prefix,
+the following are standardized across all Elastic APM agents:
+`app`, `db`, `cache`, `template`, and `external`.
+
+
+[float]
+[[span-add-tags]]
+==== `span.addTags()`
+
+[source,js]
+----
+span.addTags({ [name]: value })
+----
+
+Add several tags on the span. If an error happens during the span,
+it will also get tagged with the same tags.
+
+Arguments:
+
+* `name` - Any string. All periods (.), asterisks (*), and double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
+
+* `value` - Any string. If a non-string data type is given, it's converted to a string before being sent to the APM Server.
+
+
+[float]
+[[span-end]]
+==== `span.end()`
+
+[source,js]
+----
+span.end()
+----
+
+Ends the span. If the span has already ended, nothing happens.
