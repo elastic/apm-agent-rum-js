@@ -1,0 +1,196 @@
+[[agent-api]]
+
+=== `Agent` API
+
+You can access agent API after initializing the agent: 
+
+[source,js]
+----
+var apm = require('@elastic/apm-rum').init(...)
+----
+
+[float]
+[[apm-set-user-context]]
+==== `apm.setUserContext()`
+
+[source,js]
+----
+apm.setUserContext(context)
+----
+
+Call this method to enrich collected performance data and errors with information about the user.
+
+The given `context` argument must be an object and can contain the following properties (all optional):
+
+* `id` - The users ID
+* `username` - The users username
+* `email` - The users e-mail
+
+
+The provided user context is stored under `context.user` in Elasticsearch on both errors and transactions.
+
+
+[float]
+[[apm-set-custom-context]]
+==== `apm.setCustomContext()`
+
+[source,js]
+----
+apm.setCustomContext(context)
+----
+
+Call this to enrich collected errors and transactions with any information that you think will help you debug performance issues or errors.
+
+The provided custom context is stored under `context.custom` in Elasticsearch on both errors and transactions.
+
+The given `context` argument must be an object and can contain any property that can be JSON encoded.
+
+
+[float]
+[[apm-add-tags]]
+==== `apm.addTags()`
+
+[source,js]
+----
+apm.addTags({ [name]: value })
+----
+
+Set tags on transactions and errors.
+
+Tags are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via `setCustomContext()`). You can set multiple tags.
+
+Arguments:
+
+* `name` - Any string. All periods (.), asterisks (*), and double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
+
+* `value` - Any string. If a non-string data type is given, it's converted to a string before being sent to the APM Server.
+
+
+[float]
+[[apm-add-filter]]
+==== `apm.addFilter()`
+
+A filter can be used to modify the APM payload before it is sent to the apm-server.
+This can be useful in for example redacting sensitive information from the payload:
+
+[source,js]
+----
+apm.addFilter(function (payload) {
+  if (payload.errors) {
+    payload.errors.forEach(function (error) {
+      error.exception.message = error.exception.message.replace('secret', '[REDACTED]')
+    })
+  }
+  if (payload.transactions) {
+    payload.transactions.forEach(function (tr) {
+      tr.spans.forEach(function (span) {
+        if (span.context && span.context.http && span.context.http.url) {
+          var url = new URL(span.context.http.url)
+          if (url.searchParams.get('token')) {
+            url.searchParams.set('token', 'REDACTED')
+          }
+          span.context.http.url = url.toString()
+        }
+      })
+    })
+  }
+  // Make sure to return the payload
+  return payload
+})
+----
+
+NOTE: The payload will be dropped if one of the filters return a falsy value.
+
+
+[float]
+[[apm-start-transaction]]
+==== `apm.startTransaction()`
+
+[source,js]
+----
+apm.startTransaction(name, type)
+----
+
+
+Starts and returns a new transaction.
+
+Arguments:
+
+* `name` - The name of the transaction (string). Defaults to `Unknown`
+
+* `type` - The type of the transaction (string). Defaults to `custom`
+
+
+Use this method to create a custom transaction.
+
+NOTE: Calling this method would result in ending the current transaction and replacing it with the new transaction.
+
+NOTE: This method returns `undefined` if apm is disabled or if `isActive` is set to `false`.
+
+[float]
+[[apm-start-span]]
+==== `apm.startSpan()`
+
+[source,js]
+----
+var span = apm.startSpan(name, type)
+----
+
+Starts and returns a new span on the current transaction.
+
+Arguments:
+
+* `name` - The name of the span (string). Defaults to `Unknown`
+
+* `type` - The type of the span (string). Defaults to `custom`
+
+NOTE: This method returns `undefined` if apm is disabled or if `isActive` is set to `false`.
+
+
+[float]
+[[set-initial-page-load-name]]
+==== `apm.setInitialPageLoadName()`
+
+[source,js]
+----
+apm.setInitialPageLoadName(name)
+----
+
+Arguments:
+
+* `name` - The name of the page-load transaction (string).
+
+Use this method to set the name of the `page-load` transaction that is sent automatically on page load event.
+See the <<custom-transaction-name,custom initial page load transaction names>> documentation for strategies on using this method.
+
+
+[float]
+[[get-current-transaction]]
+==== `apm.getCurrentTransaction()`
+
+[source,js]
+----
+apm.getCurrentTransaction()
+----
+
+Use this method to get the current active transaction. If there is no active transaction it will return `undefined`.
+
+[float]
+[[capture-error]]
+==== `apm.captureError()`
+
+[source,js]
+----
+apm.captureError(error)
+----
+
+Arguments:
+
+* `error` - An instance of `Error`.
+
+Use this method to manually send an error to APM Server:
+
+[source,js]
+----
+apm.captureError(new Error('<error-message>'))
+----

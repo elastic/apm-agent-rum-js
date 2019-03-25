@@ -1,0 +1,124 @@
+[[transaction-api]]
+
+=== `Transaction` API
+
+A transaction groups multiple spans in a logical group.
+
+To start a transaction,
+you need to call <<apm-start-transaction,`apm.startTransaction()`>>.
+
+To see an example of using custom transactions,
+see the <<custom-transactions,Custom Transactions>> article.
+
+[float]
+[[transaction-name]]
+==== `transaction.name`
+
+* *Type:* String
+* *Default:* `Unknown`
+
+The name of the transaction.
+
+Can be used to set or overwrite the name of the transaction (visible in the performance monitoring breakdown).
+
+
+[float]
+[[transaction-type]]
+==== `transaction.type`
+
+* *Type:* String
+* *Default:* `custom`
+
+The type of the transaction.
+
+
+[float]
+[[transaction-timestamp]]
+==== `transaction.timestamp`
+
+* *Type:* String
+* *Default:* `undefined`
+
+The timestamp of the transaction.
+If the transaction timestamp is not provided (the default behaviour), it will be set by the apm-server (v6.3+).
+You can, however, set the timestamp on the client (using `new Date().toISOString()`), but you should be aware that the timestamp will reflect the client's local time
+which might not always be accurate.
+
+
+[float]
+[[transaction-start-span]]
+==== `transaction.startSpan([name][, type][, options])`
+
+[source,js]
+----
+var span = transaction.startSpan('My custom span')
+----
+
+Start and return a new custom span associated with this transaction.
+
+Arguments:
+
+* `name` - The name of the span (string). Defaults to `unnamed`
+
+* `type` - The type of span (string). Defaults to `custom`
+
+* `options` - The following options are supported:
+
+** `parentId` - Parent id associated with the new span. Defaults to current transaction id
+
+** `sync` - Denotes if the span is blocking (sync) or non-blocking(async). 
+
+When a span is started it will measure the time until <<span-end,`span.end()`>> is called.
+
+See <<span-api,Span API>> docs for details on how to use custom spans.
+
+
+[float]
+[[transaction-add-tags]]
+==== `transaction.addTags()`
+
+[source,js]
+----
+transaction.addTags({ [name]: value })
+----
+
+Add several tags on the transaction.
+If an error happens during the transaction,
+it will also get tagged with the same tags.
+
+Tags are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via <<apm-set-custom-context,`apm.setCustomContext()`>>).
+
+Arguments:
+
+* `name` - Any string. All periods (.), asterisks (*), and double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
+
+* `value` - Any string. If a non-string data type is given, it's converted to a string before being sent to the APM Server.
+
+
+[float]
+[[transaction-end]]
+==== `transaction.end()`
+
+[source,js]
+----
+transaction.end()
+----
+
+Ends the transaction. If the transaction has already ended, nothing happens.
+
+
+[float]
+[[transaction-mark]]
+==== `transaction.mark(key)`
+
+[source,js]
+----
+transaction.mark(key)
+----
+
+Marks the current point in time relative to the start of the transaction.
+Use this method to mark significant events that happen while the transaction is active.
+
+Arguments:
+
+* `key` -  Any string. All periods (.), asterisks (*), and double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
