@@ -247,7 +247,7 @@ describe('lib/utils', function() {
     utils.setTag('obj', {}, tags)
     expect(tags).toEqual({
       test: 'test',
-      no: 1,
+      no: '1',
       test_test: 'passed',
       date: String(date),
       removed: undefined,

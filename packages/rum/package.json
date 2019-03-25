@@ -35,11 +35,11 @@
   "bundlesize": [
     {
       "path": "./dist/bundles/elastic-apm-js-base*.min.js",
-      "maxSize": "16.5 kB"
+      "maxSize": "16 kB"
     },
     {
       "path": "./dist/bundles/elastic-apm-opentracing*.min.js",
-      "maxSize": "18.5 kB"
+      "maxSize": "18kB"
     }
   ]
 }

@@ -165,7 +165,7 @@ describe('ConfigService', function() {
     const contextTags = configService.get('context.tags')
     expect(contextTags).toEqual({
       test: 'test',
-      no: 1,
+      no: '1',
       test_test: 'test',
       obj: '[object Object]',
       date: String(date)

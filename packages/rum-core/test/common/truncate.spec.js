@@ -89,7 +89,6 @@ describe('Truncate', () => {
           username: generateStr('f', keywordLen)
         },
         tags: {
-          pageload: true,
           key: generateStr('g', keywordLen)
         }
       },
@@ -123,7 +122,6 @@ describe('Truncate', () => {
           username: generateStr('f', stringLimit)
         },
         tags: {
-          pageload: true,
           key: generateStr('g', stringLimit)
         }
       },
