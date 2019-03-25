@@ -86,15 +86,15 @@ function getBrowserList() {
   return [
     {
       browserName: 'chrome',
-      version: '62'
+      version: '49'
     },
     {
       browserName: 'chrome',
-      version: '46'
+      version: '62'
     },
     {
       browserName: 'firefox',
-      version: '42'
+      version: '59'
     },
     {
       browserName: 'safari',
