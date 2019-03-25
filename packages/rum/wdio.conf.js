@@ -36,7 +36,7 @@ const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
 /**
  * Skip the ios platform on E2E tests because of script
  * timeout issue in Appium
-ß */
+ */
 const capabilities = getBrowserList()
   .filter(({ platformName }) => platformName !== 'iOS')
   .map(capability => ({
@@ -73,7 +73,6 @@ exports.config = {
   afterTest() {
     /** Log api is only available in Chrome */
     if (isChrome()) {
-      browser.execute('1+1')
       const response = browser.getLogs('browser')
       console.log('browser.log:', JSON.stringify(response, undefined, 2))
     }

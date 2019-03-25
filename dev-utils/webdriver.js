@@ -40,11 +40,6 @@ function isChrome() {
   return browserName.indexOf('chrome') !== -1
 }
 
-function isIOSDevice() {
-  const platformName = browser.capabilities.platformName.toLowerCase()
-  return platformName === 'ios'
-}
-
 function assertNoBrowserErrors(whitelist) {
   return new Promise((resolve, reject) => {
     /**
@@ -53,9 +48,6 @@ function assertNoBrowserErrors(whitelist) {
     if (!isChrome()) {
       return resolve()
     }
-    // TODO: Bug in ChromeDriver: Need to execute at least one command
-    // so that the browser logs can be read out!
-    browser.execute('1+1')
     var response = browser.getLogs('browser')
     var failureEntries = []
     var debugLogs = []
@@ -138,6 +130,5 @@ module.exports = {
       // done()
     }
   },
-  isChrome,
-  isIOSDevice
+  isChrome
 }
