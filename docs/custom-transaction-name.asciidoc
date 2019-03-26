@@ -41,7 +41,7 @@ Based on our example URLs above, here's a code snippet to illustrate this proces
 var parts = window.location.pathname.split('/'); <1>
 var pageName = window.location.pathname; <2>
 if (parts.length > 0) {
-    pageName = parts[1] <3>
+    pageName = parts[1]; <3>
 }
 elasticApm.init({
     serviceName: "service-name",
