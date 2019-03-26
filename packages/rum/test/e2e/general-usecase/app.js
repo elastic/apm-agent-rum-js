@@ -66,6 +66,13 @@ elasticApm.addFilter(function(payload) {
     })
   }
   if (payload.transactions) {
+    /**
+     * In IE 11 - window.URL is not supported but it exists as an object
+     * We have to ensure that it is indeed a native code
+     */
+    if (window.URL.toString().indexOf('native code') === -1) {
+      return payload
+    }
     payload.transactions.forEach(function(tr) {
       tr.spans.forEach(function(span) {
         if (span.context && span.context.http && span.context.http.url) {

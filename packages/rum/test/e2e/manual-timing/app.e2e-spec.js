@@ -28,9 +28,6 @@ const { verifyNoBrowserErrors } = require('../../../../../dev-utils/webdriver')
 describe('manual-timing', function() {
   it('should run manual timing', async function() {
     browser.url('/test/e2e/manual-timing/index.html')
-    browser.setTimeout({
-      script: 10000
-    })
     browser.waitUntil(
       () => {
         return $('#test-element').getText() === 'Passed'

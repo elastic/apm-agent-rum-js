@@ -25,37 +25,24 @@
 
 const { join } = require('path')
 const glob = require('glob')
-const { getSauceConnectOptions } = require('../../dev-utils/test-config')
+const {
+  getSauceConnectOptions,
+  getBrowserList
+} = require('../../dev-utils/test-config')
 const { isChrome } = require('../../dev-utils/webdriver')
 
 const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
-const browserList = [
-  {
-    browserName: 'chrome',
-    version: '62'
-  },
-  {
-    browserName: 'firefox',
-    version: '57'
-  },
-  {
-    browserName: 'microsoftedge',
-    platform: 'Windows 10',
-    version: '17'
-  },
-  {
-    browserName: 'safari',
-    platform: 'OS X 10.11',
-    version: '9.0'
-  },
-  {
-    appiumVersion: '1.9.1',
-    deviceName: 'android emulator',
-    browserName: 'browser',
-    platformVersion: '5.0',
-    platformName: 'android'
-  }
-].map(capability => ({ tunnelIdentifier, ...capability }))
+
+/**
+ * Skip the ios platform on E2E tests because of script
+ * timeout issue in Appium
+ */
+const capabilities = getBrowserList()
+  .filter(({ platformName }) => platformName !== 'iOS')
+  .map(capability => ({
+    tunnelIdentifier,
+    ...capability
+  }))
 
 exports.config = {
   runner: 'local',
@@ -65,8 +52,8 @@ exports.config = {
   user: username,
   key: accessKey,
   sauceConnect: false,
-  capabilities: browserList,
-  logLevel: 'silent',
+  capabilities,
+  logLevel: 'error',
   bail: 1,
   screenshotPath: join(__dirname, 'error-screenshot'),
   baseUrl: 'http://localhost:8000',
@@ -76,10 +63,16 @@ exports.config = {
   jasmineNodeOpts: {
     defaultTimeoutInterval: 90000
   },
+  beforeTest() {
+    /**
+     * Sets timeout for scripts executed in the browser
+     * via browser.executeAsync method
+     */
+    browser.setTimeout({ script: 20000 })
+  },
   afterTest() {
     /** Log api is only available in Chrome */
     if (isChrome()) {
-      browser.execute('1+1')
       const response = browser.getLogs('browser')
       console.log('browser.log:', JSON.stringify(response, undefined, 2))
     }

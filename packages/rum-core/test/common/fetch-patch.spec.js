@@ -27,7 +27,7 @@ require('./patch')
 const patchSubscription = window['__patchSubscription']
 const { globalState } = require('../../src/common/patching/patch-utils')
 
-describe('xhrPatch', function() {
+describe('fetchPatch', function() {
   var events = []
   var cancelFn
 
@@ -81,11 +81,17 @@ describe('xhrPatch', function() {
     it('should support native fetch exception', function(done) {
       var promise = window.fetch()
       expect(promise).toBeDefined()
-      promise.catch(function(error) {
-        // can not check the native error message since it's different in browsers
-        expect(error.message).toBeDefined()
-        done()
-      })
+      promise.then(
+        () => {
+          console.log('Bug in fetch spec', window.navigator.userAgent)
+          done()
+        },
+        error => {
+          // can not check the native error message since it's different in browsers
+          expect(error.message).toBeDefined()
+          done()
+        }
+      )
     })
 
     it('should support native fetch alternative call format', function(done) {

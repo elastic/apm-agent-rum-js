@@ -34,13 +34,6 @@ const browserList = [
     browserName: 'internet explorer',
     platform: 'Windows 7',
     version: '10'
-  },
-  {
-    appiumVersion: '1.9.1',
-    deviceName: 'android emulator',
-    browserName: 'browser',
-    platformVersion: '4.4',
-    platformName: 'android'
   }
 ].map(capability => ({ tunnelIdentifier, ...capability }))
 

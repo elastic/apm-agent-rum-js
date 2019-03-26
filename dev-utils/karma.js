@@ -25,61 +25,18 @@
 
 const { Server } = require('karma')
 const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv, getSauceConnectOptions } = require('./test-config')
+const {
+  getWebpackEnv,
+  getSauceConnectOptions,
+  getBrowserList
+} = require('./test-config')
 
 const BABEL_CONFIG_FILE = require.resolve('@elastic/apm-rum/babel.config.js')
 
-const baseLaunchers = {
-  SL_CHROME: {
-    base: 'SauceLabs',
-    browserName: 'chrome',
-    version: '62'
-  },
-  SL_CHROME46: {
-    base: 'SauceLabs',
-    browserName: 'chrome',
-    version: '46'
-  },
-  SL_FIREFOX: {
-    base: 'SauceLabs',
-    browserName: 'firefox',
-    version: '42'
-  },
-  SL_SAFARI9: {
-    base: 'SauceLabs',
-    browserName: 'safari',
-    platform: 'OS X 10.11',
-    version: '9.0'
-  },
-  SL_IE11: {
-    base: 'SauceLabs',
-    browserName: 'internet explorer',
-    platform: 'Windows 8.1',
-    version: '11'
-  },
-  SL_EDGE: {
-    base: 'SauceLabs',
-    browserName: 'microsoftedge',
-    platform: 'Windows 10',
-    version: '13'
-  },
-  SL_ANDROID: {
-    base: 'SauceLabs',
-    appiumVersion: '1.9.1',
-    deviceName: 'android emulator',
-    browserName: 'browser',
-    platformVersion: '5.0',
-    platformName: 'android'
-  },
-  SL_IOS9: {
-    base: 'SauceLabs',
-    deviceName: 'iPhone Simulator',
-    deviceOrientation: 'portrait',
-    platformVersion: '9.3',
-    platformName: 'iOS',
-    browserName: 'Safari'
-  }
-}
+const baseLaunchers = getBrowserList().map(launcher => ({
+  base: 'SauceLabs',
+  ...launcher
+}))
 
 const specPattern = 'test/{*.spec.js,!(e2e)/*.spec.js}'
 const { tunnelIdentifier } = getSauceConnectOptions()
