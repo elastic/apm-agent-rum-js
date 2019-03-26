@@ -82,9 +82,57 @@ function getWebpackEnv() {
   }
 }
 
+function getBrowserList() {
+  return [
+    {
+      browserName: 'chrome',
+      version: '49'
+    },
+    {
+      browserName: 'chrome',
+      version: '62'
+    },
+    {
+      browserName: 'firefox',
+      version: '59'
+    },
+    {
+      browserName: 'safari',
+      platform: 'OS X 10.11',
+      version: '9.0'
+    },
+    {
+      browserName: 'internet explorer',
+      platform: 'Windows 8.1',
+      version: '11'
+    },
+    {
+      browserName: 'microsoftedge',
+      platform: 'Windows 10',
+      version: '13'
+    },
+    {
+      appiumVersion: '1.9.1',
+      deviceName: 'android emulator',
+      browserName: 'browser',
+      platformVersion: '5.1',
+      platformName: 'android'
+    },
+    {
+      appiumVersion: '1.9.1',
+      deviceName: 'iPhone Simulator',
+      deviceOrientation: 'portrait',
+      platformVersion: '11.1',
+      platformName: 'iOS',
+      browserName: 'Safari'
+    }
+  ]
+}
+
 module.exports = {
   getSauceConnectOptions,
   getTestEnvironmentVariables,
   getGlobalConfig,
-  getWebpackEnv
+  getWebpackEnv,
+  getBrowserList
 }

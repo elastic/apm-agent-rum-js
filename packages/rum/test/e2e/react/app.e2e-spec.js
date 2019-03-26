@@ -28,9 +28,6 @@ const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 describe('react app', function() {
   it('should run the react app', function() {
     browser.url('/test/e2e/react/')
-    browser.setTimeout({
-      script: 10000
-    })
     browser.waitUntil(
       () => {
         return $('#test-element').getText() === 'Passed'

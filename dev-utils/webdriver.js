@@ -48,9 +48,6 @@ function assertNoBrowserErrors(whitelist) {
     if (!isChrome()) {
       return resolve()
     }
-    // TODO: Bug in ChromeDriver: Need to execute at least one command
-    // so that the browser logs can be read out!
-    browser.execute('1+1')
     var response = browser.getLogs('browser')
     var failureEntries = []
     var debugLogs = []

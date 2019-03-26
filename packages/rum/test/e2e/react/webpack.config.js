@@ -31,7 +31,10 @@ module.exports = {
   entry: path.resolve(__dirname, './app.jsx'),
   output: { path: __dirname, filename: 'app.e2e-bundle.js' },
   devtool: 'source-map',
-  mode: 'development',
+  mode: 'production',
+  performance: {
+    hints: false
+  },
   module: {
     rules: [
       {
