@@ -69,3 +69,29 @@ https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG
 ----
 
 NOTE: Currently our minified JavaScript bundle is about 16KB (gzipped).
+
+[float]
+[[Configuring CORS]]
+=== Configuring CORS
+
+If APM Server is deployed in an origin different than the page's origin,
+you will need to configure Cross-Origin Resource Sharing (CORS).
+
+TIP: To learn more about CORS, and why this process is necessary, see the MDN page on
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing].
+
+To configure CORS,
+//configuration goes here
+
+When using this setup,
+the RUM agent will send an `HTTP OPTIONS` request prior to making the original `POST` request.
+This `OPTIONS` request will ensure all headers and `HTTP` methods are supported,
+and that the origin is allowed. 
+This request will fail if RUM support is not configured in the APM Server.
+See {apm-server-ref-v}/configuration-rum.html[Set up Real User Monitoring (RUM) support]
+for instructions on how to enable RUM support.
+By default, APM Server allows all origins:
+{apm-server-ref-v}/configuration-rum.html#_literal_allow_origins_literal[`apm-server.rum.allow_origins: ['*']`].
+
+// should we also link to/talk about `distributeTracingOrigins`?
+// <<`distributedTracingOrigins`,distributed-tracing-origins>>
