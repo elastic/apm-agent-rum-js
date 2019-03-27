@@ -25,21 +25,22 @@
 
 // export public core APIs.
 
-var ErrorLogging = require('./error-logging')
-var PerformanceMonitoring = require('./performance-monitoring')
+const ErrorLogging = require('./error-logging')
+const PerformanceMonitoring = require('./performance-monitoring')
+const utils = require('./common/utils')
+const patching = require('./common/patching')
+const ApmServer = require('./common/apm-server')
+const ConfigService = require('./common/config-service')
+const LoggingService = require('./common/logging-service')
+const TransactionService = require('./performance-monitoring/transaction-service')
 
-var ServiceFactory = require('./common/service-factory')
-var utils = require('./common/utils')
-var patching = require('./common/patching')
 module.exports = {
-  createServiceFactory() {
-    var serviceFactory = new ServiceFactory()
-    serviceFactory.registerCoreServices()
-    ErrorLogging.registerServices(serviceFactory)
-    PerformanceMonitoring.registerServices(serviceFactory)
-    return serviceFactory
-  },
-  ServiceFactory,
+  utils,
   patching,
-  utils
+  ApmServer,
+  ErrorLogging,
+  ConfigService,
+  LoggingService,
+  TransactionService,
+  PerformanceMonitoring
 }

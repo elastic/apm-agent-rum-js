@@ -23,32 +23,88 @@
  *
  */
 
+const {
+  ApmServer,
+  ErrorLogging,
+  ConfigService,
+  LoggingService,
+  TransactionService,
+  PerformanceMonitoring
+} = require('@elastic/apm-rum-core')
+
 class ApmBase {
-  constructor(serviceFactory, disable) {
-    this._disable = disable
-    this.serviceFactory = serviceFactory
+  constructor(enabled) {
+    this.enabled = enabled
     this._initialized = false
+    this.configService = new ConfigService()
+    /**
+     * Initialize Logging service which reflects log level based on
+     * config changes
+     */
+    this.loggingService = new LoggingService()
+
+    const setLogLevel = () => {
+      const { logLevel, debug } = this.configService.config
+
+      if (debug === true && logLevel !== 'trace') {
+        this.loggingService.setLevel('debug', false)
+      } else {
+        this.loggingService.setLevel(logLevel, false)
+      }
+    }
+    setLogLevel()
+    this.configService.subscribeToChange(() => setLogLevel())
+
+    /**
+     * Below instances gets assigned only after the initialization
+     */
+    this.transactionService = undefined
+    this.errorLogging = undefined
   }
 
   init(config) {
-    if (this.isEnabled() && !this._initialized) {
+    if (this.enabled && !this._initialized) {
+      this.configService.setConfig(config)
       this._initialized = true
-      var configService = this.serviceFactory.getService('ConfigService')
-      configService.setConfig({
-        agentName: 'js-base',
-        agentVersion: '%%agent-version%%'
-      })
-      configService.setConfig(config)
-      this.serviceFactory.init()
-      var errorLogging = this.serviceFactory.getService('ErrorLogging')
-      errorLogging.registerGlobalEventListener()
+      /**
+       * Set the config that is sent via script attributes
+       */
+      this.configService.init()
 
-      var performanceMonitoring = this.serviceFactory.getService(
-        'PerformanceMonitoring'
+      /**
+       * Initialize the APM Server
+       */
+      const apmServer = new ApmServer(this.configService, this.loggingService)
+      apmServer.init()
+
+      /**
+       * Intialize  the transaction service
+       */
+      this.transactionService = new TransactionService(
+        this.loggingService,
+        this.configService
+      )
+
+      /**
+       * Register for window onerror to capture browser errors
+       */
+      this.errorLogging = new ErrorLogging(
+        apmServer,
+        this.configService,
+        this.loggingService,
+        this.transactionService
+      )
+      this.errorLogging.registerGlobalEventListener()
+
+      const performanceMonitoring = new PerformanceMonitoring(
+        apmServer,
+        this.configService,
+        this.loggingService,
+        this.transactionService
       )
       performanceMonitoring.init()
 
-      if (configService.get('sendPageLoadTransaction')) {
+      if (this.configService.get('sendPageLoadTransaction')) {
         this._sendPageLoadMetrics()
       }
     }
@@ -56,25 +112,24 @@ class ApmBase {
   }
 
   _sendPageLoadMetrics() {
-    var transactionService = this.serviceFactory.getService(
-      'TransactionService'
+    const pageLoadTransactionName = this.configService.get(
+      'pageLoadTransactionName'
     )
-    var configService = this.serviceFactory.getService('ConfigService')
 
     const pageLoadTaskId = 'page-load'
-    var tr = transactionService.startTransaction(
-      configService.get('pageLoadTransactionName'),
-      'page-load'
+    const transaction = this.transactionService.startTransaction(
+      pageLoadTransactionName,
+      pageLoadTaskId
     )
 
-    if (tr) {
-      tr.addTask(pageLoadTaskId)
+    if (transaction) {
+      transaction.addTask(pageLoadTaskId)
     }
-    var sendPageLoadMetrics = function sendPageLoadMetrics() {
+    const sendPageLoadMetrics = function sendPageLoadMetrics() {
       // to make sure PerformanceTiming.loadEventEnd has a value
       setTimeout(function() {
-        if (tr) {
-          tr.removeTask(pageLoadTaskId)
+        if (transaction) {
+          transaction.removeTask(pageLoadTaskId)
         }
       })
     }
@@ -86,86 +141,57 @@ class ApmBase {
     }
   }
 
-  isEnabled() {
-    return !this._disable
-  }
-
   config(config) {
-    var configService = this.serviceFactory.getService('ConfigService')
-    configService.setConfig(config)
+    this.configService.setConfig(config)
   }
 
   setUserContext(userContext) {
-    var configService = this.serviceFactory.getService('ConfigService')
-    configService.setUserContext(userContext)
+    this.configService.setUserContext(userContext)
   }
 
   setCustomContext(customContext) {
-    var configService = this.serviceFactory.getService('ConfigService')
-    configService.setCustomContext(customContext)
+    this.configService.setCustomContext(customContext)
   }
 
   addTags(tags) {
-    var configService = this.serviceFactory.getService('ConfigService')
-    configService.addTags(tags)
+    this.configService.addTags(tags)
   }
 
   // Should call this method before 'load' event on window is fired
   setInitialPageLoadName(name) {
-    if (this.isEnabled()) {
-      var configService = this.serviceFactory.getService('ConfigService')
-      configService.setConfig({
+    if (this.enabled) {
+      this.configService.setConfig({
         pageLoadTransactionName: name
       })
     }
   }
 
   startTransaction(name, type) {
-    if (this.isEnabled()) {
-      var transactionService = this.serviceFactory.getService(
-        'TransactionService'
-      )
-      return transactionService.startTransaction(name, type)
+    if (this.enabled) {
+      return this.transactionService.startTransaction(name, type)
     }
   }
 
   startSpan(name, type) {
-    if (this.isEnabled()) {
-      var transactionService = this.serviceFactory.getService(
-        'TransactionService'
-      )
-      return transactionService.startSpan(name, type)
+    if (this.enabled) {
+      return this.transactionService.startSpan(name, type)
     }
   }
 
   getCurrentTransaction() {
-    if (this.isEnabled()) {
-      var transactionService = this.serviceFactory.getService(
-        'TransactionService'
-      )
-      return transactionService.getCurrentTransaction()
-    }
-  }
-
-  getTransactionService() {
-    if (this.isEnabled()) {
-      var transactionService = this.serviceFactory.getService(
-        'TransactionService'
-      )
-      return transactionService
+    if (this.enabled) {
+      return this.transactionService.getCurrentTransaction()
     }
   }
 
   captureError(error) {
-    if (this.isEnabled()) {
-      var errorLogging = this.serviceFactory.getService('ErrorLogging')
-      return errorLogging.logError(error)
+    if (this.enabled && this._initialized) {
+      return this.errorLogging.logError(error)
     }
   }
 
   addFilter(fn) {
-    var configService = this.serviceFactory.getService('ConfigService')
-    configService.addFilter(fn)
+    this.configService.addFilter(fn)
   }
 }
 

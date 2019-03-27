@@ -23,27 +23,35 @@
  *
  */
 
-var bootstrap = require('./bootstrap')
-var enabled = bootstrap()
+const { utils, patching } = require('@elastic/apm-rum-core')
+const { polyfill } = require('es6-promise')
+const ApmBase = require('./apm-base')
 
-var apmCore = require('@elastic/apm-rum-core')
-var ApmBase = require('./apm-base')
+function bootstrap() {
+  let enabled = false
+  if (utils.isPlatformSupported()) {
+    polyfill()
+    patching.patchAll()
+    enabled = true
+  } else {
+    console.warn('APM: Platform is not supported!')
+  }
+  return enabled
+}
 
-var serviceFactory = apmCore.createServiceFactory()
+const enabled = bootstrap()
 
-var apmBase = new ApmBase(serviceFactory, !enabled)
+const apmBase = new ApmBase(enabled)
 
 if (typeof window !== 'undefined') {
   window.elasticApm = apmBase
 }
 
-var exports = {
+module.exports = {
   __esModule: true,
   default: apmBase.init.bind(apmBase),
   init: apmBase.init.bind(apmBase),
-  ApmBase,
+  apm: apmBase,
   apmBase,
-  apm: apmBase
+  ApmBase
 }
-
-module.exports = exports
