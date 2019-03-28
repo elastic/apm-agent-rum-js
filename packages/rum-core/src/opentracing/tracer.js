@@ -36,34 +36,28 @@ const { getTimeOrigin, find } = require('../common/utils')
 const Span = require('./span')
 
 class Tracer extends otTracer {
-  constructor(
-    performanceMonitoring,
-    transactionService,
-    loggingService,
-    errorLogging
-  ) {
+  constructor(performance, transaction, logger) {
     super()
-    this.performanceMonitoring = performanceMonitoring
-    this.transactionService = transactionService
-    this.loggingService = loggingService
-    this.errorLogging = errorLogging
+    this.performance = performance
+    this.transaction = transaction
+    this.logger = logger
   }
 
   _startSpan(name, options) {
-    var spanOptions = {}
+    const spanOptions = {}
     if (options) {
       spanOptions.timestamp = options.startTime
       if (options.childOf) {
         spanOptions.parentId = options.childOf.id
       } else if (options.references && options.references.length > 0) {
         if (options.references.length > 1) {
-          this.loggingService.debug(
+          this.logger.debug(
             // eslint-disable-next-line
             'Elastic APM OpenTracing: Unsupported number of references, only the first childOf reference will be recorded.'
           )
         }
 
-        var childRef = find(options.references, function(ref) {
+        const childRef = find(options.references, function(ref) {
           return ref.type() === REFERENCE_CHILD_OF
         })
         if (childRef) {
@@ -72,17 +66,13 @@ class Tracer extends otTracer {
       }
     }
 
-    var span
-    var currentTransaction = this.transactionService.getCurrentTransaction()
+    const currentTransaction = this.transaction.getCurrentTransaction()
+    let span
 
     if (currentTransaction && !currentTransaction.ended) {
-      span = this.transactionService.startSpan(name, undefined, spanOptions)
+      span = this.transaction.startSpan(name, undefined, spanOptions)
     } else {
-      span = this.transactionService.startTransaction(
-        name,
-        undefined,
-        spanOptions
-      )
+      span = this.transaction.startTransaction(name, undefined, spanOptions)
     }
 
     if (!span) {
@@ -92,7 +82,7 @@ class Tracer extends otTracer {
     if (spanOptions.timestamp) {
       span._start = spanOptions.timestamp - getTimeOrigin()
     }
-    var otSpan = new Span(this, span)
+    const otSpan = new Span(this, span)
     if (options && options.tags) {
       otSpan.addTags(options.tags)
     }
@@ -103,10 +93,10 @@ class Tracer extends otTracer {
     switch (format) {
       case FORMAT_TEXT_MAP:
       case FORMAT_HTTP_HEADERS:
-        this.performanceMonitoring.injectDtHeader(spanContext, carrier)
+        this.performance.injectDtHeader(spanContext, carrier)
         break
       case FORMAT_BINARY:
-        this.loggingService.debug(
+        this.logger.debug(
           'Elastic APM OpenTracing: binary carrier format is not supported.'
         )
         break
@@ -114,14 +104,14 @@ class Tracer extends otTracer {
   }
 
   _extract(format, carrier) {
-    var ctx
+    let ctx
     switch (format) {
       case FORMAT_TEXT_MAP:
       case FORMAT_HTTP_HEADERS:
-        ctx = this.performanceMonitoring.extractDtHeader(carrier)
+        ctx = this.performance.extractDtHeader(carrier)
         break
       case FORMAT_BINARY:
-        this.loggingService.debug(
+        this.logger.debug(
           'Elastic APM OpenTracing: binary carrier format is not supported.'
         )
         break

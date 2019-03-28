@@ -25,13 +25,12 @@
 
 var errorStackParser = require('error-stack-parser')
 
-class StackTraceService {
-  constructor(configService, loggingService) {
-    this._configService = configService
-    this._loggingService = loggingService
+class StackTrace {
+  constructor(config, logger) {
+    this._config = config
+    this._logger = logger
   }
   createStackTraces(errorEvent) {
-    var stackTraceService = this
     var error = errorEvent.error
 
     var stackTraces
@@ -39,7 +38,7 @@ class StackTraceService {
       try {
         stackTraces = errorStackParser.parse(error)
       } catch (e) {
-        this._loggingService.debug('Parsing error stack failed!', e)
+        this._logger.debug('Parsing error stack failed!', e)
       }
     }
 
@@ -55,7 +54,7 @@ class StackTraceService {
 
     stackTraces = ErrorStackNormalizer(stackTraces)
 
-    stackTraces = stackTraces.map(function(stack) {
+    stackTraces = stackTraces.map(stack => {
       if (!stack.fileName && !stack.lineNumber) {
         return {}
       }
@@ -63,10 +62,10 @@ class StackTraceService {
         return {}
       }
 
-      var filePath = stackTraceService.cleanFilePath(stack.fileName)
-      var fileName = stackTraceService.filePathToFileName(filePath)
+      var filePath = this.cleanFilePath(stack.fileName)
+      var fileName = this.filePathToFileName(filePath)
 
-      if (stackTraceService.isFileInline(filePath)) {
+      if (this.isFileInline(filePath)) {
         fileName = '(inline script)'
       }
 
@@ -167,4 +166,4 @@ function normalizeFunctionName(fnName) {
   return fnName
 }
 
-module.exports = StackTraceService
+module.exports = StackTrace

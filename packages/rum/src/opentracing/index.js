@@ -23,23 +23,17 @@
  *
  */
 
-const {
-  createTracer: createElasticTracer
-} = require('@elastic/apm-rum-core/src/opentracing')
+const { Tracer } = require('@elastic/apm-rum-core/src/opentracing')
+const { extend } = require('@elastic/apm-rum-core/src/common/utils')
+const { performance, transactionService, logger } = require('../bootstrap')
+const apmBaseExports = require('../index')
 
-function createTracer(apmBase) {
-  return createElasticTracer(apmBase.serviceFactory)
+function createTracer() {
+  return new Tracer(performance, transactionService, logger)
 }
 
 if (window && window.elasticApm) {
-  window.elasticApm.createTracer = createTracer.bind(
-    window.elasticApm,
-    window.elasticApm
-  )
+  window.elasticApm.createTracer = createTracer.bind(window.elasticApm)
 }
 
-module.exports = {
-  __esModule: true,
-  default: createTracer,
-  createTracer
-}
+module.exports = extend({}, apmBaseExports, { createTracer })

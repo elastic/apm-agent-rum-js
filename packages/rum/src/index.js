@@ -22,26 +22,26 @@
  * THE SOFTWARE.
  *
  */
-
-const { utils, patching } = require('@elastic/apm-rum-core')
-const { polyfill } = require('es6-promise')
+const {
+  enabled,
+  config,
+  logger,
+  server,
+  transactionService,
+  performance,
+  errorLogger
+} = require('./bootstrap')
 const ApmBase = require('./apm-base')
 
-function bootstrap() {
-  let enabled = false
-  if (utils.isPlatformSupported()) {
-    polyfill()
-    patching.patchAll()
-    enabled = true
-  } else {
-    console.warn('APM: Platform is not supported!')
-  }
-  return enabled
-}
-
-const enabled = bootstrap()
-
-const apmBase = new ApmBase(enabled)
+const apmBase = new ApmBase({
+  enabled,
+  config,
+  server,
+  logger,
+  transactionService,
+  performance,
+  errorLogger
+})
 
 if (typeof window !== 'undefined') {
   window.elasticApm = apmBase

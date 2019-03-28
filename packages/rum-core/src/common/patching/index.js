@@ -23,11 +23,13 @@
  *
  */
 
-var patchXMLHttpRequest = require('./xhr-patch').patchXMLHttpRequest
-var patchFetch = require('./fetch-patch').patchFetch
-var Subscription = require('../subscription')
-var subscription = new Subscription()
-var alreadyPatched = false
+const { patchXMLHttpRequest } = require('./xhr-patch')
+const { patchFetch } = require('./fetch-patch')
+const Subscription = require('../subscription')
+const subscription = new Subscription()
+
+let alreadyPatched = false
+
 function patchAll() {
   if (!alreadyPatched) {
     alreadyPatched = true

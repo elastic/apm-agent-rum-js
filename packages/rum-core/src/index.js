@@ -27,20 +27,18 @@
 
 const ErrorLogging = require('./error-logging')
 const PerformanceMonitoring = require('./performance-monitoring')
-const utils = require('./common/utils')
 const patching = require('./common/patching')
 const ApmServer = require('./common/apm-server')
-const ConfigService = require('./common/config-service')
-const LoggingService = require('./common/logging-service')
+const Config = require('./common/config')
+const Logger = require('./common/logger')
 const TransactionService = require('./performance-monitoring/transaction-service')
 
 module.exports = {
-  utils,
   patching,
   ApmServer,
   ErrorLogging,
-  ConfigService,
-  LoggingService,
+  Config,
+  Logger,
   TransactionService,
   PerformanceMonitoring
 }

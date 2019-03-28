@@ -24,7 +24,7 @@
  */
 
 const { getCurrentScript, sanitizeString, setTag, merge } = require('./utils')
-const Subscription = require('../common/subscription')
+const Subscription = require('./subscription')
 const constants = require('./constants')
 
 function getConfigFromScript() {
@@ -83,8 +83,6 @@ class Config {
       similarSpanThreshold: 0.05,
       capturePageLoad: true,
       ignoreTransactions: [],
-      // throttlingRequestLimit: 20,
-      // throttlingInterval: 30000, // 30s
       errorThrottleLimit: 20,
       errorThrottleInterval: 30000,
       transactionThrottleLimit: 20,

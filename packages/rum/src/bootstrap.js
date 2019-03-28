@@ -22,8 +22,57 @@
  * THE SOFTWARE.
  *
  */
+const {
+  isPlatformSupported
+} = require('@elastic/apm-rum-core/src/common/utils')
+const { patchAll } = require('@elastic/apm-rum-core/src/common/patching')
+const { polyfill } = require('es6-promise')
+const {
+  ApmServer,
+  ErrorLogging,
+  Config,
+  Logger,
+  TransactionService,
+  PerformanceMonitoring
+} = require('@elastic/apm-rum-core')
 
-const indexExports = require('./index')
-const opentracing = require('./opentracing')
-const { extend } = require('@elastic/apm-rum-core/src/common/utils')
-module.exports = extend({}, indexExports, opentracing)
+let enabled = false
+
+/**
+ * IIFE to polyfill for the supported platforms
+ */
+!(function() {
+  if (isPlatformSupported()) {
+    polyfill()
+    patchAll()
+    enabled = true
+  } else {
+    console.warn('APM: Platform is not supported!')
+  }
+})()
+
+/**
+ * Set up all the essential singleton instances required
+ * across all the core API
+ */
+const logger = new Logger()
+const config = new Config()
+const server = new ApmServer(config, logger)
+const transactionService = new TransactionService(logger, config)
+const performance = new PerformanceMonitoring(
+  server,
+  config,
+  logger,
+  transactionService
+)
+const errorLogger = new ErrorLogging(server, config, logger, transactionService)
+
+module.exports = {
+  enabled,
+  logger,
+  config,
+  server,
+  transactionService,
+  performance,
+  errorLogger
+}

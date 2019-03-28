@@ -26,14 +26,7 @@
 const { globalState } = require('./patch-utils')
 const { SCHEDULE, INVOKE, FETCH_SOURCE } = require('../constants')
 
-var alreadyPatched = false
-
 function patchFetch(callback) {
-  if (alreadyPatched) {
-    return
-  }
-  alreadyPatched = true
-
   if (!window.fetch || !window.Request) {
     return
   }
@@ -114,6 +107,4 @@ function patchFetch(callback) {
   }
 }
 
-module.exports = {
-  patchFetch
-}
+module.exports = { patchFetch }

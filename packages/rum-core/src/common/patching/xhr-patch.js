@@ -45,14 +45,7 @@ const XHR_TASK = apmSymbol('xhrTask')
 const XHR_LISTENER = apmSymbol('xhrListener')
 const XHR_SCHEDULED = apmSymbol('xhrScheduled')
 
-var alreadyPatched = false
 function patchXMLHttpRequest(callback) {
-  if (alreadyPatched) {
-    return
-  }
-
-  alreadyPatched = true
-
   const XMLHttpRequestPrototype = XMLHttpRequest.prototype
 
   let oriAddListener = XMLHttpRequestPrototype[ADD_EVENT_LISTENER_STR]
@@ -188,6 +181,4 @@ function patchXMLHttpRequest(callback) {
   )
 }
 
-module.exports = {
-  patchXMLHttpRequest
-}
+module.exports = { patchXMLHttpRequest }

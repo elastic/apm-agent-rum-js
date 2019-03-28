@@ -43,10 +43,10 @@ const {
 } = require('../common/constants')
 
 class PerformanceMonitoring {
-  constructor(apmServer, configService, loggingService, transactionService) {
-    this._apmServer = apmServer
-    this._configService = configService
-    this._logginService = loggingService
+  constructor(server, config, logger, transactionService) {
+    this._server = server
+    this._config = config
+    this._logger = logger
     this._transactionService = transactionService
   }
 
@@ -55,22 +55,19 @@ class PerformanceMonitoring {
     this._transactionService.subscribe(function(tr) {
       var payload = performanceMonitoring.createTransactionPayload(tr)
       if (payload) {
-        performanceMonitoring._apmServer.addTransaction(payload)
+        performanceMonitoring._server.addTransaction(payload)
       }
     })
 
     var patchSubFn = this.getXhrPatchSubFn(
-      this._configService,
+      this._config,
       this._transactionService
     )
     this.cancelPatchSub = patchingSub.subscribe(patchSubFn)
   }
 
   getXhrPatchSubFn() {
-    var configService = this._configService
-    var transactionService = this._transactionService
-    var pm = this
-    return function(event, task) {
+    return (event, task) => {
       if (
         (task.source === XMLHTTPREQUEST_SOURCE &&
           !globalState.fetchInProgress) ||
@@ -79,18 +76,21 @@ class PerformanceMonitoring {
         if (event === SCHEDULE && task.data) {
           var spanName =
             task.data.method + ' ' + stripQueryStringFromUrl(task.data.url)
-          var span = transactionService.startSpan(spanName, 'external.http')
-          var taskId = transactionService.addTask()
+          var span = this._transactionService.startSpan(
+            spanName,
+            'external.http'
+          )
+          var taskId = this._transactionService.addTask()
 
           if (span) {
-            var isDtEnabled = configService.get('distributedTracing')
-            var origins = configService.get('distributedTracingOrigins')
+            var isDtEnabled = this._config.get('distributedTracing')
+            var origins = this._config.get('distributedTracingOrigins')
             var isSameOrigin =
               checkSameOrigin(task.data.url, window.location.href) ||
               checkSameOrigin(task.data.url, origins)
             var target = task.data.target
             if (isDtEnabled && isSameOrigin && target) {
-              pm.injectDtHeader(span, target)
+              this.injectDtHeader(span, target)
             }
             span.addContext({
               http: {
@@ -117,16 +117,15 @@ class PerformanceMonitoring {
         }
 
         if (event === INVOKE && task.id) {
-          transactionService.removeTask(task.id)
+          this._transactionService.removeTask(task.id)
         }
       }
     }
   }
 
   injectDtHeader(span, target) {
-    var configService = this._configService
-    var headerName = configService.get('distributedTracingHeaderName')
-    var headerValueCallback = configService.get(
+    var headerName = this._config.get('distributedTracingHeaderName')
+    var headerValueCallback = this._config.get(
       'distributedTracingHeaderValueCallback'
     )
     if (typeof headerValueCallback !== 'function') {
@@ -150,23 +149,21 @@ class PerformanceMonitoring {
   }
 
   extractDtHeader(target) {
-    var configService = this._configService
-    var headerName = configService.get('distributedTracingHeaderName')
+    var headerName = this._config.get('distributedTracingHeaderName')
     if (target) {
       return parseDtHeaderValue(target[headerName])
     }
   }
 
   setTransactionContext(transaction) {
-    var context = this._configService.get('context')
+    var context = this._config.get('context')
     if (context) {
       transaction.addContext(context)
     }
   }
 
   filterTransaction(tr) {
-    var performanceMonitoring = this
-    var transactionDurationThreshold = this._configService.get(
+    var transactionDurationThreshold = this._config.get(
       'transactionDurationThreshold'
     )
     var duration = tr.duration()
@@ -186,25 +183,23 @@ class PerformanceMonitoring {
       tr.resetSpans()
     }
 
-    var browserResponsivenessInterval = this._configService.get(
+    var browserResponsivenessInterval = this._config.get(
       'browserResponsivenessInterval'
     )
-    var checkBrowserResponsiveness = this._configService.get(
+    var checkBrowserResponsiveness = this._config.get(
       'checkBrowserResponsiveness'
     )
 
     if (checkBrowserResponsiveness && !tr.isHardNavigation) {
-      var buffer = performanceMonitoring._configService.get(
-        'browserResponsivenessBuffer'
-      )
+      var buffer = this._config.get('browserResponsivenessBuffer')
 
-      var wasBrowserResponsive = performanceMonitoring.checkBrowserResponsiveness(
+      var wasBrowserResponsive = this.checkBrowserResponsiveness(
         tr,
         browserResponsivenessInterval,
         buffer
       )
       if (!wasBrowserResponsive) {
-        performanceMonitoring._logginService.debug(
+        this._logger.debug(
           'Transaction was discarded! browser was not responsive enough during the transaction.',
           ' duration:',
           duration,
@@ -224,8 +219,8 @@ class PerformanceMonitoring {
       return spanA._start - spanB._start
     })
 
-    if (this._configService.get('groupSimilarSpans')) {
-      var similarSpanThreshold = this._configService.get('similarSpanThreshold')
+    if (this._config.get('groupSimilarSpans')) {
+      var similarSpanThreshold = this._config.get('similarSpanThreshold')
       transaction.spans = this.groupSmallContinuouslySimilarSpans(
         transaction,
         similarSpanThreshold
@@ -246,8 +241,8 @@ class PerformanceMonitoring {
   }
 
   createTransactionDataModel(transaction) {
-    const configContext = this._configService.get('context')
-    const stringLimit = this._configService.get('serverStringLimit')
+    const configContext = this._config.get('context')
+    const stringLimit = this._config.get('serverStringLimit')
     const transactionStart = transaction._start
 
     const spans = transaction.spans.map(function(span) {
@@ -301,13 +296,13 @@ class PerformanceMonitoring {
       .map(tr => this.createTransactionPayload(tr))
       .filter(tr => tr)
 
-    this._logginService.debug(
+    this._logger.debug(
       'Sending Transactions to apm server.',
       transactions.length
     )
 
     // todo: check if transactions are already being sent
-    const promise = this._apmServer.sendTransactions(payload)
+    const promise = this._server.sendTransactions(payload)
     return promise
   }
 

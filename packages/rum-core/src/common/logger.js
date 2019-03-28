@@ -25,7 +25,7 @@
 
 const { noop } = require('./utils')
 
-class LoggingService {
+class Logger {
   constructor(spec) {
     if (!spec) spec = {}
     this.levels = ['trace', 'debug', 'info', 'warn', 'error']
@@ -45,12 +45,11 @@ class LoggingService {
   }
 
   resetLogMethods() {
-    var loggingService = this
-    this.levels.forEach(function(level) {
-      loggingService[level] = loggingService.shouldLog(level) ? log : noop
+    this.levels.forEach(level => {
+      this[level] = this.shouldLog(level) ? log : noop
 
       function log() {
-        var prefix = loggingService.prefix
+        var prefix = this.prefix
         var normalizedLevel
 
         switch (level) {
@@ -81,4 +80,4 @@ class LoggingService {
   }
 }
 
-module.exports = LoggingService
+module.exports = Logger

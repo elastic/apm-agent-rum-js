@@ -23,29 +23,26 @@
  *
  */
 
-var StackTraceService = require('./stack-trace-service')
+var StackTrace = require('./stack-trace')
 
 var utils = require('../common/utils')
 
 class ErrorLogging {
-  constructor(apmServer, configService, loggingService, transactionService) {
-    this._apmServer = apmServer
-    this._configService = configService
-    this._loggingService = loggingService
+  constructor(server, config, logger, transactionService) {
+    this._server = server
+    this._config = config
+    this._logger = logger
     this._transactionService = transactionService
-    this._stackTraceService = new StackTraceService(
-      configService,
-      loggingService
-    )
+    this._stackTrace = new StackTrace(config, logger)
   }
 
   // errorEvent = {message, filename, lineno, colno, error}
   createErrorDataModel(errorEvent) {
-    var filePath = this._stackTraceService.cleanFilePath(errorEvent.filename)
-    var fileName = this._stackTraceService.filePathToFileName(filePath)
+    var filePath = this._stackTrace.cleanFilePath(errorEvent.filename)
+    var fileName = this._stackTrace.filePathToFileName(filePath)
     var culprit
-    var frames = this._stackTraceService.createStackTraces(errorEvent)
-    frames = this._stackTraceService.filterInvalidFrames(frames)
+    var frames = this._stackTrace.createStackTraces(errorEvent)
+    frames = this._stackTrace.filterInvalidFrames(frames)
 
     if (!fileName && frames.length) {
       var lastFrame = frames[frames.length - 1]
@@ -57,7 +54,7 @@ class ErrorLogging {
       }
     }
 
-    if (this._stackTraceService.isFileInline(filePath)) {
+    if (this._stackTrace.isFileInline(filePath)) {
       culprit = '(inline script)'
     } else {
       culprit = fileName
@@ -78,8 +75,8 @@ class ErrorLogging {
       }
     }
 
-    var configContext = this._configService.get('context')
-    var stringLimit = this._configService.get('serverStringLimit')
+    var configContext = this._config.get('context')
+    var stringLimit = this._config.get('serverStringLimit')
     var errorContext
     if (errorEvent.error && typeof errorEvent.error === 'object') {
       errorContext = this._getErrorProperties(errorEvent.error)
@@ -112,7 +109,7 @@ class ErrorLogging {
   }
 
   logErrorEvent(errorEvent, sendImmediately) {
-    if (this._configService.isActive()) {
+    if (this._config.isActive()) {
       if (typeof errorEvent === 'undefined') {
         return
       }
@@ -121,9 +118,9 @@ class ErrorLogging {
         return
       }
       if (sendImmediately) {
-        return this._apmServer.sendErrors([errorObject])
+        return this._server.sendErrors([errorObject])
       } else {
-        return this._apmServer.addError(errorObject)
+        return this._server.addError(errorObject)
       }
     }
   }

@@ -23,101 +23,74 @@
  *
  */
 
-const {
-  ApmServer,
-  ErrorLogging,
-  ConfigService,
-  LoggingService,
-  TransactionService,
-  PerformanceMonitoring
-} = require('@elastic/apm-rum-core')
-
 class ApmBase {
-  constructor(enabled) {
+  constructor({
+    enabled,
+    config,
+    server,
+    logger,
+    transactionService,
+    performance,
+    errorLogger
+  }) {
     this.enabled = enabled
     this._initialized = false
-    this.configService = new ConfigService()
-    /**
-     * Initialize Logging service which reflects log level based on
-     * config changes
-     */
-    this.loggingService = new LoggingService()
-
-    const setLogLevel = () => {
-      const { logLevel, debug } = this.configService.config
-
-      if (debug === true && logLevel !== 'trace') {
-        this.loggingService.setLevel('debug', false)
-      } else {
-        this.loggingService.setLevel(logLevel, false)
-      }
-    }
-    setLogLevel()
-    this.configService.subscribeToChange(() => setLogLevel())
-
-    /**
-     * Below instances gets assigned only after the initialization
-     */
-    this.transactionService = undefined
-    this.errorLogging = undefined
+    this._config = config
+    this._loggger = logger
+    this._server = server
+    this._transactionService = transactionService
+    this._performance = performance
+    this._errorLogger = errorLogger
   }
 
   init(config) {
     if (this.enabled && !this._initialized) {
-      this.configService.setConfig(config)
-      this._initialized = true
+      this.config(config)
       /**
        * Set the config that is sent via script attributes
        */
-      this.configService.init()
+      this._config.init()
+      /**
+       * logger should reflect log level based on
+       * config changes
+       */
+      const setLogLevel = () => {
+        const { logLevel, debug } = this._config.config
 
+        if (debug === true && logLevel !== 'trace') {
+          this._loggger.setLevel('debug', false)
+        } else {
+          this._loggger.setLevel(logLevel, false)
+        }
+      }
+      setLogLevel()
+      this._config.subscribeToChange(() => setLogLevel())
       /**
        * Initialize the APM Server
        */
-      const apmServer = new ApmServer(this.configService, this.loggingService)
-      apmServer.init()
-
-      /**
-       * Intialize  the transaction service
-       */
-      this.transactionService = new TransactionService(
-        this.loggingService,
-        this.configService
-      )
-
+      this._server.init()
       /**
        * Register for window onerror to capture browser errors
        */
-      this.errorLogging = new ErrorLogging(
-        apmServer,
-        this.configService,
-        this.loggingService,
-        this.transactionService
-      )
-      this.errorLogging.registerGlobalEventListener()
+      this._errorLogger.registerGlobalEventListener()
+      /**
+       * Initialize the performance monitoring
+       */
+      this._performance.init()
 
-      const performanceMonitoring = new PerformanceMonitoring(
-        apmServer,
-        this.configService,
-        this.loggingService,
-        this.transactionService
-      )
-      performanceMonitoring.init()
-
-      if (this.configService.get('sendPageLoadTransaction')) {
+      if (this._config.get('sendPageLoadTransaction')) {
         this._sendPageLoadMetrics()
       }
+      this._initialized = true
     }
     return this
   }
 
   _sendPageLoadMetrics() {
-    const pageLoadTransactionName = this.configService.get(
-      'pageLoadTransactionName'
-    )
+    const pageLoadTransactionName = this._config.get('pageLoadTransactionName')
 
     const pageLoadTaskId = 'page-load'
-    const transaction = this.transactionService.startTransaction(
+    const transaction = this._transactionService.startTransaction(
       pageLoadTransactionName,
       pageLoadTaskId
     )
@@ -142,25 +115,25 @@ class ApmBase {
   }
 
   config(config) {
-    this.configService.setConfig(config)
+    this._config.setConfig(config)
   }
 
   setUserContext(userContext) {
-    this.configService.setUserContext(userContext)
+    this._config.setUserContext(userContext)
   }
 
   setCustomContext(customContext) {
-    this.configService.setCustomContext(customContext)
+    this._config.setCustomContext(customContext)
   }
 
   addTags(tags) {
-    this.configService.addTags(tags)
+    this._config.addTags(tags)
   }
 
   // Should call this method before 'load' event on window is fired
   setInitialPageLoadName(name) {
     if (this.enabled) {
-      this.configService.setConfig({
+      this._config.setConfig({
         pageLoadTransactionName: name
       })
     }
@@ -168,30 +141,30 @@ class ApmBase {
 
   startTransaction(name, type) {
     if (this.enabled) {
-      return this.transactionService.startTransaction(name, type)
+      return this._transactionService.startTransaction(name, type)
     }
   }
 
   startSpan(name, type) {
     if (this.enabled) {
-      return this.transactionService.startSpan(name, type)
+      return this._transactionService.startSpan(name, type)
     }
   }
 
   getCurrentTransaction() {
     if (this.enabled) {
-      return this.transactionService.getCurrentTransaction()
+      return this._transactionService.getCurrentTransaction()
     }
   }
 
   captureError(error) {
     if (this.enabled && this._initialized) {
-      return this.errorLogging.logError(error)
+      return this._errorLogger.logError(error)
     }
   }
 
   addFilter(fn) {
-    this.configService.addFilter(fn)
+    this._config.addFilter(fn)
   }
 }
 

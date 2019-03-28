@@ -30,9 +30,9 @@ const NDJSON = require('./ndjson')
 const { XHR_IGNORE } = require('./patching/patch-utils')
 
 class ApmServer {
-  constructor(configService, loggingService) {
-    this._configService = configService
-    this._loggingService = loggingService
+  constructor(config, logger) {
+    this._config = config
+    this._logger = logger
     this.logMessages = {
       invalidConfig: { message: 'Configuration is invalid!', level: 'warn' }
     }
@@ -58,7 +58,7 @@ class ApmServer {
   }
 
   createServiceObject() {
-    const cfg = this._configService
+    const cfg = this._config
     const stringLimit = cfg.get('serverStringLimit')
 
     const serviceObject = {
@@ -120,8 +120,8 @@ class ApmServer {
   }
 
   _createQueue(onFlush) {
-    var queueLimit = this._configService.get('queueLimit')
-    var flushInterval = this._configService.get('flushInterval')
+    var queueLimit = this._config.get('queueLimit')
+    var flushInterval = this._config.get('flushInterval')
     return new Queue(onFlush, { queueLimit, flushInterval })
   }
 
@@ -134,18 +134,18 @@ class ApmServer {
       var p = apmServer.sendErrors(errors)
       if (p) {
         p.then(undefined, function(reason) {
-          apmServer._loggingService.warn('Failed sending errors!', reason)
+          apmServer._logger.warn('Failed sending errors!', reason)
         })
       }
     })
 
-    var limit = apmServer._configService.get('errorThrottleLimit')
-    var interval = apmServer._configService.get('errorThrottleInterval')
+    var limit = apmServer._config.get('errorThrottleLimit')
+    var interval = apmServer._config.get('errorThrottleInterval')
 
     this.throttleAddError = throttle(
       this.errorQueue.add.bind(this.errorQueue),
       function() {
-        apmServer._loggingService.warn('Dropped error due to throttling!')
+        apmServer._logger.warn('Dropped error due to throttling!')
       },
       { limit, interval }
     )
@@ -160,25 +160,25 @@ class ApmServer {
       var p = apmServer.sendTransactions(transactions)
       if (p) {
         p.then(undefined, function(reason) {
-          apmServer._loggingService.warn('Failed sending transactions!', reason)
+          apmServer._logger.warn('Failed sending transactions!', reason)
         })
       }
     })
 
-    var limit = apmServer._configService.get('transactionThrottleLimit')
-    var interval = apmServer._configService.get('transactionThrottleInterval')
+    var limit = apmServer._config.get('transactionThrottleLimit')
+    var interval = apmServer._config.get('transactionThrottleInterval')
 
     this.throttleAddTransaction = throttle(
       this.transactionQueue.add.bind(this.transactionQueue),
       function() {
-        apmServer._loggingService.warn('Dropped transaction due to throttling!')
+        apmServer._logger.warn('Dropped transaction due to throttling!')
       },
       { limit, interval }
     )
   }
 
   addError(error) {
-    if (this._configService.isActive()) {
+    if (this._config.isActive()) {
       if (!this.errorQueue) {
         this.initErrorQueue()
       }
@@ -187,7 +187,7 @@ class ApmServer {
   }
 
   addTransaction(transaction) {
-    if (this._configService.isActive()) {
+    if (this._config.isActive()) {
       if (!this.transactionQueue) {
         this.initTransactionQueue()
       }
@@ -198,9 +198,9 @@ class ApmServer {
   warnOnce(logObject) {
     if (logObject.level === 'warn') {
       logObject.level = 'debug'
-      this._loggingService.warn(logObject.message)
+      this._logger.warn(logObject.message)
     } else {
-      this._loggingService.debug(logObject.message)
+      this._logger.debug(logObject.message)
     }
   }
 
@@ -211,15 +211,15 @@ class ApmServer {
   }
 
   sendErrors(errors) {
-    if (this._configService.isValid() && this._configService.isActive()) {
+    if (this._config.isValid() && this._config.isActive()) {
       if (errors && errors.length > 0) {
         const payload = {
           service: this.createServiceObject(),
           errors
         }
-        const filteredPayload = this._configService.applyFilters(payload)
+        const filteredPayload = this._config.applyFilters(payload)
         if (filteredPayload) {
-          const endPoint = this._configService.getEndpointUrl('errors')
+          const endPoint = this._config.getEndpointUrl('errors')
           const ndjson = this.ndjsonErrors(filteredPayload.errors)
           ndjson.unshift(
             NDJSON.stringify({ metadata: { service: filteredPayload.service } })
@@ -227,7 +227,7 @@ class ApmServer {
           const ndjsonPayload = ndjson.join('')
           return this._postJson(endPoint, ndjsonPayload)
         } else {
-          this._loggingService.warn('Dropped payload due to filtering!')
+          this._logger.warn('Dropped payload due to filtering!')
         }
       }
     } else {
@@ -253,15 +253,15 @@ class ApmServer {
   }
 
   sendTransactions(transactions) {
-    if (this._configService.isValid() && this._configService.isActive()) {
+    if (this._config.isValid() && this._config.isActive()) {
       if (transactions && transactions.length > 0) {
         const payload = {
           service: this.createServiceObject(),
           transactions
         }
-        const filteredPayload = this._configService.applyFilters(payload)
+        const filteredPayload = this._config.applyFilters(payload)
         if (filteredPayload) {
-          const endPoint = this._configService.getEndpointUrl('transactions')
+          const endPoint = this._config.getEndpointUrl('transactions')
           const ndjson = this.ndjsonTransactions(filteredPayload.transactions)
           ndjson.unshift(
             NDJSON.stringify({ metadata: { service: filteredPayload.service } })
@@ -269,7 +269,7 @@ class ApmServer {
           const ndjsonPayload = ndjson.join('')
           return this._postJson(endPoint, ndjsonPayload)
         } else {
-          this._loggingService.warn('Dropped payload due to filtering!')
+          this._logger.warn('Dropped payload due to filtering!')
         }
       }
     } else {

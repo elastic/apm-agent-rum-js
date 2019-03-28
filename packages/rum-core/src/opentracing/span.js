@@ -53,7 +53,7 @@ class Span extends otSpan {
   }
 
   _addTags(keyValuePairs) {
-    var tags = extend({}, keyValuePairs)
+    const tags = extend({}, keyValuePairs)
     if (tags.type) {
       this.span.type = tags.type
       delete tags.type
