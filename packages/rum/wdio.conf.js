@@ -70,11 +70,14 @@ exports.config = {
      */
     browser.setTimeout({ script: 20000 })
   },
-  afterTest() {
-    /** Log api is only available in Chrome */
-    if (isChrome()) {
+  afterTest(test) {
+    /**
+     * Log only on failures
+     * Log api is only available in chrome driver
+     * */
+    if (!test.passed && isChrome()) {
       const response = browser.getLogs('browser')
-      console.log('browser.log:', JSON.stringify(response, undefined, 2))
+      console.log('[Browser Logs]:', JSON.stringify(response, undefined, 2))
     }
   }
 }
