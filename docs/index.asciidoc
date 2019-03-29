@@ -26,3 +26,5 @@ include::./troubleshooting.asciidoc[]
 include::./distributed-tracing-guide.asciidoc[]
 
 include::./opentracing.asciidoc[]
+
+include::./release-notes.asciidoc[]
