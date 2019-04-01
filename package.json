@@ -19,7 +19,7 @@
     "format": "eslint . --fix",
     "test": "lerna run test --stream --scope=$SCOPE --no-prefix",
     "serve": "lerna run serve",
-    "bundlesize": "lerna run --scope @elastic/apm-rum bundlesize"
+    "bundlesize": "lerna run --scope @elastic/apm-rum bundlesize  --stream"
   },
   "author": "",
   "license": "MIT",

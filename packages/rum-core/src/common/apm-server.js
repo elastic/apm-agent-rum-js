@@ -23,7 +23,6 @@
  *
  */
 
-import { version as agentVersion } from '../../package.json'
 const Queue = require('./queue')
 const throttle = require('./throttle')
 const { sanitizeString } = require('./utils')
@@ -67,7 +66,7 @@ class ApmServer {
       version: sanitizeString(cfg.get('serviceVersion'), stringLimit),
       agent: {
         name: 'js-base',
-        version: agentVersion
+        version: '4.0.1'
       },
       language: {
         name: 'javascript'
