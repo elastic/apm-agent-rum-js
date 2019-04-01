@@ -24,7 +24,6 @@
  */
 
 const path = require('path')
-const { version: agentVersion } = require('./package.json')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
@@ -53,17 +52,6 @@ const baseConfig = {
         test: /\.js$/,
         use: {
           loader: 'babel-loader'
-        }
-      },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'string-replace-loader',
-          options: {
-            search: '%%agent-version%%',
-            replace: agentVersion
-          }
         }
       }
     ]

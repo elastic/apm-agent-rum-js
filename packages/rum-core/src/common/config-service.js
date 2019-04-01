@@ -69,8 +69,6 @@ class Config {
       serviceName: '',
       serviceVersion: '',
       environment: '',
-      agentName: 'js-base',
-      agentVersion: '%%agent-version%%',
       serverUrl: 'http://localhost:8200',
       serverUrlPrefix: '/intake/v2/rum/events',
       active: true,

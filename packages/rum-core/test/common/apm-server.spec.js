@@ -368,16 +368,17 @@ describe('ApmServer', function() {
     configService.setConfig({
       serviceName: 'test',
       serviceVersion: '0.0.1',
-      environment: 'staging',
-      agentName: 'rum',
-      agentVersion: '3.0.0'
+      environment: 'staging'
     })
 
     expect(apmServer.createServiceObject()).toEqual({
       name: 'test',
       version: '0.0.1',
       environment: 'staging',
-      agent: { name: 'rum', version: '3.0.0' },
+      agent: {
+        name: 'js-base',
+        version: jasmine.stringMatching(/^([0-9]+)\.([0-9]+)\.([0-9]+)/)
+      },
       language: { name: 'javascript' }
     })
   })
