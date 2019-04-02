@@ -23,7 +23,7 @@
  *
  */
 
-const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
+import { allowSomeBrowserErrors } from '../../../../../dev-utils/webdriver'
 
 describe('general-usercase', function() {
   it('should run the general usecase', function() {

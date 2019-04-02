@@ -23,8 +23,8 @@
  *
  */
 
-const { apmBase } = require('../../src')
-const { getGlobalConfig } = require('../../../../dev-utils/test-config')
+import { apmBase } from '../../src'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig().globalConfigs
 

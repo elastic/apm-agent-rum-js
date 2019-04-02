@@ -23,7 +23,7 @@
  *
  */
 
-var createApmBase = require('../')
+import createApmBase from '../'
 
 var apm = createApmBase({
   debug: true,
@@ -33,6 +33,5 @@ var apm = createApmBase({
 })
 
 apm.setInitialPageLoadName('react-initial-page-load')
-module.exports = {
-  apm
-}
+
+export { apm }

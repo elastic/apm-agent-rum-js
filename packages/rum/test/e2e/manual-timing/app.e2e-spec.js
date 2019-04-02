@@ -23,7 +23,7 @@
  *
  */
 
-const { verifyNoBrowserErrors } = require('../../../../../dev-utils/webdriver')
+import { verifyNoBrowserErrors } from '../../../../../dev-utils/webdriver'
 
 describe('manual-timing', function() {
   it('should run manual timing', async function() {

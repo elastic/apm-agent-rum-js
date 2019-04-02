@@ -23,11 +23,10 @@
  *
  */
 
-const elasticApm = require('../../')
-const { getGlobalConfig } = require('../../../../dev-utils/test-config')
-const ApmServerMock = require('../../../rum-core/test/utils/apm-server-mock')
+import { apmBase } from '../../src'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import ApmServerMock from '../../../rum-core/test/utils/apm-server-mock'
 
-const apmBase = elasticApm.apmBase
 const { globalConfigs } = getGlobalConfig()
 
 function createApmBase(config) {
@@ -40,7 +39,7 @@ function createApmBase(config) {
   const serverMock = new ApmServerMock(apmServer, globalConfigs.useMocks)
   apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
 
-  return elasticApm.init(config)
+  return apmBase.init(config)
 }
 
-module.exports = createApmBase
+export default createApmBase

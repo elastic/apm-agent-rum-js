@@ -23,12 +23,10 @@
  *
  */
 
-const path = require('path')
-const request = require('request')
-const fs = require('fs')
-const {
-  getTestEnvironmentVariables
-} = require('../../../../dev-utils/test-config')
+import path from 'path'
+import request from 'request'
+import fs from 'fs'
+import { getTestEnvironmentVariables } from '../../../../dev-utils/test-config'
 
 const basePath = path.join(__dirname, '../e2e')
 const { serverUrl } = getTestEnvironmentVariables()

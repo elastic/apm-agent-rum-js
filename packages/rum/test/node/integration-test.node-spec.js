@@ -23,7 +23,7 @@
  *
  */
 
-var request = require('request')
+import request from 'request'
 
 describe('integration-test', function() {
   it('should run integration test', function(done) {

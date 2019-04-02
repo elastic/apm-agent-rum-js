@@ -62,9 +62,4 @@ function testFetch(backendUrl, callback = () => {}) {
   }
 }
 
-module.exports = {
-  checkDtInfo,
-  testXHR,
-  testFetch,
-  renderTestElement
-}
+export { checkDtInfo, testXHR, testFetch, renderTestElement }

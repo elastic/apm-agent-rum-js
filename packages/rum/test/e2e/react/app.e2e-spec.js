@@ -23,7 +23,7 @@
  *
  */
 
-const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
+import { allowSomeBrowserErrors } from '../../../../../dev-utils/webdriver'
 
 describe('react app', function() {
   it('should run the react app', function() {
