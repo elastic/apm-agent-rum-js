@@ -23,8 +23,9 @@
  *
  */
 
-const { createServiceFactory } = require('../')
-const { getGlobalConfig } = require('../../../../dev-utils/test-config')
+import { createServiceFactory } from '../'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+
 const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
 describe('ErrorLogging', function() {

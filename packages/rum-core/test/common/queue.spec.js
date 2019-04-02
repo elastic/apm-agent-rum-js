@@ -23,7 +23,7 @@
  *
  */
 
-var Queue = require('../../src/common/queue')
+import Queue from '../../src/common/queue'
 
 describe('Queue', function() {
   it('should work for default options', function(done) {

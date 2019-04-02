@@ -23,7 +23,8 @@
  *
  */
 
-var Subscription = require('../../src/common/subscription')
+import Subscription from '../../src/common/subscription'
+
 class ApmServerMock {
   constructor(apmServer, useMocks) {
     var subscription = (this.subscription = new Subscription())
@@ -100,4 +101,4 @@ class ApmServerMock {
   init() {}
 }
 
-module.exports = ApmServerMock
+export default ApmServerMock

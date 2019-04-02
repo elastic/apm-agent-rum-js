@@ -23,7 +23,8 @@
  *
  */
 
-var SpanBase = require('../../src/performance-monitoring/span-base')
+import SpanBase from '../../src/performance-monitoring/span-base'
+
 describe('SpanBase', function() {
   it('should addTags', function() {
     var span = new SpanBase()

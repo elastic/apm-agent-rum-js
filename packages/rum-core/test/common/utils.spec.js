@@ -23,8 +23,8 @@
  *
  */
 
-var utils = require('../../src/common/utils')
-var Span = require('../../src/performance-monitoring/span')
+import * as utils from '../../src/common/utils'
+import Span from '../../src/performance-monitoring/span'
 
 describe('lib/utils', function() {
   it('should merge objects', function() {

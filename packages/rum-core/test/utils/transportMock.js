@@ -23,7 +23,7 @@
  *
  */
 
-var Subscription = require('../../src/common/subscription')
+import Subscription from '../../src/common/subscription'
 
 function TransportMock(transport) {
   this._transport = transport
@@ -66,4 +66,4 @@ TransportMock.prototype.sendError = function(data, headers) {
   this.subscription.applyAll(this, ['sendError', errorData])
 }
 
-module.exports = TransportMock
+export default TransportMock

@@ -23,9 +23,8 @@
  *
  */
 
-require('./patch')
-const patchSubscription = window['__patchSubscription']
-const { globalState } = require('../../src/common/patching/patch-utils')
+import patchSubscription from './patch'
+import { globalState } from '../../src/common/patching/patch-utils'
 
 describe('fetchPatch', function() {
   var events = []

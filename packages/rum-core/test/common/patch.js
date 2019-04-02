@@ -23,7 +23,7 @@
  *
  */
 
-const { patchAll } = require('../../src/common/patching/')
+import { patchAll } from '../../src/common/patching/'
 
 if (!window['__patchSubscription']) {
   var nativeFetch = window.fetch
@@ -41,4 +41,4 @@ if (!window['__patchSubscription']) {
   window['__patchSubscription'] = patchAll()
 }
 
-module.exports = window['__patchSubscription']
+export default window['__patchSubscription']

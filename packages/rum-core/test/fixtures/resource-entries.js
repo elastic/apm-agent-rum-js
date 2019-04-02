@@ -24,7 +24,7 @@
  */
 
 /* eslint-disable max-len */
-module.exports = [
+export default [
   {
     name: null,
     initiatorType: 'script',
