@@ -26,6 +26,7 @@
 const ApmServer = require('../../src/common/apm-server')
 const Transaction = require('../../src/performance-monitoring/transaction')
 const { createServiceFactory } = require('../')
+const { version: agentVersion } = require('../../../rum/package.json')
 
 function generateTransaction(count) {
   var result = []
@@ -371,13 +372,14 @@ describe('ApmServer', function() {
       environment: 'staging'
     })
 
+    /** To catch agent version mismatch during release */
     expect(apmServer.createServiceObject()).toEqual({
       name: 'test',
       version: '0.0.1',
       environment: 'staging',
       agent: {
         name: 'js-base',
-        version: jasmine.stringMatching(/^([0-9]+)\.([0-9]+)\.([0-9]+)/)
+        version: agentVersion
       },
       language: { name: 'javascript' }
     })
