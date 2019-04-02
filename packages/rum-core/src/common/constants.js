@@ -66,7 +66,7 @@ const SPAN_THRESHOLD = 5 * 60 * 1000
  */
 const serverStringLimit = 1024
 
-module.exports = {
+export {
   SCHEDULE,
   INVOKE,
   CLEAR,

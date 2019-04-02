@@ -23,7 +23,8 @@
  *
  */
 
-const indexExports = require('./index')
-const opentracing = require('./opentracing')
-const { extend } = require('@elastic/apm-rum-core/src/common/utils')
-module.exports = extend({}, indexExports, opentracing)
+import * as indexExports from './index'
+import opentracing from './opentracing'
+import { extend } from '@elastic/apm-rum-core/src/common/utils'
+
+export default extend({}, indexExports, opentracing)

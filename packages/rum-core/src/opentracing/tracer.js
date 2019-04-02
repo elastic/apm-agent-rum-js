@@ -23,17 +23,16 @@
  *
  */
 
-const { Tracer: otTracer } = require('opentracing/lib/tracer')
-const {
+import { Tracer as otTracer } from 'opentracing/lib/tracer'
+import {
   REFERENCE_CHILD_OF,
   FORMAT_TEXT_MAP,
   FORMAT_HTTP_HEADERS,
   FORMAT_BINARY
-} = require('opentracing/lib/constants')
-const { Span: NoopSpan } = require('opentracing/lib/span')
-
-const { getTimeOrigin, find } = require('../common/utils')
-const Span = require('./span')
+} from 'opentracing/lib/constants'
+import { Span as NoopSpan } from 'opentracing/lib/span'
+import { getTimeOrigin, find } from '../common/utils'
+import Span from './span'
 
 class Tracer extends otTracer {
   constructor(
@@ -134,4 +133,4 @@ class Tracer extends otTracer {
   }
 }
 
-module.exports = Tracer
+export default Tracer

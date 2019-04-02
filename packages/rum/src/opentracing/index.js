@@ -23,11 +23,9 @@
  *
  */
 
-const {
-  createTracer: createElasticTracer
-} = require('@elastic/apm-rum-core/src/opentracing')
+import { createTracer as createElasticTracer } from '@elastic/apm-rum-core/src/opentracing'
 
-function createTracer(apmBase) {
+export function createTracer(apmBase) {
   return createElasticTracer(apmBase.serviceFactory)
 }
 
@@ -38,8 +36,4 @@ if (window && window.elasticApm) {
   )
 }
 
-module.exports = {
-  __esModule: true,
-  default: createTracer,
-  createTracer
-}
+export default createTracer

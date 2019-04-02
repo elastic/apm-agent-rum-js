@@ -23,9 +23,9 @@
  *
  */
 
-const { serverStringLimit } = require('./constants')
-const Url = require('../common/url')
-const rng = require('uuid/lib/rng-browser')
+import { serverStringLimit } from './constants'
+import Url from '../common/url'
+import rng from 'uuid/lib/rng-browser'
 
 const slice = [].slice
 
@@ -351,7 +351,7 @@ function removeInvalidChars(key) {
   return key.replace(/[.*"]/g, '_')
 }
 
-module.exports = {
+export {
   extend,
   merge,
   isUndefined,

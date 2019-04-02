@@ -23,18 +23,21 @@
  *
  */
 
+import { isPlatformSupported, patchAll } from '@elastic/apm-rum-core'
+import { polyfill } from 'es6-promise'
+
 var alreadyBootstrap = false
 var enabled = false
-module.exports = function bootstrap() {
+
+export default function bootstrap() {
   if (alreadyBootstrap) {
     return enabled
   }
   alreadyBootstrap = true
 
-  var apmCore = require('@elastic/apm-rum-core')
-  if (apmCore.utils.isPlatformSupported()) {
-    require('es6-promise/auto')
-    apmCore.patching.patchAll()
+  if (isPlatformSupported()) {
+    polyfill()
+    patchAll()
     enabled = true
   } else {
     console.log('APM: Platform is not supported!')

@@ -23,9 +23,10 @@
  *
  */
 
-var patchXMLHttpRequest = require('./xhr-patch').patchXMLHttpRequest
-var patchFetch = require('./fetch-patch').patchFetch
-var Subscription = require('../subscription')
+import { patchXMLHttpRequest } from './xhr-patch'
+import { patchFetch } from './fetch-patch'
+import Subscription from '../subscription'
+
 var subscription = new Subscription()
 var alreadyPatched = false
 function patchAll() {
@@ -41,7 +42,4 @@ function patchAll() {
   return subscription
 }
 
-module.exports = {
-  patchAll,
-  subscription
-}
+export { patchAll, subscription }

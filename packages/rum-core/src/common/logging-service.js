@@ -23,7 +23,7 @@
  *
  */
 
-const { noop } = require('./utils')
+import { noop } from './utils'
 
 class LoggingService {
   constructor(spec) {
@@ -81,4 +81,4 @@ class LoggingService {
   }
 }
 
-module.exports = LoggingService
+export default LoggingService

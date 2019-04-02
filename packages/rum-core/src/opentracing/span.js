@@ -23,9 +23,9 @@
  *
  */
 
-const { Span: otSpan } = require('opentracing/lib/span')
-const { extend, getTimeOrigin } = require('../common/utils')
-const Transaction = require('../performance-monitoring/transaction')
+import { Span as otSpan } from 'opentracing/lib/span'
+import { extend, getTimeOrigin } from '../common/utils'
+import Transaction from '../performance-monitoring/transaction'
 
 class Span extends otSpan {
   constructor(tracer, span) {
@@ -98,4 +98,4 @@ class Span extends otSpan {
   }
 }
 
-module.exports = Span
+export default Span

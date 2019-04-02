@@ -23,12 +23,11 @@
  *
  */
 
-const ApmServer = require('./apm-server')
-const ConfigService = require('./config-service')
-const LoggingService = require('./logging-service')
-
-const patchUtils = require('./patching/patch-utils')
-const utils = require('./utils')
+import ApmServer from './apm-server'
+import ConfigService from './config-service'
+import LoggingService from './logging-service'
+import * as patchUtils from './patching/patch-utils'
+import * as utils from './utils'
 
 class ServiceFactory {
   constructor() {
@@ -107,4 +106,4 @@ class ServiceFactory {
   }
 }
 
-module.exports = ServiceFactory
+export default ServiceFactory

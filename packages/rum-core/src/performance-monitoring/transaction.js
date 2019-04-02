@@ -23,9 +23,9 @@
  *
  */
 
-const Span = require('./span')
-const SpanBase = require('./span-base')
-const {
+import Span from './span'
+import SpanBase from './span-base'
+import {
   generateRandomId,
   getNavigationTimingMarks,
   getPaintTimingMarks,
@@ -33,7 +33,7 @@ const {
   extend,
   getPageMetadata,
   removeInvalidChars
-} = require('../common/utils')
+} from '../common/utils'
 
 class Transaction extends SpanBase {
   constructor(name, type, options) {
@@ -230,4 +230,4 @@ function getEarliestSpan(spans) {
   return earliestSpan
 }
 
-module.exports = Transaction
+export default Transaction
