@@ -114,10 +114,14 @@ function serveE2e(servingPath, port) {
 }
 
 function runJasmine(cb) {
-  const specFiles = ['test/node/*.node-spec.js']
-  const jrunner = new JasmineRunner({
-    projectBaseDir: PROJECT_DIR,
-    specDir: ''
+  const jrunner = new JasmineRunner()
+  /**
+   * Files are relative to spec directory
+   */
+  jrunner.loadConfig({
+    spec_dir: 'test/node',
+    spec_files: ['*.node-spec.js'],
+    helpers: ['babel-helper.js']
   })
   jrunner.onComplete(passed => {
     if (!passed) {
@@ -129,10 +133,6 @@ function runJasmine(cb) {
       cb()
     }
   })
-
-  jrunner.showColors(true)
-  jrunner.addReporter(JasmineRunner.ConsoleReporter(jrunner))
-  jrunner.addSpecFiles(specFiles)
   jrunner.execute()
 }
 

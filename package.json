@@ -35,6 +35,7 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.4.0",
     "@wdio/cli": "^5.7.2",
     "@wdio/dot-reporter": "^5.7.2",
     "@wdio/jasmine-framework": "^5.7.2",
