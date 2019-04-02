@@ -22,8 +22,7 @@
  * THE SOFTWARE.
  *
  */
-
-import { allowSomeBrowserErrors } from '../../../../../dev-utils/webdriver'
+const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('general-usercase', function() {
   it('should run the general usecase', function() {
