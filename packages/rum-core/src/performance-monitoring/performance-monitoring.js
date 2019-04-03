@@ -33,7 +33,7 @@ import {
   stripQueryStringFromUrl,
   parseDtHeaderValue
 } from '../common/utils'
-import { subscription as patchingSub } from '../common/patching'
+import { patchSubscription } from '../common/patching'
 import { globalState } from '../common/patching/patch-utils'
 import {
   SCHEDULE,
@@ -63,7 +63,7 @@ class PerformanceMonitoring {
       this._configService,
       this._transactionService
     )
-    this.cancelPatchSub = patchingSub.subscribe(patchSubFn)
+    this.cancelPatchSub = patchSubscription.subscribe(patchSubFn)
   }
 
   getXhrPatchSubFn() {

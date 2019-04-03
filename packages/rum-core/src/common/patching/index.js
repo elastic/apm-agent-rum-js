@@ -27,19 +27,19 @@ import { patchXMLHttpRequest } from './xhr-patch'
 import { patchFetch } from './fetch-patch'
 import Subscription from '../subscription'
 
-var subscription = new Subscription()
+const patchSubscription = new Subscription()
 var alreadyPatched = false
 function patchAll() {
   if (!alreadyPatched) {
     alreadyPatched = true
     patchXMLHttpRequest(function(event, task) {
-      subscription.applyAll(this, [event, task])
+      patchSubscription.applyAll(this, [event, task])
     })
     patchFetch(function(event, task) {
-      subscription.applyAll(this, [event, task])
+      patchSubscription.applyAll(this, [event, task])
     })
   }
-  return subscription
+  return patchSubscription
 }
 
-export { patchAll, subscription }
+export { patchAll, patchSubscription }

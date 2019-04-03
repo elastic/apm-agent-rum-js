@@ -37,5 +37,5 @@ if (typeof window !== 'undefined') {
 
 const init = () => apmBase.init.bind(apmBase)
 
-export default apmBase
+export default init
 export { init, apmBase, ApmBase, apmBase as apm }

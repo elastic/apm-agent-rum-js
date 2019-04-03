@@ -29,7 +29,7 @@ import ErrorLogging from './error-logging'
 import PerformanceMonitoring from './performance-monitoring'
 import ServiceFactory from './common/service-factory'
 import { isPlatformSupported } from './common/utils'
-import { patchAll, subscription } from './common/patching'
+import { patchAll, patchSubscription } from './common/patching'
 
 function createServiceFactory() {
   var serviceFactory = new ServiceFactory()
@@ -43,6 +43,6 @@ export {
   createServiceFactory,
   ServiceFactory,
   patchAll,
-  subscription,
+  patchSubscription,
   isPlatformSupported
 }
