@@ -39,6 +39,15 @@ class ApmBase {
        */
       configService.setVersion('4.0.1')
       configService.setConfig(config)
+      /**
+       * Deactive agent when the active config flag is set to false
+       */
+      const loggingService = this.serviceFactory.getService('LoggingService')
+      if (!configService.isActive()) {
+        loggingService.info('RUM agent is inactive')
+        return this
+      }
+
       this.serviceFactory.init()
       var errorLogging = this.serviceFactory.getService('ErrorLogging')
       errorLogging.registerGlobalEventListener()

@@ -67,6 +67,31 @@ describe('ApmBase', function() {
     })
   })
 
+  it('should be noop when agent is not active', done => {
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    const loggingService = serviceFactory.getService('LoggingService')
+    spyOn(loggingService, 'info')
+
+    apmBase.init({
+      active: false
+    })
+    /**
+     * Start a XHR which shouldn't be captured as transaction
+     */
+    const req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+    req.addEventListener('load', function() {
+      setTimeout(() => {
+        done()
+      })
+    })
+
+    req.send()
+    const tr = apmBase.getCurrentTransaction()
+    expect(tr).toBeUndefined()
+    expect(loggingService.info).toHaveBeenCalledWith('RUM agent is inactive')
+  })
+
   it('should provide the public api', function() {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({})
@@ -152,29 +177,6 @@ describe('ApmBase', function() {
     tr = apmBase.getCurrentTransaction()
     expect(tr).toBeDefined()
     expect(tr.name).toBe('ZoneTransaction')
-  })
-
-  it('should instrument xhr when not active', function(done) {
-    var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ capturePageLoad: false, active: false })
-    var performanceMonitoring = serviceFactory.getService(
-      'PerformanceMonitoring'
-    )
-
-    var tr
-
-    var req = new window.XMLHttpRequest()
-    req.open('GET', '/', true)
-    req.addEventListener('load', function() {
-      setTimeout(() => {
-        performanceMonitoring.cancelPatchSub()
-        done()
-      })
-    })
-
-    req.send()
-    tr = apmBase.getCurrentTransaction()
-    expect(tr).toBeUndefined()
   })
 
   it('should instrument sync xhr', function(done) {
