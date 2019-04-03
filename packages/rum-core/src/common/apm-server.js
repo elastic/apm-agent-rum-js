@@ -66,7 +66,7 @@ class ApmServer {
       version: sanitizeString(cfg.get('serviceVersion'), stringLimit),
       agent: {
         name: 'js-base',
-        version: sanitizeString(cfg.agentVersion, stringLimit)
+        version: sanitizeString(cfg.version, stringLimit)
       },
       language: {
         name: 'javascript'
