@@ -35,7 +35,7 @@ if (typeof window !== 'undefined') {
   window.elasticApm = apmBase
 }
 
-const init = () => apmBase.init.bind(apmBase)
+const init = apmBase.init.bind(apmBase)
 
 export default init
 export { init, apmBase, ApmBase, apmBase as apm }
