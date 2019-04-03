@@ -114,6 +114,11 @@ class Config {
 
     this._changeSubscription = new Subscription()
     this.filters = []
+    /**
+     * Packages that uses rum-core under the hood must override
+     * the version via setVersion
+     */
+    this.version = ''
   }
 
   init() {
@@ -123,6 +128,10 @@ class Config {
 
   isActive() {
     return this.get('active')
+  }
+
+  setVersion(version) {
+    this.version = version
   }
 
   addFilter(cb) {

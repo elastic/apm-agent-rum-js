@@ -8,6 +8,7 @@
     "url": "https://github.com/elastic/apm-agent-rum-js.git"
   },
   "scripts": {
+    "pre-commit": "lerna run version-check --stream",
     "prerelease": "npm test",
     "release": "lerna publish",
     "release-package": "node scripts/publish",
@@ -19,7 +20,7 @@
     "format": "eslint . --fix",
     "test": "lerna run test --stream --scope=$SCOPE --no-prefix",
     "serve": "lerna run serve",
-    "bundlesize": "lerna run --scope @elastic/apm-rum bundlesize  --stream"
+    "bundlesize": "lerna run bundlesize --stream"
   },
   "author": "",
   "license": "MIT",
