@@ -8,7 +8,6 @@
     "url": "https://github.com/elastic/apm-agent-rum-js.git"
   },
   "scripts": {
-    "pre-commit": "lerna run version-check --stream",
     "prerelease": "npm test",
     "release": "lerna publish",
     "release-package": "node scripts/publish",
@@ -21,6 +20,11 @@
     "test": "lerna run test --stream --scope=$SCOPE --no-prefix",
     "serve": "lerna run serve",
     "bundlesize": "lerna run bundlesize --stream"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npx lerna run version-check --stream"
+    }
   },
   "author": "",
   "license": "MIT",
@@ -52,6 +56,7 @@
     "gh-release-assets": "^1.1.2",
     "glob": "^7.1.3",
     "http-server": "^0.10.0",
+    "husky": "^1.3.1",
     "jasmine": "^2.8.0",
     "karma": "^3.0.0",
     "karma-chrome-launcher": "^2.2.0",
