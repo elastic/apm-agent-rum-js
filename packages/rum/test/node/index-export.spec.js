@@ -23,15 +23,16 @@
  *
  */
 
-require('@babel/register')({
-  presets: [
-    [
-      '@babel/preset-env',
-      {
-        targets: {
-          node: 'current'
-        }
-      }
-    ]
-  ]
+const elasticApm = require('@elastic/apm-rum')
+const { init: namedInit, apm, apmBase, ApmBase } = require('@elastic/apm-rum')
+
+describe('apm base build', () => {
+  it('should have default and named exports', () => {
+    expect(elasticApm.init).toEqual(jasmine.any(Function))
+    expect(namedInit).toEqual(jasmine.any(Function))
+    expect(apm).toEqual(jasmine.any(Object))
+    expect(apmBase).toEqual(jasmine.any(Object))
+    expect(apmBase.init).toEqual(jasmine.any(Function))
+    expect(ApmBase).toEqual(jasmine.any(Function))
+  })
 })

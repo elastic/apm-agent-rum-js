@@ -23,8 +23,19 @@
  *
  */
 
-import * as indexExports from './index'
-import opentracing from './opentracing'
-import { extend } from '@elastic/apm-rum-core/src/common/utils'
+import { init, apm, apmBase, ApmBase } from './index'
+import { createTracer as createElasticTracer } from '@elastic/apm-rum-core'
 
-export default extend({}, indexExports, opentracing)
+function createTracer(apmBase) {
+  return createElasticTracer(apmBase.serviceFactory)
+}
+
+if (typeof window !== 'undefined' && window.elasticApm) {
+  window.elasticApm.createTracer = createTracer.bind(
+    window.elasticApm,
+    window.elasticApm
+  )
+}
+
+export default createTracer
+export { createTracer, init, apm, apmBase, ApmBase }

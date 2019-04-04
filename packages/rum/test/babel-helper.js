@@ -23,28 +23,6 @@
  *
  */
 
-// export public core APIs.
+const configFile = require.resolve('../../../babel.node')
 
-import ErrorLogging from './error-logging'
-import PerformanceMonitoring from './performance-monitoring'
-import ServiceFactory from './common/service-factory'
-import { isPlatformSupported } from './common/utils'
-import { patchAll, patchSubscription } from './common/patching'
-import { createTracer } from './opentracing'
-
-function createServiceFactory() {
-  var serviceFactory = new ServiceFactory()
-  serviceFactory.registerCoreServices()
-  ErrorLogging.registerServices(serviceFactory)
-  PerformanceMonitoring.registerServices(serviceFactory)
-  return serviceFactory
-}
-
-export {
-  createServiceFactory,
-  ServiceFactory,
-  patchAll,
-  patchSubscription,
-  isPlatformSupported,
-  createTracer
-}
+require('@babel/register')({ configFile })

@@ -22,18 +22,23 @@
  * THE SOFTWARE.
  *
  */
+const opentracing = require('@elastic/apm-rum/dist/lib/opentracing-entry')
+const {
+  init,
+  apm,
+  apmBase,
+  ApmBase,
+  createTracer
+} = require('@elastic/apm-rum/dist/lib/opentracing-entry')
 
-import { createTracer as createElasticTracer } from '@elastic/apm-rum-core/src/opentracing'
-
-export function createTracer(apmBase) {
-  return createElasticTracer(apmBase.serviceFactory)
-}
-
-if (window && window.elasticApm) {
-  window.elasticApm.createTracer = createTracer.bind(
-    window.elasticApm,
-    window.elasticApm
-  )
-}
-
-export default createTracer
+describe('opentracing build', () => {
+  it('should have default and named exports', () => {
+    expect(opentracing.default).toEqual(jasmine.any(Function))
+    expect(createTracer).toEqual(jasmine.any(Function))
+    expect(init).toEqual(jasmine.any(Function))
+    expect(apm).toEqual(jasmine.any(Object))
+    expect(apmBase).toEqual(jasmine.any(Object))
+    expect(apmBase.init).toEqual(jasmine.any(Function))
+    expect(ApmBase).toEqual(jasmine.any(Function))
+  })
+})

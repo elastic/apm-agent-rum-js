@@ -23,28 +23,20 @@
  *
  */
 
-// export public core APIs.
-
-import ErrorLogging from './error-logging'
-import PerformanceMonitoring from './performance-monitoring'
-import ServiceFactory from './common/service-factory'
-import { isPlatformSupported } from './common/utils'
-import { patchAll, patchSubscription } from './common/patching'
-import { createTracer } from './opentracing'
-
-function createServiceFactory() {
-  var serviceFactory = new ServiceFactory()
-  serviceFactory.registerCoreServices()
-  ErrorLogging.registerServices(serviceFactory)
-  PerformanceMonitoring.registerServices(serviceFactory)
-  return serviceFactory
-}
-
-export {
-  createServiceFactory,
-  ServiceFactory,
-  patchAll,
-  patchSubscription,
-  isPlatformSupported,
-  createTracer
+module.exports = function(api) {
+  api.cache(true)
+  return {
+    comments: false,
+    presets: [
+      [
+        '@babel/preset-env',
+        {
+          targets: {
+            node: '8.0.0'
+          },
+          loose: true
+        }
+      ]
+    ]
+  }
 }
