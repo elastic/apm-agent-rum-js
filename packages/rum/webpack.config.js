@@ -32,7 +32,7 @@ const OUTPUT_DIR = path.join(__dirname, 'dist', 'bundles')
 const baseConfig = {
   entry: {
     'elastic-apm-rum': './src/index.js',
-    'elastic-apm-opentracing': './src/opentracing-entry.js'
+    'elastic-apm-opentracing': './src/opentracing.js'
   },
   output: {
     filename: '[name].umd.js',
