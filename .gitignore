@@ -15,5 +15,3 @@ coverage
 
 # ignore lerna-debug and npm-debug logs
 *debug.log
-
-/packages/*/lib

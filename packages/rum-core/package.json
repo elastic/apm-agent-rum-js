@@ -25,7 +25,7 @@
   },
   "files": [
     "src",
-    "lib"
+    "dist"
   ],
   "engines": {
     "node": ">=8.0.0"
