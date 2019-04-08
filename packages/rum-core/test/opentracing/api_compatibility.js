@@ -24,9 +24,9 @@
  */
 
 // Source: opentracing/lib/test/api_compatibility.js
-const ot = require('opentracing')
+import * as ot from 'opentracing'
 
-function apiCompatibilityChecks(createTracer, options) {
+export default function apiCompatibilityChecks(createTracer, options) {
   if (options === void 0) {
     options = { skipBaggageChecks: false, skipInjectExtractChecks: false }
   }
@@ -131,4 +131,3 @@ function apiCompatibilityChecks(createTracer, options) {
     })
   })
 }
-exports.default = apiCompatibilityChecks

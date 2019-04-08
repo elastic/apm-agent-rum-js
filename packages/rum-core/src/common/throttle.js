@@ -53,4 +53,4 @@ function throttle(fn, onThrottle, opts) {
   }
 }
 
-module.exports = throttle
+export default throttle

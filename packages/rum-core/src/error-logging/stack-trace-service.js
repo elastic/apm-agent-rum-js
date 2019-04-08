@@ -23,7 +23,7 @@
  *
  */
 
-var errorStackParser = require('error-stack-parser')
+import errorStackParser from 'error-stack-parser'
 
 class StackTraceService {
   constructor(configService, loggingService) {
@@ -167,4 +167,4 @@ function normalizeFunctionName(fnName) {
   return fnName
 }
 
-module.exports = StackTraceService
+export default StackTraceService

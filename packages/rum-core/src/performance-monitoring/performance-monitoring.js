@@ -23,7 +23,7 @@
  *
  */
 
-const {
+import {
   sanitizeObjectStrings,
   sanitizeString,
   checkSameOrigin,
@@ -32,15 +32,15 @@ const {
   merge,
   stripQueryStringFromUrl,
   parseDtHeaderValue
-} = require('../common/utils')
-const patchingSub = require('../common/patching').subscription
-const { globalState } = require('../common/patching/patch-utils')
-const {
+} from '../common/utils'
+import { patchSubscription } from '../common/patching'
+import { globalState } from '../common/patching/patch-utils'
+import {
   SCHEDULE,
   INVOKE,
   XMLHTTPREQUEST_SOURCE,
   FETCH_SOURCE
-} = require('../common/constants')
+} from '../common/constants'
 
 class PerformanceMonitoring {
   constructor(apmServer, configService, loggingService, transactionService) {
@@ -63,7 +63,7 @@ class PerformanceMonitoring {
       this._configService,
       this._transactionService
     )
-    this.cancelPatchSub = patchingSub.subscribe(patchSubFn)
+    this.cancelPatchSub = patchSubscription.subscribe(patchSubFn)
   }
 
   getXhrPatchSubFn() {
@@ -367,4 +367,4 @@ class PerformanceMonitoring {
   }
 }
 
-module.exports = PerformanceMonitoring
+export default PerformanceMonitoring

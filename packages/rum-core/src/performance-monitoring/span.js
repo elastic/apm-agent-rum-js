@@ -23,7 +23,7 @@
  *
  */
 
-const BaseSpan = require('./span-base')
+import BaseSpan from './span-base'
 
 class Span extends BaseSpan {
   constructor(name, type, options) {
@@ -41,4 +41,4 @@ class Span extends BaseSpan {
   }
 }
 
-module.exports = Span
+export default Span

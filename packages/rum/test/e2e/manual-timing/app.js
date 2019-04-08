@@ -23,8 +23,9 @@
  *
  */
 
-const createApmBase = require('../')
-const { renderTestElement } = require('../utils')
+import createApmBase from '../'
+import { renderTestElement } from '../utils'
+
 const apm = createApmBase({
   serviceName: 'manual-timing',
   sendPageLoadTransaction: false,

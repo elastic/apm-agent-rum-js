@@ -23,7 +23,8 @@
  *
  */
 
-var NDJSON = require('../../src/common/ndjson')
+import NDJSON from '../../src/common/ndjson'
+
 describe('NDJSON', function() {
   it('should stringify', function() {
     var result = NDJSON.stringify({ test: 'passed' })

@@ -23,17 +23,12 @@
  *
  */
 
-const {
+import {
   XHR_IGNORE,
   XHR_METHOD,
   XHR_URL
-} = require('../../src/common/patching/patch-utils')
-
-var urlSympbol = XHR_URL
-var methodSymbol = XHR_METHOD
-var xhrIgnore = XHR_IGNORE
-
-var patchSubscription = require('./patch')
+} from '../../src/common/patching/patch-utils'
+import patchSubscription from './patch'
 
 describe('xhrPatch', function() {
   var events = []
@@ -64,8 +59,8 @@ describe('xhrPatch', function() {
   it('should have correct url and method', function() {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    expect(req[urlSympbol]).toBe('/')
-    expect(req[methodSymbol]).toBe('GET')
+    expect(req[XHR_URL]).toBe('/')
+    expect(req[XHR_METHOD]).toBe('GET')
   })
 
   it('should produce events', function(done) {
@@ -228,14 +223,14 @@ describe('xhrPatch', function() {
     const func = function() {
       const req = new XMLHttpRequest()
       // eslint-disable-next-line
-        req.onreadystatechange
+      req.onreadystatechange
     }
     expect(func).not.toThrow()
   })
 
   it('should consider xhr ignore', function(done) {
     var req = new window.XMLHttpRequest()
-    req[xhrIgnore] = true
+    req[XHR_IGNORE] = true
     req.open('GET', '/')
     req.addEventListener('load', function() {
       done()

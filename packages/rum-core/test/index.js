@@ -23,17 +23,15 @@
  *
  */
 
-const { createServiceFactory } = require('../src')
+import { createServiceFactory as originalFactory } from '../src'
 
-module.exports = {
-  createServiceFactory() {
-    var serviceFactory = createServiceFactory()
-    if (window.globalConfigs && window.globalConfigs.useMocks) {
-      var apmServer = serviceFactory.getService('ApmServer')
-      apmServer._makeHttpRequest = function() {
-        return Promise.resolve()
-      }
+export function createServiceFactory() {
+  var serviceFactory = originalFactory()
+  if (window.globalConfigs && window.globalConfigs.useMocks) {
+    var apmServer = serviceFactory.getService('ApmServer')
+    apmServer._makeHttpRequest = function() {
+      return Promise.resolve()
     }
-    return serviceFactory
   }
+  return serviceFactory
 }

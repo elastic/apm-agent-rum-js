@@ -23,14 +23,16 @@
  *
  */
 
-var ApmBase = require('../../src/apm-base')
-var apmCore = require('@elastic/apm-rum-core')
-var enabled = require('../../src/bootstrap')()
+import ApmBase from '../../src/apm-base'
+import { createServiceFactory } from '@elastic/apm-rum-core'
+import bootstrap from '../../src/bootstrap'
+
+var enabled = bootstrap()
 
 describe('ApmBase', function() {
   var serviceFactory
   beforeEach(function() {
-    serviceFactory = apmCore.createServiceFactory()
+    serviceFactory = createServiceFactory()
   })
 
   it('should send page load metrics before or after load event', function(done) {

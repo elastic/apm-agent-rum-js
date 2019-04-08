@@ -23,8 +23,8 @@
  *
  */
 
-const Tracer = require('./tracer')
-const Span = require('./span')
+import Tracer from './tracer'
+import Span from './span'
 
 function createTracer(serviceFactory) {
   var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
@@ -39,8 +39,4 @@ function createTracer(serviceFactory) {
   )
 }
 
-module.exports = {
-  Span,
-  Tracer,
-  createTracer
-}
+export { Span, Tracer, createTracer }

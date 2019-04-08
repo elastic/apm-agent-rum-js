@@ -25,21 +25,17 @@
 
 import { apmBase } from '../../src'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
-import ApmServerMock from '../../../rum-core/test/utils/apm-server-mock'
 
-const { globalConfigs } = getGlobalConfig()
+const { agentConfig } = getGlobalConfig().globalConfigs
 
-function createApmBase(config) {
-  console.log('E2E Global Configs', JSON.stringify(globalConfigs, null, 2))
-  const apmServer = apmBase.serviceFactory.getService('ApmServer')
-  const { serverUrl } = globalConfigs.agentConfig
-  if (serverUrl) {
-    config.serverUrl = serverUrl
-  }
-  const serverMock = new ApmServerMock(apmServer, globalConfigs.useMocks)
-  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
-
-  return apmBase.init(config)
-}
-
-export default createApmBase
+describe('ApmBase', function() {
+  it('should not init ApmBase', function() {
+    apmBase.init(agentConfig)
+    try {
+      throw new Error('ApmBase test error')
+    } catch (error) {
+      var result = apmBase.captureError(error)
+      expect(result).toBeUndefined()
+    }
+  })
+})

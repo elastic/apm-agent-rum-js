@@ -23,9 +23,9 @@
  *
  */
 
-describe('ServiceFactory', function() {
-  var ServiceFactory = require('../../src/common/service-factory')
+import ServiceFactory from '../../src/common/service-factory'
 
+describe('ServiceFactory', function() {
   var configService
   var loggingService
   beforeEach(function() {

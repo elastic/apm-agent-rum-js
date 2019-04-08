@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  *
  */
-
 const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
 describe('general-usercase', function() {

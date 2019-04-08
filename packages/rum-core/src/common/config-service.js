@@ -23,9 +23,9 @@
  *
  */
 
-const { getCurrentScript, sanitizeString, setTag, merge } = require('./utils')
-const Subscription = require('../common/subscription')
-const constants = require('./constants')
+import { getCurrentScript, sanitizeString, setTag, merge } from './utils'
+import Subscription from '../common/subscription'
+import { serverStringLimit } from './constants'
 
 function getConfigFromScript() {
   var script = getCurrentScript()
@@ -94,7 +94,7 @@ class Config {
 
       sendPageLoadTransaction: true,
 
-      serverStringLimit: constants.serverStringLimit,
+      serverStringLimit,
 
       distributedTracing: true,
       distributedTracingOrigins: [],
@@ -252,4 +252,4 @@ class Config {
   }
 }
 
-module.exports = Config
+export default Config

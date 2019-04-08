@@ -23,10 +23,10 @@
  *
  */
 
-const Transaction = require('./transaction')
-const utils = require('../common/utils')
-const Subscription = require('../common/subscription')
-const { captureHardNavigation } = require('./capture-hard-navigation')
+import Transaction from './transaction'
+import { isUndefined, extend } from '../common/utils'
+import Subscription from '../common/subscription'
+import { captureHardNavigation } from './capture-hard-navigation'
 
 class TransactionService {
   constructor(logger, config) {
@@ -51,7 +51,7 @@ class TransactionService {
       return
     }
     var tr = this.getCurrentTransaction()
-    if (!utils.isUndefined(tr) && !tr.ended) {
+    if (!isUndefined(tr) && !tr.ended) {
       return tr
     }
     return this.createZoneTransaction()
@@ -67,7 +67,7 @@ class TransactionService {
 
   createTransaction(name, type, options) {
     var perfOptions = options
-    if (utils.isUndefined(perfOptions)) {
+    if (isUndefined(perfOptions)) {
       perfOptions = this._config.config
     }
     if (!this.shouldCreateTransaction()) {
@@ -128,7 +128,7 @@ class TransactionService {
     var self = this
     var config = self._config.config
 
-    var perfOptions = utils.extend(
+    var perfOptions = extend(
       {
         pageLoadTraceId: config.pageLoadTraceId,
         pageLoadSampled: config.pageLoadSampled,
@@ -265,7 +265,7 @@ class TransactionService {
 
   removeTask(taskId) {
     var tr = this.getCurrentTransaction()
-    if (!utils.isUndefined(tr) && !tr.ended) {
+    if (!isUndefined(tr) && !tr.ended) {
       tr.removeTask(taskId)
       this._logger.debug('TransactionService.removeTask', taskId)
     }
@@ -273,7 +273,7 @@ class TransactionService {
 
   detectFinish() {
     var tr = this.getCurrentTransaction()
-    if (!utils.isUndefined(tr) && !tr.ended) {
+    if (!isUndefined(tr) && !tr.ended) {
       tr.detectFinish()
       this._logger.debug('TransactionService.detectFinish')
     }
@@ -284,4 +284,4 @@ class TransactionService {
   }
 }
 
-module.exports = TransactionService
+export default TransactionService

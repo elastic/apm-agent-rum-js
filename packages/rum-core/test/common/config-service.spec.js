@@ -23,7 +23,7 @@
  *
  */
 
-var ConfigService = require('../../src/common/config-service')
+import ConfigService from '../../src/common/config-service'
 
 describe('ConfigService', function() {
   var configService

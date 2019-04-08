@@ -23,7 +23,7 @@
  *
  */
 
-const Url = require('../../src/common/url')
+import Url from '../../src/common/url'
 
 describe('Url parser', function() {
   it('should parse relative url', function() {

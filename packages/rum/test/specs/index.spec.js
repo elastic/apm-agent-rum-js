@@ -23,9 +23,9 @@
  *
  */
 
-const { apmBase } = require('../../src/')
-const apmCore = require('@elastic/apm-rum-core')
-const { getGlobalConfig } = require('../../../../dev-utils/test-config')
+import { apmBase } from '../../src/'
+import { isPlatformSupported } from '@elastic/apm-rum-core'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { globalConfigs } = getGlobalConfig()
 
@@ -56,7 +56,7 @@ describe('index', function() {
       throw new Error('ApmBase test error')
     } catch (error) {
       apmBase.captureError(error)
-      if (apmCore.utils.isPlatformSupported()) {
+      if (isPlatformSupported()) {
         expect(apmServer.errorQueue).toBeUndefined()
         expect(apmServer.sendErrors).not.toHaveBeenCalled()
         expect(apmServer._postJson).not.toHaveBeenCalled()
@@ -83,7 +83,7 @@ describe('index', function() {
     } catch (error) {
       apmBase.captureError(error)
       expect(apmServer.sendErrors).not.toHaveBeenCalled()
-      if (apmCore.utils.isPlatformSupported()) {
+      if (isPlatformSupported()) {
         expect(apmServer.errorQueue.items.length).toBe(1)
         setTimeout(() => {
           expect(apmServer.sendErrors).toHaveBeenCalled()
