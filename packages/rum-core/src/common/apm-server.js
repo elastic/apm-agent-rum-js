@@ -25,9 +25,9 @@
 
 import Queue from './queue'
 import throttle from './throttle'
-import { truncateMetadata } from './truncate'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
+import { truncateModel, METADATA_MODEL } from './truncate'
 
 class ApmServer {
   constructor(configService, loggingService) {
@@ -62,19 +62,21 @@ class ApmServer {
 
   createMetaData() {
     const cfg = this._configService
-    const service = {
-      name: cfg.get('serviceName'),
-      version: cfg.get('serviceVersion'),
-      agent: {
-        name: 'js-base',
-        version: cfg.version
-      },
-      language: {
-        name: 'javascript'
-      },
-      environment: cfg.get('environment')
+    const metadata = {
+      service: {
+        name: cfg.get('serviceName'),
+        version: cfg.get('serviceVersion'),
+        agent: {
+          name: 'js-base',
+          version: cfg.version
+        },
+        language: {
+          name: 'javascript'
+        },
+        environment: cfg.get('environment')
+      }
     }
-    return truncateMetadata({ service })
+    return truncateModel(METADATA_MODEL, metadata)
   }
 
   _postJson(endPoint, payload) {

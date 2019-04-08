@@ -25,7 +25,7 @@
 
 import StackTraceService from './stack-trace-service'
 import { getPageMetadata, generateRandomId, merge } from '../common/utils'
-import { truncateError } from '../common/truncate'
+import { truncateModel, ERROR_MODEL } from '../common/truncate'
 
 class ErrorLogging {
   constructor(apmServer, configService, loggingService, transactionService) {
@@ -107,7 +107,7 @@ class ErrorLogging {
         sampled: currentTransaction.sampled
       }
     }
-    return truncateError(errorObject)
+    return truncateModel(ERROR_MODEL, errorObject)
   }
 
   logErrorEvent(errorEvent, sendImmediately) {

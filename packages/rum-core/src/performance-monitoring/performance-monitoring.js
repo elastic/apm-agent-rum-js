@@ -38,7 +38,11 @@ import {
   XMLHTTPREQUEST_SOURCE,
   FETCH_SOURCE
 } from '../common/constants'
-import { truncateSpan, truncateTransaction } from '../common/truncate'
+import {
+  truncateModel,
+  SPAN_MODEL,
+  TRANSACTION_MODEL
+} from '../common/truncate'
 
 class PerformanceMonitoring {
   constructor(apmServer, configService, loggingService, transactionService) {
@@ -245,7 +249,7 @@ class PerformanceMonitoring {
     const transactionStart = transaction._start
 
     const spans = transaction.spans.map(function(span) {
-      const spanModel = {
+      const spanData = {
         id: span.id,
         transaction_id: transaction.id,
         parent_id: span.parentId || transaction.id,
@@ -259,12 +263,12 @@ class PerformanceMonitoring {
         duration: span.duration(),
         context: span.context
       }
-      return truncateSpan(spanModel)
+      return truncateModel(SPAN_MODEL, spanData)
     })
 
     var context = merge({}, configContext, transaction.context)
 
-    const transactionModel = {
+    const transactionData = {
       id: transaction.id,
       trace_id: transaction.traceId,
       name: transaction.name,
@@ -278,7 +282,7 @@ class PerformanceMonitoring {
       },
       sampled: transaction.sampled
     }
-    return truncateTransaction(transactionModel)
+    return truncateModel(TRANSACTION_MODEL, transactionData)
   }
 
   createTransactionPayload(transaction) {

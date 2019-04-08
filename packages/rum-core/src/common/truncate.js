@@ -33,63 +33,69 @@ const { KEYWORD_LIMIT } = require('./constants')
 const METADATA_MODEL = {
   service: {
     name: [KEYWORD_LIMIT, true],
-    version: [KEYWORD_LIMIT],
-    environment: [KEYWORD_LIMIT]
+    version: [],
+    environment: []
   }
 }
 
 const CONTEXT_COMMON = {
   user: {
-    id: [KEYWORD_LIMIT],
-    email: [KEYWORD_LIMIT],
-    username: [KEYWORD_LIMIT]
+    id: [],
+    email: [],
+    username: []
   },
   tags: {
-    '*': [KEYWORD_LIMIT]
+    '*': []
   }
 }
 
 const SPAN_MODEL = {
   name: [KEYWORD_LIMIT, true],
   type: [KEYWORD_LIMIT, true],
-  subtype: [KEYWORD_LIMIT],
-  action: [KEYWORD_LIMIT],
   id: [KEYWORD_LIMIT, true],
   trace_id: [KEYWORD_LIMIT, true],
   parent_id: [KEYWORD_LIMIT, true],
   transaction_id: [KEYWORD_LIMIT, true],
   duration: [KEYWORD_LIMIT, true],
+  subtype: [],
+  action: [],
   context: CONTEXT_COMMON
 }
 
 const TRANSACTION_MODEL = {
-  name: [KEYWORD_LIMIT],
+  name: [],
+  parent_id: [],
   type: [KEYWORD_LIMIT, true],
   id: [KEYWORD_LIMIT, true],
   trace_id: [KEYWORD_LIMIT, true],
-  parent_id: [KEYWORD_LIMIT, true],
   span_count: {
     started: [KEYWORD_LIMIT, true]
   },
+  duration: [KEYWORD_LIMIT, true],
   context: CONTEXT_COMMON
 }
 
 const ERROR_MODEL = {
   id: [KEYWORD_LIMIT, true],
-  trace_id: [KEYWORD_LIMIT],
-  transaction_id: [KEYWORD_LIMIT],
-  parent_id: [KEYWORD_LIMIT],
-  culprit: [KEYWORD_LIMIT],
+  trace_id: [],
+  transaction_id: [],
+  parent_id: [],
+  culprit: [],
   exception: {
-    type: [KEYWORD_LIMIT]
+    type: []
   },
   transaction: {
-    type: [KEYWORD_LIMIT]
+    type: []
   },
   context: CONTEXT_COMMON
 }
 
-function truncate(value, limit, required = false, placeholder = 'N/A') {
+function truncate(
+  value,
+  limit = KEYWORD_LIMIT,
+  required = false,
+  placeholder = 'N/A'
+) {
   if (required && !value) {
     value = placeholder
   }
@@ -116,17 +122,19 @@ function truncateModel(model = {}, target, childTarget = target) {
        */
       if (currKey === '*') {
         Object.keys(childTarget).forEach(key => {
-          if (childTarget[key]) {
-            childTarget[key] = truncate(childTarget[key], value[0], value[1])
+          const truncatedValue = truncate(childTarget[key], value[0], value[1])
+          if (truncatedValue) {
+            childTarget[key] = truncatedValue
           }
         })
       } else {
-        if (childTarget[currKey]) {
-          childTarget[currKey] = truncate(
-            childTarget[currKey],
-            value[0],
-            value[1]
-          )
+        const truncatedValue = truncate(
+          childTarget[currKey],
+          value[0],
+          value[1]
+        )
+        if (truncatedValue) {
+          childTarget[currKey] = truncatedValue
         }
       }
     }
@@ -134,26 +142,11 @@ function truncateModel(model = {}, target, childTarget = target) {
   return target
 }
 
-function truncateMetadata(metadata) {
-  return truncateModel(METADATA_MODEL, metadata)
-}
-
-function truncateSpan(span) {
-  return truncateModel(SPAN_MODEL, span)
-}
-
-function truncateTransaction(transaction) {
-  return truncateModel(TRANSACTION_MODEL, transaction)
-}
-
-function truncateError(error) {
-  return truncateModel(ERROR_MODEL, error)
-}
-
 module.exports = {
   truncate,
-  truncateMetadata,
-  truncateSpan,
-  truncateTransaction,
-  truncateError
+  truncateModel,
+  SPAN_MODEL,
+  TRANSACTION_MODEL,
+  ERROR_MODEL,
+  METADATA_MODEL
 }

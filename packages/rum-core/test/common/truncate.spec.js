@@ -23,15 +23,69 @@
  *
  */
 
-const {
-  truncate,
-  truncateMetadata,
-  truncateTransaction,
-  truncateSpan,
-  truncateError
-} = require('../../src/common/truncate')
+const { truncate, truncateModel } = require('../../src/common/truncate')
 
-xdescribe('Truncate', () => {
+/**
+ * Dummy models to make the testing easier
+ */
+const getMetadataModel = limit => ({
+  service: {
+    name: [limit, true],
+    version: [limit],
+    environment: [limit]
+  }
+})
+const getContextModel = limit => ({
+  user: {
+    id: [limit],
+    email: [limit],
+    username: [limit]
+  },
+  tags: {
+    '*': [limit]
+  }
+})
+const getSpanModel = limit => ({
+  name: [limit, true],
+  type: [limit, true],
+  subtype: [limit],
+  action: [limit],
+  id: [limit, true],
+  trace_id: [limit, true],
+  parent_id: [limit, true],
+  transaction_id: [limit, true],
+  duration: [limit, true],
+  context: getContextModel(limit)
+})
+
+const getTransactionModel = limit => ({
+  name: [limit],
+  parent_id: [limit],
+  type: [limit, true],
+  id: [limit, true],
+  trace_id: [limit, true],
+  span_count: {
+    started: [limit, true]
+  },
+  duration: [limit, true],
+  context: getContextModel(limit)
+})
+const getErrorModel = limit => ({
+  id: [limit, true],
+  trace_id: [limit],
+  transaction_id: [limit],
+  parent_id: [limit],
+  culprit: [limit],
+  exception: {
+    type: [limit]
+  },
+  transaction: {
+    type: [limit]
+  },
+  context: getContextModel(limit)
+})
+
+describe('Truncate', () => {
   function generateStr(ch, length) {
     return new Array(length + 1).join(ch)
   }
@@ -44,28 +98,20 @@ xdescribe('Truncate', () => {
   })
 
   it('truncate metadata', () => {
+    const metadataModel = getMetadataModel(3)
     const metadata = {
       service: {
         name: '',
-        version: 2.0,
-        agent: {
-          name: generateStr('a', 5),
-          version: 3
-        },
-        environment: 'dev'
+        version: generateStr('b', 7),
+        environment: 'development'
       }
     }
 
-    const filtered = truncateMetadata(metadata)
-
+    const filtered = truncateModel(metadataModel, metadata)
     expect(filtered).toEqual({
       service: {
         name: 'N/A',
-        version: 2.0,
-        agent: {
-          name: 'aaa',
-          version: 3
-        },
+        version: 'bbb',
         environment: 'dev'
       }
     })
@@ -87,7 +133,8 @@ xdescribe('Truncate', () => {
           username: generateStr('f', keywordLen)
         },
         tags: {
-          key: generateStr('g', keywordLen)
+          ab: generateStr('g', keywordLen),
+          bc: generateStr('h', keywordLen)
         }
       },
       marks: {
@@ -104,7 +151,8 @@ xdescribe('Truncate', () => {
     }
 
     const stringLimit = 5
-    const filtered = truncateTransaction(transaction)
+    const transactionModel = getTransactionModel(stringLimit)
+    const filtered = truncateModel(transactionModel, transaction)
 
     expect(filtered).toEqual({
       id: 'abc12',
@@ -120,7 +168,8 @@ xdescribe('Truncate', () => {
           username: generateStr('f', stringLimit)
         },
         tags: {
-          key: generateStr('g', stringLimit)
+          ab: generateStr('g', stringLimit),
+          bc: generateStr('h', stringLimit)
         }
       },
       marks: {
@@ -163,7 +212,8 @@ xdescribe('Truncate', () => {
     }
 
     const stringLimit = 7
-    const filtered = truncateSpan(span)
+    const spanModel = getSpanModel(stringLimit)
+    const filtered = truncateModel(spanModel, span)
 
     expect(filtered).toEqual({
       id: '123abc',
@@ -191,7 +241,6 @@ xdescribe('Truncate', () => {
 
   it('truncate error', () => {
     const keywordLen = 15
-
     const error = {
       id: '',
       culprit: generateStr('a', keywordLen),
@@ -222,7 +271,8 @@ xdescribe('Truncate', () => {
     }
 
     const stringLimit = 10
-    const filtered = truncateError(error)
+    const errorModel = getErrorModel(stringLimit)
+    const filtered = truncateModel(errorModel, error)
 
     expect(filtered).toEqual({
       id: 'N/A',
