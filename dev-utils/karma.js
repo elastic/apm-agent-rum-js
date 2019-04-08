@@ -103,8 +103,7 @@ function prepareConfig(defaultConfig) {
   const testConfig = defaultConfig.testConfig || {}
   const agentConfig = defaultConfig.globalConfigs.agentConfig || {}
   const { isTravis, sauceLabs: isSauce } = testConfig
-  const { agentName, agentVersion } = agentConfig
-  let buildId = `ApmJs-${agentName}@${agentVersion}`
+  let buildId = `ApmJs-${agentConfig.name}`
 
   if (isTravis) {
     buildId =

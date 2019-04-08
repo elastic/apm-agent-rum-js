@@ -52,8 +52,7 @@ function getGlobalConfig(packageName = 'rum') {
     agentConfig: {
       serverUrl: testEnv.serverUrl,
       serviceName: `test`,
-      agentName: `${packageName}`,
-      agentVersion: '0.0.1'
+      name: `${packageName}`
     },
     useMocks: false,
     mockApmServer: false
