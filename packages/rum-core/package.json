@@ -3,7 +3,7 @@
   "version": "4.0.1",
   "description": "Elastic apm core",
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": "dist/lib/index.js",
   "module": "src/index.js",
   "sideEffects": false,
   "publishConfig": {
@@ -16,7 +16,7 @@
   },
   "scripts": {
     "prepublish": "npm run build:main",
-    "build:main": "npx babel src -d lib --config-file ../../babel.node.js",
+    "build:main": "npx babel src -d dist/lib --config-file ../../babel.node.js",
     "karma": "karma start",
     "karma:bench": "karma start karma.bench.conf.js",
     "karma:coverage": "karma start --coverage",

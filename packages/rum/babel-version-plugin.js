@@ -23,9 +23,11 @@
  *
  */
 
-const { transformSync } = require('@babel/core')
-const APM_BASE_CODE = require('./src/apm-base')
+const { transformFileSync } = require('@babel/core')
+const { join } = require('path')
 const { version: agentVersion } = require('./package.json')
+
+const APM_BASE_PATH = join(__dirname, './src/apm-base.js')
 
 const pass = () => console.log('Agent version matches with build version')
 const fail = version => {
@@ -57,6 +59,6 @@ const versionPlugin = ({ types: t }) => {
   }
 }
 
-transformSync(APM_BASE_CODE, {
+transformFileSync(APM_BASE_PATH, {
   plugins: [versionPlugin]
 })
