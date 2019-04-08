@@ -34,10 +34,10 @@ class ApmBase {
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
       var configService = this.serviceFactory.getService('ConfigService')
-      configService.setConfig({
-        agentName: 'js-base',
-        agentVersion: '%%agent-version%%'
-      })
+      /**
+       * Set Agent version to be sent as part of metadata to the APM Server
+       */
+      configService.setVersion('4.0.1')
       configService.setConfig(config)
       this.serviceFactory.init()
       var errorLogging = this.serviceFactory.getService('ErrorLogging')

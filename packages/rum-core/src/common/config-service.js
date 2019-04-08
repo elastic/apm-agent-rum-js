@@ -69,8 +69,6 @@ class Config {
       serviceName: '',
       serviceVersion: '',
       environment: '',
-      agentName: 'js-base',
-      agentVersion: '%%agent-version%%',
       serverUrl: 'http://localhost:8200',
       serverUrlPrefix: '/intake/v2/rum/events',
       active: true,
@@ -116,6 +114,11 @@ class Config {
 
     this._changeSubscription = new Subscription()
     this.filters = []
+    /**
+     * Packages that uses rum-core under the hood must override
+     * the version via setVersion
+     */
+    this.version = ''
   }
 
   init() {
@@ -125,6 +128,10 @@ class Config {
 
   isActive() {
     return this.get('active')
+  }
+
+  setVersion(version) {
+    this.version = version
   }
 
   addFilter(cb) {

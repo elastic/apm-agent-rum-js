@@ -368,16 +368,20 @@ describe('ApmServer', function() {
     configService.setConfig({
       serviceName: 'test',
       serviceVersion: '0.0.1',
-      environment: 'staging',
-      agentName: 'rum',
-      agentVersion: '3.0.0'
+      environment: 'staging'
     })
 
+    configService.setVersion('4.0.1')
+
+    /** To catch agent version mismatch during release */
     expect(apmServer.createServiceObject()).toEqual({
       name: 'test',
       version: '0.0.1',
       environment: 'staging',
-      agent: { name: 'rum', version: '3.0.0' },
+      agent: {
+        name: 'js-base',
+        version: '4.0.1'
+      },
       language: { name: 'javascript' }
     })
   })
