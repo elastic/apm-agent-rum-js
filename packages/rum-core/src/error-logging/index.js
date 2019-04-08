@@ -23,9 +23,9 @@
  *
  */
 
-const ErrorLogging = require('./error-logging')
+import ErrorLogging from './error-logging'
 
-module.exports = {
+export default {
   ErrorLogging,
   registerServices: function registerServices(serviceFactory) {
     serviceFactory.registerServiceCreator('ErrorLogging', function() {

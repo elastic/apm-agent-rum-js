@@ -23,11 +23,11 @@
  *
  */
 
-var globalState = {
+export let globalState = {
   fetchInProgress: false
 }
 
-function apmSymbol(name) {
+export function apmSymbol(name) {
   return '__apm_symbol__' + name
 }
 
@@ -50,7 +50,7 @@ function attachOriginToPatched(patched, original) {
   patched[apmSymbol('OriginalDelegate')] = original
 }
 
-function patchMethod(target, name, patchFn) {
+export function patchMethod(target, name, patchFn) {
   var proto = target
   while (proto && !proto.hasOwnProperty(name)) {
     proto = Object.getPrototypeOf(proto)
@@ -78,12 +78,7 @@ function patchMethod(target, name, patchFn) {
   return delegate
 }
 
-module.exports = {
-  apmSymbol,
-  patchMethod,
-  globalState,
-  XHR_IGNORE: apmSymbol('xhrIgnore'),
-  XHR_SYNC: apmSymbol('xhrSync'),
-  XHR_URL: apmSymbol('xhrURL'),
-  XHR_METHOD: apmSymbol('xhrMethod')
-}
+export const XHR_IGNORE = apmSymbol('xhrIgnore')
+export const XHR_SYNC = apmSymbol('xhrSync')
+export const XHR_URL = apmSymbol('xhrURL')
+export const XHR_METHOD = apmSymbol('xhrMethod')

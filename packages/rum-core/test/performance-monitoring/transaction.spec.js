@@ -23,8 +23,8 @@
  *
  */
 
-var Transaction = require('../../src/performance-monitoring/transaction')
-var Span = require('../../src/performance-monitoring/span')
+import Transaction from '../../src/performance-monitoring/transaction'
+import Span from '../../src/performance-monitoring/span'
 
 describe('transaction.Transaction', function() {
   beforeEach(function() {})

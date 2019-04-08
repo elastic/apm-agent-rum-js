@@ -23,27 +23,19 @@
  *
  */
 
-var bootstrap = require('./bootstrap')
-var enabled = bootstrap()
+import bootstrap from './bootstrap'
+import { createServiceFactory } from '@elastic/apm-rum-core'
+import ApmBase from './apm-base'
 
-var apmCore = require('@elastic/apm-rum-core')
-var ApmBase = require('./apm-base')
-
-var serviceFactory = apmCore.createServiceFactory()
-
-var apmBase = new ApmBase(serviceFactory, !enabled)
+const enabled = bootstrap()
+const serviceFactory = createServiceFactory()
+const apmBase = new ApmBase(serviceFactory, !enabled)
 
 if (typeof window !== 'undefined') {
   window.elasticApm = apmBase
 }
 
-var exports = {
-  __esModule: true,
-  default: apmBase.init.bind(apmBase),
-  init: apmBase.init.bind(apmBase),
-  ApmBase,
-  apmBase,
-  apm: apmBase
-}
+const init = apmBase.init.bind(apmBase)
 
-module.exports = exports
+export default init
+export { init, apmBase, ApmBase, apmBase as apm }

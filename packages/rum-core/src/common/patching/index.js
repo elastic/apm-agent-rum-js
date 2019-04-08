@@ -23,25 +23,23 @@
  *
  */
 
-var patchXMLHttpRequest = require('./xhr-patch').patchXMLHttpRequest
-var patchFetch = require('./fetch-patch').patchFetch
-var Subscription = require('../subscription')
-var subscription = new Subscription()
+import { patchXMLHttpRequest } from './xhr-patch'
+import { patchFetch } from './fetch-patch'
+import Subscription from '../subscription'
+
+const patchSubscription = new Subscription()
 var alreadyPatched = false
 function patchAll() {
   if (!alreadyPatched) {
     alreadyPatched = true
     patchXMLHttpRequest(function(event, task) {
-      subscription.applyAll(this, [event, task])
+      patchSubscription.applyAll(this, [event, task])
     })
     patchFetch(function(event, task) {
-      subscription.applyAll(this, [event, task])
+      patchSubscription.applyAll(this, [event, task])
     })
   }
-  return subscription
+  return patchSubscription
 }
 
-module.exports = {
-  patchAll,
-  subscription
-}
+export { patchAll, patchSubscription }

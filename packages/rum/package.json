@@ -2,7 +2,8 @@
   "name": "@elastic/apm-rum",
   "version": "4.0.1",
   "description": "Elastic APM JavaScript agent",
-  "main": "src/index.js",
+  "main": "dist/lib/index.js",
+  "module": "src/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/elastic/apm-agent-rum-js.git",
@@ -15,23 +16,28 @@
     "version-check": "node babel-version-plugin.js",
     "build": "webpack",
     "build:dev": "webpack -w",
+    "build:main": "npx babel src -d dist/lib --config-file ../../babel.node.js",
     "build:e2e": "npm run script buildE2eBundles",
     "bundlesize": "npm run build && bundlesize",
     "karma": "karma start",
     "karma:coverage": "karma start --coverage",
     "script": "node ./run-script.js",
     "serve": "npm run script serveE2e ./ 8000",
-    "test:integration": "npm run script runNodeTests",
+    "test:node": "npm run script runNodeTests",
+    "test:integration": "npm run script runIntegrationTests",
     "test:unit": "node ../../dev-utils/run-script.js runUnitTests false packages/rum",
     "test:e2e:supported": "npm run script runE2eTests wdio.conf.js",
     "test:e2e:failsafe": "npm run script runE2eTests wdio-failsafe.conf.js",
     "test:sauce": "npm run script runSauceTests",
-    "test": "npm-run-all build build:e2e test:integration test:sauce"
+    "test": "npm-run-all build build:main build:e2e test:node test:integration test:sauce"
   },
   "files": [
     "src",
     "dist"
   ],
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "author": "",
   "license": "MIT",
   "dependencies": {

@@ -23,16 +23,16 @@
  *
  */
 
-const { createServiceFactory } = require('../')
-const Transaction = require('../../src/performance-monitoring/transaction')
-const Span = require('../../src/performance-monitoring/span')
-const { getGlobalConfig } = require('../../../../dev-utils/test-config')
-const resourceEntries = require('../fixtures/resource-entries')
-const paintEntries = require('../fixtures/paint-entries')
-const utils = require('../../src/common/utils')
-const { globalState } = require('../../src/common/patching/patch-utils')
-const { SCHEDULE } = require('../../src/common/constants')
-const patchSub = require('../common/patch')
+import { createServiceFactory } from '../'
+import Transaction from '../../src/performance-monitoring/transaction'
+import Span from '../../src/performance-monitoring/span'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import resourceEntries from '../fixtures/resource-entries'
+import paintEntries from '../fixtures/paint-entries'
+import { getDtHeaderValue } from '../../src/common/utils'
+import { globalState } from '../../src/common/patching/patch-utils'
+import { SCHEDULE } from '../../src/common/constants'
+import patchSub from '../common/patch'
 
 const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
@@ -437,7 +437,7 @@ describe('PerformanceMonitoring', function() {
     expect(task.data.span).toBeDefined()
     expect(task.data.span.ended).toBeFalsy()
     var headerName = configService.get('distributedTracingHeaderName')
-    var headerValue = utils.getDtHeaderValue(task.data.span)
+    var headerValue = getDtHeaderValue(task.data.span)
     expect(req.setRequestHeader).toHaveBeenCalledWith(headerName, headerValue)
   })
 

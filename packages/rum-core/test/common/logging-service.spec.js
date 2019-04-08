@@ -23,7 +23,8 @@
  *
  */
 
-var LoggingService = require('../../src/common/logging-service')
+import LoggingService from '../../src/common/logging-service'
+
 describe('LoggingService', function() {
   var loggingService
   beforeEach(function() {

@@ -23,14 +23,12 @@
  *
  */
 
-var TransactionService = require('../../src/performance-monitoring/transaction-service')
-var Transaction = require('../../src/performance-monitoring/transaction')
-
-var Config = require('../../src/common/config-service')
-var LoggingService = require('../../src/common/logging-service')
-
-var resourceEntries = require('../fixtures/resource-entries')
-var paintEntries = require('../fixtures/paint-entries')
+import TransactionService from '../../src/performance-monitoring/transaction-service'
+import Transaction from '../../src/performance-monitoring/transaction'
+import Config from '../../src/common/config-service'
+import LoggingService from '../../src/common/logging-service'
+import resourceEntries from '../fixtures/resource-entries'
+import paintEntries from '../fixtures/paint-entries'
 
 describe('TransactionService', function() {
   var transactionService

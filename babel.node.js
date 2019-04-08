@@ -23,19 +23,20 @@
  *
  */
 
-const { apmBase } = require('../../src')
-const { getGlobalConfig } = require('../../../../dev-utils/test-config')
-
-const { agentConfig } = getGlobalConfig().globalConfigs
-
-describe('ApmBase', function() {
-  it('should not init ApmBase', function() {
-    apmBase.init(agentConfig)
-    try {
-      throw new Error('ApmBase test error')
-    } catch (error) {
-      var result = apmBase.captureError(error)
-      expect(result).toBeUndefined()
-    }
-  })
-})
+module.exports = function(api) {
+  api.cache(true)
+  return {
+    comments: false,
+    presets: [
+      [
+        '@babel/preset-env',
+        {
+          targets: {
+            node: '8.0.0'
+          },
+          loose: true
+        }
+      ]
+    ]
+  }
+}

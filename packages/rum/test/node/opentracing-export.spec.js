@@ -22,24 +22,23 @@
  * THE SOFTWARE.
  *
  */
+const opentracing = require('@elastic/apm-rum/dist/lib/opentracing')
+const {
+  init,
+  apm,
+  apmBase,
+  ApmBase,
+  createTracer
+} = require('@elastic/apm-rum/dist/lib/opentracing')
 
-import { apmBase } from '../../src'
-import { getGlobalConfig } from '../../../../dev-utils/test-config'
-import ApmServerMock from '../../../rum-core/test/utils/apm-server-mock'
-
-const { globalConfigs } = getGlobalConfig()
-
-function createApmBase(config) {
-  console.log('E2E Global Configs', JSON.stringify(globalConfigs, null, 2))
-  const apmServer = apmBase.serviceFactory.getService('ApmServer')
-  const { serverUrl } = globalConfigs.agentConfig
-  if (serverUrl) {
-    config.serverUrl = serverUrl
-  }
-  const serverMock = new ApmServerMock(apmServer, globalConfigs.useMocks)
-  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
-
-  return apmBase.init(config)
-}
-
-export default createApmBase
+describe('opentracing build', () => {
+  it('should have default and named exports', () => {
+    expect(opentracing.default).toEqual(jasmine.any(Function))
+    expect(createTracer).toEqual(jasmine.any(Function))
+    expect(init).toEqual(jasmine.any(Function))
+    expect(apm).toEqual(jasmine.any(Object))
+    expect(apmBase).toEqual(jasmine.any(Object))
+    expect(apmBase.init).toEqual(jasmine.any(Function))
+    expect(ApmBase).toEqual(jasmine.any(Function))
+  })
+})

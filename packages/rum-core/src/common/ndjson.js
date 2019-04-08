@@ -29,4 +29,4 @@ class NDJSON {
   }
 }
 
-module.exports = NDJSON
+export default NDJSON

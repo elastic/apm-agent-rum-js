@@ -23,9 +23,9 @@
  *
  */
 
-const { createServiceFactory } = require('../')
-const Transaction = require('../../src/performance-monitoring/transaction')
-const { getGlobalConfig } = require('../../../../dev-utils/test-config')
+import { createServiceFactory } from '../'
+import Transaction from '../../src/performance-monitoring/transaction'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
 const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
 function generateTransaction() {

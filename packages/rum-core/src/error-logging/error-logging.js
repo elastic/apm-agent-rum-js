@@ -23,9 +23,13 @@
  *
  */
 
-var StackTraceService = require('./stack-trace-service')
-
-var utils = require('../common/utils')
+import StackTraceService from './stack-trace-service'
+import {
+  getPageMetadata,
+  sanitizeString,
+  generateRandomId,
+  merge
+} from '../common/utils'
 
 class ErrorLogging {
   constructor(apmServer, configService, loggingService, transactionService) {
@@ -84,16 +88,16 @@ class ErrorLogging {
     if (errorEvent.error && typeof errorEvent.error === 'object') {
       errorContext = this._getErrorProperties(errorEvent.error)
     }
-    var browserMetadata = utils.getPageMetadata()
-    var context = utils.merge({}, browserMetadata, configContext, errorContext)
+    var browserMetadata = getPageMetadata()
+    var context = merge({}, browserMetadata, configContext, errorContext)
 
     var errorObject = {
-      id: utils.generateRandomId(),
-      culprit: utils.sanitizeString(culprit),
+      id: generateRandomId(),
+      culprit: sanitizeString(culprit),
       exception: {
-        message: utils.sanitizeString(message, undefined, true),
+        message: sanitizeString(message, undefined, true),
         stacktrace: frames,
-        type: utils.sanitizeString(errorType, stringLimit, false)
+        type: sanitizeString(errorType, stringLimit, false)
       },
       context
     }
@@ -180,4 +184,4 @@ class ErrorLogging {
   }
 }
 
-module.exports = ErrorLogging
+export default ErrorLogging

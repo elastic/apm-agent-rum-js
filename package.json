@@ -17,8 +17,7 @@
     "lint:js": "eslint .",
     "lint:license": "node scripts/license-checker",
     "format": "eslint . --fix",
-    "test": "lerna run test --stream --scope=$SCOPE --no-prefix",
-    "serve": "lerna run serve",
+    "test": "lerna run build:main && lerna run test --stream --scope=$SCOPE --no-prefix",
     "bundlesize": "lerna run bundlesize --stream"
   },
   "husky": {
@@ -30,11 +29,13 @@
   "license": "MIT",
   "homepage": "https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html",
   "devDependencies": {
+    "@babel/cli": "^7.4.3",
     "@babel/core": "^7.2.0",
     "@babel/plugin-transform-destructuring": "^7.3.2",
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.4.0",
     "@wdio/cli": "^5.7.2",
     "@wdio/dot-reporter": "^5.7.2",
     "@wdio/jasmine-framework": "^5.7.2",

@@ -113,15 +113,19 @@ function serveE2e(servingPath, port) {
   return [staticServer, backendAgentServer]
 }
 
-function runJasmine(cb) {
-  const specFiles = ['test/node/*.node-spec.js']
-  const jrunner = new JasmineRunner({
-    projectBaseDir: PROJECT_DIR,
-    specDir: ''
+function runJasmine(specDir, transform, cb) {
+  const jrunner = new JasmineRunner()
+  /**
+   * Files are relative to spec directory
+   */
+  jrunner.loadConfig({
+    spec_dir: specDir,
+    spec_files: ['*.spec.js'],
+    helpers: transform ? ['../babel-helper.js'] : []
   })
   jrunner.onComplete(passed => {
     if (!passed) {
-      const err = new Error('Jasmine node tests failed.')
+      const err = new Error('Jasmine tests failed')
       // The stack is not useful in this context.
       err.stack = ''
       cb(err)
@@ -129,10 +133,6 @@ function runJasmine(cb) {
       cb()
     }
   })
-
-  jrunner.showColors(true)
-  jrunner.addReporter(JasmineRunner.ConsoleReporter(jrunner))
-  jrunner.addSpecFiles(specFiles)
   jrunner.execute()
 }
 
@@ -180,20 +180,38 @@ function runSauceTests(serve = 'true') {
   })
 }
 
+function runIntegrationTests() {
+  const servers = serveE2e('./', 8000)
+  const SPEC_DIR = 'test/integration'
+  runJasmine(SPEC_DIR, true, err => {
+    servers.forEach(server => server.close())
+    if (err) {
+      console.log('Integration tests failed:', err.message)
+      process.exit(2)
+    }
+  })
+}
+
+/**
+ * Ensure all the exports from our module works
+ * in Node.js without babel transpiling the modules
+ */
+function runNodeTests() {
+  const SPEC_DIR = 'test/node'
+  runJasmine(SPEC_DIR, false, err => {
+    if (err) {
+      console.log('Node tests for build failed:', err.message)
+      process.exit(2)
+    }
+  })
+}
+
 const scripts = {
   startSelenium: testUtils.startSelenium,
   runSauceTests,
   runE2eTests,
-  runNodeTests() {
-    const servers = serveE2e('./', 8000)
-    runJasmine(function(err) {
-      servers.forEach(server => server.close())
-      if (err) {
-        console.log('Node tests failed:', err.message)
-        process.exit(2)
-      }
-    })
-  },
+  runIntegrationTests,
+  runNodeTests,
   buildE2eBundles(basePath) {
     basePath = basePath || './test/e2e'
     testUtils.buildE2eBundles(path.join(PROJECT_DIR, basePath), err => {

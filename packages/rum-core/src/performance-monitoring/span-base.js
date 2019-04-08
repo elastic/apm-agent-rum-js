@@ -23,12 +23,8 @@
  *
  */
 
-const {
-  isUndefined,
-  generateRandomId,
-  setTag,
-  merge
-} = require('../common/utils')
+import { isUndefined, generateRandomId, setTag, merge } from '../common/utils'
+
 class SpanBase {
   // context
 
@@ -97,4 +93,4 @@ class SpanBase {
   }
 }
 
-module.exports = SpanBase
+export default SpanBase

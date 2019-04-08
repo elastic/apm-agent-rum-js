@@ -23,12 +23,9 @@
  *
  */
 
-const Span = require('./span')
-const {
-  RESOURCE_INITIATOR_TYPES,
-  SPAN_THRESHOLD
-} = require('../common/constants')
-const { stripQueryStringFromUrl } = require('../common/utils')
+import Span from './span'
+import { RESOURCE_INITIATOR_TYPES, SPAN_THRESHOLD } from '../common/constants'
+import { stripQueryStringFromUrl } from '../common/utils'
 
 /**
  * Navigation Timing Spans
@@ -223,7 +220,7 @@ function captureHardNavigation(transaction) {
   }
 }
 
-module.exports = {
+export {
   captureHardNavigation,
   createNavigationTimingSpans,
   createResourceTimingSpans

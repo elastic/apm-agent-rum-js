@@ -23,10 +23,10 @@
  *
  */
 
-const createApmBase = require('../')
-const { renderTestElement, testXHR, testFetch } = require('../utils')
-const { createTracer } = require('../../../src/opentracing')
-const { getGlobalConfig } = require('../../../../../dev-utils/test-config')
+import createApmBase from '../'
+import { renderTestElement, testXHR, testFetch } from '../utils'
+import { createTracer } from '../../../src/opentracing'
+import { getGlobalConfig } from '../../../../../dev-utils/test-config'
 
 const { mockBackendUrl } = getGlobalConfig().testConfig
 const active = Math.random() < 1

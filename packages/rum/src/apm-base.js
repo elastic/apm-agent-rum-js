@@ -169,4 +169,4 @@ class ApmBase {
   }
 }
 
-module.exports = ApmBase
+export default ApmBase

@@ -23,12 +23,12 @@
  *
  */
 
-const { globalState } = require('./patch-utils')
-const { SCHEDULE, INVOKE, FETCH_SOURCE } = require('../constants')
+import { globalState } from './patch-utils'
+import { SCHEDULE, INVOKE, FETCH_SOURCE } from '../constants'
 
 var alreadyPatched = false
 
-function patchFetch(callback) {
+export function patchFetch(callback) {
   if (alreadyPatched) {
     return
   }
@@ -112,8 +112,4 @@ function patchFetch(callback) {
       globalState.fetchInProgress = false
     })
   }
-}
-
-module.exports = {
-  patchFetch
 }

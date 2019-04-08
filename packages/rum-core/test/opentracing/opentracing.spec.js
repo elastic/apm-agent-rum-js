@@ -23,12 +23,12 @@
  *
  */
 
-const apiCompatibilityChecks = require('./api_compatibility').default
-const { createServiceFactory } = require('..')
-const ElasticTracer = require('../../src/opentracing/tracer')
-const Transaction = require('../../src/performance-monitoring/transaction')
-const Span = require('../../src/performance-monitoring/span')
-const { Reference, REFERENCE_CHILD_OF } = require('opentracing')
+import apiCompatibilityChecks from './api_compatibility'
+import { createServiceFactory } from '..'
+import ElasticTracer from '../../src/opentracing/tracer'
+import Transaction from '../../src/performance-monitoring/transaction'
+import Span from '../../src/performance-monitoring/span'
+import { Reference, REFERENCE_CHILD_OF } from 'opentracing'
 
 function createTracer(config) {
   var serviceFactory = createServiceFactory()

@@ -23,9 +23,9 @@
  *
  */
 
-const ApmServer = require('../../src/common/apm-server')
-const Transaction = require('../../src/performance-monitoring/transaction')
-const { createServiceFactory } = require('../')
+import ApmServer from '../../src/common/apm-server'
+import Transaction from '../../src/performance-monitoring/transaction'
+import { createServiceFactory } from '../'
 
 function generateTransaction(count) {
   var result = []

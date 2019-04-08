@@ -23,11 +23,11 @@
  *
  */
 
-const Queue = require('./queue')
-const throttle = require('./throttle')
-const { sanitizeString } = require('./utils')
-const NDJSON = require('./ndjson')
-const { XHR_IGNORE } = require('./patching/patch-utils')
+import Queue from './queue'
+import throttle from './throttle'
+import { sanitizeString } from './utils'
+import NDJSON from './ndjson'
+import { XHR_IGNORE } from './patching/patch-utils'
 
 class ApmServer {
   constructor(configService, loggingService) {
@@ -278,4 +278,4 @@ class ApmServer {
   }
 }
 
-module.exports = ApmServer
+export default ApmServer

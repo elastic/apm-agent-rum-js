@@ -23,7 +23,7 @@
  *
  */
 
-module.exports = [
+export default [
   {
     name: 'http://beacon.test',
     type: 'resource.beacon',

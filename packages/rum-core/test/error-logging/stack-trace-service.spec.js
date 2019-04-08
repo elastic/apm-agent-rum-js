@@ -23,8 +23,8 @@
  *
  */
 
-var StackTraceService = require('../../src/error-logging/stack-trace-service')
-var createServiceFactory = require('..').createServiceFactory
+import { createServiceFactory } from '..'
+import StackTraceService from '../../src/error-logging/stack-trace-service'
 
 describe('StackTraceService', function() {
   it('should produce correct number of frames', function(done) {

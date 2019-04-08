@@ -23,30 +23,31 @@
  *
  */
 
-const {
+import {
   apmSymbol,
   patchMethod,
   XHR_SYNC,
   XHR_URL,
   XHR_METHOD,
   XHR_IGNORE
-} = require('./patch-utils')
+} from './patch-utils'
 
-const {
+import {
   SCHEDULE,
   INVOKE,
   CLEAR,
   XMLHTTPREQUEST_SOURCE,
   ADD_EVENT_LISTENER_STR,
   REMOVE_EVENT_LISTENER_STR
-} = require('../constants')
+} from '../constants'
 
 const XHR_TASK = apmSymbol('xhrTask')
 const XHR_LISTENER = apmSymbol('xhrListener')
 const XHR_SCHEDULED = apmSymbol('xhrScheduled')
 
 var alreadyPatched = false
-function patchXMLHttpRequest(callback) {
+
+export function patchXMLHttpRequest(callback) {
   if (alreadyPatched) {
     return
   }
@@ -186,8 +187,4 @@ function patchXMLHttpRequest(callback) {
         return abortNative.apply(self, args)
       }
   )
-}
-
-module.exports = {
-  patchXMLHttpRequest
 }

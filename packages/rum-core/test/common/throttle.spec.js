@@ -23,7 +23,7 @@
  *
  */
 
-var throttle = require('../../src/common/throttle')
+import throttle from '../../src/common/throttle'
 
 describe('throttle', function() {
   it('should throttle', function(done) {

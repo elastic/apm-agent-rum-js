@@ -50,4 +50,4 @@ class Subscription {
   }
 }
 
-module.exports = Subscription
+export default Subscription
