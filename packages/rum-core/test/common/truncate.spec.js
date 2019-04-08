@@ -23,7 +23,7 @@
  *
  */
 
-const { truncate, truncateModel } = require('../../src/common/truncate')
+import { truncate, truncateModel } from '../../src/common/truncate'
 
 /**
  * Dummy models to make the testing easier

@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  *
  */
-const { KEYWORD_LIMIT } = require('./constants')
+import { KEYWORD_LIMIT } from './constants'
 
 /**
  * All models value holds the arrary of form
@@ -143,7 +143,7 @@ function truncateModel(model = {}, target, childTarget = target) {
   return target
 }
 
-module.exports = {
+export {
   truncate,
   truncateModel,
   SPAN_MODEL,
