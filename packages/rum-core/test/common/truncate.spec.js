@@ -32,6 +32,9 @@ const getMetadataModel = limit => ({
   service: {
     name: [limit, true],
     version: [limit],
+    agent: {
+      version: [limit]
+    },
     environment: [limit]
   }
 })
@@ -103,6 +106,9 @@ describe('Truncate', () => {
       service: {
         name: '',
         version: generateStr('b', 7),
+        agent: {
+          version: '2.0.1'
+        },
         environment: 'development'
       }
     }
@@ -112,6 +118,9 @@ describe('Truncate', () => {
       service: {
         name: 'N/A',
         version: 'bbb',
+        agent: {
+          version: '2.0'
+        },
         environment: 'dev'
       }
     })

@@ -34,6 +34,9 @@ const METADATA_MODEL = {
   service: {
     name: [KEYWORD_LIMIT, true],
     version: [],
+    agent: {
+      version: []
+    },
     environment: []
   }
 }
