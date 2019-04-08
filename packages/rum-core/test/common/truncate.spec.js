@@ -57,7 +57,6 @@ const getSpanModel = limit => ({
   trace_id: [limit, true],
   parent_id: [limit, true],
   transaction_id: [limit, true],
-  duration: [limit, true],
   context: getContextModel(limit)
 })
 
@@ -70,7 +69,6 @@ const getTransactionModel = limit => ({
   span_count: {
     started: [limit, true]
   },
-  duration: [limit, true],
   context: getContextModel(limit)
 })
 const getErrorModel = limit => ({

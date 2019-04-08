@@ -59,7 +59,6 @@ const SPAN_MODEL = {
   trace_id: [KEYWORD_LIMIT, true],
   parent_id: [KEYWORD_LIMIT, true],
   transaction_id: [KEYWORD_LIMIT, true],
-  duration: [KEYWORD_LIMIT, true],
   subtype: [],
   action: [],
   context: CONTEXT_COMMON
@@ -74,7 +73,6 @@ const TRANSACTION_MODEL = {
   span_count: {
     started: [KEYWORD_LIMIT, true]
   },
-  duration: [KEYWORD_LIMIT, true],
   context: CONTEXT_COMMON
 }
 
