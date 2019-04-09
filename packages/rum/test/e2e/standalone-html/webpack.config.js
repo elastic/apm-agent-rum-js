@@ -24,7 +24,7 @@
  */
 
 const path = require('path')
-const { EnvironmentPlugin } = require('webpack')
+const { EnvironmentPlugin, DefinePlugin } = require('webpack')
 const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 
 module.exports = {
@@ -48,5 +48,10 @@ module.exports = {
       }
     ]
   },
-  plugins: [new EnvironmentPlugin(getWebpackEnv())]
+  plugins: [
+    new EnvironmentPlugin(getWebpackEnv()),
+    new DefinePlugin({
+      __DEV__: true
+    })
+  ]
 }

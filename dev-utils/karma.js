@@ -24,7 +24,7 @@
  */
 
 const { Server } = require('karma')
-const { EnvironmentPlugin } = require('webpack')
+const { EnvironmentPlugin, DefinePlugin } = require('webpack')
 const {
   getWebpackEnv,
   getSauceConnectOptions,
@@ -73,7 +73,12 @@ const baseConfig = {
         }
       ]
     },
-    plugins: [new EnvironmentPlugin(getWebpackEnv())],
+    plugins: [
+      new EnvironmentPlugin(getWebpackEnv()),
+      new DefinePlugin({
+        __DEV__: true
+      })
+    ],
     devtool: 'inline-source-map'
   },
   webpackMiddleware: {

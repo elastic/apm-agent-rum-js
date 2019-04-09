@@ -56,10 +56,12 @@ class Tracer extends otTracer {
         spanOptions.parentId = options.childOf.id
       } else if (options.references && options.references.length > 0) {
         if (options.references.length > 1) {
-          this.loggingService.debug(
-            // eslint-disable-next-line
-            'Elastic APM OpenTracing: Unsupported number of references, only the first childOf reference will be recorded.'
-          )
+          if (__DEV__) {
+            this.loggingService.debug(
+              // eslint-disable-next-line
+              'Elastic APM OpenTracing: Unsupported number of references, only the first childOf reference will be recorded.'
+            )
+          }
         }
 
         var childRef = find(options.references, function(ref) {
@@ -105,9 +107,11 @@ class Tracer extends otTracer {
         this.performanceMonitoring.injectDtHeader(spanContext, carrier)
         break
       case FORMAT_BINARY:
-        this.loggingService.debug(
-          'Elastic APM OpenTracing: binary carrier format is not supported.'
-        )
+        if (__DEV__) {
+          this.loggingService.debug(
+            'Elastic APM OpenTracing: binary carrier format is not supported.'
+          )
+        }
         break
     }
   }
@@ -120,9 +124,11 @@ class Tracer extends otTracer {
         ctx = this.performanceMonitoring.extractDtHeader(carrier)
         break
       case FORMAT_BINARY:
-        this.loggingService.debug(
-          'Elastic APM OpenTracing: binary carrier format is not supported.'
-        )
+        if (__DEV__) {
+          this.loggingService.debug(
+            'Elastic APM OpenTracing: binary carrier format is not supported.'
+          )
+        }
         break
     }
 

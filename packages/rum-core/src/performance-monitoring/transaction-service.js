@@ -77,7 +77,9 @@ class TransactionService {
     transaction.browserResponsivenessCounter = 0
     var interval = this._config.get('browserResponsivenessInterval')
     if (typeof interval === 'undefined') {
-      this._logger.debug('browserResponsivenessInterval is undefined!')
+      if (__DEV__) {
+        this._logger.debug('browserResponsivenessInterval is undefined!')
+      }
       return
     }
 
@@ -219,7 +221,9 @@ class TransactionService {
     var trans = this.ensureCurrentTransaction()
 
     if (trans) {
-      this._logger.debug('TransactionService.startSpan', name, type)
+      if (__DEV__) {
+        this._logger.debug('TransactionService.startSpan', name, type)
+      }
       var span = trans.startSpan(name, type, options)
       return span
     }
@@ -227,7 +231,9 @@ class TransactionService {
 
   add(transaction) {
     this._subscription.applyAll(this, [transaction])
-    this._logger.debug('TransactionService.add', transaction)
+    if (__DEV__) {
+      this._logger.debug('TransactionService.add', transaction)
+    }
   }
 
   subscribe(fn) {
@@ -238,7 +244,9 @@ class TransactionService {
     var tr = this.ensureCurrentTransaction()
     if (tr) {
       var taskId = tr.addTask(taskId)
-      this._logger.debug('TransactionService.addTask', taskId)
+      if (__DEV__) {
+        this._logger.debug('TransactionService.addTask', taskId)
+      }
     }
     return taskId
   }
@@ -247,7 +255,9 @@ class TransactionService {
     var tr = this.getCurrentTransaction()
     if (tr) {
       tr.removeTask(taskId)
-      this._logger.debug('TransactionService.removeTask', taskId)
+      if (__DEV__) {
+        this._logger.debug('TransactionService.removeTask', taskId)
+      }
     }
   }
 
@@ -255,7 +265,9 @@ class TransactionService {
     var tr = this.getCurrentTransaction()
     if (tr) {
       tr.detectFinish()
-      this._logger.debug('TransactionService.detectFinish')
+      if (__DEV__) {
+        this._logger.debug('TransactionService.detectFinish')
+      }
     }
   }
 }
