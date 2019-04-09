@@ -23,7 +23,13 @@
  *
  */
 
-import { getCurrentScript, sanitizeString, setTag, merge } from './utils'
+import {
+  getCurrentScript,
+  sanitizeString,
+  setTag,
+  merge,
+  getDtHeaderValue
+} from './utils'
 import Subscription from '../common/subscription'
 import { serverStringLimit } from './constants'
 
