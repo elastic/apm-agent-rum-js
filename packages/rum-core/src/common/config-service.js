@@ -218,7 +218,7 @@ class Config {
       this.config.context.tags = {}
     }
     var keys = Object.keys(tags)
-    keys.map(k => setTag(k, tags[k], this.config.context.tags))
+    keys.forEach(k => setTag(k, tags[k], this.config.context.tags))
   }
 
   setConfig(properties = {}) {

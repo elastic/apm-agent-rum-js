@@ -179,6 +179,29 @@ describe('ApmBase', function() {
     expect(tr.name).toBe('ZoneTransaction')
   })
 
+  it('should instrument xhr when not active', function(done) {
+    var apmBase = new ApmBase(serviceFactory, !enabled)
+    apmBase.init({ capturePageLoad: false, active: false })
+    var performanceMonitoring = serviceFactory.getService(
+      'PerformanceMonitoring'
+    )
+
+    var tr
+
+    var req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+    req.addEventListener('load', function() {
+      setTimeout(() => {
+        performanceMonitoring.cancelPatchSub()
+        done()
+      })
+    })
+
+    req.send()
+    tr = apmBase.getCurrentTransaction()
+    expect(tr).toBeUndefined()
+  })
+
   it('should instrument sync xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({})

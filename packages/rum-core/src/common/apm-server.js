@@ -226,9 +226,12 @@ class ApmServer {
     })
   }
 
-  _send(data, type = 'transaction') {
+  _send(data = [], type = 'transaction') {
     if (!this._configService.isValid()) {
       this.warnOnce(this.logMessages.invalidConfig)
+      return
+    }
+    if (data.length === 0) {
       return
     }
     const payload = {
@@ -245,8 +248,11 @@ class ApmServer {
     let ndjson
     if (type === 'errors') {
       ndjson = this.ndjsonErrors(filteredPayload.data)
-    } else {
+    } else if (type === 'transaction') {
       ndjson = this.ndjsonTransactions(filteredPayload.data)
+    } else {
+      this._loggingService.debug('Dropped payload due to unknown data type ')
+      return
     }
     ndjson.unshift(
       NDJSON.stringify({ metadata: { service: filteredPayload.service } })
@@ -255,17 +261,11 @@ class ApmServer {
     return this._postJson(endPoint, ndjsonPayload)
   }
 
-  sendTransactions(transactions = []) {
-    if (transactions.length === 0) {
-      return
-    }
+  sendTransactions(transactions) {
     return this._send(transactions)
   }
 
-  sendErrors(errors = []) {
-    if (errors.length === 0) {
-      return
-    }
+  sendErrors(errors) {
     return this._send(errors, 'errors')
   }
 }
