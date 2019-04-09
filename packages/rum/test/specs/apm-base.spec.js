@@ -179,26 +179,24 @@ describe('ApmBase', function() {
     expect(tr.name).toBe('ZoneTransaction')
   })
 
-  it('should instrument xhr when not active', function(done) {
+  it('should patch xhr when not active', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ capturePageLoad: false, active: false })
-    var performanceMonitoring = serviceFactory.getService(
-      'PerformanceMonitoring'
-    )
-
-    var tr
+    apmBase.init({ active: false })
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     req.addEventListener('load', function() {
       setTimeout(() => {
-        performanceMonitoring.cancelPatchSub()
+        /**
+         * We patch and register symbols on the native XHR with
+         * our own APM symbol keys
+         */
+        expect(Object.keys(req).length).toBeGreaterThanOrEqual(5)
         done()
       })
     })
-
     req.send()
-    tr = apmBase.getCurrentTransaction()
+    const tr = apmBase.getCurrentTransaction()
     expect(tr).toBeUndefined()
   })
 
