@@ -76,22 +76,37 @@ NOTE: Currently our minified JavaScript bundle is about 16KB (gzipped).
 
 If APM Server is deployed in an origin different than the page's origin,
 you will need to configure Cross-Origin Resource Sharing (CORS).
+To configure CORS, simply:
 
-TIP: To learn more about CORS, and why this process is necessary, see the MDN page on
-https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing].
+1. {apm-server-ref-v}/configuration-rum.html[Enable RUM support] in APM Server.
+2. Adjust the {apm-server-ref-v}/configuration-rum.html#_literal_allow_origins_literal[`apm-server.rum.allow_origins`] configuration.
+By default, APM Server allows all origins.
 
-To configure CORS,
-//configuration goes here
+[float]
+==== How CORS works
 
-When using this setup,
-the RUM agent will send an `HTTP OPTIONS` request prior to making the original `POST` request.
-This `OPTIONS` request will ensure all headers and `HTTP` methods are supported,
-and that the origin is allowed. 
+When the RUM agent makes it's initial `POST` request, the browser will check to see if it is a cross-origin request.
+If it is, the browser automatically makes a preflight `OPTIONS` request to the server to ensure the original `POST` request is allowed.
+If this `OPTIONS` check passes, then the original `POST` request is allowed.
 This request will fail if RUM support is not configured in the APM Server.
-See {apm-server-ref-v}/configuration-rum.html[Set up Real User Monitoring (RUM) support]
-for instructions on how to enable RUM support.
-By default, APM Server allows all origins:
-{apm-server-ref-v}/configuration-rum.html#_literal_allow_origins_literal[`apm-server.rum.allow_origins: ['*']`].
 
-// should we also link to/talk about `distributeTracingOrigins`?
-// <<`distributedTracingOrigins`,distributed-tracing-origins>>
+If you use a proxy, the preflight request headers may be necessary for your configuration:
+
+[source,js]
+----
+Access-Control-Request-Headers: Content-Type
+Access-Control-Request-Method: POST
+Origin: [request-origin]
+----
+
+The response should include these headers:
+
+[source,js]
+----
+Access-Control-Allow-Headers: Content-Type
+Access-Control-Allow-Methods: POST, OPTIONS
+Access-Control-Allow-Origin: [request-origin]
+----
+
+TIP: To learn more about CORS, see the MDN page on
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing].
