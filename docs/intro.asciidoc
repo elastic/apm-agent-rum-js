@@ -19,6 +19,10 @@ You will also need to {apm-server-ref-v}/rum.html[enable frontend endpoints in t
 [[getting-started]]
 == Getting started
 
+* <<using-package-managers>>
+* <<using-script-tags>>
+* <<configuring-cors>>
+
 [float]
 [[using-package-managers]]
 === Using Package Managers
@@ -71,7 +75,7 @@ https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG
 NOTE: Currently our minified JavaScript bundle is about 16KB (gzipped).
 
 [float]
-[[Configuring CORS]]
+[[configuring-cors]]
 === Configuring CORS
 
 If APM Server is deployed in an origin different than the page's origin,
