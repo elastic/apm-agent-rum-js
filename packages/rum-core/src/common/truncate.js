@@ -28,27 +28,29 @@ import { KEYWORD_LIMIT } from './constants'
  * All models value holds the arrary of form
  * [ limit, required, placeholder]
  *
- * Defaults are not represented in the array to reduce the size
+ * Defaults are represented in the array as true
+ * to reduce the bundlesize
+ * true -> !0 in the minified code
  */
 const METADATA_MODEL = {
   service: {
     name: [KEYWORD_LIMIT, true],
-    version: [],
+    version: true,
     agent: {
-      version: []
+      version: [KEYWORD_LIMIT, true]
     },
-    environment: []
+    environment: true
   }
 }
 
 const CONTEXT_COMMON = {
   user: {
-    id: [],
-    email: [],
-    username: []
+    id: true,
+    email: true,
+    username: true
   },
   tags: {
-    '*': []
+    '*': true
   }
 }
 
@@ -59,14 +61,14 @@ const SPAN_MODEL = {
   trace_id: [KEYWORD_LIMIT, true],
   parent_id: [KEYWORD_LIMIT, true],
   transaction_id: [KEYWORD_LIMIT, true],
-  subtype: [],
-  action: [],
+  subtype: true,
+  action: true,
   context: CONTEXT_COMMON
 }
 
 const TRANSACTION_MODEL = {
-  name: [],
-  parent_id: [],
+  name: true,
+  parent_id: true,
   type: [KEYWORD_LIMIT, true],
   id: [KEYWORD_LIMIT, true],
   trace_id: [KEYWORD_LIMIT, true],
@@ -78,15 +80,15 @@ const TRANSACTION_MODEL = {
 
 const ERROR_MODEL = {
   id: [KEYWORD_LIMIT, true],
-  trace_id: [],
-  transaction_id: [],
-  parent_id: [],
-  culprit: [],
+  trace_id: true,
+  transaction_id: true,
+  parent_id: true,
+  culprit: true,
   exception: {
-    type: []
+    type: true
   },
   transaction: {
-    type: []
+    type: true
   },
   context: CONTEXT_COMMON
 }
@@ -101,18 +103,33 @@ function truncate(
     value = placeholder
   }
   if (typeof value === 'string') {
-    return value.substr(0, limit)
+    return value.substring(0, limit)
   }
   return value
 }
 
+function checkFalsyValue(value) {
+  return value == null || value === ''
+}
+
+function replaceValue(target, key, currModel) {
+  const value = truncate(target[key], currModel[0], currModel[1])
+  if (checkFalsyValue(value)) {
+    delete target[key]
+    return
+  }
+  target[key] = value
+}
+
 function truncateModel(model = {}, target, childTarget = target) {
   const keys = Object.keys(model)
+  const emptyArr = []
   for (let i = 0; i < keys.length; i++) {
     const currKey = keys[i]
-    const value = model[currKey]
-    if (!Array.isArray(value)) {
-      truncateModel(value, target, childTarget[currKey])
+    const currModel = model[currKey] === true ? emptyArr : model[currKey]
+
+    if (!Array.isArray(currModel)) {
+      truncateModel(currModel, target, childTarget[currKey])
     } else {
       /**
        * To avoid traversing the target object, we keep a reference to
@@ -122,21 +139,11 @@ function truncateModel(model = {}, target, childTarget = target) {
        * when the key is '*', Apply truncation to all the keys in current level
        */
       if (currKey === '*') {
-        Object.keys(childTarget).forEach(key => {
-          const truncatedValue = truncate(childTarget[key], value[0], value[1])
-          if (truncatedValue) {
-            childTarget[key] = truncatedValue
-          }
-        })
-      } else {
-        const truncatedValue = truncate(
-          childTarget[currKey],
-          value[0],
-          value[1]
+        Object.keys(childTarget).forEach(key =>
+          replaceValue(childTarget, key, currModel)
         )
-        if (truncatedValue) {
-          childTarget[currKey] = truncatedValue
-        }
+      } else {
+        replaceValue(childTarget, currKey, currModel)
       }
     }
   }

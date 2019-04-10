@@ -234,10 +234,9 @@ class ApmServer {
     if (data.length === 0) {
       return
     }
-    const payload = {
-      service: this.createServiceObject(),
-      data
-    }
+    const { service } = this.createMetaData()
+    const payload = { service, data }
+
     const filteredPayload = this._configService.applyFilters(payload)
     if (!filteredPayload) {
       this._loggingService.warn('Dropped payload due to filtering!')

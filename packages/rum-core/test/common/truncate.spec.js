@@ -96,6 +96,11 @@ describe('Truncate', () => {
     expect(truncate(generateStr('ab', 5), 2)).toEqual('ab')
     const placeHolder = 'dummyplaceholder'
     expect(truncate('', undefined, true, placeHolder)).toEqual(placeHolder)
+    expect(truncate(undefined, undefined, true, placeHolder)).toEqual(
+      placeHolder
+    )
+    expect(truncate(undefined)).toBeUndefined()
+    expect(truncate(null)).toEqual(null)
   })
 
   it('truncate metadata', () => {
@@ -203,6 +208,8 @@ describe('Truncate', () => {
       name: generateStr('d', keywordLen),
       type: generateStr('e', keywordLen),
       sync: false,
+      subType: undefined,
+      action: undefined,
       start: 500,
       duration: 700.02,
       context: {
