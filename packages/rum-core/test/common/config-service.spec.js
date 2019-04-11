@@ -143,15 +143,6 @@ describe('ConfigService', function() {
     expect(result).toBe(true)
   })
 
-  it('should setTag', function() {
-    configService.setTag('', 'test')
-    configService.setTag('test', 'test')
-    configService.setTag('test.key', 'test value')
-    configService.setTag('newKey', '')
-    var tags = configService.get('context.tags')
-    expect(tags).toEqual({ test: 'test', test_key: 'test value', newKey: '' })
-  })
-
   it('should addTags', function() {
     var date = new Date()
     configService.addTags({

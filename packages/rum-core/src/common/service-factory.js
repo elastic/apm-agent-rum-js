@@ -67,13 +67,12 @@ class ServiceFactory {
     var loggingService = serviceFactory.getService('LoggingService')
 
     function setLogLevel(loggingService, configService) {
-      if (
-        configService.get('debug') === true &&
-        configService.config.logLevel !== 'trace'
-      ) {
-        loggingService.setLevel('debug', false)
+      const debug = configService.get('debug')
+      const logLevel = configService.get('logLevel')
+      if (debug === true && logLevel !== 'trace') {
+        loggingService.setLevel('debug')
       } else {
-        loggingService.setLevel(configService.get('logLevel'), false)
+        loggingService.setLevel(logLevel)
       }
     }
 
