@@ -9,6 +9,22 @@ You can access agent API after initializing the agent:
 var apm = require('@elastic/apm-rum').init(...)
 ----
 
+
+[float]
+[[apm-init]]
+==== `apm.init([config])`
+
+Initializes the agent with the given <<configuration,configuration>> and returns itself. Under the hood init does the following
+
+* Registers a global `error` listener to track JavaScript errors on the page.
+* Adds a `onload` event listener to collect the page load metrics.
+
+NOTE: When the agent is inactive, both `error` and `onload` listeners will not be registered on the page
+
+NOTE: Both XHR and Fetch API are patched as soon as the agent script is executed on the page and does not get changed even if the agent is inactive. The reason is to allow users to initialize the agent asynchronously on the page.
+
+
+
 [float]
 [[apm-set-user-context]]
 ==== `apm.setUserContext()`
@@ -125,7 +141,7 @@ Use this method to create a custom transaction.
 
 NOTE: Calling this method would result in ending the current transaction and replacing it with the new transaction.
 
-NOTE: This method returns `undefined` if apm is disabled or if `isActive` is set to `false`.
+NOTE: This method returns `undefined` if apm is disabled or if <<active,active>> flag is set to `false` in the config.
 
 [float]
 [[apm-start-span]]
@@ -144,7 +160,7 @@ Arguments:
 
 * `type` - The type of the span (string). Defaults to `custom`
 
-NOTE: This method returns `undefined` if apm is disabled or if `isActive` is set to `false`.
+NOTE: This method returns `undefined` if apm is disabled or if <<active,active>> flag is set to `false` in the config.
 
 
 [float]

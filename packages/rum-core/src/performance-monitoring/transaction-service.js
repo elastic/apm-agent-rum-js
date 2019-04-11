@@ -168,7 +168,7 @@ class TransactionService {
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
-      if (typeof perfOptions.pageLoadSampled !== 'undefined') {
+      if (perfOptions.pageLoadSampled) {
         tr.sampled = perfOptions.pageLoadSampled
       }
 

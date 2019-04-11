@@ -28,7 +28,6 @@ import {
   sanitizeString,
   checkSameOrigin,
   isDtHeaderValid,
-  getDtHeaderValue,
   merge,
   stripQueryStringFromUrl,
   parseDtHeaderValue
@@ -129,9 +128,6 @@ class PerformanceMonitoring {
     var headerValueCallback = configService.get(
       'distributedTracingHeaderValueCallback'
     )
-    if (typeof headerValueCallback !== 'function') {
-      headerValueCallback = getDtHeaderValue
-    }
 
     var headerValue = headerValueCallback(span)
     var isHeaderValid = isDtHeaderValid(headerValue)

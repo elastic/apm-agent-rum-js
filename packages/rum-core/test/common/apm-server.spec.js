@@ -138,7 +138,6 @@ describe('ApmServer', function() {
       serviceName: 'serviceName',
       throttlingRequestLimit: 1
     })
-    expect(configService.isValid()).toBe(true)
     spyOn(apmServer, '_postJson').and.callThrough()
     spyOn(apmServer, '_makeHttpRequest').and.callThrough()
     apmServer.init()
@@ -232,7 +231,6 @@ describe('ApmServer', function() {
       serverUrl: 'http://localhost:54321',
       serviceName: 'test-service'
     })
-    expect(configService.isValid()).toBe(true)
     apmServer.addError({ test: 'test' })
 
     expect(loggingService.warn).not.toHaveBeenCalled()
@@ -265,7 +263,6 @@ describe('ApmServer', function() {
       serverUrl: 'http://localhost:54321',
       serviceName: 'test-service'
     })
-    expect(configService.isValid()).toBe(true)
     apmServer.addTransaction({ test: 'test' })
 
     expect(loggingService.warn).not.toHaveBeenCalled()
@@ -279,7 +276,6 @@ describe('ApmServer', function() {
       errorThrottleLimit: 5,
       errorThrottleInterval: 200
     })
-    expect(configService.isValid()).toBe(true)
     spyOn(apmServer, 'sendErrors')
     spyOn(loggingService, 'warn').and.callThrough()
 
@@ -310,7 +306,6 @@ describe('ApmServer', function() {
       transactionThrottleLimit: 5,
       transactionThrottleInterval: 200
     })
-    expect(configService.isValid()).toBe(true)
     spyOn(apmServer, 'sendTransactions')
     spyOn(loggingService, 'warn').and.callThrough()
 
@@ -332,22 +327,6 @@ describe('ApmServer', function() {
       apmServer.transactionQueue._clear()
       done()
     }, 300)
-  })
-
-  it('should check isActive', function() {
-    configService.setConfig({
-      active: false
-    })
-    expect(configService.isActive()).toBe(false)
-
-    expect(apmServer.transactionQueue).toBeUndefined()
-    expect(apmServer.errorQueue).toBeUndefined()
-
-    apmServer.addTransaction({ test: 'test' })
-    apmServer.addError({ test: 'test' })
-
-    expect(apmServer.transactionQueue).toBeUndefined()
-    expect(apmServer.errorQueue).toBeUndefined()
   })
 
   it('should ignore undefined payload', function() {

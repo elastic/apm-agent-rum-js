@@ -23,7 +23,13 @@
  *
  */
 
-import { getCurrentScript, sanitizeString, setTag, merge } from './utils'
+import {
+  getCurrentScript,
+  sanitizeString,
+  setTag,
+  merge,
+  getDtHeaderValue
+} from './utils'
 import Subscription from '../common/subscription'
 import { serverStringLimit } from './constants'
 
@@ -98,18 +104,17 @@ class Config {
 
       distributedTracing: true,
       distributedTracingOrigins: [],
-      distributedTracingHeaderValueCallback: undefined,
+      distributedTracingHeaderValueCallback: getDtHeaderValue,
       distributedTracingHeaderName: 'elastic-apm-traceparent',
 
-      pageLoadTraceId: undefined,
-      pageLoadSpanId: undefined,
-      pageLoadSampled: undefined,
-      pageLoadTransactionName: undefined,
+      pageLoadTraceId: '',
+      pageLoadSpanId: '',
+      pageLoadSampled: false,
+      pageLoadTransactionName: '',
 
       transactionSampleRate: 1.0,
 
-      context: {},
-      platform: {}
+      context: {}
     }
 
     this._changeSubscription = new Subscription()
@@ -182,25 +187,22 @@ class Config {
     }
   }
 
-  setUserContext(userContext) {
-    var context = {}
-    if (typeof userContext.id === 'number') {
-      context.id = userContext.id
+  setUserContext(userContext = {}) {
+    const context = {}
+    const { id, username, email } = userContext
+    const serverStringLimit = this.get('serverStringLimit')
+
+    if (typeof id === 'number') {
+      context.id = id
     }
-    if (typeof userContext.id === 'string') {
-      context.id = sanitizeString(userContext.id, this.get('serverStringLimit'))
+    if (typeof id === 'string') {
+      context.id = sanitizeString(id, serverStringLimit)
     }
-    if (typeof userContext.username === 'string') {
-      context.username = sanitizeString(
-        userContext.username,
-        this.get('serverStringLimit')
-      )
+    if (typeof username === 'string') {
+      context.username = sanitizeString(username, serverStringLimit)
     }
-    if (typeof userContext.email === 'string') {
-      context.email = sanitizeString(
-        userContext.email,
-        this.get('serverStringLimit')
-      )
+    if (typeof email === 'string') {
+      context.email = sanitizeString(email, serverStringLimit)
     }
     this.set('context.user', context)
   }
@@ -211,26 +213,16 @@ class Config {
     }
   }
 
-  setTag(key, value) {
-    if (!key) return
+  addTags(tags) {
     if (!this.config.context.tags) {
       this.config.context.tags = {}
     }
-
-    setTag(key, value, this.config.context.tags)
-  }
-
-  addTags(tags) {
     var keys = Object.keys(tags)
-    keys.forEach(k => {
-      this.setTag(k, tags[k])
-    })
+    keys.forEach(k => setTag(k, tags[k], this.config.context.tags))
   }
 
-  setConfig(properties) {
-    properties = properties || {}
+  setConfig(properties = {}) {
     this.config = merge({}, this.defaults, this.config, properties)
-
     this._changeSubscription.applyAll(this, [this.config])
   }
 

@@ -34,7 +34,10 @@ class ApmServer {
     this._configService = configService
     this._loggingService = loggingService
     this.logMessages = {
-      invalidConfig: { message: 'Configuration is invalid!', level: 'warn' }
+      invalidConfig: {
+        message: 'RUM agent configuration is invalid!',
+        level: 'warn'
+      }
     }
 
     this.errorQueue = undefined
@@ -178,21 +181,17 @@ class ApmServer {
   }
 
   addError(error) {
-    if (this._configService.isActive()) {
-      if (!this.errorQueue) {
-        this.initErrorQueue()
-      }
-      this.throttleAddError(error)
+    if (!this.errorQueue) {
+      this.initErrorQueue()
     }
+    this.throttleAddError(error)
   }
 
   addTransaction(transaction) {
-    if (this._configService.isActive()) {
-      if (!this.transactionQueue) {
-        this.initTransactionQueue()
-      }
-      this.throttleAddTransaction(transaction)
+    if (!this.transactionQueue) {
+      this.initTransactionQueue()
     }
+    this.throttleAddTransaction(transaction)
   }
 
   warnOnce(logObject) {
@@ -208,31 +207,6 @@ class ApmServer {
     return errors.map(function(error) {
       return NDJSON.stringify({ error })
     })
-  }
-
-  sendErrors(errors) {
-    if (this._configService.isValid() && this._configService.isActive()) {
-      if (errors && errors.length > 0) {
-        const payload = {
-          service: this.createServiceObject(),
-          errors
-        }
-        const filteredPayload = this._configService.applyFilters(payload)
-        if (filteredPayload) {
-          const endPoint = this._configService.getEndpointUrl('errors')
-          const ndjson = this.ndjsonErrors(filteredPayload.errors)
-          ndjson.unshift(
-            NDJSON.stringify({ metadata: { service: filteredPayload.service } })
-          )
-          const ndjsonPayload = ndjson.join('')
-          return this._postJson(endPoint, ndjsonPayload)
-        } else {
-          this._loggingService.warn('Dropped payload due to filtering!')
-        }
-      }
-    } else {
-      this.warnOnce(this.logMessages.invalidConfig)
-    }
   }
 
   ndjsonTransactions(transactions) {
@@ -252,29 +226,47 @@ class ApmServer {
     })
   }
 
-  sendTransactions(transactions) {
-    if (this._configService.isValid() && this._configService.isActive()) {
-      if (transactions && transactions.length > 0) {
-        const payload = {
-          service: this.createServiceObject(),
-          transactions
-        }
-        const filteredPayload = this._configService.applyFilters(payload)
-        if (filteredPayload) {
-          const endPoint = this._configService.getEndpointUrl('transactions')
-          const ndjson = this.ndjsonTransactions(filteredPayload.transactions)
-          ndjson.unshift(
-            NDJSON.stringify({ metadata: { service: filteredPayload.service } })
-          )
-          const ndjsonPayload = ndjson.join('')
-          return this._postJson(endPoint, ndjsonPayload)
-        } else {
-          this._loggingService.warn('Dropped payload due to filtering!')
-        }
-      }
-    } else {
+  _send(data = [], type = 'transaction') {
+    if (!this._configService.isValid()) {
       this.warnOnce(this.logMessages.invalidConfig)
+      return
     }
+    if (data.length === 0) {
+      return
+    }
+    const payload = {
+      service: this.createServiceObject(),
+      data
+    }
+    const filteredPayload = this._configService.applyFilters(payload)
+    if (!filteredPayload) {
+      this._loggingService.warn('Dropped payload due to filtering!')
+      return
+    }
+
+    const endPoint = this._configService.getEndpointUrl()
+    let ndjson
+    if (type === 'errors') {
+      ndjson = this.ndjsonErrors(filteredPayload.data)
+    } else if (type === 'transaction') {
+      ndjson = this.ndjsonTransactions(filteredPayload.data)
+    } else {
+      this._loggingService.debug('Dropped payload due to unknown data type ')
+      return
+    }
+    ndjson.unshift(
+      NDJSON.stringify({ metadata: { service: filteredPayload.service } })
+    )
+    const ndjsonPayload = ndjson.join('')
+    return this._postJson(endPoint, ndjsonPayload)
+  }
+
+  sendTransactions(transactions) {
+    return this._send(transactions)
+  }
+
+  sendErrors(errors) {
+    return this._send(errors, 'errors')
   }
 }
 
