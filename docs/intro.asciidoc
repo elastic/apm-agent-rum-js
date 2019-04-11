@@ -19,6 +19,10 @@ You will also need to {apm-server-ref-v}/rum.html[enable frontend endpoints in t
 [[getting-started]]
 == Getting started
 
+* <<using-package-managers>>
+* <<using-script-tags>>
+* <<configuring-cors>>
+
 [float]
 [[using-package-managers]]
 === Using Package Managers
@@ -69,3 +73,44 @@ https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG
 ----
 
 NOTE: Currently our minified JavaScript bundle is about 16KB (gzipped).
+
+[float]
+[[configuring-cors]]
+=== Configuring CORS
+
+If APM Server is deployed in an origin different than the page's origin,
+you will need to configure Cross-Origin Resource Sharing (CORS).
+To configure CORS, simply:
+
+1. {apm-server-ref-v}/configuration-rum.html[Enable RUM support] in APM Server.
+2. Adjust the {apm-server-ref-v}/configuration-rum.html#_literal_allow_origins_literal[`apm-server.rum.allow_origins`] configuration.
+By default, APM Server allows all origins.
+
+[float]
+==== How CORS works
+
+When the RUM agent makes it's initial `POST` request, the browser will check to see if it is a cross-origin request.
+If it is, the browser automatically makes a preflight `OPTIONS` request to the server to ensure the original `POST` request is allowed.
+If this `OPTIONS` check passes, then the original `POST` request is allowed.
+This request will fail if RUM support is not configured in the APM Server.
+
+If you use a proxy, the preflight request headers may be necessary for your configuration:
+
+[source,js]
+----
+Access-Control-Request-Headers: Content-Type
+Access-Control-Request-Method: POST
+Origin: [request-origin]
+----
+
+The response should include these headers:
+
+[source,js]
+----
+Access-Control-Allow-Headers: Content-Type
+Access-Control-Allow-Methods: POST, OPTIONS
+Access-Control-Allow-Origin: [request-origin]
+----
+
+TIP: To learn more about CORS, see the MDN page on
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing].
