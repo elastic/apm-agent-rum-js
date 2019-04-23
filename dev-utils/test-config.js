@@ -24,6 +24,23 @@
  */
 const defaultApmServerUrl = 'http://localhost:8200'
 
+/*
+ * If the serverUrl has a trailing slash, trim it off
+ */
+function getServerUrl() {
+  if (!process.env.APM_SERVER_URL) {
+    return defaultApmServerUrl
+  }
+
+  const urlLength = process.env.APM_SERVER_URL.length
+
+  if (process.env.APM_SERVER_URL[urlLength - 1] === '/') {
+    return process.env.APM_SERVER_URL.slice(0, urlLength - 1)
+  }
+
+  return process.env.APM_SERVER_URL
+}
+
 function getSauceConnectOptions() {
   return {
     username: process.env.SAUCE_USERNAME,
@@ -41,7 +58,7 @@ function getTestEnvironmentVariables() {
     mode: process.env.MODE,
     sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
     isTravis: process.env.TRAVIS,
-    serverUrl: process.env.APM_SERVER_URL || defaultApmServerUrl,
+    serverUrl: getServerUrl() || defaultApmServerUrl,
     mockBackendUrl: 'http://localhost:8003'
   }
 }
