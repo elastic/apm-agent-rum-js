@@ -1,14 +1,18 @@
 [[sourcemap]]
 == Source Maps
 
-It is a common practice to minify JavaScript bundles.
+TIP: Additional information on the source map endpoint is available in the
+APM Server's {apm-server-ref-v}/sourcemaps.html[source map documentation].
+Don't forget, you must enable {apm-server-ref-v}/configuration-rum.html[RUM support] in the APM Server for this endpoint to work.
+
+It's a common practice to minify JavaScript bundles.
 However, debugging minified files is inherently difficult. To resolve this issue,
 you can generate source maps for your bundles and upload them to the APM server.
 
-Here is an example to generate source maps with webpack and configure the JavaScript agent accordingly.
-For a detailed description of APM Server source map endpoint see {apm-server-ref-v}/sourcemaps.html[our documentation].
+Here's an example that shows how to generate source maps with webpack,
+and configure the JavaScript agent accordingly.
 
-First you need to configure webpack to generate source map and provide the service version to your app:
+First, you need to configure webpack to generate source maps and provide the service version to your app:
 
 [source,js]
 ----
