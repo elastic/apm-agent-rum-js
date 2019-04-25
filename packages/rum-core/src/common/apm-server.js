@@ -25,9 +25,9 @@
 
 import Queue from './queue'
 import throttle from './throttle'
-import { sanitizeString } from './utils'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
+import { truncateModel, METADATA_MODEL } from './truncate'
 
 class ApmServer {
   constructor(configService, loggingService) {
@@ -60,23 +60,23 @@ class ApmServer {
     this.initTransactionQueue()
   }
 
-  createServiceObject() {
+  createMetaData() {
     const cfg = this._configService
-    const stringLimit = cfg.get('serverStringLimit')
-
-    const serviceObject = {
-      name: sanitizeString(cfg.get('serviceName'), stringLimit, true),
-      version: sanitizeString(cfg.get('serviceVersion'), stringLimit),
-      agent: {
-        name: 'js-base',
-        version: sanitizeString(cfg.version, stringLimit)
-      },
-      language: {
-        name: 'javascript'
-      },
-      environment: sanitizeString(cfg.get('environment'), stringLimit)
+    const metadata = {
+      service: {
+        name: cfg.get('serviceName'),
+        version: cfg.get('serviceVersion'),
+        agent: {
+          name: 'js-base',
+          version: cfg.version
+        },
+        language: {
+          name: 'javascript'
+        },
+        environment: cfg.get('environment')
+      }
     }
-    return serviceObject
+    return truncateModel(METADATA_MODEL, metadata)
   }
 
   _postJson(endPoint, payload) {
@@ -234,10 +234,9 @@ class ApmServer {
     if (data.length === 0) {
       return
     }
-    const payload = {
-      service: this.createServiceObject(),
-      data
-    }
+    const { service } = this.createMetaData()
+    const payload = { service, data }
+
     const filteredPayload = this._configService.applyFilters(payload)
     if (!filteredPayload) {
       this._loggingService.warn('Dropped payload due to filtering!')

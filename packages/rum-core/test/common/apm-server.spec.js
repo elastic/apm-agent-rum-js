@@ -343,7 +343,7 @@ describe('ApmServer', function() {
     expect(apmServer._postJson).not.toHaveBeenCalled()
   })
 
-  it('should set service object from config along with defaults', () => {
+  it('should set metadata from config along with defaults', () => {
     configService.setConfig({
       serviceName: 'test',
       serviceVersion: '0.0.1',
@@ -353,7 +353,8 @@ describe('ApmServer', function() {
     configService.setVersion('4.0.1')
 
     /** To catch agent version mismatch during release */
-    expect(apmServer.createServiceObject()).toEqual({
+    const { service } = apmServer.createMetaData()
+    expect(service).toEqual({
       name: 'test',
       version: '0.0.1',
       environment: 'staging',
@@ -371,9 +372,9 @@ describe('ApmServer', function() {
     var result = apmServer.ndjsonTransactions(trs)
     /* eslint-disable max-len */
     var expected = [
-      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","subType":"NA","action":"NA","sync":false,"start":10,"duration":10}}\n',
-      '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","subType":"NA","action":"NA","sync":false,"start":10,"duration":10}}\n',
-      '{"transaction":{"id":"transaction-id-2","trace_id":"trace-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-2-1","transaction_id":"transaction-id-2","parent_id":"transaction-id-2","trace_id":"trace-id-2","name":"name","type":"type","subType":"NA","action":"NA","sync":false,"start":10,"duration":10}}\n'
+      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
+      '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
+      '{"transaction":{"id":"transaction-id-2","trace_id":"trace-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-2-1","transaction_id":"transaction-id-2","parent_id":"transaction-id-2","trace_id":"trace-id-2","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n'
     ]
     expect(result).toEqual(expected)
   })

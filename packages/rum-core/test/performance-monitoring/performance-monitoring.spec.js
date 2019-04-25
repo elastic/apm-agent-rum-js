@@ -61,14 +61,11 @@ describe('PerformanceMonitoring', function() {
     var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
     var promise = apmServer.sendTransactions(payload)
     expect(promise).toBeDefined()
-    promise.then(
-      function() {
-        done()
-      },
-      function(reason) {
+    promise
+      .catch(reason => {
         fail('Failed sending transactions to the server, reason: ' + reason)
-      }
-    )
+      })
+      .then(() => done())
   })
 
   it('should group small continuously similar spans up until the last one', function() {
@@ -306,15 +303,19 @@ describe('PerformanceMonitoring', function() {
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
       expect(promise).toBeDefined()
-      promise.then(
-        function() {
-          window.performance.getEntriesByType = _getEntriesByType
-          done()
-        },
-        function(reason) {
-          fail('Failed sending transactions to the server, reason: ' + reason)
-        }
-      )
+      promise
+        .then(
+          () => {
+            window.performance.getEntriesByType = _getEntriesByType
+          },
+          reason => {
+            fail(
+              'Failed sending page load metrics so the server, reason: ' +
+                reason
+            )
+          }
+        )
+        .then(() => done())
     })
     transactionService.sendPageLoadMetrics('resource-test')
   })
