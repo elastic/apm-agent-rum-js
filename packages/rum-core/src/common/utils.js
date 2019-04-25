@@ -23,7 +23,6 @@
  *
  */
 
-import { serverStringLimit } from './constants'
 import Url from '../common/url'
 import rng from 'uuid/lib/rng-browser'
 
@@ -135,47 +134,21 @@ function isPlatformSupported() {
   )
 }
 
-function sanitizeString(
-  value,
-  limit = serverStringLimit,
-  required = false,
-  placeholder = 'NA'
-) {
-  if (typeof value === 'number') {
-    value = String(value)
-  }
-  if (required && !value) {
-    value = placeholder
-  }
-  if (value) {
-    return String(value).substr(0, limit)
-  } else {
-    return value
-  }
-}
-
+/**
+ * Convert values of the tag to be string to be compatible
+ * with the apm server prior to <6.7 version
+ *
+ * TODO: Remove string conversion in the next major release since
+ * support for boolean and number in the APM server has landed in 6.7
+ * https://github.com/elastic/apm-server/pull/1712/
+ */
 function setTag(key, value, obj) {
   if (!obj || !key) return
   var skey = removeInvalidChars(key)
-  obj[skey] = sanitizeString(value, serverStringLimit)
-  return obj
-}
-
-function sanitizeObjectStrings(obj, limit, required, placeholder) {
-  if (!obj) return obj
-  if (typeof obj === 'string') {
-    return sanitizeString(obj, limit, required, placeholder)
+  if (value) {
+    value = String(value)
   }
-  var keys = Object.keys(obj)
-  keys.forEach(function(k) {
-    var value = obj[k]
-    if (typeof value === 'string') {
-      value = sanitizeString(obj[k], limit, required, placeholder)
-    } else if (typeof value === 'object') {
-      value = sanitizeObjectStrings(value, limit, required, placeholder)
-    }
-    obj[k] = value
-  })
+  obj[skey] = value
   return obj
 }
 
@@ -374,8 +347,6 @@ export {
   generateRandomId,
   rng,
   checkSameOrigin,
-  sanitizeString,
-  sanitizeObjectStrings,
   setTag,
   stripQueryStringFromUrl,
   find,

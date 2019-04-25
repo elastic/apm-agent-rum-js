@@ -50,14 +50,12 @@ describe('ErrorLogging', function() {
     } catch (error) {
       errorObject = errorLogging.createErrorDataModel({ error })
     }
-    apmServer.sendErrors([errorObject]).then(
-      function() {
-        done()
-      },
-      function(reason) {
+    apmServer
+      .sendErrors([errorObject])
+      .catch(reason => {
         fail('Failed to send errors to the server, reason: ' + reason)
-      }
-    )
+      })
+      .then(() => done())
   })
 
   it('should process errors', function(done) {
@@ -75,23 +73,25 @@ describe('ErrorLogging', function() {
       error.anObject = obj
       error.aFunction = function noop() {}
       error.null = null
-      errorLogging.logErrorEvent({ error }, true).then(
-        function() {
-          expect(apmServer.sendErrors).toHaveBeenCalled()
-          var errors = apmServer.sendErrors.calls.argsFor(0)[0]
-          expect(errors.length).toBe(1)
-          var errorData = errors[0]
-          expect(errorData.context.test).toBe('hamid')
-          expect(errorData.context.aDate).toBe('2017-01-12T00:00:00.000Z') // toISOString()
-          expect(errorData.context.anObject).toBeUndefined()
-          expect(errorData.context.aFunction).toBeUndefined()
-          expect(errorData.context.null).toBeUndefined()
-          done()
-        },
-        function(reason) {
-          fail(reason)
-        }
-      )
+      errorLogging
+        .logErrorEvent({ error }, true)
+        .then(
+          () => {
+            expect(apmServer.sendErrors).toHaveBeenCalled()
+            var errors = apmServer.sendErrors.calls.argsFor(0)[0]
+            expect(errors.length).toBe(1)
+            var errorData = errors[0]
+            expect(errorData.context.test).toBe('hamid')
+            expect(errorData.context.aDate).toBe('2017-01-12T00:00:00.000Z') // toISOString()
+            expect(errorData.context.anObject).toBeUndefined()
+            expect(errorData.context.aFunction).toBeUndefined()
+            expect(errorData.context.null).toBeUndefined()
+          },
+          reason => {
+            fail(reason)
+          }
+        )
+        .then(() => done())
     }
   })
 
@@ -101,23 +101,25 @@ describe('ErrorLogging', function() {
     try {
       throw new Error('Test Error')
     } catch (error) {
-      errorLogging.logErrorEvent({ error }, true).then(
-        () => {
-          expect(apmServer.sendErrors).toHaveBeenCalled()
-          var errors = apmServer.sendErrors.calls.argsFor(0)[0]
-          expect(errors.length).toBe(1)
-          var errorData = errors[0]
-          expect(errorData.transaction_id).toEqual(transaction.id)
-          expect(errorData.trace_id).toEqual(transaction.traceId)
-          expect(errorData.parent_id).toEqual(transaction.id)
-          expect(errorData.transaction).toEqual({
-            type: transaction.type,
-            sampled: transaction.sampled
-          })
-          done()
-        },
-        reason => fail(reason)
-      )
+      errorLogging
+        .logErrorEvent({ error }, true)
+        .then(
+          () => {
+            expect(apmServer.sendErrors).toHaveBeenCalled()
+            var errors = apmServer.sendErrors.calls.argsFor(0)[0]
+            expect(errors.length).toBe(1)
+            var errorData = errors[0]
+            expect(errorData.transaction_id).toEqual(transaction.id)
+            expect(errorData.trace_id).toEqual(transaction.traceId)
+            expect(errorData.parent_id).toEqual(transaction.id)
+            expect(errorData.transaction).toEqual({
+              type: transaction.type,
+              sampled: transaction.sampled
+            })
+          },
+          reason => fail(reason)
+        )
+        .then(() => done())
     }
   })
 
@@ -152,22 +154,24 @@ describe('ErrorLogging', function() {
 
     var errorEvent = createErrorEvent(testErrorMessage)
 
-    errorLogging.logErrorEvent(errorEvent, true).then(
-      function() {
-        expect(apmServer.sendErrors).toHaveBeenCalled()
-        var errors = apmServer.sendErrors.calls.argsFor(0)[0]
-        expect(errors.length).toBe(1)
-        var errorData = errors[0]
-        // the message is different in IE 10 since error type is not available
-        expect(errorData.exception.message).toContain(testErrorMessage)
-        // the number of frames is different in different platforms
-        expect(errorData.exception.stacktrace.length).toBeGreaterThan(0)
-        done()
-      },
-      function(reason) {
-        fail('Failed to send errors to the server, reason: ' + reason)
-      }
-    )
+    errorLogging
+      .logErrorEvent(errorEvent, true)
+      .then(
+        () => {
+          expect(apmServer.sendErrors).toHaveBeenCalled()
+          var errors = apmServer.sendErrors.calls.argsFor(0)[0]
+          expect(errors.length).toBe(1)
+          var errorData = errors[0]
+          // the message is different in IE 10 since error type is not available
+          expect(errorData.exception.message).toContain(testErrorMessage)
+          // the number of frames is different in different platforms
+          expect(errorData.exception.stacktrace.length).toBeGreaterThan(0)
+        },
+        reason => {
+          fail('Failed to send errors to the server, reason: ' + reason)
+        }
+      )
+      .then(() => done())
   })
 
   it('should install onerror and accept ErrorEvents', function(done) {

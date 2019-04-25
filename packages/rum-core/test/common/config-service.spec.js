@@ -145,32 +145,17 @@ describe('ConfigService', function() {
 
   it('should addTags', function() {
     var date = new Date()
-    configService.addTags({
+    const tags = {
       test: 'test',
       no: 1,
       'test.test': 'test',
       obj: { just: 'object' },
       date
-    })
-    var tags = configService.get('context.tags')
-    expect(tags).toEqual({
+    }
+    configService.addTags(tags)
+    const contextTags = configService.get('context.tags')
+    expect(contextTags).toEqual({
       test: 'test',
-      no: '1',
-      test_test: 'test',
-      obj: '[object Object]',
-      date: String(date)
-    })
-
-    configService.addTags({
-      test: undefined,
-      no: 1,
-      'test.test': 'test',
-      obj: { just: 'object' },
-      date
-    })
-    tags = configService.get('context.tags')
-    expect(tags).toEqual({
-      test: undefined,
       no: '1',
       test_test: 'test',
       obj: '[object Object]',
