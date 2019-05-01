@@ -61,6 +61,8 @@ The provided custom context is stored under `context.custom` in Elasticsearch on
 
 The given `context` argument must be an object and can contain any property that can be JSON encoded.
 
+TIP: Before using custom context, ensure you understand the different types of
+{apm-overview-ref-v}/metadata.html[metadata] that are available.
 
 [float]
 [[apm-add-tags]]
@@ -75,12 +77,18 @@ Set tags on transactions and errors.
 
 Tags are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via `setCustomContext()`). You can set multiple tags.
 
+TIP: Before using custom tags, ensure you understand the different types of
+{apm-overview-ref-v}/metadata.html[metadata] that are available.
+
 Arguments:
 
 * `name` - Any string. All periods (.), asterisks (*), and double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
 
 * `value` - Any string. If a non-string data type is given, it's converted to a string before being sent to the APM Server.
 
+WARNING: Avoid defining too many user-specified tags.
+Defining too many unique fields in an index is a condition that can lead to a
+{ref}/mapping.html#mapping-limit-settings[mapping explosion].
 
 [float]
 [[apm-add-filter]]
