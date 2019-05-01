@@ -50,11 +50,11 @@ jobs:
         - SCOPE=@elastic/apm-rum
     - stage: test
       env:
-        - STACK_VERSION=7.0.0-beta1
+        - STACK_VERSION=7.0.0
         - SCOPE=@elastic/apm-rum-core
     - stage: test
       env:
-        - STACK_VERSION=7.0.0-beta1
+        - STACK_VERSION=7.0.0
         - SCOPE=@elastic/apm-rum
     - stage: test
       script: npm run build-docs
