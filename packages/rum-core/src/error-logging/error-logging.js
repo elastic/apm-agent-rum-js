@@ -23,29 +23,31 @@
  *
  */
 
-var StackTraceService = require('./stack-trace-service')
-
-var utils = require('../common/utils')
+import StackTraceService from './stack-trace-service'
+import { getPageMetadata, generateRandomId, merge } from '../common/utils'
+import { truncateModel, ERROR_MODEL } from '../common/truncate'
 
 class ErrorLogging {
-  constructor (apmServer, configService, loggingService, transactionService) {
+  constructor(apmServer, configService, loggingService, transactionService) {
     this._apmServer = apmServer
     this._configService = configService
     this._loggingService = loggingService
     this._transactionService = transactionService
-    this._stackTraceService = new StackTraceService(configService, loggingService)
+    this._stackTraceService = new StackTraceService(
+      configService,
+      loggingService
+    )
   }
 
   // errorEvent = {message, filename, lineno, colno, error}
-  createErrorDataModel (errorEvent) {
-    var filePath = this._stackTraceService.cleanFilePath(errorEvent.filename)
-    var fileName = this._stackTraceService.filePathToFileName(filePath)
-    var culprit
-    var frames = this._stackTraceService.createStackTraces(errorEvent)
-    frames = this._stackTraceService.filterInvalidFrames(frames)
+  createErrorDataModel(errorEvent) {
+    const filePath = this._stackTraceService.cleanFilePath(errorEvent.filename)
+    const frames = this._stackTraceService.createStackTraces(errorEvent)
+    const filteredFrames = this._stackTraceService.filterInvalidFrames(frames)
+    let fileName = this._stackTraceService.filePathToFileName(filePath)
 
-    if (!fileName && frames.length) {
-      var lastFrame = frames[frames.length - 1]
+    if (!fileName && filteredFrames.length) {
+      var lastFrame = filteredFrames[filteredFrames.length - 1]
       if (lastFrame.filename) {
         fileName = lastFrame.filename
       } else {
@@ -54,14 +56,16 @@ class ErrorLogging {
       }
     }
 
+    let culprit
     if (this._stackTraceService.isFileInline(filePath)) {
       culprit = '(inline script)'
     } else {
       culprit = fileName
     }
 
-    var message = errorEvent.message || (errorEvent.error && errorEvent.error.message)
-    var errorType = errorEvent.error ? errorEvent.error.name : undefined
+    const message =
+      errorEvent.message || (errorEvent.error && errorEvent.error.message)
+    let errorType = errorEvent.error ? errorEvent.error.name : undefined
     if (!errorType) {
       /**
        * Try to extract type from message formatted like
@@ -74,27 +78,26 @@ class ErrorLogging {
       }
     }
 
-    var configContext = this._configService.get('context')
-    var stringLimit = this._configService.get('serverStringLimit')
-    var errorContext
-    if (errorEvent.error && typeof errorEvent.error === 'object') {
+    const configContext = this._configService.get('context')
+    let errorContext
+    if (typeof errorEvent.error === 'object') {
       errorContext = this._getErrorProperties(errorEvent.error)
     }
-    var browserMetadata = utils.getPageMetadata()
-    var context = utils.merge({}, browserMetadata, configContext, errorContext)
+    const browserMetadata = getPageMetadata()
+    const context = merge({}, browserMetadata, configContext, errorContext)
 
-    var errorObject = {
-      id: utils.generateRandomId(),
-      culprit: utils.sanitizeString(culprit),
+    const errorObject = {
+      id: generateRandomId(),
+      culprit,
       exception: {
-        message: utils.sanitizeString(message, undefined, true),
-        stacktrace: frames,
-        type: utils.sanitizeString(errorType, stringLimit, false)
+        message,
+        stacktrace: filteredFrames,
+        type: errorType
       },
       context
     }
 
-    var currentTransaction = this._transactionService.getCurrentTransaction()
+    const currentTransaction = this._transactionService.getCurrentTransaction()
     if (currentTransaction) {
       errorObject.trace_id = currentTransaction.traceId
       errorObject.parent_id = currentTransaction.id
@@ -104,10 +107,10 @@ class ErrorLogging {
         sampled: currentTransaction.sampled
       }
     }
-    return errorObject
+    return truncateModel(ERROR_MODEL, errorObject)
   }
 
-  logErrorEvent (errorEvent, sendImmediately) {
+  logErrorEvent(errorEvent, sendImmediately) {
     if (this._configService.isActive()) {
       if (typeof errorEvent === 'undefined') {
         return
@@ -124,11 +127,14 @@ class ErrorLogging {
     }
   }
 
-  registerGlobalEventListener () {
+  registerGlobalEventListener() {
     var errorLogging = this
-    window.onerror = function (messageOrEvent, source, lineno, colno, error) {
+    window.onerror = function(messageOrEvent, source, lineno, colno, error) {
       var errorEvent
-      if (typeof messageOrEvent !== 'undefined' && typeof messageOrEvent !== 'string') {
+      if (
+        typeof messageOrEvent !== 'undefined' &&
+        typeof messageOrEvent !== 'string'
+      ) {
         errorEvent = messageOrEvent
       } else {
         errorEvent = {
@@ -143,7 +149,7 @@ class ErrorLogging {
     }
   }
 
-  logError (messageOrError) {
+  logError(messageOrError) {
     var errorEvent = {}
     if (typeof messageOrError === 'string') {
       errorEvent.message = messageOrError
@@ -153,9 +159,9 @@ class ErrorLogging {
     return this.logErrorEvent(errorEvent)
   }
 
-  _getErrorProperties (error) {
+  _getErrorProperties(error) {
     var properties = {}
-    Object.keys(error).forEach(function (key) {
+    Object.keys(error).forEach(function(key) {
       if (key === 'stack') return
       var val = error[key]
       if (val === null) return // null is typeof object and well break the switch below
@@ -173,4 +179,4 @@ class ErrorLogging {
   }
 }
 
-module.exports = ErrorLogging
+export default ErrorLogging

@@ -23,15 +23,15 @@
  *
  */
 
-var globalState = {
+export let globalState = {
   fetchInProgress: false
 }
 
-function apmSymbol (name) {
+export function apmSymbol(name) {
   return '__apm_symbol__' + name
 }
 
-function isPropertyWritable (propertyDesc) {
+function isPropertyWritable(propertyDesc) {
   if (!propertyDesc) {
     return true
   }
@@ -40,14 +40,17 @@ function isPropertyWritable (propertyDesc) {
     return false
   }
 
-  return !(typeof propertyDesc.get === 'function' && typeof propertyDesc.set === 'undefined')
+  return !(
+    typeof propertyDesc.get === 'function' &&
+    typeof propertyDesc.set === 'undefined'
+  )
 }
 
-function attachOriginToPatched (patched, original) {
+function attachOriginToPatched(patched, original) {
   patched[apmSymbol('OriginalDelegate')] = original
 }
 
-function patchMethod (target, name, patchFn) {
+export function patchMethod(target, name, patchFn) {
   var proto = target
   while (proto && !proto.hasOwnProperty(name)) {
     proto = Object.getPrototypeOf(proto)
@@ -66,7 +69,7 @@ function patchMethod (target, name, patchFn) {
     const desc = proto && Object.getOwnPropertyDescriptor(proto, name)
     if (isPropertyWritable(desc)) {
       const patchDelegate = patchFn(delegate, delegateName, name)
-      proto[name] = function () {
+      proto[name] = function() {
         return patchDelegate(this, arguments)
       }
       attachOriginToPatched(proto[name], delegate)
@@ -75,12 +78,7 @@ function patchMethod (target, name, patchFn) {
   return delegate
 }
 
-module.exports = {
-  apmSymbol,
-  patchMethod,
-  globalState,
-  XHR_IGNORE: apmSymbol('xhrIgnore'),
-  XHR_SYNC: apmSymbol('xhrSync'),
-  XHR_URL: apmSymbol('xhrURL'),
-  XHR_METHOD: apmSymbol('xhrMethod')
-}
+export const XHR_IGNORE = apmSymbol('xhrIgnore')
+export const XHR_SYNC = apmSymbol('xhrSync')
+export const XHR_URL = apmSymbol('xhrURL')
+export const XHR_METHOD = apmSymbol('xhrMethod')

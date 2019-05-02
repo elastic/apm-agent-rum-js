@@ -23,25 +23,28 @@
  *
  */
 
-var apmBase = require('../../src/index.js').apmBase
-var apmCore = require('elastic-apm-js-core')
+import { apmBase } from '../../src/'
+import { isPlatformSupported } from '@elastic/apm-rum-core'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
-describe('index', function () {
+const { globalConfigs } = getGlobalConfig()
+
+describe('index', function() {
   var originalTimeout
 
-  beforeEach(function () {
+  beforeEach(function() {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000
   })
 
-  afterEach(function () {
+  afterEach(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
-  it('should init ApmBase', function (done) {
+  it('should init ApmBase', function(done) {
     var apmServer = apmBase.serviceFactory.getService('ApmServer')
-    if (window.globalConfigs && window.globalConfigs.useMocks) {
-      apmServer._makeHttpRequest = function () {
+    if (globalConfigs && globalConfigs.useMocks) {
+      apmServer._makeHttpRequest = function() {
         return Promise.resolve()
       }
     }
@@ -53,15 +56,16 @@ describe('index', function () {
       throw new Error('ApmBase test error')
     } catch (error) {
       apmBase.captureError(error)
-      if (apmCore.utils.isPlatformSupported()) {
+      if (isPlatformSupported()) {
         expect(apmServer.errorQueue).toBeUndefined()
         expect(apmServer.sendErrors).not.toHaveBeenCalled()
         expect(apmServer._postJson).not.toHaveBeenCalled()
       }
     }
+    const { agentConfig } = globalConfigs
     apmBase.init({
-      serverUrl: window.globalConfigs.serverUrl,
-      serviceName: 'apm-agent-js-base-test',
+      serverUrl: agentConfig.serverUrl,
+      serviceName: agentConfig.serviceName,
       flushInterval: 100
     })
 
@@ -79,7 +83,7 @@ describe('index', function () {
     } catch (error) {
       apmBase.captureError(error)
       expect(apmServer.sendErrors).not.toHaveBeenCalled()
-      if (apmCore.utils.isPlatformSupported()) {
+      if (isPlatformSupported()) {
         expect(apmServer.errorQueue.items.length).toBe(1)
         setTimeout(() => {
           expect(apmServer.sendErrors).toHaveBeenCalled()

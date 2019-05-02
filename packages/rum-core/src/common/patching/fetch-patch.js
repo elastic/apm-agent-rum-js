@@ -23,12 +23,12 @@
  *
  */
 
-const { globalState } = require('./patch-utils')
-const { SCHEDULE, INVOKE, FETCH_SOURCE } = require('../constants')
+import { globalState } from './patch-utils'
+import { SCHEDULE, INVOKE, FETCH_SOURCE } from '../constants'
 
 var alreadyPatched = false
 
-function patchFetch (callback) {
+export function patchFetch(callback) {
   if (alreadyPatched) {
     return
   }
@@ -38,18 +38,18 @@ function patchFetch (callback) {
     return
   }
 
-  function scheduleTask (task) {
+  function scheduleTask(task) {
     task.state = SCHEDULE
     callback(SCHEDULE, task)
   }
 
-  function invokeTask (task) {
+  function invokeTask(task) {
     task.state = INVOKE
     callback(INVOKE, task)
   }
 
   var nativeFetch = window.fetch
-  window.fetch = function (input, init) {
+  window.fetch = function(input, init) {
     var fetchSelf = this
     var args = arguments
     var request, url
@@ -77,7 +77,7 @@ function patchFetch (callback) {
       }
     }
 
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       globalState.fetchInProgress = true
       scheduleTask(task)
       var promise
@@ -92,22 +92,24 @@ function patchFetch (callback) {
       }
 
       promise.then(
-        function (response) {
+        function(response) {
           resolve(response)
-          task.data.response = response
-          invokeTask(task)
+
+          // invokeTask in the next execution cycle to let the promise resolution complete
+          Promise.resolve().then(() => {
+            task.data.response = response
+            invokeTask(task)
+          })
         },
-        function (error) {
+        function(error) {
           reject(error)
-          task.data.error = error
-          invokeTask(task)
+          Promise.resolve().then(() => {
+            task.data.error = error
+            invokeTask(task)
+          })
         }
       )
       globalState.fetchInProgress = false
     })
   }
-}
-
-module.exports = {
-  patchFetch
 }

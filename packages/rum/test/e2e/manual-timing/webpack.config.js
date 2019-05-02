@@ -24,14 +24,8 @@
  */
 
 const path = require('path')
-const webpack = require('webpack')
-
-const { getConfig } = require('../../../../../dev-utils/test')
-const globalConfigs = getConfig()
-
-const configJson = JSON.stringify(globalConfigs, undefined, 2)
-const env = { globalConfigs: configJson }
-console.log(configJson)
+const { EnvironmentPlugin } = require('webpack')
+const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 
 module.exports = {
   entry: path.resolve(__dirname, './app.js'),
@@ -48,5 +42,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [new webpack.DefinePlugin(env)]
+  plugins: [new EnvironmentPlugin(getWebpackEnv())]
 }

@@ -25,28 +25,33 @@
 
 const puppeteer = require('puppeteer')
 
-async function runIntegrationTest (pageUrl) {
+async function runIntegrationTest(pageUrl) {
   const browser = await puppeteer.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--remote-debugging-port=9222']
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
   })
-  var result = {}
-  function handleError (error) {
+  const result = {}
+  function handleError(error) {
     console.log(`Error on ${pageUrl}:\n ${String(error)}`)
   }
   try {
     const page = await browser.newPage()
     page.on('error', handleError)
     page.on('pageerror', handleError)
+    page.on('console', msg => {
+      console.log('Page Logs:', msg.text())
+    })
 
     await page.goto(pageUrl, { timeout: 30000 })
     const transactionResponse = await page.waitForResponse(response => {
-      console.log(`${response.request().method()} ${response.url()} ${response.status()}`)
-      var request = response.request()
-      var data = request.postData()
-      var transactionData = false
+      console.log(
+        `${response.request().method()} ${response.url()} ${response.status()}`
+      )
+      const request = response.request()
+      const data = request.postData()
+      let transactionData = false
       if (data) {
-        var payloads = data.split('\n').map(p => p && JSON.parse(p))
+        const payloads = data.split('\n').map(p => p && JSON.parse(p))
         if (payloads[1].hasOwnProperty('transaction')) {
           transactionData = true
         }
@@ -59,7 +64,7 @@ async function runIntegrationTest (pageUrl) {
       )
     })
 
-    var transactionRequest = transactionResponse.request()
+    const transactionRequest = transactionResponse.request()
     result.request = {
       url: transactionResponse.url(),
       method: transactionRequest.method(),
@@ -68,16 +73,21 @@ async function runIntegrationTest (pageUrl) {
     result.response = {
       status: transactionResponse.status()
     }
+  } catch (err) {
+    console.log('[Intgration Tests Error]', err)
+    throw err
   } finally {
     await browser.close()
   }
   return result
 }
 
-// ; (async () => {
-//     var result = await runIntegrationTest('http://localhost:8000/test/e2e/general-usecase/')
-//     console.log(JSON.stringify(result, undefined, 2))
-// })();
+// ;(async () => {
+//   const result = await runIntegrationTest(
+//     'http://localhost:8000/test/e2e/general-usecase/'
+//   )
+//   console.log(JSON.stringify(result, undefined, 2))
+// })()
 
 module.exports = {
   runIntegrationTest

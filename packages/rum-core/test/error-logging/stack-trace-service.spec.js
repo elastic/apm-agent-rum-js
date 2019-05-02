@@ -23,18 +23,18 @@
  *
  */
 
-var StackTraceService = require('../../src/error-logging/stack-trace-service')
-var createServiceFactory = require('..').createServiceFactory
+import { createServiceFactory } from '..'
+import StackTraceService from '../../src/error-logging/stack-trace-service'
 
-describe('StackTraceService', function () {
-  it('should produce correct number of frames', function (done) {
+describe('StackTraceService', function() {
+  it('should produce correct number of frames', function(done) {
     var serviceFactory = createServiceFactory()
     var configService = serviceFactory.getService('ConfigService')
     var stackTraceService = new StackTraceService(configService)
-    function generateError () {
+    function generateError() {
       throw new Error('test error')
     }
-    setTimeout(function () {
+    setTimeout(function() {
       try {
         generateError()
       } catch (error) {

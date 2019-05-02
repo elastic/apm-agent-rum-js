@@ -23,17 +23,17 @@
  *
  */
 
-var path = require('path')
-var request = require('request')
-var fs = require('fs')
+import path from 'path'
+import request from 'request'
+import fs from 'fs'
+import { getTestEnvironmentVariables } from '../../../../dev-utils/test-config'
 
-var basePath = path.join(__dirname, '../e2e')
-const { getConfig } = require('../../../../dev-utils/test')
-const testConfig = getConfig()
+const basePath = path.join(__dirname, '../e2e')
+const { serverUrl } = getTestEnvironmentVariables()
 
-describe('Sourcemaps', function () {
-  it('should upload sourcemaps', function (done) {
-    // curl http://localhost:8200/v1/rum/sourcemaps -X POST -F sourcemap=@app.e2e-bundle.js.map -F service_version=0.0.1 -F bundle_filepath="/test/e2e/general-usecase/app.e2e-bundle.js" -F service_name="apm-agent-js-base-test-e2e-general-usecase"
+describe('Sourcemaps', function() {
+  it('should upload sourcemaps', function(done) {
+    // curl http://localhost:8200/assets/v1/sourcemaps -X POST -F sourcemap=@app.e2e-bundle.js.map -F service_version=0.0.1 -F bundle_filepath="/test/e2e/general-usecase/app.e2e-bundle.js" -F service_name="apm-agent-rum-test-e2e-general-usecase"
     var filepath = path.join(
       basePath,
       'general-usecase/app.e2e-bundle.min.js.map'
@@ -43,15 +43,15 @@ describe('Sourcemaps', function () {
       service_version: '0.0.1',
       bundle_filepath:
         'http://localhost:8000/test/e2e/general-usecase/app.e2e-bundle.min.js',
-      service_name: 'apm-agent-js-base-test-e2e-general-usecase'
+      service_name: 'apm-agent-rum-test-e2e-general-usecase'
     }
 
     request.post(
       {
-        url: testConfig.serverUrl + '/v1/rum/sourcemaps',
+        url: serverUrl + '/assets/v1/sourcemaps',
         formData
       },
-      function (err, resp, body) {
+      function(err, resp, body) {
         if (err || (resp.statusCode !== 200 && resp.statusCode !== 202)) {
           var message = `Error while uploading sourcemaps, error: ${err}, response: ${resp &&
             resp.statusCode}, body: ${body}`

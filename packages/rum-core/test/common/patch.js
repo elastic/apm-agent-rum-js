@@ -23,12 +23,12 @@
  *
  */
 
-var patchAll = require('../../src/common/patching/').patchAll
+import { patchAll } from '../../src/common/patching/'
 
 if (!window['__patchSubscription']) {
   var nativeFetch = window.fetch
   if (nativeFetch) {
-    window.fetch = function () {
+    window.fetch = function() {
       var delegate = window['__fetchDelegate']
       if (typeof delegate === 'function') {
         return delegate.apply(this, arguments)
@@ -37,8 +37,8 @@ if (!window['__patchSubscription']) {
       }
     }
   }
-  console.log('patchservice')
+  console.log('Pathching XHR and FETCH calls')
   window['__patchSubscription'] = patchAll()
 }
 
-module.exports = window['__patchSubscription']
+export default window['__patchSubscription']

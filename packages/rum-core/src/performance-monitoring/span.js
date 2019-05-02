@@ -23,10 +23,10 @@
  *
  */
 
-const BaseSpan = require('./span-base')
+import BaseSpan from './span-base'
 
 class Span extends BaseSpan {
-  constructor (name, type, options) {
+  constructor(name, type, options) {
     super(name, type, options)
     this.parentId = this.options.parentId
     this.subType = undefined
@@ -41,4 +41,4 @@ class Span extends BaseSpan {
   }
 }
 
-module.exports = Span
+export default Span

@@ -23,35 +23,23 @@
  *
  */
 
-function launchSauceConnect (userConfig, done) {
-  var sauceConnectLauncher = require('sauce-connect-launcher')
+import { apmBase } from '../../src'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import ApmServerMock from '../../../rum-core/test/utils/apm-server-mock'
 
-  var config = {
-    username: userConfig && (userConfig.username || process.env.SAUCE_USERNAME),
-    accessKey: userConfig && (userConfig.accessKey || process.env.SAUCE_ACCESS_KEY),
-    logger: console.log,
-    noSslBumpDomains: 'all'
+const { globalConfigs } = getGlobalConfig()
+
+function createApmBase(config) {
+  console.log('E2E Global Configs', JSON.stringify(globalConfigs, null, 2))
+  const apmServer = apmBase.serviceFactory.getService('ApmServer')
+  const { serverUrl } = globalConfigs.agentConfig
+  if (serverUrl) {
+    config.serverUrl = serverUrl
   }
+  const serverMock = new ApmServerMock(apmServer, globalConfigs.useMocks)
+  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
 
-  var tryConnect = function (maxAttempts, currAttempts, done) {
-    sauceConnectLauncher(config, function (err) {
-      if (err) {
-        console.error(err.message)
-        if (currAttempts <= maxAttempts) {
-          console.log('Retrying... (attempt ' + currAttempts + ' of ' + maxAttempts + ')')
-          tryConnect(maxAttempts, ++currAttempts, done)
-        } else {
-          return process.exit(1)
-        }
-      } else {
-        console.log('Sauce Connect ready')
-        done()
-      }
-    })
-  }
+  return apmBase.init(config)
+}
 
-  tryConnect(3, 1, done)
-}
-module.exports = {
-  launchSauceConnect
-}
+export default createApmBase

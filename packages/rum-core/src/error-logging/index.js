@@ -23,17 +23,22 @@
  *
  */
 
-const ErrorLogging = require('./error-logging')
+import ErrorLogging from './error-logging'
 
-module.exports = {
+export default {
   ErrorLogging,
-  registerServices: function registerServices (serviceFactory) {
-    serviceFactory.registerServiceCreator('ErrorLogging', function () {
+  registerServices: function registerServices(serviceFactory) {
+    serviceFactory.registerServiceCreator('ErrorLogging', function() {
       const apmService = serviceFactory.getService('ApmServer')
       const configService = serviceFactory.getService('ConfigService')
       const loggingService = serviceFactory.getService('LoggingService')
       const transactionService = serviceFactory.getService('TransactionService')
-      return new ErrorLogging(apmService, configService, loggingService, transactionService)
+      return new ErrorLogging(
+        apmService,
+        configService,
+        loggingService,
+        transactionService
+      )
     })
   }
 }

@@ -23,13 +23,13 @@
  *
  */
 
-var Transaction = require('./transaction')
-var utils = require('../common/utils')
-var Subscription = require('../common/subscription')
+import Transaction from './transaction'
+import { isUndefined, extend } from '../common/utils'
+import Subscription from '../common/subscription'
+import { captureHardNavigation } from './capture-hard-navigation'
 
-var captureHardNavigation = require('./capture-hard-navigation').captureHardNavigation
 class TransactionService {
-  constructor (logger, config) {
+  constructor(logger, config) {
     if (typeof config === 'undefined') {
       logger.debug('TransactionService: config is not provided')
     }
@@ -42,32 +42,32 @@ class TransactionService {
     this._alreadyCapturedPageLoad = false
   }
 
-  shouldCreateTransaction () {
+  shouldCreateTransaction() {
     return this._config.isActive()
   }
 
-  getOrCreateCurrentTransaction () {
+  getOrCreateCurrentTransaction() {
     if (!this.shouldCreateTransaction()) {
       return
     }
     var tr = this.getCurrentTransaction()
-    if (!utils.isUndefined(tr) && !tr.ended) {
+    if (!isUndefined(tr) && !tr.ended) {
       return tr
     }
     return this.createZoneTransaction()
   }
 
-  getCurrentTransaction () {
+  getCurrentTransaction() {
     return this.currentTransaction
   }
 
-  setCurrentTransaction (value) {
+  setCurrentTransaction(value) {
     this.currentTransaction = value
   }
 
-  createTransaction (name, type, options) {
+  createTransaction(name, type, options) {
     var perfOptions = options
-    if (utils.isUndefined(perfOptions)) {
+    if (isUndefined(perfOptions)) {
       perfOptions = this._config.config
     }
     if (!this.shouldCreateTransaction()) {
@@ -81,19 +81,19 @@ class TransactionService {
     }
     return tr
   }
-  createZoneTransaction () {
+  createZoneTransaction() {
     return this.createTransaction('ZoneTransaction', 'transaction')
   }
 
-  startCounter (transaction) {
+  startCounter(transaction) {
     transaction.browserResponsivenessCounter = 0
     var interval = this._config.get('browserResponsivenessInterval')
     if (typeof interval === 'undefined') {
       this._logger.debug('browserResponsivenessInterval is undefined!')
       return
     }
-    this.runOuter(function () {
-      var id = setInterval(function () {
+    this.runOuter(function() {
+      var id = setInterval(function() {
         if (transaction.ended) {
           window.clearInterval(id)
         } else {
@@ -103,16 +103,20 @@ class TransactionService {
     })
   }
 
-  sendPageLoadMetrics (name) {
+  sendPageLoadMetrics(name) {
     var tr = this.startTransaction(name, 'page-load')
     tr.detectFinish()
     return tr
   }
 
-  capturePageLoadMetrics (tr) {
+  capturePageLoadMetrics(tr) {
     var self = this
     var capturePageLoad = self._config.get('capturePageLoad')
-    if (capturePageLoad && !self._alreadyCapturedPageLoad && tr.isHardNavigation) {
+    if (
+      capturePageLoad &&
+      !self._alreadyCapturedPageLoad &&
+      tr.isHardNavigation
+    ) {
       tr.addMarks(self.marks)
       captureHardNavigation(tr)
       self._alreadyCapturedPageLoad = true
@@ -120,11 +124,11 @@ class TransactionService {
     }
   }
 
-  startTransaction (name, type, options) {
+  startTransaction(name, type, options) {
     var self = this
     var config = self._config.config
 
-    var perfOptions = utils.extend(
+    var perfOptions = extend(
       {
         pageLoadTraceId: config.pageLoadTraceId,
         pageLoadSampled: config.pageLoadSampled,
@@ -164,7 +168,7 @@ class TransactionService {
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
-      if (typeof perfOptions.pageLoadSampled !== 'undefined') {
+      if (perfOptions.pageLoadSampled) {
         tr.sampled = perfOptions.pageLoadSampled
       }
 
@@ -174,12 +178,15 @@ class TransactionService {
     }
 
     this._logger.debug('TransactionService.startTransaction', tr)
-    tr.onEnd = function () {
-      self.applyAsync(function () {
+    tr.onEnd = function() {
+      self.applyAsync(function() {
         self._logger.debug('TransactionService transaction finished', tr)
         if (!self.shouldIgnoreTransaction(tr.name)) {
           if (type === 'page-load') {
-            if (tr.name === 'Unknown' && self._config.get('pageLoadTransactionName')) {
+            if (
+              tr.name === 'Unknown' &&
+              self._config.get('pageLoadTransactionName')
+            ) {
               tr.name = self._config.get('pageLoadTransactionName')
             }
             var captured = self.capturePageLoadMetrics(tr)
@@ -195,20 +202,20 @@ class TransactionService {
     return tr
   }
 
-  applyAsync (fn, applyThis, applyArgs) {
-    return this.runOuter(function () {
+  applyAsync(fn, applyThis, applyArgs) {
+    return this.runOuter(function() {
       return Promise.resolve().then(
-        function () {
+        function() {
           return fn.apply(applyThis, applyArgs)
         },
-        function (reason) {
+        function(reason) {
           console.log(reason)
         }
       )
     })
   }
 
-  shouldIgnoreTransaction (transactionName) {
+  shouldIgnoreTransaction(transactionName) {
     var ignoreList = this._config.get('ignoreTransactions')
 
     for (var i = 0; i < ignoreList.length; i++) {
@@ -224,7 +231,7 @@ class TransactionService {
     return false
   }
 
-  startSpan (name, type, options) {
+  startSpan(name, type, options) {
     var trans = this.getOrCreateCurrentTransaction()
 
     if (trans) {
@@ -234,7 +241,7 @@ class TransactionService {
     }
   }
 
-  add (transaction) {
+  add(transaction) {
     if (!this._config.isActive()) {
       return
     }
@@ -243,38 +250,38 @@ class TransactionService {
     this._logger.debug('TransactionService.add', transaction)
   }
 
-  subscribe (fn) {
+  subscribe(fn) {
     return this._subscription.subscribe(fn)
   }
 
-  addTask (taskId) {
+  addTask(taskId) {
     var tr = this.getOrCreateCurrentTransaction()
     if (tr) {
-      tr.addTask(taskId)
+      var taskId = tr.addTask(taskId)
       this._logger.debug('TransactionService.addTask', taskId)
     }
     return taskId
   }
 
-  removeTask (taskId) {
+  removeTask(taskId) {
     var tr = this.getCurrentTransaction()
-    if (!utils.isUndefined(tr) && !tr.ended) {
+    if (!isUndefined(tr) && !tr.ended) {
       tr.removeTask(taskId)
       this._logger.debug('TransactionService.removeTask', taskId)
     }
   }
 
-  detectFinish () {
+  detectFinish() {
     var tr = this.getCurrentTransaction()
-    if (!utils.isUndefined(tr) && !tr.ended) {
+    if (!isUndefined(tr) && !tr.ended) {
       tr.detectFinish()
       this._logger.debug('TransactionService.detectFinish')
     }
   }
 
-  runOuter (fn, applyThis, applyArgs) {
+  runOuter(fn, applyThis, applyArgs) {
     return fn.apply(applyThis, applyArgs)
   }
 }
 
-module.exports = TransactionService
+export default TransactionService

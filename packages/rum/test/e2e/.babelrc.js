@@ -6,13 +6,14 @@ module.exports = function(api) {
         '@babel/preset-env',
         {
           targets: {
-            ie: '10'
+            ie: '11'
           },
           useBuiltIns: false,
           modules: 'umd'
         }
       ],
       ['@babel/preset-react']
-    ]
+    ],
+    plugins: ['@babel/plugin-transform-destructuring']
   }
 }

@@ -23,7 +23,7 @@
  *
  */
 
-module.exports = [
+export default [
   {
     name: 'first-paint',
     entryType: 'paint',

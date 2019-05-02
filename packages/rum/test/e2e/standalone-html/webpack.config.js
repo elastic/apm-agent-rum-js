@@ -23,21 +23,30 @@
  *
  */
 
-const { apmBase } = require('../../src/index.js')
-const { getConfig } = require('../../../../dev-utils/test')
-const testConfig = getConfig()
+const path = require('path')
+const { EnvironmentPlugin } = require('webpack')
+const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 
-describe('ApmBase', function () {
-  it('should not init ApmBase', function () {
-    apmBase.init({
-      serverUrl: testConfig.serverUrl,
-      serviceName: 'apm-agent-js-base-test'
-    })
-    try {
-      throw new Error('ApmBase test error')
-    } catch (error) {
-      var result = apmBase.captureError(error)
-      expect(result).toBeUndefined()
-    }
-  })
-})
+module.exports = {
+  entry: {
+    base: path.join(__dirname, 'base'),
+    opentracing: path.join(__dirname, 'opentracing')
+  },
+  output: {
+    path: path.resolve(__dirname),
+    filename: '[name].e2e-bundle.js'
+  },
+  target: 'web',
+  mode: 'none',
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: {
+          loader: 'babel-loader'
+        }
+      }
+    ]
+  },
+  plugins: [new EnvironmentPlugin(getWebpackEnv())]
+}

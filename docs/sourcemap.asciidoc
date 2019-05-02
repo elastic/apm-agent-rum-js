@@ -1,14 +1,18 @@
 [[sourcemap]]
 == Source Maps
 
-It is a common practice to minify JavaScript bundles.
+TIP: Additional information on the source map endpoint is available in the
+APM Server's {apm-server-ref-v}/sourcemaps.html[source map documentation].
+Don't forget, you must enable {apm-server-ref-v}/configuration-rum.html[RUM support] in the APM Server for this endpoint to work.
+
+It's a common practice to minify JavaScript bundles.
 However, debugging minified files is inherently difficult. To resolve this issue,
 you can generate source maps for your bundles and upload them to the APM server.
 
-Here is an example to generate source maps with webpack and configure the JavaScript agent accordingly.
-For a detailed description of APM Server source map endpoint see {apm-server-ref-v}/sourcemaps.html[our documentation].
+Here's an example that shows how to generate source maps with webpack,
+and configure the JavaScript agent accordingly.
 
-First you need to configure webpack to generate source map and provide the service version to your app:
+First, you need to configure webpack to generate source maps and provide the service version to your app:
 
 [source,js]
 ----
@@ -59,7 +63,7 @@ Then you can use the provided service version to set the "serviceVersion" config
 
 [source,js]
 ----
-import { init as initApm } from 'elastic-apm-js-base'
+import { init as initApm } from '@elastic/apm-rum'
 var apm = initApm({
   // Set required service name
   serviceName: 'service-name',
@@ -85,7 +89,7 @@ var formData = {
   bundle_filepath: 'http://localhost/app.min.js',
   service_name: 'service-name'
 }
-request.post({url: 'http://localhost:8200/v1/rum/sourcemaps',formData: formData}, function (err, resp, body) {
+request.post({url: 'http://localhost:8200/assets/v1/sourcemaps',formData: formData}, function (err, resp, body) {
   if (err) {
     console.log('Error while uploading sourcemaps!', err)
   } else {
@@ -99,7 +103,7 @@ You can also use `curl` command:
 [source,sh]
 ----
 SERVICEVERSION=`node -e "console.log(require('./package.json').version);"` && \
-curl http://localhost:8200/v1/rum/sourcemaps -X POST \
+curl http://localhost:8200/assets/v1/sourcemaps -X POST \
     -F sourcemap=@./dist/app.min.js.map \
     -F service_version="$SERVICEVERSION" \
     -F bundle_filepath="http://localhost/app.min.js" \
@@ -111,7 +115,7 @@ Or use current git commit hash:
 [source,sh]
 ----
 SERVICEVERSION=`git rev-parse --short HEAD` && \
-curl http://localhost:8200/v1/rum/sourcemaps -X POST \
+curl http://localhost:8200/assets/v1/sourcemaps -X POST \
     -F sourcemap=@./dist/app.min.js.map \
     -F service_version="$SERVICEVERSION" \
     -F bundle_filepath="http://localhost/app.min.js" \
@@ -130,10 +134,14 @@ Here's how to add the secret token to a curl command:
 [source,sh]
 ----
 SERVICEVERSION=`git rev-parse --short HEAD` && \
-curl http://localhost:8200/v1/rum/sourcemaps -X POST \
+curl http://localhost:8200/assets/v1/sourcemaps -X POST \
     -F sourcemap=@./dist/app.min.js.map \
     -F service_version="$SERVICEVERSION" \
     -F bundle_filepath="http://localhost/app.min.js" \
     -F service_name="service-name" \
     -H "Authorization: Bearer <token>"
 ----
+
+
+NOTE: Please note that the previously provided endpoint (`/v1/rum/sourcemaps`) 
+has been deprecated and will be removed starting with APM Server version 7.0+.

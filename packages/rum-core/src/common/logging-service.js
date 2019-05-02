@@ -23,10 +23,10 @@
  *
  */
 
-const { noop } = require('./utils')
+import { noop } from './utils'
 
 class LoggingService {
-  constructor (spec) {
+  constructor(spec) {
     if (!spec) spec = {}
     this.levels = ['trace', 'debug', 'info', 'warn', 'error']
     this.level = spec.level || 'info'
@@ -35,21 +35,21 @@ class LoggingService {
     this.resetLogMethods()
   }
 
-  shouldLog (level) {
+  shouldLog(level) {
     return this.levels.indexOf(level) >= this.levels.indexOf(this.level)
   }
 
-  setLevel (level) {
+  setLevel(level) {
     this.level = level
     this.resetLogMethods()
   }
 
-  resetLogMethods () {
+  resetLogMethods() {
     var loggingService = this
-    this.levels.forEach(function (level) {
+    this.levels.forEach(function(level) {
       loggingService[level] = loggingService.shouldLog(level) ? log : noop
 
-      function log () {
+      function log() {
         var prefix = loggingService.prefix
         var normalizedLevel
 
@@ -69,7 +69,9 @@ class LoggingService {
           args[0] = prefix + args[0]
         }
         if (console) {
-          var realMethod = console[normalizedLevel] ? console[normalizedLevel] : console.log
+          var realMethod = console[normalizedLevel]
+            ? console[normalizedLevel]
+            : console.log
           if (typeof realMethod === 'function') {
             realMethod.apply(console, args)
           }
@@ -79,4 +81,4 @@ class LoggingService {
   }
 }
 
-module.exports = LoggingService
+export default LoggingService

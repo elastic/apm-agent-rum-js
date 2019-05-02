@@ -23,9 +23,9 @@
  *
  */
 
-const Span = require('./span')
-const SpanBase = require('./span-base')
-const {
+import Span from './span'
+import SpanBase from './span-base'
+import {
   generateRandomId,
   getNavigationTimingMarks,
   getPaintTimingMarks,
@@ -33,10 +33,10 @@ const {
   extend,
   getPageMetadata,
   removeInvalidChars
-} = require('../common/utils')
+} from '../common/utils'
 
 class Transaction extends SpanBase {
-  constructor (name, type, options) {
+  constructor(name, type, options) {
     super(name, type, options)
     this.traceId = generateRandomId()
     this.marks = undefined
@@ -44,20 +44,19 @@ class Transaction extends SpanBase {
     this.spans = []
     this._activeSpans = {}
 
-    this._scheduledTasks = {}
-
-    this.nextAutoTaskId = 0
+    this.nextAutoTaskId = 1
+    this._scheduledTasks = []
 
     this.isHardNavigation = false
 
     this.sampled = Math.random() <= this.options.transactionSampleRate
   }
 
-  addNavigationTimingMarks () {
-    var marks = getNavigationTimingMarks()
-    var paintMarks = getPaintTimingMarks()
+  addNavigationTimingMarks() {
+    const marks = getNavigationTimingMarks()
+    const paintMarks = getPaintTimingMarks()
     if (marks) {
-      var agent = {
+      const agent = {
         timeToFirstByte: marks.responseStart,
         domInteractive: marks.domInteractive,
         domComplete: marks.domComplete
@@ -69,33 +68,32 @@ class Transaction extends SpanBase {
     }
   }
 
-  addMarks (obj) {
+  addMarks(obj) {
     this.marks = merge(this.marks || {}, obj)
   }
 
-  mark (key) {
-    var skey = removeInvalidChars(key)
-    var now = window.performance.now() - this._start
-    var custom = {}
+  mark(key) {
+    const skey = removeInvalidChars(key)
+    const now = window.performance.now() - this._start
+    const custom = {}
     custom[skey] = now
     this.addMarks({ custom })
   }
 
-  redefine (name, type, options) {
+  redefine(name, type, options) {
     this.name = name
     this.type = type
     this.options = options
   }
 
-  startSpan (name, type, options) {
+  startSpan(name, type, options) {
     if (this.ended) {
       return
     }
-    var transaction = this
-    var opts = extend({}, options)
+    const opts = extend({}, options)
 
-    opts.onEnd = function (trc) {
-      transaction._onSpanEnd(trc)
+    opts.onEnd = trc => {
+      this._onSpanEnd(trc)
     }
     opts.traceId = this.traceId
     opts.sampled = this.sampled
@@ -104,35 +102,34 @@ class Transaction extends SpanBase {
       opts.parentId = this.id
     }
 
-    var span = new Span(name, type, opts)
+    const span = new Span(name, type, opts)
     this._activeSpans[span.id] = span
 
     return span
   }
 
-  isFinished () {
-    var scheduledTasks = Object.keys(this._scheduledTasks)
-    return scheduledTasks.length === 0
+  isFinished() {
+    return this._scheduledTasks.length === 0
   }
 
-  detectFinish () {
+  detectFinish() {
     if (this.isFinished()) this.end()
   }
 
-  end () {
+  end() {
     if (this.ended) {
       return
     }
     this.ended = true
     this._end = window.performance.now()
     // truncate active spans
-    for (var sid in this._activeSpans) {
-      var span = this._activeSpans[sid]
+    for (let sid in this._activeSpans) {
+      const span = this._activeSpans[sid]
       span.type = span.type + '.truncated'
       span.end()
     }
 
-    var metadata = getPageMetadata()
+    const metadata = getPageMetadata()
     this.addContext(metadata)
 
     this._adjustStartToEarliestSpan()
@@ -140,44 +137,48 @@ class Transaction extends SpanBase {
     this.callOnEnd()
   }
 
-  addTask (taskId) {
-    // todo: should not accept more tasks if the transaction is alreadyFinished]
+  addTask(taskId) {
     if (typeof taskId === 'undefined') {
-      taskId = 'autoId' + this.nextAutoTaskId++
+      taskId = 'task' + this.nextAutoTaskId++
     }
-    this._scheduledTasks[taskId] = taskId
-    return taskId
+    if (this._scheduledTasks.indexOf(taskId) == -1) {
+      this._scheduledTasks.push(taskId)
+      return taskId
+    }
   }
 
-  removeTask (taskId) {
-    delete this._scheduledTasks[taskId]
+  removeTask(taskId) {
+    let index = this._scheduledTasks.indexOf(taskId)
+    if (index > -1) {
+      this._scheduledTasks.splice(index, 1)
+    }
     this.detectFinish()
   }
 
-  addEndedSpans (existingSpans) {
+  addEndedSpans(existingSpans) {
     this.spans = this.spans.concat(existingSpans)
   }
 
-  resetSpans () {
+  resetSpans() {
     this.spans = []
   }
 
-  _onSpanEnd (span) {
+  _onSpanEnd(span) {
     this.spans.push(span)
     // Remove span from _activeSpans
     delete this._activeSpans[span.id]
   }
 
-  _adjustEndToLatestSpan () {
-    var latestSpan = findLatestNonXHRSpan(this.spans)
+  _adjustEndToLatestSpan() {
+    const latestSpan = findLatestNonXHRSpan(this.spans)
 
     if (latestSpan) {
       this._end = latestSpan._end
 
       // set all spans that now are longer than the transaction to
       // be truncated spans
-      for (var i = 0; i < this.spans.length; i++) {
-        var span = this.spans[i]
+      for (let i = 0; i < this.spans.length; i++) {
+        const span = this.spans[i]
         if (span._end > this._end) {
           span._end = this._end
           span.type = span.type + '.truncated'
@@ -189,8 +190,8 @@ class Transaction extends SpanBase {
     }
   }
 
-  _adjustStartToEarliestSpan () {
-    var span = getEarliestSpan(this.spans)
+  _adjustStartToEarliestSpan() {
+    const span = getEarliestSpan(this.spans)
 
     if (span && span._start < this._start) {
       this._start = span._start
@@ -198,10 +199,10 @@ class Transaction extends SpanBase {
   }
 }
 
-function findLatestNonXHRSpan (spans) {
-  var latestSpan = null
-  for (var i = 0; i < spans.length; i++) {
-    var span = spans[i]
+function findLatestNonXHRSpan(spans) {
+  let latestSpan = null
+  for (let i = 0; i < spans.length; i++) {
+    const span = spans[i]
     if (
       span.type &&
       span.type.indexOf('ext') === -1 &&
@@ -214,10 +215,10 @@ function findLatestNonXHRSpan (spans) {
   return latestSpan
 }
 
-function getEarliestSpan (spans) {
-  var earliestSpan = null
+function getEarliestSpan(spans) {
+  let earliestSpan = null
 
-  spans.forEach(function (span) {
+  spans.forEach(function(span) {
     if (!earliestSpan) {
       earliestSpan = span
     }
@@ -229,4 +230,4 @@ function getEarliestSpan (spans) {
   return earliestSpan
 }
 
-module.exports = Transaction
+export default Transaction

@@ -23,18 +23,21 @@
  *
  */
 
-const Queue = require('./queue')
-const throttle = require('./throttle')
-const { sanitizeString } = require('./utils')
-const NDJSON = require('./ndjson')
-const { XHR_IGNORE } = require('./patching/patch-utils')
+import Queue from './queue'
+import throttle from './throttle'
+import NDJSON from './ndjson'
+import { XHR_IGNORE } from './patching/patch-utils'
+import { truncateModel, METADATA_MODEL } from './truncate'
 
 class ApmServer {
-  constructor (configService, loggingService) {
+  constructor(configService, loggingService) {
     this._configService = configService
     this._loggingService = loggingService
     this.logMessages = {
-      invalidConfig: { message: 'Configuration is invalid!', level: 'warn' }
+      invalidConfig: {
+        message: 'RUM agent configuration is invalid!',
+        level: 'warn'
+      }
     }
 
     this.errorQueue = undefined
@@ -47,7 +50,7 @@ class ApmServer {
     this.ndjsonSpan = {}
   }
 
-  init () {
+  init() {
     if (this.initialized) {
       return
     }
@@ -57,32 +60,33 @@ class ApmServer {
     this.initTransactionQueue()
   }
 
-  createServiceObject () {
-    var cfg = this._configService
-    var stringLimit = cfg.get('serverStringLimit')
-
-    var serviceObject = {
-      name: sanitizeString(cfg.get('serviceName'), stringLimit, true),
-      version: sanitizeString(cfg.get('serviceVersion'), stringLimit, false),
-      agent: {
-        name: cfg.get('agentName'),
-        version: cfg.get('agentVersion')
-      },
-      language: {
-        name: 'javascript'
+  createMetaData() {
+    const cfg = this._configService
+    const metadata = {
+      service: {
+        name: cfg.get('serviceName'),
+        version: cfg.get('serviceVersion'),
+        agent: {
+          name: 'js-base',
+          version: cfg.version
+        },
+        language: {
+          name: 'javascript'
+        },
+        environment: cfg.get('environment')
       }
     }
-    return serviceObject
+    return truncateModel(METADATA_MODEL, metadata)
   }
 
-  _postJson (endPoint, payload) {
+  _postJson(endPoint, payload) {
     return this._makeHttpRequest('POST', endPoint, payload, {
       'Content-Type': 'application/x-ndjson'
     })
   }
 
-  _makeHttpRequest (method, url, payload, headers) {
-    return new Promise(function (resolve, reject) {
+  _makeHttpRequest(method, url, payload, headers) {
+    return new Promise(function(resolve, reject) {
       var xhr = new window.XMLHttpRequest()
       xhr[XHR_IGNORE] = true
       xhr.open(method, url, true)
@@ -96,7 +100,7 @@ class ApmServer {
         }
       }
 
-      xhr.onreadystatechange = function () {
+      xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
           var status = xhr.status
           if (status === 0 || (status > 399 && status < 600)) {
@@ -110,7 +114,7 @@ class ApmServer {
         }
       }
 
-      xhr.onerror = function (err) {
+      xhr.onerror = function(err) {
         reject(err)
       }
 
@@ -118,24 +122,21 @@ class ApmServer {
     })
   }
 
-  _createQueue (onFlush) {
+  _createQueue(onFlush) {
     var queueLimit = this._configService.get('queueLimit')
     var flushInterval = this._configService.get('flushInterval')
-    return new Queue(onFlush, {
-      queueLimit,
-      flushInterval
-    })
+    return new Queue(onFlush, { queueLimit, flushInterval })
   }
 
-  initErrorQueue () {
+  initErrorQueue() {
     var apmServer = this
     if (this.errorQueue) {
       this.errorQueue.flush()
     }
-    this.errorQueue = this._createQueue(function (errors) {
+    this.errorQueue = this._createQueue(function(errors) {
       var p = apmServer.sendErrors(errors)
       if (p) {
-        p.then(undefined, function (reason) {
+        p.then(undefined, function(reason) {
           apmServer._loggingService.warn('Failed sending errors!', reason)
         })
       }
@@ -146,25 +147,22 @@ class ApmServer {
 
     this.throttleAddError = throttle(
       this.errorQueue.add.bind(this.errorQueue),
-      function () {
+      function() {
         apmServer._loggingService.warn('Dropped error due to throttling!')
       },
-      {
-        limit,
-        interval
-      }
+      { limit, interval }
     )
   }
 
-  initTransactionQueue () {
+  initTransactionQueue() {
     var apmServer = this
     if (this.transactionQueue) {
       this.transactionQueue.flush()
     }
-    this.transactionQueue = this._createQueue(function (transactions) {
+    this.transactionQueue = this._createQueue(function(transactions) {
       var p = apmServer.sendTransactions(transactions)
       if (p) {
-        p.then(undefined, function (reason) {
+        p.then(undefined, function(reason) {
           apmServer._loggingService.warn('Failed sending transactions!', reason)
         })
       }
@@ -175,35 +173,28 @@ class ApmServer {
 
     this.throttleAddTransaction = throttle(
       this.transactionQueue.add.bind(this.transactionQueue),
-      function () {
+      function() {
         apmServer._loggingService.warn('Dropped transaction due to throttling!')
       },
-      {
-        limit,
-        interval
-      }
+      { limit, interval }
     )
   }
 
-  addError (error) {
-    if (this._configService.isActive()) {
-      if (!this.errorQueue) {
-        this.initErrorQueue()
-      }
-      this.throttleAddError(error)
+  addError(error) {
+    if (!this.errorQueue) {
+      this.initErrorQueue()
     }
+    this.throttleAddError(error)
   }
 
-  addTransaction (transaction) {
-    if (this._configService.isActive()) {
-      if (!this.transactionQueue) {
-        this.initTransactionQueue()
-      }
-      this.throttleAddTransaction(transaction)
+  addTransaction(transaction) {
+    if (!this.transactionQueue) {
+      this.initTransactionQueue()
     }
+    this.throttleAddTransaction(transaction)
   }
 
-  warnOnce (logObject) {
+  warnOnce(logObject) {
     if (logObject.level === 'warn') {
       logObject.level = 'debug'
       this._loggingService.warn(logObject.message)
@@ -212,43 +203,19 @@ class ApmServer {
     }
   }
 
-  ndjsonErrors (errors) {
-    return errors.map(function (error) {
+  ndjsonErrors(errors) {
+    return errors.map(function(error) {
       return NDJSON.stringify({ error })
     })
   }
 
-  sendErrors (errors) {
-    if (this._configService.isValid() && this._configService.isActive()) {
-      if (errors && errors.length > 0) {
-        var payload = {
-          service: this.createServiceObject(),
-          errors
-        }
-
-        payload = this._configService.applyFilters(payload)
-        if (payload) {
-          var endPoint = this._configService.getEndpointUrl('errors')
-          var ndjson = this.ndjsonErrors(payload.errors)
-          ndjson.unshift(NDJSON.stringify({ metadata: { service: payload.service } }))
-          var ndjsonPayload = ndjson.join('')
-          return this._postJson(endPoint, ndjsonPayload)
-        } else {
-          this._loggingService.warn('Dropped payload due to filtering!')
-        }
-      }
-    } else {
-      this.warnOnce(this.logMessages.invalidConfig)
-    }
-  }
-
-  ndjsonTransactions (transactions) {
+  ndjsonTransactions(transactions) {
     var ndjsonSpan = this.ndjsonSpan
-    return transactions.map(function (tr) {
+    return transactions.map(function(tr) {
       var spans = ''
       if (tr.spans) {
         spans = tr.spans
-          .map(function (sp) {
+          .map(function(sp) {
             ndjsonSpan.span = sp
             return NDJSON.stringify(ndjsonSpan)
           })
@@ -259,28 +226,47 @@ class ApmServer {
     })
   }
 
-  sendTransactions (transactions) {
-    if (this._configService.isValid() && this._configService.isActive()) {
-      if (transactions && transactions.length > 0) {
-        var payload = {
-          service: this.createServiceObject(),
-          transactions
-        }
-        payload = this._configService.applyFilters(payload)
-        if (payload) {
-          var endPoint = this._configService.getEndpointUrl('transactions')
-          var ndjson = this.ndjsonTransactions(payload.transactions)
-          ndjson.unshift(NDJSON.stringify({ metadata: { service: payload.service } }))
-          var ndjsonPayload = ndjson.join('')
-          return this._postJson(endPoint, ndjsonPayload)
-        } else {
-          this._loggingService.warn('Dropped payload due to filtering!')
-        }
-      }
-    } else {
+  _send(data = [], type = 'transaction') {
+    if (!this._configService.isValid()) {
       this.warnOnce(this.logMessages.invalidConfig)
+      return
     }
+    if (data.length === 0) {
+      return
+    }
+    const { service } = this.createMetaData()
+    const payload = { service, data }
+
+    const filteredPayload = this._configService.applyFilters(payload)
+    if (!filteredPayload) {
+      this._loggingService.warn('Dropped payload due to filtering!')
+      return
+    }
+
+    const endPoint = this._configService.getEndpointUrl()
+    let ndjson
+    if (type === 'errors') {
+      ndjson = this.ndjsonErrors(filteredPayload.data)
+    } else if (type === 'transaction') {
+      ndjson = this.ndjsonTransactions(filteredPayload.data)
+    } else {
+      this._loggingService.debug('Dropped payload due to unknown data type ')
+      return
+    }
+    ndjson.unshift(
+      NDJSON.stringify({ metadata: { service: filteredPayload.service } })
+    )
+    const ndjsonPayload = ndjson.join('')
+    return this._postJson(endPoint, ndjsonPayload)
+  }
+
+  sendTransactions(transactions) {
+    return this._send(transactions)
+  }
+
+  sendErrors(errors) {
+    return this._send(errors, 'errors')
   }
 }
 
-module.exports = ApmServer
+export default ApmServer

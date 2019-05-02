@@ -53,15 +53,16 @@ const LICENSE_WHITELIST = [
   'CC-BY-3.0',
   'CC-BY-4.0',
   'Unlicense',
-  'Artistic-2.0'
+  'Artistic-2.0',
+  'WTFPL'
 ]
 
 /**
  * Packages that must be ignored during license check
  */
-const IGNORE_LIST = ['colors@0.6.2', 'elastic-apm-rum@3.0.0']
+const IGNORE_LIST = ['colors@0.6.2', 'elastic-apm-rum@0.0.0-monorepo']
 
-function generateInvalidMessage (name, path, licenses) {
+function generateInvalidMessage(name, path, licenses) {
   return `
   name: ${name}
   path: ${path}
@@ -69,7 +70,7 @@ function generateInvalidMessage (name, path, licenses) {
 `
 }
 
-function runLicenseChecker () {
+function runLicenseChecker() {
   return new Promise((resolve, reject) => {
     licenseChecker.init({ start: ROOT_REPO, json: true }, (err, packages) => {
       if (err) {
@@ -81,7 +82,7 @@ function runLicenseChecker () {
   })
 }
 
-;(async function () {
+;(async function() {
   const packagesList = await runLicenseChecker()
   const errors = []
 

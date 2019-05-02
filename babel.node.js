@@ -23,7 +23,20 @@
  *
  */
 
-const indexExports = require('./index')
-const opentracing = require('./opentracing')
-const { extend } = require('elastic-apm-js-core/src/common/utils')
-module.exports = extend({}, indexExports, opentracing)
+module.exports = function(api) {
+  api.cache(true)
+  return {
+    comments: false,
+    presets: [
+      [
+        '@babel/preset-env',
+        {
+          targets: {
+            node: '8.0.0'
+          },
+          loose: true
+        }
+      ]
+    ]
+  }
+}

@@ -23,31 +23,21 @@
  *
  */
 
-const elasticApm = require('../..')
-const apmBase = elasticApm.apmBase
+const { join } = require('path')
+const glob = require('glob')
+const { config } = require('./wdio.conf')
+const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 
-const ApmServerMock = require('../../../rum-core/test/utils/apm-server-mock')
-function createApmBase (config) {
-  /**
-   * globalConfigs - environment variable injected by webpack
-   * during e2e build process
-   */
-  // eslint-disable-next-line
-  var envConfig = globalConfigs
-  if (!window.globalConfigs) {
-    window.globalConfigs = envConfig
+const { tunnelIdentifier } = getSauceConnectOptions()
+const browserList = [
+  {
+    browserName: 'internet explorer',
+    platform: 'Windows 7',
+    version: '10'
   }
-  var gc = window.globalConfigs
-  console.log(gc)
-  var apmServer
-  apmServer = apmBase.serviceFactory.getService('ApmServer')
-  if (gc.serverUrl) {
-    config.serverUrl = gc.serverUrl
-  }
-  var serverMock = new ApmServerMock(apmServer, gc.useMocks)
-  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
+].map(capability => ({ tunnelIdentifier, ...capability }))
 
-  return elasticApm.init(config)
-}
-
-module.exports = createApmBase
+exports.config = Object.assign({}, config, {
+  specs: glob.sync(join(__dirname, '/test/e2e/**/*failsafe.js')),
+  capabilities: browserList
+})

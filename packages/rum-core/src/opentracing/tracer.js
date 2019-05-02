@@ -23,20 +23,19 @@
  *
  */
 
-const { Tracer: otTracer } = require('opentracing/lib/tracer')
-const {
+import { Tracer as otTracer } from 'opentracing/lib/tracer'
+import {
   REFERENCE_CHILD_OF,
   FORMAT_TEXT_MAP,
   FORMAT_HTTP_HEADERS,
   FORMAT_BINARY
-} = require('opentracing/lib/constants')
-const { Span: NoopSpan } = require('opentracing/lib/span')
-
-const { getTimeOrigin, find } = require('../common/utils')
-const Span = require('./span')
+} from 'opentracing/lib/constants'
+import { Span as NoopSpan } from 'opentracing/lib/span'
+import { getTimeOrigin, find } from '../common/utils'
+import Span from './span'
 
 class Tracer extends otTracer {
-  constructor (
+  constructor(
     performanceMonitoring,
     transactionService,
     loggingService,
@@ -49,7 +48,7 @@ class Tracer extends otTracer {
     this.errorLogging = errorLogging
   }
 
-  _startSpan (name, options) {
+  _startSpan(name, options) {
     var spanOptions = {}
     if (options) {
       spanOptions.timestamp = options.startTime
@@ -63,7 +62,7 @@ class Tracer extends otTracer {
           )
         }
 
-        var childRef = find(options.references, function (ref) {
+        var childRef = find(options.references, function(ref) {
           return ref.type() === REFERENCE_CHILD_OF
         })
         if (childRef) {
@@ -99,7 +98,7 @@ class Tracer extends otTracer {
     return otSpan
   }
 
-  _inject (spanContext, format, carrier) {
+  _inject(spanContext, format, carrier) {
     switch (format) {
       case FORMAT_TEXT_MAP:
       case FORMAT_HTTP_HEADERS:
@@ -113,7 +112,7 @@ class Tracer extends otTracer {
     }
   }
 
-  _extract (format, carrier) {
+  _extract(format, carrier) {
     var ctx
     switch (format) {
       case FORMAT_TEXT_MAP:
@@ -134,4 +133,4 @@ class Tracer extends otTracer {
   }
 }
 
-module.exports = Tracer
+export default Tracer

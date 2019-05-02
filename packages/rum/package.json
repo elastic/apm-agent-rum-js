@@ -1,31 +1,57 @@
 {
-  "name": "elastic-apm-js-base",
-  "version": "3.0.0",
+  "name": "@elastic/apm-rum",
+  "version": "4.0.1",
   "description": "Elastic APM JavaScript agent",
-  "main": "dist/bundles/elastic-apm-js-base.umd.js",
-  "repository": "https://github.com/elastic/apm-agent-js-base/tree/master/packages/rum",
+  "main": "dist/lib/index.js",
+  "module": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elastic/apm-agent-rum-js.git",
+    "directory": "packages/rum"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "github-release": "node ./scripts/release-github.js",
+    "version-check": "node babel-version-plugin.js",
     "build": "webpack",
-    "build-dev": "webpack -w",
+    "build:dev": "webpack -w",
+    "build:main": "npx babel src -d dist/lib --config-file ../../babel.node.js",
+    "build:e2e": "npm run script buildE2eBundles",
+    "bundlesize": "npm run build && bundlesize",
     "karma": "karma start",
-    "karma-coverage": "karma start --coverage",
-    "serve": "npm run script serveE2e ./ 8000",
-    "runUnitTests": "npm run script runUnitTests",
-    "runNodeTests": "npm run script runNodeTests",
-    "buildE2eBundles": "npm run script buildE2eBundles",
-    "run-e2e": "npm run script runE2eTests",
+    "karma:coverage": "karma start --coverage",
     "script": "node ./run-script.js",
-    "test": "npm run build && npm run buildE2eBundles && npm run runNodeTests && npm run runUnitTests && npm run run-e2e"
+    "serve": "npm run script serveE2e ./ 8000",
+    "test:node": "npm run script runNodeTests",
+    "test:integration": "npm run script runIntegrationTests",
+    "test:unit": "node ../../dev-utils/run-script.js runUnitTests false packages/rum",
+    "test:e2e:supported": "npm run script runE2eTests wdio.conf.js",
+    "test:e2e:failsafe": "npm run script runE2eTests wdio-failsafe.conf.js",
+    "test:sauce": "npm run script runSauceTests",
+    "test": "npm-run-all build build:main build:e2e test:node test:integration test:sauce"
   },
   "files": [
     "src",
     "dist"
   ],
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "elastic-apm-js-core": "^3.0.1",
+    "@elastic/apm-rum-core": "file:../rum-core",
     "es6-promise": "^4.2.4"
-  }
+  },
+  "bundlesize": [
+    {
+      "path": "./dist/bundles/elastic-apm-rum*.min.js",
+      "maxSize": "16 kB"
+    },
+    {
+      "path": "./dist/bundles/elastic-apm-opentracing*.min.js",
+      "maxSize": "18kB"
+    }
+  ]
 }

@@ -23,19 +23,19 @@
  *
  */
 
-var PerformanceMonitoring = require('./performance-monitoring')
-var TransactionService = require('./transaction-service')
+import PerformanceMonitoring from './performance-monitoring'
+import TransactionService from './transaction-service'
 
-module.exports = {
+export default {
   PerformanceMonitoring,
-  registerServices: function registerServices (serviceFactory) {
-    serviceFactory.registerServiceCreator('TransactionService', function () {
+  registerServices: function registerServices(serviceFactory) {
+    serviceFactory.registerServiceCreator('TransactionService', function() {
       var configService = serviceFactory.getService('ConfigService')
       var loggingService = serviceFactory.getService('LoggingService')
       return new TransactionService(loggingService, configService)
     })
 
-    serviceFactory.registerServiceCreator('PerformanceMonitoring', function () {
+    serviceFactory.registerServiceCreator('PerformanceMonitoring', function() {
       var configService = serviceFactory.getService('ConfigService')
       var loggingService = serviceFactory.getService('LoggingService')
       var apmService = serviceFactory.getService('ApmServer')

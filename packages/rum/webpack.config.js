@@ -24,7 +24,6 @@
  */
 
 const path = require('path')
-const { version: agentVersion } = require('./package.json')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
@@ -32,8 +31,8 @@ const OUTPUT_DIR = path.join(__dirname, 'dist', 'bundles')
 
 const baseConfig = {
   entry: {
-    'elastic-apm-js-base': './src/index.js',
-    'elastic-apm-opentracing': './src/opentracing-entry.js'
+    'elastic-apm-rum': './src/index.js',
+    'elastic-apm-opentracing': './src/opentracing.js'
   },
   output: {
     filename: '[name].umd.js',
@@ -42,6 +41,10 @@ const baseConfig = {
     libraryTarget: 'umd'
   },
   mode: 'development',
+  stats: {
+    assets: true,
+    modules: false
+  },
   node: false,
   module: {
     rules: [
@@ -49,17 +52,6 @@ const baseConfig = {
         test: /\.js$/,
         use: {
           loader: 'babel-loader'
-        }
-      },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'string-replace-loader',
-          options: {
-            search: '%%agent-version%%',
-            replace: agentVersion
-          }
         }
       }
     ]
@@ -88,7 +80,11 @@ const optimizeConfig = Object.assign({}, baseConfig, {
   plugins: [
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',
-      reportFilename: path.resolve(__dirname, 'reports', 'bundle-analyzer.html'),
+      reportFilename: path.resolve(
+        __dirname,
+        'reports',
+        'bundle-analyzer.html'
+      ),
       generateStatsFile: true,
       statsFilename: path.resolve(__dirname, 'reports', 'bundle-analyzer.json'),
       openAnalyzer: false

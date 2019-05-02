@@ -23,30 +23,31 @@
  *
  */
 
-const {
+import {
   apmSymbol,
   patchMethod,
   XHR_SYNC,
   XHR_URL,
   XHR_METHOD,
   XHR_IGNORE
-} = require('./patch-utils')
+} from './patch-utils'
 
-const {
+import {
   SCHEDULE,
   INVOKE,
   CLEAR,
   XMLHTTPREQUEST_SOURCE,
   ADD_EVENT_LISTENER_STR,
   REMOVE_EVENT_LISTENER_STR
-} = require('../constants')
+} from '../constants'
 
 const XHR_TASK = apmSymbol('xhrTask')
 const XHR_LISTENER = apmSymbol('xhrListener')
 const XHR_SCHEDULED = apmSymbol('xhrScheduled')
 
 var alreadyPatched = false
-function patchXMLHttpRequest (callback) {
+
+export function patchXMLHttpRequest(callback) {
   if (alreadyPatched) {
     return
   }
@@ -60,22 +61,25 @@ function patchXMLHttpRequest (callback) {
   if (!oriAddListener) {
     const XMLHttpRequestEventTarget = window['XMLHttpRequestEventTarget']
     if (XMLHttpRequestEventTarget) {
-      const XMLHttpRequestEventTargetPrototype = XMLHttpRequestEventTarget.prototype
-      oriAddListener = XMLHttpRequestEventTargetPrototype[ADD_EVENT_LISTENER_STR]
-      oriRemoveListener = XMLHttpRequestEventTargetPrototype[REMOVE_EVENT_LISTENER_STR]
+      const XMLHttpRequestEventTargetPrototype =
+        XMLHttpRequestEventTarget.prototype
+      oriAddListener =
+        XMLHttpRequestEventTargetPrototype[ADD_EVENT_LISTENER_STR]
+      oriRemoveListener =
+        XMLHttpRequestEventTargetPrototype[REMOVE_EVENT_LISTENER_STR]
     }
   }
 
   const READY_STATE_CHANGE = 'readystatechange'
 
-  function invokeTask (task) {
+  function invokeTask(task) {
     task.state = INVOKE
     if (!task.ignore) {
       callback(INVOKE, task)
     }
   }
 
-  function scheduleTask (task) {
+  function scheduleTask(task) {
     XMLHttpRequest[XHR_SCHEDULED] = false
     task.state = SCHEDULE
     if (!task.ignore) {
@@ -97,7 +101,11 @@ function patchXMLHttpRequest (callback) {
       if (target.readyState === target.DONE) {
         // sometimes on some browsers XMLHttpRequest will fire onreadystatechange with
         // readyState=4 multiple times, so we need to check task state here
-        if (!data.aborted && XMLHttpRequest[XHR_SCHEDULED] && task.state === SCHEDULE) {
+        if (
+          !data.aborted &&
+          XMLHttpRequest[XHR_SCHEDULED] &&
+          task.state === SCHEDULE
+        ) {
           invokeTask(task)
         }
       }
@@ -114,7 +122,7 @@ function patchXMLHttpRequest (callback) {
     return result
   }
 
-  function clearTask (task) {
+  function clearTask(task) {
     task.state = CLEAR
     callback(CLEAR, task)
     const data = task.data
@@ -127,7 +135,7 @@ function patchXMLHttpRequest (callback) {
     XMLHttpRequestPrototype,
     'open',
     () =>
-      function (self, args) {
+      function(self, args) {
         self[XHR_METHOD] = args[0]
         self[XHR_URL] = args[1]
         self[XHR_SYNC] = args[2] === false
@@ -139,7 +147,7 @@ function patchXMLHttpRequest (callback) {
     XMLHttpRequestPrototype,
     'send',
     () =>
-      function (self, args) {
+      function(self, args) {
         const task = {
           source: XMLHTTPREQUEST_SOURCE,
           state: '',
@@ -167,7 +175,7 @@ function patchXMLHttpRequest (callback) {
     XMLHttpRequestPrototype,
     'abort',
     () =>
-      function (self, args) {
+      function(self, args) {
         const task = self[XHR_TASK]
         if (task && typeof task.type === 'string') {
           // If the XHR has already been aborted, do nothing.
@@ -179,8 +187,4 @@ function patchXMLHttpRequest (callback) {
         return abortNative.apply(self, args)
       }
   )
-}
-
-module.exports = {
-  patchXMLHttpRequest
 }

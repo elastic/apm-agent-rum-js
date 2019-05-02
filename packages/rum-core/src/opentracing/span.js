@@ -23,12 +23,12 @@
  *
  */
 
-const { Span: otSpan } = require('opentracing/lib/span')
-const { extend, getTimeOrigin } = require('../common/utils')
-const Transaction = require('../performance-monitoring/transaction')
+import { Span as otSpan } from 'opentracing/lib/span'
+import { extend, getTimeOrigin } from '../common/utils'
+import Transaction from '../performance-monitoring/transaction'
 
 class Span extends otSpan {
-  constructor (tracer, span) {
+  constructor(tracer, span) {
     super()
     this.__tracer = tracer
     this.span = span
@@ -40,19 +40,19 @@ class Span extends otSpan {
     }
   }
 
-  _context () {
+  _context() {
     return this.spanContext
   }
 
-  _tracer () {
+  _tracer() {
     return this.__tracer
   }
 
-  _setOperationName (name) {
+  _setOperationName(name) {
     this.span.name = name
   }
 
-  _addTags (keyValuePairs) {
+  _addTags(keyValuePairs) {
     var tags = extend({}, keyValuePairs)
     if (tags.type) {
       this.span.type = tags.type
@@ -90,7 +90,7 @@ class Span extends otSpan {
     }
   }
 
-  _finish (finishTime) {
+  _finish(finishTime) {
     this.span.end()
     if (finishTime) {
       this.span._end = finishTime - getTimeOrigin()
@@ -98,4 +98,4 @@ class Span extends otSpan {
   }
 }
 
-module.exports = Span
+export default Span

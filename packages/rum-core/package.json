@@ -1,27 +1,39 @@
 {
-  "name": "elastic-apm-js-core",
-  "version": "3.0.1",
+  "name": "@elastic/apm-rum-core",
+  "version": "4.0.1",
   "description": "Elastic apm core",
   "license": "MIT",
-  "main": "src/index.js",
-  "repository": "https://github.com/elastic/apm-agent-js-base/tree/master/packages/rum-core",
+  "main": "dist/lib/index.js",
+  "module": "src/index.js",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elastic/apm-agent-rum-js.git",
+    "directory": "packages/rum-core"
+  },
   "scripts": {
+    "prepublish": "npm run build:main",
+    "build:main": "npx babel src -d dist/lib --config-file ../../babel.node.js",
     "karma": "karma start",
-    "karma-bench": "karma start karma.bench.conf.js",
-    "karma-coverage": "karma start --coverage",
-    "runUnitTests": "node ../../dev-utils/run-script.js runUnitTests true packages/rum-core",
-    "test": "npm run runUnitTests"
+    "karma:bench": "karma start karma.bench.conf.js",
+    "karma:coverage": "karma start --coverage",
+    "test:unit": "node ../../dev-utils/run-script.js runUnitTests true packages/rum-core",
+    "test": "npm run test:unit"
   },
   "files": [
-    "src"
+    "src",
+    "dist"
   ],
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "dependencies": {
     "error-stack-parser": "^1.3.5",
     "opentracing": "^0.14.3",
     "stack-generator": "^1.0.7",
     "uuid": "^3.1.0"
-  },
-  "devDependencies": {
-    "es6-promise": "^4.2.4"
   }
 }

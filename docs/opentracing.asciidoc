@@ -16,7 +16,7 @@ In order to use OpenTracing API with Elastic APM, you need to first create a Tra
 
 [source,js]
 ----
-const { init: initApm, createTracer } = require('elastic-apm-js-base/dist/bundles/elastic-apm-opentracing.umd.js')
+const { init: initApm, createTracer } = require('@elastic/apm-rum/dist/bundles/elastic-apm-opentracing.umd.js')
 const elasticApm = initApm({
     // ...
 })
@@ -39,7 +39,7 @@ Please refer to https://github.com/opentracing/opentracing-javascript/[opentraci
 on OpenTracing API.
 
 NOTE: If you are loading the RUM agent using a script tag, please make sure to use our OpenTracing bundle 
-(`elastic-apm-js-base/dist/bundles/elastic-apm-opentracing.umd.js`) in your scripts instead, then you can create a tracer
+(`@elastic/apm-rum/dist/bundles/elastic-apm-opentracing.umd.js`) in your scripts instead, then you can create a tracer
 using `window.elasticApm.createTracer()`.
 
 

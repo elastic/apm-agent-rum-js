@@ -23,9 +23,15 @@
  *
  */
 
-function isChrome () {
-  const browserName = browser.desiredCapabilities.browserName.toLowerCase()
-  return browserName.indexOf('chrome') !== -1
-}
+import createApmBase from '../'
 
-module.exports = { isChrome }
+var apm = createApmBase({
+  debug: true,
+  serviceName: 'apm-agent-rum-test-e2e-react',
+  serviceVersion: '0.0.1',
+  sendPageLoadTransaction: false
+})
+
+apm.setInitialPageLoadName('react-initial-page-load')
+
+export { apm }

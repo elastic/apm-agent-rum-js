@@ -20,6 +20,7 @@ pipeline {
     PIPELINE_LOG_LEVEL='INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs'
+    DOCKER_ELASTIC_SECRET = 'secret/apm-team/ci/docker-registry/prod'
   }
   options {
     timeout(time: 1, unit: 'HOURS')
@@ -60,11 +61,11 @@ pipeline {
             deleteDir()
             unstash 'source'
             script{
-              docker.image('node:8-alpine').inside(){
+              docker.image('node:8').inside(){
                 dir("${BASE_DIR}"){
                   sh(label: "Lint", script: '''
                   HOME=$(pwd)
-                  npm install get-dependencies --save
+                  npm install
                   npm run lint
                   npm run bundlesize || true
                   ''')
@@ -80,7 +81,10 @@ pipeline {
         stage('Test') {
           steps {
             deleteDir()
-            runParallelTest()
+            unstash 'source'
+            dir("${BASE_DIR}"){
+              runParallelTest()
+            }
           }
         }
         /**
@@ -172,35 +176,38 @@ def runScript(Map params = [:]){
 
   env.STACK_VERSION = "${stack}"
   env.SCOPE = "${scope}"
-  env.APM_SERVER_URL = 'http://apm-server:8200'
+  env.APM_SERVER_URL = 'http://localhost:8001'
+  env.APM_SERVER_PORT = '8001'
   env.MODE = 'saucelabs'
 
   deleteDir()
   unstash 'source'
   unstash 'cache'
-
-  dir("${BASE_DIR}"){
-    withSaucelabsEnv(){
-      sh(label: "Start Elastic Stack ${stack}",
-      script: '''
-      docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
-      docker ps -a
-      docker network ls
-      docker container ls
-      ''')
-    }
-  }
-
-  docker.image('node:8-alpine').inside('--network=apm'){
+  retry(2){
+    sleep randomNumber(min:10, max: 30)
     dir("${BASE_DIR}"){
       withSaucelabsEnv(){
-        sh(label: "Test ${stack} - ${scope}",
+        sh(label: "Start Elastic Stack ${stack}",
         script: '''
-        HOME=$(pwd)
-        npm install get-dependencies --save
-        npm run bootstrap
-        npm run test
+        docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
+        docker ps -a
+        docker network ls
+        docker container ls
         ''')
+      }
+    }
+
+    dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "docker.elastic.co")
+    docker.image('docker.elastic.co/observability-ci/node-puppeteer:8').inside('--network=dev-utils_apm'){
+      dir("${BASE_DIR}"){
+        withSaucelabsEnv(){
+          sh(label: "Test ${stack} - ${scope}",
+          script: '''
+          HOME=$(pwd)
+          npm install
+          npm run test
+          ''')
+        }
       }
     }
   }

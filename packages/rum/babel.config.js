@@ -23,7 +23,7 @@
  *
  */
 
-module.exports = function (api) {
+module.exports = function(api) {
   api.cache(true)
   return {
     presets: [
@@ -31,7 +31,7 @@ module.exports = function (api) {
         '@babel/preset-env',
         {
           targets: {
-            ie: '10'
+            ie: '11'
           },
           useBuiltIns: false,
           modules: false,

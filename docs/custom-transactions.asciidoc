@@ -15,7 +15,7 @@ Here is an example application using custom transactions:
 
 [source,js]
 ----
-import { init as initApm } from 'elastic-apm-js-base'
+import { init as initApm } from '@elastic/apm-rum'
 var apm = initApm({
   serviceName: 'service-name',
   serverUrl: 'http://localhost:8200'

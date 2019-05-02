@@ -23,17 +23,16 @@
  *
  */
 
-const { getCurrentScript, sanitizeString, setTag, merge } = require('./utils')
-const Subscription = require('../common/subscription')
-const constants = require('./constants')
+import { getCurrentScript, setTag, merge, getDtHeaderValue } from './utils'
+import Subscription from '../common/subscription'
 
-function getConfigFromScript () {
+function getConfigFromScript() {
   var script = getCurrentScript()
   var config = getDataAttributesFromNode(script)
   return config
 }
 
-function getDataAttributesFromNode (node) {
+function getDataAttributesFromNode(node) {
   if (!node) {
     return {}
   }
@@ -49,7 +48,9 @@ function getDataAttributesFromNode (node) {
       var camelCasedkey = key
         .split('-')
         .map((value, index) => {
-          return index > 0 ? value.charAt(0).toUpperCase() + value.substring(1) : value
+          return index > 0
+            ? value.charAt(0).toUpperCase() + value.substring(1)
+            : value
         })
         .join('')
 
@@ -61,13 +62,12 @@ function getDataAttributesFromNode (node) {
 }
 
 class Config {
-  constructor () {
+  constructor() {
     this.config = {}
     this.defaults = {
       serviceName: '',
       serviceVersion: '',
-      agentName: 'js-base',
-      agentVersion: '%%agent-version%%',
+      environment: '',
       serverUrl: 'http://localhost:8200',
       serverUrlPrefix: '/intake/v2/rum/events',
       active: true,
@@ -93,45 +93,51 @@ class Config {
 
       sendPageLoadTransaction: true,
 
-      serverStringLimit: constants.serverStringLimit,
-
       distributedTracing: true,
       distributedTracingOrigins: [],
-      distributedTracingHeaderValueCallback: undefined,
+      distributedTracingHeaderValueCallback: getDtHeaderValue,
       distributedTracingHeaderName: 'elastic-apm-traceparent',
 
-      pageLoadTraceId: undefined,
-      pageLoadSpanId: undefined,
-      pageLoadSampled: undefined,
-      pageLoadTransactionName: undefined,
+      pageLoadTraceId: '',
+      pageLoadSpanId: '',
+      pageLoadSampled: false,
+      pageLoadTransactionName: '',
 
       transactionSampleRate: 1.0,
 
-      context: {},
-      platform: {}
+      context: {}
     }
 
     this._changeSubscription = new Subscription()
     this.filters = []
+    /**
+     * Packages that uses rum-core under the hood must override
+     * the version via setVersion
+     */
+    this.version = ''
   }
 
-  init () {
+  init() {
     var scriptData = getConfigFromScript()
     this.setConfig(scriptData)
   }
 
-  isActive () {
+  isActive() {
     return this.get('active')
   }
 
-  addFilter (cb) {
+  setVersion(version) {
+    this.version = version
+  }
+
+  addFilter(cb) {
     if (typeof cb !== 'function') {
       throw new Error('Argument to must be function')
     }
     this.filters.push(cb)
   }
 
-  applyFilters (data) {
+  applyFilters(data) {
     for (var i = 0; i < this.filters.length; i++) {
       data = this.filters[i](data)
       if (!data) {
@@ -141,18 +147,18 @@ class Config {
     return data
   }
 
-  get (key) {
+  get(key) {
     return key.split('.').reduce((obj, objKey) => {
       return obj && obj[objKey]
     }, this.config)
   }
 
-  getEndpointUrl () {
+  getEndpointUrl() {
     var url = this.get('serverUrl') + this.get('serverUrlPrefix')
     return url
   }
 
-  set (key, value) {
+  set(key, value) {
     var levels = key.split('.')
     var maxLevel = levels.length - 1
     var target = this.config
@@ -172,57 +178,46 @@ class Config {
     }
   }
 
-  setUserContext (userContext) {
-    var context = {}
-    if (typeof userContext.id === 'number') {
-      context.id = userContext.id
+  setUserContext(userContext = {}) {
+    const context = {}
+    const { id, username, email } = userContext
+
+    if (typeof id === 'number' || typeof id === 'string') {
+      context.id = id
     }
-    if (typeof userContext.id === 'string') {
-      context.id = sanitizeString(userContext.id, this.get('serverStringLimit'))
+    if (typeof username === 'string') {
+      context.username = username
     }
-    if (typeof userContext.username === 'string') {
-      context.username = sanitizeString(userContext.username, this.get('serverStringLimit'))
-    }
-    if (typeof userContext.email === 'string') {
-      context.email = sanitizeString(userContext.email, this.get('serverStringLimit'))
+    if (typeof email === 'string') {
+      context.email = email
     }
     this.set('context.user', context)
   }
 
-  setCustomContext (customContext) {
+  setCustomContext(customContext) {
     if (customContext && typeof customContext === 'object') {
       this.set('context.custom', customContext)
     }
   }
 
-  setTag (key, value) {
-    if (!key) return
+  addTags(tags) {
     if (!this.config.context.tags) {
       this.config.context.tags = {}
     }
-
-    setTag(key, value, this.config.context.tags)
-  }
-
-  addTags (tags) {
     var keys = Object.keys(tags)
-    keys.forEach(k => {
-      this.setTag(k, tags[k])
-    })
+    keys.forEach(k => setTag(k, tags[k], this.config.context.tags))
   }
 
-  setConfig (properties) {
-    properties = properties || {}
+  setConfig(properties = {}) {
     this.config = merge({}, this.defaults, this.config, properties)
-
     this._changeSubscription.applyAll(this, [this.config])
   }
 
-  subscribeToChange (fn) {
+  subscribeToChange(fn) {
     return this._changeSubscription.subscribe(fn)
   }
 
-  isValid () {
+  isValid() {
     const requiredKeys = ['serviceName', 'serverUrl']
 
     for (let i = 0; i < requiredKeys.length; i++) {
@@ -236,4 +231,4 @@ class Config {
   }
 }
 
-module.exports = Config
+export default Config

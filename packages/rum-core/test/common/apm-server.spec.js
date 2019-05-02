@@ -23,12 +23,11 @@
  *
  */
 
-var ApmServer = require('../../src/common/apm-server')
-var Transaction = require('../../src/performance-monitoring/transaction')
-// var performanceMonitoring = require('../../src/performance-monitoring/performance-monitoring')
-var createServiceFactory = require('..').createServiceFactory
+import ApmServer from '../../src/common/apm-server'
+import Transaction from '../../src/performance-monitoring/transaction'
+import { createServiceFactory } from '../'
 
-function generateTransaction (count) {
+function generateTransaction(count) {
   var result = []
   for (var i = 0; i < count; i++) {
     var tr = new Transaction('transaction #' + i, 'transaction', {})
@@ -52,21 +51,21 @@ function generateTransaction (count) {
   return result
 }
 
-function generateErrors (count) {
+function generateErrors(count) {
   var result = []
   for (var i = 0; i < count; i++) {
     result.push(new Error('error #' + i))
   }
   return result
 }
-describe('ApmServer', function () {
+describe('ApmServer', function() {
   var serviceFactory
   var apmServer
   var configService
   var loggingService
   var originalTimeout
   var performanceMonitoring
-  beforeEach(function () {
+  beforeEach(function() {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
 
@@ -77,18 +76,18 @@ describe('ApmServer', function () {
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   })
 
-  afterEach(function () {
+  afterEach(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
-  it('should not send transctions when the list is empty', function () {
+  it('should not send transctions when the list is empty', function() {
     spyOn(apmServer, '_postJson')
     var result = apmServer.sendTransactions([])
     expect(result).toBeUndefined()
     expect(apmServer._postJson).not.toHaveBeenCalled()
   })
 
-  it('should report http errors', function (done) {
+  it('should report http errors', function(done) {
     var apmServer = new ApmServer(configService, loggingService)
     configService.setConfig({
       serverUrl: 'http://localhost:54321',
@@ -97,17 +96,17 @@ describe('ApmServer', function () {
     var result = apmServer.sendTransactions([{ test: 'test' }])
     expect(result).toBeDefined()
     result.then(
-      function () {
+      function() {
         fail('Request should have failed!')
       },
-      function (reason) {
+      function(reason) {
         expect(reason).toBeDefined()
         done()
       }
     )
   })
 
-  it('should check config validity before making request to the server', function () {
+  it('should check config validity before making request to the server', function() {
     spyOn(apmServer, '_postJson')
     spyOn(loggingService, 'warn')
     spyOn(loggingService, 'debug')
@@ -133,13 +132,12 @@ describe('ApmServer', function () {
     expect(loggingService.warn).not.toHaveBeenCalled()
   })
 
-  xit('should queue items', function () {
+  xit('should queue items', function() {
     spyOn(loggingService, 'warn').and.callThrough()
     configService.setConfig({
       serviceName: 'serviceName',
       throttlingRequestLimit: 1
     })
-    expect(configService.isValid()).toBe(true)
     spyOn(apmServer, '_postJson').and.callThrough()
     spyOn(apmServer, '_makeHttpRequest').and.callThrough()
     apmServer.init()
@@ -168,7 +166,7 @@ describe('ApmServer', function () {
     expect(apmServer._makeHttpRequest).not.toHaveBeenCalled()
   })
 
-  it('should init queue if not initialized before', function (done) {
+  it('should init queue if not initialized before', function(done) {
     configService.setConfig({ flushInterval: 200 })
     spyOn(apmServer, 'sendErrors')
     spyOn(apmServer, 'sendTransactions')
@@ -207,17 +205,17 @@ describe('ApmServer', function () {
     }, 300)
   })
 
-  it('should report http errors for queued errors', function (done) {
+  it('should report http errors for queued errors', function(done) {
     spyOn(loggingService, 'warn').and.callThrough()
     var apmServer = new ApmServer(configService, loggingService)
     var _sendErrors = apmServer.sendErrors
-    apmServer.sendErrors = function () {
+    apmServer.sendErrors = function() {
       var result = _sendErrors.apply(apmServer, arguments)
       result.then(
-        function () {
+        function() {
           fail('Request should have failed!')
         },
-        function () {
+        function() {
           setTimeout(() => {
             expect(loggingService.warn).toHaveBeenCalledWith(
               'Failed sending errors!',
@@ -233,24 +231,23 @@ describe('ApmServer', function () {
       serverUrl: 'http://localhost:54321',
       serviceName: 'test-service'
     })
-    expect(configService.isValid()).toBe(true)
     apmServer.addError({ test: 'test' })
 
     expect(loggingService.warn).not.toHaveBeenCalled()
     apmServer.errorQueue.flush()
   })
 
-  it('should report http errors for queued transactions', function (done) {
+  it('should report http errors for queued transactions', function(done) {
     spyOn(loggingService, 'warn').and.callThrough()
     var apmServer = new ApmServer(configService, loggingService)
     var _sendTransactions = apmServer.sendTransactions
-    apmServer.sendTransactions = function () {
+    apmServer.sendTransactions = function() {
       var result = _sendTransactions.apply(apmServer, arguments)
       result.then(
-        function () {
+        function() {
           fail('Request should have failed!')
         },
-        function () {
+        function() {
           setTimeout(() => {
             expect(loggingService.warn).toHaveBeenCalledWith(
               'Failed sending transactions!',
@@ -266,21 +263,19 @@ describe('ApmServer', function () {
       serverUrl: 'http://localhost:54321',
       serviceName: 'test-service'
     })
-    expect(configService.isValid()).toBe(true)
     apmServer.addTransaction({ test: 'test' })
 
     expect(loggingService.warn).not.toHaveBeenCalled()
     apmServer.transactionQueue.flush()
   })
 
-  it('should throttle adding to the error queue', function (done) {
+  it('should throttle adding to the error queue', function(done) {
     configService.setConfig({
       serviceName: 'serviceName',
       flushInterval: 100,
       errorThrottleLimit: 5,
       errorThrottleInterval: 200
     })
-    expect(configService.isValid()).toBe(true)
     spyOn(apmServer, 'sendErrors')
     spyOn(loggingService, 'warn').and.callThrough()
 
@@ -304,14 +299,13 @@ describe('ApmServer', function () {
     }, 300)
   })
 
-  it('should throttle adding to the transaction queue', function (done) {
+  it('should throttle adding to the transaction queue', function(done) {
     configService.setConfig({
       serviceName: 'serviceName',
       flushInterval: 100,
       transactionThrottleLimit: 5,
       transactionThrottleInterval: 200
     })
-    expect(configService.isValid()).toBe(true)
     spyOn(apmServer, 'sendTransactions')
     spyOn(loggingService, 'warn').and.callThrough()
 
@@ -335,27 +329,11 @@ describe('ApmServer', function () {
     }, 300)
   })
 
-  it('should check isActive', function () {
-    configService.setConfig({
-      active: false
-    })
-    expect(configService.isActive()).toBe(false)
-
-    expect(apmServer.transactionQueue).toBeUndefined()
-    expect(apmServer.errorQueue).toBeUndefined()
-
-    apmServer.addTransaction({ test: 'test' })
-    apmServer.addError({ test: 'test' })
-
-    expect(apmServer.transactionQueue).toBeUndefined()
-    expect(apmServer.errorQueue).toBeUndefined()
-  })
-
-  it('should ignore undefined payload', function () {
+  it('should ignore undefined payload', function() {
     configService.setConfig({
       serviceName: 'serviceName'
     })
-    configService.addFilter(function () {})
+    configService.addFilter(function() {})
     spyOn(apmServer, '_postJson')
     var result = apmServer.sendErrors([{ test: 'test' }])
     expect(result).toBeUndefined()
@@ -365,15 +343,38 @@ describe('ApmServer', function () {
     expect(apmServer._postJson).not.toHaveBeenCalled()
   })
 
-  it('should ndjson transactions', function () {
+  it('should set metadata from config along with defaults', () => {
+    configService.setConfig({
+      serviceName: 'test',
+      serviceVersion: '0.0.1',
+      environment: 'staging'
+    })
+
+    configService.setVersion('4.0.1')
+
+    /** To catch agent version mismatch during release */
+    const { service } = apmServer.createMetaData()
+    expect(service).toEqual({
+      name: 'test',
+      version: '0.0.1',
+      environment: 'staging',
+      agent: {
+        name: 'js-base',
+        version: '4.0.1'
+      },
+      language: { name: 'javascript' }
+    })
+  })
+
+  it('should ndjson transactions', function() {
     var trs = generateTransaction(3)
     trs = performanceMonitoring.convertTransactionsToServerModel(trs)
     var result = apmServer.ndjsonTransactions(trs)
     /* eslint-disable max-len */
     var expected = [
-      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","subType":"NA","action":"NA","sync":false,"start":10,"duration":10}}\n',
-      '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","subType":"NA","action":"NA","sync":false,"start":10,"duration":10}}\n',
-      '{"transaction":{"id":"transaction-id-2","trace_id":"trace-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-2-1","transaction_id":"transaction-id-2","parent_id":"transaction-id-2","trace_id":"trace-id-2","name":"name","type":"type","subType":"NA","action":"NA","sync":false,"start":10,"duration":10}}\n'
+      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
+      '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
+      '{"transaction":{"id":"transaction-id-2","trace_id":"trace-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-2-1","transaction_id":"transaction-id-2","parent_id":"transaction-id-2","trace_id":"trace-id-2","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n'
     ]
     expect(result).toEqual(expected)
   })

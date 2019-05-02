@@ -23,30 +23,29 @@
  *
  */
 
-const ApmServer = require('./apm-server')
-const ConfigService = require('./config-service')
-const LoggingService = require('./logging-service')
-
-const patchUtils = require('./patching/patch-utils')
-const utils = require('./utils')
+import ApmServer from './apm-server'
+import ConfigService from './config-service'
+import LoggingService from './logging-service'
+import * as patchUtils from './patching/patch-utils'
+import * as utils from './utils'
 
 class ServiceFactory {
-  constructor () {
+  constructor() {
     this._serviceCreators = {}
     this._serviceInstances = {}
     this.initialized = false
   }
 
-  registerCoreServices () {
+  registerCoreServices() {
     var serviceFactory = this
 
-    this.registerServiceCreator('ConfigService', function () {
+    this.registerServiceCreator('ConfigService', function() {
       return new ConfigService()
     })
-    this.registerServiceCreator('LoggingService', function () {
+    this.registerServiceCreator('LoggingService', function() {
       return new LoggingService()
     })
-    this.registerServiceCreator('ApmServer', function () {
+    this.registerServiceCreator('ApmServer', function() {
       return new ApmServer(
         serviceFactory.getService('ConfigService'),
         serviceFactory.getService('LoggingService')
@@ -56,7 +55,7 @@ class ServiceFactory {
     this.registerServiceInstance('PatchUtils', patchUtils)
     this.registerServiceInstance('Utils', utils)
   }
-  init () {
+  init() {
     if (this.initialized) {
       return
     }
@@ -67,16 +66,18 @@ class ServiceFactory {
     configService.init()
     var loggingService = serviceFactory.getService('LoggingService')
 
-    function setLogLevel (loggingService, configService) {
-      if (configService.get('debug') === true && configService.config.logLevel !== 'trace') {
-        loggingService.setLevel('debug', false)
+    function setLogLevel(loggingService, configService) {
+      const debug = configService.get('debug')
+      const logLevel = configService.get('logLevel')
+      if (debug === true && logLevel !== 'trace') {
+        loggingService.setLevel('debug')
       } else {
-        loggingService.setLevel(configService.get('logLevel'), false)
+        loggingService.setLevel(logLevel)
       }
     }
 
     setLogLevel(loggingService, configService)
-    configService.subscribeToChange(function () {
+    configService.subscribeToChange(function() {
       setLogLevel(loggingService, configService)
     })
 
@@ -84,15 +85,15 @@ class ServiceFactory {
     apmServer.init()
   }
 
-  registerServiceCreator (name, creator) {
+  registerServiceCreator(name, creator) {
     this._serviceCreators[name] = creator
   }
 
-  registerServiceInstance (name, instance) {
+  registerServiceInstance(name, instance) {
     this._serviceInstances[name] = instance
   }
 
-  getService (name) {
+  getService(name) {
     if (!this._serviceInstances[name]) {
       if (typeof this._serviceCreators[name] === 'function') {
         this._serviceInstances[name] = this._serviceCreators[name](this)
@@ -104,4 +105,4 @@ class ServiceFactory {
   }
 }
 
-module.exports = ServiceFactory
+export default ServiceFactory

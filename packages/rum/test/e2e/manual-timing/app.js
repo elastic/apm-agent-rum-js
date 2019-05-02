@@ -1,18 +1,18 @@
 /**
  * MIT License
- * 
+ *
  * Copyright (c) 2017-present, Elasticsearch BV
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,19 +20,21 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  */
 
-var createApmBase = require('../e2e')
-var apm = createApmBase({
+import createApmBase from '../'
+import { renderTestElement } from '../utils'
+
+const apm = createApmBase({
   serviceName: 'manual-timing',
   sendPageLoadTransaction: false,
   operationMode: 'manual'
 })
 
-var transaction = apm.startTransaction('transaction-name', 'transaction-type')
+const transaction = apm.startTransaction('transaction-name', 'transaction-type')
 transaction.addTask('load-event')
-window.addEventListener('load', function () {
+window.addEventListener('load', function() {
   transaction.mark('load-event')
   setTimeout(() => {
     transaction.addNavigationTimingMarks()
@@ -40,21 +42,17 @@ window.addEventListener('load', function () {
   })
 })
 
-var span = transaction.startSpan('span-name', 'span-type')
+const span = transaction.startSpan('span-name', 'span-type')
 
-var appEl = document.getElementById('app')
-var testEl = document.createElement('h2')
-testEl.setAttribute('id', 'test-element')
-testEl.innerHTML = 'Passed'
-appEl.appendChild(testEl)
+renderTestElement()
 
 span.end()
 
-function generateError () {
+function generateError() {
   throw new Error('timeout test error with a secret')
 }
 
-setTimeout(function () {
+setTimeout(function() {
   try {
     generateError()
   } catch (e) {
@@ -70,7 +68,9 @@ var isFetchSupported = 'fetch' in window
 if (isFetchSupported) {
   fetch(url).then(resp => {
     if (!resp.ok) {
-      apm.captureError(new Error(`fetch failed with status ${resp.status} ${resp.statusText}`))
+      apm.captureError(
+        new Error(`fetch failed with status ${resp.status} ${resp.statusText}`)
+      )
     }
     httpSpan.end()
   })
@@ -79,7 +79,7 @@ if (isFetchSupported) {
 var tid = transaction.addTask()
 var req = new window.XMLHttpRequest()
 req.open('GET', url)
-req.addEventListener('load', function () {
+req.addEventListener('load', function() {
   console.log('got data!')
   transaction.removeTask(tid)
   !isFetchSupported && httpSpan.end()
