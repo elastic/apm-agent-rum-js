@@ -24,7 +24,7 @@
  */
 
 import Transaction from './transaction'
-import { isUndefined, extend } from '../common/utils'
+import { extend } from '../common/utils'
 import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
 
@@ -46,19 +46,26 @@ class TransactionService {
     return this._config.isActive()
   }
 
-  getOrCreateCurrentTransaction() {
+  ensureCurrentTransaction(options) {
+    if (!options) {
+      options = this.createPerfOptions()
+    }
     if (!this.shouldCreateTransaction()) {
       return
     }
     var tr = this.getCurrentTransaction()
-    if (!isUndefined(tr) && !tr.ended) {
+    if (tr) {
       return tr
+    } else {
+      options.canReuse = true
+      return this.createTransaction(undefined, undefined, options)
     }
-    return this.createZoneTransaction()
   }
 
   getCurrentTransaction() {
-    return this.currentTransaction
+    if (this.currentTransaction && !this.currentTransaction.ended) {
+      return this.currentTransaction
+    }
   }
 
   setCurrentTransaction(value) {
@@ -66,23 +73,16 @@ class TransactionService {
   }
 
   createTransaction(name, type, options) {
-    var perfOptions = options
-    if (isUndefined(perfOptions)) {
-      perfOptions = this._config.config
-    }
     if (!this.shouldCreateTransaction()) {
       return
     }
 
-    var tr = new Transaction(name, type, perfOptions)
+    var tr = new Transaction(name, type, options)
     this.setCurrentTransaction(tr)
-    if (perfOptions.checkBrowserResponsiveness) {
+    if (options.checkBrowserResponsiveness) {
       this.startCounter(tr)
     }
     return tr
-  }
-  createZoneTransaction() {
-    return this.createTransaction('ZoneTransaction', 'transaction')
   }
 
   startCounter(transaction) {
@@ -124,20 +124,24 @@ class TransactionService {
     }
   }
 
-  startTransaction(name, type, options) {
-    var self = this
-    var config = self._config.config
-
-    var perfOptions = extend(
+  createPerfOptions(options) {
+    var config = this._config.config
+    return extend(
       {
         pageLoadTraceId: config.pageLoadTraceId,
         pageLoadSampled: config.pageLoadSampled,
         pageLoadSpanId: config.pageLoadSpanId,
         pageLoadTransactionName: config.pageLoadTransactionName,
-        transactionSampleRate: config.transactionSampleRate
+        transactionSampleRate: config.transactionSampleRate,
+        checkBrowserResponsiveness: config.checkBrowserResponsiveness
       },
       options
     )
+  }
+
+  startTransaction(name, type, options) {
+    var self = this
+    var perfOptions = this.createPerfOptions(options)
 
     if (!type) {
       type = 'custom'
@@ -147,11 +151,23 @@ class TransactionService {
       name = 'Unknown'
     }
 
-    // this will create a zone transaction if possible
-    var tr = this.getOrCreateCurrentTransaction()
+    var tr = this.getCurrentTransaction()
 
     if (tr) {
-      if (tr.name === 'ZoneTransaction') {
+      if (tr.canReuse()) {
+        /*
+         * perfOptions could also have `canReuse:true` in which case we
+         * allow a redefinition until there's a call that doesn't have that
+         * or the threshold is exceeded.
+         */
+
+        this._logger.debug(
+          'Redefining the current transaction',
+          tr,
+          name,
+          type,
+          perfOptions
+        )
         tr.redefine(name, type, perfOptions)
       } else {
         this._logger.debug('Ending old transaction', tr)
@@ -159,7 +175,10 @@ class TransactionService {
         tr = this.createTransaction(name, type, perfOptions)
       }
     } else {
-      return
+      tr = this.createTransaction(name, type, perfOptions)
+      if (!tr) {
+        return
+      }
     }
 
     if (type === 'page-load') {
@@ -172,8 +191,8 @@ class TransactionService {
         tr.sampled = perfOptions.pageLoadSampled
       }
 
-      if (tr.name === 'Unknown' && config.pageLoadTransactionName) {
-        tr.name = config.pageLoadTransactionName
+      if (tr.name === 'Unknown' && perfOptions.pageLoadTransactionName) {
+        tr.name = perfOptions.pageLoadTransactionName
       }
     }
 
@@ -232,7 +251,7 @@ class TransactionService {
   }
 
   startSpan(name, type, options) {
-    var trans = this.getOrCreateCurrentTransaction()
+    var trans = this.ensureCurrentTransaction()
 
     if (trans) {
       this._logger.debug('TransactionService.startSpan', name, type)
@@ -255,7 +274,7 @@ class TransactionService {
   }
 
   addTask(taskId) {
-    var tr = this.getOrCreateCurrentTransaction()
+    var tr = this.ensureCurrentTransaction()
     if (tr) {
       var taskId = tr.addTask(taskId)
       this._logger.debug('TransactionService.addTask', taskId)
@@ -265,7 +284,7 @@ class TransactionService {
 
   removeTask(taskId) {
     var tr = this.getCurrentTransaction()
-    if (!isUndefined(tr) && !tr.ended) {
+    if (tr) {
       tr.removeTask(taskId)
       this._logger.debug('TransactionService.removeTask', taskId)
     }
@@ -273,7 +292,7 @@ class TransactionService {
 
   detectFinish() {
     var tr = this.getCurrentTransaction()
-    if (!isUndefined(tr) && !tr.ended) {
+    if (tr) {
       tr.detectFinish()
       this._logger.debug('TransactionService.detectFinish')
     }

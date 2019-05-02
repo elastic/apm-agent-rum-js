@@ -591,6 +591,7 @@ describe('PerformanceMonitoring', function() {
       window['__fetchDelegate'] = undefined
     })
   }
+
   it('should add xhr tasks', function(done) {
     var fn = performanceMonitoring.getXhrPatchSubFn()
     var transactionService = performanceMonitoring._transactionService
@@ -617,5 +618,27 @@ describe('PerformanceMonitoring', function() {
     expect(task.id).toBeDefined()
     expect(tr._scheduledTasks).toEqual(['task1'])
     req.send()
+  })
+
+  it('should create Transactions on history.pushState', function() {
+    var fn = performanceMonitoring.getXhrPatchSubFn()
+    performanceMonitoring.cancelPatchSub = patchSub.subscribe(function(
+      event,
+      task
+    ) {
+      fn(event, task)
+    })
+    var transactionService = performanceMonitoring._transactionService
+
+    spyOn(transactionService, 'startTransaction').and.callThrough()
+
+    history.pushState(undefined, 'test', 'test')
+
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      'test',
+      'route-change',
+      { canReuse: true }
+    )
+    performanceMonitoring.cancelPatchSub()
   })
 })

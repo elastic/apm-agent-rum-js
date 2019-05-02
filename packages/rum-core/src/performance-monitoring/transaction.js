@@ -35,6 +35,8 @@ import {
   removeInvalidChars
 } from '../common/utils'
 
+import { REUSABILITY_THRESHOLD } from '../common/constants'
+
 class Transaction extends SpanBase {
   constructor(name, type, options) {
     super(name, type, options)
@@ -80,10 +82,18 @@ class Transaction extends SpanBase {
     this.addMarks({ custom })
   }
 
+  canReuse(threshold = REUSABILITY_THRESHOLD) {
+    return (
+      !!this.options.canReuse &&
+      !this.ended &&
+      performance.now() - this._start < threshold
+    ) // To avoid a stale transaction capture everything
+  }
+
   redefine(name, type, options) {
     this.name = name
     this.type = type
-    this.options = options
+    this.options = extend(this.options, options)
   }
 
   startSpan(name, type, options) {

@@ -201,4 +201,25 @@ describe('transaction.Transaction', function() {
     span = transaction.startSpan('name', 'type', { parentId: 'test-parent-id' })
     expect(span.parentId).toBe('test-parent-id')
   })
+
+  it('should calculate reusability', function() {
+    var transaction = new Transaction('transaction', 'transaction')
+    expect(transaction.canReuse()).toBe(false)
+
+    transaction = new Transaction('transaction', 'transaction', {
+      canReuse: true
+    })
+    expect(transaction.canReuse()).toBe(true)
+
+    transaction.end()
+    expect(transaction.canReuse()).toBe(false)
+
+    transaction = new Transaction('transaction', 'transaction', {
+      canReuse: true
+    })
+    expect(transaction.canReuse()).toBe(true)
+
+    transaction._start = transaction._start - 10000
+    expect(transaction.canReuse()).toBe(false)
+  })
 })

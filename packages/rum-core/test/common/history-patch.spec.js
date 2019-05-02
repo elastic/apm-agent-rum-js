@@ -23,27 +23,43 @@
  *
  */
 
-import { patchXMLHttpRequest } from './xhr-patch'
-import { patchFetch } from './fetch-patch'
-import { patchHistory } from './history-patch'
-import Subscription from '../subscription'
+import patchSubscription from './patch'
+describe('historyPatch', function() {
+  var events = []
+  var cancelFn
 
-const patchSubscription = new Subscription()
-var alreadyPatched = false
-function patchAll() {
-  if (!alreadyPatched) {
-    alreadyPatched = true
-    patchXMLHttpRequest(function(event, task) {
-      patchSubscription.applyAll(this, [event, task])
+  beforeAll(function() {
+    cancelFn = patchSubscription.subscribe(function(event, task) {
+      events.push({
+        event,
+        task
+      })
     })
-    patchFetch(function(event, task) {
-      patchSubscription.applyAll(this, [event, task])
-    })
-    patchHistory(function(event, task) {
-      patchSubscription.applyAll(this, [event, task])
-    })
-  }
-  return patchSubscription
-}
+  })
 
-export { patchAll, patchSubscription }
+  afterAll(function() {
+    cancelFn()
+  })
+
+  beforeEach(function() {
+    events = []
+  })
+
+  it('should patch history.pushState', function() {
+    history.pushState(undefined, 'test', 'test')
+
+    expect(events).toEqual([
+      {
+        event: 'invoke',
+        task: {
+          source: 'history.pushState',
+          data: {
+            state: undefined,
+            title: 'test',
+            url: 'test'
+          }
+        }
+      }
+    ])
+  })
+})

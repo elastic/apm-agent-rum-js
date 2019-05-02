@@ -36,7 +36,8 @@ import {
   SCHEDULE,
   INVOKE,
   XMLHTTPREQUEST_SOURCE,
-  FETCH_SOURCE
+  FETCH_SOURCE,
+  HISTORY_PUSHSTATE
 } from '../common/constants'
 import {
   truncateModel,
@@ -122,6 +123,12 @@ class PerformanceMonitoring {
           transactionService.removeTask(task.id)
         }
       }
+
+      if (event === INVOKE && task.source === HISTORY_PUSHSTATE) {
+        transactionService.startTransaction(task.data.title, 'route-change', {
+          canReuse: true
+        })
+      }
     }
   }
 
@@ -202,6 +209,7 @@ class PerformanceMonitoring {
         browserResponsivenessInterval,
         buffer
       )
+
       if (!wasBrowserResponsive) {
         performanceMonitoring._logginService.debug(
           'Transaction was discarded! browser was not responsive enough during the transaction.',
