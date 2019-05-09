@@ -86,6 +86,10 @@ class ApmServer {
   }
 
   _makeHttpRequest(method, url, payload, headers) {
+    if (this._configService.get('http')) {
+      this._configService.get('http')(method, url, payload, headers)
+    }
+
     return new Promise(function(resolve, reject) {
       var xhr = new window.XMLHttpRequest()
       xhr[XHR_IGNORE] = true

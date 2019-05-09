@@ -93,6 +93,17 @@ This option sets the flush interval in *milliseconds* for these queues.
 
 NOTE: After each flush of the queue, the next flush isn't scheduled until an item is added to the queue.
 
+
+[function]
+[[http]]
+=== `http`
+
+* *Type:* Function
+* *Default:* ``
+
+Override the agents built-in method for sending data from the queue
+The function has the form of (method: string, url: string, data: string, headers: Object) => void
+
 [float]
 [[error-throttling]]
 === Error throttling
