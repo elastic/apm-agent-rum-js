@@ -23,15 +23,22 @@
  *
  */
 
-import createApmBase from '../'
+import React from 'react'
+import { Route } from 'react-router-dom'
+import { getWithTransaction } from './get-with-transaction'
 
-var apm = createApmBase({
-  debug: true,
-  serviceName: 'apm-agent-rum-test-e2e-react',
-  serviceVersion: '0.0.1',
-  sendPageLoadTransaction: false
-})
-
-apm.setInitialPageLoadName('react-initial-page-load')
-
-export { apm }
+function getApmRoute(apm) {
+  const withTransaction = getWithTransaction(apm)
+  return class ApmRoute extends React.Component {
+    constructor(props) {
+      super(props)
+      const { path, component: Component } = this.props
+      this.ApmComponent = withTransaction(path, 'route-change')(Component)
+      console.log('ApmRoute:', path)
+    }
+    render() {
+      return <Route {...this.props} component={this.ApmComponent} />
+    }
+  }
+}
+export { getApmRoute }

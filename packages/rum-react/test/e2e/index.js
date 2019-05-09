@@ -23,52 +23,23 @@
  *
  */
 
-import React from 'react'
+import { apmBase } from '../../../rum/src'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import ApmServerMock from '../../../rum-core/test/utils/apm-server-mock'
 
-import { apm } from './rum'
+const { globalConfigs } = getGlobalConfig()
 
-class MainComponent extends React.Component {
-  constructor(props, state) {
-    super(props, state)
-    var path = this.props.match.path
-    this.state = {
-      userName: '',
-      path
-    }
-    this.transaction = apm.startTransaction('Main - ' + path, 'route-change')
+function createApmBase(config) {
+  console.log('E2E Global Configs', JSON.stringify(globalConfigs, null, 2))
+  const apmServer = apmBase.serviceFactory.getService('ApmServer')
+  const { serverUrl } = globalConfigs.agentConfig
+  if (serverUrl) {
+    config.serverUrl = serverUrl
   }
+  const serverMock = new ApmServerMock(apmServer, globalConfigs.useMocks)
+  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
 
-  componentDidMount() {
-    this.fetchData()
-    this.transaction.detectFinish()
-  }
-  fetchData() {
-    var url = '/test/e2e/react/data.json'
-
-    fetch(url)
-      .then(resp => {
-        var tid = this.transaction.addTask()
-        var span = this.transaction.startSpan('Timeout span')
-        setTimeout(() => {
-          span.end()
-          this.transaction.removeTask(tid)
-        }, 500)
-        return resp.json()
-      })
-      .then(data => {
-        this.setState({ userName: data.userName })
-      })
-  }
-  render() {
-    return (
-      <div>
-        <h3>
-          <span>{this.state.path}</span>
-        </h3>
-        <span>{this.state.userName}</span>
-      </div>
-    )
-  }
+  return apmBase.init(config)
 }
 
-export default MainComponent
+export default createApmBase

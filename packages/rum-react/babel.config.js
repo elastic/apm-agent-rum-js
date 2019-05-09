@@ -23,27 +23,21 @@
  *
  */
 
-const path = require('path')
-const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
-
-module.exports = {
-  entry: path.resolve(__dirname, './app.jsx'),
-  output: { path: __dirname, filename: 'app.e2e-bundle.js' },
-  devtool: 'source-map',
-  mode: 'production',
-  performance: {
-    hints: false
-  },
-  module: {
-    rules: [
-      {
-        test: /.jsx?$/,
-        use: {
-          loader: 'babel-loader'
+module.exports = function(api) {
+  api.cache(true)
+  return {
+    presets: [
+      [
+        '@babel/preset-env',
+        {
+          targets: {
+            ie: '11'
+          },
+          useBuiltIns: false,
+          modules: false,
+          loose: true
         }
-      }
+      ]
     ]
-  },
-  plugins: [new EnvironmentPlugin(getWebpackEnv())]
+  }
 }

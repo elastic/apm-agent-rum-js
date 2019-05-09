@@ -62,6 +62,11 @@ class PerformanceMonitoring {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
         this._apmServer.addTransaction(payload)
+      } else {
+        this._logginService.debug(
+          'Could not create a payload from the Transaction',
+          tr
+        )
       }
     })
 

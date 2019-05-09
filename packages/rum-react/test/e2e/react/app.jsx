@@ -30,13 +30,28 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import { withRouter } from 'react-router'
 import MainComponent from './main-component.jsx'
+import TopicComponent from './topic-component'
 
-import { apm } from './rum'
+
+import { apm } from '@elastic/apm-rum'
+apm.init({
+  debug: true,
+  serverUrl: 'http://localhost:8200',
+  serviceName: 'apm-agent-rum-test-e2e-react',
+  serviceVersion: '0.0.1',
+  sendPageLoadTransaction: false
+})
+
+import { ApmRoute } from '../../../src'
+import ManualComponent from './manual-component.jsx';
 
 var tr = apm.startTransaction('App Load', 'page-load')
 tr.isHardNavigation = true
 
 class App extends React.Component {
+  constructor(props) {
+    super(props)
+  }
   render() {
     return (
       <div>
@@ -49,6 +64,9 @@ class App extends React.Component {
               <Link to="/about">About</Link>
             </li>
             <li>
+              <Link to="/manual">Manual</Link>
+            </li>
+            <li>
               <Link to="/topics">Topics</Link>
             </li>
             <li>
@@ -57,10 +75,11 @@ class App extends React.Component {
           </ul>
 
           <hr />
-          <Route exact path="/" component={MainComponent} />
-          <Route path="/about" component={MainComponent} />
-          <Route path="/topics" component={MainComponent} />
-          <Route path="/topic/:id" component={MainComponent} />
+          <Route exact path='/' component={MainComponent} />
+          <Route path='/about' component={MainComponent} />
+          <Route path='/topics' component={MainComponent} />
+          <ApmRoute path='/topic/:id' component={TopicComponent} />
+          <Route path='/manual/' component={ManualComponent} />
         </div>
         <div id="test-element">Passed</div>
       </div>

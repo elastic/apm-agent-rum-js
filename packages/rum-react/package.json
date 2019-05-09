@@ -1,0 +1,32 @@
+{
+  "name": "@elastic/apm-rum-react",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Hamid <h.jahtalab@gmail.com>",
+  "homepage": "https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html",
+  "license": "MIT",
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elastic/apm-agent-rum-js.git"
+  },
+  "scripts": {
+    "build": "webpack",
+    "build:dev": "webpack -w",
+    "test:unit": "node ../../dev-utils/run-script.js runUnitTests true packages/rum-react",
+    "karma": "karma start",
+    "test": "npm run test:unit"
+  },
+  "bugs": {
+    "url": "https://github.com/elastic/apm-agent-rum-js/issues"
+  },
+  "dependencies": {
+    "hoist-non-react-statics": "^3.3.0"
+  }
+}
