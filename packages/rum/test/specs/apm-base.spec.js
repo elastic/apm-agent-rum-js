@@ -26,6 +26,7 @@
 import ApmBase from '../../src/apm-base'
 import { createServiceFactory } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
+import { apm } from '../../src'
 
 var enabled = bootstrap()
 

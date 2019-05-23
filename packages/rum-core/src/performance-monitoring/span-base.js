@@ -23,7 +23,7 @@
  *
  */
 
-import { isUndefined, generateRandomId, setTag, merge } from '../common/utils'
+import { isUndefined, generateRandomId, setLabel, merge } from '../common/utils'
 
 class SpanBase {
   // context
@@ -48,16 +48,14 @@ class SpanBase {
     }
   }
 
-  addTags(tags) {
+  addLabels(labels) {
     this.ensureContext()
     var ctx = this.context
-    if (!ctx.tags) {
-      ctx.tags = {}
+    if (!ctx.labels) {
+      ctx.labels = {}
     }
-    var keys = Object.keys(tags)
-    keys.forEach(function(k) {
-      setTag(k, tags[k], ctx.tags)
-    })
+    var keys = Object.keys(labels)
+    keys.forEach(k => setLabel(k, labels[k], ctx.labels))
   }
 
   addContext(context) {

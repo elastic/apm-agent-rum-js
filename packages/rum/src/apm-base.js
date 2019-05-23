@@ -115,8 +115,14 @@ class ApmBase {
   }
 
   addTags(tags) {
+    const loggingService = this.serviceFactory.getService('LoggingService')
+    loggingService.warn('addTags deprecated, please use addLabels')
+    this.addLabels(tags)
+  }
+
+  addLabels(labels) {
     var configService = this.serviceFactory.getService('ConfigService')
-    configService.addTags(tags)
+    configService.addLabels(labels)
   }
 
   // Should call this method before 'load' event on window is fired

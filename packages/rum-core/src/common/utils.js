@@ -135,14 +135,14 @@ function isPlatformSupported() {
 }
 
 /**
- * Convert values of the tag to be string to be compatible
+ * Convert values of the Tag/Label to be string to be compatible
  * with the apm server prior to <6.7 version
  *
  * TODO: Remove string conversion in the next major release since
  * support for boolean and number in the APM server has landed in 6.7
  * https://github.com/elastic/apm-server/pull/1712/
  */
-function setTag(key, value, obj) {
+function setLabel(key, value, obj) {
   if (!obj || !key) return
   var skey = removeInvalidChars(key)
   if (value) {
@@ -347,7 +347,7 @@ export {
   generateRandomId,
   rng,
   checkSameOrigin,
-  setTag,
+  setLabel,
   stripQueryStringFromUrl,
   find,
   removeInvalidChars

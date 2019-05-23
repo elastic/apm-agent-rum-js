@@ -143,18 +143,18 @@ describe('ConfigService', function() {
     expect(result).toBe(true)
   })
 
-  it('should addTags', function() {
+  it('should addLabels', function() {
     var date = new Date()
-    const tags = {
+    const labels = {
       test: 'test',
       no: 1,
       'test.test': 'test',
       obj: { just: 'object' },
       date
     }
-    configService.addTags(tags)
-    const contextTags = configService.get('context.tags')
-    expect(contextTags).toEqual({
+    configService.addLabels(labels)
+    const contextLabels = configService.get('context.labels')
+    expect(contextLabels).toEqual({
       test: 'test',
       no: '1',
       test_test: 'test',

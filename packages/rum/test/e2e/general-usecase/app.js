@@ -54,7 +54,7 @@ elasticApm.setUserContext({
   email: 'email'
 })
 elasticApm.setCustomContext({ testContext: 'testContext' })
-elasticApm.addTags({ testTagKey: 'testTagValue' })
+elasticApm.addLabels({ testTagKey: 'testTagValue' })
 
 elasticApm.addFilter(function(payload) {
   if (payload.errors) {
