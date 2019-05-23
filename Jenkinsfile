@@ -14,7 +14,7 @@ it is need as field to store the results of the tests.
 pipeline {
   agent { label 'linux && immutable' }
   environment {
-    BASE_DIR="src/github.com/elastic/apm-agent-js-base"
+    BASE_DIR="src/github.com/elastic/apm-agent-rum-js"
     NOTIFY_TO = credentials('notify-to')
     JOB_GCS_BUCKET = credentials('gcs-bucket')
     PIPELINE_LOG_LEVEL='INFO'
@@ -176,38 +176,22 @@ def runScript(Map params = [:]){
 
   env.STACK_VERSION = "${stack}"
   env.SCOPE = "${scope}"
-  env.APM_SERVER_URL = 'http://localhost:8001'
-  env.APM_SERVER_PORT = '8001'
+  env.APM_SERVER_URL = 'http://apm-server:8200'
+  env.APM_SERVER_PORT = '8200'
   env.MODE = 'saucelabs'
 
   deleteDir()
   unstash 'source'
   unstash 'cache'
-  retry(2){
+  retry(1){
     sleep randomNumber(min:10, max: 30)
+    dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "docker.elastic.co")
     dir("${BASE_DIR}"){
       withSaucelabsEnv(){
         sh(label: "Start Elastic Stack ${stack}",
         script: '''
-        docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
-        docker ps -a
-        docker network ls
-        docker container ls
+        docker-compose -f ./dev-utils/docker-compose.yml up node-puppeteer
         ''')
-      }
-    }
-
-    dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "docker.elastic.co")
-    docker.image('docker.elastic.co/observability-ci/node-puppeteer:8').inside('--network=dev-utils_apm'){
-      dir("${BASE_DIR}"){
-        withSaucelabsEnv(){
-          sh(label: "Test ${stack} - ${scope}",
-          script: '''
-          HOME=$(pwd)
-          npm install
-          npm run test
-          ''')
-        }
       }
     }
   }

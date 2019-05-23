@@ -41,6 +41,7 @@ function getTestEnvironmentVariables() {
     mode: process.env.MODE,
     sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
     isTravis: process.env.TRAVIS,
+    isJenkins: process.env.JENKINS_URL,
     serverUrl: process.env.APM_SERVER_URL || defaultApmServerUrl,
     mockBackendUrl: 'http://localhost:8003'
   }

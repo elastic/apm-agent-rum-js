@@ -102,10 +102,11 @@ const baseConfig = {
 function prepareConfig(defaultConfig) {
   const testConfig = defaultConfig.testConfig || {}
   const agentConfig = defaultConfig.globalConfigs.agentConfig || {}
-  const { isTravis, sauceLabs: isSauce } = testConfig
+  const { isTravis, isJenkins, sauceLabs: isSauce } = testConfig
   let buildId = `ApmJs-${agentConfig.name}`
 
   if (isTravis) {
+    console.log('prepareConfig: Run in Travis')
     buildId =
       buildId +
       ' - TRAVIS #' +
@@ -115,7 +116,19 @@ function prepareConfig(defaultConfig) {
       ')'
     defaultConfig.plugins.push('karma-firefox-launcher')
     defaultConfig.browsers.push('Firefox')
+  } else if (isJenkins) {
+    console.log('prepareConfig: Run in Jenkins')
+    buildId =
+      buildId +
+      ' - Jenkins #' +
+      process.env.BUILD_NUMBER +
+      ' (' +
+      process.env.BUILD_ID +
+      ')'
+    defaultConfig.plugins.push('karma-firefox-launcher')
+    defaultConfig.browsers.push('Firefox')
   } else {
+    console.log('prepareConfig: Run in Default enviroment')
     defaultConfig.plugins.push('karma-chrome-launcher')
     defaultConfig.browsers.push('Chrome')
 
@@ -139,6 +152,7 @@ function prepareConfig(defaultConfig) {
   }
 
   if (isSauce) {
+    console.log('prepareConfig: Run in SuaceLab mode')
     defaultConfig.concurrency = 3
     if (testConfig.branch === 'master') {
       // && process.env.TRAVIS_PULL_REQUEST !== 'false'

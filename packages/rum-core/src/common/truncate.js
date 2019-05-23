@@ -99,7 +99,12 @@ function truncate(
   required = false,
   placeholder = 'N/A'
 ) {
-  if (required && !value) {
+  /*
+    The request will fail if we set a string placeholder
+    when the apm server expects a number.
+    However, if this happens it must be a bug.
+  */
+  if (required && isEmpty(value)) {
     value = placeholder
   }
   if (typeof value === 'string') {
@@ -108,13 +113,13 @@ function truncate(
   return value
 }
 
-function checkFalsyValue(value) {
-  return value == null || value === ''
+function isEmpty(value) {
+  return value == null || value === '' || typeof value === 'undefined'
 }
 
 function replaceValue(target, key, currModel) {
   const value = truncate(target[key], currModel[0], currModel[1])
-  if (checkFalsyValue(value)) {
+  if (isEmpty(value)) {
     delete target[key]
     return
   }
