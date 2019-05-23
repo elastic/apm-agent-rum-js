@@ -217,17 +217,40 @@ class Config {
     return this._changeSubscription.subscribe(fn)
   }
 
-  isValid() {
+  /**
+   * Validate the config once set via setConfig aganist the required parameters
+   * Also normalizes the config on specific keys
+   */
+  validate() {
     const requiredKeys = ['serviceName', 'serverUrl']
+    const errors = []
 
     for (let i = 0; i < requiredKeys.length; i++) {
       const key = requiredKeys[i]
       if (this.config[key] == null || this.config[key] === '') {
-        return false
+        errors.push(errors.length === 0 ? 'Missing ' + key : key)
       }
     }
+    /**
+     * Invalid characters on serviceName
+     */
+    if (!/^[a-zA-Z0-9 _-]+$/.test(this.config.serviceName)) {
+      errors.push(
+        'serviceName ' +
+          this.config.serviceName +
+          ' contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)'
+      )
+    }
+    /**
+     * Remove all trailing slash for serverUrl since serverUrlPrefix
+     * includes a forward slash for the path
+     */
+    const serverUrl = this.config.serverUrl
+    if (serverUrl) {
+      this.config.serverUrl = serverUrl.replace(/\/+$/, '')
+    }
 
-    return true
+    return errors
   }
 }
 

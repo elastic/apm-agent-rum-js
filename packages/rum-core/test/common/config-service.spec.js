@@ -126,21 +126,32 @@ describe('ConfigService', function() {
     expect(userContext).toEqual({})
   })
 
-  it('should check config validity', function() {
-    var result = configService.isValid()
-    expect(result).toBe(false)
+  it('should validate and normalize config options', () => {
+    // Valid
+    configService.setConfig({ serviceName: 'name' })
+    const errors1 = configService.validate()
+    expect(errors1.length).toEqual(0)
 
-    configService.setConfig({ serviceName: 'serviceName' })
-    result = configService.isValid()
-    expect(result).toBe(true)
+    // Invalid required key serviceName
+    configService.setConfig({ serviceName: undefined })
+    const errors2 = configService.validate()
+    expect(errors2).toEqual(['Missing serviceName'])
 
-    configService.setConfig({ serverUrl: undefined })
-    result = configService.isValid()
-    expect(result).toBe(false)
+    // Invalid characters in serviceName
+    configService.setConfig({ serviceName: 'abc.def' })
+    const errors3 = configService.validate()
+    expect(errors3).toEqual([
+      'serviceName abc.def contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)'
+    ])
 
-    configService.setConfig({ serverUrl: 'test' })
-    result = configService.isValid()
-    expect(result).toBe(true)
+    // normalize serverUrl
+    configService.setConfig({
+      serviceName: 'aabc',
+      serverUrl: 'http://localhost:8080/////'
+    })
+    const errors4 = configService.validate()
+    expect(configService.get('serverUrl')).toEqual('http://localhost:8080')
+    expect(errors4.length).toEqual(0)
   })
 
   it('should addLabels', function() {

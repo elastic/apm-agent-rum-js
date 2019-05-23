@@ -52,16 +52,6 @@ describe('index', function() {
     spyOn(apmServer, 'sendErrors').and.callThrough()
     spyOn(apmServer, '_postJson').and.callThrough()
 
-    try {
-      throw new Error('ApmBase test error')
-    } catch (error) {
-      apmBase.captureError(error)
-      if (isPlatformSupported()) {
-        expect(apmServer.errorQueue).toBeUndefined()
-        expect(apmServer.sendErrors).not.toHaveBeenCalled()
-        expect(apmServer._postJson).not.toHaveBeenCalled()
-      }
-    }
     const { agentConfig } = globalConfigs
     apmBase.init({
       serverUrl: agentConfig.serverUrl,

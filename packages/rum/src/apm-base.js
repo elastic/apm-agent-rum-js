@@ -33,12 +33,12 @@ class ApmBase {
   init(config) {
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
-      var configService = this.serviceFactory.getService('ConfigService')
+      const configService = this.serviceFactory.getService('ConfigService')
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
       configService.setVersion('4.1.2')
-      configService.setConfig(config)
+      this.config(config)
       /**
        * Deactive agent when the active config flag is set to false
        */
@@ -49,10 +49,10 @@ class ApmBase {
       }
 
       this.serviceFactory.init()
-      var errorLogging = this.serviceFactory.getService('ErrorLogging')
+      const errorLogging = this.serviceFactory.getService('ErrorLogging')
       errorLogging.registerGlobalEventListener()
 
-      var performanceMonitoring = this.serviceFactory.getService(
+      const performanceMonitoring = this.serviceFactory.getService(
         'PerformanceMonitoring'
       )
       performanceMonitoring.init()
@@ -99,9 +99,33 @@ class ApmBase {
     return !this._disable
   }
 
+  /**
+   * When the required config keys are invalid, the agent is deactivated with
+   * logging error to the console
+   */
   config(config) {
-    var configService = this.serviceFactory.getService('ConfigService')
+    const configService = this.serviceFactory.getService('ConfigService')
     configService.setConfig(config)
+    /**
+     * Skip validation when agent is not active
+     */
+    if (!configService.isActive()) {
+      return
+    }
+
+    const errors = configService.validate()
+    if (errors.length === 0) {
+      return
+    }
+    const loggingService = this.serviceFactory.getService('LoggingService')
+    const message = 'RUM Agent configuration is invalid: ' + errors.join(', ')
+
+    /**
+     * TODO: Deactivate the agent when configuration is invalid
+     * on next major version
+     */
+    // configService.setConfig({ active: false })
+    loggingService.error(message)
   }
 
   setUserContext(userContext) {
