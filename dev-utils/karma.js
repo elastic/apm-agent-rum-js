@@ -123,8 +123,10 @@ function prepareConfig(defaultConfig) {
       ' - Jenkins #' +
       process.env.BUILD_NUMBER +
       ' (' +
-      process.env.BUILD_ID +
-      ')'
+      process.env.BRANCH_NAME +
+      ') Elastic Stack ' +
+      process.env.STACK_VERSION
+    console.log('prepareConfig: buildId ' + buildId)
     defaultConfig.plugins.push('karma-firefox-launcher')
     defaultConfig.browsers.push('Firefox')
   } else {
@@ -154,10 +156,17 @@ function prepareConfig(defaultConfig) {
   if (isSauce) {
     console.log('prepareConfig: Run in SuaceLab mode')
     defaultConfig.concurrency = 3
-    if (testConfig.branch === 'master') {
+    if (testConfig.branch === 'master' && !isJenkins) {
       // && process.env.TRAVIS_PULL_REQUEST !== 'false'
       defaultConfig.sauceLabs.build = buildId
       defaultConfig.sauceLabs.tags = ['master']
+      console.log('saucelabs.build:', buildId)
+    } else if (isJenkins) {
+      defaultConfig.sauceLabs.build = buildId
+      defaultConfig.sauceLabs.tags = [
+        testConfig.branch,
+        process.env.STACK_VERSION
+      ]
       console.log('saucelabs.build:', buildId)
     }
     defaultConfig.reporters = ['dots', 'saucelabs']

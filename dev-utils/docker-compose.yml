@@ -1,4 +1,4 @@
-version: "2.4"
+version: "2.1"
 services:
   elasticsearch:
     container_name: elasticsearch
@@ -14,6 +14,8 @@ services:
       memlock:
         soft: -1
         hard: -1
+    mem_limit: 2000m
+#    cpus: 0.5
     logging:
       driver: 'json-file'
       options:
@@ -56,6 +58,8 @@ services:
       options:
           max-size: '2m'
           max-file: '5'
+    mem_limit: 1000m
+#    cpus: 0.5
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -85,6 +89,8 @@ services:
       test: ["CMD", "curl", "--write-out", "'HTTP %{http_code}'", "--silent", "--output", "/dev/null", "http://kibana:5601/"]
       retries: 10
       interval: 10s
+    mem_limit: 2000m
+#    cpus: 0.5
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -99,9 +105,9 @@ services:
     container_name: wait-for-apm-server
     image: alpine
     command: >
-      exit 0
+      /bin/sh -c exit 0
     healthcheck:
-      test: ["CMD", "exit", "0"]
+      test: ["CMD", "/bin/sh", "-c", "exit 0"]
       retries: 10
       interval: 10s
     depends_on:
@@ -118,20 +124,28 @@ services:
     environment:
       - HOME=/app
       - SCOPE=${SCOPE}
+      - STACK_VERSION=${STACK_VERSION}
       - APM_SERVER_URL=${APM_SERVER_URL}
-      - JENKINS_BUILD_NUMBER=${BUILD_NUMBER}
+      - BUILD_NUMBER=${BUILD_NUMBER}
+      - BRANCH_NAME=${BRANCH_NAME}
       - JENKINS_URL=${JENKINS_URL}
       - SAUCE_USERNAME=${SAUCE_USERNAME}
       - SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}
       - MODE=${MODE}
     command: >
       /bin/bash -c "set -x
+        id
         node --version
         npm --version
+        npx --version
         cd /app
         export
         npm install
+        npm install puppeteer --unsafe-perm=true --allow-root
+        set -eo pipefail
         npm run test"
+    mem_limit: 2000m
+#    cpus: 0.5
     depends_on:
       apm-server:
         condition: service_healthy

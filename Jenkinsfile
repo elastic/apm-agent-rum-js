@@ -23,7 +23,7 @@ pipeline {
     DOCKER_ELASTIC_SECRET = 'secret/apm-team/ci/docker-registry/prod'
   }
   options {
-    timeout(time: 1, unit: 'HOURS')
+    timeout(time: 3, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -63,12 +63,7 @@ pipeline {
             script{
               docker.image('node:8').inside(){
                 dir("${BASE_DIR}"){
-                  sh(label: "Lint", script: '''
-                  HOME=$(pwd)
-                  npm install
-                  npm run lint
-                  npm run bundlesize || true
-                  ''')
+                  sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
                 }
                 stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
               }
@@ -103,18 +98,8 @@ pipeline {
     }
   }
   post {
-    success {
-      echoColor(text: '[SUCCESS]', colorfg: 'green', colorbg: 'default')
-    }
-    aborted {
-      echoColor(text: '[ABORTED]', colorfg: 'magenta', colorbg: 'default')
-    }
-    failure {
-      echoColor(text: '[FAILURE]', colorfg: 'red', colorbg: 'default')
-      step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: "${NOTIFY_TO}", sendToIndividuals: false])
-    }
-    unstable {
-      echoColor(text: '[UNSTABLE]', colorfg: 'yellow', colorbg: 'default')
+    always {
+      notifyBuildResult()
     }
   }
 }
@@ -134,7 +119,7 @@ class RumParallelTaskGenerator extends DefaultParallelTaskGenerator {
   */
   public Closure generateStep(x, y){
     return {
-      steps.node('linux && immutable'){
+      steps.node('linux && immutable && docker'){
         def label = "${this.tag}:${x}#${y}"
         try {
           steps.runScript(label: label, stack: x, scope: y)
@@ -146,7 +131,7 @@ class RumParallelTaskGenerator extends DefaultParallelTaskGenerator {
           steps.junit(allowEmptyResults: true,
             keepLongStdio: true,
             testResults: "**/spec/rum-agent-junit.xml")
-          steps.archiveArtifacts("${steps.env.BASE_DIR}/.npm/_logs")
+          steps.archiveArtifacts(allowEmptyArchive: true, artifacts: "**/.npm/_logs")
           steps.codecov(repo: 'apm-agent-rum', basedir: "${steps.env.BASE_DIR}",
             secret: "${steps.env.CODECOV_SECRET}")
         }
@@ -159,15 +144,38 @@ def runParallelTest(){
   rumTasksGen = new RumParallelTaskGenerator(
     xFile: '.ci/.jenkins_stack_versions.yaml',
     xKey: 'STACK_VERSION',
-    yFile: '.ci/.jenkins_scopes.yaml',
-    yKey: 'SCOPE',
+    yVersions: ['@elastic/apm-rum-core'],
+    excludedVersions: ['empty'],
+    tag: "Rum-core",
+    name: "Rum-core",
+    steps: this
+  )
+  def mapPatallelTasks = rumTasksGen.generateParallelTests()
+  //parallel(mapPatallelTasks)
+
+  mapPatallelTasks.each{ k, v ->
+    stage(k){
+      v()
+    }
+  }
+
+  rumTasksGen = new RumParallelTaskGenerator(
+    xFile: '.ci/.jenkins_stack_versions.yaml',
+    xKey: 'STACK_VERSION',
+    yVersions: ['@elastic/apm-rum'],
     excludedVersions: ['empty'],
     tag: "Rum",
     name: "Rum",
     steps: this
-    )
-    def mapPatallelTasks = rumTasksGen.generateParallelTests()
-    parallel(mapPatallelTasks)
+  )
+  mapPatallelTasks = rumTasksGen.generateParallelTests()
+  //parallel(mapPatallelTasks)
+
+  mapPatallelTasks.each{ k, v ->
+    stage(k){
+      v()
+    }
+  }
 }
 
 def runScript(Map params = [:]){
@@ -184,17 +192,10 @@ def runScript(Map params = [:]){
   deleteDir()
   unstash 'source'
   unstash 'cache'
-  retry(1){
-    sleep randomNumber(min:10, max: 30)
-    dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "docker.elastic.co")
-    dir("${BASE_DIR}"){
-      withSaucelabsEnv(){
-        sh(label: "Start Elastic Stack ${stack}",
-        script: '''
-        docker-compose -f ./dev-utils/docker-compose.yml up node-puppeteer
-        docker-compose -f ./dev-utils/docker-compose.yml stop
-        ''')
-      }
+  dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "docker.elastic.co")
+  dir("${BASE_DIR}"){
+    withSaucelabsEnv(){
+      sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
     }
   }
 }

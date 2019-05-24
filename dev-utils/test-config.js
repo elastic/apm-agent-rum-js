@@ -30,14 +30,14 @@ function getSauceConnectOptions() {
     accessKey: process.env.SAUCE_ACCESS_KEY,
     logger: console.log,
     noSslBumpDomains: 'all',
-    tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+    tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER || process.env.BUILD_NUMBER,
     connectRetries: 3
   }
 }
 
 function getTestEnvironmentVariables() {
   return {
-    branch: process.env.TRAVIS_BRANCH,
+    branch: process.env.TRAVIS_BRANCH || process.env.BRANCH_NAME,
     mode: process.env.MODE,
     sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
     isTravis: process.env.TRAVIS,
