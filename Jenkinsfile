@@ -14,12 +14,13 @@ it is need as field to store the results of the tests.
 pipeline {
   agent { label 'linux && immutable' }
   environment {
-    BASE_DIR="src/github.com/elastic/apm-agent-js-base"
+    BASE_DIR="src/github.com/elastic/apm-agent-rum-js"
     NOTIFY_TO = credentials('notify-to')
     JOB_GCS_BUCKET = credentials('gcs-bucket')
     PIPELINE_LOG_LEVEL='INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs'
+    DOCKER_ELASTIC_SECRET = 'secret/apm-team/ci/docker-registry/prod'
   }
   options {
     timeout(time: 1, unit: 'HOURS')
@@ -60,11 +61,11 @@ pipeline {
             deleteDir()
             unstash 'source'
             script{
-              docker.image('node:8-alpine').inside(){
+              docker.image('node:8').inside(){
                 dir("${BASE_DIR}"){
                   sh(label: "Lint", script: '''
                   HOME=$(pwd)
-                  npm install get-dependencies --save
+                  npm install
                   npm run lint
                   npm run bundlesize || true
                   ''')
@@ -80,7 +81,10 @@ pipeline {
         stage('Test') {
           steps {
             deleteDir()
-            runParallelTest()
+            unstash 'source'
+            dir("${BASE_DIR}"){
+              runParallelTest()
+            }
           }
         }
         /**
@@ -139,9 +143,10 @@ class RumParallelTaskGenerator extends DefaultParallelTaskGenerator {
           saveResult(x, y, 0)
           error("${label} tests failed : ${e.toString()}\n")
         } finally {
-          steps.junit(allowEmptyResults: false,
+          steps.junit(allowEmptyResults: true,
             keepLongStdio: true,
             testResults: "**/spec/rum-agent-junit.xml")
+          steps.archiveArtifacts("${steps.env.BASE_DIR}/.npm/_logs")
           steps.codecov(repo: 'apm-agent-rum', basedir: "${steps.env.BASE_DIR}",
             secret: "${steps.env.CODECOV_SECRET}")
         }
@@ -173,33 +178,21 @@ def runScript(Map params = [:]){
   env.STACK_VERSION = "${stack}"
   env.SCOPE = "${scope}"
   env.APM_SERVER_URL = 'http://apm-server:8200'
+  env.APM_SERVER_PORT = '8200'
   env.MODE = 'saucelabs'
 
   deleteDir()
   unstash 'source'
   unstash 'cache'
-
-  dir("${BASE_DIR}"){
-    withSaucelabsEnv(){
-      sh(label: "Start Elastic Stack ${stack}",
-      script: '''
-      docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
-      docker ps -a
-      docker network ls
-      docker container ls
-      ''')
-    }
-  }
-
-  docker.image('node:8-alpine').inside('--network=apm'){
+  retry(1){
+    sleep randomNumber(min:10, max: 30)
+    dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "docker.elastic.co")
     dir("${BASE_DIR}"){
       withSaucelabsEnv(){
-        sh(label: "Test ${stack} - ${scope}",
+        sh(label: "Start Elastic Stack ${stack}",
         script: '''
-        HOME=$(pwd)
-        npm install get-dependencies --save
-        npm run bootstrap
-        npm run test
+        docker-compose -f ./dev-utils/docker-compose.yml up node-puppeteer
+        docker-compose -f ./dev-utils/docker-compose.yml stop
         ''')
       }
     }
