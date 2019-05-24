@@ -68,7 +68,7 @@ TIP: Before using custom context, ensure you understand the different types of
 [[apm-add-tags]]
 ==== `apm.addTags()`
 
-deprecated, Please use <<apm-add-labels,`apm.addLabels()`>> instead
+deprecated[4.1.x,Tags have been replaced with labels], Please use <<apm-add-labels,`apm.addLabels()`>> instead
 
 [float]
 [[apm-add-labels]]
