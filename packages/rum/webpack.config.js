@@ -24,7 +24,7 @@
  */
 
 const path = require('path')
-const { DefinePlugin } = require('webpack')
+const { EnvironmentPlugin } = require('webpack')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
@@ -58,8 +58,8 @@ const baseConfig = {
     ]
   },
   plugins: [
-    new DefinePlugin({
-      __DEV__: true
+    new EnvironmentPlugin({
+      NODE_ENV: 'development'
     })
   ]
 }
@@ -84,8 +84,8 @@ const optimizeConfig = Object.assign({}, baseConfig, {
     maxAssetSize: 65 * 1024 // 65 kB
   },
   plugins: [
-    new DefinePlugin({
-      __DEV__: false
+    new EnvironmentPlugin({
+      NODE_ENV: 'production'
     }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',

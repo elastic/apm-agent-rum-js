@@ -231,7 +231,9 @@ class ApmServer {
     } else if (type === 'transaction') {
       ndjson = this.ndjsonTransactions(filteredPayload.data)
     } else {
-      this._loggingService.debug('Dropped payload due to unknown data type ')
+      if (process.env.NODE_ENV !== 'production') {
+        this._loggingService.debug('Dropped payload due to unknown data type ')
+      }
       return
     }
     ndjson.unshift(

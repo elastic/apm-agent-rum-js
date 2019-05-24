@@ -220,7 +220,7 @@ class PerformanceMonitoring {
       )
 
       if (!wasBrowserResponsive) {
-        if (__DEV__) {
+        if (process.env.NODE_ENV !== 'production') {
           performanceMonitoring._logginService.debug(
             'Transaction was discarded! browser was not responsive enough during the transaction.',
             ' duration:',
@@ -354,7 +354,7 @@ class PerformanceMonitoring {
       .map(tr => this.createTransactionPayload(tr))
       .filter(tr => tr)
 
-    if (__DEV__) {
+    if (process.env.NODE_ENV !== 'production') {
       this._logginService.debug(
         'Sending Transactions to apm server.',
         transactions.length

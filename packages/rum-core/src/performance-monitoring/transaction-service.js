@@ -29,6 +29,8 @@ import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
 
+const __DEV__ = process.env.NODE_ENV !== 'production'
+
 class TransactionService {
   constructor(logger, config) {
     if (typeof config === 'undefined') {

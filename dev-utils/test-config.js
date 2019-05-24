@@ -74,10 +74,11 @@ function getGlobalConfig(packageName = 'rum') {
 /**
  * Used for injecting process.env across webpack bundles for testing
  */
-function getWebpackEnv() {
+function getWebpackEnv(env = 'development') {
   const { serverUrl } = getTestEnvironmentVariables()
   return {
-    APM_SERVER_URL: serverUrl
+    APM_SERVER_URL: serverUrl,
+    NODE_ENV: env
   }
 }
 

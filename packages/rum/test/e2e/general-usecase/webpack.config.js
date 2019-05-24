@@ -25,7 +25,7 @@
 
 const path = require('path')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
-const { EnvironmentPlugin, DefinePlugin } = require('webpack')
+const { EnvironmentPlugin } = require('webpack')
 const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 
 const optimized = {
@@ -54,12 +54,7 @@ const optimized = {
       })
     ]
   },
-  plugins: [
-    new EnvironmentPlugin(getWebpackEnv()),
-    new DefinePlugin({
-      __DEV__: true
-    })
-  ]
+  plugins: [new EnvironmentPlugin(getWebpackEnv())]
 }
 
 module.exports = optimized

@@ -39,7 +39,7 @@ class StackTraceService {
       try {
         stackTraces = errorStackParser.parse(error)
       } catch (e) {
-        if (__DEV__) {
+        if (process.env.NODE_ENV !== 'production') {
           this._loggingService.debug('Parsing error stack failed!', e)
         }
       }
