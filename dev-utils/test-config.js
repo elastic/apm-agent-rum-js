@@ -85,7 +85,8 @@ function getBrowserList() {
   return [
     {
       browserName: 'chrome',
-      version: '49'
+      version: '49',
+      extendedDebugging: true
     },
     {
       browserName: 'chrome',
@@ -125,7 +126,12 @@ function getBrowserList() {
       platformName: 'iOS',
       browserName: 'Safari'
     }
-  ]
+  ].map(c => ({
+    ...c,
+    loggingPrefs: {
+      browser: 'INFO'
+    }
+  }))
 }
 
 module.exports = {
