@@ -25,6 +25,8 @@
 
 import Span from './span'
 import SpanBase from './span-base'
+import { PAGE_LOAD } from '../common/constants'
+
 import {
   generateRandomId,
   getNavigationTimingMarks,
@@ -142,8 +144,18 @@ class Transaction extends SpanBase {
     const metadata = getPageMetadata()
     this.addContext(metadata)
 
-    this._adjustStartToEarliestSpan()
-    this._adjustEndToLatestSpan()
+    /**
+     * For page load transactions, we have to adjust the transaction start/end
+     * depending on the navigation & resource timing spans.
+     *
+     * Doing it here would exclude the navigation and resource timing spans since
+     * transaction.end might be lesser than those spans end and
+     * it would be considered as invalid span
+     */
+    if (this.type !== PAGE_LOAD) {
+      this._adjustStartToEarliestSpan()
+      this._adjustEndToLatestSpan()
+    }
     this.callOnEnd()
   }
 

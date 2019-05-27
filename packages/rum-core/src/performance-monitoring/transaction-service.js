@@ -25,6 +25,7 @@
 
 import Transaction from './transaction'
 import { extend } from '../common/utils'
+import { PAGE_LOAD } from '../common/constants'
 import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
 
@@ -104,7 +105,7 @@ class TransactionService {
   }
 
   sendPageLoadMetrics(name) {
-    var tr = this.startTransaction(name, 'page-load')
+    var tr = this.startTransaction(name, PAGE_LOAD)
     tr.detectFinish()
     return tr
   }
@@ -181,7 +182,7 @@ class TransactionService {
       }
     }
 
-    if (type === 'page-load') {
+    if (type === PAGE_LOAD) {
       tr.isHardNavigation = true
 
       if (perfOptions.pageLoadTraceId) {
@@ -201,7 +202,7 @@ class TransactionService {
       self.applyAsync(function() {
         self._logger.debug('TransactionService transaction finished', tr)
         if (!self.shouldIgnoreTransaction(tr.name)) {
-          if (type === 'page-load') {
+          if (type === PAGE_LOAD) {
             if (
               tr.name === 'Unknown' &&
               self._config.get('pageLoadTransactionName')
