@@ -77,18 +77,23 @@ See <<span-api,Span API>> docs for details on how to use custom spans.
 [[transaction-add-tags]]
 ==== `transaction.addTags()`
 
+deprecated[4.1.x,Tags have been replaced with labels], Please use <<transaction-add-labels,`transaction.addLabels()`>> instead
+
+[float]
+[[transaction-add-labels]]
+==== `transaction.addLabels()`
+
 [source,js]
 ----
-transaction.addTags({ [name]: value })
+transaction.addLabels({ [name]: value })
 ----
 
-Add several tags on the transaction.
-If an error happens during the transaction,
-it will also get tagged with the same tags.
+Add several labels on the transaction. If an error happens during the transaction,
+it will also get tagged with the same labels.
 
-Tags are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via <<apm-set-custom-context,`apm.setCustomContext()`>>).
+Labels are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via <<apm-set-custom-context,`apm.setCustomContext()`>>).
 
-TIP: Before using custom tags, ensure you understand the different types of
+TIP: Before using custom labels, ensure you understand the different types of
 {apm-overview-ref-v}/metadata.html[metadata] that are available.
 
 Arguments:

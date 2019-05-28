@@ -48,6 +48,11 @@ class SpanBase {
     }
   }
 
+  addTags(tags) {
+    console.warn('addTags deprecated, please use addLabels')
+    this.addLabels(tags)
+  }
+
   addLabels(labels) {
     this.ensureContext()
     var ctx = this.context
