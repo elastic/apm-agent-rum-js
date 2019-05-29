@@ -366,6 +366,19 @@ function getPageLoadMarks() {
   }
 }
 
+/**
+ * Removes the username:password portion from Urls
+ *
+ * Ex: https://a:b@example.com/c  -> https://example.com/c
+ */
+function removeAuthFromUrl(url = '') {
+  const userpass = url.match(/^https?:\/\/([^/]+)@/)
+  if (userpass == null) {
+    return url
+  }
+  return url.replace(userpass[1] + '@', '')
+}
+
 export {
   extend,
   merge,
@@ -395,5 +408,6 @@ export {
   setLabel,
   stripQueryStringFromUrl,
   find,
-  removeInvalidChars
+  removeInvalidChars,
+  removeAuthFromUrl
 }

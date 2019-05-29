@@ -291,4 +291,9 @@ describe('lib/utils', function() {
     )
     expect(utils.removeInvalidChars('invalid"')).toEqual('invalid_')
   })
+
+  it('should remove sensitive auth from url', () => {
+    const url = 'https://a:b@c.com/d'
+    expect(utils.removeAuthFromUrl(url)).toEqual('https://c.com/d')
+  })
 })

@@ -30,7 +30,8 @@ import {
   stripQueryStringFromUrl,
   parseDtHeaderValue,
   getEarliestSpan,
-  getLatestNonXHRSpan
+  getLatestNonXHRSpan,
+  removeAuthFromUrl
 } from '../common/utils'
 import { patchSubscription } from '../common/patching'
 import { globalState } from '../common/patching/patch-utils'
@@ -89,9 +90,17 @@ class PerformanceMonitoring {
           if (span) {
             var isDtEnabled = configService.get('distributedTracing')
             var origins = configService.get('distributedTracingOrigins')
+            /**
+             * Fetch calls throws Request construction error so its safer to do this operation
+             * only for XHR calls
+             */
+            const requestUrl =
+              task.source === XMLHTTPREQUEST_SOURCE
+                ? removeAuthFromUrl(task.data.url)
+                : task.data.url
             var isSameOrigin =
-              checkSameOrigin(task.data.url, window.location.href) ||
-              checkSameOrigin(task.data.url, origins)
+              checkSameOrigin(requestUrl, window.location.href) ||
+              checkSameOrigin(requestUrl, origins)
             var target = task.data.target
             if (isDtEnabled && isSameOrigin && target) {
               pm.injectDtHeader(span, target)
@@ -99,7 +108,7 @@ class PerformanceMonitoring {
             span.addContext({
               http: {
                 method: task.data.method,
-                url: task.data.url
+                url: requestUrl
               }
             })
             span.sync = task.data.sync
