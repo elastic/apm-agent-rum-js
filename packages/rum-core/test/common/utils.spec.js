@@ -293,7 +293,13 @@ describe('lib/utils', function() {
   })
 
   it('should remove sensitive auth from url', () => {
-    const url = 'https://a:b@c.com/d'
-    expect(utils.removeAuthFromUrl(url)).toEqual('https://c.com/d')
+    expect(utils.removeAuthFromUrl('https://a:b@c.com/d')).toEqual(
+      'https://c.com/d'
+    )
+    expect(utils.removeAuthFromUrl('http://e:f@example.com/g')).toEqual(
+      'http://example.com/g'
+    )
+    const noAuthUrl = 'https://test.com/abc'
+    expect(utils.removeAuthFromUrl(noAuthUrl)).toEqual(noAuthUrl)
   })
 })

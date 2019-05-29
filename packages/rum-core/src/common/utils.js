@@ -371,12 +371,15 @@ function getPageLoadMarks() {
  *
  * Ex: https://a:b@example.com/c  -> https://example.com/c
  */
-function removeAuthFromUrl(url = '') {
-  const userpass = url.match(/^https?:\/\/([^/]+)@/)
+function removeAuthFromUrl(url) {
+  if (!url) {
+    return url
+  }
+  const userpass = url.match(/^http(s?):\/\/([^/]+)@/)
   if (userpass == null) {
     return url
   }
-  return url.replace(userpass[1] + '@', '')
+  return url.replace(userpass[2] + '@', '')
 }
 
 export {
