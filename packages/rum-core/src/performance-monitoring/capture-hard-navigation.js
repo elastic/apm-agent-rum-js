@@ -26,7 +26,8 @@
 import Span from './span'
 import {
   RESOURCE_INITIATOR_TYPES,
-  MAX_SPAN_DURATION
+  MAX_SPAN_DURATION,
+  USER_TIMING_THRESHOLD
 } from '../common/constants'
 import { stripQueryStringFromUrl } from '../common/utils'
 
@@ -174,6 +175,27 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
   return spans
 }
 
+function createUserTimingSpans(entries) {
+  const userTimingSpans = []
+
+  for (let i = 0; i < entries.length; i++) {
+    const { name, startTime, duration } = entries[i]
+
+    if (duration <= USER_TIMING_THRESHOLD) {
+      continue
+    }
+    const kind = 'user.measure'
+    const end = startTime + duration
+    const span = new Span(name, kind)
+    span._start = startTime
+    span.ended = true
+    span._end = end
+
+    userTimingSpans.push(span)
+  }
+  return userTimingSpans
+}
+
 function captureHardNavigation(transaction) {
   const perf = window.performance
   if (transaction.isHardNavigation && perf && perf.timing) {
@@ -210,7 +232,7 @@ function captureHardNavigation(transaction) {
     })
 
     if (typeof perf.getEntriesByType === 'function') {
-      const entries = perf.getEntriesByType('resource')
+      const resourceEntries = perf.getEntriesByType('resource')
 
       const ajaxUrls = []
       for (let i = 0; i < transaction.spans; i++) {
@@ -221,8 +243,15 @@ function captureHardNavigation(transaction) {
         }
         ajaxUrls.push(span.name.split(' ')[1])
       }
-      createResourceTimingSpans(entries, ajaxUrls, transactionEnd).forEach(
-        span => transaction.spans.push(span)
+      createResourceTimingSpans(
+        resourceEntries,
+        ajaxUrls,
+        transactionEnd
+      ).forEach(span => transaction.spans.push(span))
+
+      const userEntries = perf.getEntriesByType('measure')
+      createUserTimingSpans(userEntries).forEach(
+        span => span._end <= transaction._end && transaction.spans.push(span)
       )
     }
   }
