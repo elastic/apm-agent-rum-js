@@ -299,6 +299,8 @@ describe('lib/utils', function() {
     expect(utils.removeAuthFromUrl('http://e:f@example.com/g')).toEqual(
       'http://example.com/g'
     )
+    const authInPath = 'https://test.com/a:c@blah/10'
+    expect(utils.removeAuthFromUrl(authInPath)).toEqual(authInPath)
     const noAuthUrl = 'https://test.com/abc'
     expect(utils.removeAuthFromUrl(noAuthUrl)).toEqual(noAuthUrl)
   })
