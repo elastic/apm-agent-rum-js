@@ -27,8 +27,6 @@ import TransactionService from '../../src/performance-monitoring/transaction-ser
 import Transaction from '../../src/performance-monitoring/transaction'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
-import resourceEntries from '../fixtures/resource-entries'
-import paintEntries from '../fixtures/paint-entries'
 
 describe('TransactionService', function() {
   var transactionService
@@ -237,23 +235,12 @@ describe('TransactionService', function() {
   })
 
   it('should capture resources from navigation timing', function(done) {
-    var _getEntriesByType = window.performance.getEntriesByType
-
-    window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint']).toContain(type)
-      if (type === 'resource') {
-        return resourceEntries
-      }
-      return paintEntries
-    }
-
     config.set('active', true)
     config.set('capturePageLoad', true)
 
     const customTransactionService = new TransactionService(logger, config)
     customTransactionService.subscribe(function() {
       expect(tr.isHardNavigation).toBe(true)
-      window.performance.getEntriesByType = _getEntriesByType
       done()
     })
 
@@ -309,14 +296,6 @@ describe('TransactionService', function() {
       pageLoadSpanId: 'test-span-id',
       pageLoadSampled: true
     })
-
-    window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint']).toContain(type)
-      if (type === 'resource') {
-        return resourceEntries
-      }
-      return {}
-    }
 
     transactionService = new TransactionService(logger, config)
     const tr = sendPageLoadMetrics()

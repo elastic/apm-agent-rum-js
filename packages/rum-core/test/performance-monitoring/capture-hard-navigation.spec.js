@@ -26,10 +26,12 @@
 import {
   createNavigationTimingSpans,
   createResourceTimingSpans,
+  createUserTimingSpans,
   captureHardNavigation
 } from '../../src/performance-monitoring/capture-hard-navigation'
 import Transaction from '../../src/performance-monitoring/transaction'
 import resourceEntries from '../fixtures/resource-entries'
+import userTimingEntries from '../fixtures/user-timing-entries'
 import navTimingSpans from '../fixtures/navigation-timing-span-snapshot'
 
 const spanSnapshot = navTimingSpans.map(mapSpan)
@@ -159,6 +161,25 @@ describe('Capture hard navigation', function() {
       transactionEnd
     )
     expect(spans.map(mapSpan)).toEqual(spanSnapshot)
+  })
+
+  it('should createUserTimingSpans', function() {
+    const spans = createUserTimingSpans(userTimingEntries)
+    expect(spans.length).toEqual(2)
+    expect(spans).toEqual([
+      jasmine.objectContaining({
+        name: 'measure_1',
+        _start: jasmine.any(Number),
+        _end: jasmine.any(Number),
+        ended: true
+      }),
+      jasmine.objectContaining({
+        name: 'measure_2',
+        _start: jasmine.any(Number),
+        _end: jasmine.any(Number),
+        ended: true
+      })
+    ])
   })
 
   it('should captureHardNavigation', function() {

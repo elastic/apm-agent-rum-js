@@ -260,5 +260,6 @@ function captureHardNavigation(transaction) {
 export {
   captureHardNavigation,
   createNavigationTimingSpans,
-  createResourceTimingSpans
+  createResourceTimingSpans,
+  createUserTimingSpans
 }

@@ -81,7 +81,7 @@ const TYPE_CUSTOM = 'custom'
 /**
  * Check only for long tasks that are more than 60ms
  */
-const USER_TIMING_THRESHOLD = 60 * 1000
+const USER_TIMING_THRESHOLD = 60
 
 /**
  * Others

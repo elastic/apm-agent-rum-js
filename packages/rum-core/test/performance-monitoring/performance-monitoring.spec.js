@@ -29,6 +29,7 @@ import Span from '../../src/performance-monitoring/span'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import resourceEntries from '../fixtures/resource-entries'
 import paintEntries from '../fixtures/paint-entries'
+import userTimingEntries from '../fixtures/user-timing-entries'
 import { getDtHeaderValue } from '../../src/common/utils'
 import { globalState } from '../../src/common/patching/patch-utils'
 import { SCHEDULE } from '../../src/common/constants'
@@ -360,11 +361,13 @@ describe('PerformanceMonitoring', function() {
     var _getEntriesByType = window.performance.getEntriesByType
 
     window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint']).toContain(type)
+      expect(['resource', 'paint', 'measure']).toContain(type)
       if (type === 'resource') {
         return resourceEntries
+      } else if (type === 'paint') {
+        return paintEntries
       }
-      return paintEntries
+      return userTimingEntries
     }
 
     var transactionService = serviceFactory.getService('TransactionService')
