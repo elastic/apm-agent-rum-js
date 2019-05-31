@@ -69,7 +69,7 @@ const REUSABILITY_THRESHOLD = 10000
 /**
  * Maximum duration of the span that is used to decide if the span is valid - 300 secs / 5 mins
  */
-const SPAN_THRESHOLD = 5 * 60 * 1000
+const MAX_SPAN_DURATION = 5 * 60 * 1000
 
 /**
  * Transaction & Span - Name & Types
@@ -94,7 +94,7 @@ export {
   RESOURCE_INITIATOR_TYPES,
   HISTORY_PUSHSTATE,
   REUSABILITY_THRESHOLD,
-  SPAN_THRESHOLD,
+  MAX_SPAN_DURATION,
   PAGE_LOAD,
   NAME_UNKNOWN,
   TYPE_CUSTOM,
