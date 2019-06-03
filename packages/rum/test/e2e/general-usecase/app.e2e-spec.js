@@ -101,7 +101,7 @@ describe('general-usercase', function() {
     expect(transactionPayload.marks.agent.domComplete).toBeDefined()
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('general-usecase-initial-page-load')
-    expect(transactionPayload.spans.length).toBeGreaterThanOrEqual(6)
+    expect(transactionPayload.spans.length).toBeGreaterThan(4)
     var span = transactionPayload.spans.find(function(s) {
       return s.name === 'GET /test/e2e/common/data.json'
     })
