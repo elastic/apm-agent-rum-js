@@ -388,7 +388,8 @@ describe('PerformanceMonitoring', function() {
         )
         .then(() => done())
     })
-    transactionService.sendPageLoadMetrics('resource-test')
+    const tr = transactionService.startTransaction('resource-test', 'page-load')
+    tr.detectFinish()
   })
 
   it('should filter out empty transactions', function() {
