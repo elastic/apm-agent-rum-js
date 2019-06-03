@@ -105,7 +105,7 @@ class TransactionService {
   }
 
   createPerfOptions(options) {
-    var config = this._config.config
+    const config = this._config.config
     return extend(
       {
         pageLoadTraceId: config.pageLoadTraceId,
@@ -170,8 +170,8 @@ class TransactionService {
     this._logger.debug('TransactionService.startTransaction', tr)
 
     tr.onEnd = () => {
-      return Promise.resolve()
-        .then(() => {
+      return Promise.resolve().then(
+        () => {
           this._logger.debug('TransactionService transaction finished', tr)
           if (this.shouldIgnoreTransaction(tr.name)) {
             return
@@ -190,8 +190,9 @@ class TransactionService {
           } else {
             this.add(tr)
           }
-        })
-        .catch(err => this._logger.debug(err))
+        },
+        err => this._logger.debug(err)
+      )
     }
     return tr
   }

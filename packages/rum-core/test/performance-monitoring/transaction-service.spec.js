@@ -65,30 +65,6 @@ describe('TransactionService', function() {
     ).toHaveBeenCalledWith('test-span', 'test-span', { test: 'passed' })
   })
 
-  it('should not start span when performance monitoring is disabled', function() {
-    config.set('active', false)
-    transactionService = new TransactionService(logger, config)
-    var tr = new Transaction('transaction', 'transaction')
-    spyOn(tr, 'startSpan').and.callThrough()
-    transactionService.setCurrentTransaction(tr)
-    transactionService.startSpan('test-span', 'test-span')
-    expect(
-      transactionService.getCurrentTransaction().startSpan
-    ).not.toHaveBeenCalled()
-  })
-
-  it('should not start transaction when performance monitoring is disabled', function() {
-    config.set('active', false)
-    transactionService = new TransactionService(logger, config)
-
-    var result = transactionService.startTransaction(
-      'transaction',
-      'transaction'
-    )
-
-    expect(result).toBeUndefined()
-  })
-
   it('should start transaction', function(done) {
     config.set('active', true)
     config.set('browserResponsivenessInterval', true)
@@ -128,17 +104,6 @@ describe('TransactionService', function() {
     expect(trans.name).toBe('Unknown')
     transactionService.startTransaction('transaction', 'transaction')
     expect(trans.name).toBe('transaction')
-  })
-
-  it('should not create transaction if performance is not enabled', function() {
-    config.set('active', false)
-    transactionService = new TransactionService(logger, config)
-    var result = transactionService.createTransaction(
-      'test',
-      'test',
-      config.get('performance')
-    )
-    expect(result).toBeUndefined()
   })
 
   it('should capture page load on first transaction', function(done) {
