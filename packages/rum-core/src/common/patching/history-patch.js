@@ -23,27 +23,29 @@
  *
  */
 
-import { patchXMLHttpRequest } from './xhr-patch'
-import { patchFetch } from './fetch-patch'
-import { patchHistory } from './history-patch'
-import Subscription from '../subscription'
-
-const patchSubscription = new Subscription()
+import { INVOKE, HISTORY_PUSHSTATE } from '../constants'
 var alreadyPatched = false
-function patchAll() {
-  if (!alreadyPatched) {
-    alreadyPatched = true
-    patchXMLHttpRequest(function(event, task) {
-      patchSubscription.applyAll(this, [event, task])
-    })
-    patchFetch(function(event, task) {
-      patchSubscription.applyAll(this, [event, task])
-    })
-    patchHistory(function(event, task) {
-      patchSubscription.applyAll(this, [event, task])
-    })
-  }
-  return patchSubscription
-}
 
-export { patchAll, patchSubscription }
+export function patchHistory(callback) {
+  if (alreadyPatched || !window.history) {
+    return
+  }
+  alreadyPatched = true
+
+  const nativePushState = history.pushState
+  if (typeof nativePushState === 'function') {
+    history.pushState = function(state, title, url) {
+      const task = {
+        source: HISTORY_PUSHSTATE,
+        data: {
+          state,
+          title,
+          url
+        }
+      }
+
+      callback(INVOKE, task)
+      nativePushState.apply(this, arguments)
+    }
+  }
+}

@@ -37,6 +37,11 @@ const FETCH_SOURCE = 'fetch'
 const XMLHTTPREQUEST_SOURCE = 'XMLHttpRequest.send'
 
 /**
+ * History sources
+ */
+const HISTORY_PUSHSTATE = 'history.pushState'
+
+/**
  * Event listener methods
  */
 const ADD_EVENT_LISTENER_STR = 'addEventListener'
@@ -55,6 +60,11 @@ const RESOURCE_INITIATOR_TYPES = [
   'beacon',
   'iframe'
 ]
+
+/**
+ * The amount of time it is allowed for a transaction to be reused in another startTransaction
+ */
+const REUSABILITY_THRESHOLD = 10000
 
 /**
  * Maximum duration of the span that is used to decide if the span is valid - 300 secs / 5 mins
@@ -76,5 +86,7 @@ export {
   REMOVE_EVENT_LISTENER_STR,
   RESOURCE_INITIATOR_TYPES,
   SPAN_THRESHOLD,
-  KEYWORD_LIMIT
+  KEYWORD_LIMIT,
+  HISTORY_PUSHSTATE,
+  REUSABILITY_THRESHOLD
 }
