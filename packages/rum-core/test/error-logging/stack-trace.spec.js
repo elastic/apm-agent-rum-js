@@ -23,14 +23,10 @@
  *
  */
 
-import { createServiceFactory } from '..'
-import StackTraceService from '../../src/error-logging/stack-trace-service'
+import { createStackTraces } from '../../src/error-logging/stack-trace'
 
 describe('StackTraceService', function() {
   it('should produce correct number of frames', function(done) {
-    var serviceFactory = createServiceFactory()
-    var configService = serviceFactory.getService('ConfigService')
-    var stackTraceService = new StackTraceService(configService)
     function generateError() {
       throw new Error('test error')
     }
@@ -38,7 +34,7 @@ describe('StackTraceService', function() {
       try {
         generateError()
       } catch (error) {
-        var stackTraces = stackTraceService.createStackTraces({ error })
+        var stackTraces = createStackTraces({ error })
         expect(stackTraces.length).toBeGreaterThan(1)
         done()
       }
