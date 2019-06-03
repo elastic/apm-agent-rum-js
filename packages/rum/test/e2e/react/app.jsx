@@ -30,11 +30,9 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import { withRouter } from 'react-router'
 import MainComponent from './main-component.jsx'
-
 import { apm } from './rum'
 
-var tr = apm.startTransaction('App Load', 'page-load')
-tr.isHardNavigation = true
+const tr = apm.startTransaction('App Load', 'page-load')
 
 class App extends React.Component {
   render() {

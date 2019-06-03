@@ -320,6 +320,11 @@ describe('Capture hard navigation', function() {
     var tr = new Transaction('test', 'test')
     tr.isHardNavigation = true
     tr.end()
+    /**
+     * In an ideal scenaio, hard navigation happens only after page
+     * load event has fired
+     */
+    tr._end = performance.timing.loadEventEnd
     captureHardNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
   })
