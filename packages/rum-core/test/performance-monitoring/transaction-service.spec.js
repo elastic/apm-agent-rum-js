@@ -118,7 +118,7 @@ describe('TransactionService', function() {
 
     transactionService.startSpan('testSpan', 'testtype')
     var trans = transactionService.getCurrentTransaction()
-    expect(trans.name).toBe('ZoneTransaction')
+    expect(trans.name).toBe('Unknown')
     transactionService.startTransaction('transaction', 'transaction')
     expect(trans.name).toBe('transaction')
   })
@@ -180,7 +180,9 @@ describe('TransactionService', function() {
     var tr = transactionService.sendPageLoadMetrics('test')
 
     transactionService = new TransactionService(logger, config)
-    var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
+    var zoneTr = new Transaction('test-name', 'test-type', {
+      canReuse: true
+    })
     transactionService.setCurrentTransaction(zoneTr)
 
     var pageLoadTr = transactionService.sendPageLoadMetrics('new tr')
@@ -265,7 +267,7 @@ describe('TransactionService', function() {
       done()
     })
 
-    var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
+    var zoneTr = new Transaction('test', 'test-transaction')
     transactionService.setCurrentTransaction(zoneTr)
     var span = zoneTr.startSpan('GET http://example.com', 'external.http')
     span.end()

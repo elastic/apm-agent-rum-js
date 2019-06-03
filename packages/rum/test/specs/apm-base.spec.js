@@ -176,7 +176,7 @@ describe('ApmBase', function() {
     req.send()
     tr = apmBase.getCurrentTransaction()
     expect(tr).toBeDefined()
-    expect(tr.name).toBe('ZoneTransaction')
+    expect(tr.name).toBe('Unknown')
   })
 
   it('should patch xhr when not active', function(done) {
