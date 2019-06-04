@@ -77,7 +77,7 @@ class Span extends otSpan {
       }
     }
 
-    this.span.addTags(tags)
+    this.span.addLabels(tags)
   }
   // eslint-disable-next-line
   _log(log, timestamp) {

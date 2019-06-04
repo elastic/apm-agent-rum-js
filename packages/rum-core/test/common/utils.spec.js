@@ -233,19 +233,19 @@ describe('lib/utils', function() {
     expect(result).toBeLessThanOrEqual(now)
   })
 
-  it('should setTag', function() {
+  it('should setLabel', function() {
     var date = new Date()
-    var tags = {}
-    utils.setTag('key', 'value', undefined)
-    utils.setTag(undefined, 'value', tags)
-    utils.setTag('test', 'test', tags)
-    utils.setTag('no', 1, tags)
-    utils.setTag('test.test', 'passed', tags)
-    utils.setTag('date', date, tags)
-    utils.setTag()
-    utils.setTag('removed', undefined, tags)
-    utils.setTag('obj', {}, tags)
-    expect(tags).toEqual({
+    var labels = {}
+    utils.setLabel('key', 'value', undefined)
+    utils.setLabel(undefined, 'value', labels)
+    utils.setLabel('test', 'test', labels)
+    utils.setLabel('no', 1, labels)
+    utils.setLabel('test.test', 'passed', labels)
+    utils.setLabel('date', date, labels)
+    utils.setLabel()
+    utils.setLabel('removed', undefined, labels)
+    utils.setLabel('obj', {}, labels)
+    expect(labels).toEqual({
       test: 'test',
       no: '1',
       test_test: 'passed',

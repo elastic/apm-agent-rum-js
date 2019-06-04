@@ -68,16 +68,22 @@ TIP: Before using custom context, ensure you understand the different types of
 [[apm-add-tags]]
 ==== `apm.addTags()`
 
+deprecated[4.1.x,Tags have been replaced with labels], Please use <<apm-add-labels,`apm.addLabels()`>> instead
+
+[float]
+[[apm-add-labels]]
+==== `apm.addLabels()`
+
 [source,js]
 ----
-apm.addTags({ [name]: value })
+apm.addLabels({ [name]: value })
 ----
 
-Set tags on transactions and errors.
+Set labels on transactions and errors.
 
-Tags are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via `setCustomContext()`). You can set multiple tags.
+Labels are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via <<apm-set-custom-context,`apm.setCustomContext()`>>). You can set multiple labels.
 
-TIP: Before using custom tags, ensure you understand the different types of
+TIP: Before using custom labels, ensure you understand the different types of
 {apm-overview-ref-v}/metadata.html[metadata] that are available.
 
 Arguments:
@@ -86,7 +92,7 @@ Arguments:
 
 * `value` - Any string. If a non-string data type is given, it's converted to a string before being sent to the APM Server.
 
-WARNING: Avoid defining too many user-specified tags.
+WARNING: Avoid defining too many user-specified labels.
 Defining too many unique fields in an index is a condition that can lead to a
 {ref}/mapping.html#mapping-limit-settings[mapping explosion].
 
