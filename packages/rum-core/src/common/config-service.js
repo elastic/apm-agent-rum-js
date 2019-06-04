@@ -23,7 +23,7 @@
  *
  */
 
-import { getCurrentScript, setTag, merge, getDtHeaderValue } from './utils'
+import { getCurrentScript, setLabel, merge, getDtHeaderValue } from './utils'
 import Subscription from '../common/subscription'
 
 function getConfigFromScript() {
@@ -200,12 +200,12 @@ class Config {
     }
   }
 
-  addTags(tags) {
-    if (!this.config.context.tags) {
-      this.config.context.tags = {}
+  addLabels(labels) {
+    if (!this.config.context.labels) {
+      this.config.context.labels = {}
     }
-    var keys = Object.keys(tags)
-    keys.forEach(k => setTag(k, tags[k], this.config.context.tags))
+    var keys = Object.keys(labels)
+    keys.forEach(k => setLabel(k, labels[k], this.config.context.labels))
   }
 
   setConfig(properties = {}) {
