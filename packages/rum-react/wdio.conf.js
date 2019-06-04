@@ -23,23 +23,6 @@
  *
  */
 
-import { apm } from '@elastic/apm-rum'
-import { getGlobalConfig } from '../../../../dev-utils/test-config'
-import ApmServerMock from '../../../rum-core/test/utils/apm-server-mock'
+const { getWebdriveBaseConfig } = require('../../dev-utils/webdriver')
 
-const { globalConfigs } = getGlobalConfig()
-
-function createApmBase(config) {
-  console.log('E2E Global Configs', JSON.stringify(globalConfigs, null, 2))
-  const apmServer = apm.serviceFactory.getService('ApmServer')
-  const { serverUrl } = globalConfigs.agentConfig
-  if (serverUrl) {
-    config.serverUrl = serverUrl
-  }
-  const serverMock = new ApmServerMock(apmServer, globalConfigs.useMocks)
-  apm.serviceFactory.registerServiceInstance('ApmServer', serverMock)
-
-  return apm.init(config)
-}
-
-export default createApmBase
+exports.config = getWebdriveBaseConfig(__dirname)

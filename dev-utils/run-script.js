@@ -30,7 +30,6 @@ const {
   runE2eTests: runE2eTestsUtils,
   buildE2eBundles: buildE2eBundlesUtils
 } = require('./test-utils')
-
 const runAll = require('npm-run-all')
 
 const { startTestServers } = require('./test-servers')

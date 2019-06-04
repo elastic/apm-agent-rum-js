@@ -45,13 +45,10 @@ describe('react app', function() {
         var serverCalls = apmServerMock.calls
         var validCalls =
           serverCalls.sendTransactions &&
-          serverCalls.sendTransactions.length > 1
+          serverCalls.sendTransactions.length >= 1
 
         if (validCalls) {
-          Promise.all([
-            serverCalls.sendTransactions[0].returnValue,
-            serverCalls.sendTransactions[1].returnValue
-          ])
+          Promise.all([serverCalls.sendTransactions[0].returnValue])
             .then(function() {
               function mapCall(c) {
                 return { args: c.args, mocked: c.mocked }
@@ -88,15 +85,11 @@ describe('react app', function() {
       fail(serverCalls.error)
     }
 
-    expect(serverCalls.sendTransactions.length).toBe(2)
-    var pageLoadTransaction = serverCalls.sendTransactions[0].args[0][0]
-    expect(pageLoadTransaction.type).toBe('page-load')
-    expect(pageLoadTransaction.name).toBe('App Load')
-    expect(pageLoadTransaction.spans.length).toBeGreaterThan(1)
+    expect(serverCalls.sendTransactions.length).toBe(1)
 
-    var routeChangeTransaction = serverCalls.sendTransactions[1].args[0][0]
+    var routeChangeTransaction = serverCalls.sendTransactions[0].args[0][0]
     expect(routeChangeTransaction.type).toBe('route-change')
-    expect(routeChangeTransaction.name).toBe('Main - /')
+    expect(routeChangeTransaction.name).toBe('/')
     expect(routeChangeTransaction.spans.length).toBeGreaterThan(1)
 
     var fetchDataSpan = routeChangeTransaction.spans.find(function(s) {
