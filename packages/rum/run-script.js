@@ -142,6 +142,14 @@ function runE2eTests(config) {
 }
 
 function runSauceTests(serve = 'true') {
+  /**
+   * `console.logs` from the tests will be truncated when the process exits
+   * To avoid truncation, we flush the data from stdout before exiting the process
+   */
+  if (process.stdout.isTTY && process.stdout._handle) {
+    process.stdout._handle.setBlocking(true)
+  }
+
   let servers = []
   if (serve === 'true') {
     servers = serveE2e('./', 8000)
@@ -175,7 +183,9 @@ function runSauceTests(serve = 'true') {
       exitCode = 1
     } finally {
       servers.map(s => s.close())
-      sauceConnectProcess.close(() => process.exit(exitCode))
+      sauceConnectProcess.close(() => {
+        exitCode && process.exit(exitCode)
+      })
     }
   })
 }
