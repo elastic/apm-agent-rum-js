@@ -23,49 +23,34 @@
  *
  */
 
-import StackTraceService from './stack-trace-service'
+import { createStackTraces, filterInvalidFrames } from './stack-trace'
 import { getPageMetadata, generateRandomId, merge } from '../common/utils'
 import { truncateModel, ERROR_MODEL } from '../common/truncate'
 
 class ErrorLogging {
-  constructor(apmServer, configService, loggingService, transactionService) {
+  constructor(apmServer, configService, transactionService) {
     this._apmServer = apmServer
     this._configService = configService
-    this._loggingService = loggingService
     this._transactionService = transactionService
-    this._stackTraceService = new StackTraceService(
-      configService,
-      loggingService
-    )
   }
 
-  // errorEvent = {message, filename, lineno, colno, error}
+  /**
+   * errorEvent = { message, filename, lineno, colno, error }
+   */
   createErrorDataModel(errorEvent) {
-    const filePath = this._stackTraceService.cleanFilePath(errorEvent.filename)
-    const frames = this._stackTraceService.createStackTraces(errorEvent)
-    const filteredFrames = this._stackTraceService.filterInvalidFrames(frames)
-    let fileName = this._stackTraceService.filePathToFileName(filePath)
+    const frames = createStackTraces(errorEvent)
+    const filteredFrames = filterInvalidFrames(frames)
 
-    if (!fileName && filteredFrames.length) {
-      var lastFrame = filteredFrames[filteredFrames.length - 1]
-      if (lastFrame.filename) {
-        fileName = lastFrame.filename
-      } else {
-        // If filename empty, assume inline script
-        fileName = '(inline script)'
-      }
-    }
-
-    let culprit
-    if (this._stackTraceService.isFileInline(filePath)) {
-      culprit = '(inline script)'
-    } else {
-      culprit = fileName
+    // If filename empty, assume inline script
+    let culprit = '(inline script)'
+    const lastFrame = filteredFrames[filteredFrames.length - 1]
+    if (lastFrame && lastFrame.filename) {
+      culprit = lastFrame.filename
     }
 
     const message =
       errorEvent.message || (errorEvent.error && errorEvent.error.message)
-    let errorType = errorEvent.error ? errorEvent.error.name : undefined
+    let errorType = errorEvent.error ? errorEvent.error.name : ''
     if (!errorType) {
       /**
        * Try to extract type from message formatted like
@@ -73,8 +58,6 @@ class ErrorLogging {
        */
       if (message && message.indexOf(':') > -1) {
         errorType = message.split(':')[0]
-      } else {
-        errorType = ''
       }
     }
 
@@ -115,7 +98,7 @@ class ErrorLogging {
       if (typeof errorEvent === 'undefined') {
         return
       }
-      var errorObject = this.createErrorDataModel(errorEvent)
+      const errorObject = this.createErrorDataModel(errorEvent)
       if (typeof errorObject.exception.message === 'undefined') {
         return
       }
@@ -128,9 +111,8 @@ class ErrorLogging {
   }
 
   registerGlobalEventListener() {
-    var errorLogging = this
-    window.onerror = function(messageOrEvent, source, lineno, colno, error) {
-      var errorEvent
+    window.onerror = (messageOrEvent, source, lineno, colno, error) => {
+      let errorEvent
       if (
         typeof messageOrEvent !== 'undefined' &&
         typeof messageOrEvent !== 'string'
@@ -145,12 +127,12 @@ class ErrorLogging {
           error
         }
       }
-      errorLogging.logErrorEvent(errorEvent)
+      this.logErrorEvent(errorEvent)
     }
   }
 
   logError(messageOrError) {
-    var errorEvent = {}
+    let errorEvent = {}
     if (typeof messageOrError === 'string') {
       errorEvent.message = messageOrError
     } else {
@@ -160,10 +142,10 @@ class ErrorLogging {
   }
 
   _getErrorProperties(error) {
-    var properties = {}
+    const properties = {}
     Object.keys(error).forEach(function(key) {
       if (key === 'stack') return
-      var val = error[key]
+      let val = error[key]
       if (val === null) return // null is typeof object and well break the switch below
       switch (typeof val) {
         case 'function':
