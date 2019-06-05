@@ -174,9 +174,10 @@ describe('ErrorLogging', function() {
       .then(() => done())
   })
 
-  it('should install onerror and accept ErrorEvents', function(done) {
+  it('should install global listener for error and accept ErrorEvents', function(done) {
     var count = 0
-    var numberOfErrors = 7
+    var numberOfErrors = 4
+    const original = window.addEventListener
     spyOn(apmServer, 'sendErrors').and.callFake(function(errors) {
       expect(errors.length).toBe(numberOfErrors)
       var error = errors[0]
@@ -184,34 +185,49 @@ describe('ErrorLogging', function() {
 
       count = count + errors.length
       if (count === numberOfErrors) {
+        window.addEventListener = original
         done()
       }
     })
 
-    window.onerror = null
+    const addedListenerTypes = []
+    window.addEventListener = function(type, listener) {
+      addedListenerTypes.push(type)
+      original.call(null, type, listener)
+    }
     errorLogging.registerGlobalEventListener()
+    expect(addedListenerTypes).toContain('error')
 
-    expect(typeof window.onerror).toBe('function')
-    var apmOnError = window.onerror
+    const filename = 'filename'
+    const lineno = 1
+    const colno = 2
 
     try {
       throw new Error(testErrorMessage)
     } catch (error) {
-      apmOnError(testErrorMessage, 'filename', 1, 2, error)
+      errorLogging.logErrorEvent({
+        message: testErrorMessage,
+        filename,
+        lineno,
+        colno,
+        error
+      })
     }
-
-    apmOnError(testErrorMessage, 'filename', 1, 2, undefined)
-    apmOnError(testErrorMessage, 'filename', 1, 2, testErrorMessage) // throw "test";
-    apmOnError(testErrorMessage, undefined, undefined, undefined, undefined)
-    apmOnError('Test:' + testErrorMessage, 'filename', 1, 2, undefined)
-    apmOnError(
-      'Script error.' + testErrorMessage,
-      undefined,
-      undefined,
-      undefined,
-      undefined
-    )
-    apmOnError(createErrorEvent(testErrorMessage))
+    errorLogging.logErrorEvent({
+      message: testErrorMessage,
+      filename,
+      lineno,
+      colno,
+      error: undefined
+    })
+    errorLogging.logErrorEvent({
+      message: 'Script error.' + testErrorMessage,
+      filename: undefined,
+      lineno: undefined,
+      colno: undefined,
+      error: undefined
+    })
+    errorLogging.logErrorEvent(createErrorEvent(testErrorMessage))
   })
 
   it('should handle edge cases', function(done) {
