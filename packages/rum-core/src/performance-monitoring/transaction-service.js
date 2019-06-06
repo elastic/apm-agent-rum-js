@@ -24,7 +24,7 @@
  */
 
 import Transaction from './transaction'
-import { extend } from '../common/utils'
+import { extend, getPageLoadMarks } from '../common/utils'
 import { PAGE_LOAD } from '../common/constants'
 import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
@@ -120,6 +120,7 @@ class TransactionService {
     ) {
       tr.addMarks(self.marks)
       captureHardNavigation(tr)
+      tr.addMarks(getPageLoadMarks())
       self._alreadyCapturedPageLoad = true
       return true
     }

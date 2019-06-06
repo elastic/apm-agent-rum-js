@@ -324,6 +324,47 @@ function removeInvalidChars(key) {
   return key.replace(/[.*"]/g, '_')
 }
 
+function getLatestNonXHRSpan(spans) {
+  let latestSpan = null
+  for (let i = 0; i < spans.length; i++) {
+    const span = spans[i]
+    if (
+      String(span.type).indexOf('ext') === -1 &&
+      (!latestSpan || latestSpan._end < span._end)
+    ) {
+      latestSpan = span
+    }
+  }
+  return latestSpan
+}
+
+function getEarliestSpan(spans) {
+  let earliestSpan = spans[0]
+  spans.forEach(span => {
+    if (earliestSpan._start > span._start) {
+      earliestSpan = span
+    }
+  })
+  return earliestSpan
+}
+
+function getPageLoadMarks() {
+  const marks = getNavigationTimingMarks()
+  const paintMarks = getPaintTimingMarks()
+  const agent = {
+    timeToFirstByte: marks.responseStart,
+    domInteractive: marks.domInteractive,
+    domComplete: marks.domComplete
+  }
+  if (paintMarks['first-contentful-paint']) {
+    agent.firstContentfulPaint = paintMarks['first-contentful-paint']
+  }
+  return {
+    navigationTiming: marks,
+    agent
+  }
+}
+
 export {
   extend,
   merge,
@@ -345,6 +386,9 @@ export {
   getElasticScript,
   getTimeOrigin,
   generateRandomId,
+  getEarliestSpan,
+  getLatestNonXHRSpan,
+  getPageLoadMarks,
   rng,
   checkSameOrigin,
   setLabel,

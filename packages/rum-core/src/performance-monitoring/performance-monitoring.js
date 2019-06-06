@@ -28,7 +28,9 @@ import {
   isDtHeaderValid,
   merge,
   stripQueryStringFromUrl,
-  parseDtHeaderValue
+  parseDtHeaderValue,
+  getEarliestSpan,
+  getLatestNonXHRSpan
 } from '../common/utils'
 import { patchSubscription } from '../common/patching'
 import { globalState } from '../common/patching/patch-utils'
@@ -54,15 +56,14 @@ class PerformanceMonitoring {
   }
 
   init() {
-    var performanceMonitoring = this
-    this._transactionService.subscribe(function(tr) {
-      var payload = performanceMonitoring.createTransactionPayload(tr)
+    this._transactionService.subscribe(tr => {
+      const payload = this.createTransactionPayload(tr)
       if (payload) {
-        performanceMonitoring._apmServer.addTransaction(payload)
+        this._apmServer.addTransaction(payload)
       }
     })
 
-    var patchSubFn = this.getXhrPatchSubFn(
+    const patchSubFn = this.getXhrPatchSubFn(
       this._configService,
       this._transactionService
     )
@@ -226,6 +227,44 @@ class PerformanceMonitoring {
     return true
   }
 
+  adjustTransactionTime(transaction) {
+    /**
+     * Adjust start time of the transaction
+     */
+    const spans = transaction.spans
+    const earliestSpan = getEarliestSpan(spans)
+
+    if (earliestSpan && earliestSpan._start < transaction._start) {
+      transaction._start = earliestSpan._start
+    }
+
+    /**
+     * Adjust end time of the transaction to match the latest
+     * span end time
+     */
+    const latestSpan = getLatestNonXHRSpan(spans)
+    if (latestSpan && latestSpan._end > transaction._end) {
+      transaction._end = latestSpan._end
+    }
+
+    /**
+     * Set all spans that are longer than the transaction to
+     * be truncated spans
+     */
+    const transactionEnd = transaction._end
+    for (let i = 0; i < spans.length; i++) {
+      const span = spans[i]
+
+      if (span._end > transactionEnd) {
+        span._end = transactionEnd
+        span.type += '.truncated'
+      }
+      if (span._start > transactionEnd) {
+        span._start = transactionEnd
+      }
+    }
+  }
+
   prepareTransaction(transaction) {
     transaction.spans.sort(function(spanA, spanB) {
       return spanA._start - spanB._start
@@ -294,6 +333,7 @@ class PerformanceMonitoring {
   }
 
   createTransactionPayload(transaction) {
+    this.adjustTransactionTime(transaction)
     this.prepareTransaction(transaction)
     const filtered = this.filterTransaction(transaction)
     if (filtered) {

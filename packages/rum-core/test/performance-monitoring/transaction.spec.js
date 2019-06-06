@@ -36,7 +36,7 @@ describe('transaction.Transaction', function() {
     var transaction = new Transaction('/', 'transaction', {})
 
     firstSpan.transaction = transaction
-    transaction.addEndedSpans([firstSpan])
+    transaction.spans.push(firstSpan)
 
     var lastSpan = transaction.startSpan('last-span-name', 'last-span')
     lastSpan.end()
@@ -44,49 +44,6 @@ describe('transaction.Transaction', function() {
 
     expect(transaction.spans.length).toBe(2)
     done()
-  })
-
-  it('should adjust rootSpan to earliest span', function(done) {
-    var firstSpan = new Span('first-span-name', 'first-span')
-    firstSpan.end()
-
-    var transaction = new Transaction('/', 'transaction', {})
-    transaction.onEnd = function() {
-      expect(transaction._start).toBe(firstSpan._start)
-      expect(transaction._end >= lastSpan._end).toBeTruthy()
-      done()
-    }
-    firstSpan.transaction = transaction
-    transaction.addEndedSpans([firstSpan])
-
-    var lastSpan = transaction.startSpan('last-span-name', 'last-span')
-
-    lastSpan.end()
-    transaction.detectFinish()
-  })
-
-  it('should adjust rootSpan to latest span', function(done) {
-    var transaction = new Transaction('/', 'transaction', {})
-    var rootSpanStart = transaction._start
-
-    var firstSpan = transaction.startSpan('first-span-name', 'first-span')
-    firstSpan.end()
-
-    var longSpan = transaction.startSpan('long-span-name', 'long-span')
-
-    var lastSpan = transaction.startSpan('last-span-name', 'last-span')
-    lastSpan.end()
-
-    setTimeout(function() {
-      longSpan.end()
-      transaction.detectFinish()
-
-      setTimeout(function() {
-        expect(transaction._start).toBe(rootSpanStart)
-        expect(transaction._end).toEqual(longSpan._end)
-        done()
-      })
-    }, 500)
   })
 
   xit('should not start any spans after transaction has been added to queue', function() {
@@ -166,31 +123,6 @@ describe('transaction.Transaction', function() {
     transaction.end()
     var span = transaction.startSpan('test', 'test')
     expect(span).toBe(undefined)
-  })
-
-  it('should not produce negative durations while adjusting to the spans', function() {
-    var transaction = new Transaction('transaction', 'transaction')
-    var span = transaction.startSpan('test', 'test')
-    span.end()
-    span._end += 100
-    span = transaction.startSpan('test', 'external.http')
-
-    span.end()
-    span._start = 10000000
-    span._end = 11000000
-    transaction.end()
-    expect(span.duration()).toBe(0)
-  })
-
-  it('should truncate active spans', function() {
-    var transaction = new Transaction('transaction', 'transaction')
-    var span = transaction.startSpan('test', 'test')
-    expect(transaction.spans.length).toBe(0)
-    expect(Object.keys(transaction._activeSpans).length).toBe(1)
-    transaction.end()
-    expect(transaction.spans.length).toBe(1)
-    expect(Object.keys(transaction._activeSpans).length).toBe(0)
-    expect(span.type).toContain('.truncated')
   })
 
   it('should always set span parentId', function() {

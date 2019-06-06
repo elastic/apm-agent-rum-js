@@ -213,9 +213,6 @@ function captureHardNavigation(transaction) {
         }
       })
     }
-    transaction._adjustStartToEarliestSpan()
-    transaction._adjustEndToLatestSpan()
-    transaction.addNavigationTimingMarks()
   }
 }
 

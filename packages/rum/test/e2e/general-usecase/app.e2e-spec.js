@@ -102,10 +102,24 @@ describe('general-usercase', function() {
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('general-usecase-initial-page-load')
     expect(transactionPayload.spans.length).toBeGreaterThan(4)
-    var span = transactionPayload.spans.find(function(s) {
-      return s.name === 'GET /test/e2e/common/data.json'
+
+    /**
+     * Check for all XHR, Fetch and Opentracing spans
+     */
+    const spanNames = [
+      'OpenTracing span',
+      'GET /test/e2e/common/data.json',
+      'POST http://localhost:8003/data',
+      'POST http://localhost:8003/fetch'
+    ]
+    let noOfSpansFound = 0
+
+    transactionPayload.spans.forEach(({ name }) => {
+      if (spanNames.indexOf(name) >= 0) {
+        noOfSpansFound++
+      }
     })
-    expect(span).toBeDefined()
+    expect(noOfSpansFound).toEqual(spanNames.length)
 
     return allowSomeBrowserErrors(['timeout test error with a secret'])
   })
