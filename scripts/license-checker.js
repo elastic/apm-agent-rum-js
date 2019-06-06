@@ -46,6 +46,7 @@ const LICENSE_WHITELIST = [
   'AFLv2.1',
   '(MIT OR Apache-2.0)',
   '(WTFPL OR MIT)',
+  '(MIT OR WTFPL)',
   '(MIT AND Zlib)',
   '(BSD-2-Clause OR MIT OR Apache-2.0)',
   '(MIT AND BSD-3-Clause)',
