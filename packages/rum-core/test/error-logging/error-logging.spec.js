@@ -191,10 +191,10 @@ describe('ErrorLogging', function() {
     })
 
     const addedListenerTypes = []
-    window.addEventListener = function(type, listener) {
+    let listener = (window.addEventListener = function(type, event) {
       addedListenerTypes.push(type)
-      original.call(null, type, listener)
-    }
+      errorLogging.logErrorEvent(event)
+    })
     errorLogging.registerGlobalEventListener()
     expect(addedListenerTypes).toContain('error')
 
@@ -205,7 +205,7 @@ describe('ErrorLogging', function() {
     try {
       throw new Error(testErrorMessage)
     } catch (error) {
-      errorLogging.logErrorEvent({
+      listener('error', {
         message: testErrorMessage,
         filename,
         lineno,
@@ -213,21 +213,16 @@ describe('ErrorLogging', function() {
         error
       })
     }
-    errorLogging.logErrorEvent({
+    listener('error', {
       message: testErrorMessage,
       filename,
       lineno,
-      colno,
-      error: undefined
+      colno
     })
-    errorLogging.logErrorEvent({
-      message: 'Script error.' + testErrorMessage,
-      filename: undefined,
-      lineno: undefined,
-      colno: undefined,
-      error: undefined
+    listener('error', {
+      message: 'Script error.' + testErrorMessage
     })
-    errorLogging.logErrorEvent(createErrorEvent(testErrorMessage))
+    listener('error', createErrorEvent(testErrorMessage))
   })
 
   it('should handle edge cases', function(done) {
