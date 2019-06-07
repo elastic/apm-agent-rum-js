@@ -329,7 +329,7 @@ function getLatestNonXHRSpan(spans) {
   for (let i = 0; i < spans.length; i++) {
     const span = spans[i]
     if (
-      String(span.type).indexOf('ext') === -1 &&
+      String(span.type).indexOf('external') === -1 &&
       (!latestSpan || latestSpan._end < span._end)
     ) {
       latestSpan = span
@@ -340,11 +340,12 @@ function getLatestNonXHRSpan(spans) {
 
 function getEarliestSpan(spans) {
   let earliestSpan = spans[0]
-  spans.forEach(span => {
+  for (let i = 1; i < spans.length; i++) {
+    const span = spans[i]
     if (earliestSpan._start > span._start) {
       earliestSpan = span
     }
-  })
+  }
   return earliestSpan
 }
 

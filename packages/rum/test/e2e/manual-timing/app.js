@@ -37,7 +37,6 @@ transaction.addTask('load-event')
 window.addEventListener('load', function() {
   transaction.mark('load-event')
   setTimeout(() => {
-    transaction.addNavigationTimingMarks()
     transaction.removeTask('load-event')
   })
 })

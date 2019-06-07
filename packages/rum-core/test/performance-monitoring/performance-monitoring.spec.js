@@ -323,6 +323,7 @@ describe('PerformanceMonitoring', function() {
     })
     var span = tr.startSpan('span1', 'span1type')
     span.end()
+    span._end += 10
     tr.detectFinish()
 
     expect(tr._end).toBeDefined()
@@ -338,6 +339,21 @@ describe('PerformanceMonitoring', function() {
     expect(payload.spans[0].type).toBe('span1type')
     expect(payload.spans[0].start).toBe(span._start - tr._start)
     expect(payload.spans[0].duration).toBe(span._end - span._start)
+  })
+
+  it('should not produce negative durations while adjusting to the spans', function() {
+    var transaction = new Transaction('transaction', 'transaction')
+    var span = transaction.startSpan('test', 'test')
+    span.end()
+    span._end += 100
+    span = transaction.startSpan('test', 'external.http')
+
+    span.end()
+    span._start = 10000000
+    span._end = 11000000
+    transaction.end()
+    performanceMonitoring.adjustTransactionTime(transaction)
+    expect(span.duration()).toBe(0)
   })
 
   it('should sendPageLoadMetrics', function(done) {
