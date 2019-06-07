@@ -27,8 +27,6 @@ import Span from './span'
 import SpanBase from './span-base'
 import {
   generateRandomId,
-  getNavigationTimingMarks,
-  getPaintTimingMarks,
   merge,
   extend,
   getPageMetadata,
@@ -52,22 +50,6 @@ class Transaction extends SpanBase {
     this.isHardNavigation = false
 
     this.sampled = Math.random() <= this.options.transactionSampleRate
-  }
-
-  addNavigationTimingMarks() {
-    const marks = getNavigationTimingMarks()
-    const paintMarks = getPaintTimingMarks()
-    if (marks) {
-      const agent = {
-        timeToFirstByte: marks.responseStart,
-        domInteractive: marks.domInteractive,
-        domComplete: marks.domComplete
-      }
-      if (paintMarks['first-contentful-paint']) {
-        agent.firstContentfulPaint = paintMarks['first-contentful-paint']
-      }
-      this.addMarks({ navigationTiming: marks, agent })
-    }
   }
 
   addMarks(obj) {
@@ -142,8 +124,6 @@ class Transaction extends SpanBase {
     const metadata = getPageMetadata()
     this.addContext(metadata)
 
-    this._adjustStartToEarliestSpan()
-    this._adjustEndToLatestSpan()
     this.callOnEnd()
   }
 
@@ -165,10 +145,6 @@ class Transaction extends SpanBase {
     this.detectFinish()
   }
 
-  addEndedSpans(existingSpans) {
-    this.spans = this.spans.concat(existingSpans)
-  }
-
   resetSpans() {
     this.spans = []
   }
@@ -178,66 +154,6 @@ class Transaction extends SpanBase {
     // Remove span from _activeSpans
     delete this._activeSpans[span.id]
   }
-
-  _adjustEndToLatestSpan() {
-    const latestSpan = findLatestNonXHRSpan(this.spans)
-
-    if (latestSpan) {
-      this._end = latestSpan._end
-
-      // set all spans that now are longer than the transaction to
-      // be truncated spans
-      for (let i = 0; i < this.spans.length; i++) {
-        const span = this.spans[i]
-        if (span._end > this._end) {
-          span._end = this._end
-          span.type = span.type + '.truncated'
-        }
-        if (span._start > this._end) {
-          span._start = this._end
-        }
-      }
-    }
-  }
-
-  _adjustStartToEarliestSpan() {
-    const span = getEarliestSpan(this.spans)
-
-    if (span && span._start < this._start) {
-      this._start = span._start
-    }
-  }
-}
-
-function findLatestNonXHRSpan(spans) {
-  let latestSpan = null
-  for (let i = 0; i < spans.length; i++) {
-    const span = spans[i]
-    if (
-      span.type &&
-      span.type.indexOf('ext') === -1 &&
-      span.type !== 'transaction' &&
-      (!latestSpan || latestSpan._end < span._end)
-    ) {
-      latestSpan = span
-    }
-  }
-  return latestSpan
-}
-
-function getEarliestSpan(spans) {
-  let earliestSpan = null
-
-  spans.forEach(function(span) {
-    if (!earliestSpan) {
-      earliestSpan = span
-    }
-    if (earliestSpan && earliestSpan._start > span._start) {
-      earliestSpan = span
-    }
-  })
-
-  return earliestSpan
 }
 
 export default Transaction

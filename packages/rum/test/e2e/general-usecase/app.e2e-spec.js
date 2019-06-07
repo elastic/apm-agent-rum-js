@@ -101,11 +101,31 @@ describe('general-usercase', function() {
     expect(transactionPayload.marks.agent.domComplete).toBeDefined()
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('general-usecase-initial-page-load')
-    expect(transactionPayload.spans.length).toBeGreaterThan(2)
-    var span = transactionPayload.spans.find(function(s) {
-      return s.name === 'GET /test/e2e/common/data.json'
+    expect(transactionPayload.spans.length).toBeGreaterThan(4)
+
+    /**
+     * Check for all XHR, Fetch and Opentracing spans
+     */
+    const spanNames = [
+      'OpenTracing span',
+      'GET /test/e2e/common/data.json',
+      'POST http://localhost:8003/data',
+      'POST http://localhost:8003/fetch'
+    ]
+    let noOfSpansFound = 0
+
+    transactionPayload.spans.forEach(({ name }) => {
+      if (spanNames.indexOf(name) >= 0) {
+        noOfSpansFound++
+      }
     })
-    expect(span).toBeDefined()
+
+    /**
+     * Fetch does not block the page load and its hard to exactly check if
+     * fetch span happened before/after the payload, hence we check the span
+     * length to be >=3 instead of 4
+     */
+    expect(noOfSpansFound).toBeGreaterThanOrEqual(3)
 
     return allowSomeBrowserErrors(['timeout test error with a secret'])
   })

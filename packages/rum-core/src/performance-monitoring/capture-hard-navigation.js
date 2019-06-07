@@ -181,7 +181,6 @@ function captureHardNavigation(transaction) {
 
     // must be zero otherwise the calculated relative _start time would be wrong
     transaction._start = 0
-    transaction.type = 'page-load'
 
     createNavigationTimingSpans(timings, timings.fetchStart).forEach(function(
       span
@@ -214,9 +213,6 @@ function captureHardNavigation(transaction) {
         }
       })
     }
-    transaction._adjustStartToEarliestSpan()
-    transaction._adjustEndToLatestSpan()
-    transaction.addNavigationTimingMarks()
   }
 }
 
