@@ -190,6 +190,34 @@ describe('TransactionService', function() {
     expect(pageLoadTr).toBe(zoneTr)
   })
 
+  it('should contain agent marks in page load transaction', function() {
+    const _getEntriesByType = window.performance.getEntriesByType
+
+    window.performance.getEntriesByType = function(type) {
+      expect(['resource', 'paint']).toContain(type)
+      if (type === 'resource') {
+        return resourceEntries
+      }
+      return paintEntries
+    }
+    const tr = new Transaction('test', 'test')
+    tr.isHardNavigation = true
+    transactionService.capturePageLoadMetrics(tr)
+
+    const agentMarks = [
+      'timeToFirstByte',
+      'domInteractive',
+      'domComplete',
+      'firstContentfulPaint'
+    ]
+
+    expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
+    agentMarks.forEach(mark => {
+      expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
+    })
+    window.performance.getEntriesByType = _getEntriesByType
+  })
+
   it('should consider initial page load name or use location.pathname', function() {
     transactionService = new TransactionService(logger, config)
     var tr
