@@ -9,8 +9,7 @@
       "allowBranch": "master",
       "conventionalCommits": true,
       "message": "chore(release): publish",
-      "gitRemote": "upstream",
-      "noPush": true
+      "gitRemote": "upstream"
     }
   },
   "ignoreChanges": [

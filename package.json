@@ -8,7 +8,8 @@
     "url": "https://github.com/elastic/apm-agent-rum-js.git"
   },
   "scripts": {
-    "release": "lerna publish",
+    "prerelease": "npm test",
+    "release": "lerna publish && npm run release-github",
     "release-package": "node scripts/publish",
     "release-github": "node scripts/release-github",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
@@ -19,9 +20,16 @@
     "test": "lerna run build:main && lerna run test --stream --scope=$SCOPE --no-prefix",
     "bundlesize": "lerna run bundlesize --stream"
   },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "lerna run version-check --stream",
+      "eslint . --fix",
+      "git add"
+    ]
+  },
   "husky": {
     "hooks": {
-      "pre-commit": "npx lerna run version-check --stream"
+      "pre-commit": "lint-staged"
     }
   },
   "author": "",
