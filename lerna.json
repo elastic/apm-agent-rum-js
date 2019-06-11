@@ -9,12 +9,13 @@
       "allowBranch": "master",
       "conventionalCommits": true,
       "message": "chore(release): publish",
-      "gitRemote": "upstream"
-    },
-    "ignoreChanges": [
-      "**/*.md",
-      "**/test/**",
-      "docs"
-    ]
-  }
+      "gitRemote": "upstream",
+      "noPush": true
+    }
+  },
+  "ignoreChanges": [
+    "**/*.md",
+    "**/test/**",
+    "docs"
+  ]
 }
