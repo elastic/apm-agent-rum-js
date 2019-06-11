@@ -23,31 +23,38 @@
  *
  */
 
-const { version: agentVersion } = require('@elastic/apm-rum/package.json')
+const log = require('npmlog')
+const PromptUtils = require('@lerna/prompt')
+const childProcess = require('@lerna/child-process')
 
-module.exports = context => {
-  return {
-    MemberExpression(node) {
-      const { name, type } = node.property
-      if (type === 'Identifier' && name === 'setVersion') {
-        const args = node.parent.arguments
-        if (args.length > 0 && args[0].type === 'Literal') {
-          const literalNode = args[0]
-          const version = literalNode.value
-          if (version !== agentVersion) {
-            context.report({
-              node: literalNode,
-              message: `Agent version: ${agentVersion} should match with build version: ${version}`,
-              fix(fixer) {
-                return fixer.replaceTextRange(
-                  literalNode.range,
-                  "'" + agentVersion + "'"
-                )
-              }
-            })
-          }
-        }
-      }
+!(async () => {
+  /**
+   * Test the agent version with updated package version
+   */
+  try {
+    childProcess.execSync('eslint', [
+      '--rule',
+      '{"rulesdir/version-checker": "error"}',
+      '--fix',
+      './packages/rum/src/apm-base.js'
+    ])
+
+    /**
+     * Prompt for working directory clean
+     */
+    const answer = await PromptUtils.confirm(
+      'Are these changes ok (Check your working directory before continuing)'
+    )
+
+    if (!answer) {
+      log.error(
+        'release',
+        'Aborting the release process',
+        `Please run 'npm run release' again to start`
+      )
+      process.exit(1)
     }
+  } catch (err) {
+    log.error(err)
   }
-}
+})()

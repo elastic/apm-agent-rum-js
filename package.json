@@ -8,22 +8,19 @@
     "url": "https://github.com/elastic/apm-agent-rum-js.git"
   },
   "scripts": {
+    "version": "node scripts/prompt-release",
     "prerelease": "npm test",
-    "release": "RELEASE=true lerna publish && npm run release-github",
-    "release-package": "node scripts/publish",
+    "release": "lerna publish && npm run release-github",
+    "release-package": "node scripts/publish-package",
     "release-github": "node scripts/release-github",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
     "lint": "npm-run-all --silent -p lint:*",
     "lint:js": "eslint .",
     "lint:license": "node scripts/license-checker",
-    "format": "eslint . --fix",
     "test": "lerna run build:main && lerna run test --stream --scope=$SCOPE --no-prefix",
     "bundlesize": "lerna run bundlesize --stream"
   },
   "lint-staged": {
-    "*.{js}": [
-      "eslint --rule \"{'rulesdir/version-checker': 'error'}\" ./packages/rum/src/apm-base.js"
-    ],
     "*.{js,jsx}": [
       "eslint . --fix",
       "git add"
@@ -45,6 +42,8 @@
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.4.0",
+    "@lerna/child-process": "^3.14.2",
+    "@lerna/prompt": "^3.13.0",
     "@wdio/cli": "^5.7.2",
     "@wdio/dot-reporter": "^5.7.2",
     "@wdio/jasmine-framework": "^5.7.2",
@@ -82,6 +81,7 @@
     "license-checker": "^25.0.1",
     "lint-staged": "^8.2.0",
     "npm-run-all": "^4.1.5",
+    "npmlog": "^4.1.2",
     "prettier": "^1.16.4",
     "puppeteer": "^1.12.2",
     "react": "^16.2.0",
