@@ -9,7 +9,7 @@
   },
   "scripts": {
     "prerelease": "npm test",
-    "release": "lerna publish && npm run release-github",
+    "release": "RELEASE=true lerna publish && npm run release-github",
     "release-package": "node scripts/publish",
     "release-github": "node scripts/release-github",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
@@ -21,8 +21,10 @@
     "bundlesize": "lerna run bundlesize --stream"
   },
   "lint-staged": {
+    "*.{js}": [
+      "eslint --rule \"{'rulesdir/version-checker': 'error'}\" ./packages/rum/src/apm-base.js"
+    ],
     "*.{js,jsx}": [
-      "lerna run version-check --stream",
       "eslint . --fix",
       "git add"
     ]
