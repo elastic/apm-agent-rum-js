@@ -13,7 +13,7 @@
     "access": "public"
   },
   "scripts": {
-    "version-check": "node babel-version-plugin.js",
+    "prepublishOnly": "npm run build:main",
     "build": "webpack",
     "build:dev": "webpack -w",
     "build:main": "npx babel src -d dist/lib --config-file ../../babel.node.js",

@@ -15,7 +15,7 @@
     "directory": "packages/rum-core"
   },
   "scripts": {
-    "prepublish": "npm run build:main",
+    "prepublishOnly": "npm run build:main",
     "build:main": "npx babel src -d dist/lib --config-file ../../babel.node.js",
     "karma": "karma start",
     "karma:bench": "karma start karma.bench.conf.js",

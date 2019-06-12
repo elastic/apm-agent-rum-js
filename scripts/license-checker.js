@@ -48,6 +48,7 @@ const LICENSE_WHITELIST = [
   '(WTFPL OR MIT)',
   '(MIT OR WTFPL)',
   '(MIT AND Zlib)',
+  '(MIT OR CC0-1.0)',
   '(BSD-2-Clause OR MIT OR Apache-2.0)',
   '(MIT AND BSD-3-Clause)',
   'CC0-1.0',
