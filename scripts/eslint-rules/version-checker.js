@@ -23,42 +23,31 @@
  *
  */
 
-const { transformFileSync } = require('@babel/core')
-const { join } = require('path')
-const { version: agentVersion } = require('./package.json')
+const { version: agentVersion } = require('@elastic/apm-rum/package.json')
 
-const APM_BASE_PATH = join(__dirname, './src/apm-base.js')
-
-const pass = () => console.log('Agent version matches with build version')
-const fail = version => {
-  throw new Error(
-    `Agent version ${agentVersion} does not match with build version - ${version}`
-  )
-}
-const versionPlugin = ({ types: t }) => {
+module.exports = context => {
   return {
-    name: 'babel-version-plugin',
-    visitor: {
-      MemberExpression(path) {
-        const property = path.get('property')
-        const name = property.node.name
-        if (t.isIdentifier(property) && name === 'setVersion') {
-          const args = path.parentPath.get('arguments')
-          if (args.length > 0 && t.isStringLiteral(args[0])) {
-            const version = args[0].node.value
-            if (version !== agentVersion) {
-              fail(version)
-              process.exit(1)
-            } else {
-              pass()
-            }
+    MemberExpression(node) {
+      const { name, type } = node.property
+      if (type === 'Identifier' && name === 'setVersion') {
+        const args = node.parent.arguments
+        if (args.length > 0 && args[0].type === 'Literal') {
+          const literalNode = args[0]
+          const version = literalNode.value
+          if (version !== agentVersion) {
+            context.report({
+              node: literalNode,
+              message: `Agent version: ${agentVersion} should match with build version: ${version}`,
+              fix(fixer) {
+                return fixer.replaceTextRange(
+                  literalNode.range,
+                  "'" + agentVersion + "'"
+                )
+              }
+            })
           }
         }
       }
     }
   }
 }
-
-transformFileSync(APM_BASE_PATH, {
-  plugins: [versionPlugin]
-})
