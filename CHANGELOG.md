@@ -3,7 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# 4.1.0
+# 4.1.1 (2019-06-12)
+## Bug Fixes
+
+* **rum:** Fix the agent version in the bundles
+
+
+# 4.1.0 (2019-06-12)
 ## Bug Fixes
 
 * **rum-core:** capture all spans as part of page-load transaction ([#273](https://github.com/elastic/apm-agent-rum-js/issues/273)) ([0122bf7](https://github.com/elastic/apm-agent-rum-js/commit/0122bf7))
