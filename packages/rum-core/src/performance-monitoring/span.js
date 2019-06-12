@@ -23,9 +23,9 @@
  *
  */
 
-import BaseSpan from './span-base'
+import SpanBase from './span-base'
 
-class Span extends BaseSpan {
+class Span extends SpanBase {
   constructor(name, type, options) {
     super(name, type, options)
     this.parentId = this.options.parentId

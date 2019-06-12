@@ -72,9 +72,11 @@ const REUSABILITY_THRESHOLD = 10000
 const SPAN_THRESHOLD = 5 * 60 * 1000
 
 /**
- * Transaction Type
+ * Transaction & Span - Name & Types
  */
 const PAGE_LOAD = 'page-load'
+const NAME_UNKNOWN = 'Unknown'
+const TYPE_CUSTOM = 'custom'
 
 /**
  * Others
@@ -94,5 +96,7 @@ export {
   REUSABILITY_THRESHOLD,
   SPAN_THRESHOLD,
   PAGE_LOAD,
+  NAME_UNKNOWN,
+  TYPE_CUSTOM,
   KEYWORD_LIMIT
 }

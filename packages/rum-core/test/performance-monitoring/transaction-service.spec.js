@@ -34,6 +34,13 @@ describe('TransactionService', function() {
   var transactionService
   var config
   var logger
+
+  function sendPageLoadMetrics(name) {
+    var tr = transactionService.startTransaction(name, 'page-load')
+    tr.detectFinish()
+    return tr
+  }
+
   beforeEach(function() {
     logger = new LoggingService()
     spyOn(logger, 'debug')
@@ -56,30 +63,6 @@ describe('TransactionService', function() {
     expect(
       transactionService.getCurrentTransaction().startSpan
     ).toHaveBeenCalledWith('test-span', 'test-span', { test: 'passed' })
-  })
-
-  it('should not start span when performance monitoring is disabled', function() {
-    config.set('active', false)
-    transactionService = new TransactionService(logger, config)
-    var tr = new Transaction('transaction', 'transaction')
-    spyOn(tr, 'startSpan').and.callThrough()
-    transactionService.setCurrentTransaction(tr)
-    transactionService.startSpan('test-span', 'test-span')
-    expect(
-      transactionService.getCurrentTransaction().startSpan
-    ).not.toHaveBeenCalled()
-  })
-
-  it('should not start transaction when performance monitoring is disabled', function() {
-    config.set('active', false)
-    transactionService = new TransactionService(logger, config)
-
-    var result = transactionService.startTransaction(
-      'transaction',
-      'transaction'
-    )
-
-    expect(result).toBeUndefined()
   })
 
   it('should start transaction', function(done) {
@@ -123,17 +106,6 @@ describe('TransactionService', function() {
     expect(trans.name).toBe('transaction')
   })
 
-  it('should not create transaction if performance is not enabled', function() {
-    config.set('active', false)
-    transactionService = new TransactionService(logger, config)
-    var result = transactionService.createTransaction(
-      'test',
-      'test',
-      config.get('performance')
-    )
-    expect(result).toBeUndefined()
-  })
-
   it('should capture page load on first transaction', function(done) {
     // todo: can't test hard navigation metrics since karma runs tests inside an iframe
     config.set('active', true)
@@ -165,27 +137,13 @@ describe('TransactionService', function() {
     tr2.detectFinish()
   })
 
-  it('should sendPageLoadMetrics', function(done) {
-    config.set('active', true)
-    config.set('capturePageLoad', true)
-
+  it('should reuse Transaction', function() {
     transactionService = new TransactionService(logger, config)
-
-    transactionService.subscribe(function() {
-      expect(tr.isHardNavigation).toBe(true)
-      expect(tr.marks.agent).toBeDefined()
-      expect(tr.marks.navigationTiming).toBeDefined()
-      done()
-    })
-    var tr = transactionService.sendPageLoadMetrics('test')
-
-    transactionService = new TransactionService(logger, config)
-    var zoneTr = new Transaction('test-name', 'test-type', {
+    const zoneTr = new Transaction('test-name', 'test-type', {
       canReuse: true
     })
     transactionService.setCurrentTransaction(zoneTr)
-
-    var pageLoadTr = transactionService.sendPageLoadMetrics('new tr')
+    const pageLoadTr = sendPageLoadMetrics('new tr')
 
     expect(pageLoadTr).toBe(zoneTr)
   })
@@ -218,19 +176,23 @@ describe('TransactionService', function() {
     window.performance.getEntriesByType = _getEntriesByType
   })
 
-  it('should consider initial page load name or use location.pathname', function() {
+  it('should use initial page load name before ending the transaction', function() {
     transactionService = new TransactionService(logger, config)
-    var tr
 
-    tr = transactionService.sendPageLoadMetrics()
+    const tr = transactionService.startTransaction(undefined, 'page-load')
     expect(tr.name).toBe('Unknown')
 
     config.set('pageLoadTransactionName', 'page load name')
-    tr = transactionService.sendPageLoadMetrics()
-    expect(tr.name).toBe('page load name')
+    tr.detectFinish()
 
-    tr = transactionService.sendPageLoadMetrics('hamid-test')
-    expect(tr.name).toBe('hamid-test')
+    /**
+     * For page load transaction we set the transaction name using
+     * transaction.onEnd which is scheduled in microtask using Promise.resolve()
+     */
+    Promise.resolve().then(() => {
+      expect(tr.name).toBe('page load name')
+      done()
+    })
   })
 
   xit('should not add duplicate resource spans', function() {
@@ -288,18 +250,23 @@ describe('TransactionService', function() {
     config.set('active', true)
     config.set('capturePageLoad', true)
 
-    var transactionService = new TransactionService(logger, config)
-    transactionService.subscribe(function() {
+    const customTransactionService = new TransactionService(logger, config)
+    customTransactionService.subscribe(function() {
       expect(tr.isHardNavigation).toBe(true)
       window.performance.getEntriesByType = _getEntriesByType
       done()
     })
 
-    var zoneTr = new Transaction('test', 'test-transaction')
-    transactionService.setCurrentTransaction(zoneTr)
-    var span = zoneTr.startSpan('GET http://example.com', 'external.http')
+    const zoneTr = new Transaction('test', 'test-transaction')
+    customTransactionService.setCurrentTransaction(zoneTr)
+    const span = zoneTr.startSpan('GET http://example.com', 'external.http')
     span.end()
-    var tr = transactionService.sendPageLoadMetrics('resource-test')
+
+    const tr = customTransactionService.startTransaction(
+      'resource-test',
+      'page-load'
+    )
+    tr.detectFinish()
   })
 
   it('should ignore transactions that match the list', function() {
@@ -352,7 +319,7 @@ describe('TransactionService', function() {
     }
 
     transactionService = new TransactionService(logger, config)
-    var tr = transactionService.sendPageLoadMetrics()
+    const tr = sendPageLoadMetrics()
     expect(tr.traceId).toBe('test-trace-id')
     expect(tr.sampled).toBe(true)
 
