@@ -18,7 +18,9 @@
     "lint:js": "eslint .",
     "lint:license": "node scripts/license-checker",
     "test": "lerna run build:main && lerna run test --stream --scope=$SCOPE --no-prefix",
-    "bundlesize": "lerna run bundlesize --stream"
+    "bundlesize": "lerna run bundlesize --stream",
+    "serve": "node ./dev-utils/run-script.js startTestServers",
+    "karma": "karma start"
   },
   "lint-staged": {
     "*.{js,jsx}": [
