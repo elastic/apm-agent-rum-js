@@ -24,14 +24,15 @@
  */
 
 import { isUndefined, generateRandomId, setLabel, merge } from '../common/utils'
+import { NAME_UNKNOWN, TYPE_CUSTOM } from '../common/constants'
 
 class SpanBase {
   // context
 
-  constructor(name, type, options) {
-    this.options = options || {}
-    this.name = name || this.options.name || 'Unknown'
-    this.type = type || this.options.type || 'custom'
+  constructor(name = NAME_UNKNOWN, type = TYPE_CUSTOM, options = {}) {
+    this.options = options
+    this.name = name
+    this.type = type
     this.id = this.options.id || generateRandomId(16)
     this.traceId = this.options.traceId
     this.sampled = this.options.sampled
