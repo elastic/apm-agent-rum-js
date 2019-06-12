@@ -27,6 +27,6 @@ To publish a single package, run `npm run release-package -- @elastic/apm-rum` w
 
 ### Releasing artifacts to GitHub
 
-Use `npm run release-github` in the root directory, the script takes care packaging and creating a release for `@elastic/apm-rum` in GitHub with the previous annonated tag.
+Use `npm run github-release` in the root directory, the script takes care packaging and creating a release for `@elastic/apm-rum` in GitHub with the previous annonated tag.
 
 **Note: Make sure you pass the GITHUB_TOKEN (with push access) in your environment variable while releasing**
