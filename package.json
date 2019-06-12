@@ -10,9 +10,9 @@
   "scripts": {
     "version": "node scripts/prompt-release",
     "prerelease": "npm test",
-    "release": "lerna publish && npm run release-github",
+    "release": "lerna publish && npm run github-release",
     "release-package": "node scripts/publish-package",
-    "release-github": "node scripts/release-github",
+    "github-release": "node scripts/github-release",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
     "lint": "npm-run-all --silent -p lint:*",
     "lint:js": "eslint .",
