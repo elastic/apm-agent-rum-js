@@ -137,6 +137,17 @@ describe('TransactionService', function() {
     tr2.detectFinish()
   })
 
+  it('should reuse Transaction', function() {
+    transactionService = new TransactionService(logger, config)
+    const zoneTr = new Transaction('test-name', 'test-type', {
+      canReuse: true
+    })
+    transactionService.setCurrentTransaction(zoneTr)
+    const pageLoadTr = sendPageLoadMetrics('new tr')
+
+    expect(pageLoadTr).toBe(zoneTr)
+  })
+
   it('should contain agent marks in page load transaction', function() {
     const _getEntriesByType = window.performance.getEntriesByType
 
