@@ -111,24 +111,9 @@ class ErrorLogging {
   }
 
   registerGlobalEventListener() {
-    window.onerror = (messageOrEvent, source, lineno, colno, error) => {
-      let errorEvent
-      if (
-        typeof messageOrEvent !== 'undefined' &&
-        typeof messageOrEvent !== 'string'
-      ) {
-        errorEvent = messageOrEvent
-      } else {
-        errorEvent = {
-          message: messageOrEvent,
-          filename: source,
-          lineno,
-          colno,
-          error
-        }
-      }
+    window.addEventListener('error', errorEvent =>
       this.logErrorEvent(errorEvent)
-    }
+    )
   }
 
   logError(messageOrError) {
