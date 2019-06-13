@@ -68,11 +68,7 @@ describe('Capture hard navigation', function() {
    */
   const transactionEnd = timings.loadEventEnd + 100
   it('should createNavigationTimingSpans', function() {
-    var spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
+    let spans = createNavigationTimingSpans(timings, transactionEnd)
     expect(spans.map(mapSpan)).toEqual([
       { name: 'Requesting and receiving the document', _end: 947, _start: 7 },
       {
@@ -84,224 +80,52 @@ describe('Capture hard navigation', function() {
       { name: 'Fire "load" event', _end: 2874, _start: 2852 }
     ])
 
-    spans = createNavigationTimingSpans(timings, null, transactionEnd)
-    expect(spans).toEqual([])
-    spans = createNavigationTimingSpans(timings, undefined, transactionEnd)
-    expect(spans).toEqual([])
-    spans = createNavigationTimingSpans(timings, 0, transactionEnd)
-    expect(spans).toEqual([])
-    spans = createNavigationTimingSpans(timings, 1, transactionEnd)
-    expect(spans).toEqual([])
-    spans = createNavigationTimingSpans(
-      timings,
-      Number(new Date()),
-      transactionEnd
-    )
-    expect(spans).toEqual([])
+    const fetchStartValues = [undefined, null, Number(new Date())]
+    for (let i = 0; i < fetchStartValues.length; i++) {
+      const value = fetchStartValues[i]
+      const timingObj = { ...timings, fetchStart: value }
+      const spans = createNavigationTimingSpans(timingObj, transactionEnd)
+      expect(spans).toEqual([])
+    }
 
-    timings.requestStart = null
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      {
-        name: 'Parsing the document, executing sync. scripts',
-        _end: 1464,
-        _start: 820
-      },
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
+    const requestStartValues = [undefined, null, 0, 1, Number(new Date())]
+    for (let i = 0; i < requestStartValues.length; i++) {
+      const value = requestStartValues[i]
+      const timingObj = { ...timings, requestStart: value }
+      const spans = createNavigationTimingSpans(timingObj, transactionEnd)
+      expect(spans.map(mapSpan)).toEqual([
+        {
+          name: 'Parsing the document, executing sync. scripts',
+          _end: 1464,
+          _start: 820
+        },
+        { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
+        { name: 'Fire "load" event', _end: 2874, _start: 2852 }
+      ])
+    }
 
-    timings.requestStart = undefined
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      {
-        name: 'Parsing the document, executing sync. scripts',
-        _end: 1464,
-        _start: 820
-      },
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
+    const domInteractiveValues = [undefined, null, 0, 1, Number(new Date())]
+    for (let i = 0; i < domInteractiveValues.length; i++) {
+      const value = domInteractiveValues[i]
+      const timingObj = {
+        ...timings,
+        domInteractive: value,
+        requestStart: 0
+      }
+      const spans = createNavigationTimingSpans(timingObj, transactionEnd)
+      expect(spans.map(mapSpan)).toEqual([
+        { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
+        { name: 'Fire "load" event', _end: 2874, _start: 2852 }
+      ])
+    }
 
-    timings.requestStart = 0
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      {
-        name: 'Parsing the document, executing sync. scripts',
-        _end: 1464,
-        _start: 820
-      },
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.requestStart = 1
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      {
-        name: 'Parsing the document, executing sync. scripts',
-        _end: 1464,
-        _start: 820
-      },
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.requestStart = Number(new Date())
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      {
-        name: 'Parsing the document, executing sync. scripts',
-        _end: 1464,
-        _start: 820
-      },
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    // testing the end
-    timings.domInteractive = null
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.domInteractive = undefined
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.domInteractive = 0
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.domInteractive = 1
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.domInteractive = Number(new Date())
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.domLoading = null
-    timings.domInteractive = null
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.domLoading = undefined
-    timings.domInteractive = undefined
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.domLoading = 0
-    timings.domInteractive = 0
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.domLoading = 1
-    timings.domInteractive = 1
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.domLoading = Number(new Date())
-    timings.domInteractive = Number(new Date())
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
-    expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
-    ])
-
-    timings.domContentLoadedEventStart = 'testing'
-    timings.domContentLoadedEventEnd = 'testings'
-    spans = createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    )
+    const timingsObj = {
+      ...timings,
+      domInteractive: 0,
+      requestStart: 0,
+      domContentLoadedEventStart: 'a'
+    }
+    spans = createNavigationTimingSpans(timingsObj, transactionEnd)
     expect(spans.map(mapSpan)).toEqual([
       { name: 'Fire "load" event', _end: 2874, _start: 2852 }
     ])

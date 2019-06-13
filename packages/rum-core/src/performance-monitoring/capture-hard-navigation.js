@@ -54,32 +54,26 @@ const eventPairs = [
   ['loadEventStart', 'loadEventEnd', 'Fire "load" event']
 ]
 
-function shouldCreateSpan(start, end, transactionEnd) {
-  const duration = end - start
-  return duration > 0 && duration < MAX_SPAN_DURATION && end <= transactionEnd
-}
-
-function isValidPerformanceTiming(start, end, baseTime) {
+function shouldCreateSpan(start, end, baseTime, transactionEnd) {
   return (
     typeof start === 'number' &&
     typeof end === 'number' &&
+    typeof baseTime === 'number' &&
     start >= baseTime &&
     end > start &&
-    start - baseTime < MAX_SPAN_DURATION &&
-    end - baseTime < MAX_SPAN_DURATION
+    end - start < MAX_SPAN_DURATION &&
+    end <= transactionEnd
   )
 }
 
-function createNavigationTimingSpans(timings, baseTime, transactionEnd) {
+function createNavigationTimingSpans(timings, transactionEnd) {
   const spans = []
+  const baseTime = timings.fetchStart
   for (let i = 0; i < eventPairs.length; i++) {
     const start = timings[eventPairs[i][0]]
     const end = timings[eventPairs[i][1]]
 
-    if (!isValidPerformanceTiming(start, end, baseTime)) {
-      continue
-    }
-    if (!shouldCreateSpan(start, end, transactionEnd)) {
+    if (!shouldCreateSpan(start, end, baseTime, transactionEnd)) {
       continue
     }
     const span = new Span(eventPairs[i][2], 'hard-navigation.browser-timing')
@@ -121,15 +115,12 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
       !name
     ) {
       continue
-    } else if (!isValidPerformanceTiming(startTime, responseEnd, 0)) {
-      continue
     }
-
     /**
      * Create spans for all known resource initiator types
      */
     if (RESOURCE_INITIATOR_TYPES.indexOf(initiatorType) !== -1) {
-      if (!shouldCreateSpan(startTime, responseEnd, transactionEnd)) {
+      if (!shouldCreateSpan(startTime, responseEnd, 0, transactionEnd)) {
         continue
       }
       spans.push(
@@ -163,7 +154,7 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
        */
       if (
         !foundAjaxReq &&
-        shouldCreateSpan(startTime, responseEnd, transactionEnd)
+        shouldCreateSpan(startTime, responseEnd, 0, transactionEnd)
       ) {
         spans.push(
           createResourceTimingSpan(name, initiatorType, startTime, responseEnd)
@@ -192,15 +183,11 @@ function captureHardNavigation(transaction) {
      * Threshold that decides if the span must be
      * captured as part of the page load transaction
      *
-     * Denoted the time when the onload event fires
+     * Denotes the time when the onload event fires
      */
     const transactionEnd = transaction._end
 
-    createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    ).forEach(span => {
+    createNavigationTimingSpans(timings, transactionEnd).forEach(span => {
       span.traceId = transaction.traceId
       span.sampled = transaction.sampled
       if (span.pageResponse && transaction.options.pageLoadSpanId) {
