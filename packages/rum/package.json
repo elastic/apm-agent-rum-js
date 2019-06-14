@@ -17,7 +17,7 @@
     "build": "webpack",
     "build:dev": "webpack -w",
     "build:main": "npx babel src -d dist/lib --config-file ../../babel.node.js",
-    "build:e2e": "npm run script buildE2eBundles",
+    "build:e2e": "node ../../dev-utils/run-script.js buildE2eBundles packages/rum/test/e2e",
     "bundlesize": "npm run build && bundlesize",
     "karma": "karma start",
     "karma:coverage": "karma start --coverage",
@@ -26,9 +26,9 @@
     "test:node": "npm run script runNodeTests",
     "test:integration": "npm run script runIntegrationTests",
     "test:unit": "node ../../dev-utils/run-script.js runUnitTests false packages/rum",
-    "test:e2e:supported": "npm run script runE2eTests wdio.conf.js",
-    "test:e2e:failsafe": "npm run script runE2eTests wdio-failsafe.conf.js",
-    "test:sauce": "npm run script runSauceTests",
+    "test:e2e:supported": "node ../../dev-utils/run-script.js runE2eTests packages/rum/wdio.conf.js",
+    "test:e2e:failsafe": "node ../../dev-utils/run-script.js runE2eTests packages/rum/wdio-failsafe.conf.js",
+    "test:sauce": "node ../../dev-utils/run-script.js runSauceTests true packages/rum test:unit test:e2e:supported test:e2e:failsafe",
     "test": "npm-run-all build build:main build:e2e test:node test:integration test:sauce"
   },
   "files": [

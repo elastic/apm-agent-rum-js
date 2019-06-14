@@ -23,61 +23,6 @@
  *
  */
 
-const { join } = require('path')
-const glob = require('glob')
-const {
-  getSauceConnectOptions,
-  getBrowserList
-} = require('../../dev-utils/test-config')
-const { isChrome } = require('../../dev-utils/webdriver')
+const { getWebdriveBaseConfig } = require('../../dev-utils/webdriver')
 
-const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
-
-/**
- * Skip the ios platform on E2E tests because of script
- * timeout issue in Appium
- */
-const capabilities = getBrowserList()
-  .filter(({ platformName }) => platformName !== 'iOS')
-  .map(capability => ({
-    tunnelIdentifier,
-    ...capability
-  }))
-
-exports.config = {
-  runner: 'local',
-  specs: glob.sync(join(__dirname, '/test/e2e/**/*.e2e-spec.js')),
-  maxInstancesPerCapability: 3,
-  services: ['sauce'],
-  user: username,
-  key: accessKey,
-  sauceConnect: false,
-  capabilities,
-  logLevel: 'error',
-  bail: 1,
-  screenshotPath: join(__dirname, 'error-screenshot'),
-  baseUrl: 'http://localhost:8000',
-  waitforTimeout: 30000,
-  framework: 'jasmine',
-  reporters: ['dot', 'spec'],
-  jasmineNodeOpts: {
-    defaultTimeoutInterval: 90000
-  },
-  beforeTest() {
-    /**
-     * Sets timeout for scripts executed in the browser
-     * via browser.executeAsync method
-     */
-    browser.setTimeout({ script: 20000 })
-  },
-  afterTest(test) {
-    /**
-     * Log only on failures
-     * Log api is only available in chrome driver
-     * */
-    if (!test.passed && isChrome()) {
-      const response = browser.getLogs('browser')
-      console.log('[Browser Logs]:', JSON.stringify(response, undefined, 2))
-    }
-  }
-}
+exports.config = getWebdriveBaseConfig(__dirname)

@@ -23,17 +23,11 @@
  *
  */
 
-const path = require('path')
-const JasmineRunner = require('jasmine')
 const express = require('express')
 const serveIndex = require('serve-index')
-const testUtils = require('../../dev-utils/test-utils')
-const { runIntegrationTest } = require('./test/e2e/integration-test')
-const { generateNotice } = require('../../dev-utils/dep-info')
+const { join } = require('path')
 
-const PROJECT_DIR = path.join(__dirname, './')
-
-function createBackendAgentServer() {
+function startBackendAgentServer(port = 8003) {
   const express = require('express')
   const app = express()
 
@@ -68,16 +62,15 @@ function createBackendAgentServer() {
   app.post('/data', dTRespond)
   app.post('/fetch', dTRespond)
 
-  const port = 8003
   const server = app.listen(port)
 
   console.log('[Backend Server] - serving on: ', port)
   return server
 }
 
-function serveE2e(servingPath, port) {
+function startTestServers(path = join(__dirname, '../'), port = 8000) {
   const app = express()
-  const staticPath = path.join(__dirname, servingPath)
+  const staticPath = path
 
   app.get('/healthcheck', function(req, res) {
     res.send('OK')
@@ -106,89 +99,12 @@ function serveE2e(servingPath, port) {
   const staticServer = app.listen(port)
 
   console.log('[Static Server] - serving on: ', staticPath, port)
-  const backendAgentServer = createBackendAgentServer()
+  const backendAgentServer = startBackendAgentServer()
 
   return [staticServer, backendAgentServer]
 }
 
-function runJasmine(specDir, transform, cb) {
-  const jrunner = new JasmineRunner()
-  /**
-   * Files are relative to spec directory
-   */
-  jrunner.loadConfig({
-    spec_dir: specDir,
-    spec_files: ['*.spec.js'],
-    helpers: transform ? ['../babel-helper.js'] : []
-  })
-  jrunner.onComplete(passed => {
-    if (!passed) {
-      const err = new Error('Jasmine tests failed')
-      // The stack is not useful in this context.
-      err.stack = ''
-      cb(err)
-    } else {
-      cb()
-    }
-  })
-  jrunner.execute()
+module.exports = {
+  startBackendAgentServer,
+  startTestServers
 }
-
-function runE2eTests(config) {
-  const webDriverConfig = path.join(PROJECT_DIR, config)
-  testUtils.runE2eTests(webDriverConfig, false)
-}
-
-function runIntegrationTests() {
-  const servers = serveE2e('./', 8000)
-  const SPEC_DIR = 'test/integration'
-  runJasmine(SPEC_DIR, true, err => {
-    servers.forEach(server => server.close())
-    if (err) {
-      console.log('Integration tests failed:', err.message)
-      process.exit(2)
-    }
-  })
-}
-
-/**
- * Ensure all the exports from our module works
- * in Node.js without babel transpiling the modules
- */
-function runNodeTests() {
-  const SPEC_DIR = 'test/node'
-  runJasmine(SPEC_DIR, false, err => {
-    if (err) {
-      console.log('Node tests for build failed:', err.message)
-      process.exit(2)
-    }
-  })
-}
-
-const scripts = {
-  startSelenium: testUtils.startSelenium,
-  runE2eTests,
-  runIntegrationTests,
-  runNodeTests,
-  serveE2e,
-  generateNotice
-}
-
-module.exports = scripts
-
-function runScript() {
-  const [, , scriptName, ...scriptArgs] = process.argv
-  if (scriptName) {
-    var message = `Running: ${scriptName}(${scriptArgs
-      .map(a => a.trim())
-      .join(', ')}) \n`
-    console.log(message)
-    if (typeof scripts[scriptName] === 'function') {
-      return scripts[scriptName].apply(this, scriptArgs)
-    } else {
-      throw new Error('No script with name ' + scriptName)
-    }
-  }
-}
-
-runScript()

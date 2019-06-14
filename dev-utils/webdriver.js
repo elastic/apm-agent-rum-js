@@ -23,6 +23,10 @@
  *
  */
 
+const { join } = require('path')
+const glob = require('glob')
+const { getSauceConnectOptions, getBrowserList } = require('./test-config')
+
 const logLevels = {
   ALL: { value: Number.MIN_VALUE },
   DEBUG: { value: 700 },
@@ -31,7 +35,6 @@ const logLevels = {
   SEVERE: { value: 1000 },
   OFF: { value: Number.MAX_VALUE }
 }
-
 const debugMode = false
 const debugLevel = logLevels.INFO.value
 
@@ -102,6 +105,59 @@ function isLogEntryATestFailure(entry, whitelist) {
   return result
 }
 
+function getWebdriveBaseConfig(path) {
+  const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
+
+  /**
+   * Skip the ios platform on E2E tests because of script
+   * timeout issue in Appium
+   */
+  const capabilities = getBrowserList()
+    .filter(({ platformName }) => platformName !== 'iOS')
+    .map(capability => ({
+      tunnelIdentifier,
+      ...capability
+    }))
+
+  return {
+    runner: 'local',
+    specs: glob.sync(join(path, './test/e2e/**/*.e2e-spec.js')),
+    maxInstancesPerCapability: 3,
+    services: ['sauce'],
+    user: username,
+    key: accessKey,
+    sauceConnect: false,
+    capabilities,
+    logLevel: 'error',
+    bail: 1,
+    screenshotPath: join(path, 'error-screenshot'),
+    baseUrl: 'http://localhost:8000',
+    waitforTimeout: 30000,
+    framework: 'jasmine',
+    reporters: ['dot', 'spec'],
+    jasmineNodeOpts: {
+      defaultTimeoutInterval: 90000
+    },
+    beforeTest() {
+      /**
+       * Sets timeout for scripts executed in the browser
+       * via browser.executeAsync method
+       */
+      browser.setTimeout({ script: 20000 })
+    },
+    afterTest(test) {
+      /**
+       * Log only on failures
+       * Log api is only available in chrome driver
+       * */
+      if (!test.passed && isChrome()) {
+        const response = browser.getLogs('browser')
+        console.log('[Browser Logs]:', JSON.stringify(response, undefined, 2))
+      }
+    }
+  }
+}
+
 module.exports = {
   allowSomeBrowserErrors: function allowSomeBrowserErrors(whitelist, done) {
     if (typeof done === 'function') {
@@ -130,5 +186,6 @@ module.exports = {
       // done()
     }
   },
-  isChrome
+  isChrome,
+  getWebdriveBaseConfig
 }
