@@ -176,25 +176,22 @@ describe('TransactionService', function() {
     window.performance.getEntriesByType = _getEntriesByType
   })
 
-  it('should use page URL as page load transaction name', () => {
+  it('should use page URL as page load transaction name', done => {
     transactionService = new TransactionService(logger, config)
 
     const tr = transactionService.startTransaction(undefined, 'page-load')
-    const trDoneFn = tr.onEnd
-    tr.onEnd = function() {
-      trDoneFn()
-      expect(tr.isHardNavigation).toBe(true)
+    tr.detectFinish()
+
+    Promise.resolve().then(() => {
       expect(window.location.href).toContain(tr.name)
-    }
-    tr.end()
+      done()
+    })
   })
 
   it('should use initial page load name before ending the transaction', function() {
     transactionService = new TransactionService(logger, config)
 
     const tr = transactionService.startTransaction(undefined, 'page-load')
-    expect(window.location.href).toContain(tr.name)
-
     config.set('pageLoadTransactionName', 'page load name')
     tr.detectFinish()
 

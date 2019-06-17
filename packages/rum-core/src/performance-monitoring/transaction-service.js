@@ -115,7 +115,6 @@ class TransactionService {
         pageLoadTraceId: config.pageLoadTraceId,
         pageLoadSampled: config.pageLoadSampled,
         pageLoadSpanId: config.pageLoadSpanId,
-        pageLoadTransactionName: config.pageLoadTransactionName,
         transactionSampleRate: config.transactionSampleRate,
         checkBrowserResponsiveness: config.checkBrowserResponsiveness
       },
@@ -155,25 +154,11 @@ class TransactionService {
 
     if (type === PAGE_LOAD) {
       tr.isHardNavigation = true
-
-      if (tr.name === NAME_UNKNOWN) {
-        const pageUrl = stripQueryStringFromUrl(window.location.href)
-        if (pageUrl) {
-          tr.name = pageUrl
-        }
-      }
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
       if (perfOptions.pageLoadSampled) {
         tr.sampled = perfOptions.pageLoadSampled
-      }
-      /**
-       * Retriving the name before transaction ends should reflect
-       * the correctg page load transaction name
-       */
-      if (perfOptions.pageLoadTransactionName) {
-        tr.name = perfOptions.pageLoadTransactionName
       }
     }
 
@@ -191,11 +176,21 @@ class TransactionService {
              * Setting the name via configService.setConfig after transaction
              * has started should also reflect the correct name.
              */
-            const pageLoadTransactionName = this._config.get(
-              'pageLoadTransactionName'
-            )
-            if (pageLoadTransactionName) {
-              tr.name = pageLoadTransactionName
+            if (tr.name === NAME_UNKNOWN) {
+              const pageLoadTransactionName = this._config.get(
+                'pageLoadTransactionName'
+              )
+              if (pageLoadTransactionName) {
+                tr.name = pageLoadTransactionName
+              } else {
+                /**
+                 * Use page url as page-load transaction name
+                 */
+                const pageUrl = stripQueryStringFromUrl(window.location.href)
+                if (pageUrl) {
+                  tr.name = pageUrl
+                }
+              }
             }
             const captured = this.capturePageLoadMetrics(tr)
             if (captured) {
