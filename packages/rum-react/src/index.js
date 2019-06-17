@@ -30,4 +30,4 @@ import { getApmRoute } from './get-apm-route'
 const withTransaction = getWithTransaction(apm)
 const ApmRoute = getApmRoute(apm)
 
-export { getWithTransaction, withTransaction, ApmRoute }
+export { withTransaction, ApmRoute }

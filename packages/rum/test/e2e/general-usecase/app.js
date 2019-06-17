@@ -111,4 +111,19 @@ generateError.tmp = 'tmp'
 
 testFetch(mockBackendUrl)
 
+if (location.hash === '#test-state') {
+  const path = location.pathname
+  history.pushState(
+    { data: 'test-state' },
+    'Push state title',
+    path + '#test-state'
+  )
+  history.pushState(
+    { data: 'test-state' },
+    'Push state title',
+    path + '#test-state'
+  )
+  history.go(-1)
+}
+
 renderTestElement()

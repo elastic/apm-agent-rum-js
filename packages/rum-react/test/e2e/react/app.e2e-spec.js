@@ -23,7 +23,10 @@
  *
  */
 
-const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
+const {
+  allowSomeBrowserErrors,
+  waitForApmServerCalls
+} = require('../../../../../dev-utils/webdriver')
 
 describe('react app', function() {
   it('should run the react app', function() {
@@ -36,54 +39,7 @@ describe('react app', function() {
       'expected element #test-element'
     )
 
-    const serverCalls = browser.executeAsync(function(done) {
-      var apmServerMock = window.elasticApm.serviceFactory.getService(
-        'ApmServer'
-      )
-
-      function checkCalls() {
-        var serverCalls = apmServerMock.calls
-        var validCalls =
-          serverCalls.sendTransactions &&
-          serverCalls.sendTransactions.length >= 1
-
-        if (validCalls) {
-          Promise.all([serverCalls.sendTransactions[0].returnValue])
-            .then(function() {
-              function mapCall(c) {
-                return { args: c.args, mocked: c.mocked }
-              }
-              try {
-                var calls = {
-                  sendTransactions: serverCalls.sendTransactions.map(mapCall)
-                }
-                done(calls)
-              } catch (e) {
-                throw e
-              }
-            })
-            .catch(function(reason) {
-              console.log('reason', reason)
-              try {
-                done({ error: reason.message || JSON.stringify(reason) })
-              } catch (e) {
-                done({
-                  error: 'Failed serializing rejection reason: ' + e.message
-                })
-              }
-            })
-        }
-      }
-
-      checkCalls()
-      apmServerMock.subscription.subscribe(checkCalls)
-    })
-
-    expect(serverCalls).toBeTruthy()
-    console.log(JSON.stringify(serverCalls, null, 2))
-    if (serverCalls.error) {
-      fail(serverCalls.error)
-    }
+    const serverCalls = waitForApmServerCalls(0, 1)
 
     expect(serverCalls.sendTransactions.length).toBe(1)
 

@@ -33,8 +33,6 @@ import React from 'react'
 import hoistStatics from 'hoist-non-react-statics'
 
 function getWithTransaction(apm) {
-  if (!apm) {
-  }
   return function withTransaction(name, type) {
     if (typeof name !== 'string') {
       //todo: warn user about the usage
