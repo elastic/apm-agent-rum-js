@@ -143,15 +143,6 @@ describe('ConfigService', function() {
     expect(errors3).toEqual([
       'serviceName abc.def contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)'
     ])
-
-    // normalize serverUrl
-    configService.setConfig({
-      serviceName: 'aabc',
-      serverUrl: 'http://localhost:8080/////'
-    })
-    const errors4 = configService.validate()
-    expect(configService.get('serverUrl')).toEqual('http://localhost:8080')
-    expect(errors4.length).toEqual(0)
   })
 
   it('should addLabels', function() {
@@ -185,5 +176,17 @@ describe('ConfigService', function() {
     configServiceFromScript.init()
     expect(configServiceFromScript.get('serviceName')).toBe('js-core')
     expect(configServiceFromScript.get('capturePageLoad')).toBe('false')
+  })
+
+  it('should remove trailing slash from serverUrl', () => {
+    configService.setConfig({
+      serviceName: 'aabc',
+      serverUrl: 'http://localhost:8080/////',
+      serverUrlPrefix: '/rum/events'
+    })
+    expect(configService.getEndpointUrl()).toEqual(
+      'http://localhost:8080/rum/events'
+    )
+    expect(configService.get('serverUrl')).toEqual('http://localhost:8080')
   })
 })

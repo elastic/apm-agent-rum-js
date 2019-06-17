@@ -154,8 +154,13 @@ class Config {
   }
 
   getEndpointUrl() {
-    var url = this.get('serverUrl') + this.get('serverUrlPrefix')
-    return url
+    /**
+     * Remove all trailing slash for serverUrl since serverUrlPrefix
+     * includes a forward slash for the path
+     */
+    this.config.serverUrl = this.config.serverUrl.replace(/\/+$/, '')
+
+    return this.config.serverUrl + this.config.serverUrlPrefix
   }
 
   set(key, value) {
@@ -240,14 +245,6 @@ class Config {
           this.config.serviceName +
           ' contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)'
       )
-    }
-    /**
-     * Remove all trailing slash for serverUrl since serverUrlPrefix
-     * includes a forward slash for the path
-     */
-    const serverUrl = this.config.serverUrl
-    if (serverUrl) {
-      this.config.serverUrl = serverUrl.replace(/\/+$/, '')
     }
 
     return errors
