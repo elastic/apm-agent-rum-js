@@ -58,10 +58,11 @@ function shouldCreateSpan(start, end, baseTime, transactionEnd) {
   return (
     typeof start === 'number' &&
     typeof end === 'number' &&
-    typeof baseTime === 'number' &&
     start >= baseTime &&
     end > start &&
     end - start < MAX_SPAN_DURATION &&
+    start - baseTime < MAX_SPAN_DURATION &&
+    end - baseTime < MAX_SPAN_DURATION &&
     end <= transactionEnd
   )
 }
