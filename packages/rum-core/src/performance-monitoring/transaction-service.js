@@ -24,8 +24,12 @@
  */
 
 import Transaction from './transaction'
-import { extend, getPageLoadMarks } from '../common/utils'
-import { PAGE_LOAD, NAME_UNKNOWN, TYPE_CUSTOM } from '../common/constants'
+import {
+  extend,
+  getPageLoadMarks,
+  stripQueryStringFromUrl
+} from '../common/utils'
+import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
 
@@ -122,14 +126,6 @@ class TransactionService {
   startTransaction(name, type, options) {
     const perfOptions = this.createPerfOptions(options)
 
-    if (!type) {
-      type = TYPE_CUSTOM
-    }
-
-    if (!name) {
-      name = NAME_UNKNOWN
-    }
-
     var tr = this.getCurrentTransaction()
 
     if (!tr) {
@@ -160,6 +156,12 @@ class TransactionService {
     if (type === PAGE_LOAD) {
       tr.isHardNavigation = true
 
+      if (tr.name === NAME_UNKNOWN) {
+        const pageUrl = stripQueryStringFromUrl(window.location.href)
+        if (pageUrl) {
+          tr.name = pageUrl
+        }
+      }
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
@@ -170,7 +172,7 @@ class TransactionService {
        * Retriving the name before transaction ends should reflect
        * the correctg page load transaction name
        */
-      if (tr.name === NAME_UNKNOWN && perfOptions.pageLoadTransactionName) {
+      if (perfOptions.pageLoadTransactionName) {
         tr.name = perfOptions.pageLoadTransactionName
       }
     }
@@ -192,7 +194,7 @@ class TransactionService {
             const pageLoadTransactionName = this._config.get(
               'pageLoadTransactionName'
             )
-            if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
+            if (pageLoadTransactionName) {
               tr.name = pageLoadTransactionName
             }
             const captured = this.capturePageLoadMetrics(tr)
