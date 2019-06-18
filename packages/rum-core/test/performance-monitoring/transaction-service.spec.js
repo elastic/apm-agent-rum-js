@@ -338,4 +338,10 @@ describe('TransactionService', function() {
       done()
     })
   })
+
+  it('should createTransaction once per startTransaction', function() {
+    spyOn(transactionService, 'createTransaction').and.callThrough()
+    transactionService.startTransaction('test-name', 'test-type')
+    expect(transactionService.createTransaction).toHaveBeenCalledTimes(1)
+  })
 })
