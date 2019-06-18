@@ -123,7 +123,15 @@ if (location.hash === '#test-state') {
     'Push state title',
     path + '#test-state'
   )
-  history.go(-1)
+
+  /**
+   * There is a bug in Android 5.1 that prevents load event,
+   * if history.go(-1) is called before the load event.
+   */
+
+  window.addEventListener('load', function() {
+    history.go(-1)
+  })
 }
 
 renderTestElement()

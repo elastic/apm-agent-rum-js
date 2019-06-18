@@ -79,7 +79,13 @@ describe('general-usercase', function() {
 
     return allowSomeBrowserErrors(['timeout test error with a secret'])
   })
+
   it('should capture history.pushState', function() {
+    /**
+     * The query string is only used to make url different to the previous test,
+     * Otherwise, both tests will run in the same window.
+     */
+
     browser.url('/test/e2e/general-usecase/index.html?run=pushState#test-state')
     browser.waitUntil(
       () => {

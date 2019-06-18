@@ -48,7 +48,7 @@ describe('ApmBase', function() {
     var tr = trService.getCurrentTransaction()
     expect(tr.name).toBe('Unknown')
     expect(tr.type).toBe('page-load')
-    spyOn(tr, 'detectFinish')
+    spyOn(tr, 'detectFinish').and.callThrough()
     window.addEventListener('load', function() {
       setTimeout(() => {
         expect(tr.detectFinish).toHaveBeenCalled()

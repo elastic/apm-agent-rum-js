@@ -201,12 +201,16 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
 
           if (serverCalls.sendErrors) {
             promises = promises.concat(
-              serverCalls.sendErrors.map(s => s.returnValue)
+              serverCalls.sendErrors.map(function(s) {
+                return s.returnValue
+              })
             )
           }
           if (serverCalls.sendTransactions) {
             promises = promises.concat(
-              serverCalls.sendTransactions.map(s => s.returnValue)
+              serverCalls.sendTransactions.map(function(s) {
+                return s.returnValue
+              })
             )
           }
 
