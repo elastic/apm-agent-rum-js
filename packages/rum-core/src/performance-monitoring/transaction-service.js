@@ -134,9 +134,7 @@ class TransactionService {
 
     if (!tr) {
       tr = this.createTransaction(name, type, perfOptions)
-    }
-
-    if (tr.canReuse()) {
+    } else if (tr.canReuse()) {
       /*
        * perfOptions could also have `canReuse:true` in which case we
        * allow a redefinition until there's a call that doesn't have that
