@@ -23,7 +23,6 @@
  *
  */
 
-import Url from '../common/url'
 import rng from 'uuid/lib/rng-browser'
 
 const slice = [].slice
@@ -104,9 +103,7 @@ function isDtHeaderValid(header) {
 function checkSameOrigin(source, target) {
   let isSame = false
   if (typeof target === 'string') {
-    const src = new Url(source)
-    const tar = new Url(target)
-    isSame = src.origin === tar.origin
+    isSame = source === target
   } else if (Array.isArray(target)) {
     target.forEach(function(t) {
       if (!isSame) {
@@ -366,22 +363,6 @@ function getPageLoadMarks() {
   }
 }
 
-/**
- * Removes the username:password portion from Urls
- *
- * Ex: https://a:b@example.com/c  -> https://example.com/c
- */
-function removeAuthFromUrl(url) {
-  if (!url) {
-    return url
-  }
-  const userpass = url.match(/^http(s?):\/\/([^/]+)@/)
-  if (userpass == null) {
-    return url
-  }
-  return url.replace(userpass[2] + '@', '')
-}
-
 export {
   extend,
   merge,
@@ -411,6 +392,5 @@ export {
   setLabel,
   stripQueryStringFromUrl,
   find,
-  removeInvalidChars,
-  removeAuthFromUrl
+  removeInvalidChars
 }

@@ -25,6 +25,7 @@
 
 import * as utils from '../../src/common/utils'
 import Span from '../../src/performance-monitoring/span'
+import Url from '../../src/common/url'
 
 describe('lib/utils', function() {
   it('should merge objects', function() {
@@ -114,38 +115,33 @@ describe('lib/utils', function() {
   })
 
   it('should identify same origin urls', function() {
-    var result = utils.checkSameOrigin('/test/new', window.location.href)
-    expect(result).toBe(true)
-    result = utils.checkSameOrigin(
-      'http:test.com/test/new',
-      window.location.href
+    const currentOrigin = new Url(window.location.href).origin
+    const relOrigin = new Url('/test/new').origin
+    const absOrigin = new Url('http://test.com/test/new').origin
+    console.log(relOrigin, currentOrigin)
+    expect(utils.checkSameOrigin(relOrigin, currentOrigin)).toBe(true)
+    expect(utils.checkSameOrigin(absOrigin, currentOrigin)).toBe(false)
+    expect(
+      utils.checkSameOrigin(absOrigin, [currentOrigin, 'http://test.com'])
+    ).toBe(true)
+    expect(
+      utils.checkSameOrigin(absOrigin, [
+        currentOrigin,
+        'http://test1.com',
+        'not-url:3000'
+      ])
+    ).toBe(false)
+
+    expect(utils.checkSameOrigin(absOrigin, undefined)).toBe(false)
+    expect(utils.checkSameOrigin(new Url(undefined), absOrigin)).toBe(false)
+    expect(utils.checkSameOrigin(new Url({}), 'http://test.com/')).toBe(false)
+    expect(
+      utils.checkSameOrigin(new Url('test test'), 'http://test.com/')
+    ).toBe(false)
+    expect(utils.checkSameOrigin(new Url('/test'), 'http://test.com/')).toBe(
+      false
     )
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin('http://test.com/test/new', [
-      window.location.href,
-      'http://test.com'
-    ])
-    expect(result).toBe(true)
-    result = utils.checkSameOrigin('http://test.com/test/new', [
-      window.location.href,
-      'http://test1.com',
-      'not-url:3000',
-      {},
-      undefined
-    ])
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin('http://test.com/test/new', undefined)
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin(undefined, 'http://test.com/test/new')
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin({}, 'http://test.com/')
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin('test test', 'http://test.com/')
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin('/test', 'http://test.com/')
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin('', 'http://test.com/')
-    expect(result).toBe(false)
+    expect(utils.checkSameOrigin(new Url(''), 'http://test.com/')).toBe(false)
   })
 
   it('should generate correct DT headers', function() {
@@ -290,18 +286,5 @@ describe('lib/utils', function() {
       'invalid1_invalid2'
     )
     expect(utils.removeInvalidChars('invalid"')).toEqual('invalid_')
-  })
-
-  it('should remove sensitive auth from url', () => {
-    expect(utils.removeAuthFromUrl('https://a:b@c.com/d')).toEqual(
-      'https://c.com/d'
-    )
-    expect(utils.removeAuthFromUrl('http://e:f@example.com/g')).toEqual(
-      'http://example.com/g'
-    )
-    const authInPath = 'https://test.com/a:c@blah/10'
-    expect(utils.removeAuthFromUrl(authInPath)).toEqual(authInPath)
-    const noAuthUrl = 'https://test.com/abc'
-    expect(utils.removeAuthFromUrl(noAuthUrl)).toEqual(noAuthUrl)
   })
 })

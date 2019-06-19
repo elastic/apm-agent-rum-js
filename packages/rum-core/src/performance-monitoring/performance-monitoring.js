@@ -30,9 +30,9 @@ import {
   stripQueryStringFromUrl,
   parseDtHeaderValue,
   getEarliestSpan,
-  getLatestNonXHRSpan,
-  removeAuthFromUrl
+  getLatestNonXHRSpan
 } from '../common/utils'
+import Url from '../common/url'
 import { patchSubscription } from '../common/patching'
 import { globalState } from '../common/patching/patch-utils'
 import {
@@ -88,27 +88,21 @@ class PerformanceMonitoring {
           var taskId = transactionService.addTask()
 
           if (span) {
-            var isDtEnabled = configService.get('distributedTracing')
-            var origins = configService.get('distributedTracingOrigins')
-            /**
-             * Fetch calls throws Request construction error so its safer to do this operation
-             * only for XHR calls
-             */
-            const requestUrl =
-              task.source === XMLHTTPREQUEST_SOURCE
-                ? removeAuthFromUrl(task.data.url)
-                : task.data.url
-            var isSameOrigin =
-              checkSameOrigin(requestUrl, window.location.href) ||
-              checkSameOrigin(requestUrl, origins)
-            var target = task.data.target
+            const isDtEnabled = configService.get('distributedTracing')
+            const dtOrigins = configService.get('distributedTracingOrigins')
+            const requestUrl = new Url(task.data.url)
+            const currentUrl = new Url(window.location.href)
+            const isSameOrigin =
+              checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
+              checkSameOrigin(requestUrl.origin, dtOrigins)
+            const target = task.data.target
             if (isDtEnabled && isSameOrigin && target) {
               pm.injectDtHeader(span, target)
             }
             span.addContext({
               http: {
                 method: task.data.method,
-                url: requestUrl
+                url: requestUrl.href
               }
             })
             span.sync = task.data.sync
