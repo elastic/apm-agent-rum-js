@@ -562,6 +562,25 @@ describe('PerformanceMonitoring', function() {
       )
     })
 
+    it('should redact auth from xhr tasks', () => {
+      const fn = performanceMonitoring.getXhrPatchSubFn()
+      const transactionService = performanceMonitoring._transactionService
+      const fakeXHRTask = {
+        source: 'XMLHttpRequest.send',
+        data: {
+          method: 'GET',
+          url: 'https://a:b@c.com/d?e=10&f=20'
+        }
+      }
+      spyOn(transactionService, 'startSpan').and.callThrough()
+      fn(SCHEDULE, fakeXHRTask)
+
+      expect(transactionService.startSpan).toHaveBeenCalledWith(
+        'GET https://[REDACTED]:[REDACTED]@c.com/d',
+        'external.http'
+      )
+    })
+
     it('should not duplicate xhr spans if fetch is a polyfill', function(done) {
       var fn = performanceMonitoring.getXhrPatchSubFn()
 

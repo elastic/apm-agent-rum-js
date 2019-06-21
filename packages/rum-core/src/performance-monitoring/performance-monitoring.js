@@ -29,6 +29,7 @@ import {
   merge,
   parseDtHeaderValue,
   getEarliestSpan,
+  stripQueryStringFromUrl,
   getLatestNonXHRSpan
 } from '../common/utils'
 import Url from '../common/url'
@@ -82,9 +83,14 @@ class PerformanceMonitoring {
       ) {
         if (event === SCHEDULE && task.data) {
           const requestUrl = new Url(task.data.url)
-          var spanName = task.data.method + ' ' + requestUrl.path
-          var span = transactionService.startSpan(spanName, 'external.http')
-          var taskId = transactionService.addTask()
+          const spanName =
+            task.data.method +
+            ' ' +
+            (requestUrl.relative
+              ? requestUrl.path
+              : stripQueryStringFromUrl(requestUrl.href))
+          const span = transactionService.startSpan(spanName, 'external.http')
+          const taskId = transactionService.addTask()
 
           if (!span) {
             return

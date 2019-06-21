@@ -115,6 +115,8 @@ class Url {
       if (instruction[3]) this[key] = this[key].toLowerCase()
     }
 
+    this.relative = relative
+
     this.protocol = protocol || location.protocol || ''
 
     this.origin =
