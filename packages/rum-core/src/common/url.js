@@ -45,6 +45,14 @@
  *
  */
 
+/**
+ * Order of the RULES are very important
+ *
+ * RULE[0] -> for checking the index of the character on the URL
+ * RULE[1] -> key to store the associated value present after the RULE[0]
+ * RULE[2] -> Extract from the front till the last index
+ * RULE[3] -> Left over values of the URL
+ */
 const RULES = [
   ['#', 'hash'],
   ['?', 'query'],
@@ -74,6 +82,14 @@ class Url {
         if (~index) {
           const instLength = instruction[2]
           if (instLength) {
+            /**
+             * we need to figure out the explicit index where the auth portion
+             * in the host ends before parsing the rest of the URL as host.
+             *
+             * ex: http://a@b@c.com/d
+             * auth -> a@b
+             * host -> c.com
+             */
             let newIndex = address.lastIndexOf(parse)
             index = Math.max(index, newIndex)
             this[key] = address.slice(0, index)

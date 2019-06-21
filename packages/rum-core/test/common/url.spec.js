@@ -173,5 +173,17 @@ describe('Url parser', function() {
         query: ''
       })
     )
+    expect(new Url('http://a@b/c@d')).toEqual(
+      jasmine.objectContaining({
+        auth: 'a',
+        hash: '',
+        host: 'b',
+        href: 'http://[REDACTED]@b/c@d',
+        origin: 'http://b',
+        path: '/c@d',
+        protocol: 'http:',
+        query: ''
+      })
+    )
   })
 })
