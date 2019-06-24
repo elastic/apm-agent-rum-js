@@ -27,11 +27,12 @@ import {
   checkSameOrigin,
   isDtHeaderValid,
   merge,
-  stripQueryStringFromUrl,
   parseDtHeaderValue,
   getEarliestSpan,
+  stripQueryStringFromUrl,
   getLatestNonXHRSpan
 } from '../common/utils'
+import Url from '../common/url'
 import { patchSubscription } from '../common/patching'
 import { globalState } from '../common/patching/patch-utils'
 import {
@@ -81,31 +82,38 @@ class PerformanceMonitoring {
         task.source === FETCH_SOURCE
       ) {
         if (event === SCHEDULE && task.data) {
-          var spanName =
-            task.data.method + ' ' + stripQueryStringFromUrl(task.data.url)
-          var span = transactionService.startSpan(spanName, 'external.http')
-          var taskId = transactionService.addTask()
+          const requestUrl = new Url(task.data.url)
+          const spanName =
+            task.data.method +
+            ' ' +
+            (requestUrl.relative
+              ? requestUrl.path
+              : stripQueryStringFromUrl(requestUrl.href))
+          const span = transactionService.startSpan(spanName, 'external.http')
+          const taskId = transactionService.addTask()
 
-          if (span) {
-            var isDtEnabled = configService.get('distributedTracing')
-            var origins = configService.get('distributedTracingOrigins')
-            var isSameOrigin =
-              checkSameOrigin(task.data.url, window.location.href) ||
-              checkSameOrigin(task.data.url, origins)
-            var target = task.data.target
-            if (isDtEnabled && isSameOrigin && target) {
-              pm.injectDtHeader(span, target)
-            }
-            span.addContext({
-              http: {
-                method: task.data.method,
-                url: task.data.url
-              }
-            })
-            span.sync = task.data.sync
-            task.data.span = span
-            task.id = taskId
+          if (!span) {
+            return
           }
+          const isDtEnabled = configService.get('distributedTracing')
+          const dtOrigins = configService.get('distributedTracingOrigins')
+          const currentUrl = new Url(window.location.href)
+          const isSameOrigin =
+            checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
+            checkSameOrigin(requestUrl.origin, dtOrigins)
+          const target = task.data.target
+          if (isDtEnabled && isSameOrigin && target) {
+            pm.injectDtHeader(span, target)
+          }
+          span.addContext({
+            http: {
+              method: task.data.method,
+              url: requestUrl.href
+            }
+          })
+          span.sync = task.data.sync
+          task.data.span = span
+          task.id = taskId
         }
         if (event === INVOKE && task.data && task.data.span) {
           if (typeof task.data.target.status !== 'undefined') {
@@ -125,7 +133,7 @@ class PerformanceMonitoring {
         }
       }
 
-      if (event === INVOKE && task.source === HISTORY_PUSHSTATE) {
+      if (task.source === HISTORY_PUSHSTATE && event === INVOKE) {
         transactionService.startTransaction(task.data.title, 'route-change', {
           canReuse: true
         })

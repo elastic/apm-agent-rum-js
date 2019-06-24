@@ -547,7 +547,7 @@ describe('PerformanceMonitoring', function() {
           expect(tr.spans[0].context).toEqual({
             http: {
               method: 'GET',
-              url: '/?a=b&c=d',
+              url: 'http://localhost:9876/?a=b&c=d',
               status_code: 200
             }
           })
@@ -558,6 +558,25 @@ describe('PerformanceMonitoring', function() {
       })
       expect(transactionService.startSpan).toHaveBeenCalledWith(
         'GET /',
+        'external.http'
+      )
+    })
+
+    it('should redact auth from xhr tasks', () => {
+      const fn = performanceMonitoring.getXhrPatchSubFn()
+      const transactionService = performanceMonitoring._transactionService
+      const fakeXHRTask = {
+        source: 'XMLHttpRequest.send',
+        data: {
+          method: 'GET',
+          url: 'https://a:b@c.com/d?e=10&f=20'
+        }
+      }
+      spyOn(transactionService, 'startSpan').and.callThrough()
+      fn(SCHEDULE, fakeXHRTask)
+
+      expect(transactionService.startSpan).toHaveBeenCalledWith(
+        'GET https://[REDACTED]:[REDACTED]@c.com/d',
         'external.http'
       )
     })

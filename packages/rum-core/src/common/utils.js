@@ -23,7 +23,6 @@
  *
  */
 
-import Url from '../common/url'
 import rng from 'uuid/lib/rng-browser'
 
 const slice = [].slice
@@ -104,9 +103,7 @@ function isDtHeaderValid(header) {
 function checkSameOrigin(source, target) {
   let isSame = false
   if (typeof target === 'string') {
-    const src = new Url(source)
-    const tar = new Url(target)
-    isSame = src.origin === tar.origin
+    isSame = source === target
   } else if (Array.isArray(target)) {
     target.forEach(function(t) {
       if (!isSame) {
