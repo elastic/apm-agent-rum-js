@@ -106,4 +106,84 @@ describe('Url parser', function() {
       })
     )
   })
+
+  it('should parse auth in the URL', function() {
+    expect(new Url('http://a:b@c')).toEqual(
+      jasmine.objectContaining({
+        auth: 'a:b',
+        hash: '',
+        host: 'c',
+        href: 'http://[REDACTED]:[REDACTED]@c',
+        origin: 'http://c',
+        path: '',
+        protocol: 'http:',
+        query: ''
+      })
+    )
+    expect(new Url('http://a@b@c/')).toEqual(
+      jasmine.objectContaining({
+        auth: 'a@b',
+        hash: '',
+        host: 'c',
+        href: 'http://[REDACTED]@c/',
+        origin: 'http://c',
+        path: '/',
+        protocol: 'http:',
+        query: ''
+      })
+    )
+    expect(new Url('http://a@b?@c')).toEqual(
+      jasmine.objectContaining({
+        auth: 'a',
+        hash: '',
+        host: 'b',
+        href: 'http://[REDACTED]@b?@c',
+        origin: 'http://b',
+        path: '',
+        protocol: 'http:',
+        query: '?@c'
+      })
+    )
+    expect(
+      new Url(
+        'http://user:pass@mt0.google.com/vt/lyrs=m@114???&hl=en&src=api&x=2&y=2&z=3&s='
+      )
+    ).toEqual(
+      jasmine.objectContaining({
+        auth: 'user:pass',
+        hash: '',
+        host: 'mt0.google.com',
+        href:
+          'http://[REDACTED]:[REDACTED]@mt0.google.com/vt/lyrs=m@114???&hl=en&src=api&x=2&y=2&z=3&s=',
+        origin: 'http://mt0.google.com',
+        path: '/vt/lyrs=m@114',
+        protocol: 'http:',
+        query: '???&hl=en&src=api&x=2&y=2&z=3&s='
+      })
+    )
+    expect(new Url('http://user:pass@-lovemonsterz.tumblr.com/rss')).toEqual(
+      jasmine.objectContaining({
+        auth: 'user:pass',
+        hash: '',
+        host: '-lovemonsterz.tumblr.com',
+        href: 'http://[REDACTED]:[REDACTED]@-lovemonsterz.tumblr.com/rss',
+        origin: 'http://-lovemonsterz.tumblr.com',
+        path: '/rss',
+        protocol: 'http:',
+        query: ''
+      })
+    )
+    expect(new Url('http://a@b/c@d')).toEqual(
+      jasmine.objectContaining({
+        auth: 'a',
+        hash: '',
+        host: 'b',
+        href: 'http://[REDACTED]@b/c@d',
+        origin: 'http://b',
+        path: '/c@d',
+        protocol: 'http:',
+        query: ''
+      })
+    )
+  })
 })

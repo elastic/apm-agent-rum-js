@@ -45,11 +45,20 @@
  *
  */
 
+/**
+ * Order of the RULES are very important
+ *
+ * RULE[0] -> for checking the index of the character on the URL
+ * RULE[1] -> key to store the associated value present after the RULE[0]
+ * RULE[2] -> Extract from the front till the last index
+ * RULE[3] -> Left over values of the URL
+ */
 const RULES = [
   ['#', 'hash'],
   ['?', 'query'],
   ['/', 'path'],
-  [NaN, 'host', 1] //
+  ['@', 'auth', 1],
+  [NaN, 'host', undefined, 1] //
 ]
 const PROTOCOL_REGEX = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i
 
@@ -71,8 +80,24 @@ class Url {
       if (typeof parse === 'string') {
         index = address.indexOf(parse)
         if (~index) {
-          this[key] = address.slice(index)
-          address = address.slice(0, index)
+          const instLength = instruction[2]
+          if (instLength) {
+            /**
+             * we need to figure out the explicit index where the auth portion
+             * in the host ends before parsing the rest of the URL as host.
+             *
+             * ex: http://a@b@c.com/d
+             * auth -> a@b
+             * host -> c.com
+             */
+            let newIndex = address.lastIndexOf(parse)
+            index = Math.max(index, newIndex)
+            this[key] = address.slice(0, index)
+            address = address.slice(index + instLength)
+          } else {
+            this[key] = address.slice(index)
+            address = address.slice(0, index)
+          }
         }
       } else {
         /** NaN condition */
@@ -82,13 +107,15 @@ class Url {
        * Default values for all keys from location if url is relative
        */
       this[key] =
-        this[key] || (relative && instruction[2] ? location[key] || '' : '')
+        this[key] || (relative && instruction[3] ? location[key] || '' : '')
       /**
        * host should be lowercased so they can be used to
        * create a proper `origin`.
        */
-      if (instruction[2]) this[key] = this[key].toLowerCase()
+      if (instruction[3]) this[key] = this[key].toLowerCase()
     }
+
+    this.relative = relative
 
     this.protocol = protocol || location.protocol || ''
 
@@ -96,6 +123,25 @@ class Url {
       this.protocol && this.host && this.protocol !== 'file:'
         ? this.protocol + '//' + this.host
         : 'null'
+
+    this.href = this.toString()
+  }
+
+  toString() {
+    let result = this.protocol
+    result += '//'
+    if (this.auth) {
+      const REDACTED = '[REDACTED]'
+      const userpass = this.auth.split(':')
+      const username = userpass[0] ? REDACTED : ''
+      const password = userpass[1] ? ':' + REDACTED : ''
+      result += username + password + '@'
+    }
+    result += this.host
+    result += this.path
+    result += this.query
+    result += this.hash
+    return result
   }
 
   getLocation() {
