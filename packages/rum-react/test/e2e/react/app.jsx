@@ -25,26 +25,29 @@
 
 import '@babel/polyfill'
 import 'whatwg-fetch'
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
+const ManualComponent = lazy(() => import('./manual-component.jsx'))
 import ReactDOM from 'react-dom'
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect
+} from 'react-router-dom'
 import { withRouter } from 'react-router'
 import MainComponent from './main-component.jsx'
 import TopicComponent from './topic-component'
 
-
+import { ApmRoute } from '../../../src'
 import createApmBase from '../'
 const apm = createApmBase({
   debug: true,
   serverUrl: 'http://localhost:8200',
   serviceName: 'apm-agent-rum-test-e2e-react',
-  serviceVersion: '0.0.1',
+  serviceVersion: '0.0.1'
 })
 
-import { ApmRoute } from '../../../src'
-import ManualComponent from './manual-component.jsx';
-
-var tr  = apm.getCurrentTransaction()
+var tr = apm.getCurrentTransaction()
 
 class App extends React.Component {
   constructor(props) {
@@ -73,11 +76,31 @@ class App extends React.Component {
           </ul>
 
           <hr />
-          <ApmRoute exact path='/' component={MainComponent} />
-          <Route path='/about' component={MainComponent} />
-          <ApmRoute path='/topics' component={MainComponent} />
-          <ApmRoute path='/topic/:id' component={TopicComponent} />
-          <Route path='/manual/' component={ManualComponent} />
+          <ApmRoute
+            exact
+            path="/"
+            component={() => (
+              <Redirect
+                to={{
+                  pathname: '/home'
+                }}
+              />
+            )}
+          />
+          <ApmRoute path="/home" component={MainComponent} />
+          <Route path="/about" component={MainComponent} />
+          <ApmRoute path="/topics" component={MainComponent} />
+          <ApmRoute path="/topic/:id" component={TopicComponent} />
+          <Route
+            path="/manual/"
+            component={() => {
+              return (
+                <Suspense fallback={<div>Loading...</div>}>
+                  <ManualComponent />
+                </Suspense>
+              )
+            }}
+          />
         </div>
         <div id="test-element">Passed</div>
       </div>

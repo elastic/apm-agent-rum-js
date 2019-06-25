@@ -144,7 +144,7 @@ class TransactionService {
           perfOptions
         )
       }
-      tr.redefine(name, type, perfOptions)
+      tr.redefine(name, undefined, perfOptions)
     } else {
       if (__DEV__) {
         this._logger.debug('Ending old transaction', tr)

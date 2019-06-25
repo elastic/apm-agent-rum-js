@@ -43,12 +43,12 @@ describe('react app', function() {
 
     expect(serverCalls.sendTransactions.length).toBe(1)
 
-    var routeChangeTransaction = serverCalls.sendTransactions[0].args[0][0]
-    expect(routeChangeTransaction.type).toBe('route-change')
-    expect(routeChangeTransaction.name).toBe('/')
-    expect(routeChangeTransaction.spans.length).toBeGreaterThan(1)
+    var transaction = serverCalls.sendTransactions[0].args[0][0]
+    expect(transaction.type).toBe('page-load')
+    expect(transaction.name).toBe('/home')
+    expect(transaction.spans.length).toBeGreaterThan(1)
 
-    var fetchDataSpan = routeChangeTransaction.spans.find(function(s) {
+    var fetchDataSpan = transaction.spans.find(function(s) {
       return s.name === 'GET /test/e2e/react/data.json'
     })
     expect(fetchDataSpan).toBeDefined()

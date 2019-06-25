@@ -34,7 +34,6 @@ function getApmRoute(apm) {
       super(props)
       const { path, component: Component } = this.props
       this.ApmComponent = withTransaction(path, 'route-change')(Component)
-      console.log('ApmRoute:', path)
     }
     render() {
       return <Route {...this.props} component={this.ApmComponent} />

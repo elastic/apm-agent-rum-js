@@ -114,9 +114,9 @@ testFetch(mockBackendUrl)
 if (location.hash === '#test-state') {
   const path = location.pathname
   history.pushState(
-    { data: 'test-state' },
-    'Push state title',
-    path + '#test-state'
+    { data: 'buffer-state' },
+    'buffer state',
+    path + '#buffer-state'
   )
   history.pushState(
     { data: 'test-state' },

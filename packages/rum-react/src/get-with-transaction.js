@@ -34,17 +34,14 @@ import hoistStatics from 'hoist-non-react-statics'
 
 function getWithTransaction(apm) {
   return function withTransaction(name, type) {
-    if (typeof name !== 'string') {
-      //todo: warn user about the usage
-    }
     return function(WrappedComponent) {
       class ApmComponent extends React.Component {
         constructor(props) {
           super(props)
-          /*
-                        We need to start the transaction in constructor because otherwise,
-                        we won't be able to capture what happens in componentDidMount of child components.
-                    */
+          /**
+           * We need to start the transaction in constructor because otherwise,
+           * we won't be able to capture what happens in componentDidMount of child components.
+           */
           this.transaction = apm.startTransaction(name, type)
         }
 
@@ -55,10 +52,10 @@ function getWithTransaction(apm) {
         }
 
         componentWillUnmount() {
-          /*
-                        It is possible that the transaction has ended before this unmount event,
-                        in that case this is a noop.
-                    */
+          /**
+           * It is possible that the transaction has ended before this unmount event,
+           * in that case this is a noop.
+           */
           if (this.transaction) {
             this.transaction.end()
           }

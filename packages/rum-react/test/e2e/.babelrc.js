@@ -1,4 +1,4 @@
-module.exports = function(api) {
+module.exports = function (api) {
   api.cache(true)
   return {
     presets: [
@@ -14,6 +14,6 @@ module.exports = function(api) {
       ],
       ['@babel/preset-react']
     ],
-    plugins: ['@babel/plugin-transform-destructuring']
+    plugins: ['@babel/plugin-transform-destructuring', '@babel/plugin-syntax-dynamic-import']
   }
 }
