@@ -58,14 +58,16 @@ pipeline {
         */
         stage('Lint') {
           steps {
-            deleteDir()
-            unstash 'source'
-            script{
-              docker.image('node:8').inside(){
-                dir("${BASE_DIR}"){
-                  sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
+            withGithubNotify(context: 'Lint') {
+              deleteDir()
+              unstash 'source'
+              script{
+                docker.image('node:8').inside(){
+                  dir("${BASE_DIR}"){
+                    sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
+                  }
+                  stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
                 }
-                stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
               }
             }
           }
@@ -87,10 +89,12 @@ pipeline {
         */
         stage('Documentation') {
           steps {
-            deleteDir()
-            unstash 'source'
-            dir("${BASE_DIR}"){
-              buildDocs(docsDir: "docs", archive: true)
+            withGithubNotify(context: 'Documentation') {
+              deleteDir()
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                buildDocs(docsDir: "docs", archive: true)
+              }
             }
           }
         }
@@ -98,7 +102,7 @@ pipeline {
     }
   }
   post {
-    always {
+    cleanup {
       notifyBuildResult()
     }
   }
