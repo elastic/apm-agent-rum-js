@@ -90,20 +90,25 @@ function getBrowserList() {
     },
     {
       browserName: 'chrome',
-      version: '62'
-    },
-    {
-      browserName: 'chrome',
       version: '74'
     },
     {
       browserName: 'firefox',
-      version: '59'
+      version: '52'
+    },
+    {
+      browserName: 'firefox',
+      version: '66'
     },
     {
       browserName: 'safari',
       platform: 'OS X 10.11',
-      version: '9.0'
+      version: '9.1'
+    },
+    {
+      browserName: 'safari',
+      platform: 'OS X 10.11',
+      version: '12.1'
     },
     {
       browserName: 'internet explorer',
@@ -113,7 +118,7 @@ function getBrowserList() {
     {
       browserName: 'microsoftedge',
       platform: 'Windows 10',
-      version: '13'
+      version: '17'
     },
     {
       appiumVersion: '1.9.1',
@@ -126,7 +131,7 @@ function getBrowserList() {
       appiumVersion: '1.9.1',
       deviceName: 'iPhone Simulator',
       deviceOrientation: 'portrait',
-      platformVersion: '11.1',
+      platformVersion: '12.2',
       platformName: 'iOS',
       browserName: 'Safari'
     }
