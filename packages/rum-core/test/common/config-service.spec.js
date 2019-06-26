@@ -126,21 +126,25 @@ describe('ConfigService', function() {
     expect(userContext).toEqual({})
   })
 
-  it('should validate and normalize config options', () => {
+  it('should validate required config options', () => {
     // Valid
-    configService.setConfig({ serviceName: 'name' })
-    const errors1 = configService.validate()
+    const errors1 = configService.validate({ serviceName: 'name' })
     expect(errors1.length).toEqual(0)
 
     // Invalid required key serviceName
-    configService.setConfig({ serviceName: undefined })
-    const errors2 = configService.validate()
+    const errors2 = configService.validate({ serviceName: undefined })
     expect(errors2).toEqual(['Missing serviceName'])
 
+    // Invalid required key serviceName & serverUrl
+    const errors3 = configService.validate({
+      serviceName: undefined,
+      serverUrl: ''
+    })
+    expect(errors3).toEqual(['Missing serviceName', 'serverUrl'])
+
     // Invalid characters in serviceName
-    configService.setConfig({ serviceName: 'abc.def' })
-    const errors3 = configService.validate()
-    expect(errors3).toEqual([
+    const errors4 = configService.validate({ serviceName: 'abc.def' })
+    expect(errors4).toEqual([
       'serviceName abc.def contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)'
     ])
   })

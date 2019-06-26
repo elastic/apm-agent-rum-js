@@ -105,27 +105,15 @@ class ApmBase {
    */
   config(config) {
     const configService = this.serviceFactory.getService('ConfigService')
-    configService.setConfig(config)
-    /**
-     * Skip validation when agent is not active
-     */
-    if (!configService.isActive()) {
-      return
-    }
-
-    const errors = configService.validate()
+    const errors = configService.validate(config)
     if (errors.length === 0) {
-      return
+      configService.setConfig(config)
+    } else {
+      const loggingService = this.serviceFactory.getService('LoggingService')
+      const message = 'RUM Agent configuration is invalid: ' + errors.join(', ')
+      configService.setConfig({ active: false })
+      loggingService.error(message)
     }
-    const loggingService = this.serviceFactory.getService('LoggingService')
-    const message = 'RUM Agent configuration is invalid: ' + errors.join(', ')
-
-    /**
-     * TODO: Deactivate the agent when configuration is invalid
-     * on next major version
-     */
-    // configService.setConfig({ active: false })
-    loggingService.error(message)
   }
 
   setUserContext(userContext) {

@@ -154,12 +154,6 @@ class Config {
   }
 
   getEndpointUrl() {
-    /**
-     * Remove all trailing slash for serverUrl since serverUrlPrefix
-     * includes a forward slash for the path
-     */
-    this.config.serverUrl = this.config.serverUrl.replace(/\/+$/, '')
-
     return this.config.serverUrl + this.config.serverUrlPrefix
   }
 
@@ -214,6 +208,16 @@ class Config {
   }
 
   setConfig(properties = {}) {
+    /**
+     * Normalize config
+     *
+     * Remove all trailing slash for serverUrl since serverUrlPrefix
+     * includes a forward slash for the path
+     */
+    if (properties.serverUrl) {
+      properties.serverUrl = properties.serverUrl.replace(/\/+$/, '')
+    }
+
     this.config = merge({}, this.defaults, this.config, properties)
     this._changeSubscription.applyAll(this, [this.config])
   }
@@ -223,26 +227,28 @@ class Config {
   }
 
   /**
-   * Validate the config once set via setConfig aganist the required parameters
-   * Also normalizes the config on specific keys
+   * Validate the config aganist the required parameters and
+   * generates error messages
    */
-  validate() {
+  validate(properties = {}) {
     const requiredKeys = ['serviceName', 'serverUrl']
     const errors = []
 
-    for (let i = 0; i < requiredKeys.length; i++) {
-      const key = requiredKeys[i]
-      if (this.config[key] == null || this.config[key] === '') {
+    Object.keys(properties).forEach(key => {
+      if (requiredKeys.indexOf(key) !== -1 && !properties[key]) {
         errors.push(errors.length === 0 ? 'Missing ' + key : key)
       }
-    }
+    })
     /**
      * Invalid characters on serviceName
      */
-    if (!/^[a-zA-Z0-9 _-]+$/.test(this.config.serviceName)) {
+    if (
+      properties.serviceName &&
+      !/^[a-zA-Z0-9 _-]+$/.test(properties.serviceName)
+    ) {
       errors.push(
         'serviceName ' +
-          this.config.serviceName +
+          properties.serviceName +
           ' contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)'
       )
     }

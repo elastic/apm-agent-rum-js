@@ -211,14 +211,15 @@ describe('ApmBase', function() {
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(loggingService, 'error').and.callFake(msg => {
       expect(msg).toEqual(
-        'RUM Agent configuration is invalid: Missing serviceName, serverUrl'
+        'RUM Agent configuration is invalid: Missing serverUrl, serviceName'
       )
     })
-
     apmBase.init({
       serverUrl: '',
       serviceName: undefined
     })
+    const configService = serviceFactory.getService('ConfigService')
+    expect(configService.get('active')).toEqual(false)
   })
 
   it('should instrument sync xhr', function(done) {
