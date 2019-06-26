@@ -33,7 +33,7 @@ const __DEV__ = process.env.NODE_ENV !== 'production'
 
 class TransactionService {
   constructor(logger, config) {
-    if (typeof config === 'undefined') {
+    if (__DEV__ && typeof config === 'undefined') {
       logger.debug('TransactionService: config is not provided')
     }
     this._config = config
@@ -136,17 +136,20 @@ class TransactionService {
        * allow a redefinition until there's a call that doesn't have that
        * or the threshold is exceeded.
        */
-
-      this._logger.debug(
-        'Redefining the current transaction',
-        tr,
-        name,
-        type,
-        perfOptions
-      )
+      if (__DEV__) {
+        this._logger.debug(
+          'Redefining the current transaction',
+          tr,
+          name,
+          type,
+          perfOptions
+        )
+      }
       tr.redefine(name, type, perfOptions)
     } else {
-      this._logger.debug('Ending old transaction', tr)
+      if (__DEV__) {
+        this._logger.debug('Ending old transaction', tr)
+      }
       tr.end()
       tr = this.createTransaction(name, type, perfOptions)
     }
@@ -168,13 +171,16 @@ class TransactionService {
         tr.name = perfOptions.pageLoadTransactionName
       }
     }
-
-    this._logger.debug('TransactionService.startTransaction', tr)
+    if (__DEV__) {
+      this._logger.debug('TransactionService.startTransaction', tr)
+    }
 
     tr.onEnd = () => {
       return Promise.resolve().then(
         () => {
-          this._logger.debug('TransactionService transaction finished', tr)
+          if (__DEV__) {
+            this._logger.debug('TransactionService transaction finished', tr)
+          }
           if (this.shouldIgnoreTransaction(tr.name)) {
             return
           }
@@ -197,7 +203,11 @@ class TransactionService {
             this.add(tr)
           }
         },
-        err => this._logger.debug(err)
+        err => {
+          if (__DEV__) {
+            this._logger.debug('TransactionService transaction onEnd', err)
+          }
+        }
       )
     }
     return tr
