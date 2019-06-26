@@ -103,12 +103,7 @@ function getBrowserList() {
     {
       browserName: 'safari',
       platform: 'OS X 10.11',
-      version: '9.1'
-    },
-    {
-      browserName: 'safari',
-      platform: 'OS X 10.11',
-      version: '12.1'
+      version: '9.0'
     },
     {
       browserName: 'internet explorer',
@@ -128,7 +123,7 @@ function getBrowserList() {
       platformName: 'android'
     },
     {
-      appiumVersion: '1.9.1',
+      appiumVersion: '1.13.0',
       deviceName: 'iPhone Simulator',
       deviceOrientation: 'portrait',
       platformVersion: '12.2',
