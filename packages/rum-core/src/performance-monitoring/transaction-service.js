@@ -25,7 +25,7 @@
 
 import Transaction from './transaction'
 import { extend, getPageLoadMarks } from '../common/utils'
-import { PAGE_LOAD, NAME_UNKNOWN, TYPE_CUSTOM } from '../common/constants'
+import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
 
@@ -111,7 +111,6 @@ class TransactionService {
         pageLoadTraceId: config.pageLoadTraceId,
         pageLoadSampled: config.pageLoadSampled,
         pageLoadSpanId: config.pageLoadSpanId,
-        pageLoadTransactionName: config.pageLoadTransactionName,
         transactionSampleRate: config.transactionSampleRate,
         checkBrowserResponsiveness: config.checkBrowserResponsiveness
       },
@@ -121,14 +120,6 @@ class TransactionService {
 
   startTransaction(name, type, options) {
     const perfOptions = this.createPerfOptions(options)
-
-    if (!type) {
-      type = TYPE_CUSTOM
-    }
-
-    if (!name) {
-      name = NAME_UNKNOWN
-    }
 
     var tr = this.getCurrentTransaction()
 
@@ -164,13 +155,6 @@ class TransactionService {
       if (perfOptions.pageLoadSampled) {
         tr.sampled = perfOptions.pageLoadSampled
       }
-      /**
-       * Retriving the name before transaction ends should reflect
-       * the correctg page load transaction name
-       */
-      if (tr.name === NAME_UNKNOWN && perfOptions.pageLoadTransactionName) {
-        tr.name = perfOptions.pageLoadTransactionName
-      }
     }
 
     this._logger.debug('TransactionService.startTransaction', tr)
@@ -184,8 +168,8 @@ class TransactionService {
           }
           if (type === PAGE_LOAD) {
             /**
-             * Setting the name via configService.setConfig after transaction
-             * has started should also reflect the correct name.
+             * Setting the pageLoadTransactionName via configService.setConfig after
+             * transaction has started should also reflect the correct name.
              */
             const pageLoadTransactionName = this._config.get(
               'pageLoadTransactionName'
