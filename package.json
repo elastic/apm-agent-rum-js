@@ -109,6 +109,7 @@
   },
   "dependencies": {
     "@elastic/apm-rum": "file:packages/rum",
-    "@elastic/apm-rum-core": "file:packages/rum-core"
+    "@elastic/apm-rum-core": "file:packages/rum-core",
+    "@elastic/apm-rum-react": "file:packages/rum-react"
   }
 }

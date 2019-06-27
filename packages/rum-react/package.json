@@ -1,7 +1,7 @@
 {
   "name": "@elastic/apm-rum-react",
   "version": "0.0.0",
-  "description": "> TODO: description",
+  "description": "Elastic APM RUM React integration",
   "author": "Hamid <h.jahtalab@gmail.com>",
   "homepage": "https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html",
   "license": "MIT",
@@ -31,6 +31,11 @@
     "url": "https://github.com/elastic/apm-agent-rum-js/issues"
   },
   "dependencies": {
-    "hoist-non-react-statics": "^3.3.0"
+    "hoist-non-react-statics": "^3.3.0",
+    "@elastic/apm-rum": "file:../rum"
+  },
+  "peerDependencies": {
+    "react": "^16.2.0",
+    "react-router-dom": "^4.2.2"
   }
 }

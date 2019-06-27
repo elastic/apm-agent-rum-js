@@ -108,7 +108,7 @@ describe('ApmBase', function() {
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     expect(tr).toBeDefined()
     expect(tr.name).toBe('test-transaction')
-    expect(tr.type).toBe('test-type')
+    expect(tr.type).toBe('page-load')
 
     spyOn(tr, 'startSpan').and.callThrough()
     apmBase.startSpan('test-span', 'test-type')
