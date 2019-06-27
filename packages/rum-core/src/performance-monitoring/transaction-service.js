@@ -111,6 +111,7 @@ class TransactionService {
         pageLoadTraceId: config.pageLoadTraceId,
         pageLoadSampled: config.pageLoadSampled,
         pageLoadSpanId: config.pageLoadSpanId,
+        pageLoadTransactionName: config.pageLoadTransactionName,
         transactionSampleRate: config.transactionSampleRate,
         checkBrowserResponsiveness: config.checkBrowserResponsiveness
       },
@@ -154,6 +155,13 @@ class TransactionService {
       }
       if (perfOptions.pageLoadSampled) {
         tr.sampled = perfOptions.pageLoadSampled
+      }
+      /**
+       * The name must be set as soon as the transaction is started
+       * Ex: Helps to decide sampling based on name
+       */
+      if (tr.name === NAME_UNKNOWN && perfOptions.pageLoadTransactionName) {
+        tr.name = perfOptions.pageLoadTransactionName
       }
     }
 

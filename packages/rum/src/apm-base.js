@@ -65,21 +65,21 @@ class ApmBase {
   }
 
   _sendPageLoadMetrics() {
-    var transactionService = this.serviceFactory.getService(
+    const transactionService = this.serviceFactory.getService(
       'TransactionService'
     )
-    var configService = this.serviceFactory.getService('ConfigService')
 
     const pageLoadTaskId = 'page-load'
-    var tr = transactionService.startTransaction(
-      configService.get('pageLoadTransactionName'),
-      'page-load'
-    )
+    /**
+     * Name of the transaction is set in transaction service to
+     * avoid duplicate the logic at multiple places
+     */
+    const tr = transactionService.startTransaction(undefined, 'page-load')
 
     if (tr) {
       tr.addTask(pageLoadTaskId)
     }
-    var sendPageLoadMetrics = function sendPageLoadMetrics() {
+    const sendPageLoadMetrics = function sendPageLoadMetrics() {
       // to make sure PerformanceTiming.loadEventEnd has a value
       setTimeout(function() {
         if (tr) {
