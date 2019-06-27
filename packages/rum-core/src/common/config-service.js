@@ -228,29 +228,34 @@ class Config {
 
   /**
    * Validate the config aganist the required parameters and
-   * generates error messages
+   * generates error messages with missing and invalid keys
    */
   validate(properties = {}) {
     const requiredKeys = ['serviceName', 'serverUrl']
-    const errors = []
-
+    const errors = {
+      missing: [],
+      invalid: []
+    }
+    /**
+     * Check when required keys are missing
+     */
     Object.keys(properties).forEach(key => {
       if (requiredKeys.indexOf(key) !== -1 && !properties[key]) {
-        errors.push(errors.length === 0 ? 'Missing ' + key : key)
+        errors.missing.push(key)
       }
     })
     /**
-     * Invalid characters on serviceName
+     * Invalid values on the config
      */
     if (
       properties.serviceName &&
       !/^[a-zA-Z0-9 _-]+$/.test(properties.serviceName)
     ) {
-      errors.push(
-        'serviceName ' +
-          properties.serviceName +
-          ' contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)'
-      )
+      errors.invalid.push({
+        key: 'serviceName',
+        value: properties.serviceName,
+        allowed: 'a-z, A-Z, 0-9, _, -, <space>'
+      })
     }
 
     return errors

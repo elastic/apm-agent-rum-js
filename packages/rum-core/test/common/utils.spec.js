@@ -118,7 +118,6 @@ describe('lib/utils', function() {
     const currentOrigin = new Url(window.location.href).origin
     const relOrigin = new Url('/test/new').origin
     const absOrigin = new Url('http://test.com/test/new').origin
-    console.log(relOrigin, currentOrigin)
     expect(utils.checkSameOrigin(relOrigin, currentOrigin)).toBe(true)
     expect(utils.checkSameOrigin(absOrigin, currentOrigin)).toBe(false)
     expect(

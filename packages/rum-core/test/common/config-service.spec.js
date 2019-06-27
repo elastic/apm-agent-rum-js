@@ -129,24 +129,40 @@ describe('ConfigService', function() {
   it('should validate required config options', () => {
     // Valid
     const errors1 = configService.validate({ serviceName: 'name' })
-    expect(errors1.length).toEqual(0)
+    expect(errors1).toEqual({
+      missing: [],
+      invalid: []
+    })
 
-    // Invalid required key serviceName
+    // missing required key serviceName
     const errors2 = configService.validate({ serviceName: undefined })
-    expect(errors2).toEqual(['Missing serviceName'])
+    expect(errors2).toEqual({
+      missing: ['serviceName'],
+      invalid: []
+    })
 
-    // Invalid required key serviceName & serverUrl
+    // missing required key serviceName & serverUrl
     const errors3 = configService.validate({
       serviceName: undefined,
       serverUrl: ''
     })
-    expect(errors3).toEqual(['Missing serviceName', 'serverUrl'])
+    expect(errors3).toEqual({
+      missing: ['serviceName', 'serverUrl'],
+      invalid: []
+    })
 
     // Invalid characters in serviceName
     const errors4 = configService.validate({ serviceName: 'abc.def' })
-    expect(errors4).toEqual([
-      'serviceName abc.def contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)'
-    ])
+    expect(errors4).toEqual({
+      missing: [],
+      invalid: [
+        {
+          key: 'serviceName',
+          value: 'abc.def',
+          allowed: 'a-z, A-Z, 0-9, _, -, <space>'
+        }
+      ]
+    })
   })
 
   it('should addLabels', function() {

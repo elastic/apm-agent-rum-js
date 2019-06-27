@@ -71,9 +71,7 @@ describe('ApmBase', function() {
   it('should be noop when agent is not active', done => {
     const apmBase = new ApmBase(serviceFactory, !enabled)
     const loggingService = serviceFactory.getService('LoggingService')
-    spyOn(loggingService, 'info').and.callFake(msg => {
-      expect(msg).toEqual('RUM agent is inactive')
-    })
+    spyOn(loggingService, 'info')
 
     apmBase.init({
       active: false
@@ -92,6 +90,7 @@ describe('ApmBase', function() {
     req.send()
     const tr = apmBase.getCurrentTransaction()
     expect(tr).toBeUndefined()
+    expect(loggingService.info).toHaveBeenCalledWith('RUM agent is inactive')
   })
 
   it('should provide the public api', function() {
@@ -209,17 +208,17 @@ describe('ApmBase', function() {
   it('should log errors when config is invalid', () => {
     const apmBase = new ApmBase(serviceFactory, !enabled)
     const loggingService = serviceFactory.getService('LoggingService')
-    spyOn(loggingService, 'error').and.callFake(msg => {
-      expect(msg).toEqual(
-        'RUM Agent configuration is invalid: Missing serverUrl, serviceName'
-      )
-    })
+    spyOn(loggingService, 'error')
     apmBase.init({
       serverUrl: '',
-      serviceName: undefined
+      serviceName: 'abc.def'
     })
     const configService = serviceFactory.getService('ConfigService')
     expect(configService.get('active')).toEqual(false)
+
+    expect(loggingService.error).toHaveBeenCalledWith(
+      `RUM Agent isn't correctly configured: Missing config - serverUrl, serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
+    )
   })
 
   it('should instrument sync xhr', function(done) {

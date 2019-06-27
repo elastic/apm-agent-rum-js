@@ -105,14 +105,22 @@ class ApmBase {
    */
   config(config) {
     const configService = this.serviceFactory.getService('ConfigService')
-    const errors = configService.validate(config)
-    if (errors.length === 0) {
+    const { missing, invalid } = configService.validate(config)
+    if (missing.length === 0 && invalid.length === 0) {
       configService.setConfig(config)
     } else {
       const loggingService = this.serviceFactory.getService('LoggingService')
-      const message = 'RUM Agent configuration is invalid: ' + errors.join(', ')
-      configService.setConfig({ active: false })
+      let message = "RUM Agent isn't correctly configured: "
+
+      if (missing.length > 0) {
+        message += 'Missing config - ' + missing.join(', ')
+      }
+
+      invalid.forEach(({ key, value, allowed }) => {
+        message += `, ${key} "${value}" contains invalid characters! (allowed: ${allowed})`
+      })
       loggingService.error(message)
+      configService.setConfig({ active: false })
     }
   }
 
