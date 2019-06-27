@@ -80,7 +80,7 @@ describe('Capture hard navigation', function() {
       { name: 'Fire "load" event', _end: 2874, _start: 2852 }
     ])
 
-    const fetchStartValues = [undefined, null, Number(new Date())]
+    const fetchStartValues = [undefined, null, Number(new Date()), 0, 1]
     for (let i = 0; i < fetchStartValues.length; i++) {
       const value = fetchStartValues[i]
       const timingObj = { ...timings, fetchStart: value }
@@ -110,7 +110,7 @@ describe('Capture hard navigation', function() {
       const timingObj = {
         ...timings,
         domInteractive: value,
-        requestStart: 0
+        requestStart: Number(new Date())
       }
       const spans = createNavigationTimingSpans(timingObj, transactionEnd)
       expect(spans.map(mapSpan)).toEqual([
@@ -123,7 +123,8 @@ describe('Capture hard navigation', function() {
       ...timings,
       domInteractive: 0,
       requestStart: 0,
-      domContentLoadedEventStart: 'a'
+      domContentLoadedEventStart: 'a',
+      domContentLoadedEventEnd: 'testing'
     }
     spans = createNavigationTimingSpans(timingsObj, transactionEnd)
     expect(spans.map(mapSpan)).toEqual([
@@ -144,11 +145,6 @@ describe('Capture hard navigation', function() {
     var tr = new Transaction('test', 'test')
     tr.isHardNavigation = true
     tr.end()
-    /**
-     * In an ideal scenaio, hard navigation happens only after page
-     * load event has fired
-     */
-    tr._end = performance.timing.loadEventEnd
     captureHardNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
   })

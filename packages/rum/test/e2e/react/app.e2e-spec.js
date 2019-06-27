@@ -93,7 +93,6 @@ describe('react app', function() {
     expect(pageLoadTransaction.type).toBe('page-load')
     expect(pageLoadTransaction.name).toBe('App Load')
     expect(pageLoadTransaction.spans.length).toBeGreaterThan(1)
-    expect(pageLoadTransaction.marks.navigationTiming).toBeDefined()
 
     var routeChangeTransaction = serverCalls.sendTransactions[1].args[0][0]
     expect(routeChangeTransaction.type).toBe('route-change')
