@@ -68,7 +68,11 @@ describe('Capture hard navigation', function() {
    */
   const transactionEnd = timings.loadEventEnd + 100
   it('should createNavigationTimingSpans', function() {
-    let spans = createNavigationTimingSpans(timings, transactionEnd)
+    let spans = createNavigationTimingSpans(
+      timings,
+      timings.fetchStart,
+      transactionEnd
+    )
     expect(spans.map(mapSpan)).toEqual([
       { name: 'Requesting and receiving the document', _end: 947, _start: 7 },
       {
@@ -84,7 +88,11 @@ describe('Capture hard navigation', function() {
     for (let i = 0; i < fetchStartValues.length; i++) {
       const value = fetchStartValues[i]
       const timingObj = { ...timings, fetchStart: value }
-      const spans = createNavigationTimingSpans(timingObj, transactionEnd)
+      const spans = createNavigationTimingSpans(
+        timingObj,
+        timingObj.fetchStart,
+        transactionEnd
+      )
       expect(spans).toEqual([])
     }
 
@@ -92,7 +100,11 @@ describe('Capture hard navigation', function() {
     for (let i = 0; i < requestStartValues.length; i++) {
       const value = requestStartValues[i]
       const timingObj = { ...timings, requestStart: value }
-      const spans = createNavigationTimingSpans(timingObj, transactionEnd)
+      const spans = createNavigationTimingSpans(
+        timingObj,
+        timingObj.fetchStart,
+        transactionEnd
+      )
       expect(spans.map(mapSpan)).toEqual([
         {
           name: 'Parsing the document, executing sync. scripts',
@@ -112,7 +124,11 @@ describe('Capture hard navigation', function() {
         domInteractive: value,
         requestStart: Number(new Date())
       }
-      const spans = createNavigationTimingSpans(timingObj, transactionEnd)
+      const spans = createNavigationTimingSpans(
+        timingObj,
+        timingObj.fetchStart,
+        transactionEnd
+      )
       expect(spans.map(mapSpan)).toEqual([
         { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
         { name: 'Fire "load" event', _end: 2874, _start: 2852 }
@@ -126,7 +142,11 @@ describe('Capture hard navigation', function() {
       domContentLoadedEventStart: 'a',
       domContentLoadedEventEnd: 'testing'
     }
-    spans = createNavigationTimingSpans(timingsObj, transactionEnd)
+    spans = createNavigationTimingSpans(
+      timingsObj,
+      timingsObj.fetchStart,
+      transactionEnd
+    )
     expect(spans.map(mapSpan)).toEqual([
       { name: 'Fire "load" event', _end: 2874, _start: 2852 }
     ])

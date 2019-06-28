@@ -54,22 +54,30 @@ const eventPairs = [
   ['loadEventStart', 'loadEventEnd', 'Fire "load" event']
 ]
 
+/**
+ * start, end, baseTime - unsigned long long(PerformanceTiming)
+ * representing the moment, in milliseconds since the UNIX epoch
+ *
+ * transactionEnd - DOMHighResTimeStamp, measured in milliseconds.
+ *
+ * We have to convert the long values in milliseconds before doing the comparision
+ * eg: end - baseTime <= transactionEnd
+ */
 function shouldCreateSpan(start, end, baseTime, transactionEnd) {
   return (
     typeof start === 'number' &&
     typeof end === 'number' &&
     start >= baseTime &&
     end > start &&
-    end - baseTime < transactionEnd &&
+    end - baseTime <= transactionEnd &&
     end - start < MAX_SPAN_DURATION &&
     start - baseTime < MAX_SPAN_DURATION &&
     end - baseTime < MAX_SPAN_DURATION
   )
 }
 
-function createNavigationTimingSpans(timings, transactionEnd) {
+function createNavigationTimingSpans(timings, baseTime, transactionEnd) {
   const spans = []
-  const baseTime = timings.fetchStart
   for (let i = 0; i < eventPairs.length; i++) {
     const start = timings[eventPairs[i][0]]
     const end = timings[eventPairs[i][1]]
@@ -188,7 +196,11 @@ function captureHardNavigation(transaction) {
      */
     const transactionEnd = transaction._end
 
-    createNavigationTimingSpans(timings, transactionEnd).forEach(span => {
+    createNavigationTimingSpans(
+      timings,
+      timings.fetchStart,
+      transactionEnd
+    ).forEach(span => {
       span.traceId = transaction.traceId
       span.sampled = transaction.sampled
       if (span.pageResponse && transaction.options.pageLoadSpanId) {
