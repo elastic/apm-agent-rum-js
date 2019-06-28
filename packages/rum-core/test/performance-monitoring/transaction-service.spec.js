@@ -27,6 +27,9 @@ import TransactionService from '../../src/performance-monitoring/transaction-ser
 import Transaction from '../../src/performance-monitoring/transaction'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
+import resourceEntries from '../fixtures/resource-entries'
+import paintEntries from '../fixtures/paint-entries'
+import userTimingEntries from '../fixtures/user-timing-entries'
 
 describe('TransactionService', function() {
   var transactionService
@@ -150,11 +153,16 @@ describe('TransactionService', function() {
     const _getEntriesByType = window.performance.getEntriesByType
 
     window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint']).toContain(type)
+      expect(['resource', 'paint', 'measure']).toContain(type)
       if (type === 'resource') {
         return resourceEntries
+      } else if (type === 'paint') {
+        return paintEntries
+      } else if (type === 'measure') {
+        return userTimingEntries
+      } else {
+        return []
       }
-      return paintEntries
     }
     const tr = new Transaction('test', 'test')
     tr.isHardNavigation = true
@@ -235,12 +243,36 @@ describe('TransactionService', function() {
   })
 
   it('should capture resources from navigation timing', function(done) {
+    var _getEntriesByType = window.performance.getEntriesByType
+
+    window.performance.getEntriesByType = function(type) {
+      expect(['resource', 'paint', 'measure']).toContain(type)
+      if (type === 'resource') {
+        return resourceEntries
+      } else if (type === 'paint') {
+        return paintEntries
+      } else if (type === 'measure') {
+        return userTimingEntries
+      } else {
+        return []
+      }
+    }
+
     config.set('active', true)
     config.set('capturePageLoad', true)
 
     const customTransactionService = new TransactionService(logger, config)
     customTransactionService.subscribe(function() {
       expect(tr.isHardNavigation).toBe(true)
+      expect(
+        tr.spans.filter(({ type }) => type === 'resource').length
+      ).toBeGreaterThanOrEqual(1)
+      expect(
+        tr.spans.filter(({ type }) => type === 'app').length
+      ).toBeGreaterThanOrEqual(1)
+      expect(tr.marks.agent.firstContentfulPaint).toBeDefined()
+      expect(tr.marks.navigationTiming).toBeDefined()
+      window.performance.getEntriesByType = _getEntriesByType
       done()
     })
 
@@ -296,6 +328,20 @@ describe('TransactionService', function() {
       pageLoadSpanId: 'test-span-id',
       pageLoadSampled: true
     })
+    var _getEntriesByType = window.performance.getEntriesByType
+
+    window.performance.getEntriesByType = function(type) {
+      expect(['resource', 'paint', 'measure']).toContain(type)
+      if (type === 'resource') {
+        return resourceEntries
+      } else if (type === 'paint') {
+        return paintEntries
+      } else if (type === 'measure') {
+        return userTimingEntries
+      } else {
+        return []
+      }
+    }
 
     transactionService = new TransactionService(logger, config)
     const tr = sendPageLoadMetrics()
@@ -314,6 +360,7 @@ describe('TransactionService', function() {
         expect(spans[0].id).toBe('test-span-id')
         expect(spans[0].name).toBe('Requesting and receiving the document')
       }
+      window.performance.getEntriesByType = _getEntriesByType
       done()
     })
   })

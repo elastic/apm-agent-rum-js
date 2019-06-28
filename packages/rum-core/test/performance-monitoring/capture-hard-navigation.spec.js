@@ -164,17 +164,19 @@ describe('Capture hard navigation', function() {
   })
 
   it('should createUserTimingSpans', function() {
-    const spans = createUserTimingSpans(userTimingEntries)
+    const spans = createUserTimingSpans(userTimingEntries, transactionEnd)
     expect(spans.length).toEqual(2)
     expect(spans).toEqual([
       jasmine.objectContaining({
         name: 'measure_1',
+        type: 'app',
         _start: jasmine.any(Number),
         _end: jasmine.any(Number),
         ended: true
       }),
       jasmine.objectContaining({
         name: 'measure_2',
+        type: 'app',
         _start: jasmine.any(Number),
         _end: jasmine.any(Number),
         ended: true

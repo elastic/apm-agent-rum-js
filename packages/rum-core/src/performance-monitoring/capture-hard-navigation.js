@@ -107,7 +107,7 @@ function createResourceTimingSpan(name, initiatorType, start, end) {
   const span = new Span(spanName, kind)
   span.addContext({ http: { url: name } })
   span._start = start
-  span.ended = true
+  span.end()
   span._end = end
   return span
 }
@@ -175,20 +175,22 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
   return spans
 }
 
-function createUserTimingSpans(entries) {
+function createUserTimingSpans(entries, transactionEnd) {
   const userTimingSpans = []
-
   for (let i = 0; i < entries.length; i++) {
     const { name, startTime, duration } = entries[i]
+    const end = startTime + duration
 
-    if (duration <= USER_TIMING_THRESHOLD) {
+    if (
+      duration <= USER_TIMING_THRESHOLD ||
+      !shouldCreateSpan(startTime, end, 0, transactionEnd)
+    ) {
       continue
     }
-    const kind = 'user.measure'
-    const end = startTime + duration
+    const kind = 'app'
     const span = new Span(name, kind)
     span._start = startTime
-    span.ended = true
+    span.end()
     span._end = end
 
     userTimingSpans.push(span)
@@ -250,8 +252,8 @@ function captureHardNavigation(transaction) {
       ).forEach(span => transaction.spans.push(span))
 
       const userEntries = perf.getEntriesByType('measure')
-      createUserTimingSpans(userEntries).forEach(
-        span => span._end <= transaction._end && transaction.spans.push(span)
+      createUserTimingSpans(userEntries, transactionEnd).forEach(span =>
+        transaction.spans.push(span)
       )
     }
   }

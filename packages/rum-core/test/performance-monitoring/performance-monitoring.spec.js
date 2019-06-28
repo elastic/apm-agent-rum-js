@@ -366,8 +366,11 @@ describe('PerformanceMonitoring', function() {
         return resourceEntries
       } else if (type === 'paint') {
         return paintEntries
+      } else if (type === 'measure') {
+        return userTimingEntries
+      } else {
+        return []
       }
-      return userTimingEntries
     }
 
     var transactionService = serviceFactory.getService('TransactionService')
