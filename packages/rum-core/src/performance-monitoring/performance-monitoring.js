@@ -290,8 +290,6 @@ class PerformanceMonitoring {
       return (
         span.duration() > 0 &&
         span._start >= transaction._start &&
-        span._end > transaction._start &&
-        span._start < transaction._end &&
         span._end <= transaction._end
       )
     })
