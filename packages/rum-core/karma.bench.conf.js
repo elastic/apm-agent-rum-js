@@ -23,8 +23,11 @@
  *
  */
 
+const { join } = require('path')
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma')
 const { getGlobalConfig } = require('../../dev-utils/test-config')
+
+const BENCHMARKS_DIR = join(__dirname, 'test', 'benchmarks')
 
 module.exports = function(config) {
   config.set(baseConfig)
@@ -35,7 +38,7 @@ module.exports = function(config) {
     JSON.stringify(customConfig, null, 2)
   )
   config.set(customConfig)
-  const specPattern = 'test/**/*.bench.js'
+  const specPattern = `${BENCHMARKS_DIR}/*.bench.js`
   config.set({
     files: [specPattern],
     frameworks: ['benchmark'],
@@ -51,7 +54,7 @@ module.exports = function(config) {
       [specPattern]: ['webpack', 'sourcemap']
     },
     benchmarkJsonReporter: {
-      pathToJson: 'reports/benchmark-results.json',
+      pathToJson: `${BENCHMARKS_DIR}/benchmark-results.json`,
       formatOutput(results) {
         const summary = results.map(r => {
           return {

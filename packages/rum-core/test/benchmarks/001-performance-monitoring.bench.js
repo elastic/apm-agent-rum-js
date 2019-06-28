@@ -23,22 +23,10 @@
  *
  */
 
-import { createServiceFactory } from '../'
-import Transaction from '../../src/performance-monitoring/transaction'
+import { generateTestTransaction } from './'
+import { createServiceFactory } from '../../'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
-
-function generateTransaction() {
-  var tr = new Transaction('transaction1', 'transaction1type')
-  var span = tr.startSpan('span1', 'span1type')
-  span.end()
-  tr.detectFinish()
-
-  if (tr._end === tr._start) {
-    tr._end = tr._end + 100
-  }
-  return tr
-}
 
 suite('PerformanceMonitoring', function() {
   var serviceFactory = createServiceFactory()
@@ -49,18 +37,17 @@ suite('PerformanceMonitoring', function() {
   configService.setConfig({ serviceName: 'benchmark-send-transactions' })
   configService.setConfig(agentConfig)
 
-  benchmark('createTransactionPayload', function() {
-    var tr = generateTransaction()
-    performanceMonitoring.createTransactionPayload(tr)
-  })
-
   function ResolvedPromise() {
     return Promise.resolve()
   }
+  const tr = generateTestTransaction(10)
+
+  benchmark('createTransactionPayload', function() {
+    performanceMonitoring.createTransactionPayload(tr)
+  })
 
   benchmark('sendTransactions-no-json', function() {
     apmServer._postJson = ResolvedPromise
-    var tr = generateTransaction()
     performanceMonitoring.sendTransactions([tr])
   })
 
@@ -68,7 +55,6 @@ suite('PerformanceMonitoring', function() {
     'sendTransactions',
     function() {
       apmServer._postJson = _postJson
-      var tr = generateTransaction()
       performanceMonitoring.sendTransactions([tr])
     },
     { delay: 1 }
