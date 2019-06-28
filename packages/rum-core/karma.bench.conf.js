@@ -48,13 +48,17 @@ module.exports = function(config) {
       'karma-benchmark-json-reporter'
     ],
     preprocessors: {
-      specPattern: ['webpack', 'sourcemap']
+      [specPattern]: ['webpack', 'sourcemap']
     },
     benchmarkJsonReporter: {
       pathToJson: 'reports/benchmark-results.json',
       formatOutput(results) {
         const summary = results.map(r => {
-          return { name: `${r.suite}.${r.name}`, mean: r.mean, hz: r.hz }
+          return {
+            name: `${r.suite}.${r.name}`,
+            mean: r.mean,
+            hz: r.hz
+          }
         })
         console.log(JSON.stringify(summary, undefined, 2))
         return { results }
