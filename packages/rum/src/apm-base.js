@@ -111,13 +111,15 @@ class ApmBase {
     } else {
       const loggingService = this.serviceFactory.getService('LoggingService')
       let message = "RUM Agent isn't correctly configured: "
+      const separator = ', '
 
       if (missing.length > 0) {
-        message += 'Missing config - ' + missing.join(', ')
+        message += 'Missing config - ' + missing.join(separator)
       }
 
       invalid.forEach(({ key, value, allowed }) => {
-        message += `, ${key} "${value}" contains invalid characters! (allowed: ${allowed})`
+        message += missing.length > 0 ? separator : ''
+        message += `${key} "${value}" contains invalid characters! (allowed: ${allowed})`
       })
       loggingService.error(message)
       configService.setConfig({ active: false })
