@@ -102,6 +102,16 @@ class ApmBase {
   /**
    * When the required config keys are invalid, the agent is deactivated with
    * logging error to the console
+   *
+   * validation error format
+   * {
+   *  missing: [ 'key1', 'key2']
+   *  invalid: [{
+   *    key: 'a',
+   *    value: 'abcd',
+   *    allowed: 'string'
+   *  }]
+   * }
    */
   config(config) {
     const configService = this.serviceFactory.getService('ConfigService')
@@ -110,16 +120,20 @@ class ApmBase {
       configService.setConfig(config)
     } else {
       const loggingService = this.serviceFactory.getService('LoggingService')
-      let message = "RUM Agent isn't correctly configured: "
       const separator = ', '
+      let message = "RUM Agent isn't correctly configured: "
 
       if (missing.length > 0) {
         message += 'Missing config - ' + missing.join(separator)
+        if (invalid.length > 0) {
+          message += separator
+        }
       }
 
-      invalid.forEach(({ key, value, allowed }) => {
-        message += missing.length > 0 ? separator : ''
-        message += `${key} "${value}" contains invalid characters! (allowed: ${allowed})`
+      invalid.forEach(({ key, value, allowed }, index) => {
+        message +=
+          `${key} "${value}" contains invalid characters! (allowed: ${allowed})` +
+          (index !== invalid.length - 1 ? separator : '')
       })
       loggingService.error(message)
       configService.setConfig({ active: false })
