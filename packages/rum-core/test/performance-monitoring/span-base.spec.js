@@ -26,6 +26,13 @@
 import SpanBase from '../../src/performance-monitoring/span-base'
 
 describe('SpanBase', function() {
+  it('should add default name and type for span', () => {
+    const span = new SpanBase('', undefined)
+
+    expect(span.name).toEqual('Unknown')
+    expect(span.type).toEqual('custom')
+  })
+
   it('should addLabels', function() {
     var span = new SpanBase()
     span.addLabels({ test: 'passed', 'test.new': 'new' })

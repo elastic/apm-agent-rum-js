@@ -29,7 +29,16 @@ import { NAME_UNKNOWN, TYPE_CUSTOM } from '../common/constants'
 class SpanBase {
   // context
 
-  constructor(name = NAME_UNKNOWN, type = TYPE_CUSTOM, options = {}) {
+  constructor(name, type, options = {}) {
+    /**
+     * Check for undefined and empty string
+     */
+    if (!name) {
+      name = NAME_UNKNOWN
+    }
+    if (!type) {
+      type = TYPE_CUSTOM
+    }
     this.options = options
     this.name = name
     this.type = type
