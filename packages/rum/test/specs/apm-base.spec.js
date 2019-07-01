@@ -28,6 +28,7 @@ import { createServiceFactory } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
 
 var enabled = bootstrap()
+const serviceName = 'apm-base-test'
 
 describe('ApmBase', function() {
   var serviceFactory
@@ -94,7 +95,7 @@ describe('ApmBase', function() {
 
   it('should provide the public api', function() {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({})
+    apmBase.init({ serviceName })
     apmBase.setInitialPageLoadName('test')
     var trService = serviceFactory.getService('TransactionService')
     var configService = serviceFactory.getService('ConfigService')
@@ -132,7 +133,7 @@ describe('ApmBase', function() {
 
   it('should instrument xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({})
+    apmBase.init({ serviceName })
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     expect(tr).toBeDefined()
     var performanceMonitoring = serviceFactory.getService(
@@ -155,7 +156,7 @@ describe('ApmBase', function() {
 
   it('should instrument xhr when no transaction was started', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ capturePageLoad: false })
+    apmBase.init({ capturePageLoad: false, serviceName })
     var performanceMonitoring = serviceFactory.getService(
       'PerformanceMonitoring'
     )
@@ -182,6 +183,10 @@ describe('ApmBase', function() {
   it('should patch xhr when not active', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ active: false })
+    const loggingService = serviceFactory.getService('LoggingService')
+    spyOn(loggingService, 'info').and.callFake(msg => {
+      expect(msg).toEqual('RUM agent is inactive')
+    })
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -200,9 +205,41 @@ describe('ApmBase', function() {
     expect(tr).toBeUndefined()
   })
 
+  it('should log errors when config is invalid', () => {
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    const loggingService = serviceFactory.getService('LoggingService')
+    const logErrorSpy = spyOn(loggingService, 'error')
+    apmBase.init({
+      serverUrl: undefined,
+      serviceName: ''
+    })
+    expect(loggingService.error).toHaveBeenCalledWith(
+      `RUM Agent isn't correctly configured: Missing config - serverUrl, serviceName`
+    )
+    const configService = serviceFactory.getService('ConfigService')
+    expect(configService.get('active')).toEqual(false)
+
+    logErrorSpy.calls.reset()
+    apmBase.config({
+      serverUrl: '',
+      serviceName: 'abc.def'
+    })
+    expect(loggingService.error).toHaveBeenCalledWith(
+      `RUM Agent isn't correctly configured: Missing config - serverUrl, serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
+    )
+
+    logErrorSpy.calls.reset()
+    apmBase.config({
+      serviceName: 'abc.def'
+    })
+    expect(loggingService.error).toHaveBeenCalledWith(
+      `RUM Agent isn't correctly configured: serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
+    )
+  })
+
   it('should instrument sync xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({})
+    apmBase.init({ serviceName })
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     var performanceMonitoring = serviceFactory.getService(
       'PerformanceMonitoring'

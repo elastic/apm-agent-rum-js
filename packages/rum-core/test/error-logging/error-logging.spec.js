@@ -245,7 +245,6 @@ describe('ErrorLogging', function() {
     configService.setConfig({
       serviceName: 'serviceName'
     })
-    expect(configService.isValid()).toBe(true)
     spyOn(apmServer, 'sendErrors')
     try {
       throw new Error('unittest error')
@@ -256,26 +255,6 @@ describe('ErrorLogging', function() {
       errorLogging.logError('test error')
       expect(apmServer.sendErrors).not.toHaveBeenCalled()
       expect(apmServer.errorQueue.items.length).toBe(4)
-    }
-  })
-
-  it('should check isActive', function() {
-    configService.setConfig({
-      active: false
-    })
-    expect(configService.isActive()).toBe(false)
-    spyOn(apmServer, 'sendErrors')
-    spyOn(apmServer, 'addError')
-    try {
-      throw new Error('unittest error')
-    } catch (error) {
-      errorLogging.logErrorEvent({ error })
-      errorLogging.logErrorEvent({ error })
-      errorLogging.logError(error)
-      errorLogging.logError('test error')
-      expect(apmServer.sendErrors).not.toHaveBeenCalled()
-      expect(apmServer.addError).not.toHaveBeenCalled()
-      expect(apmServer.errorQueue).toBe(undefined)
     }
   })
 })

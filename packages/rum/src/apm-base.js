@@ -33,12 +33,12 @@ class ApmBase {
   init(config) {
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
-      var configService = this.serviceFactory.getService('ConfigService')
+      const configService = this.serviceFactory.getService('ConfigService')
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
       configService.setVersion('4.1.2')
-      configService.setConfig(config)
+      this.config(config)
       /**
        * Deactive agent when the active config flag is set to false
        */
@@ -49,10 +49,10 @@ class ApmBase {
       }
 
       this.serviceFactory.init()
-      var errorLogging = this.serviceFactory.getService('ErrorLogging')
+      const errorLogging = this.serviceFactory.getService('ErrorLogging')
       errorLogging.registerGlobalEventListener()
 
-      var performanceMonitoring = this.serviceFactory.getService(
+      const performanceMonitoring = this.serviceFactory.getService(
         'PerformanceMonitoring'
       )
       performanceMonitoring.init()
@@ -99,9 +99,45 @@ class ApmBase {
     return !this._disable
   }
 
+  /**
+   * When the required config keys are invalid, the agent is deactivated with
+   * logging error to the console
+   *
+   * validation error format
+   * {
+   *  missing: [ 'key1', 'key2']
+   *  invalid: [{
+   *    key: 'a',
+   *    value: 'abcd',
+   *    allowed: 'string'
+   *  }]
+   * }
+   */
   config(config) {
-    var configService = this.serviceFactory.getService('ConfigService')
-    configService.setConfig(config)
+    const configService = this.serviceFactory.getService('ConfigService')
+    const { missing, invalid } = configService.validate(config)
+    if (missing.length === 0 && invalid.length === 0) {
+      configService.setConfig(config)
+    } else {
+      const loggingService = this.serviceFactory.getService('LoggingService')
+      const separator = ', '
+      let message = "RUM Agent isn't correctly configured: "
+
+      if (missing.length > 0) {
+        message += 'Missing config - ' + missing.join(separator)
+        if (invalid.length > 0) {
+          message += separator
+        }
+      }
+
+      invalid.forEach(({ key, value, allowed }, index) => {
+        message +=
+          `${key} "${value}" contains invalid characters! (allowed: ${allowed})` +
+          (index !== invalid.length - 1 ? separator : '')
+      })
+      loggingService.error(message)
+      configService.setConfig({ active: false })
+    }
   }
 
   setUserContext(userContext) {
