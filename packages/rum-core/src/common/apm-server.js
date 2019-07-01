@@ -33,12 +33,6 @@ class ApmServer {
   constructor(configService, loggingService) {
     this._configService = configService
     this._loggingService = loggingService
-    this.logMessages = {
-      invalidConfig: {
-        message: 'RUM agent configuration is invalid!',
-        level: 'warn'
-      }
-    }
 
     this.errorQueue = undefined
     this.transactionQueue = undefined
@@ -194,15 +188,6 @@ class ApmServer {
     this.throttleAddTransaction(transaction)
   }
 
-  warnOnce(logObject) {
-    if (logObject.level === 'warn') {
-      logObject.level = 'debug'
-      this._loggingService.warn(logObject.message)
-    } else {
-      this._loggingService.debug(logObject.message)
-    }
-  }
-
   ndjsonErrors(errors) {
     return errors.map(function(error) {
       return NDJSON.stringify({ error })
@@ -227,10 +212,6 @@ class ApmServer {
   }
 
   _send(data = [], type = 'transaction') {
-    if (!this._configService.isValid()) {
-      this.warnOnce(this.logMessages.invalidConfig)
-      return
-    }
     if (data.length === 0) {
       return
     }

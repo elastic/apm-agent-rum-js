@@ -190,7 +190,6 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should sendTransactionInterval', function() {
-    expect(configService.isValid()).toBe(true)
     var tr = new Transaction('test transaction', 'transaction', {
       transactionSampleRate: 1
     })
