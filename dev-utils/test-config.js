@@ -97,10 +97,6 @@ function getBrowserList() {
       version: '52'
     },
     {
-      browserName: 'firefox',
-      version: '66'
-    },
-    {
       browserName: 'safari',
       platform: 'OS X 10.11',
       version: '9.0'
