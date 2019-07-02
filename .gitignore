@@ -12,7 +12,6 @@ html_docs
 build
 reports
 coverage
-**/benchmarks/*.json
 
 # ignore lerna-debug and npm-debug logs
 *debug.log

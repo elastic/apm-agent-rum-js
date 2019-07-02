@@ -24,12 +24,26 @@
  */
 
 const { join } = require('path')
+const { mkdirSync, existsSync } = require('fs')
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma')
 const { getGlobalConfig } = require('../../dev-utils/test-config')
 
 const BENCHMARKS_DIR = join(__dirname, 'test', 'benchmarks')
+const REPORTS_DIR = join(__dirname, 'reports')
 
 module.exports = function(config) {
+  /**
+   * create reports directory if it does not exist
+   */
+  try {
+    if (!existsSync(REPORTS_DIR)) {
+      mkdirSync(REPORTS_DIR)
+    }
+  } catch (err) {
+    console.error('Failed to create reports directory', err)
+    process.exit(1)
+  }
+
   config.set(baseConfig)
   const customConfig = getGlobalConfig('rum-core')
 
@@ -38,7 +52,7 @@ module.exports = function(config) {
     JSON.stringify(customConfig, null, 2)
   )
   config.set(customConfig)
-  const specPattern = `${BENCHMARKS_DIR}/*.bench.js`
+  const specPattern = `${BENCHMARKS_DIR}/**/*.bench.js`
   config.set({
     files: [specPattern],
     frameworks: ['benchmark'],
@@ -54,7 +68,7 @@ module.exports = function(config) {
       [specPattern]: ['webpack', 'sourcemap']
     },
     benchmarkJsonReporter: {
-      pathToJson: `${BENCHMARKS_DIR}/benchmark-results.json`,
+      pathToJson: `${REPORTS_DIR}/benchmark-results.json`,
       formatOutput(results) {
         const summary = results.map(r => {
           return {
