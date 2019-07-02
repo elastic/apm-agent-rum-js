@@ -27,9 +27,7 @@ import TransactionService from '../../src/performance-monitoring/transaction-ser
 import Transaction from '../../src/performance-monitoring/transaction'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
-import resourceEntries from '../fixtures/resource-entries'
-import paintEntries from '../fixtures/paint-entries'
-import userTimingEntries from '../fixtures/user-timing-entries'
+import { mockGetEntriesByType } from '../utils/globals-mock'
 
 describe('TransactionService', function() {
   var transactionService
@@ -150,20 +148,7 @@ describe('TransactionService', function() {
   })
 
   it('should contain agent marks in page load transaction', function() {
-    const _getEntriesByType = window.performance.getEntriesByType
-
-    window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint', 'measure']).toContain(type)
-      if (type === 'resource') {
-        return resourceEntries
-      } else if (type === 'paint') {
-        return paintEntries
-      } else if (type === 'measure') {
-        return userTimingEntries
-      } else {
-        return []
-      }
-    }
+    const unMock = mockGetEntriesByType()
     const tr = new Transaction('test', 'test')
     tr.isHardNavigation = true
     transactionService.capturePageLoadMetrics(tr)
@@ -179,7 +164,7 @@ describe('TransactionService', function() {
     agentMarks.forEach(mark => {
       expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
     })
-    window.performance.getEntriesByType = _getEntriesByType
+    unMock()
   })
 
   it('should use initial page load name before ending the transaction', function() {
@@ -243,20 +228,7 @@ describe('TransactionService', function() {
   })
 
   it('should capture resources from navigation timing', function(done) {
-    var _getEntriesByType = window.performance.getEntriesByType
-
-    window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint', 'measure']).toContain(type)
-      if (type === 'resource') {
-        return resourceEntries
-      } else if (type === 'paint') {
-        return paintEntries
-      } else if (type === 'measure') {
-        return userTimingEntries
-      } else {
-        return []
-      }
-    }
+    const unMock = mockGetEntriesByType()
 
     config.set('active', true)
     config.set('capturePageLoad', true)
@@ -272,7 +244,7 @@ describe('TransactionService', function() {
       ).toBeGreaterThanOrEqual(1)
       expect(tr.marks.agent.firstContentfulPaint).toBeDefined()
       expect(tr.marks.navigationTiming).toBeDefined()
-      window.performance.getEntriesByType = _getEntriesByType
+      unMock()
       done()
     })
 
@@ -328,20 +300,7 @@ describe('TransactionService', function() {
       pageLoadSpanId: 'test-span-id',
       pageLoadSampled: true
     })
-    var _getEntriesByType = window.performance.getEntriesByType
-
-    window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint', 'measure']).toContain(type)
-      if (type === 'resource') {
-        return resourceEntries
-      } else if (type === 'paint') {
-        return paintEntries
-      } else if (type === 'measure') {
-        return userTimingEntries
-      } else {
-        return []
-      }
-    }
+    const unMock = mockGetEntriesByType()
 
     transactionService = new TransactionService(logger, config)
     const tr = sendPageLoadMetrics()
@@ -360,7 +319,7 @@ describe('TransactionService', function() {
         expect(spans[0].id).toBe('test-span-id')
         expect(spans[0].name).toBe('Requesting and receiving the document')
       }
-      window.performance.getEntriesByType = _getEntriesByType
+      unMock()
       done()
     })
   })

@@ -170,15 +170,15 @@ describe('Capture hard navigation', function() {
       jasmine.objectContaining({
         name: 'measure_1',
         type: 'app',
-        _start: jasmine.any(Number),
-        _end: jasmine.any(Number),
+        _start: 0,
+        _end: 1052.5299999972049,
         ended: true
       }),
       jasmine.objectContaining({
         name: 'measure_2',
         type: 'app',
-        _start: jasmine.any(Number),
-        _end: jasmine.any(Number),
+        _start: 0,
+        _end: 2119.7900000006484,
         ended: true
       })
     ])
