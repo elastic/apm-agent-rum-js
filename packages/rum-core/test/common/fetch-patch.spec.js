@@ -25,6 +25,7 @@
 
 import patchSubscription from './patch'
 import { globalState } from '../../src/common/patching/patch-utils'
+import { FETCH_SOURCE } from '../../src/common/constants'
 
 describe('fetchPatch', function() {
   var events = []
@@ -32,19 +33,21 @@ describe('fetchPatch', function() {
 
   beforeAll(function() {
     cancelFn = patchSubscription.subscribe(function(event, task) {
-      events.push({
-        event,
-        task
-      })
+      if (task.source === FETCH_SOURCE) {
+        events.push({
+          event,
+          task
+        })
+      }
     })
-  })
-
-  afterAll(function() {
-    cancelFn()
   })
 
   beforeEach(function() {
     events = []
+  })
+
+  afterAll(function() {
+    cancelFn()
   })
 
   if (window.fetch) {

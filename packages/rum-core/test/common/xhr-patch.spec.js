@@ -29,6 +29,7 @@ import {
   XHR_URL
 } from '../../src/common/patching/patch-utils'
 import patchSubscription from './patch'
+import { XMLHTTPREQUEST_SOURCE } from '../../src/common/constants'
 
 describe('xhrPatch', function() {
   var events = []
@@ -36,11 +37,17 @@ describe('xhrPatch', function() {
 
   beforeAll(function() {
     cancelFn = patchSubscription.subscribe(function(event, task) {
-      events.push({
-        event,
-        task
-      })
+      if (task.source === XMLHTTPREQUEST_SOURCE) {
+        events.push({
+          event,
+          task
+        })
+      }
     })
+  })
+
+  beforeEach(function() {
+    events = []
   })
 
   afterAll(function() {
@@ -53,9 +60,6 @@ describe('xhrPatch', function() {
     return event
   }
 
-  beforeEach(function() {
-    events = []
-  })
   it('should have correct url and method', function() {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
