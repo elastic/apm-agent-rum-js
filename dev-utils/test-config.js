@@ -81,6 +81,11 @@ function getWebpackEnv() {
   }
 }
 
+/**
+ * Supported lowest and highest versions across major browser platform
+ *
+ * The list below is based purely on the market share distribution.
+ */
 function getBrowserList() {
   return [
     {

@@ -25,7 +25,6 @@
 
 import patchSubscription from './patch'
 import { globalState } from '../../src/common/patching/patch-utils'
-import { FETCH_SOURCE } from '../../src/common/constants'
 
 describe('fetchPatch', function() {
   var events = []
@@ -33,21 +32,19 @@ describe('fetchPatch', function() {
 
   beforeAll(function() {
     cancelFn = patchSubscription.subscribe(function(event, task) {
-      if (task.source === FETCH_SOURCE) {
-        events.push({
-          event,
-          task
-        })
-      }
+      events.push({
+        event,
+        task
+      })
     })
-  })
-
-  beforeEach(function() {
-    events = []
   })
 
   afterAll(function() {
     cancelFn()
+  })
+
+  beforeEach(function() {
+    events = []
   })
 
   if (window.fetch) {
@@ -118,9 +115,9 @@ describe('fetchPatch', function() {
         })
       })
     })
-    it('should reset fetchInProgress global state', function() {
+    it('should reset fetchInProgress global state', function(done) {
       expect(globalState.fetchInProgress).toBe(false)
-      window.fetch('http://localhost:54321/')
+      window.fetch('http://localhost:54321/').then(done, done)
       expect(globalState.fetchInProgress).toBe(false)
     })
   }
