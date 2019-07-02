@@ -301,19 +301,14 @@ describe('lib/utils', function() {
       },
       {
         name: 'miss'
+      },
+      {
+        name: 'app',
+        duration: '50'
       }
     ])
     expect(serverTimingStr).toEqual(
-      'Origin cache;cache=200,Edge cache;edge=20,miss'
+      'cache;desc=Origin cache;dur=200, edge;desc=Edge cache;dur=20, miss, app;dur=50'
     )
-    // Without description
-    expect(
-      utils.getServerTimingInfo([
-        {
-          name: 'app',
-          duration: '50'
-        }
-      ])
-    ).toEqual('app=50')
   })
 })

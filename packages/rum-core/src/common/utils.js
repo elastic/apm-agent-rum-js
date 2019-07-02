@@ -209,38 +209,38 @@ function getPaintTimingMarks() {
 
 /**
  *  Server timing information on Performance resource timing entries
+ *  https://www.w3.org/TR/server-timing/
  *  [
  *    {
- *      name: "cache",
- *      duration:  "200",
- *      desciprion: "Cache read"
+ *      name: "cdn-cache",
+ *      duration: 0,
+ *      desciprion: "HIT"
  *    },
  *    {
- *      name: "app",
- *      duration: "500"
+ *      name: "edge",
+ *      duration: 4,
+ *      desciption: ''
  *    }
  *  ]
- *  returns "Cache read;cache=200,app=500"
+ *  returns "cdn-cache;desc=HIT, edge;dur=4"
  */
-function getServerTimingInfo(serverTimingEntries) {
-  let serverTimingStr = ''
-  if (!serverTimingEntries) {
-    return serverTimingStr
-  }
-
+function getServerTimingInfo(serverTimingEntries = []) {
+  let serverTimingInfo = []
+  const entrySeparator = ', '
+  const valueSeparator = ';'
   for (let i = 0; i < serverTimingEntries.length; i++) {
     const { name, duration, description } = serverTimingEntries[i]
-    // Separate the entries by ','
-    serverTimingStr += i > 0 ? ',' : ''
+    let timingValue = ''
+    timingValue += name
     if (description) {
-      serverTimingStr += description + ';'
+      timingValue += valueSeparator + 'desc=' + description
     }
-    serverTimingStr += name
     if (duration) {
-      serverTimingStr += `=${duration}`
+      timingValue += valueSeparator + 'dur=' + duration
     }
+    serverTimingInfo.push(timingValue)
   }
-  return serverTimingStr
+  return serverTimingInfo.join(entrySeparator)
 }
 
 function getTimeOrigin() {

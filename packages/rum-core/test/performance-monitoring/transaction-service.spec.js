@@ -331,37 +331,21 @@ describe('TransactionService', function() {
   })
 
   it('should include size & server timing in page load context', done => {
-    const _getEntriesByType = window.performance.getEntriesByType
-
-    window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint', 'navigation']).toContain(type)
-      if (type === 'navigation') {
-        return [
-          {
-            transferSize: 55555,
-            encodedBodySize: 58000,
-            serverTiming: [
-              {
-                name: 'a',
-                duration: 20,
-                description: 'test'
-              }
-            ]
-          }
-        ]
-      }
-      return []
-    }
-    transactionService = new TransactionService(logger, config)
-    transactionService.subscribe(function() {
+    const unMock = mockGetEntriesByType()
+    const customTrService = new TransactionService(logger, config)
+    customTrService.subscribe(function() {
       expect(tr.context.response).toEqual({
-        transfer_size: 55555,
-        compressed_size: 58000,
-        server_timing: 'test;a=20'
+        transfer_size: 26941,
+        encoded_body_size: 105297,
+        decoded_body_size: 42687,
+        headers: {
+          'server-timing': 'edge;dur=4, cdn-cache;desc=HIT'
+        }
       })
-      window.performance.getEntriesByType = _getEntriesByType
+      unMock()
       done()
     })
-    var tr = transactionService.sendPageLoadMetrics('test')
+    const tr = customTrService.startTransaction('test', 'page-load')
+    tr.detectFinish()
   })
 })

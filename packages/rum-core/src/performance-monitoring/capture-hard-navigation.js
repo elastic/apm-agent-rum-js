@@ -83,12 +83,20 @@ function shouldCreateSpan(start, end, baseTime, transactionEnd) {
  * for CORS requests, transferSize & encodedBodySize will be 0
  */
 function getResponseContext(perfTimingEntry) {
-  const { transferSize, encodedBodySize, serverTiming } = perfTimingEntry
+  const {
+    transferSize,
+    encodedBodySize,
+    decodedBodySize,
+    serverTiming
+  } = perfTimingEntry
 
   return {
     transfer_size: transferSize,
-    compressed_size: encodedBodySize,
-    server_timing: getServerTimingInfo(serverTiming)
+    encoded_body_size: encodedBodySize,
+    decoded_body_size: decodedBodySize,
+    headers: {
+      'server-timing': getServerTimingInfo(serverTiming)
+    }
   }
 }
 
@@ -157,9 +165,7 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
       if (!shouldCreateSpan(startTime, responseEnd, 0, transactionEnd)) {
         continue
       }
-      spans.push(
-        createResourceTimingSpan(name, initiatorType, startTime, responseEnd)
-      )
+      spans.push(createResourceTimingSpan(entries[i]))
     } else {
       /**
        * Since IE does not support initiatorType in Resource timing entry,
@@ -190,9 +196,7 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
         !foundAjaxReq &&
         shouldCreateSpan(startTime, responseEnd, 0, transactionEnd)
       ) {
-        spans.push(
-          createResourceTimingSpan(name, initiatorType, startTime, responseEnd)
-        )
+        spans.push(createResourceTimingSpan(entries[i]))
       }
     }
   }
@@ -287,7 +291,7 @@ function captureHardNavigation(transaction) {
        * Add transaction context information from performance navigation timing entry level 2 API
        */
       let navigationEntry = perf.getEntriesByType('navigation')
-      if (navigationEntry && navigationEntry.length) {
+      if (navigationEntry && navigationEntry.length > 0) {
         navigationEntry = navigationEntry[0]
         transaction.addContext({
           response: getResponseContext(navigationEntry)
