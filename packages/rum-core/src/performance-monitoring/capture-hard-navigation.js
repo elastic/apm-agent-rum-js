@@ -26,7 +26,8 @@
 import Span from './span'
 import {
   RESOURCE_INITIATOR_TYPES,
-  MAX_SPAN_DURATION
+  MAX_SPAN_DURATION,
+  USER_TIMING_THRESHOLD
 } from '../common/constants'
 import { stripQueryStringFromUrl } from '../common/utils'
 
@@ -106,7 +107,7 @@ function createResourceTimingSpan(name, initiatorType, start, end) {
   const span = new Span(spanName, kind)
   span.addContext({ http: { url: name } })
   span._start = start
-  span.ended = true
+  span.end()
   span._end = end
   return span
 }
@@ -174,6 +175,29 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
   return spans
 }
 
+function createUserTimingSpans(entries, transactionEnd) {
+  const userTimingSpans = []
+  for (let i = 0; i < entries.length; i++) {
+    const { name, startTime, duration } = entries[i]
+    const end = startTime + duration
+
+    if (
+      duration <= USER_TIMING_THRESHOLD ||
+      !shouldCreateSpan(startTime, end, 0, transactionEnd)
+    ) {
+      continue
+    }
+    const kind = 'app'
+    const span = new Span(name, kind)
+    span._start = startTime
+    span.end()
+    span._end = end
+
+    userTimingSpans.push(span)
+  }
+  return userTimingSpans
+}
+
 function captureHardNavigation(transaction) {
   const perf = window.performance
   if (transaction.isHardNavigation && perf && perf.timing) {
@@ -210,7 +234,7 @@ function captureHardNavigation(transaction) {
     })
 
     if (typeof perf.getEntriesByType === 'function') {
-      const entries = perf.getEntriesByType('resource')
+      const resourceEntries = perf.getEntriesByType('resource')
 
       const ajaxUrls = []
       for (let i = 0; i < transaction.spans; i++) {
@@ -221,8 +245,15 @@ function captureHardNavigation(transaction) {
         }
         ajaxUrls.push(span.name.split(' ')[1])
       }
-      createResourceTimingSpans(entries, ajaxUrls, transactionEnd).forEach(
-        span => transaction.spans.push(span)
+      createResourceTimingSpans(
+        resourceEntries,
+        ajaxUrls,
+        transactionEnd
+      ).forEach(span => transaction.spans.push(span))
+
+      const userEntries = perf.getEntriesByType('measure')
+      createUserTimingSpans(userEntries, transactionEnd).forEach(span =>
+        transaction.spans.push(span)
       )
     }
   }
@@ -231,5 +262,6 @@ function captureHardNavigation(transaction) {
 export {
   captureHardNavigation,
   createNavigationTimingSpans,
-  createResourceTimingSpans
+  createResourceTimingSpans,
+  createUserTimingSpans
 }
