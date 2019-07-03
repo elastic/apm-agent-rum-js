@@ -38,6 +38,14 @@ const getMetadataModel = limit => ({
     environment: [limit]
   }
 })
+
+const RESPONSE_MODEL = {
+  '*': true,
+  headers: {
+    '*': true
+  }
+}
+
 const getContextModel = limit => ({
   user: {
     id: [limit],
@@ -46,7 +54,11 @@ const getContextModel = limit => ({
   },
   tags: {
     '*': [limit]
-  }
+  },
+  http: {
+    response: RESPONSE_MODEL
+  },
+  response: RESPONSE_MODEL
 })
 const getSpanModel = limit => ({
   name: [limit, true],
@@ -147,6 +159,14 @@ describe('Truncate', () => {
         tags: {
           ab: generateStr('g', keywordLen),
           bc: generateStr('h', keywordLen)
+        },
+        response: {
+          cb: 2134,
+          de: null,
+          ef: '',
+          headers: {
+            fg: ''
+          }
         }
       },
       marks: {
@@ -182,6 +202,10 @@ describe('Truncate', () => {
         tags: {
           ab: generateStr('g', stringLimit),
           bc: generateStr('h', stringLimit)
+        },
+        response: {
+          cb: 2134,
+          headers: {}
         }
       },
       marks: {
@@ -221,6 +245,16 @@ describe('Truncate', () => {
         page: {
           referer: 'blah',
           url: 'http://a.com/script.js'
+        },
+        http: {
+          response: {
+            cb: 2134,
+            de: null,
+            ef: '',
+            headers: {
+              fg: ''
+            }
+          }
         }
       }
     }
@@ -248,6 +282,12 @@ describe('Truncate', () => {
         page: {
           referer: 'blah',
           url: 'http://a.com/script.js'
+        },
+        http: {
+          response: {
+            cb: 2134,
+            headers: {}
+          }
         }
       }
     })

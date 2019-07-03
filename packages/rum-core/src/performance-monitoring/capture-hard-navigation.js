@@ -80,7 +80,7 @@ function shouldCreateSpan(start, end, baseTime, transactionEnd) {
 /**
  * Both Navigation and Resource timing level 2 exposes these below information
  *
- * for CORS requests, transferSize & encodedBodySize will be 0
+ * for CORS requests without Timing-Allow-Origin header, transferSize & encodedBodySize will be 0
  */
 function getResponseContext(perfTimingEntry) {
   const {
