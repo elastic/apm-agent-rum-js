@@ -68,6 +68,10 @@ pipeline {
                 docker.image('node:8').inside(){
                   dir("${BASE_DIR}"){
                     sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
+                    def bundlesize = sh(label: "Bundlesize", script: 'npm run bundlesize', returnStatus: true)
+                    withGithubNotify(context: "Bundle Size ${bundlesize > 0 ? 'FAIL' : 'PASS'}"){
+                      echo "Bundle Size"
+                    }
                   }
                   stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
                 }
