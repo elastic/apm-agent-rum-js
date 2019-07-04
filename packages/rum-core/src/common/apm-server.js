@@ -28,6 +28,7 @@ import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
+import { __DEV__ } from '../env'
 
 class ApmServer {
   constructor(configService, loggingService) {
@@ -231,7 +232,9 @@ class ApmServer {
     } else if (type === 'transaction') {
       ndjson = this.ndjsonTransactions(filteredPayload.data)
     } else {
-      this._loggingService.debug('Dropped payload due to unknown data type ')
+      if (__DEV__) {
+        this._loggingService.debug('Dropped payload due to unknown data type')
+      }
       return
     }
     ndjson.unshift(

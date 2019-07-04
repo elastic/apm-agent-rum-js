@@ -21,6 +21,7 @@ You will also need to {apm-server-ref-v}/rum.html[enable frontend endpoints in t
 
 * <<using-package-managers>>
 * <<using-script-tags>>
+* <<using-production-build>>
 * <<configuring-cors>>
 
 [float]
@@ -72,7 +73,49 @@ https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG
 </script>
 ----
 
-NOTE: Currently our minified JavaScript bundle is about 16KB (gzipped).
+NOTE: Currently the optimized(minified + gzipped) JavaScript bundle size is about 16KiB.
+
+
+[float]
+[[using-production-build]]
+=== Using Production Build
+
+By default, RUM agent logs all the debug messages to the browser console. These logs are very useful in development. However, they make the RUM agent bundle size larger so you should make sure to use the optimized production version when deploying your application.
+
+You can find instructions for building optimized code below for different bundlers
+
+[float]
+==== Webpack
+For optimized webpack production build, include the Environment/Define plugin in the webpack configuration.
+
+[source, js]
+----
+const { EnvironmentPlugin } = require('webpack')
+
+plugins: [
+  new EnvironmentPlugin({
+    NODE_ENV: 'production'
+  })
+]
+----
+
+You can learn more about this in https://webpack.js.org/plugins/environment-plugin[Webpack documentation].
+
+[float]
+==== Rollup
+
+For optimized rollup production build, include the replace plugin which ensures the right build environment is used. 
+
+[source, js]
+----
+const replace = require('rollup-plugin-replace')
+
+plugins: [
+  replace({
+    'process.env.NODE_ENV': 'production'
+  })
+]
+----
 
 [float]
 [[configuring-cors]]
