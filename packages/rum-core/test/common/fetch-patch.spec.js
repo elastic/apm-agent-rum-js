@@ -115,9 +115,9 @@ describe('fetchPatch', function() {
         })
       })
     })
-    it('should reset fetchInProgress global state', function() {
+    it('should reset fetchInProgress global state', function(done) {
       expect(globalState.fetchInProgress).toBe(false)
-      window.fetch('http://localhost:54321/')
+      window.fetch('http://localhost:54321/').then(done, done)
       expect(globalState.fetchInProgress).toBe(false)
     })
   }

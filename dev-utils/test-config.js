@@ -82,6 +82,11 @@ function getWebpackEnv(env = 'development') {
   }
 }
 
+/**
+ * Supported lowest and highest versions across major browser platform
+ *
+ * The list below is based purely on the market share distribution.
+ */
 function getBrowserList() {
   return [
     {
@@ -91,11 +96,11 @@ function getBrowserList() {
     },
     {
       browserName: 'chrome',
-      version: '62'
+      version: '74'
     },
     {
       browserName: 'firefox',
-      version: '59'
+      version: '52'
     },
     {
       browserName: 'safari',
@@ -110,7 +115,7 @@ function getBrowserList() {
     {
       browserName: 'microsoftedge',
       platform: 'Windows 10',
-      version: '13'
+      version: '17'
     },
     {
       appiumVersion: '1.9.1',
@@ -120,10 +125,10 @@ function getBrowserList() {
       platformName: 'android'
     },
     {
-      appiumVersion: '1.9.1',
+      appiumVersion: '1.13.0',
       deviceName: 'iPhone Simulator',
       deviceOrientation: 'portrait',
-      platformVersion: '11.1',
+      platformVersion: '12.2',
       platformName: 'iOS',
       browserName: 'Safari'
     }
