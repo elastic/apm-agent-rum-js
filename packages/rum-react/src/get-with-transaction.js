@@ -57,7 +57,7 @@ function getWithTransaction(apm) {
            * in that case this is a noop.
            */
           if (this.transaction) {
-            this.transaction.end()
+            this.transaction.detectFinish()
           }
         }
 

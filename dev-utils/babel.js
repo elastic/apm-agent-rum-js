@@ -23,6 +23,24 @@
  *
  */
 
-import createApmBase from '../../../rum/test/e2e'
+function getBabelConfig() {
+  return {
+    comments: false,
+    presets: [
+      [
+        '@babel/preset-env',
+        {
+          targets: {
+            node: '8.0.0'
+          },
+          loose: true
+        }
+      ]
+    ],
+    plugins: []
+  }
+}
 
-export default createApmBase
+module.exports = {
+  getBabelConfig
+}

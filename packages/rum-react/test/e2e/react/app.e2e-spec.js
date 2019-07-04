@@ -48,10 +48,17 @@ describe('react app', function() {
     expect(transaction.name).toBe('/home')
     expect(transaction.spans.length).toBeGreaterThan(1)
 
-    var fetchDataSpan = transaction.spans.find(function(s) {
-      return s.name === 'GET /test/e2e/react/data.json'
+    const spanNames = [
+      'Requesting and receiving the document',
+      'Parsing the document, executing sync. scripts',
+      'GET /test/e2e/react/data.json',
+      'Render'
+    ]
+    var foundSpans = transaction.spans.filter(span => {
+      return spanNames.indexOf(span.name) > -1
     })
-    expect(fetchDataSpan).toBeDefined()
+
+    expect(foundSpans.length).toBeGreaterThanOrEqual(4)
 
     return allowSomeBrowserErrors()
   })

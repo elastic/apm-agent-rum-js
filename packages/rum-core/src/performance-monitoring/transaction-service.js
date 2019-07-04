@@ -183,7 +183,7 @@ class TransactionService {
           if (this.shouldIgnoreTransaction(tr.name)) {
             return
           }
-          if (type === PAGE_LOAD) {
+          if (tr.type === PAGE_LOAD) {
             /**
              * Setting the pageLoadTransactionName via configService.setConfig after
              * transaction has started should also reflect the correct name.

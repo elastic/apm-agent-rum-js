@@ -99,6 +99,9 @@ describe('general-usercase', function() {
     expect(serverCalls.sendTransactions.length).toBe(1)
     const transactionPayload = serverCalls.sendTransactions[0].args[0][0]
     expect(transactionPayload.name).toBe('Push state title')
+    /**
+     * The actual spans are tested as part of the previous test.
+     */
     expect(transactionPayload.spans.length).toBeGreaterThanOrEqual(3)
   })
 })

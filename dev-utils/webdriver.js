@@ -253,7 +253,10 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
     transactionCount
   )
 
-  expect(serverCalls).toBeTruthy()
+  if (!serverCalls) {
+    throw new Error('serverCalls is undefined!')
+  }
+
   console.log(JSON.stringify(serverCalls, null, 2))
   if (serverCalls.error) {
     fail(serverCalls.error)
