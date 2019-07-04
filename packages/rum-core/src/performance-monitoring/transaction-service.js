@@ -28,8 +28,7 @@ import { extend, getPageLoadMarks } from '../common/utils'
 import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
-
-const __DEV__ = process.env.NODE_ENV !== 'production'
+import { __DEV__ } from '../env'
 
 class TransactionService {
   constructor(logger, config) {

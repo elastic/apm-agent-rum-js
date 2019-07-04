@@ -47,6 +47,7 @@ import {
   SPAN_MODEL,
   TRANSACTION_MODEL
 } from '../common/truncate'
+import { __DEV__ } from '../env'
 
 class PerformanceMonitoring {
   constructor(apmServer, configService, loggingService, transactionService) {
@@ -220,7 +221,7 @@ class PerformanceMonitoring {
       )
 
       if (!wasBrowserResponsive) {
-        if (process.env.NODE_ENV !== 'production') {
+        if (__DEV__) {
           performanceMonitoring._logginService.debug(
             'Transaction was discarded! browser was not responsive enough during the transaction.',
             ' duration:',
@@ -354,7 +355,7 @@ class PerformanceMonitoring {
       .map(tr => this.createTransactionPayload(tr))
       .filter(tr => tr)
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (__DEV__) {
       this._logginService.debug(
         'Sending Transactions to apm server.',
         transactions.length
