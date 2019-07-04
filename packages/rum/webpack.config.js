@@ -23,18 +23,17 @@
  *
  */
 
-const path = require('path')
+const { join } = require('path')
 const { EnvironmentPlugin } = require('webpack')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
-const OUTPUT_DIR = path.join(__dirname, 'dist', 'bundles')
+const OUTPUT_DIR = join(__dirname, 'dist', 'bundles')
+const SRC_DIR = join(__dirname, 'src')
+const REPORTS_DIR = join(__dirname, 'reports')
 
-const baseConfig = {
-  entry: {
-    'elastic-apm-rum': './src/index.js',
-    'elastic-apm-opentracing': './src/opentracing.js'
-  },
+const devConfig = entry => ({
+  entry,
   output: {
     filename: '[name].umd.js',
     path: OUTPUT_DIR,
@@ -62,9 +61,9 @@ const baseConfig = {
       NODE_ENV: 'development'
     })
   ]
-}
+})
 
-const optimizeConfig = Object.assign({}, baseConfig, {
+const prodConfig = name => ({
   output: {
     filename: '[name].umd.min.js',
     path: OUTPUT_DIR
@@ -89,16 +88,33 @@ const optimizeConfig = Object.assign({}, baseConfig, {
     }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'static',
-      reportFilename: path.resolve(
-        __dirname,
-        'reports',
-        'bundle-analyzer.html'
-      ),
+      reportFilename: join(REPORTS_DIR, `${name}-report.html`),
       generateStatsFile: true,
-      statsFilename: path.resolve(__dirname, 'reports', 'bundle-analyzer.json'),
+      statsFilename: join(REPORTS_DIR, `${name}-stats.json`),
       openAnalyzer: false
     })
   ]
 })
 
-module.exports = [baseConfig, optimizeConfig]
+const rumDevConfig = devConfig({
+  'elastic-apm-rum': join(SRC_DIR, 'index.js')
+})
+
+const rumProdConfig = Object.assign({}, rumDevConfig, prodConfig('apm-rum'))
+
+const rumOpenTracingDevConfig = devConfig({
+  'elastic-apm-opentracing': join(SRC_DIR, 'opentracing.js')
+})
+
+const rumOpenTracingProdConfig = Object.assign(
+  {},
+  rumOpenTracingDevConfig,
+  prodConfig('apm-opentracing')
+)
+
+module.exports = [
+  rumDevConfig,
+  rumProdConfig,
+  rumOpenTracingDevConfig,
+  rumOpenTracingProdConfig
+]
