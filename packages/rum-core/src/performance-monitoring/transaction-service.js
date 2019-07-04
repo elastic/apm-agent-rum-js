@@ -28,10 +28,11 @@ import { extend, getPageLoadMarks } from '../common/utils'
 import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
+import { __DEV__ } from '../env'
 
 class TransactionService {
   constructor(logger, config) {
-    if (typeof config === 'undefined') {
+    if (__DEV__ && typeof config === 'undefined') {
       logger.debug('TransactionService: config is not provided')
     }
     this._config = config
@@ -77,7 +78,9 @@ class TransactionService {
     transaction.browserResponsivenessCounter = 0
     var interval = this._config.get('browserResponsivenessInterval')
     if (typeof interval === 'undefined') {
-      this._logger.debug('browserResponsivenessInterval is undefined!')
+      if (__DEV__) {
+        this._logger.debug('browserResponsivenessInterval is undefined!')
+      }
       return
     }
 
@@ -132,17 +135,20 @@ class TransactionService {
        * allow a redefinition until there's a call that doesn't have that
        * or the threshold is exceeded.
        */
-
-      this._logger.debug(
-        'Redefining the current transaction',
-        tr,
-        name,
-        type,
-        perfOptions
-      )
+      if (__DEV__) {
+        this._logger.debug(
+          'Redefining the current transaction',
+          tr,
+          name,
+          type,
+          perfOptions
+        )
+      }
       tr.redefine(name, type, perfOptions)
     } else {
-      this._logger.debug('Ending old transaction', tr)
+      if (__DEV__) {
+        this._logger.debug('Ending old transaction', tr)
+      }
       tr.end()
       tr = this.createTransaction(name, type, perfOptions)
     }
@@ -164,13 +170,16 @@ class TransactionService {
         tr.name = perfOptions.pageLoadTransactionName
       }
     }
-
-    this._logger.debug('TransactionService.startTransaction', tr)
+    if (__DEV__) {
+      this._logger.debug('TransactionService.startTransaction', tr)
+    }
 
     tr.onEnd = () => {
       return Promise.resolve().then(
         () => {
-          this._logger.debug('TransactionService transaction finished', tr)
+          if (__DEV__) {
+            this._logger.debug('TransactionService transaction finished', tr)
+          }
           if (this.shouldIgnoreTransaction(tr.name)) {
             return
           }
@@ -193,7 +202,11 @@ class TransactionService {
             this.add(tr)
           }
         },
-        err => this._logger.debug(err)
+        err => {
+          if (__DEV__) {
+            this._logger.debug('TransactionService transaction onEnd', err)
+          }
+        }
       )
     }
     return tr
@@ -219,7 +232,9 @@ class TransactionService {
     var trans = this.ensureCurrentTransaction()
 
     if (trans) {
-      this._logger.debug('TransactionService.startSpan', name, type)
+      if (__DEV__) {
+        this._logger.debug('TransactionService.startSpan', name, type)
+      }
       var span = trans.startSpan(name, type, options)
       return span
     }
@@ -227,7 +242,9 @@ class TransactionService {
 
   add(transaction) {
     this._subscription.applyAll(this, [transaction])
-    this._logger.debug('TransactionService.add', transaction)
+    if (__DEV__) {
+      this._logger.debug('TransactionService.add', transaction)
+    }
   }
 
   subscribe(fn) {
@@ -238,7 +255,9 @@ class TransactionService {
     var tr = this.ensureCurrentTransaction()
     if (tr) {
       var taskId = tr.addTask(taskId)
-      this._logger.debug('TransactionService.addTask', taskId)
+      if (__DEV__) {
+        this._logger.debug('TransactionService.addTask', taskId)
+      }
     }
     return taskId
   }
@@ -247,7 +266,9 @@ class TransactionService {
     var tr = this.getCurrentTransaction()
     if (tr) {
       tr.removeTask(taskId)
-      this._logger.debug('TransactionService.removeTask', taskId)
+      if (__DEV__) {
+        this._logger.debug('TransactionService.removeTask', taskId)
+      }
     }
   }
 
@@ -255,7 +276,9 @@ class TransactionService {
     var tr = this.getCurrentTransaction()
     if (tr) {
       tr.detectFinish()
-      this._logger.debug('TransactionService.detectFinish')
+      if (__DEV__) {
+        this._logger.debug('TransactionService.detectFinish')
+      }
     }
   }
 }
