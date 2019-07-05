@@ -25,26 +25,24 @@
 
 import { join } from 'path'
 import resolve from 'rollup-plugin-node-resolve'
-// import { uglify } from 'rollup-plugin-uglify'
-import { terser } from 'rollup-plugin-terser'
+import { uglify } from 'rollup-plugin-uglify'
 import babel from 'rollup-plugin-babel'
 import commonjs from 'rollup-plugin-commonjs'
 import replace from 'rollup-plugin-replace'
 
 const OUTPUT_DIR = join(__dirname, 'dist', 'rollup')
 const SRC_DIR = join(__dirname, 'src')
+const BABEL_CONFIG = join(__dirname, 'babel.config.js')
 
-export default {
-  input: {
-    'elastic-apm-rum': join(SRC_DIR, 'index.js')
-  },
+const prodConfig = input => ({
+  input,
   output: {
     dir: OUTPUT_DIR,
-    name: '[name].umd.min.js',
+    entryFileNames: '[name].[format].min.js',
+    name: 'elasticApm',
     format: 'umd',
     exports: 'named',
-    sourcemap: true,
-    esModule: false
+    sourcemap: true
   },
   plugins: [
     resolve({
@@ -60,10 +58,16 @@ export default {
     replace({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
-    babel(),
-    terser({
-      sourcemap: true,
-      ecma: '5'
+    babel({
+      configFile: BABEL_CONFIG
+    }),
+    uglify({
+      sourcemap: true
     })
   ]
-}
+})
+
+export default [
+  prodConfig({ 'elastic-apm-rum': join(SRC_DIR, 'index.js') }),
+  prodConfig({ 'elastic-apm-opentracing': join(SRC_DIR, 'opentracing.js') })
+]
