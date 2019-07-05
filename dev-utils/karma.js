@@ -116,7 +116,7 @@ function prepareConfig(defaultConfig) {
       ')'
     defaultConfig.plugins.push('karma-firefox-launcher')
     defaultConfig.browsers.push('Firefox')
-  } else if (isJenkins) {
+  } else if (isJenkins && isSauce) {
     console.log('prepareConfig: Run in Jenkins')
     buildId =
       buildId +
@@ -129,6 +129,19 @@ function prepareConfig(defaultConfig) {
     console.log('prepareConfig: buildId ' + buildId)
     defaultConfig.plugins.push('karma-firefox-launcher')
     defaultConfig.browsers.push('Firefox')
+  } else if (isJenkins && !isSauce) {
+    defaultConfig.plugins.push('karma-chrome-launcher')
+    defaultConfig.browsers = ['ChromeHeadlessNoSandbox']
+    defaultConfig.customLaunchers = {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox', // required to run without privileges in docker
+          '--user-data-dir=/tmp/chrome-test-profile',
+          '--disable-web-security'
+        ]
+      }
+    }
   } else {
     console.log('prepareConfig: Run in Default enviroment')
     defaultConfig.plugins.push('karma-chrome-launcher')

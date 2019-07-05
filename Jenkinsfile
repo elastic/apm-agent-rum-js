@@ -38,6 +38,10 @@ pipeline {
   triggers {
     issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
   }
+  parameters {
+    booleanParam(name: 'saucelab_test', defaultValue: "false", description: "Enable run a Sauce lab test")
+    booleanParam(name: 'parallel_test', defaultValue: "true", description: "Enable run tests in parallel")
+  }
   stages {
     stage('Initializing'){
       agent { label 'linux && immutable' }
@@ -68,10 +72,7 @@ pipeline {
                 docker.image('node:8').inside(){
                   dir("${BASE_DIR}"){
                     sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
-                    def bundlesize = sh(label: "Bundlesize", script: 'npm run bundlesize', returnStatus: true)
-                    withGithubNotify(context: "Bundle Size ${bundlesize > 0 ? 'FAIL' : 'PASS'}"){
-                      echo "Bundle Size"
-                    }
+                    bundlesize()
                   }
                   stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
                 }
@@ -163,12 +164,7 @@ class RumParallelTaskGenerator extends DefaultParallelTaskGenerator {
           saveResult(x, y, 0)
           error("${label} tests failed : ${e.toString()}\n")
         } finally {
-          steps.junit(allowEmptyResults: true,
-            keepLongStdio: true,
-            testResults: "**/spec/rum-agent-junit.xml")
-          steps.archiveArtifacts(allowEmptyArchive: true, artifacts: "**/.npm/_logs")
-          steps.codecov(repo: 'apm-agent-rum', basedir: "${steps.env.BASE_DIR}",
-            secret: "${steps.env.CODECOV_SECRET}")
+          wrappingUp()
         }
       }
     }
@@ -179,36 +175,22 @@ def runParallelTest(){
   rumTasksGen = new RumParallelTaskGenerator(
     xFile: '.ci/.jenkins_stack_versions.yaml',
     xKey: 'STACK_VERSION',
-    yVersions: ['@elastic/apm-rum-core'],
-    excludedVersions: ['empty'],
-    tag: "Rum-core",
-    name: "Rum-core",
-    steps: this
-  )
-  def mapPatallelTasks = rumTasksGen.generateParallelTests()
-  //parallel(mapPatallelTasks)
-
-  mapPatallelTasks.each{ k, v ->
-    stage(k){
-      v()
-    }
-  }
-
-  rumTasksGen = new RumParallelTaskGenerator(
-    xFile: '.ci/.jenkins_stack_versions.yaml',
-    xKey: 'STACK_VERSION',
-    yVersions: ['@elastic/apm-rum'],
+    yFile: '.ci/.jenkins_scope.yaml',
+    yKey: 'SCOPE',
     excludedVersions: ['empty'],
     tag: "Rum",
     name: "Rum",
     steps: this
   )
-  mapPatallelTasks = rumTasksGen.generateParallelTests()
-  //parallel(mapPatallelTasks)
+  def mapPatallelTasks = rumTasksGen.generateParallelTests()
 
-  mapPatallelTasks.each{ k, v ->
-    stage(k){
-      v()
+  if(params.parallel_test){
+    parallel(mapPatallelTasks)
+  } else {
+    mapPatallelTasks.each{ k, v ->
+      stage(k){
+        v()
+      }
     }
   }
 }
@@ -222,14 +204,19 @@ def runScript(Map params = [:]){
   env.SCOPE = "${scope}"
   env.APM_SERVER_URL = 'http://apm-server:8200'
   env.APM_SERVER_PORT = '8200'
-  env.MODE = 'saucelabs'
 
   deleteDir()
   unstash 'source'
   unstash 'cache'
   dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "docker.elastic.co")
   dir("${BASE_DIR}"){
-    withSaucelabsEnv(){
+    if(params.saucelab_test){
+      env.MODE = 'saucelabs'
+      withSaucelabsEnv(){
+        sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
+      }
+    } else {
+      env.MODE = 'none'
       sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
     }
   }
@@ -247,4 +234,33 @@ def withSaucelabsEnv(Closure body){
         body()
     }
   }
+}
+
+def bundlesize(){
+  catchError(buildResult: 'SUCCESS', message: 'Bundlesize report issues', stageResult: 'UNSTABLE') {
+    sh(label: "Bundlesize", script: '''#!/bin/bash
+      set -o pipefail
+      npm run bundlesize|tee bundlesize.txt
+    ''')
+  }
+  catchError(buildResult: 'SUCCESS', message: 'Bundlesize report issues', stageResult: 'UNSTABLE') {
+    sh(label: "Process Bundlesize out", script: '''#!/bin/bash
+      grep -e "\\(FAIL\\|PASS\\)" bundlesize.txt|cut -d ":" -f 2 >bundlesize-lines.txt
+    ''')
+    def file = readFile(file: "bundlesize-lines.txt")
+    file?.split("\n").each { line ->
+      withGithubNotify(context: "Bundle Size :${line}"){
+        echo "Bundle Size :${line}"
+      }
+    }
+  }
+}
+
+def wrappingUp(){
+  junit(allowEmptyResults: true,
+    keepLongStdio: true,
+    testResults: "**/spec/rum-agent-junit.xml")
+  archiveArtifacts(allowEmptyArchive: true, artifacts: "**/.npm/_logs")
+  codecov(repo: 'apm-agent-rum', basedir: "${steps.env.BASE_DIR}",
+    secret: "${steps.env.CODECOV_SECRET}")
 }
