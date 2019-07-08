@@ -29,6 +29,7 @@ const webpack = require('webpack')
 const { default: Launcher } = require('@wdio/cli')
 const sauceConnectLauncher = require('sauce-connect-launcher')
 const { singleRunKarma } = require('./karma')
+const { getSauceConnectOptions } = require('./test-config')
 
 function walkSync(dir, filter, filelist) {
   var files = fs.readdirSync(dir)
@@ -160,7 +161,8 @@ function startSelenium(callback, manualStop) {
   )
 }
 
-function runSauceConnect(config, callback) {
+function runSauceConnect(callback) {
+  const config = getSauceConnectOptions()
   return sauceConnectLauncher(config, (err, sauceConnectProcess) => {
     if (err) {
       console.error('Sauce connect Error', err)
