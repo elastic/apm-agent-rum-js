@@ -24,13 +24,13 @@
  */
 
 const {
-  verifyNoBrowserErrors,
+  allowSomeBrowserErrors,
   waitForApmServerCalls
 } = require('../../../../../dev-utils/webdriver')
 
-describe('manual-timing', function() {
-  it('should run manual timing', async function() {
-    browser.url('/test/e2e/manual-timing/index.html')
+describe('ReactApp', function() {
+  it('should run the react app', function() {
+    browser.url('/test/e2e/react/')
     browser.waitUntil(
       () => {
         return $('#test-element').getText() === 'Passed'
@@ -39,19 +39,27 @@ describe('manual-timing', function() {
       'expected element #test-element'
     )
 
-    const serverCalls = waitForApmServerCalls(1, 1)
-
-    expect(serverCalls.sendErrors.length).toBe(1)
-    var errorPayload = serverCalls.sendErrors[0].args[0][0]
-    expect(
-      errorPayload.exception.message.indexOf('timeout test error') >= 0
-    ).toBeTruthy()
+    const serverCalls = waitForApmServerCalls(0, 1)
 
     expect(serverCalls.sendTransactions.length).toBe(1)
-    var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
-    expect(transactionPayload.name).toBe('transaction-name')
-    expect(transactionPayload.type).toBe('transaction-type')
 
-    return verifyNoBrowserErrors()
+    var transaction = serverCalls.sendTransactions[0].args[0][0]
+    expect(transaction.type).toBe('page-load')
+    expect(transaction.name).toBe('/home')
+    expect(transaction.spans.length).toBeGreaterThan(1)
+
+    const spanNames = [
+      'Requesting and receiving the document',
+      'Parsing the document, executing sync. scripts',
+      'GET /test/e2e/react/data.json',
+      'Render'
+    ]
+    var foundSpans = transaction.spans.filter(span => {
+      return spanNames.indexOf(span.name) > -1
+    })
+
+    expect(foundSpans.length).toBeGreaterThanOrEqual(4)
+
+    return allowSomeBrowserErrors()
   })
 })

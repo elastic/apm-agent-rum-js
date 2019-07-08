@@ -73,9 +73,16 @@ class Transaction extends SpanBase {
   }
 
   redefine(name, type, options) {
-    this.name = name
-    this.type = type
-    this.options = extend(this.options, options)
+    if (name) {
+      this.name = name
+    }
+    if (type) {
+      this.type = type
+    }
+
+    if (options) {
+      this.options = extend(this.options, options)
+    }
   }
 
   startSpan(name, type, options) {

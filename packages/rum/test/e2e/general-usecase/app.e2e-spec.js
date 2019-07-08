@@ -22,7 +22,10 @@
  * THE SOFTWARE.
  *
  */
-const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
+const {
+  allowSomeBrowserErrors,
+  waitForApmServerCalls
+} = require('../../../../../dev-utils/webdriver')
 
 describe('general-usercase', function() {
   it('should run the general usecase', function() {
@@ -35,61 +38,8 @@ describe('general-usercase', function() {
       'expected element #test-element'
     )
 
-    const serverCalls = browser.executeAsync(function(done) {
-      var apmServerMock = window.elasticApm.serviceFactory.getService(
-        'ApmServer'
-      )
+    const serverCalls = waitForApmServerCalls(1, 1)
 
-      function checkCalls() {
-        var serverCalls = apmServerMock.calls
-        var validCalls =
-          serverCalls.sendErrors &&
-          serverCalls.sendErrors.length &&
-          serverCalls.sendTransactions &&
-          serverCalls.sendTransactions.length
-
-        if (validCalls) {
-          console.log('calls', serverCalls)
-          Promise.all([
-            serverCalls.sendErrors[0].returnValue,
-            serverCalls.sendTransactions[0].returnValue
-          ])
-            .then(function() {
-              function mapCall(c) {
-                return { args: c.args, mocked: c.mocked }
-              }
-              try {
-                var calls = {
-                  sendErrors: serverCalls.sendErrors.map(mapCall),
-                  sendTransactions: serverCalls.sendTransactions.map(mapCall)
-                }
-                done(calls)
-              } catch (e) {
-                throw e
-              }
-            })
-            .catch(function(reason) {
-              console.log('reason', reason)
-              try {
-                done({ error: reason.message || JSON.stringify(reason) })
-              } catch (e) {
-                done({
-                  error: 'Failed serializing rejection reason: ' + e.message
-                })
-              }
-            })
-        }
-      }
-
-      checkCalls()
-      apmServerMock.subscription.subscribe(checkCalls)
-    })
-
-    expect(serverCalls).toBeTruthy()
-    console.log(JSON.stringify(serverCalls, null, 2))
-    if (serverCalls.error) {
-      fail(serverCalls.error)
-    }
     expect(serverCalls.sendErrors.length).toBe(1)
     var errorPayload = serverCalls.sendErrors[0].args[0][0]
     expect(
@@ -128,5 +78,30 @@ describe('general-usercase', function() {
     expect(noOfSpansFound).toBeGreaterThanOrEqual(3)
 
     return allowSomeBrowserErrors(['timeout test error with a secret'])
+  })
+
+  it('should capture history.pushState', function() {
+    /**
+     * The query string is only used to make url different to the previous test,
+     * Otherwise, both tests will run in the same window.
+     */
+
+    browser.url('/test/e2e/general-usecase/index.html?run=pushState#test-state')
+    browser.waitUntil(
+      () => {
+        return $('#test-element').getText() === 'Passed'
+      },
+      5000,
+      'expected element #test-element'
+    )
+
+    const serverCalls = waitForApmServerCalls(0, 1)
+    expect(serverCalls.sendTransactions.length).toBe(1)
+    const transactionPayload = serverCalls.sendTransactions[0].args[0][0]
+    expect(transactionPayload.name).toBe('Push state title')
+    /**
+     * The actual spans are tested as part of the previous test.
+     */
+    expect(transactionPayload.spans.length).toBeGreaterThanOrEqual(3)
   })
 })

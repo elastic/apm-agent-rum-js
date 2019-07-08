@@ -129,7 +129,7 @@ class TransactionService {
 
     if (!tr) {
       tr = this.createTransaction(name, type, perfOptions)
-    } else if (tr.canReuse()) {
+    } else if (tr.canReuse() && perfOptions.canReuse) {
       /*
        * perfOptions could also have `canReuse:true` in which case we
        * allow a redefinition until there's a call that doesn't have that
@@ -144,7 +144,12 @@ class TransactionService {
           perfOptions
         )
       }
-      tr.redefine(name, type, perfOptions)
+      /**
+       * We want to keep the type in it's original value, therefore,
+       * passing undefined as type. For example, in the case of a page-load
+       * we want to keep the type but redefine the name to the first route.
+       */
+      tr.redefine(name, undefined, perfOptions)
     } else {
       if (__DEV__) {
         this._logger.debug('Ending old transaction', tr)
@@ -183,7 +188,7 @@ class TransactionService {
           if (this.shouldIgnoreTransaction(tr.name)) {
             return
           }
-          if (type === PAGE_LOAD) {
+          if (tr.type === PAGE_LOAD) {
             /**
              * Setting the pageLoadTransactionName via configService.setConfig after
              * transaction has started should also reflect the correct name.

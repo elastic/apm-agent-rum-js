@@ -23,15 +23,24 @@
  *
  */
 
-import createApmBase from '../'
+function getBabelConfig() {
+  return {
+    comments: false,
+    presets: [
+      [
+        '@babel/preset-env',
+        {
+          targets: {
+            node: '8.0.0'
+          },
+          loose: true
+        }
+      ]
+    ],
+    plugins: []
+  }
+}
 
-var apm = createApmBase({
-  debug: true,
-  serviceName: 'apm-agent-rum-test-e2e-react',
-  serviceVersion: '0.0.1',
-  sendPageLoadTransaction: false
-})
-
-apm.setInitialPageLoadName('react-initial-page-load')
-
-export { apm }
+module.exports = {
+  getBabelConfig
+}

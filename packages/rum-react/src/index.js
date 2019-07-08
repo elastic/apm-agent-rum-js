@@ -23,35 +23,11 @@
  *
  */
 
-const {
-  verifyNoBrowserErrors,
-  waitForApmServerCalls
-} = require('../../../../../dev-utils/webdriver')
+import { apm } from '@elastic/apm-rum'
+import { getWithTransaction } from './get-with-transaction'
+import { getApmRoute } from './get-apm-route'
 
-describe('manual-timing', function() {
-  it('should run manual timing', async function() {
-    browser.url('/test/e2e/manual-timing/index.html')
-    browser.waitUntil(
-      () => {
-        return $('#test-element').getText() === 'Passed'
-      },
-      5000,
-      'expected element #test-element'
-    )
+const withTransaction = getWithTransaction(apm)
+const ApmRoute = getApmRoute(apm)
 
-    const serverCalls = waitForApmServerCalls(1, 1)
-
-    expect(serverCalls.sendErrors.length).toBe(1)
-    var errorPayload = serverCalls.sendErrors[0].args[0][0]
-    expect(
-      errorPayload.exception.message.indexOf('timeout test error') >= 0
-    ).toBeTruthy()
-
-    expect(serverCalls.sendTransactions.length).toBe(1)
-    var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
-    expect(transactionPayload.name).toBe('transaction-name')
-    expect(transactionPayload.type).toBe('transaction-type')
-
-    return verifyNoBrowserErrors()
-  })
-})
+export { withTransaction, ApmRoute }

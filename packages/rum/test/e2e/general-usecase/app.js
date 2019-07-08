@@ -111,4 +111,27 @@ generateError.tmp = 'tmp'
 
 testFetch(mockBackendUrl)
 
+if (location.hash === '#test-state') {
+  const path = location.pathname
+  history.pushState(
+    { data: 'buffer-state' },
+    'buffer state',
+    path + '#buffer-state'
+  )
+  history.pushState(
+    { data: 'test-state' },
+    'Push state title',
+    path + '#test-state'
+  )
+
+  /**
+   * There is a bug in Android 5.1 that prevents load event,
+   * if history.go(-1) is called before the load event.
+   */
+
+  window.addEventListener('load', function() {
+    history.go(-1)
+  })
+}
+
 renderTestElement()

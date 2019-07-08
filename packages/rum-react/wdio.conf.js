@@ -23,35 +23,6 @@
  *
  */
 
-const {
-  verifyNoBrowserErrors,
-  waitForApmServerCalls
-} = require('../../../../../dev-utils/webdriver')
+const { getWebdriveBaseConfig } = require('../../dev-utils/webdriver')
 
-describe('manual-timing', function() {
-  it('should run manual timing', async function() {
-    browser.url('/test/e2e/manual-timing/index.html')
-    browser.waitUntil(
-      () => {
-        return $('#test-element').getText() === 'Passed'
-      },
-      5000,
-      'expected element #test-element'
-    )
-
-    const serverCalls = waitForApmServerCalls(1, 1)
-
-    expect(serverCalls.sendErrors.length).toBe(1)
-    var errorPayload = serverCalls.sendErrors[0].args[0][0]
-    expect(
-      errorPayload.exception.message.indexOf('timeout test error') >= 0
-    ).toBeTruthy()
-
-    expect(serverCalls.sendTransactions.length).toBe(1)
-    var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
-    expect(transactionPayload.name).toBe('transaction-name')
-    expect(transactionPayload.type).toBe('transaction-type')
-
-    return verifyNoBrowserErrors()
-  })
-})
+exports.config = getWebdriveBaseConfig(__dirname)

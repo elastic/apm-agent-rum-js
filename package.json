@@ -39,6 +39,7 @@
   "devDependencies": {
     "@babel/cli": "^7.4.3",
     "@babel/core": "^7.2.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/plugin-transform-destructuring": "^7.3.2",
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.0",
@@ -58,10 +59,13 @@
     "babel-plugin-istanbul": "^5.1.4",
     "benchmark": "^2.1.4",
     "bundlesize": "^0.17.2",
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16": "^1.12.1",
     "es6-promise": "^4.2.4",
     "eslint": "^5.12.0",
     "eslint-config-prettier": "^4.0.0",
     "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-react": "^7.13.0",
     "eslint-plugin-rulesdir": "^0.1.0",
     "eslint-plugin-standard": "^4.0.0",
     "express": "^4.16.2",
@@ -105,6 +109,7 @@
   },
   "dependencies": {
     "@elastic/apm-rum": "file:packages/rum",
-    "@elastic/apm-rum-core": "file:packages/rum-core"
+    "@elastic/apm-rum-core": "file:packages/rum-core",
+    "@elastic/apm-rum-react": "file:packages/rum-react"
   }
 }

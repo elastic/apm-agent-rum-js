@@ -74,7 +74,9 @@ class ApmBase {
      * Name of the transaction is set in transaction service to
      * avoid duplicate the logic at multiple places
      */
-    const tr = transactionService.startTransaction(undefined, 'page-load')
+    const tr = transactionService.startTransaction(undefined, 'page-load', {
+      canReuse: true
+    })
 
     if (tr) {
       tr.addTask(pageLoadTaskId)
@@ -171,12 +173,12 @@ class ApmBase {
     }
   }
 
-  startTransaction(name, type) {
+  startTransaction(name, type, options) {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
         'TransactionService'
       )
-      return transactionService.startTransaction(name, type)
+      return transactionService.startTransaction(name, type, options)
     }
   }
 
