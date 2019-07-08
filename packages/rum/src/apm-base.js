@@ -173,12 +173,12 @@ class ApmBase {
     }
   }
 
-  startTransaction(name, type) {
+  startTransaction(name, type, options) {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
         'TransactionService'
       )
-      return transactionService.startTransaction(name, type)
+      return transactionService.startTransaction(name, type, options)
     }
   }
 

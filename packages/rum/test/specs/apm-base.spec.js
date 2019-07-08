@@ -105,7 +105,9 @@ describe('ApmBase', function() {
 
     expect(configService.get('pageLoadTransactionName')).toBe('test')
 
-    var tr = apmBase.startTransaction('test-transaction', 'test-type')
+    var tr = apmBase.startTransaction('test-transaction', 'test-type', {
+      canReuse: true
+    })
     expect(tr).toBeDefined()
     expect(tr.name).toBe('test-transaction')
     expect(tr.type).toBe('page-load')

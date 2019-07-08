@@ -42,7 +42,9 @@ function getWithTransaction(apm) {
            * We need to start the transaction in constructor because otherwise,
            * we won't be able to capture what happens in componentDidMount of child components.
            */
-          this.transaction = apm.startTransaction(name, type)
+          this.transaction = apm.startTransaction(name, type, {
+            canReuse: true
+          })
         }
 
         componentDidMount() {

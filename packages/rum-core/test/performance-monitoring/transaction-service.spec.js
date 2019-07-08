@@ -94,14 +94,16 @@ describe('TransactionService', function() {
     expect(result.onEnd).toHaveBeenCalled()
   })
 
-  it('should create a zone transaction on the first span', function() {
+  it('should create a reusable transaction on the first span', function() {
     config.set('active', true)
     transactionService = new TransactionService(logger, config)
 
     transactionService.startSpan('testSpan', 'testtype')
     var trans = transactionService.getCurrentTransaction()
     expect(trans.name).toBe('Unknown')
-    transactionService.startTransaction('transaction', 'transaction')
+    transactionService.startTransaction('transaction', 'transaction', {
+      canReuse: true
+    })
     expect(trans.name).toBe('transaction')
   })
 
@@ -138,13 +140,16 @@ describe('TransactionService', function() {
 
   it('should reuse Transaction', function() {
     transactionService = new TransactionService(logger, config)
-    const zoneTr = new Transaction('test-name', 'test-type', {
+    const reusableTr = new Transaction('test-name', 'test-type', {
       canReuse: true
     })
-    transactionService.setCurrentTransaction(zoneTr)
-    const pageLoadTr = sendPageLoadMetrics('new tr')
+    transactionService.setCurrentTransaction(reusableTr)
+    const pageLoadTr = transactionService.startTransaction(name, 'page-load', {
+      canReuse: true
+    })
+    pageLoadTr.detectFinish()
 
-    expect(pageLoadTr).toBe(zoneTr)
+    expect(pageLoadTr).toBe(reusableTr)
   })
 
   it('should contain agent marks in page load transaction', function() {

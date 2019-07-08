@@ -28,7 +28,7 @@ const {
   waitForApmServerCalls
 } = require('../../../../../dev-utils/webdriver')
 
-describe('react app', function() {
+describe('ReactApp', function() {
   it('should run the react app', function() {
     browser.url('/test/e2e/react/')
     browser.waitUntil(

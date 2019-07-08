@@ -75,7 +75,8 @@ describe('withTransaction', function() {
     TestComponent(apm)
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test-transaction',
-      'test-type'
+      'test-type',
+      { canReuse: true }
     )
   })
 })
