@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.1.2...@elastic/apm-rum@4.2.0) (2019-07-08)
+
+
+### Features
+
+* **rum:** better log message on invalid configuration ([#216](https://github.com/elastic/apm-agent-rum-js/issues/216)) ([b65a806](https://github.com/elastic/apm-agent-rum-js/commit/b65a806))
+
+
+### Performance Improvements
+
+* **rum:** remove debug logs on production build ([#245](https://github.com/elastic/apm-agent-rum-js/issues/245)) ([2565844](https://github.com/elastic/apm-agent-rum-js/commit/2565844))
+
+
+
+
+
 ## [4.1.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.1.1...@elastic/apm-rum@4.1.2) (2019-06-20)
 
 **Note:** Version bump only for package @elastic/apm-rum
