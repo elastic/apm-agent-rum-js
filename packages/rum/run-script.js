@@ -23,91 +23,9 @@
  *
  */
 
-const path = require('path')
 const JasmineRunner = require('jasmine')
-const express = require('express')
-const serveIndex = require('serve-index')
 const testUtils = require('../../dev-utils/test-utils')
-const { runIntegrationTest } = require('./test/e2e/integration-test')
-const { generateNotice } = require('../../dev-utils/dep-info')
-
-function createBackendAgentServer() {
-  const express = require('express')
-  const app = express()
-
-  app.use(function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*')
-    if (req.method === 'OPTIONS') {
-      res.header(
-        'Access-Control-Allow-Headers',
-        'Origin, elastic-apm-traceparent, Content-Type, Accept'
-      )
-    }
-    next()
-  })
-
-  function dTRespond(req, res) {
-    const header = req.headers['elastic-apm-traceparent']
-    let payload = { noHeader: true }
-    if (header) {
-      const splited = header.split('-')
-      payload = {
-        version: splited[0],
-        traceId: splited[1],
-        parentId: splited[2],
-        flags: splited[3]
-      }
-      console.log('elastic-apm-traceparent:', header)
-    }
-
-    res.setHeader('Content-Type', 'application/json')
-    res.send(JSON.stringify(payload))
-  }
-  app.post('/data', dTRespond)
-  app.post('/fetch', dTRespond)
-
-  const port = 8003
-  const server = app.listen(port)
-
-  console.log('[Backend Server] - serving on: ', port)
-  return server
-}
-
-function serveE2e(servingPath, port) {
-  const app = express()
-  const staticPath = path.join(__dirname, servingPath)
-
-  app.get('/healthcheck', function(req, res) {
-    res.send('OK')
-  })
-
-  app.get('/run_integration_test', async function(req, res) {
-    const echo = req.query.echo
-    try {
-      const result = await runIntegrationTest(
-        'http://localhost:8000/test/e2e/general-usecase/'
-      )
-      if (echo) {
-        return res.send(echo)
-      }
-      res.send(result)
-    } catch (err) {
-      /**
-       * This implies a failure in running the Integration test and we
-       * return 500 instead of success status code 200
-       */
-      res.status(500).send(err.message)
-    }
-  })
-
-  app.use(express.static(staticPath), serveIndex(staticPath, { icons: false }))
-  const staticServer = app.listen(port)
-
-  console.log('[Static Server] - serving on: ', staticPath, port)
-  const backendAgentServer = createBackendAgentServer()
-
-  return [staticServer, backendAgentServer]
-}
+const { startTestServers } = require('../../dev-utils/test-servers')
 
 function runJasmine(specDir, transform, cb) {
   const jrunner = new JasmineRunner()
@@ -133,7 +51,7 @@ function runJasmine(specDir, transform, cb) {
 }
 
 function runIntegrationTests() {
-  const servers = serveE2e('./', 8000)
+  const servers = startTestServers('./')
   const SPEC_DIR = 'test/integration'
   runJasmine(SPEC_DIR, true, err => {
     servers.forEach(server => server.close())
@@ -161,9 +79,7 @@ function runNodeTests() {
 const scripts = {
   startSelenium: testUtils.startSelenium,
   runIntegrationTests,
-  runNodeTests,
-  serveE2e,
-  generateNotice
+  runNodeTests
 }
 
 module.exports = scripts
