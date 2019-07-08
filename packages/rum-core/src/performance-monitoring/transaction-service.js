@@ -144,6 +144,11 @@ class TransactionService {
           perfOptions
         )
       }
+      /**
+       * We want to keep the type in it's original value, therefore,
+       * passing undefined as type. For example, in the case of a page-load
+       * we want to keep the type but redefine the name to the first route.
+       */
       tr.redefine(name, undefined, perfOptions)
     } else {
       if (__DEV__) {

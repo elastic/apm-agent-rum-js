@@ -1,7 +1,7 @@
 {
   "name": "@elastic/apm-rum-react",
   "version": "0.0.0",
-  "description": "Elastic APM RUM React integration",
+  "description": "Elastic APM Real User Monitoring for React applications",
   "author": "Hamid <h.jahtalab@gmail.com>",
   "homepage": "https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html",
   "license": "MIT",

@@ -28,7 +28,6 @@ import React from 'react'
 class MainComponent extends React.Component {
   constructor(props, state) {
     super(props, state)
-    console.log(props)
     var path = this.props.match.path
     this.state = {
       userName: '',
@@ -37,7 +36,6 @@ class MainComponent extends React.Component {
     // this.transaction = apm.startTransaction('Main - ' + path, 'route-change')
     // this.transaction = apm.getCurrentTransaction()
     this.transaction = this.props.transaction
-
   }
 
   componentDidMount() {
