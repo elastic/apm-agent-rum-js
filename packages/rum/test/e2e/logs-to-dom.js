@@ -23,27 +23,31 @@
  *
  */
 
-const path = require('path')
-const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
-
-module.exports = {
-  entry: path.resolve(__dirname, './app.jsx'),
-  output: { path: __dirname, filename: 'app.e2e-bundle.js' },
-  devtool: 'source-map',
-  mode: 'production',
-  performance: {
-    hints: false
-  },
-  module: {
-    rules: [
-      {
-        test: /.jsx?$/,
-        use: {
-          loader: 'babel-loader'
-        }
+;(function() {
+  function _patchDebugMethods() {
+    function patch(target, name) {
+      var orig = target[name]
+      target[name] = function() {
+        var debugElement = document.createElement('li')
+        var logs = [].slice.call(arguments)
+        debugElement.innerHTML = name + ': ' + JSON.stringify(logs) //.slice(0, 1000)
+        document.body.appendChild(debugElement)
+        orig && orig.apply(this, arguments)
       }
-    ]
-  },
-  plugins: [new EnvironmentPlugin(getWebpackEnv())]
-}
+    }
+    patch(console, 'log')
+    patch(console, 'info')
+    patch(console, 'error')
+    patch(console, 'debug')
+    patch(console, 'warn')
+    patch(window, 'onerror')
+
+    // Use this to scroll the logs into the view
+    // setInterval(function () {
+    //   window.scrollTo(0, document.body.scrollHeight);
+    // }, 1000)
+  }
+
+  _patchDebugMethods()
+  console.log('Patched debug methods!')
+})()

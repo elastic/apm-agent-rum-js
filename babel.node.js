@@ -23,20 +23,9 @@
  *
  */
 
+const { getBabelConfig } = require('./dev-utils/babel')
+
 module.exports = function(api) {
   api.cache(true)
-  return {
-    comments: false,
-    presets: [
-      [
-        '@babel/preset-env',
-        {
-          targets: {
-            node: '8.0.0'
-          },
-          loose: true
-        }
-      ]
-    ]
-  }
+  return getBabelConfig()
 }

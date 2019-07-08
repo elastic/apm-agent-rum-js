@@ -23,35 +23,47 @@
  *
  */
 
-const {
-  verifyNoBrowserErrors,
-  waitForApmServerCalls
-} = require('../../../../../dev-utils/webdriver')
+const path = require('path')
+const { EnvironmentPlugin } = require('webpack')
+const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 
-describe('manual-timing', function() {
-  it('should run manual timing', async function() {
-    browser.url('/test/e2e/manual-timing/index.html')
-    browser.waitUntil(
-      () => {
-        return $('#test-element').getText() === 'Passed'
-      },
-      5000,
-      'expected element #test-element'
-    )
-
-    const serverCalls = waitForApmServerCalls(1, 1)
-
-    expect(serverCalls.sendErrors.length).toBe(1)
-    var errorPayload = serverCalls.sendErrors[0].args[0][0]
-    expect(
-      errorPayload.exception.message.indexOf('timeout test error') >= 0
-    ).toBeTruthy()
-
-    expect(serverCalls.sendTransactions.length).toBe(1)
-    var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
-    expect(transactionPayload.name).toBe('transaction-name')
-    expect(transactionPayload.type).toBe('transaction-type')
-
-    return verifyNoBrowserErrors()
-  })
-})
+module.exports = {
+  entry: path.resolve(__dirname, './app.jsx'),
+  output: { path: __dirname, filename: 'app.e2e-bundle.js' },
+  devtool: 'source-map',
+  mode: 'development',
+  performance: {
+    hints: false
+  },
+  module: {
+    rules: [
+      {
+        test: /.jsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              [
+                '@babel/preset-env',
+                {
+                  targets: {
+                    ie: '11'
+                  },
+                  useBuiltIns: false,
+                  modules: 'umd'
+                }
+              ],
+              ['@babel/preset-react']
+            ],
+            plugins: ['@babel/plugin-transform-destructuring']
+          }
+        }
+      }
+    ]
+  },
+  plugins: [new EnvironmentPlugin(getWebpackEnv())],
+  resolve: {
+    extensions: ['.js', '.jsx']
+  }
+}

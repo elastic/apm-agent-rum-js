@@ -19,7 +19,7 @@ module.exports = {
     es6: true,
     browser: true
   },
-  extends: ['plugin:prettier/recommended'],
+  extends: ['plugin:prettier/recommended', 'plugin:react/recommended'],
   parser: 'babel-eslint',
   plugins: ['standard', 'rulesdir'],
   rules: {
@@ -31,6 +31,7 @@ module.exports = {
       {
         license: LICENSE_HEADER
       }
-    ]
+    ],
+    'react/prop-types': 0
   }
 }

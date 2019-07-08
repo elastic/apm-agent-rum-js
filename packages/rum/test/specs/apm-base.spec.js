@@ -48,7 +48,7 @@ describe('ApmBase', function() {
     var tr = trService.getCurrentTransaction()
     expect(tr.name).toBe('Unknown')
     expect(tr.type).toBe('page-load')
-    spyOn(tr, 'detectFinish')
+    spyOn(tr, 'detectFinish').and.callThrough()
     window.addEventListener('load', function() {
       setTimeout(() => {
         expect(tr.detectFinish).toHaveBeenCalled()
@@ -105,10 +105,12 @@ describe('ApmBase', function() {
 
     expect(configService.get('pageLoadTransactionName')).toBe('test')
 
-    var tr = apmBase.startTransaction('test-transaction', 'test-type')
+    var tr = apmBase.startTransaction('test-transaction', 'test-type', {
+      canReuse: true
+    })
     expect(tr).toBeDefined()
     expect(tr.name).toBe('test-transaction')
-    expect(tr.type).toBe('test-type')
+    expect(tr.type).toBe('page-load')
 
     spyOn(tr, 'startSpan').and.callThrough()
     apmBase.startSpan('test-span', 'test-type')
