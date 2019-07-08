@@ -45,8 +45,8 @@ const PROJECT_DIR = join(__dirname, '../')
 const sauceConnectOpts = getSauceConnectOptions()
 const { sauceLabs } = getTestEnvironmentVariables()
 
-function runUnitTests(launchSauceConnect = 'false', directory) {
-  const karmaConfigFile = join(__dirname, '..', directory, './karma.conf.js')
+function runUnitTests(packagePath, launchSauceConnect = 'false') {
+  const karmaConfigFile = join(PROJECT_DIR, packagePath, 'karma.conf.js')
   if (launchSauceConnect === 'true' && sauceLabs) {
     return runSauceConnect(sauceConnectOpts, () => runKarma(karmaConfigFile))
   }

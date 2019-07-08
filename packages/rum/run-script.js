@@ -31,8 +31,6 @@ const testUtils = require('../../dev-utils/test-utils')
 const { runIntegrationTest } = require('./test/e2e/integration-test')
 const { generateNotice } = require('../../dev-utils/dep-info')
 
-const PROJECT_DIR = path.join(__dirname, './')
-
 function createBackendAgentServer() {
   const express = require('express')
   const app = express()
@@ -134,11 +132,6 @@ function runJasmine(specDir, transform, cb) {
   jrunner.execute()
 }
 
-function runE2eTests(config) {
-  const webDriverConfig = path.join(PROJECT_DIR, config)
-  testUtils.runE2eTests(webDriverConfig, false)
-}
-
 function runIntegrationTests() {
   const servers = serveE2e('./', 8000)
   const SPEC_DIR = 'test/integration'
@@ -167,7 +160,6 @@ function runNodeTests() {
 
 const scripts = {
   startSelenium: testUtils.startSelenium,
-  runE2eTests,
   runIntegrationTests,
   runNodeTests,
   serveE2e,
