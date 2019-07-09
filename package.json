@@ -19,8 +19,7 @@
     "lint:license": "node scripts/license-checker",
     "test": "lerna run build:main && lerna run test --stream --scope=$SCOPE --no-prefix",
     "bundlesize": "lerna run bundlesize --stream",
-    "serve": "node ./dev-utils/run-script.js startTestServers",
-    "karma": "karma start"
+    "serve": "node ./dev-utils/run-script.js startTestServers"
   },
   "lint-staged": {
     "*.{js,jsx}": [
@@ -47,13 +46,13 @@
     "@babel/register": "^7.4.0",
     "@lerna/child-process": "^3.14.2",
     "@lerna/prompt": "^3.13.0",
-    "@wdio/cli": "^5.7.2",
-    "@wdio/dot-reporter": "^5.7.2",
-    "@wdio/jasmine-framework": "^5.7.2",
-    "@wdio/local-runner": "^5.7.2",
-    "@wdio/sauce-service": "^5.7.2",
-    "@wdio/spec-reporter": "^5.7.2",
-    "@wdio/sync": "^5.7.2",
+    "@wdio/cli": "^5.10.10",
+    "@wdio/dot-reporter": "^5.9.3",
+    "@wdio/jasmine-framework": "^5.10.8",
+    "@wdio/local-runner": "^5.10.10",
+    "@wdio/sauce-service": "^5.10.8",
+    "@wdio/spec-reporter": "^5.9.3",
+    "@wdio/sync": "^5.10.8",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
     "babel-plugin-istanbul": "^5.1.4",

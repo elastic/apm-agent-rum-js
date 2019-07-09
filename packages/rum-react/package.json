@@ -21,14 +21,13 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "script": "node ../../dev-utils/run-script.js",
-    "build": "webpack && npm run build:main",
-    "build:dev": "webpack -w",
+    "build": "npm run build:main",
     "build:main": "npx babel src -d dist/lib --config-file ./babel.config.js",
     "build:e2e": "npm run script buildE2eBundles packages/rum-react/test/e2e",
-    "test:unit": "npm run script runUnitTests false packages/rum-react",
-    "test:e2e:supported": "npm run script runE2eTests packages/rum-react/wdio.conf.js",
-    "test:sauce": "npm run build:e2e && npm run script runSauceTests true packages/rum-react test:unit test:e2e:supported",
     "karma": "karma start",
+    "test:unit": "npm run script runUnitTests packages/rum-react",
+    "test:e2e:supported": "npm run script runE2eTests packages/rum-react/wdio.conf.js",
+    "test:sauce": "npm run script runSauceTests packages/rum-react true build:e2e test:unit test:e2e:supported",
     "test": "npm run test:sauce"
   },
   "bugs": {

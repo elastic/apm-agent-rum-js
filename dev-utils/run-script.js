@@ -24,42 +24,69 @@
  */
 
 const { join } = require('path')
+const runAll = require('npm-run-all')
 const {
   runKarma,
   runSauceConnect,
+  runJasmine,
   runE2eTests: runE2eTestsUtils,
   buildE2eBundles: buildE2eBundlesUtils
 } = require('./test-utils')
-const runAll = require('npm-run-all')
-
 const { startTestServers } = require('./test-servers')
-
 const {
-  getSauceConnectOptions,
-  getTestEnvironmentVariables
+  getTestEnvironmentVariables,
+  getSauceConnectOptions
 } = require('./test-config')
 const { generateNotice } = require('./dep-info')
 
 const PROJECT_DIR = join(__dirname, '../')
-
-const sauceConnectOpts = getSauceConnectOptions()
 const { sauceLabs } = getTestEnvironmentVariables()
 
-function runUnitTests(launchSauceConnect = 'false', directory) {
-  const karmaConfigFile = join(__dirname, '..', directory, './karma.conf.js')
-  if (launchSauceConnect === 'true' && sauceLabs) {
-    return runSauceConnect(sauceConnectOpts, () => runKarma(karmaConfigFile))
+function runUnitTests(packagePath, startSauceConnect = 'false') {
+  const karmaConfigFile = join(PROJECT_DIR, packagePath, 'karma.conf.js')
+  if (startSauceConnect === 'true') {
+    return launchSauceConnect(() => runKarma(karmaConfigFile))
   }
   runKarma(karmaConfigFile)
 }
 
-function launchSauceConnect() {
+/**
+ * Checks if the MODE is set to "saucelabs" and decides where to run the
+ * corresponding callback function
+ */
+function launchSauceConnect(callback = () => {}) {
   if (sauceLabs) {
-    return runSauceConnect(sauceConnectOpts, () => {
-      console.log('Launched SauceConnect!')
-    })
+    const sauceOpts = getSauceConnectOptions()
+    return runSauceConnect(sauceOpts, callback)
   }
-  console.log('set MODE=saucelabs to launch sauce connect')
+  console.info('Skipping sauce tests, MODE is not set to saucelabs')
+  return callback()
+}
+
+function runIntegrationTests() {
+  const servers = startTestServers('./')
+  const SPEC_DIR = 'test/integration'
+  runJasmine(SPEC_DIR, err => {
+    servers.forEach(server => server.close())
+    if (err) {
+      console.log('Integration tests failed:', err.message)
+      process.exit(2)
+    }
+  })
+}
+
+/**
+ * Ensure all the exports from our module works
+ * in Node.js without babel transpiling the modules
+ */
+function runNodeTests() {
+  const SPEC_DIR = 'test/node'
+  runJasmine(SPEC_DIR, err => {
+    if (err) {
+      console.log('Node tests for build failed:', err.message)
+      process.exit(2)
+    }
+  })
 }
 
 function runE2eTests(configPath) {
@@ -73,33 +100,37 @@ function buildE2eBundles(basePath) {
   })
 }
 
-function runSauceTests(serve = 'true', path = './', ...scripts) {
-  /**
-   * `console.logs` from the tests will be truncated when the process exits
-   * To avoid truncation, we flush the data from stdout before exiting the process
-   */
-  if (process.stdout.isTTY && process.stdout._handle) {
-    process.stdout._handle.setBlocking(true)
-  }
-
-  let servers = []
-  if (serve === 'true') {
-    servers = startTestServers(join(PROJECT_DIR, path))
-  }
-  /**
-   * Decides the saucelabs test status
-   */
-  let exitCode = 0
-  const loggerOpts = {
-    stdout: process.stdout,
-    stderr: process.stderr
-  }
+function runSauceTests(packagePath, serve = 'true', ...scripts) {
   /**
    * Since there is no easy way to reuse the sauce connect tunnel even using same tunnel identifier,
    * we launch the sauce connect tunnel before starting all the saucelab tests
    */
-  const sauceConnectOpts = getSauceConnectOptions()
-  runSauceConnect(sauceConnectOpts, async sauceConnectProcess => {
+  launchSauceConnect(async sauceConnectProcess => {
+    if (!sauceLabs) {
+      return runUnitTests(packagePath)
+    }
+
+    /**
+     * `console.logs` from the tests will be truncated when the process exits
+     * To avoid truncation, we flush the data from stdout before exiting the process
+     */
+    if (process.stdout.isTTY && process.stdout._handle) {
+      process.stdout._handle.setBlocking(true)
+    }
+
+    let servers = []
+    if (serve === 'true') {
+      servers = startTestServers(join(PROJECT_DIR, packagePath))
+    }
+    /**
+     * Decides the saucelabs test status
+     */
+    let exitCode = 0
+    const loggerOpts = {
+      stdout: process.stdout,
+      stderr: process.stderr
+    }
+
     try {
       await runAll(scripts, loggerOpts)
       console.log(`Ran all [${scripts.join(', ')}] scripts successfully!`)
@@ -116,11 +147,13 @@ function runSauceTests(serve = 'true', path = './', ...scripts) {
 }
 
 const scripts = {
-  runUnitTests,
   launchSauceConnect,
   generateNotice,
+  runUnitTests,
   runSauceTests,
   runE2eTests,
+  runIntegrationTests,
+  runNodeTests,
   buildE2eBundles,
   startTestServers
 }
