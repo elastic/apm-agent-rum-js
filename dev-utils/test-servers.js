@@ -26,9 +26,7 @@
 const express = require('express')
 const serveIndex = require('serve-index')
 const { join } = require('path')
-const {
-  runIntegrationTest
-} = require('@elastic/apm-rum/test/e2e/integration-test')
+const { runIntegrationTest } = require('./integration-test')
 
 function startBackendAgentServer(port = 8003) {
   const express = require('express')
