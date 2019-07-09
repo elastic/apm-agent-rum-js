@@ -23,7 +23,6 @@
  *
  */
 
-import Url from '../common/url'
 import rng from 'uuid/lib/rng-browser'
 
 const slice = [].slice
@@ -104,9 +103,7 @@ function isDtHeaderValid(header) {
 function checkSameOrigin(source, target) {
   let isSame = false
   if (typeof target === 'string') {
-    const src = new Url(source)
-    const tar = new Url(target)
-    isSame = src.origin === tar.origin
+    isSame = source === target
   } else if (Array.isArray(target)) {
     target.forEach(function(t) {
       if (!isSame) {
@@ -135,14 +132,14 @@ function isPlatformSupported() {
 }
 
 /**
- * Convert values of the tag to be string to be compatible
+ * Convert values of the Tag/Label to be string to be compatible
  * with the apm server prior to <6.7 version
  *
  * TODO: Remove string conversion in the next major release since
  * support for boolean and number in the APM server has landed in 6.7
  * https://github.com/elastic/apm-server/pull/1712/
  */
-function setTag(key, value, obj) {
+function setLabel(key, value, obj) {
   if (!obj || !key) return
   var skey = removeInvalidChars(key)
   if (value) {
@@ -324,6 +321,48 @@ function removeInvalidChars(key) {
   return key.replace(/[.*"]/g, '_')
 }
 
+function getLatestNonXHRSpan(spans) {
+  let latestSpan = null
+  for (let i = 0; i < spans.length; i++) {
+    const span = spans[i]
+    if (
+      String(span.type).indexOf('external') === -1 &&
+      (!latestSpan || latestSpan._end < span._end)
+    ) {
+      latestSpan = span
+    }
+  }
+  return latestSpan
+}
+
+function getEarliestSpan(spans) {
+  let earliestSpan = spans[0]
+  for (let i = 1; i < spans.length; i++) {
+    const span = spans[i]
+    if (earliestSpan._start > span._start) {
+      earliestSpan = span
+    }
+  }
+  return earliestSpan
+}
+
+function getPageLoadMarks() {
+  const marks = getNavigationTimingMarks()
+  const paintMarks = getPaintTimingMarks()
+  const agent = {
+    timeToFirstByte: marks.responseStart,
+    domInteractive: marks.domInteractive,
+    domComplete: marks.domComplete
+  }
+  if (paintMarks['first-contentful-paint']) {
+    agent.firstContentfulPaint = paintMarks['first-contentful-paint']
+  }
+  return {
+    navigationTiming: marks,
+    agent
+  }
+}
+
 export {
   extend,
   merge,
@@ -345,9 +384,12 @@ export {
   getElasticScript,
   getTimeOrigin,
   generateRandomId,
+  getEarliestSpan,
+  getLatestNonXHRSpan,
+  getPageLoadMarks,
   rng,
   checkSameOrigin,
-  setTag,
+  setLabel,
   stripQueryStringFromUrl,
   find,
   removeInvalidChars

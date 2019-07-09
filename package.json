@@ -8,21 +8,29 @@
     "url": "https://github.com/elastic/apm-agent-rum-js.git"
   },
   "scripts": {
+    "version": "node scripts/prompt-release",
     "prerelease": "npm test",
-    "release": "lerna publish",
-    "release-package": "node scripts/publish",
-    "release-github": "lerna run --scope @elastic/apm-rum test && node scripts/release-github",
+    "release": "lerna publish && npm run github-release",
+    "release-package": "node scripts/publish-package",
+    "github-release": "node scripts/github-release",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
     "lint": "npm-run-all --silent -p lint:*",
     "lint:js": "eslint .",
     "lint:license": "node scripts/license-checker",
-    "format": "eslint . --fix",
     "test": "lerna run build:main && lerna run test --stream --scope=$SCOPE --no-prefix",
-    "bundlesize": "lerna run bundlesize --stream"
+    "bundlesize": "lerna run bundlesize --stream",
+    "serve": "node ./dev-utils/run-script.js startTestServers",
+    "karma": "karma start"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint . --fix",
+      "git add"
+    ]
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npx lerna run version-check --stream"
+      "pre-commit": "lint-staged"
     }
   },
   "author": "",
@@ -31,11 +39,14 @@
   "devDependencies": {
     "@babel/cli": "^7.4.3",
     "@babel/core": "^7.2.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/plugin-transform-destructuring": "^7.3.2",
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.4.0",
+    "@lerna/child-process": "^3.14.2",
+    "@lerna/prompt": "^3.13.0",
     "@wdio/cli": "^5.7.2",
     "@wdio/dot-reporter": "^5.7.2",
     "@wdio/jasmine-framework": "^5.7.2",
@@ -45,12 +56,16 @@
     "@wdio/sync": "^5.7.2",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
-    "babel-plugin-istanbul": "^4.1.5",
-    "bundlesize": "^0.17.1",
+    "babel-plugin-istanbul": "^5.1.4",
+    "benchmark": "^2.1.4",
+    "bundlesize": "^0.17.2",
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16": "^1.12.1",
     "es6-promise": "^4.2.4",
     "eslint": "^5.12.0",
     "eslint-config-prettier": "^4.0.0",
     "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-react": "^7.13.0",
     "eslint-plugin-rulesdir": "^0.1.0",
     "eslint-plugin-standard": "^4.0.0",
     "express": "^4.16.2",
@@ -59,7 +74,10 @@
     "http-server": "^0.10.0",
     "husky": "^1.3.1",
     "jasmine": "^2.8.0",
-    "karma": "^3.0.0",
+    "karma": "^4.1.0",
+    "karma-benchmark": "^1.0.3",
+    "karma-benchmark-json-reporter": "^1.0.1",
+    "karma-benchmark-reporter": "^0.1.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.2",
     "karma-failed-reporter": "^0.0.3",
@@ -69,9 +87,11 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "^0.0.31",
     "karma-webpack": "^2.0.4",
-    "lerna": "^3.13.1",
+    "lerna": "^3.14.1",
     "license-checker": "^25.0.1",
+    "lint-staged": "^8.2.0",
     "npm-run-all": "^4.1.5",
+    "npmlog": "^4.1.2",
     "prettier": "^1.16.4",
     "puppeteer": "^1.12.2",
     "react": "^16.2.0",
@@ -83,12 +103,13 @@
     "uglifyjs-webpack-plugin": "^2.0.1",
     "webdriverio": "^5.7.2",
     "webpack": "^4.27.1",
-    "webpack-bundle-analyzer": "^3.0.3",
+    "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.1.2",
     "whatwg-fetch": "^3.0.0"
   },
   "dependencies": {
     "@elastic/apm-rum": "file:packages/rum",
-    "@elastic/apm-rum-core": "file:packages/rum-core"
+    "@elastic/apm-rum-core": "file:packages/rum-core",
+    "@elastic/apm-rum-react": "file:packages/rum-react"
   }
 }

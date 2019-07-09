@@ -24,7 +24,7 @@
  */
 
 function checkDtInfo(payload) {
-  console.log('distributed tracing data', payload)
+  console.log('distributed tracing header value', payload)
   if (typeof payload.traceId !== 'string') {
     throw new Error('Wrong distributed tracing payload: ')
   }

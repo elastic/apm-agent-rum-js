@@ -25,6 +25,7 @@
 
 import { patchXMLHttpRequest } from './xhr-patch'
 import { patchFetch } from './fetch-patch'
+import { patchHistory } from './history-patch'
 import Subscription from '../subscription'
 
 const patchSubscription = new Subscription()
@@ -36,6 +37,9 @@ function patchAll() {
       patchSubscription.applyAll(this, [event, task])
     })
     patchFetch(function(event, task) {
+      patchSubscription.applyAll(this, [event, task])
+    })
+    patchHistory(function(event, task) {
       patchSubscription.applyAll(this, [event, task])
     })
   }

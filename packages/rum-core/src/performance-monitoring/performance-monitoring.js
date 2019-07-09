@@ -27,22 +27,27 @@ import {
   checkSameOrigin,
   isDtHeaderValid,
   merge,
+  parseDtHeaderValue,
+  getEarliestSpan,
   stripQueryStringFromUrl,
-  parseDtHeaderValue
+  getLatestNonXHRSpan
 } from '../common/utils'
+import Url from '../common/url'
 import { patchSubscription } from '../common/patching'
 import { globalState } from '../common/patching/patch-utils'
 import {
   SCHEDULE,
   INVOKE,
   XMLHTTPREQUEST_SOURCE,
-  FETCH_SOURCE
+  FETCH_SOURCE,
+  HISTORY_PUSHSTATE
 } from '../common/constants'
 import {
   truncateModel,
   SPAN_MODEL,
   TRANSACTION_MODEL
 } from '../common/truncate'
+import { __DEV__ } from '../env'
 
 class PerformanceMonitoring {
   constructor(apmServer, configService, loggingService, transactionService) {
@@ -53,15 +58,19 @@ class PerformanceMonitoring {
   }
 
   init() {
-    var performanceMonitoring = this
-    this._transactionService.subscribe(function(tr) {
-      var payload = performanceMonitoring.createTransactionPayload(tr)
+    this._transactionService.subscribe(tr => {
+      const payload = this.createTransactionPayload(tr)
       if (payload) {
-        performanceMonitoring._apmServer.addTransaction(payload)
+        this._apmServer.addTransaction(payload)
+      } else if (__DEV__) {
+        this._logginService.debug(
+          'Could not create a payload from the Transaction',
+          tr
+        )
       }
     })
 
-    var patchSubFn = this.getXhrPatchSubFn(
+    const patchSubFn = this.getXhrPatchSubFn(
       this._configService,
       this._transactionService
     )
@@ -79,31 +88,38 @@ class PerformanceMonitoring {
         task.source === FETCH_SOURCE
       ) {
         if (event === SCHEDULE && task.data) {
-          var spanName =
-            task.data.method + ' ' + stripQueryStringFromUrl(task.data.url)
-          var span = transactionService.startSpan(spanName, 'external.http')
-          var taskId = transactionService.addTask()
+          const requestUrl = new Url(task.data.url)
+          const spanName =
+            task.data.method +
+            ' ' +
+            (requestUrl.relative
+              ? requestUrl.path
+              : stripQueryStringFromUrl(requestUrl.href))
+          const span = transactionService.startSpan(spanName, 'external.http')
+          const taskId = transactionService.addTask()
 
-          if (span) {
-            var isDtEnabled = configService.get('distributedTracing')
-            var origins = configService.get('distributedTracingOrigins')
-            var isSameOrigin =
-              checkSameOrigin(task.data.url, window.location.href) ||
-              checkSameOrigin(task.data.url, origins)
-            var target = task.data.target
-            if (isDtEnabled && isSameOrigin && target) {
-              pm.injectDtHeader(span, target)
-            }
-            span.addContext({
-              http: {
-                method: task.data.method,
-                url: task.data.url
-              }
-            })
-            span.sync = task.data.sync
-            task.data.span = span
-            task.id = taskId
+          if (!span) {
+            return
           }
+          const isDtEnabled = configService.get('distributedTracing')
+          const dtOrigins = configService.get('distributedTracingOrigins')
+          const currentUrl = new Url(window.location.href)
+          const isSameOrigin =
+            checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
+            checkSameOrigin(requestUrl.origin, dtOrigins)
+          const target = task.data.target
+          if (isDtEnabled && isSameOrigin && target) {
+            pm.injectDtHeader(span, target)
+          }
+          span.addContext({
+            http: {
+              method: task.data.method,
+              url: requestUrl.href
+            }
+          })
+          span.sync = task.data.sync
+          task.data.span = span
+          task.id = taskId
         }
         if (event === INVOKE && task.data && task.data.span) {
           if (typeof task.data.target.status !== 'undefined') {
@@ -121,6 +137,12 @@ class PerformanceMonitoring {
         if (event === INVOKE && task.id) {
           transactionService.removeTask(task.id)
         }
+      }
+
+      if (task.source === HISTORY_PUSHSTATE && event === INVOKE) {
+        transactionService.startTransaction(task.data.title, 'route-change', {
+          canReuse: true
+        })
       }
     }
   }
@@ -202,20 +224,61 @@ class PerformanceMonitoring {
         browserResponsivenessInterval,
         buffer
       )
+
       if (!wasBrowserResponsive) {
-        performanceMonitoring._logginService.debug(
-          'Transaction was discarded! browser was not responsive enough during the transaction.',
-          ' duration:',
-          duration,
-          ' browserResponsivenessCounter:',
-          tr.browserResponsivenessCounter,
-          'interval:',
-          browserResponsivenessInterval
-        )
+        if (__DEV__) {
+          performanceMonitoring._logginService.debug(
+            'Transaction was discarded! browser was not responsive enough during the transaction.',
+            ' duration:',
+            duration,
+            ' browserResponsivenessCounter:',
+            tr.browserResponsivenessCounter,
+            'interval:',
+            browserResponsivenessInterval
+          )
+        }
         return false
       }
     }
     return true
+  }
+
+  adjustTransactionTime(transaction) {
+    /**
+     * Adjust start time of the transaction
+     */
+    const spans = transaction.spans
+    const earliestSpan = getEarliestSpan(spans)
+
+    if (earliestSpan && earliestSpan._start < transaction._start) {
+      transaction._start = earliestSpan._start
+    }
+
+    /**
+     * Adjust end time of the transaction to match the latest
+     * span end time
+     */
+    const latestSpan = getLatestNonXHRSpan(spans)
+    if (latestSpan && latestSpan._end > transaction._end) {
+      transaction._end = latestSpan._end
+    }
+
+    /**
+     * Set all spans that are longer than the transaction to
+     * be truncated spans
+     */
+    const transactionEnd = transaction._end
+    for (let i = 0; i < spans.length; i++) {
+      const span = spans[i]
+
+      if (span._end > transactionEnd) {
+        span._end = transactionEnd
+        span.type += '.truncated'
+      }
+      if (span._start > transactionEnd) {
+        span._start = transactionEnd
+      }
+    }
   }
 
   prepareTransaction(transaction) {
@@ -235,8 +298,6 @@ class PerformanceMonitoring {
       return (
         span.duration() > 0 &&
         span._start >= transaction._start &&
-        span._end > transaction._start &&
-        span._start < transaction._end &&
         span._end <= transaction._end
       )
     })
@@ -286,6 +347,7 @@ class PerformanceMonitoring {
   }
 
   createTransactionPayload(transaction) {
+    this.adjustTransactionTime(transaction)
     this.prepareTransaction(transaction)
     const filtered = this.filterTransaction(transaction)
     if (filtered) {
@@ -298,10 +360,12 @@ class PerformanceMonitoring {
       .map(tr => this.createTransactionPayload(tr))
       .filter(tr => tr)
 
-    this._logginService.debug(
-      'Sending Transactions to apm server.',
-      transactions.length
-    )
+    if (__DEV__) {
+      this._logginService.debug(
+        'Sending Transactions to apm server.',
+        transactions.length
+      )
+    }
 
     // todo: check if transactions are already being sent
     const promise = this._apmServer.sendTransactions(payload)

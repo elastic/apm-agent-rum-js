@@ -23,7 +23,10 @@
  *
  */
 
-const { verifyNoBrowserErrors } = require('../../../../../dev-utils/webdriver')
+const {
+  verifyNoBrowserErrors,
+  waitForApmServerCalls
+} = require('../../../../../dev-utils/webdriver')
 
 describe('manual-timing', function() {
   it('should run manual timing', async function() {
@@ -36,60 +39,8 @@ describe('manual-timing', function() {
       'expected element #test-element'
     )
 
-    const serverCalls = browser.executeAsync(function(done) {
-      var apmServerMock = window.elasticApm.serviceFactory.getService(
-        'ApmServer'
-      )
+    const serverCalls = waitForApmServerCalls(1, 1)
 
-      function checkCalls() {
-        var serverCalls = apmServerMock.calls
-        var validCalls =
-          serverCalls.sendErrors &&
-          serverCalls.sendErrors.length &&
-          serverCalls.sendTransactions &&
-          serverCalls.sendTransactions.length
-        if (validCalls) {
-          console.log('calls', serverCalls)
-          Promise.all([
-            serverCalls.sendErrors[0].returnValue,
-            serverCalls.sendTransactions[0].returnValue
-          ])
-            .then(function() {
-              function mapCall(c) {
-                return { args: c.args, mocked: c.mocked }
-              }
-              try {
-                var calls = {
-                  sendErrors: serverCalls.sendErrors.map(mapCall),
-                  sendTransactions: serverCalls.sendTransactions.map(mapCall)
-                }
-                done(calls)
-              } catch (e) {
-                throw e
-              }
-            })
-            .catch(function(reason) {
-              console.log('reason', reason)
-              try {
-                done({ error: reason.message || JSON.stringify(reason) })
-              } catch (e) {
-                done({
-                  error: 'Failed serializing rejection reason: ' + e.message
-                })
-              }
-            })
-        }
-      }
-
-      checkCalls()
-      apmServerMock.subscription.subscribe(checkCalls)
-    })
-
-    expect(serverCalls).toBeTruthy()
-    console.log(JSON.stringify(serverCalls, null, 2))
-    if (serverCalls.error) {
-      fail(serverCalls.error)
-    }
     expect(serverCalls.sendErrors.length).toBe(1)
     var errorPayload = serverCalls.sendErrors[0].args[0][0]
     expect(

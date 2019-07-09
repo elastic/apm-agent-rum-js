@@ -23,27 +23,31 @@
  *
  */
 
-const path = require('path')
-const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
+const { version: agentVersion } = require('@elastic/apm-rum/package.json')
 
-module.exports = {
-  entry: path.resolve(__dirname, './app.jsx'),
-  output: { path: __dirname, filename: 'app.e2e-bundle.js' },
-  devtool: 'source-map',
-  mode: 'production',
-  performance: {
-    hints: false
-  },
-  module: {
-    rules: [
-      {
-        test: /.jsx?$/,
-        use: {
-          loader: 'babel-loader'
+module.exports = context => {
+  return {
+    MemberExpression(node) {
+      const { name, type } = node.property
+      if (type === 'Identifier' && name === 'setVersion') {
+        const args = node.parent.arguments
+        if (args.length > 0 && args[0].type === 'Literal') {
+          const literalNode = args[0]
+          const version = literalNode.value
+          if (version !== agentVersion) {
+            context.report({
+              node: literalNode,
+              message: `Agent version: ${agentVersion} should match with build version: ${version}`,
+              fix(fixer) {
+                return fixer.replaceTextRange(
+                  literalNode.range,
+                  "'" + agentVersion + "'"
+                )
+              }
+            })
+          }
         }
       }
-    ]
-  },
-  plugins: [new EnvironmentPlugin(getWebpackEnv())]
+    }
+  }
 }

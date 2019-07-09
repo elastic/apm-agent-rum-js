@@ -25,6 +25,7 @@
 
 import * as utils from '../../src/common/utils'
 import Span from '../../src/performance-monitoring/span'
+import Url from '../../src/common/url'
 
 describe('lib/utils', function() {
   it('should merge objects', function() {
@@ -114,38 +115,32 @@ describe('lib/utils', function() {
   })
 
   it('should identify same origin urls', function() {
-    var result = utils.checkSameOrigin('/test/new', window.location.href)
-    expect(result).toBe(true)
-    result = utils.checkSameOrigin(
-      'http:test.com/test/new',
-      window.location.href
+    const currentOrigin = new Url(window.location.href).origin
+    const relOrigin = new Url('/test/new').origin
+    const absOrigin = new Url('http://test.com/test/new').origin
+    expect(utils.checkSameOrigin(relOrigin, currentOrigin)).toBe(true)
+    expect(utils.checkSameOrigin(absOrigin, currentOrigin)).toBe(false)
+    expect(
+      utils.checkSameOrigin(absOrigin, [currentOrigin, 'http://test.com'])
+    ).toBe(true)
+    expect(
+      utils.checkSameOrigin(absOrigin, [
+        currentOrigin,
+        'http://test1.com',
+        'not-url:3000'
+      ])
+    ).toBe(false)
+
+    expect(utils.checkSameOrigin(absOrigin, undefined)).toBe(false)
+    expect(utils.checkSameOrigin(new Url(undefined), absOrigin)).toBe(false)
+    expect(utils.checkSameOrigin(new Url({}), 'http://test.com/')).toBe(false)
+    expect(
+      utils.checkSameOrigin(new Url('test test'), 'http://test.com/')
+    ).toBe(false)
+    expect(utils.checkSameOrigin(new Url('/test'), 'http://test.com/')).toBe(
+      false
     )
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin('http://test.com/test/new', [
-      window.location.href,
-      'http://test.com'
-    ])
-    expect(result).toBe(true)
-    result = utils.checkSameOrigin('http://test.com/test/new', [
-      window.location.href,
-      'http://test1.com',
-      'not-url:3000',
-      {},
-      undefined
-    ])
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin('http://test.com/test/new', undefined)
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin(undefined, 'http://test.com/test/new')
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin({}, 'http://test.com/')
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin('test test', 'http://test.com/')
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin('/test', 'http://test.com/')
-    expect(result).toBe(false)
-    result = utils.checkSameOrigin('', 'http://test.com/')
-    expect(result).toBe(false)
+    expect(utils.checkSameOrigin(new Url(''), 'http://test.com/')).toBe(false)
   })
 
   it('should generate correct DT headers', function() {
@@ -233,19 +228,19 @@ describe('lib/utils', function() {
     expect(result).toBeLessThanOrEqual(now)
   })
 
-  it('should setTag', function() {
+  it('should setLabel', function() {
     var date = new Date()
-    var tags = {}
-    utils.setTag('key', 'value', undefined)
-    utils.setTag(undefined, 'value', tags)
-    utils.setTag('test', 'test', tags)
-    utils.setTag('no', 1, tags)
-    utils.setTag('test.test', 'passed', tags)
-    utils.setTag('date', date, tags)
-    utils.setTag()
-    utils.setTag('removed', undefined, tags)
-    utils.setTag('obj', {}, tags)
-    expect(tags).toEqual({
+    var labels = {}
+    utils.setLabel('key', 'value', undefined)
+    utils.setLabel(undefined, 'value', labels)
+    utils.setLabel('test', 'test', labels)
+    utils.setLabel('no', 1, labels)
+    utils.setLabel('test.test', 'passed', labels)
+    utils.setLabel('date', date, labels)
+    utils.setLabel()
+    utils.setLabel('removed', undefined, labels)
+    utils.setLabel('obj', {}, labels)
+    expect(labels).toEqual({
       test: 'test',
       no: '1',
       test_test: 'passed',

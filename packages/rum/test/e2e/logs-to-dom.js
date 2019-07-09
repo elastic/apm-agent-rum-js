@@ -23,52 +23,31 @@
  *
  */
 
-import React from 'react'
-
-import { apm } from './rum'
-
-class MainComponent extends React.Component {
-  constructor(props, state) {
-    super(props, state)
-    var path = this.props.match.path
-    this.state = {
-      userName: '',
-      path
+;(function() {
+  function _patchDebugMethods() {
+    function patch(target, name) {
+      var orig = target[name]
+      target[name] = function() {
+        var debugElement = document.createElement('li')
+        var logs = [].slice.call(arguments)
+        debugElement.innerHTML = name + ': ' + JSON.stringify(logs) //.slice(0, 1000)
+        document.body.appendChild(debugElement)
+        orig && orig.apply(this, arguments)
+      }
     }
-    this.transaction = apm.startTransaction('Main - ' + path, 'route-change')
+    patch(console, 'log')
+    patch(console, 'info')
+    patch(console, 'error')
+    patch(console, 'debug')
+    patch(console, 'warn')
+    patch(window, 'onerror')
+
+    // Use this to scroll the logs into the view
+    // setInterval(function () {
+    //   window.scrollTo(0, document.body.scrollHeight);
+    // }, 1000)
   }
 
-  componentDidMount() {
-    this.fetchData()
-    this.transaction.detectFinish()
-  }
-  fetchData() {
-    var url = '/test/e2e/react/data.json'
-
-    fetch(url)
-      .then(resp => {
-        var tid = this.transaction.addTask()
-        var span = this.transaction.startSpan('Timeout span')
-        setTimeout(() => {
-          span.end()
-          this.transaction.removeTask(tid)
-        }, 500)
-        return resp.json()
-      })
-      .then(data => {
-        this.setState({ userName: data.userName })
-      })
-  }
-  render() {
-    return (
-      <div>
-        <h3>
-          <span>{this.state.path}</span>
-        </h3>
-        <span>{this.state.userName}</span>
-      </div>
-    )
-  }
-}
-
-export default MainComponent
+  _patchDebugMethods()
+  console.log('Patched debug methods!')
+})()

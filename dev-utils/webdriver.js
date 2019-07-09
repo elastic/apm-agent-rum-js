@@ -23,6 +23,10 @@
  *
  */
 
+const { join } = require('path')
+const glob = require('glob')
+const { getSauceConnectOptions, getBrowserList } = require('./test-config')
+
 const logLevels = {
   ALL: { value: Number.MIN_VALUE },
   DEBUG: { value: 700 },
@@ -31,7 +35,6 @@ const logLevels = {
   SEVERE: { value: 1000 },
   OFF: { value: Number.MAX_VALUE }
 }
-
 const debugMode = false
 const debugLevel = logLevels.INFO.value
 
@@ -102,6 +105,166 @@ function isLogEntryATestFailure(entry, whitelist) {
   return result
 }
 
+function getWebdriveBaseConfig(
+  path,
+  specs = './test/e2e/**/*.e2e-spec.js',
+  capabilities
+) {
+  const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
+
+  if (!capabilities) {
+    /**
+     * Skip the ios platform on E2E tests because of script
+     * timeout issue in Appium
+     */
+
+    capabilities = getBrowserList().filter(
+      ({ platformName }) => platformName !== 'iOS'
+    )
+  }
+
+  capabilities = capabilities.map(capability => ({
+    tunnelIdentifier,
+    ...capability
+  }))
+
+  return {
+    runner: 'local',
+    specs: glob.sync(join(path, specs)),
+    maxInstancesPerCapability: 3,
+    services: ['sauce'],
+    user: username,
+    key: accessKey,
+    sauceConnect: false,
+    capabilities,
+    logLevel: 'error',
+    bail: 1,
+    screenshotPath: join(path, 'error-screenshot'),
+    baseUrl: 'http://localhost:8000',
+    waitforTimeout: 30000,
+    framework: 'jasmine',
+    reporters: ['dot', 'spec'],
+    jasmineNodeOpts: {
+      defaultTimeoutInterval: 90000
+    },
+    beforeTest() {
+      /**
+       * Sets timeout for scripts executed in the browser
+       * via browser.executeAsync method
+       */
+      browser.setTimeout({ script: 20000 })
+    },
+    afterTest(test) {
+      /**
+       * Log only on failures
+       * Log api is only available in chrome driver
+       * */
+      if (!test.passed && isChrome()) {
+        const response = browser.getLogs('browser')
+        console.log('[Browser Logs]:', JSON.stringify(response, undefined, 2))
+      }
+    }
+  }
+}
+
+function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
+  console.log(
+    `Waiting for minimum ${errorCount} Errors and ${transactionCount} Transactions.`
+  )
+  const serverCalls = browser.executeAsync(
+    function(errorCount, transactionCount, done) {
+      var apmServerMock = window.elasticApm.serviceFactory.getService(
+        'ApmServer'
+      )
+
+      function checkCalls() {
+        var serverCalls = apmServerMock.calls
+
+        var validCalls = true
+
+        if (errorCount) {
+          validCalls =
+            validCalls &&
+            serverCalls.sendErrors &&
+            serverCalls.sendErrors.length >= errorCount
+        }
+        if (transactionCount) {
+          validCalls =
+            validCalls &&
+            serverCalls.sendTransactions &&
+            serverCalls.sendTransactions.length >= transactionCount
+        }
+
+        if (validCalls) {
+          console.log('calls', serverCalls)
+          var promises = []
+
+          if (serverCalls.sendErrors) {
+            promises = promises.concat(
+              serverCalls.sendErrors.map(function(s) {
+                return s.returnValue
+              })
+            )
+          }
+          if (serverCalls.sendTransactions) {
+            promises = promises.concat(
+              serverCalls.sendTransactions.map(function(s) {
+                return s.returnValue
+              })
+            )
+          }
+
+          Promise.all(promises)
+            .then(function() {
+              function mapCall(c) {
+                return { args: c.args, mocked: c.mocked }
+              }
+              try {
+                var calls = {
+                  sendErrors: serverCalls.sendErrors
+                    ? serverCalls.sendErrors.map(mapCall)
+                    : undefined,
+                  sendTransactions: serverCalls.sendTransactions
+                    ? serverCalls.sendTransactions.map(mapCall)
+                    : undefined
+                }
+                done(calls)
+              } catch (e) {
+                throw e
+              }
+            })
+            .catch(function(reason) {
+              console.log('reason', reason)
+              try {
+                done({ error: reason.message || JSON.stringify(reason) })
+              } catch (e) {
+                done({
+                  error: 'Failed serializing rejection reason: ' + e.message
+                })
+              }
+            })
+        }
+      }
+
+      checkCalls()
+      apmServerMock.subscription.subscribe(checkCalls)
+    },
+    errorCount,
+    transactionCount
+  )
+
+  if (!serverCalls) {
+    throw new Error('serverCalls is undefined!')
+  }
+
+  console.log(JSON.stringify(serverCalls, null, 2))
+  if (serverCalls.error) {
+    fail(serverCalls.error)
+  }
+
+  return serverCalls
+}
+
 module.exports = {
   allowSomeBrowserErrors: function allowSomeBrowserErrors(whitelist, done) {
     if (typeof done === 'function') {
@@ -130,5 +293,7 @@ module.exports = {
       // done()
     }
   },
-  isChrome
+  isChrome,
+  getWebdriveBaseConfig,
+  waitForApmServerCalls
 }

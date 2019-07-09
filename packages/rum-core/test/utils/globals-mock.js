@@ -23,15 +23,27 @@
  *
  */
 
-import createApmBase from '../'
+import resourceEntries from '../fixtures/resource-entries'
+import paintEntries from '../fixtures/paint-entries'
+import userTimingEntries from '../fixtures/user-timing-entries'
 
-var apm = createApmBase({
-  debug: true,
-  serviceName: 'apm-agent-rum-test-e2e-react',
-  serviceVersion: '0.0.1',
-  sendPageLoadTransaction: false
-})
+export function mockGetEntriesByType() {
+  const _getEntriesByType = window.performance.getEntriesByType
 
-apm.setInitialPageLoadName('react-initial-page-load')
+  window.performance.getEntriesByType = function(type) {
+    expect(['resource', 'paint', 'measure']).toContain(type)
+    if (type === 'resource') {
+      return resourceEntries
+    } else if (type === 'paint') {
+      return paintEntries
+    } else if (type === 'measure') {
+      return userTimingEntries
+    } else {
+      return []
+    }
+  }
 
-export { apm }
+  return function unMock() {
+    window.performance.getEntriesByType = _getEntriesByType
+  }
+}

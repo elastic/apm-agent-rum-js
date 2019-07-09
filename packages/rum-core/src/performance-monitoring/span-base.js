@@ -23,15 +23,25 @@
  *
  */
 
-import { isUndefined, generateRandomId, setTag, merge } from '../common/utils'
+import { isUndefined, generateRandomId, setLabel, merge } from '../common/utils'
+import { NAME_UNKNOWN, TYPE_CUSTOM } from '../common/constants'
 
 class SpanBase {
   // context
 
-  constructor(name, type, options) {
-    this.options = options || {}
-    this.name = name || this.options.name || 'Unknown'
-    this.type = type || this.options.type || 'custom'
+  constructor(name, type, options = {}) {
+    /**
+     * Check for undefined and empty string
+     */
+    if (!name) {
+      name = NAME_UNKNOWN
+    }
+    if (!type) {
+      type = TYPE_CUSTOM
+    }
+    this.options = options
+    this.name = name
+    this.type = type
     this.id = this.options.id || generateRandomId(16)
     this.traceId = this.options.traceId
     this.sampled = this.options.sampled
@@ -49,15 +59,18 @@ class SpanBase {
   }
 
   addTags(tags) {
+    console.warn('addTags deprecated, please use addLabels')
+    this.addLabels(tags)
+  }
+
+  addLabels(labels) {
     this.ensureContext()
     var ctx = this.context
-    if (!ctx.tags) {
-      ctx.tags = {}
+    if (!ctx.labels) {
+      ctx.labels = {}
     }
-    var keys = Object.keys(tags)
-    keys.forEach(function(k) {
-      setTag(k, tags[k], ctx.tags)
-    })
+    var keys = Object.keys(labels)
+    keys.forEach(k => setLabel(k, labels[k], ctx.labels))
   }
 
   addContext(context) {

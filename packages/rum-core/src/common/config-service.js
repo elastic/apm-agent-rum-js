@@ -23,7 +23,7 @@
  *
  */
 
-import { getCurrentScript, setTag, merge, getDtHeaderValue } from './utils'
+import { getCurrentScript, setLabel, merge, getDtHeaderValue } from './utils'
 import Subscription from '../common/subscription'
 
 function getConfigFromScript() {
@@ -154,8 +154,7 @@ class Config {
   }
 
   getEndpointUrl() {
-    var url = this.get('serverUrl') + this.get('serverUrlPrefix')
-    return url
+    return this.config.serverUrl + this.config.serverUrlPrefix
   }
 
   set(key, value) {
@@ -200,15 +199,25 @@ class Config {
     }
   }
 
-  addTags(tags) {
-    if (!this.config.context.tags) {
-      this.config.context.tags = {}
+  addLabels(labels) {
+    if (!this.config.context.labels) {
+      this.config.context.labels = {}
     }
-    var keys = Object.keys(tags)
-    keys.forEach(k => setTag(k, tags[k], this.config.context.tags))
+    var keys = Object.keys(labels)
+    keys.forEach(k => setLabel(k, labels[k], this.config.context.labels))
   }
 
   setConfig(properties = {}) {
+    /**
+     * Normalize config
+     *
+     * Remove all trailing slash for serverUrl since serverUrlPrefix
+     * includes a forward slash for the path
+     */
+    if (properties.serverUrl) {
+      properties.serverUrl = properties.serverUrl.replace(/\/+$/, '')
+    }
+
     this.config = merge({}, this.defaults, this.config, properties)
     this._changeSubscription.applyAll(this, [this.config])
   }
@@ -217,17 +226,39 @@ class Config {
     return this._changeSubscription.subscribe(fn)
   }
 
-  isValid() {
+  /**
+   * Validate the config aganist the required parameters and
+   * generates error messages with missing and invalid keys
+   */
+  validate(properties = {}) {
     const requiredKeys = ['serviceName', 'serverUrl']
-
-    for (let i = 0; i < requiredKeys.length; i++) {
-      const key = requiredKeys[i]
-      if (this.config[key] == null || this.config[key] === '') {
-        return false
+    const errors = {
+      missing: [],
+      invalid: []
+    }
+    /**
+     * Check when required keys are missing
+     */
+    Object.keys(properties).forEach(key => {
+      if (requiredKeys.indexOf(key) !== -1 && !properties[key]) {
+        errors.missing.push(key)
       }
+    })
+    /**
+     * Invalid values on the config
+     */
+    if (
+      properties.serviceName &&
+      !/^[a-zA-Z0-9 _-]+$/.test(properties.serviceName)
+    ) {
+      errors.invalid.push({
+        key: 'serviceName',
+        value: properties.serviceName,
+        allowed: 'a-z, A-Z, 0-9, _, -, <space>'
+      })
     }
 
-    return true
+    return errors
   }
 }
 

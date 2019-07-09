@@ -42,13 +42,20 @@ the following are standardized across all Elastic APM agents:
 [[span-add-tags]]
 ==== `span.addTags()`
 
+deprecated[4.1.x,Tags have been replaced with labels], Please use <<span-add-labels,`span.addLabels()`>> instead
+
+
+[float]
+[[span-add-labels]]
+==== `span.addLabels()`
+
 [source,js]
 ----
-span.addTags({ [name]: value })
+span.addLabels({ [name]: value })
 ----
 
-Add several tags on the span. If an error happens during the span,
-it will also get tagged with the same tags.
+Add several labels on the span. If an error happens during the span,
+it will also get tagged with the same labels.
 
 Arguments:
 

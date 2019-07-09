@@ -23,42 +23,6 @@
  *
  */
 
-const { transformFileSync } = require('@babel/core')
-const { join } = require('path')
-const { version: agentVersion } = require('./package.json')
+import createApmBase from '../../../rum/test/e2e'
 
-const APM_BASE_PATH = join(__dirname, './src/apm-base.js')
-
-const pass = () => console.log('Agent version matches with build version')
-const fail = version => {
-  throw new Error(
-    `Agent version ${agentVersion} does not match with build version - ${version}`
-  )
-}
-const versionPlugin = ({ types: t }) => {
-  return {
-    name: 'babel-version-plugin',
-    visitor: {
-      MemberExpression(path) {
-        const property = path.get('property')
-        const name = property.node.name
-        if (t.isIdentifier(property) && name === 'setVersion') {
-          const args = path.parentPath.get('arguments')
-          if (args.length > 0 && t.isStringLiteral(args[0])) {
-            const version = args[0].node.value
-            if (version !== agentVersion) {
-              fail(version)
-              process.exit(1)
-            } else {
-              pass()
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-transformFileSync(APM_BASE_PATH, {
-  plugins: [versionPlugin]
-})
+export default createApmBase

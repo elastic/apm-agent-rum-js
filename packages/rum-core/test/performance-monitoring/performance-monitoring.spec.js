@@ -27,12 +27,11 @@ import { createServiceFactory } from '../'
 import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
-import resourceEntries from '../fixtures/resource-entries'
-import paintEntries from '../fixtures/paint-entries'
 import { getDtHeaderValue } from '../../src/common/utils'
 import { globalState } from '../../src/common/patching/patch-utils'
 import { SCHEDULE } from '../../src/common/constants'
 import patchSub from '../common/patch'
+import { mockGetEntriesByType } from '../utils/globals-mock'
 
 const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
@@ -190,7 +189,6 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should sendTransactionInterval', function() {
-    expect(configService.isValid()).toBe(true)
     var tr = new Transaction('test transaction', 'transaction', {
       transactionSampleRate: 1
     })
@@ -261,6 +259,62 @@ describe('PerformanceMonitoring', function() {
     }, 10)
   })
 
+  it('should adjust transaction start based on earliest span start', function(done) {
+    const firstSpan = new Span('first-span-name', 'first-span')
+    firstSpan.end()
+
+    const transaction = new Transaction('/', 'transaction', {})
+    transaction.onEnd = function() {
+      performanceMonitoring.adjustTransactionTime(transaction)
+      expect(transaction._start).toBe(firstSpan._start)
+      expect(transaction._end).toBeGreaterThanOrEqual(lastSpan._end)
+      done()
+    }
+    transaction.spans.push(firstSpan)
+
+    const lastSpan = transaction.startSpan('last-span-name', 'last-span')
+    lastSpan.end()
+
+    transaction.detectFinish()
+  })
+
+  it('should adjust transaction end based on latest span end', function(done) {
+    const transaction = new Transaction('/', 'transaction', {})
+    const transactionStart = transaction._start
+
+    const firstSpan = transaction.startSpan('first-span-name', 'first-span')
+    firstSpan.end()
+
+    const longSpan = transaction.startSpan('long-span-name', 'long-span')
+
+    const lastSpan = transaction.startSpan('last-span-name', 'last-span')
+    lastSpan.end()
+
+    longSpan.end()
+    longSpan.end += 500
+
+    transaction.onEnd = function() {
+      performanceMonitoring.adjustTransactionTime(transaction)
+      expect(transaction._start).toBe(transactionStart)
+      expect(transaction._end).toBeGreaterThanOrEqual(longSpan._end)
+      done()
+    }
+    transaction.detectFinish()
+  })
+
+  it('should truncate active spans after transaction ends', () => {
+    const transaction = new Transaction('transaction', 'transaction')
+    const span = transaction.startSpan('test', 'test')
+    expect(transaction.spans.length).toBe(0)
+    expect(Object.keys(transaction._activeSpans).length).toBe(1)
+    transaction.end()
+
+    performanceMonitoring.adjustTransactionTime(transaction)
+    expect(transaction.spans.length).toBe(1)
+    expect(Object.keys(transaction._activeSpans).length).toBe(0)
+    expect(span.type).toContain('.truncated')
+  })
+
   it('should create correct payload', function() {
     var tr = new Transaction('transaction1', 'transaction1type', {
       transactionSampleRate: 1
@@ -285,18 +339,24 @@ describe('PerformanceMonitoring', function() {
     expect(payload.spans[0].duration).toBe(span._end - span._start)
   })
 
+  it('should not produce negative durations while adjusting to the spans', function() {
+    var transaction = new Transaction('transaction', 'transaction')
+    var span = transaction.startSpan('test', 'test')
+    span.end()
+    span._end += 100
+    span = transaction.startSpan('test', 'external.http')
+
+    span.end()
+    span._start = 10000000
+    span._end = 11000000
+    transaction.end()
+    performanceMonitoring.adjustTransactionTime(transaction)
+    expect(span.duration()).toBe(0)
+  })
+
   it('should sendPageLoadMetrics', function(done) {
-    var _getEntriesByType = window.performance.getEntriesByType
-
-    window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint']).toContain(type)
-      if (type === 'resource') {
-        return resourceEntries
-      }
-      return paintEntries
-    }
-
-    var transactionService = serviceFactory.getService('TransactionService')
+    const unMock = mockGetEntriesByType()
+    const transactionService = serviceFactory.getService('TransactionService')
 
     transactionService.subscribe(function(tr) {
       expect(tr.isHardNavigation).toBe(true)
@@ -306,7 +366,7 @@ describe('PerformanceMonitoring', function() {
       promise
         .then(
           () => {
-            window.performance.getEntriesByType = _getEntriesByType
+            unMock()
           },
           reason => {
             fail(
@@ -317,34 +377,8 @@ describe('PerformanceMonitoring', function() {
         )
         .then(() => done())
     })
-    transactionService.sendPageLoadMetrics('resource-test')
-  })
-
-  it('should contain agent marks in page load transaction', function() {
-    var _getEntriesByType = window.performance.getEntriesByType
-
-    window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint']).toContain(type)
-      if (type === 'resource') {
-        return resourceEntries
-      }
-      return paintEntries
-    }
-    var tr = new Transaction('test', 'test')
-    tr.addNavigationTimingMarks()
-
-    var agentMarks = [
-      'timeToFirstByte',
-      'domInteractive',
-      'domComplete',
-      'firstContentfulPaint'
-    ]
-
-    expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
-    agentMarks.forEach(function(mark) {
-      expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
-    })
-    window.performance.getEntriesByType = _getEntriesByType
+    const tr = transactionService.startTransaction('resource-test', 'page-load')
+    tr.detectFinish()
   })
 
   it('should filter out empty transactions', function() {
@@ -502,7 +536,7 @@ describe('PerformanceMonitoring', function() {
           expect(tr.spans[0].context).toEqual({
             http: {
               method: 'GET',
-              url: '/?a=b&c=d',
+              url: 'http://localhost:9876/?a=b&c=d',
               status_code: 200
             }
           })
@@ -513,6 +547,25 @@ describe('PerformanceMonitoring', function() {
       })
       expect(transactionService.startSpan).toHaveBeenCalledWith(
         'GET /',
+        'external.http'
+      )
+    })
+
+    it('should redact auth from xhr tasks', () => {
+      const fn = performanceMonitoring.getXhrPatchSubFn()
+      const transactionService = performanceMonitoring._transactionService
+      const fakeXHRTask = {
+        source: 'XMLHttpRequest.send',
+        data: {
+          method: 'GET',
+          url: 'https://a:b@c.com/d?e=10&f=20'
+        }
+      }
+      spyOn(transactionService, 'startSpan').and.callThrough()
+      fn(SCHEDULE, fakeXHRTask)
+
+      expect(transactionService.startSpan).toHaveBeenCalledWith(
+        'GET https://[REDACTED]:[REDACTED]@c.com/d',
         'external.http'
       )
     })
@@ -591,6 +644,7 @@ describe('PerformanceMonitoring', function() {
       window['__fetchDelegate'] = undefined
     })
   }
+
   it('should add xhr tasks', function(done) {
     var fn = performanceMonitoring.getXhrPatchSubFn()
     var transactionService = performanceMonitoring._transactionService
@@ -617,5 +671,27 @@ describe('PerformanceMonitoring', function() {
     expect(task.id).toBeDefined()
     expect(tr._scheduledTasks).toEqual(['task1'])
     req.send()
+  })
+
+  it('should create Transactions on history.pushState', function() {
+    var fn = performanceMonitoring.getXhrPatchSubFn()
+    performanceMonitoring.cancelPatchSub = patchSub.subscribe(function(
+      event,
+      task
+    ) {
+      fn(event, task)
+    })
+    var transactionService = performanceMonitoring._transactionService
+
+    spyOn(transactionService, 'startTransaction').and.callThrough()
+
+    history.pushState(undefined, 'test', 'test')
+
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      'test',
+      'route-change',
+      { canReuse: true }
+    )
+    performanceMonitoring.cancelPatchSub()
   })
 })

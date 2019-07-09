@@ -174,9 +174,10 @@ describe('ErrorLogging', function() {
       .then(() => done())
   })
 
-  it('should install onerror and accept ErrorEvents', function(done) {
+  it('should install global listener for error and accept ErrorEvents', function(done) {
     var count = 0
-    var numberOfErrors = 7
+    var numberOfErrors = 4
+    const original = window.addEventListener
     spyOn(apmServer, 'sendErrors').and.callFake(function(errors) {
       expect(errors.length).toBe(numberOfErrors)
       var error = errors[0]
@@ -184,34 +185,44 @@ describe('ErrorLogging', function() {
 
       count = count + errors.length
       if (count === numberOfErrors) {
+        window.addEventListener = original
         done()
       }
     })
 
-    window.onerror = null
+    const addedListenerTypes = []
+    let listener = (window.addEventListener = function(type, event) {
+      addedListenerTypes.push(type)
+      errorLogging.logErrorEvent(event)
+    })
     errorLogging.registerGlobalEventListener()
+    expect(addedListenerTypes).toContain('error')
 
-    expect(typeof window.onerror).toBe('function')
-    var apmOnError = window.onerror
+    const filename = 'filename'
+    const lineno = 1
+    const colno = 2
 
     try {
       throw new Error(testErrorMessage)
     } catch (error) {
-      apmOnError(testErrorMessage, 'filename', 1, 2, error)
+      listener('error', {
+        message: testErrorMessage,
+        filename,
+        lineno,
+        colno,
+        error
+      })
     }
-
-    apmOnError(testErrorMessage, 'filename', 1, 2, undefined)
-    apmOnError(testErrorMessage, 'filename', 1, 2, testErrorMessage) // throw "test";
-    apmOnError(testErrorMessage, undefined, undefined, undefined, undefined)
-    apmOnError('Test:' + testErrorMessage, 'filename', 1, 2, undefined)
-    apmOnError(
-      'Script error.' + testErrorMessage,
-      undefined,
-      undefined,
-      undefined,
-      undefined
-    )
-    apmOnError(createErrorEvent(testErrorMessage))
+    listener('error', {
+      message: testErrorMessage,
+      filename,
+      lineno,
+      colno
+    })
+    listener('error', {
+      message: 'Script error.' + testErrorMessage
+    })
+    listener('error', createErrorEvent(testErrorMessage))
   })
 
   it('should handle edge cases', function(done) {
@@ -234,7 +245,6 @@ describe('ErrorLogging', function() {
     configService.setConfig({
       serviceName: 'serviceName'
     })
-    expect(configService.isValid()).toBe(true)
     spyOn(apmServer, 'sendErrors')
     try {
       throw new Error('unittest error')
@@ -245,26 +255,6 @@ describe('ErrorLogging', function() {
       errorLogging.logError('test error')
       expect(apmServer.sendErrors).not.toHaveBeenCalled()
       expect(apmServer.errorQueue.items.length).toBe(4)
-    }
-  })
-
-  it('should check isActive', function() {
-    configService.setConfig({
-      active: false
-    })
-    expect(configService.isActive()).toBe(false)
-    spyOn(apmServer, 'sendErrors')
-    spyOn(apmServer, 'addError')
-    try {
-      throw new Error('unittest error')
-    } catch (error) {
-      errorLogging.logErrorEvent({ error })
-      errorLogging.logErrorEvent({ error })
-      errorLogging.logError(error)
-      errorLogging.logError('test error')
-      expect(apmServer.sendErrors).not.toHaveBeenCalled()
-      expect(apmServer.addError).not.toHaveBeenCalled()
-      expect(apmServer.errorQueue).toBe(undefined)
     }
   })
 })

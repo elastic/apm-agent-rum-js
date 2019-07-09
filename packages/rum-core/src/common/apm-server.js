@@ -28,17 +28,12 @@ import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
+import { __DEV__ } from '../env'
 
 class ApmServer {
   constructor(configService, loggingService) {
     this._configService = configService
     this._loggingService = loggingService
-    this.logMessages = {
-      invalidConfig: {
-        message: 'RUM agent configuration is invalid!',
-        level: 'warn'
-      }
-    }
 
     this.errorQueue = undefined
     this.transactionQueue = undefined
@@ -194,15 +189,6 @@ class ApmServer {
     this.throttleAddTransaction(transaction)
   }
 
-  warnOnce(logObject) {
-    if (logObject.level === 'warn') {
-      logObject.level = 'debug'
-      this._loggingService.warn(logObject.message)
-    } else {
-      this._loggingService.debug(logObject.message)
-    }
-  }
-
   ndjsonErrors(errors) {
     return errors.map(function(error) {
       return NDJSON.stringify({ error })
@@ -227,10 +213,6 @@ class ApmServer {
   }
 
   _send(data = [], type = 'transaction') {
-    if (!this._configService.isValid()) {
-      this.warnOnce(this.logMessages.invalidConfig)
-      return
-    }
     if (data.length === 0) {
       return
     }
@@ -250,7 +232,9 @@ class ApmServer {
     } else if (type === 'transaction') {
       ndjson = this.ndjsonTransactions(filteredPayload.data)
     } else {
-      this._loggingService.debug('Dropped payload due to unknown data type ')
+      if (__DEV__) {
+        this._loggingService.debug('Dropped payload due to unknown data type')
+      }
       return
     }
     ndjson.unshift(

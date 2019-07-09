@@ -24,41 +24,41 @@
  */
 
 import Transaction from './transaction'
-import { isUndefined, extend } from '../common/utils'
+import { extend, getPageLoadMarks } from '../common/utils'
+import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
+import { __DEV__ } from '../env'
 
 class TransactionService {
   constructor(logger, config) {
-    if (typeof config === 'undefined') {
+    if (__DEV__ && typeof config === 'undefined') {
       logger.debug('TransactionService: config is not provided')
     }
-
     this._config = config
     this._logger = logger
-    this.marks = {}
     this.currentTransaction = undefined
     this._subscription = new Subscription()
     this._alreadyCapturedPageLoad = false
   }
 
-  shouldCreateTransaction() {
-    return this._config.isActive()
-  }
-
-  getOrCreateCurrentTransaction() {
-    if (!this.shouldCreateTransaction()) {
-      return
+  ensureCurrentTransaction(options) {
+    if (!options) {
+      options = this.createPerfOptions()
     }
     var tr = this.getCurrentTransaction()
-    if (!isUndefined(tr) && !tr.ended) {
+    if (tr) {
       return tr
+    } else {
+      options.canReuse = true
+      return this.createTransaction(undefined, undefined, options)
     }
-    return this.createZoneTransaction()
   }
 
   getCurrentTransaction() {
-    return this.currentTransaction
+    if (this.currentTransaction && !this.currentTransaction.ended) {
+      return this.currentTransaction
+    }
   }
 
   setCurrentTransaction(value) {
@@ -66,103 +66,99 @@ class TransactionService {
   }
 
   createTransaction(name, type, options) {
-    var perfOptions = options
-    if (isUndefined(perfOptions)) {
-      perfOptions = this._config.config
-    }
-    if (!this.shouldCreateTransaction()) {
-      return
-    }
-
-    var tr = new Transaction(name, type, perfOptions)
+    var tr = new Transaction(name, type, options)
     this.setCurrentTransaction(tr)
-    if (perfOptions.checkBrowserResponsiveness) {
+    if (options.checkBrowserResponsiveness) {
       this.startCounter(tr)
     }
     return tr
-  }
-  createZoneTransaction() {
-    return this.createTransaction('ZoneTransaction', 'transaction')
   }
 
   startCounter(transaction) {
     transaction.browserResponsivenessCounter = 0
     var interval = this._config.get('browserResponsivenessInterval')
     if (typeof interval === 'undefined') {
-      this._logger.debug('browserResponsivenessInterval is undefined!')
+      if (__DEV__) {
+        this._logger.debug('browserResponsivenessInterval is undefined!')
+      }
       return
     }
-    this.runOuter(function() {
-      var id = setInterval(function() {
-        if (transaction.ended) {
-          window.clearInterval(id)
-        } else {
-          transaction.browserResponsivenessCounter++
-        }
-      }, interval)
-    })
-  }
 
-  sendPageLoadMetrics(name) {
-    var tr = this.startTransaction(name, 'page-load')
-    tr.detectFinish()
-    return tr
+    const id = setInterval(function() {
+      if (transaction.ended) {
+        window.clearInterval(id)
+      } else {
+        transaction.browserResponsivenessCounter++
+      }
+    }, interval)
   }
 
   capturePageLoadMetrics(tr) {
-    var self = this
-    var capturePageLoad = self._config.get('capturePageLoad')
+    var capturePageLoad = this._config.get('capturePageLoad')
     if (
       capturePageLoad &&
-      !self._alreadyCapturedPageLoad &&
+      !this._alreadyCapturedPageLoad &&
       tr.isHardNavigation
     ) {
-      tr.addMarks(self.marks)
       captureHardNavigation(tr)
+      tr.addMarks(getPageLoadMarks())
       self._alreadyCapturedPageLoad = true
       return true
     }
   }
 
-  startTransaction(name, type, options) {
-    var self = this
-    var config = self._config.config
-
-    var perfOptions = extend(
+  createPerfOptions(options) {
+    const config = this._config.config
+    return extend(
       {
         pageLoadTraceId: config.pageLoadTraceId,
         pageLoadSampled: config.pageLoadSampled,
         pageLoadSpanId: config.pageLoadSpanId,
         pageLoadTransactionName: config.pageLoadTransactionName,
-        transactionSampleRate: config.transactionSampleRate
+        transactionSampleRate: config.transactionSampleRate,
+        checkBrowserResponsiveness: config.checkBrowserResponsiveness
       },
       options
     )
+  }
 
-    if (!type) {
-      type = 'custom'
-    }
+  startTransaction(name, type, options) {
+    const perfOptions = this.createPerfOptions(options)
 
-    if (!name) {
-      name = 'Unknown'
-    }
+    var tr = this.getCurrentTransaction()
 
-    // this will create a zone transaction if possible
-    var tr = this.getOrCreateCurrentTransaction()
-
-    if (tr) {
-      if (tr.name === 'ZoneTransaction') {
-        tr.redefine(name, type, perfOptions)
-      } else {
-        this._logger.debug('Ending old transaction', tr)
-        tr.end()
-        tr = this.createTransaction(name, type, perfOptions)
+    if (!tr) {
+      tr = this.createTransaction(name, type, perfOptions)
+    } else if (tr.canReuse() && perfOptions.canReuse) {
+      /*
+       * perfOptions could also have `canReuse:true` in which case we
+       * allow a redefinition until there's a call that doesn't have that
+       * or the threshold is exceeded.
+       */
+      if (__DEV__) {
+        this._logger.debug(
+          'Redefining the current transaction',
+          tr,
+          name,
+          type,
+          perfOptions
+        )
       }
+      /**
+       * We want to keep the type in it's original value, therefore,
+       * passing undefined as type. For example, in the case of a page-load
+       * we want to keep the type but redefine the name to the first route.
+       */
+      tr.redefine(name, undefined, perfOptions)
     } else {
-      return
+      if (__DEV__) {
+        this._logger.debug('Ending old transaction', tr)
+      }
+      tr.end()
+      tr = this.createTransaction(name, type, perfOptions)
     }
 
-    if (type === 'page-load') {
+    if (type === PAGE_LOAD) {
       tr.isHardNavigation = true
 
       if (perfOptions.pageLoadTraceId) {
@@ -171,48 +167,54 @@ class TransactionService {
       if (perfOptions.pageLoadSampled) {
         tr.sampled = perfOptions.pageLoadSampled
       }
-
-      if (tr.name === 'Unknown' && config.pageLoadTransactionName) {
-        tr.name = config.pageLoadTransactionName
+      /**
+       * The name must be set as soon as the transaction is started
+       * Ex: Helps to decide sampling based on name
+       */
+      if (tr.name === NAME_UNKNOWN && perfOptions.pageLoadTransactionName) {
+        tr.name = perfOptions.pageLoadTransactionName
       }
     }
+    if (__DEV__) {
+      this._logger.debug('TransactionService.startTransaction', tr)
+    }
 
-    this._logger.debug('TransactionService.startTransaction', tr)
-    tr.onEnd = function() {
-      self.applyAsync(function() {
-        self._logger.debug('TransactionService transaction finished', tr)
-        if (!self.shouldIgnoreTransaction(tr.name)) {
-          if (type === 'page-load') {
-            if (
-              tr.name === 'Unknown' &&
-              self._config.get('pageLoadTransactionName')
-            ) {
-              tr.name = self._config.get('pageLoadTransactionName')
+    tr.onEnd = () => {
+      return Promise.resolve().then(
+        () => {
+          if (__DEV__) {
+            this._logger.debug('TransactionService transaction finished', tr)
+          }
+          if (this.shouldIgnoreTransaction(tr.name)) {
+            return
+          }
+          if (tr.type === PAGE_LOAD) {
+            /**
+             * Setting the pageLoadTransactionName via configService.setConfig after
+             * transaction has started should also reflect the correct name.
+             */
+            const pageLoadTransactionName = this._config.get(
+              'pageLoadTransactionName'
+            )
+            if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
+              tr.name = pageLoadTransactionName
             }
-            var captured = self.capturePageLoadMetrics(tr)
+            const captured = this.capturePageLoadMetrics(tr)
             if (captured) {
-              self.add(tr)
+              this.add(tr)
             }
           } else {
-            self.add(tr)
+            this.add(tr)
+          }
+        },
+        err => {
+          if (__DEV__) {
+            this._logger.debug('TransactionService transaction onEnd', err)
           }
         }
-      })
+      )
     }
     return tr
-  }
-
-  applyAsync(fn, applyThis, applyArgs) {
-    return this.runOuter(function() {
-      return Promise.resolve().then(
-        function() {
-          return fn.apply(applyThis, applyArgs)
-        },
-        function(reason) {
-          console.log(reason)
-        }
-      )
-    })
   }
 
   shouldIgnoreTransaction(transactionName) {
@@ -232,22 +234,22 @@ class TransactionService {
   }
 
   startSpan(name, type, options) {
-    var trans = this.getOrCreateCurrentTransaction()
+    var trans = this.ensureCurrentTransaction()
 
     if (trans) {
-      this._logger.debug('TransactionService.startSpan', name, type)
+      if (__DEV__) {
+        this._logger.debug('TransactionService.startSpan', name, type)
+      }
       var span = trans.startSpan(name, type, options)
       return span
     }
   }
 
   add(transaction) {
-    if (!this._config.isActive()) {
-      return
-    }
-
     this._subscription.applyAll(this, [transaction])
-    this._logger.debug('TransactionService.add', transaction)
+    if (__DEV__) {
+      this._logger.debug('TransactionService.add', transaction)
+    }
   }
 
   subscribe(fn) {
@@ -255,32 +257,34 @@ class TransactionService {
   }
 
   addTask(taskId) {
-    var tr = this.getOrCreateCurrentTransaction()
+    var tr = this.ensureCurrentTransaction()
     if (tr) {
       var taskId = tr.addTask(taskId)
-      this._logger.debug('TransactionService.addTask', taskId)
+      if (__DEV__) {
+        this._logger.debug('TransactionService.addTask', taskId)
+      }
     }
     return taskId
   }
 
   removeTask(taskId) {
     var tr = this.getCurrentTransaction()
-    if (!isUndefined(tr) && !tr.ended) {
+    if (tr) {
       tr.removeTask(taskId)
-      this._logger.debug('TransactionService.removeTask', taskId)
+      if (__DEV__) {
+        this._logger.debug('TransactionService.removeTask', taskId)
+      }
     }
   }
 
   detectFinish() {
     var tr = this.getCurrentTransaction()
-    if (!isUndefined(tr) && !tr.ended) {
+    if (tr) {
       tr.detectFinish()
-      this._logger.debug('TransactionService.detectFinish')
+      if (__DEV__) {
+        this._logger.debug('TransactionService.detectFinish')
+      }
     }
-  }
-
-  runOuter(fn, applyThis, applyArgs) {
-    return fn.apply(applyThis, applyArgs)
   }
 }
 

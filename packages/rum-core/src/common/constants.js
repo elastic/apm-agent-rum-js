@@ -37,6 +37,11 @@ const FETCH_SOURCE = 'fetch'
 const XMLHTTPREQUEST_SOURCE = 'XMLHttpRequest.send'
 
 /**
+ * History sources
+ */
+const HISTORY_PUSHSTATE = 'history.pushState'
+
+/**
  * Event listener methods
  */
 const ADD_EVENT_LISTENER_STR = 'addEventListener'
@@ -57,9 +62,26 @@ const RESOURCE_INITIATOR_TYPES = [
 ]
 
 /**
+ * The amount of time it is allowed for a transaction to be reused in another startTransaction
+ */
+const REUSABILITY_THRESHOLD = 10000
+
+/**
  * Maximum duration of the span that is used to decide if the span is valid - 300 secs / 5 mins
  */
-const SPAN_THRESHOLD = 5 * 60 * 1000
+const MAX_SPAN_DURATION = 5 * 60 * 1000
+
+/**
+ * Transaction & Span - Name & Types
+ */
+const PAGE_LOAD = 'page-load'
+const NAME_UNKNOWN = 'Unknown'
+const TYPE_CUSTOM = 'custom'
+
+/**
+ * Check only for long tasks that are more than 60ms
+ */
+const USER_TIMING_THRESHOLD = 60
 
 /**
  * Others
@@ -72,9 +94,15 @@ export {
   CLEAR,
   FETCH_SOURCE,
   XMLHTTPREQUEST_SOURCE,
+  HISTORY_PUSHSTATE,
   ADD_EVENT_LISTENER_STR,
   REMOVE_EVENT_LISTENER_STR,
   RESOURCE_INITIATOR_TYPES,
-  SPAN_THRESHOLD,
+  REUSABILITY_THRESHOLD,
+  MAX_SPAN_DURATION,
+  PAGE_LOAD,
+  NAME_UNKNOWN,
+  TYPE_CUSTOM,
+  USER_TIMING_THRESHOLD,
   KEYWORD_LIMIT
 }

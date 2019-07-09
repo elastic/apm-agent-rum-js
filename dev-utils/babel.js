@@ -23,25 +23,24 @@
  *
  */
 
-import { createServiceFactory } from '..'
-import StackTraceService from '../../src/error-logging/stack-trace-service'
+function getBabelConfig() {
+  return {
+    comments: false,
+    presets: [
+      [
+        '@babel/preset-env',
+        {
+          targets: {
+            node: '8.0.0'
+          },
+          loose: true
+        }
+      ]
+    ],
+    plugins: []
+  }
+}
 
-describe('StackTraceService', function() {
-  it('should produce correct number of frames', function(done) {
-    var serviceFactory = createServiceFactory()
-    var configService = serviceFactory.getService('ConfigService')
-    var stackTraceService = new StackTraceService(configService)
-    function generateError() {
-      throw new Error('test error')
-    }
-    setTimeout(function() {
-      try {
-        generateError()
-      } catch (error) {
-        var stackTraces = stackTraceService.createStackTraces({ error })
-        expect(stackTraces.length).toBeGreaterThan(1)
-        done()
-      }
-    }, 1)
-  })
-})
+module.exports = {
+  getBabelConfig
+}

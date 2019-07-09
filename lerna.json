@@ -10,11 +10,11 @@
       "conventionalCommits": true,
       "message": "chore(release): publish",
       "gitRemote": "upstream"
-    },
-    "ignoreChanges": [
-      "**/*.md",
-      "**/test/**",
-      "docs"
-    ]
-  }
+    }
+  },
+  "ignoreChanges": [
+    "**/*.md",
+    "**/test/**",
+    "docs"
+  ]
 }

@@ -27,9 +27,7 @@ const path = require('path')
 const JasmineRunner = require('jasmine')
 const express = require('express')
 const serveIndex = require('serve-index')
-const runAll = require('npm-run-all')
 const testUtils = require('../../dev-utils/test-utils')
-const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 const { runIntegrationTest } = require('./test/e2e/integration-test')
 const { generateNotice } = require('../../dev-utils/dep-info')
 
@@ -141,45 +139,6 @@ function runE2eTests(config) {
   testUtils.runE2eTests(webDriverConfig, false)
 }
 
-function runSauceTests(serve = 'true') {
-  let servers = []
-  if (serve === 'true') {
-    servers = serveE2e('./', 8000)
-  }
-  /**
-   * Decides the saucelabs test status
-   */
-  let exitCode = 0
-  const loggerOpts = {
-    stdout: process.stdout,
-    stderr: process.stderr
-  }
-  /**
-   * Since there is no easy way to reuse the sauce connect tunnel even using same tunnel identifier,
-   * we launch the sauce connect tunnel before starting all the saucelab tests
-   *
-   * Unit tests are not run in parallel with E2E because of concurrency limit in saucelabs
-   */
-  const sauceConnectOpts = getSauceConnectOptions()
-  testUtils.runSauceConnect(sauceConnectOpts, async sauceConnectProcess => {
-    try {
-      await runAll('test:unit', loggerOpts)
-      await runAll(['test:e2e:supported', 'test:e2e:failsafe'], {
-        parallel: true,
-        printLabel: true,
-        ...loggerOpts
-      })
-      console.log('All Unit and E2E Sauce Tests done')
-    } catch (err) {
-      console.log('Sauce Tests Failed', err)
-      exitCode = 1
-    } finally {
-      servers.map(s => s.close())
-      sauceConnectProcess.close(() => process.exit(exitCode))
-    }
-  })
-}
-
 function runIntegrationTests() {
   const servers = serveE2e('./', 8000)
   const SPEC_DIR = 'test/integration'
@@ -208,16 +167,9 @@ function runNodeTests() {
 
 const scripts = {
   startSelenium: testUtils.startSelenium,
-  runSauceTests,
   runE2eTests,
   runIntegrationTests,
   runNodeTests,
-  buildE2eBundles(basePath) {
-    basePath = basePath || './test/e2e'
-    testUtils.buildE2eBundles(path.join(PROJECT_DIR, basePath), err => {
-      err && process.exit(2)
-    })
-  },
   serveE2e,
   generateNotice
 }

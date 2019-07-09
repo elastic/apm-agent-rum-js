@@ -126,35 +126,57 @@ describe('ConfigService', function() {
     expect(userContext).toEqual({})
   })
 
-  it('should check config validity', function() {
-    var result = configService.isValid()
-    expect(result).toBe(false)
+  it('should validate required config options', () => {
+    // Valid
+    const errors1 = configService.validate({ serviceName: 'name' })
+    expect(errors1).toEqual({
+      missing: [],
+      invalid: []
+    })
 
-    configService.setConfig({ serviceName: 'serviceName' })
-    result = configService.isValid()
-    expect(result).toBe(true)
+    // missing required key serviceName
+    const errors2 = configService.validate({ serviceName: undefined })
+    expect(errors2).toEqual({
+      missing: ['serviceName'],
+      invalid: []
+    })
 
-    configService.setConfig({ serverUrl: undefined })
-    result = configService.isValid()
-    expect(result).toBe(false)
+    // missing required key serviceName & serverUrl
+    const errors3 = configService.validate({
+      serviceName: undefined,
+      serverUrl: ''
+    })
+    expect(errors3).toEqual({
+      missing: ['serviceName', 'serverUrl'],
+      invalid: []
+    })
 
-    configService.setConfig({ serverUrl: 'test' })
-    result = configService.isValid()
-    expect(result).toBe(true)
+    // Invalid characters in serviceName
+    const errors4 = configService.validate({ serviceName: 'abc.def' })
+    expect(errors4).toEqual({
+      missing: [],
+      invalid: [
+        {
+          key: 'serviceName',
+          value: 'abc.def',
+          allowed: 'a-z, A-Z, 0-9, _, -, <space>'
+        }
+      ]
+    })
   })
 
-  it('should addTags', function() {
+  it('should addLabels', function() {
     var date = new Date()
-    const tags = {
+    const labels = {
       test: 'test',
       no: 1,
       'test.test': 'test',
       obj: { just: 'object' },
       date
     }
-    configService.addTags(tags)
-    const contextTags = configService.get('context.tags')
-    expect(contextTags).toEqual({
+    configService.addLabels(labels)
+    const contextLabels = configService.get('context.labels')
+    expect(contextLabels).toEqual({
       test: 'test',
       no: '1',
       test_test: 'test',
@@ -174,5 +196,17 @@ describe('ConfigService', function() {
     configServiceFromScript.init()
     expect(configServiceFromScript.get('serviceName')).toBe('js-core')
     expect(configServiceFromScript.get('capturePageLoad')).toBe('false')
+  })
+
+  it('should remove trailing slash from serverUrl', () => {
+    configService.setConfig({
+      serviceName: 'aabc',
+      serverUrl: 'http://localhost:8080/////',
+      serverUrlPrefix: '/rum/events'
+    })
+    expect(configService.getEndpointUrl()).toEqual(
+      'http://localhost:8080/rum/events'
+    )
+    expect(configService.get('serverUrl')).toEqual('http://localhost:8080')
   })
 })

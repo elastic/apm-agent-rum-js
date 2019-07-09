@@ -27,13 +27,19 @@ import TransactionService from '../../src/performance-monitoring/transaction-ser
 import Transaction from '../../src/performance-monitoring/transaction'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
-import resourceEntries from '../fixtures/resource-entries'
-import paintEntries from '../fixtures/paint-entries'
+import { mockGetEntriesByType } from '../utils/globals-mock'
 
 describe('TransactionService', function() {
   var transactionService
   var config
   var logger
+
+  function sendPageLoadMetrics(name) {
+    var tr = transactionService.startTransaction(name, 'page-load')
+    tr.detectFinish()
+    return tr
+  }
+
   beforeEach(function() {
     logger = new LoggingService()
     spyOn(logger, 'debug')
@@ -56,30 +62,6 @@ describe('TransactionService', function() {
     expect(
       transactionService.getCurrentTransaction().startSpan
     ).toHaveBeenCalledWith('test-span', 'test-span', { test: 'passed' })
-  })
-
-  it('should not start span when performance monitoring is disabled', function() {
-    config.set('active', false)
-    transactionService = new TransactionService(logger, config)
-    var tr = new Transaction('transaction', 'transaction')
-    spyOn(tr, 'startSpan').and.callThrough()
-    transactionService.setCurrentTransaction(tr)
-    transactionService.startSpan('test-span', 'test-span')
-    expect(
-      transactionService.getCurrentTransaction().startSpan
-    ).not.toHaveBeenCalled()
-  })
-
-  it('should not start transaction when performance monitoring is disabled', function() {
-    config.set('active', false)
-    transactionService = new TransactionService(logger, config)
-
-    var result = transactionService.startTransaction(
-      'transaction',
-      'transaction'
-    )
-
-    expect(result).toBeUndefined()
   })
 
   it('should start transaction', function(done) {
@@ -112,26 +94,17 @@ describe('TransactionService', function() {
     expect(result.onEnd).toHaveBeenCalled()
   })
 
-  it('should create a zone transaction on the first span', function() {
+  it('should create a reusable transaction on the first span', function() {
     config.set('active', true)
     transactionService = new TransactionService(logger, config)
 
     transactionService.startSpan('testSpan', 'testtype')
     var trans = transactionService.getCurrentTransaction()
-    expect(trans.name).toBe('ZoneTransaction')
-    transactionService.startTransaction('transaction', 'transaction')
+    expect(trans.name).toBe('Unknown')
+    transactionService.startTransaction('transaction', 'transaction', {
+      canReuse: true
+    })
     expect(trans.name).toBe('transaction')
-  })
-
-  it('should not create transaction if performance is not enabled', function() {
-    config.set('active', false)
-    transactionService = new TransactionService(logger, config)
-    var result = transactionService.createTransaction(
-      'test',
-      'test',
-      config.get('performance')
-    )
-    expect(result).toBeUndefined()
   })
 
   it('should capture page load on first transaction', function(done) {
@@ -165,42 +138,57 @@ describe('TransactionService', function() {
     tr2.detectFinish()
   })
 
-  it('should sendPageLoadMetrics', function(done) {
-    config.set('active', true)
-    config.set('capturePageLoad', true)
-
+  it('should reuse Transaction', function() {
     transactionService = new TransactionService(logger, config)
-
-    transactionService.subscribe(function() {
-      expect(tr.isHardNavigation).toBe(true)
-      expect(tr.marks.agent).toBeDefined()
-      expect(tr.marks.navigationTiming).toBeDefined()
-      done()
+    const reusableTr = new Transaction('test-name', 'test-type', {
+      canReuse: true
     })
-    var tr = transactionService.sendPageLoadMetrics('test')
+    transactionService.setCurrentTransaction(reusableTr)
+    const pageLoadTr = transactionService.startTransaction(name, 'page-load', {
+      canReuse: true
+    })
+    pageLoadTr.detectFinish()
 
-    transactionService = new TransactionService(logger, config)
-    var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
-    transactionService.setCurrentTransaction(zoneTr)
-
-    var pageLoadTr = transactionService.sendPageLoadMetrics('new tr')
-
-    expect(pageLoadTr).toBe(zoneTr)
+    expect(pageLoadTr).toBe(reusableTr)
   })
 
-  it('should consider initial page load name or use location.pathname', function() {
-    transactionService = new TransactionService(logger, config)
-    var tr
+  it('should contain agent marks in page load transaction', function() {
+    const unMock = mockGetEntriesByType()
+    const tr = new Transaction('test', 'test')
+    tr.isHardNavigation = true
+    transactionService.capturePageLoadMetrics(tr)
 
-    tr = transactionService.sendPageLoadMetrics()
+    const agentMarks = [
+      'timeToFirstByte',
+      'domInteractive',
+      'domComplete',
+      'firstContentfulPaint'
+    ]
+
+    expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
+    agentMarks.forEach(mark => {
+      expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
+    })
+    unMock()
+  })
+
+  it('should use initial page load name before ending the transaction', function() {
+    transactionService = new TransactionService(logger, config)
+
+    const tr = transactionService.startTransaction(undefined, 'page-load')
     expect(tr.name).toBe('Unknown')
 
     config.set('pageLoadTransactionName', 'page load name')
-    tr = transactionService.sendPageLoadMetrics()
-    expect(tr.name).toBe('page load name')
+    tr.detectFinish()
 
-    tr = transactionService.sendPageLoadMetrics('hamid-test')
-    expect(tr.name).toBe('hamid-test')
+    /**
+     * For page load transaction we set the transaction name using
+     * transaction.onEnd which is scheduled in microtask using Promise.resolve()
+     */
+    Promise.resolve().then(() => {
+      expect(tr.name).toBe('page load name')
+      done()
+    })
   })
 
   xit('should not add duplicate resource spans', function() {
@@ -245,31 +233,36 @@ describe('TransactionService', function() {
   })
 
   it('should capture resources from navigation timing', function(done) {
-    var _getEntriesByType = window.performance.getEntriesByType
-
-    window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint']).toContain(type)
-      if (type === 'resource') {
-        return resourceEntries
-      }
-      return paintEntries
-    }
+    const unMock = mockGetEntriesByType()
 
     config.set('active', true)
     config.set('capturePageLoad', true)
 
-    var transactionService = new TransactionService(logger, config)
-    transactionService.subscribe(function() {
+    const customTransactionService = new TransactionService(logger, config)
+    customTransactionService.subscribe(function() {
       expect(tr.isHardNavigation).toBe(true)
-      window.performance.getEntriesByType = _getEntriesByType
+      expect(
+        tr.spans.filter(({ type }) => type === 'resource').length
+      ).toBeGreaterThanOrEqual(1)
+      expect(
+        tr.spans.filter(({ type }) => type === 'app').length
+      ).toBeGreaterThanOrEqual(1)
+      expect(tr.marks.agent.firstContentfulPaint).toBeDefined()
+      expect(tr.marks.navigationTiming).toBeDefined()
+      unMock()
       done()
     })
 
-    var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
-    transactionService.setCurrentTransaction(zoneTr)
-    var span = zoneTr.startSpan('GET http://example.com', 'external.http')
+    const zoneTr = new Transaction('test', 'test-transaction')
+    customTransactionService.setCurrentTransaction(zoneTr)
+    const span = zoneTr.startSpan('GET http://example.com', 'external.http')
     span.end()
-    var tr = transactionService.sendPageLoadMetrics('resource-test')
+
+    const tr = customTransactionService.startTransaction(
+      'resource-test',
+      'page-load'
+    )
+    tr.detectFinish()
   })
 
   it('should ignore transactions that match the list', function() {
@@ -312,17 +305,10 @@ describe('TransactionService', function() {
       pageLoadSpanId: 'test-span-id',
       pageLoadSampled: true
     })
-
-    window.performance.getEntriesByType = function(type) {
-      expect(['resource', 'paint']).toContain(type)
-      if (type === 'resource') {
-        return resourceEntries
-      }
-      return {}
-    }
+    const unMock = mockGetEntriesByType()
 
     transactionService = new TransactionService(logger, config)
-    var tr = transactionService.sendPageLoadMetrics()
+    const tr = sendPageLoadMetrics()
     expect(tr.traceId).toBe('test-trace-id')
     expect(tr.sampled).toBe(true)
 
@@ -338,7 +324,14 @@ describe('TransactionService', function() {
         expect(spans[0].id).toBe('test-span-id')
         expect(spans[0].name).toBe('Requesting and receiving the document')
       }
+      unMock()
       done()
     })
+  })
+
+  it('should createTransaction once per startTransaction', function() {
+    spyOn(transactionService, 'createTransaction').and.callThrough()
+    transactionService.startTransaction('test-name', 'test-type')
+    expect(transactionService.createTransaction).toHaveBeenCalledTimes(1)
   })
 })
