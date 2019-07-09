@@ -1,14 +1,12 @@
 # Releasing
 
-Before releasing a new version of packages to the NPM and GitHub, Its advisable to follow the below steps in order
+Before releasing a new version of packages to the NPM and GitHub, Set all the environment variables necessary for the testing and release scripts. The required variables are
+- APM_SERVER_URL
+- GITHUB_TOKEN
 
-- Make sure all tests passes `npm run test`
-- Set all the environment variables necessary for the testing on saucelabs and for the release scripts. The required variables are
-  + MODE=saucelabs 
-  + APM_SERVER_URL
-  + SAUCE_USERNAME
-  + SAUCE_ACCESS_KEY
-  + GITHUB_TOKEN
+```
+$ GITHUB_TOKEN=<token> APM_SERVER_URL=<server-url> npm run release
+```
 
 ### Releasing all packages
 

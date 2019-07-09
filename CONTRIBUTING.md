@@ -83,14 +83,24 @@ $ npx lerna bootstrap
 
 ### Testing
 
-Tests fall under unit, integration and end-to-end tests. Before running the test, we have to start the APM server manually
+Tests fall under unit, integration and end-to-end tests. Before running the test, we have to start the APM server manually since all the APM payload data are sent to the server.
 
 ```sh
 STACK_VERSION=<version> docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
 // version - corresponds to Elastic Stack versions
 ```
 
-Once the APM server is up and running, we can start running the tests.
+Once the APM server is up and running, we can start running the tests. To run all the tests in each package
+
+```sh
+$ APM_SERVER_URL=<server-url> npm run test
+```
+
+To run all the tests on individual package set the `SCOPE` environment variable and start the tests
+
+```sh
+$ APM_SERVER_URL=<server-url> SCOPE=@elastic/apm-rum npm run test
+```
 
 ##### Unit tests
 ```sh
@@ -102,18 +112,12 @@ $ npx lerna run --scope @elastic/apm-rum test:unit
 $ npx lerna run --scope @elastic/apm-rum test:integration
 ```
 
-##### E2E tests (Sauce labs)
+##### E2E tests (Saucelabs)
 
-E2E tests are run on saucelabs, We have to environment variables before running these tests
+E2E tests are run on Saucelabs, Before running these tests we have to set some environment variables to run all the tests on Saucelabs
 
 ```sh
 $ MODE=saucelabs SAUCE_USERNAME=<username> SAUCE_ACCESS_KEY=<access-key> npx lerna run --scope @elastic/apm-rum test:sauce
-```
-
-To run all the tests, Set the environment variables required for the E2E and run the below command
-
-```sh
-$ npm run test --scope <package-name>
 ```
 
 ### Linting
