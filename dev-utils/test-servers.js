@@ -83,7 +83,7 @@ function startTestServers(path = join(__dirname, '../'), port = 8000) {
     const echo = req.query.echo
     try {
       const result = await runIntegrationTest(
-        'http://localhost:8000/test/e2e/general-usecase/'
+        `http://localhost:${port}/test/e2e/general-usecase/`
       )
       if (echo) {
         return res.send(echo)

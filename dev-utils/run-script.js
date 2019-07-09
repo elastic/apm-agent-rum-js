@@ -38,9 +38,9 @@ const { generateNotice } = require('./dep-info')
 const PROJECT_DIR = join(__dirname, '../')
 const { sauceLabs } = getTestEnvironmentVariables()
 
-function runUnitTests(packagePath, launchSauceConnect = 'false') {
+function runUnitTests(packagePath, startSauceConnect = 'false') {
   const karmaConfigFile = join(PROJECT_DIR, packagePath, 'karma.conf.js')
-  if (launchSauceConnect === 'true') {
+  if (startSauceConnect === 'true') {
     return launchSauceConnect(() => runKarma(karmaConfigFile))
   }
   runKarma(karmaConfigFile)

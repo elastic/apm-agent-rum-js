@@ -28,8 +28,8 @@
     "test:unit": "node ../../dev-utils/run-script.js runUnitTests packages/rum",
     "test:e2e:supported": "node ../../dev-utils/run-script.js runE2eTests packages/rum/wdio.conf.js",
     "test:e2e:failsafe": "node ../../dev-utils/run-script.js runE2eTests packages/rum/wdio-failsafe.conf.js",
-    "test:sauce": "node ../../dev-utils/run-script.js runSauceTests packages/rum true build:e2e test:unit test:e2e:supported test:e2e:failsafe",
-    "test": "npm-run-all build test:node test:integration test:sauce"
+    "test:sauce": "node ../../dev-utils/run-script.js runSauceTests packages/rum true test:unit test:e2e:supported test:e2e:failsafe",
+    "test": "npm-run-all build build:e2e test:node test:integration test:sauce"
   },
   "files": [
     "src",
