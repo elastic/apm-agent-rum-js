@@ -28,11 +28,15 @@ const runAll = require('npm-run-all')
 const {
   runKarma,
   runSauceConnect,
+  runJasmine,
   runE2eTests: runE2eTestsUtils,
   buildE2eBundles: buildE2eBundlesUtils
 } = require('./test-utils')
 const { startTestServers } = require('./test-servers')
-const { getTestEnvironmentVariables } = require('./test-config')
+const {
+  getTestEnvironmentVariables,
+  getSauceConnectOptions
+} = require('./test-config')
 const { generateNotice } = require('./dep-info')
 
 const PROJECT_DIR = join(__dirname, '../')
@@ -52,10 +56,37 @@ function runUnitTests(packagePath, startSauceConnect = 'false') {
  */
 function launchSauceConnect(callback = () => {}) {
   if (sauceLabs) {
-    return runSauceConnect(callback)
+    const sauceOpts = getSauceConnectOptions()
+    return runSauceConnect(sauceOpts, callback)
   }
   console.info('Skipping sauce tests, MODE is not set to saucelabs')
   return callback()
+}
+
+function runIntegrationTests() {
+  const servers = startTestServers('./')
+  const SPEC_DIR = 'test/integration'
+  runJasmine(SPEC_DIR, err => {
+    servers.forEach(server => server.close())
+    if (err) {
+      console.log('Integration tests failed:', err.message)
+      process.exit(2)
+    }
+  })
+}
+
+/**
+ * Ensure all the exports from our module works
+ * in Node.js without babel transpiling the modules
+ */
+function runNodeTests() {
+  const SPEC_DIR = 'test/node'
+  runJasmine(SPEC_DIR, err => {
+    if (err) {
+      console.log('Node tests for build failed:', err.message)
+      process.exit(2)
+    }
+  })
 }
 
 function runE2eTests(configPath) {
@@ -116,11 +147,13 @@ function runSauceTests(packagePath, serve = 'true', ...scripts) {
 }
 
 const scripts = {
-  runUnitTests,
   launchSauceConnect,
   generateNotice,
+  runUnitTests,
   runSauceTests,
   runE2eTests,
+  runIntegrationTests,
+  runNodeTests,
   buildE2eBundles,
   startTestServers
 }
