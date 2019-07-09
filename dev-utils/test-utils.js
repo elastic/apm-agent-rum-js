@@ -28,6 +28,7 @@ const fs = require('fs')
 const webpack = require('webpack')
 const { default: Launcher } = require('@wdio/cli')
 const sauceConnectLauncher = require('sauce-connect-launcher')
+const JasmineRunner = require('jasmine')
 const { singleRunKarma } = require('./karma')
 
 function walkSync(dir, filter, filelist) {
@@ -205,10 +206,34 @@ function runE2eTests(configFilePath, runSelenium) {
   }
 }
 
+function runJasmine(specDir, cb) {
+  const jrunner = new JasmineRunner()
+  /**
+   * spec dir is a relative directory path from the current working dir
+   */
+  jrunner.loadConfig({
+    spec_dir: specDir,
+    spec_files: ['*.spec.js'],
+    helpers: ['*.helper.js']
+  })
+  jrunner.onComplete(passed => {
+    if (!passed) {
+      const err = new Error('Jasmine tests failed')
+      // The stack is not useful in this context.
+      err.stack = ''
+      cb(err)
+    } else {
+      cb()
+    }
+  })
+  jrunner.execute()
+}
+
 module.exports = {
   buildE2eBundles,
   runE2eTests,
   runKarma,
+  runJasmine,
   runSauceConnect,
   startSelenium,
   dirWalkSync: walkSync

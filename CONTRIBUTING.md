@@ -78,35 +78,46 @@ The project structure follows a monorepo approach, all officially maintained mod
 
 ```sh
 $ git clone git@github.com:elastic/apm-agent-rum-js.git && cd apm-agent-rum-js
-$ npm install
-$ npm run bootstrap
+$ npx lerna bootstrap
 ```
 
 ### Testing
 
-Tests fall under unit, integration and end-to-end tests. To run all tests
+Tests fall under unit, integration and end-to-end tests. Before running the test, we have to start the APM server manually since all the APM payload data are sent to the server.
 
 ```sh
-$ npm test
+STACK_VERSION=<version> docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
+// version - corresponds to Elastic Stack versions
 ```
 
-To run tests for a specific package:
+Once the APM server is up and running, we can start running the tests. To run all the tests in each package
 
 ```sh
-$ SCOPE=@elastic/apm-rum npm test
+$ APM_SERVER_URL=<server-url> npm run test
 ```
 
-To run unit/integration/end-to-end tests for packages:
+To run all the tests on individual package set the `SCOPE` environment variable and start the tests
 
 ```sh
-// Unit tests
+$ APM_SERVER_URL=<server-url> SCOPE=@elastic/apm-rum npm run test
+```
+
+##### Unit tests
+```sh
 $ npx lerna run --scope @elastic/apm-rum test:unit
+```
 
-// Integration tests
+##### Integration tests
+```sh
 $ npx lerna run --scope @elastic/apm-rum test:integration
+```
 
-// End to end tests
-$ npx lerna run --scope @elastic/apm-rum test:e2e
+##### E2E tests (Saucelabs)
+
+E2E tests are run on Saucelabs, Before running these tests we have to set some environment variables to run all the tests on Saucelabs
+
+```sh
+$ MODE=saucelabs SAUCE_USERNAME=<username> SAUCE_ACCESS_KEY=<access-key> npx lerna run --scope @elastic/apm-rum test:sauce
 ```
 
 ### Linting
