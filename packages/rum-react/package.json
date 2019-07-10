@@ -16,7 +16,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/elastic/apm-agent-rum-js.git"
+    "url": "git+https://github.com/elastic/apm-agent-rum-js.git",
+    "directory": "packages/rum-react"
   },
   "scripts": {
     "prepublishOnly": "npm run build",
