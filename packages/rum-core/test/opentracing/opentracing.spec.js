@@ -96,7 +96,7 @@ describe('OpenTracing API', function() {
         username: 'test-username',
         email: 'test-email'
       },
-      labels: { another_tag: 'test-tag' }
+      tags: { another_tag: 'test-tag' }
     })
 
     var testError = new Error('OpenTracing test error')
@@ -126,7 +126,7 @@ describe('OpenTracing API', function() {
 
     expect(childSpan.span.type).toBe('new-type')
     expect(childSpan.span.context).toEqual({
-      labels: {
+      tags: {
         another_tag: 'test-tag',
         user_id: 'test-id',
         user_username: 'test-username',

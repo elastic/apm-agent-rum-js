@@ -37,7 +37,7 @@ describe('SpanBase', function() {
     var span = new SpanBase()
     span.addLabels({ test: 'passed', 'test.new': 'new' })
     expect(span.context).toEqual({
-      labels: { test: 'passed', test_new: 'new' }
+      tags: { test: 'passed', test_new: 'new' }
     })
   })
 
