@@ -199,12 +199,12 @@ class Config {
     }
   }
 
-  addLabels(labels) {
-    if (!this.config.context.labels) {
-      this.config.context.labels = {}
+  addLabels(tags) {
+    if (!this.config.context.tags) {
+      this.config.context.tags = {}
     }
-    var keys = Object.keys(labels)
-    keys.forEach(k => setLabel(k, labels[k], this.config.context.labels))
+    var keys = Object.keys(tags)
+    keys.forEach(k => setLabel(k, tags[k], this.config.context.tags))
   }
 
   setConfig(properties = {}) {

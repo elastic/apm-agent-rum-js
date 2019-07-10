@@ -175,7 +175,7 @@ describe('ConfigService', function() {
       date
     }
     configService.addLabels(labels)
-    const contextLabels = configService.get('context.labels')
+    const contextLabels = configService.get('context.tags')
     expect(contextLabels).toEqual({
       test: 'test',
       no: '1',

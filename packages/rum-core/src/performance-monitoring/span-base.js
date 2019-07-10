@@ -63,14 +63,14 @@ class SpanBase {
     this.addLabels(tags)
   }
 
-  addLabels(labels) {
+  addLabels(tags) {
     this.ensureContext()
     var ctx = this.context
-    if (!ctx.labels) {
-      ctx.labels = {}
+    if (!ctx.tags) {
+      ctx.tags = {}
     }
-    var keys = Object.keys(labels)
-    keys.forEach(k => setLabel(k, labels[k], ctx.labels))
+    var keys = Object.keys(tags)
+    keys.forEach(k => setLabel(k, tags[k], ctx.tags))
   }
 
   addContext(context) {
