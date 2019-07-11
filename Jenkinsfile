@@ -162,7 +162,7 @@ class RumParallelTaskGenerator extends DefaultParallelTaskGenerator {
           saveResult(x, y, 1)
         } catch(e){
           saveResult(x, y, 0)
-          error("${label} tests failed : ${e.toString()}\n")
+          steps.error("${label} tests failed : ${e.toString()}\n")
         } finally {
           steps.wrappingUp()
         }
@@ -260,7 +260,6 @@ def wrappingUp(){
   junit(allowEmptyResults: true,
     keepLongStdio: true,
     testResults: "**/spec/rum-agent-junit.xml")
-  archiveArtifacts(allowEmptyArchive: true, artifacts: "**/.npm/_logs")
-  codecov(repo: 'apm-agent-rum', basedir: "${steps.env.BASE_DIR}",
-    secret: "${steps.env.CODECOV_SECRET}")
+  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs")
+  codecov(repo: 'apm-agent-rum', basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
 }
