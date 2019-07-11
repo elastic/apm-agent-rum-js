@@ -257,6 +257,9 @@ def bundlesize(){
 }
 
 def wrappingUp(){
+  sh '''
+   find . -path ./.git -prune -o -path ./packages -prune -o -path ./node_modules -prune -o -path ./docs -prune -o -path ./scripts -prune -o  -type f
+  '''
   junit(allowEmptyResults: true,
     keepLongStdio: true,
     testResults: '**/spec/rum-agent-junit.xml')

@@ -143,10 +143,7 @@ services:
         npm install
         npm install puppeteer --unsafe-perm=true --allow-root
         set -eo pipefail
-        npm run test
-        ls -ltra
-        find . -path ./.git -prune -o -path ./packages -prune -o -path ./node_modules -prune -o -path ./docs -prune -o -path ./scripts -prune -o  -type f
-        "
+        npm run test"
     mem_limit: 2000m
 #    cpus: 0.5
     depends_on:
