@@ -102,10 +102,11 @@ const baseConfig = {
 function prepareConfig(defaultConfig) {
   const testConfig = defaultConfig.testConfig || {}
   const agentConfig = defaultConfig.globalConfigs.agentConfig || {}
-  const { isTravis, sauceLabs: isSauce } = testConfig
+  const { isTravis, isJenkins, sauceLabs: isSauce } = testConfig
   let buildId = `ApmJs-${agentConfig.name}`
 
   if (isTravis) {
+    console.log('prepareConfig: Run in Travis')
     buildId =
       buildId +
       ' - TRAVIS #' +
@@ -115,7 +116,34 @@ function prepareConfig(defaultConfig) {
       ')'
     defaultConfig.plugins.push('karma-firefox-launcher')
     defaultConfig.browsers.push('Firefox')
+  } else if (isJenkins && isSauce) {
+    console.log('prepareConfig: Run in Jenkins')
+    buildId =
+      buildId +
+      ' - Jenkins #' +
+      process.env.BUILD_NUMBER +
+      ' (' +
+      process.env.BRANCH_NAME +
+      ') Elastic Stack ' +
+      process.env.STACK_VERSION
+    console.log('prepareConfig: buildId ' + buildId)
+    defaultConfig.plugins.push('karma-firefox-launcher')
+    defaultConfig.browsers.push('Firefox')
+  } else if (isJenkins && !isSauce) {
+    defaultConfig.plugins.push('karma-chrome-launcher')
+    defaultConfig.browsers = ['ChromeHeadlessNoSandbox']
+    defaultConfig.customLaunchers = {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox', // required to run without privileges in docker
+          '--user-data-dir=/tmp/chrome-test-profile',
+          '--disable-web-security'
+        ]
+      }
+    }
   } else {
+    console.log('prepareConfig: Run in Default enviroment')
     defaultConfig.plugins.push('karma-chrome-launcher')
     defaultConfig.browsers.push('Chrome')
 
@@ -139,11 +167,19 @@ function prepareConfig(defaultConfig) {
   }
 
   if (isSauce) {
+    console.log('prepareConfig: Run in SuaceLab mode')
     defaultConfig.concurrency = 3
-    if (testConfig.branch === 'master') {
+    if (testConfig.branch === 'master' && !isJenkins) {
       // && process.env.TRAVIS_PULL_REQUEST !== 'false'
       defaultConfig.sauceLabs.build = buildId
       defaultConfig.sauceLabs.tags = ['master']
+      console.log('saucelabs.build:', buildId)
+    } else if (isJenkins) {
+      defaultConfig.sauceLabs.build = buildId
+      defaultConfig.sauceLabs.tags = [
+        testConfig.branch,
+        process.env.STACK_VERSION
+      ]
       console.log('saucelabs.build:', buildId)
     }
     defaultConfig.reporters = ['dots', 'saucelabs']

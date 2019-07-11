@@ -79,5 +79,5 @@ addons:
 
 script:
   - source ./scripts/export-saucelabs-account
-  - docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
+  - docker-compose -f ./dev-utils/docker-compose.yml up -d wait-for-apm-server
   - npm run test
