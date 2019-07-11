@@ -59,13 +59,6 @@ function getGlobalConfig(packageName = 'rum') {
     mockApmServer: false
   }
 
-  /**
-   * Use this for testing locally
-   */
-  // if (env.sauceLabs) {
-  //   globalConfigs.useMocks = true
-  // }
-
   return {
     globalConfigs,
     testConfig: testEnv

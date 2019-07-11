@@ -23,17 +23,19 @@
  *
  */
 
-import { generateTestTransaction } from './'
-import { createServiceFactory } from '../../'
+import { generateTestTransaction } from './index'
+import { createServiceFactory } from '../../src/index'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
-suite('PerformanceMonitoring', function() {
-  var serviceFactory = createServiceFactory()
-  var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
-  var apmServer = serviceFactory.getService('ApmServer')
-  var _postJson = apmServer._postJson
-  var configService = serviceFactory.getService('ConfigService')
+suite('PerformanceMonitoring', () => {
+  const serviceFactory = createServiceFactory()
+  const performanceMonitoring = serviceFactory.getService(
+    'PerformanceMonitoring'
+  )
+  const apmServer = serviceFactory.getService('ApmServer')
+  const _postJson = apmServer._postJson
+  const configService = serviceFactory.getService('ConfigService')
   configService.setConfig({ serviceName: 'benchmark-send-transactions' })
   configService.setConfig(agentConfig)
 
