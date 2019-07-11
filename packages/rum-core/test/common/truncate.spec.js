@@ -165,7 +165,8 @@ describe('Truncate', () => {
           de: null,
           ef: '',
           headers: {
-            fg: ''
+            fg: '',
+            gh: 'asd'
           }
         }
       },
@@ -205,7 +206,9 @@ describe('Truncate', () => {
         },
         response: {
           cb: 2134,
-          headers: {}
+          headers: {
+            gh: 'asd'
+          }
         }
       },
       marks: {

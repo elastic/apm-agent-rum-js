@@ -90,14 +90,18 @@ function getResponseContext(perfTimingEntry) {
     serverTiming
   } = perfTimingEntry
 
-  return {
+  const respContext = {
     transfer_size: transferSize,
     encoded_body_size: encodedBodySize,
-    decoded_body_size: decodedBodySize,
-    headers: {
-      'server-timing': getServerTimingInfo(serverTiming)
+    decoded_body_size: decodedBodySize
+  }
+  const serverTimingStr = getServerTimingInfo(serverTiming)
+  if (serverTimingStr) {
+    respContext.headers = {
+      'server-timing': serverTimingStr
     }
   }
+  return respContext
 }
 
 function createNavigationTimingSpans(timings, baseTime, transactionEnd) {

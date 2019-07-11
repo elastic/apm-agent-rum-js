@@ -230,8 +230,7 @@ function getServerTimingInfo(serverTimingEntries = []) {
   const valueSeparator = ';'
   for (let i = 0; i < serverTimingEntries.length; i++) {
     const { name, duration, description } = serverTimingEntries[i]
-    let timingValue = ''
-    timingValue += name
+    let timingValue = name
     if (description) {
       timingValue += valueSeparator + 'desc=' + description
     }
