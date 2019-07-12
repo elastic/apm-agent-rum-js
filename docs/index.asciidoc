@@ -19,6 +19,8 @@ include::./api.asciidoc[]
 
 include::./configuration.asciidoc[]
 
+include::./framework-integrations.asciidoc[]
+
 include::./advanced-topics.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
@@ -28,5 +30,3 @@ include::./distributed-tracing-guide.asciidoc[]
 include::./opentracing.asciidoc[]
 
 include::./release-notes.asciidoc[]
-
-include::./framework-integrations.asciidoc[]

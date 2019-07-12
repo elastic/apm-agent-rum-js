@@ -1,7 +1,7 @@
 [[react-integration]]
 === React integration
 
-This document covers how to use React integration with Real User Monitoring JavaScript agent.
+This document covers how to use Real User Monitoring JavaScript agent with React applications.
 Please see our <<getting-started, Getting started guide>> for configuring the Real User Monitoring agent.
 
 [[installing-react-integration]]
@@ -26,7 +26,8 @@ To instrument the application routes, you can use `ApmRoute` component provided 
 `ApmRoute` creates a transaction that has the path of the `Route` as its name and has `route-change`
 as its type.
 
-NOTE: Currently `ApmRoute` only supports applications using `react-router` library.
+NOTE: Currently `ApmRoute` only supports applications using 
+https://github.com/ReactTraining/react-router[`react-router`] library.
 
 First you should import `ApmRoute` from the `@elastic/apm-rum-react` package:
 
@@ -43,25 +44,25 @@ with `ApmRoute`. You can use `ApmRoute` in any of the routes that you would like
 [source,js]
 ----
 class App extends React.Component {
-    render() {
-        return (
-            <div>
-                <ApmRoute
-                    exact
-                    path="/"
-                    component={() => (
-                        <Redirect
-                            to={{
-                                pathname: '/home'
-                            }}
-                        />
-                    )}
-                />
-                <ApmRoute path="/home" component={HomeComponent} />
-                <Route path="/about" component={AboutComponent} />
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div>
+        <ApmRoute
+          exact
+          path="/"
+          component={() => (
+            <Redirect
+              to={{
+                pathname: '/home'
+              }}
+            />
+          )}
+        />
+        <ApmRoute path="/home" component={HomeComponent} />
+        <Route path="/about" component={AboutComponent} />
+      </div>
+    )
+  }
 }
 ----
 
@@ -76,17 +77,7 @@ import { withTransaction } from '@elastic/apm-rum-react'
 ----
 
 
-Then, you can use `withTransaction` to decorate your React components,
-either using the decorator notation:
-
-[source,js]
-----
-@withTransaction('AboutComponent', 'component')
-class AboutComponent extends React.Component { }
-----
-
-
-Or, using `withTransaction` as a function:
+Then, you can use `withTransaction` as a function to wrap your React components:
 
 
 [source,js]
