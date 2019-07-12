@@ -1,0 +1,6 @@
+[[framework-integrations]]
+== Framework-specific integrations
+
+* <<react-integration, React Integration>>
+
+include::./react-integration.asciidoc[React Integration]
