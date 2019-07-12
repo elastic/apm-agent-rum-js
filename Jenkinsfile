@@ -259,7 +259,7 @@ def bundlesize(){
 def wrappingUp(){
   junit(allowEmptyResults: true,
     keepLongStdio: true,
-    testResults: "**/spec/rum-agent-junit.xml")
+    testResults: "**/reports/TEST-*.xml")
   archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs")
   codecov(repo: 'apm-agent-rum', basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
 }

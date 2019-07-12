@@ -130,6 +130,18 @@ function prepareConfig(defaultConfig) {
     defaultConfig.plugins.push('karma-firefox-launcher')
     defaultConfig.browsers.push('Firefox')
   } else if (isJenkins && !isSauce) {
+    defaultConfig.plugins.push('karma-junit-reporter')
+    defaultConfig.junitReporter = {
+      outputDir: 'reports',
+      outputFile: undefined,
+      suite: '',
+      useBrowserName: true,
+      nameFormatter: undefined,
+      classNameFormatter: undefined,
+      properties: {},
+      xmlVersion: null
+    }
+    defaultConfig.reporters.push('junit')
     defaultConfig.plugins.push('karma-chrome-launcher')
     defaultConfig.browsers = ['ChromeHeadlessNoSandbox']
     defaultConfig.customLaunchers = {
