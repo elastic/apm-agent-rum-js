@@ -67,17 +67,23 @@ module.exports = function(config) {
       'karma-benchmark-json-reporter'
     ],
     benchmarkJsonReporter: {
-      pathToJson: `${REPORTS_DIR}/benchmark-results.json`,
+      pathToJson: `${REPORTS_DIR}/rum-core-benchmarks.json`,
       formatOutput(results) {
-        const summary = results.map(r => {
-          return {
-            name: `${r.suite}.${r.name}`,
-            mean: r.mean,
-            hz: r.hz
+        const summary = results.map(
+          ({ suite, name, mean, count, cycle, browser }) => {
+            return {
+              suite,
+              name,
+              mean,
+              count,
+              cycle,
+              browser,
+              hz: `${r.hz} ops/sec`
+            }
           }
-        })
+        )
         console.log(JSON.stringify(summary, undefined, 2))
-        return { results }
+        return { summary }
       }
     }
   })
