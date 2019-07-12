@@ -142,11 +142,6 @@ function prepareConfig(defaultConfig) {
         ]
       }
     }
-  } else {
-    console.log('prepareConfig: Run in Default enviroment')
-    defaultConfig.plugins.push('karma-chrome-launcher')
-    defaultConfig.browsers.push('Chrome')
-
     if (defaultConfig.coverage) {
       // istanbul code coverage
       defaultConfig.plugins.push('karma-coverage')
@@ -161,6 +156,10 @@ function prepareConfig(defaultConfig) {
       }
       defaultConfig.reporters.push('coverage')
     }
+  } else {
+    console.log('prepareConfig: Run in Default enviroment')
+    defaultConfig.plugins.push('karma-chrome-launcher')
+    defaultConfig.browsers.push('Chrome')
   }
 
   if (isSauce) {

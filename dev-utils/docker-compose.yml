@@ -119,6 +119,7 @@ services:
           - wait-for-apm-server
 
   node-puppeteer:
+    build: ../.ci/docker/node-puppeteer
     container_name: node-puppeteer
     image: docker.elastic.co/observability-ci/node-puppeteer:8
     environment:
