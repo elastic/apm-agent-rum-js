@@ -14,10 +14,12 @@ Install the `@elastic/apm-rum-react` package as a dependency to your application
 npm install @elastic/apm-rum-react --save
 ----
 
+[float]
 ==== Instrumenting your React application
 
 The React integration package provides two approaches to instrumenting your application:
 
+[float]
 ===== Instrumenting application routes
 
 To instrument the application routes, you can use `ApmRoute` component provided in the package. 
@@ -63,6 +65,7 @@ class App extends React.Component {
 }
 ----
 
+[float]
 ===== Instrumenting individual React components
 
 First you should import `withTransaction` from the `@elastic/apm-rum-react` package:
@@ -94,4 +97,4 @@ export default withTransaction('AboutComponent', 'component')(AboutComponent)
 
 
 NOTE: `withTransaction` accepts two parameters, "transaction name" and "transaction type". 
-If these parameters are not provided the defaults documented in <<transaction-api, Transaction API>> will be used.
+If these parameters are not provided, the defaults documented in <<transaction-api, Transaction API>> will be used.
