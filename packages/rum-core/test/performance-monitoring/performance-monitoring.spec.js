@@ -365,15 +365,12 @@ describe('PerformanceMonitoring', function() {
       expect(promise).toBeDefined()
       promise
         .then(
-          () => {
-            unMock()
-          },
-          reason => {
+          () => unMock(),
+          reason =>
             fail(
               'Failed sending page load metrics so the server, reason: ' +
                 reason
             )
-          }
         )
         .then(() => done())
     })

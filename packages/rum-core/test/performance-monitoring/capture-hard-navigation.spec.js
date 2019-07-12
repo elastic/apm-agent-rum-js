@@ -160,6 +160,20 @@ describe('Capture hard navigation', function() {
       ['http://ajax-filter.test'],
       transactionEnd
     )
+    const lastSpanContext = spans[spans.length - 1].context
+    expect(lastSpanContext).toEqual(
+      jasmine.objectContaining({
+        http: {
+          url: jasmine.any(String),
+          response: {
+            transfer_size: 420580,
+            encoded_body_size: 420379,
+            decoded_body_size: 420379
+          }
+        }
+      })
+    )
+
     expect(spans.map(mapSpan)).toEqual(spanSnapshot)
   })
 

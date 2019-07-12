@@ -43,7 +43,14 @@ const METADATA_MODEL = {
   }
 }
 
-const CONTEXT_COMMON = {
+const RESPONSE_MODEL = {
+  '*': true,
+  headers: {
+    '*': true
+  }
+}
+
+const CONTEXT_MODEL = {
   user: {
     id: true,
     email: true,
@@ -51,7 +58,13 @@ const CONTEXT_COMMON = {
   },
   tags: {
     '*': true
-  }
+  },
+  /** Spans */
+  http: {
+    response: RESPONSE_MODEL
+  },
+  /** Transactions */
+  response: RESPONSE_MODEL
 }
 
 const SPAN_MODEL = {
@@ -63,7 +76,7 @@ const SPAN_MODEL = {
   transaction_id: [KEYWORD_LIMIT, true],
   subtype: true,
   action: true,
-  context: CONTEXT_COMMON
+  context: CONTEXT_MODEL
 }
 
 const TRANSACTION_MODEL = {
@@ -75,7 +88,7 @@ const TRANSACTION_MODEL = {
   span_count: {
     started: [KEYWORD_LIMIT, true]
   },
-  context: CONTEXT_COMMON
+  context: CONTEXT_MODEL
 }
 
 const ERROR_MODEL = {
@@ -90,7 +103,7 @@ const ERROR_MODEL = {
   transaction: {
     type: true
   },
-  context: CONTEXT_COMMON
+  context: CONTEXT_MODEL
 }
 
 function truncate(
