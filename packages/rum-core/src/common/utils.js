@@ -207,6 +207,41 @@ function getPaintTimingMarks() {
   return paints
 }
 
+/**
+ *  Server timing information on Performance resource timing entries
+ *  https://www.w3.org/TR/server-timing/
+ *  [
+ *    {
+ *      name: "cdn-cache",
+ *      duration: 0,
+ *      desciprion: "HIT"
+ *    },
+ *    {
+ *      name: "edge",
+ *      duration: 4,
+ *      desciption: ''
+ *    }
+ *  ]
+ *  returns "cdn-cache;desc=HIT, edge;dur=4"
+ */
+function getServerTimingInfo(serverTimingEntries = []) {
+  let serverTimingInfo = []
+  const entrySeparator = ', '
+  const valueSeparator = ';'
+  for (let i = 0; i < serverTimingEntries.length; i++) {
+    const { name, duration, description } = serverTimingEntries[i]
+    let timingValue = name
+    if (description) {
+      timingValue += valueSeparator + 'desc=' + description
+    }
+    if (duration) {
+      timingValue += valueSeparator + 'dur=' + duration
+    }
+    serverTimingInfo.push(timingValue)
+  }
+  return serverTimingInfo.join(entrySeparator)
+}
+
 function getTimeOrigin() {
   return window.performance.timing.fetchStart
 }
@@ -378,6 +413,7 @@ export {
   parseDtHeaderValue,
   getNavigationTimingMarks,
   getPaintTimingMarks,
+  getServerTimingInfo,
   getDtHeaderValue,
   getPageMetadata,
   getCurrentScript,

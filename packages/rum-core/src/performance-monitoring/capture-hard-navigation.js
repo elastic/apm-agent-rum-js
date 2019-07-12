@@ -29,7 +29,7 @@ import {
   MAX_SPAN_DURATION,
   USER_TIMING_THRESHOLD
 } from '../common/constants'
-import { stripQueryStringFromUrl } from '../common/utils'
+import { stripQueryStringFromUrl, getServerTimingInfo } from '../common/utils'
 
 /**
  * Navigation Timing Spans
@@ -77,6 +77,33 @@ function shouldCreateSpan(start, end, baseTime, transactionEnd) {
   )
 }
 
+/**
+ * Both Navigation and Resource timing level 2 exposes these below information
+ *
+ * for CORS requests without Timing-Allow-Origin header, transferSize & encodedBodySize will be 0
+ */
+function getResponseContext(perfTimingEntry) {
+  const {
+    transferSize,
+    encodedBodySize,
+    decodedBodySize,
+    serverTiming
+  } = perfTimingEntry
+
+  const respContext = {
+    transfer_size: transferSize,
+    encoded_body_size: encodedBodySize,
+    decoded_body_size: decodedBodySize
+  }
+  const serverTimingStr = getServerTimingInfo(serverTiming)
+  if (serverTimingStr) {
+    respContext.headers = {
+      'server-timing': serverTimingStr
+    }
+  }
+  return respContext
+}
+
 function createNavigationTimingSpans(timings, baseTime, transactionEnd) {
   const spans = []
   for (let i = 0; i < eventPairs.length; i++) {
@@ -98,17 +125,26 @@ function createNavigationTimingSpans(timings, baseTime, transactionEnd) {
   return spans
 }
 
-function createResourceTimingSpan(name, initiatorType, start, end) {
+function createResourceTimingSpan(resourceTimingEntry) {
+  const { name, initiatorType, startTime, responseEnd } = resourceTimingEntry
   let kind = 'resource'
   if (initiatorType) {
     kind += '.' + initiatorType
   }
   const spanName = stripQueryStringFromUrl(name)
   const span = new Span(spanName, kind)
-  span.addContext({ http: { url: name } })
-  span._start = start
+  /**
+   * Add context information for spans
+   */
+  span.addContext({
+    http: {
+      url: name,
+      response: getResponseContext(resourceTimingEntry)
+    }
+  })
+  span._start = startTime
   span.end()
-  span._end = end
+  span._end = responseEnd
   return span
 }
 
@@ -133,9 +169,7 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
       if (!shouldCreateSpan(startTime, responseEnd, 0, transactionEnd)) {
         continue
       }
-      spans.push(
-        createResourceTimingSpan(name, initiatorType, startTime, responseEnd)
-      )
+      spans.push(createResourceTimingSpan(entries[i]))
     } else {
       /**
        * Since IE does not support initiatorType in Resource timing entry,
@@ -166,9 +200,7 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
         !foundAjaxReq &&
         shouldCreateSpan(startTime, responseEnd, 0, transactionEnd)
       ) {
-        spans.push(
-          createResourceTimingSpan(name, initiatorType, startTime, responseEnd)
-        )
+        spans.push(createResourceTimingSpan(entries[i]))
       }
     }
   }
@@ -233,6 +265,9 @@ function captureHardNavigation(transaction) {
       transaction.spans.push(span)
     })
 
+    /**
+     * capture resource timing information as Spans during page load transaction
+     */
     if (typeof perf.getEntriesByType === 'function') {
       const resourceEntries = perf.getEntriesByType('resource')
 
@@ -255,6 +290,17 @@ function captureHardNavigation(transaction) {
       createUserTimingSpans(userEntries, transactionEnd).forEach(span =>
         transaction.spans.push(span)
       )
+
+      /**
+       * Add transaction context information from performance navigation timing entry level 2 API
+       */
+      let navigationEntry = perf.getEntriesByType('navigation')
+      if (navigationEntry && navigationEntry.length > 0) {
+        navigationEntry = navigationEntry[0]
+        transaction.addContext({
+          response: getResponseContext(navigationEntry)
+        })
+      }
     }
   }
 }

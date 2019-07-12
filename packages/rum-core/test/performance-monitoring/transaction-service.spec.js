@@ -334,4 +334,23 @@ describe('TransactionService', function() {
     transactionService.startTransaction('test-name', 'test-type')
     expect(transactionService.createTransaction).toHaveBeenCalledTimes(1)
   })
+
+  it('should include size & server timing in page load context', done => {
+    const unMock = mockGetEntriesByType()
+    const customTrService = new TransactionService(logger, config)
+    customTrService.subscribe(function() {
+      expect(tr.context.response).toEqual({
+        transfer_size: 26941,
+        encoded_body_size: 105297,
+        decoded_body_size: 42687,
+        headers: {
+          'server-timing': 'edge;dur=4, cdn-cache;desc=HIT'
+        }
+      })
+      unMock()
+      done()
+    })
+    const tr = customTrService.startTransaction('test', 'page-load')
+    tr.detectFinish()
+  })
 })
