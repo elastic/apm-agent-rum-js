@@ -132,7 +132,7 @@ services:
       - SAUCE_USERNAME=${SAUCE_USERNAME}
       - SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}
       - MODE=${MODE}
-      - GOAL=${COVERAGE}
+      - GOAL=${GOAL}
     command: >
       /bin/bash -c "set -x
         id

@@ -100,7 +100,8 @@ pipeline {
         stage('Coverage') {
           steps {
             withGithubNotify(context: 'Coverage') {
-              runScript(label: 'coverage', stack: '7.0.0', scope: '@elastic/apm-rum', goal: 'coverage')
+              // No scope is required as the coverage should run for all of them
+              runScript(label: 'coverage', stack: '7.0.0', scope: '', goal: 'coverage')
               codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
             }
           }
