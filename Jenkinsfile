@@ -110,6 +110,7 @@ pipeline {
         Build the documentation.
         */
         stage('Documentation') {
+          agent { label 'linux && immutable' }
           steps {
             withGithubNotify(context: 'Documentation') {
               deleteDir()
