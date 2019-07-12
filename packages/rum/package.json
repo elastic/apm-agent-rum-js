@@ -20,7 +20,7 @@
     "build:e2e": "node ../../dev-utils/run-script.js buildE2eBundles packages/rum/test/e2e",
     "bundlesize": "npm run build && bundlesize",
     "karma": "karma start",
-    "karma:coverage": "karma start --coverage",
+    "karma:coverage": "karma start --coverage --singleRun",
     "script": "node ../../dev-utils/run-script.js",
     "test:node": "npm run script runNodeTests",
     "test:integration": "npm run script runIntegrationTests",

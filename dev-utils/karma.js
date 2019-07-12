@@ -156,10 +156,7 @@ function prepareConfig(defaultConfig) {
 
       defaultConfig.coverageReporter = {
         includeAllSources: true,
-        reporters: [
-          { type: 'html', dir: 'coverage/' },
-          { type: 'text-summary' }
-        ],
+        reporters: [{ type: 'lcov' }, { type: 'text-summary' }],
         dir: 'coverage/'
       }
       defaultConfig.reporters.push('coverage')
