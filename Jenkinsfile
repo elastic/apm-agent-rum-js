@@ -95,6 +95,17 @@ pipeline {
           }
         }
         /**
+        Execute code coverange only once.
+        */
+        stage('Coverage') {
+          steps {
+            withGithubNotify(context: 'Coverage') {
+              runScript(label: 'coverage', stack: '7.0.0', scope: '@elastic/apm-rum', goal: 'coverage')
+              codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
+            }
+          }
+        }
+        /**
         Build the documentation.
         */
         stage('Documentation') {
@@ -199,11 +210,13 @@ def runScript(Map params = [:]){
   def stack = params.stack
   def scope = params.scope
   def label = params.label
+  def goal = params.get('goal', 'test')
 
   env.STACK_VERSION = "${stack}"
   env.SCOPE = "${scope}"
   env.APM_SERVER_URL = 'http://apm-server:8200'
   env.APM_SERVER_PORT = '8200'
+  env.GOAL = "${goal}"
 
   deleteDir()
   unstash 'source'
@@ -261,5 +274,4 @@ def wrappingUp(){
     keepLongStdio: true,
     testResults: "**/spec/rum-agent-junit.xml")
   archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs")
-  codecov(repo: 'apm-agent-rum', basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
 }
