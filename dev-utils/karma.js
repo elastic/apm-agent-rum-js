@@ -139,6 +139,11 @@ function prepareConfig(defaultConfig) {
         ]
       }
     }
+    defaultConfig.plugins.push('karma-junit-reporter')
+    defaultConfig.reporters.push('junit')
+    defaultConfig.junitReporter = {
+      outputDir: 'reports'
+    }
   } else {
     console.log('prepareConfig: Run in Default enviroment')
     defaultConfig.plugins.push('karma-chrome-launcher')
@@ -151,7 +156,6 @@ function prepareConfig(defaultConfig) {
   if (defaultConfig.coverage) {
     defaultConfig.plugins.push('karma-coverage')
     defaultConfig.reporters.push('coverage')
-
     const babelPlugins = defaultConfig.webpack.module.rules[0].options.plugins
     babelPlugins.push('istanbul')
 
