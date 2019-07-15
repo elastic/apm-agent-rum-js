@@ -127,12 +127,6 @@ function prepareConfig(defaultConfig) {
       ') Elastic Stack ' +
       process.env.STACK_VERSION
 
-    defaultConfig.plugins.push('karma-junit-reporter')
-    defaultConfig.junitReporter = {
-      outputDir: 'reports'
-    }
-    defaultConfig.reporters.push('junit')
-
     defaultConfig.plugins.push('karma-chrome-launcher')
     defaultConfig.browsers = ['ChromeHeadlessNoSandbox']
     defaultConfig.customLaunchers = {
@@ -155,9 +149,10 @@ function prepareConfig(defaultConfig) {
    *  Add coverage reports and plugins required for all environments
    */
   if (defaultConfig.coverage) {
+    defaultConfig.plugins.push('karma-junit-reporter')
     defaultConfig.plugins.push('karma-coverage')
     defaultConfig.reporters.push('coverage')
-
+    defaultConfig.reporters.push('junit')
     const babelPlugins = defaultConfig.webpack.module.rules[0].options.plugins
     babelPlugins.push('istanbul')
 
@@ -165,6 +160,16 @@ function prepareConfig(defaultConfig) {
       includeAllSources: true,
       reporters: [{ type: 'lcov' }, { type: 'text-summary' }],
       dir: 'coverage/'
+    }
+    defaultConfig.junitReporter = {
+      outputDir: 'reports',
+      outputFile: undefined,
+      suite: '',
+      useBrowserName: true,
+      nameFormatter: undefined,
+      classNameFormatter: undefined,
+      properties: {},
+      xmlVersion: null
     }
   }
 
