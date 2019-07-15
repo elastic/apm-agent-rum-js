@@ -119,6 +119,7 @@ services:
           - wait-for-apm-server
 
   node-puppeteer:
+    build: ../.ci/docker/node-puppeteer
     container_name: node-puppeteer
     image: docker.elastic.co/observability-ci/node-puppeteer:8
     environment:
@@ -132,6 +133,7 @@ services:
       - SAUCE_USERNAME=${SAUCE_USERNAME}
       - SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}
       - MODE=${MODE}
+      - GOAL=${GOAL}
     command: >
       /bin/bash -c "set -x
         id
@@ -143,7 +145,7 @@ services:
         npm install
         npm install puppeteer --unsafe-perm=true --allow-root
         set -eo pipefail
-        npm run test"
+        npm run ${GOAL}"
     mem_limit: 2000m
 #    cpus: 0.5
     depends_on:
