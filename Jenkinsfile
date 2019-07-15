@@ -280,5 +280,5 @@ def wrappingUp(){
   junit(allowEmptyResults: true,
     keepLongStdio: true,
     testResults: "**/reports/TESTS-*.xml")
-  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs")
+  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs,**/reports/TESTS-*.xml")
 }
