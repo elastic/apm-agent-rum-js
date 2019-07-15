@@ -222,8 +222,8 @@ def runScript(Map params = [:]){
     withEnv([
       "STACK_VERSION=${stack}",
       "SCOPE=${scope}",
-      "APM_SERVER_URL='http://apm-server:8200'",
-      "APM_SERVER_PORT='8200'",
+      "APM_SERVER_URL=http://apm-server:8200",
+      "APM_SERVER_PORT=8200",
       "GOAL=${goal}"]) {
       retry(2) {
         sleep randomNumber(min: 5, max: 10)
