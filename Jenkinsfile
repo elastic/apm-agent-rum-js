@@ -214,30 +214,30 @@ def runScript(Map params = [:]){
   def label = params.label
   def goal = params.get('goal', 'test')
 
-  env.STACK_VERSION = "${stack}"
-  env.SCOPE = "${scope}"
-  env.APM_SERVER_URL = 'http://apm-server:8200'
-  env.APM_SERVER_PORT = '8200'
-  env.GOAL = "${goal}"
-
   deleteDir()
   unstash 'source'
   unstash 'cache'
   dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "docker.elastic.co")
   dir("${BASE_DIR}"){
-    retry(2) {
-      sleep randomNumber(min: 5, max: 10)
-      sh(label: 'Pull and build docker infra', script: '.ci/scripts/pull_and_build.sh')
-    }
-
-    if(params.saucelab_test){
-      env.MODE = 'saucelabs'
-      withSaucelabsEnv(){
+    withEnv([
+      "STACK_VERSION=${stack}",
+      "SCOPE=${scope}",
+      "APM_SERVER_URL=http://apm-server:8200",
+      "APM_SERVER_PORT=8200",
+      "GOAL=${goal}"]) {
+      retry(2) {
+        sleep randomNumber(min: 5, max: 10)
+        sh(label: 'Pull and build docker infra', script: '.ci/scripts/pull_and_build.sh')
+      }
+      if(params.saucelab_test){
+        env.MODE = 'saucelabs'
+        withSaucelabsEnv(){
+          sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
+        }
+      } else {
+        env.MODE = 'none'
         sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
       }
-    } else {
-      env.MODE = 'none'
-      sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
     }
   }
 }
@@ -279,6 +279,6 @@ def bundlesize(){
 def wrappingUp(){
   junit(allowEmptyResults: true,
     keepLongStdio: true,
-    testResults: "**/spec/rum-agent-junit.xml")
-  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs")
+    testResults: "${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
+  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs,${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
 }
