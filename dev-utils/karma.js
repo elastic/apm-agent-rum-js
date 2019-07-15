@@ -129,14 +129,7 @@ function prepareConfig(defaultConfig) {
 
     defaultConfig.plugins.push('karma-junit-reporter')
     defaultConfig.junitReporter = {
-      outputDir: 'reports',
-      outputFile: undefined,
-      suite: '',
-      useBrowserName: true,
-      nameFormatter: undefined,
-      classNameFormatter: undefined,
-      properties: {},
-      xmlVersion: null
+      outputDir: 'reports'
     }
     defaultConfig.reporters.push('junit')
 
