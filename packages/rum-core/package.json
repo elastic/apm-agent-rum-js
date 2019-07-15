@@ -19,7 +19,7 @@
     "build:main": "npx babel src -d dist/lib --config-file ../../babel.node.js",
     "karma": "karma start",
     "karma:bench": "karma start karma.bench.conf.js",
-    "karma:coverage": "karma start --coverage",
+    "karma:coverage": "karma start --coverage --singleRun",
     "test:unit": "node ../../dev-utils/run-script.js runUnitTests packages/rum-core true",
     "test": "npm run test:unit"
   },

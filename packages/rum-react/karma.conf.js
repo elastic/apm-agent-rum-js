@@ -38,24 +38,22 @@ module.exports = function(config) {
         {
           test: /.jsx?$/,
           exclude: /node_modules/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: [
-                [
-                  '@babel/preset-env',
-                  {
-                    targets: {
-                      ie: '11'
-                    },
-                    useBuiltIns: false,
-                    modules: 'umd'
-                  }
-                ],
-                ['@babel/preset-react']
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              [
+                '@babel/preset-env',
+                {
+                  targets: {
+                    ie: '11'
+                  },
+                  useBuiltIns: false,
+                  modules: 'umd'
+                }
               ],
-              plugins: ['@babel/plugin-transform-destructuring']
-            }
+              ['@babel/preset-react']
+            ],
+            plugins: ['@babel/plugin-transform-destructuring']
           }
         }
       ]

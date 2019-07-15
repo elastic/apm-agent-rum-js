@@ -116,7 +116,7 @@ function prepareConfig(defaultConfig) {
       ')'
     defaultConfig.plugins.push('karma-firefox-launcher')
     defaultConfig.browsers.push('Firefox')
-  } else if (isJenkins && isSauce) {
+  } else if (isJenkins) {
     console.log('prepareConfig: Run in Jenkins')
     buildId =
       buildId +
@@ -126,10 +126,7 @@ function prepareConfig(defaultConfig) {
       process.env.BRANCH_NAME +
       ') Elastic Stack ' +
       process.env.STACK_VERSION
-    console.log('prepareConfig: buildId ' + buildId)
-    defaultConfig.plugins.push('karma-firefox-launcher')
-    defaultConfig.browsers.push('Firefox')
-  } else if (isJenkins && !isSauce) {
+
     defaultConfig.plugins.push('karma-chrome-launcher')
     defaultConfig.browsers = ['ChromeHeadlessNoSandbox']
     defaultConfig.customLaunchers = {
@@ -146,41 +143,37 @@ function prepareConfig(defaultConfig) {
     console.log('prepareConfig: Run in Default enviroment')
     defaultConfig.plugins.push('karma-chrome-launcher')
     defaultConfig.browsers.push('Chrome')
+  }
 
-    if (defaultConfig.coverage) {
-      // istanbul code coverage
-      defaultConfig.plugins.push('karma-coverage')
+  /**
+   *  Add coverage reports and plugins required for all environments
+   */
+  if (defaultConfig.coverage) {
+    defaultConfig.plugins.push('karma-coverage')
+    defaultConfig.reporters.push('coverage')
 
-      var babelPlugins = defaultConfig.webpack.module.rules[0].options.plugins
-      babelPlugins.push('istanbul')
+    const babelPlugins = defaultConfig.webpack.module.rules[0].options.plugins
+    babelPlugins.push('istanbul')
 
-      defaultConfig.coverageReporter = {
-        includeAllSources: true,
-        reporters: [
-          { type: 'html', dir: 'coverage/' },
-          { type: 'text-summary' }
-        ],
-        dir: 'coverage/'
-      }
-      defaultConfig.reporters.push('coverage')
+    defaultConfig.coverageReporter = {
+      includeAllSources: true,
+      reporters: [{ type: 'lcov' }, { type: 'text-summary' }],
+      dir: 'coverage/'
     }
   }
 
   if (isSauce) {
-    console.log('prepareConfig: Run in SuaceLab mode')
+    console.log('prepareConfig: Run in SauceLab mode')
+    defaultConfig.sauceLabs.build = buildId
+    console.log('saucelabs.build:', buildId)
     defaultConfig.concurrency = 3
-    if (testConfig.branch === 'master' && !isJenkins) {
-      // && process.env.TRAVIS_PULL_REQUEST !== 'false'
-      defaultConfig.sauceLabs.build = buildId
-      defaultConfig.sauceLabs.tags = ['master']
-      console.log('saucelabs.build:', buildId)
-    } else if (isJenkins) {
-      defaultConfig.sauceLabs.build = buildId
+    if (isJenkins) {
       defaultConfig.sauceLabs.tags = [
         testConfig.branch,
         process.env.STACK_VERSION
       ]
-      console.log('saucelabs.build:', buildId)
+    } else if (testConfig.branch === 'master') {
+      defaultConfig.sauceLabs.tags = [testConfig.branch]
     }
     defaultConfig.reporters = ['dots', 'saucelabs']
     defaultConfig.browsers = Object.keys(defaultConfig.customLaunchers)
