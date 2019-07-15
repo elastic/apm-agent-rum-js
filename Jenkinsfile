@@ -279,6 +279,6 @@ def bundlesize(){
 def wrappingUp(){
   junit(allowEmptyResults: true,
     keepLongStdio: true,
-    testResults: "**/reports/TESTS-*.xml")
-  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs,**/reports/TESTS-*.xml")
+    testResults: "${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
+  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs,${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
 }
