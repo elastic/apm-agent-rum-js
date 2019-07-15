@@ -65,8 +65,7 @@ describe('ApmRoute', function() {
 
   it('should work with Route render', function() {
     const apmBase = new ApmBase(createServiceFactory())
-    apmBase.init({})
-    const ApmRoute = getApmRoute()
+    const ApmRoute = getApmRoute(apmBase)
 
     const rendered = mount(
       <div>
