@@ -19,7 +19,8 @@
     "lint:license": "node scripts/license-checker",
     "test": "lerna run build:main && lerna run test --stream --scope=$SCOPE --no-prefix",
     "bundlesize": "lerna run bundlesize --stream",
-    "serve": "node ./dev-utils/run-script.js startTestServers"
+    "serve": "node ./dev-utils/run-script.js startTestServers",
+    "coverage": "lerna run build:main && lerna run karma:coverage --stream"
   },
   "lint-staged": {
     "*.{js,jsx}": [
@@ -58,6 +59,7 @@
     "babel-plugin-istanbul": "^5.1.4",
     "benchmark": "^2.1.4",
     "bundlesize": "^0.17.2",
+    "codecov": "^3.5.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.12.1",
     "es6-promise": "^4.2.4",

@@ -23,30 +23,22 @@
  *
  */
 
-import resourceEntries from '../fixtures/resource-entries'
-import paintEntries from '../fixtures/paint-entries'
-import userTimingEntries from '../fixtures/user-timing-entries'
-import navigationEntries from '../fixtures/navigation-entries'
-
-export function mockGetEntriesByType() {
-  const _getEntriesByType = window.performance.getEntriesByType
-
-  window.performance.getEntriesByType = function(type) {
-    expect(['resource', 'paint', 'measure', 'navigation']).toContain(type)
-    if (type === 'resource') {
-      return resourceEntries
-    } else if (type === 'paint') {
-      return paintEntries
-    } else if (type === 'measure') {
-      return userTimingEntries
-    } else if (type === 'navigation') {
-      return navigationEntries
-    } else {
-      return []
-    }
+export default [
+  {
+    transferSize: 26941,
+    encodedBodySize: 105297,
+    decodedBodySize: 42687,
+    serverTiming: [
+      {
+        description: '',
+        duration: 4,
+        name: 'edge'
+      },
+      {
+        description: 'HIT',
+        duration: 0,
+        name: 'cdn-cache'
+      }
+    ]
   }
-
-  return function unMock() {
-    window.performance.getEntriesByType = _getEntriesByType
-  }
-}
+]

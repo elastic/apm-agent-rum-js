@@ -95,9 +95,22 @@ pipeline {
           }
         }
         /**
+        Execute code coverange only once.
+        */
+        stage('Coverage') {
+          steps {
+            withGithubNotify(context: 'Coverage') {
+              // No scope is required as the coverage should run for all of them
+              runScript(label: 'coverage', stack: '7.0.0', scope: '', goal: 'coverage')
+              codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
+            }
+          }
+        }
+        /**
         Build the documentation.
         */
         stage('Documentation') {
+          agent { label 'linux && immutable' }
           steps {
             withGithubNotify(context: 'Documentation') {
               deleteDir()
@@ -199,17 +212,24 @@ def runScript(Map params = [:]){
   def stack = params.stack
   def scope = params.scope
   def label = params.label
+  def goal = params.get('goal', 'test')
 
   env.STACK_VERSION = "${stack}"
   env.SCOPE = "${scope}"
   env.APM_SERVER_URL = 'http://apm-server:8200'
   env.APM_SERVER_PORT = '8200'
+  env.GOAL = "${goal}"
 
   deleteDir()
   unstash 'source'
   unstash 'cache'
   dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "docker.elastic.co")
   dir("${BASE_DIR}"){
+    retry(2) {
+      sleep randomNumber(min: 5, max: 10)
+      sh(label: 'Pull and build docker infra', script: '.ci/scripts/pull_and_build.sh')
+    }
+
     if(params.saucelab_test){
       env.MODE = 'saucelabs'
       withSaucelabsEnv(){
@@ -261,5 +281,4 @@ def wrappingUp(){
     keepLongStdio: true,
     testResults: "**/reports/TESTS-*.xml")
   archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs")
-  codecov(repo: 'apm-agent-rum', basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
 }
