@@ -54,6 +54,7 @@
     "@wdio/sauce-service": "^5.10.8",
     "@wdio/spec-reporter": "^5.9.3",
     "@wdio/sync": "^5.10.8",
+    "airbnb-browser-shims": "^3.2.1",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
     "babel-plugin-istanbul": "^5.1.4",

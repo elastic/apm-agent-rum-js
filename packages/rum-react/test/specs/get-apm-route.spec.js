@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  *
  */
-
+import 'airbnb-js-shims/target/es2015'
 import React from 'react'
 import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
