@@ -23,8 +23,9 @@
  *
  */
 
-import Enzyme from 'enzyme'
+import Enzyme, { render } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
+import React from 'react'
 
 Enzyme.configure({ adapter: new Adapter() })
 
@@ -32,8 +33,6 @@ import { getWithTransaction } from '../../src/get-with-transaction'
 
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
-import React from 'react'
-import { render } from 'enzyme'
 
 function TestComponent(apm) {
   const withTransaction = getWithTransaction(apm)
@@ -78,5 +77,13 @@ describe('withTransaction', function() {
       'test-type',
       { canReuse: true }
     )
+  })
+
+  it('should return WrappedComponent if it has a falsy value', function() {
+    const withTransaction = getWithTransaction(
+      new ApmBase(createServiceFactory())
+    )
+    const comp = withTransaction('test-name', 'test-type')(undefined)
+    expect(comp).toBe(undefined)
   })
 })
