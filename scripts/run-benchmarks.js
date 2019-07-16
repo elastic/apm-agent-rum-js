@@ -123,7 +123,10 @@ function runBenchmarks() {
         resultObj[result.name] = result
       }
 
-      const output = Object.assign({}, baseOutput, { metrics: resultObj })
+      const output = Object.assign({}, baseOutput, {
+        metrics: resultObj,
+        '@timestamp': Date.now()
+      })
       ndJSONOutput += JSON.stringify(output)
 
       const outputPath = join(PKG_DIR, outputFile)
