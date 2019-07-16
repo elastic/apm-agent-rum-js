@@ -88,7 +88,6 @@ module.exports = function(config) {
     }
   })
   const cfg = prepareConfig(config)
-  cfg.browsers = ['ChromeHeadless']
   cfg.preprocessors = {
     [specPattern]: ['webpack']
   }

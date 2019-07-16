@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
-
-## For debugging purposes only
-node --version
-npm --version
-npx --version
-export
-
-npm install
-node ./scripts/run-benchmarks.js "$1"
+docker-compose -f ./dev-utils/docker-compose.yml up \
+  --abort-on-container-exit \
+  --exit-code-from node-benchmark \
+  --remove-orphans \
+  node-benchmark

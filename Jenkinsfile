@@ -39,6 +39,7 @@ pipeline {
     issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
   }
   parameters {
+    booleanParam(name: 'Run_As_Master_Branch', defaultValue: false, description: 'Allow to run any steps on a PR, some steps normally only run on master branch.')
     booleanParam(name: 'saucelab_test', defaultValue: "false", description: "Enable run a Sauce lab test")
     booleanParam(name: 'parallel_test', defaultValue: "true", description: "Enable run tests in parallel")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
@@ -125,16 +126,7 @@ pipeline {
           }
           when {
             beforeAgent true
-            allOf {
-              anyOf {
-                branch 'master'
-                branch "\\d+\\.\\d+"
-                branch "v\\d?"
-                tag "v\\d+\\.\\d+\\.\\d+*"
-                expression { return params.Run_As_Master_Branch }
-              }
-              expression { return params.bench_ci }
-            }
+            expression { return params.bench_ci }
           }
           steps {
             withGithubNotify(context: 'Benchmarks') {
