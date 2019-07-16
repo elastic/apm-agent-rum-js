@@ -70,7 +70,7 @@ module.exports = function(config) {
       pathToJson: `${REPORTS_DIR}/rum-core-benchmarks.json`,
       formatOutput(results) {
         const summary = results.map(
-          ({ suite, name, mean, count, cycle, browser }) => {
+          ({ suite, name, mean, count, cycle, browser, hz }) => {
             return {
               suite,
               name,
@@ -78,7 +78,7 @@ module.exports = function(config) {
               count,
               cycle,
               browser,
-              hz: `${r.hz} ops/sec`
+              hz: `${hz} ops/sec`
             }
           }
         )

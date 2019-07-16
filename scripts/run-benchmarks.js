@@ -55,7 +55,7 @@ function extractFields(benchResults, type = 'benchmarkjs') {
   switch (type) {
     case 'benchmarkjs':
       keysToFilter = ['browser', 'suite', 'name', 'hz']
-      benchResults = benchResults.results
+      benchResults = benchResults.summary
       break
   }
   const filteredResult = []
@@ -83,6 +83,10 @@ function runBenchmarks() {
   lernaProcess.on('close', async () => {
     try {
       const results = await getAllBenchmarkResults()
+      if (results.length === 0) {
+        console.warn('No benchmarks results found', 'Skipping this run')
+        process.exit(1)
+      }
       const commit = execSync('git', ['rev-parse', '--short', 'HEAD'])
       const branch = execSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
 
