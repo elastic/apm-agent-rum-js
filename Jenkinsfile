@@ -105,6 +105,11 @@ pipeline {
               codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
             }
           }
+          post {
+            always {
+              coverageReport("${BASE_DIR}/packages/**")
+            }
+          }
         }
         /**
         Build the documentation.
