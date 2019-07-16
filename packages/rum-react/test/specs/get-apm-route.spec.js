@@ -22,6 +22,11 @@
  * THE SOFTWARE.
  *
  */
+
+/**
+ * shims are required for enzyme to work on older browsers.
+ */
+
 import 'airbnb-js-shims/target/es2015'
 import React from 'react'
 import Enzyme, { mount } from 'enzyme'

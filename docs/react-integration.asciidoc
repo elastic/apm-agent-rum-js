@@ -66,8 +66,8 @@ class App extends React.Component {
 }
 ----
 
-NOTE: `ApmRoute` only instruments component property if provided, in other cases, e.g. using `render` or `children` properties, 
-ApmRoute will only render the Route without instrumenting it, 
+NOTE: `ApmRoute` only instruments the route if component property is provided, in other cases, e.g. using `render` or `children` properties, 
+ApmRoute will only renders the route without instrumenting it, 
 please instrument the individual component using `withTransaction` in these cases instead.
 
 
