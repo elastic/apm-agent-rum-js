@@ -56,7 +56,8 @@ const LICENSE_WHITELIST = [
   'CC-BY-4.0',
   'Unlicense',
   'Artistic-2.0',
-  'WTFPL'
+  'WTFPL',
+  'W3C-20150513'
 ]
 
 /**

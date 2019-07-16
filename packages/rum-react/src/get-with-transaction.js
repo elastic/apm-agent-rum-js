@@ -35,6 +35,9 @@ import hoistStatics from 'hoist-non-react-statics'
 function getWithTransaction(apm) {
   return function withTransaction(name, type) {
     return function(WrappedComponent) {
+      if (!WrappedComponent) {
+        return WrappedComponent
+      }
       class ApmComponent extends React.Component {
         constructor(props) {
           super(props)

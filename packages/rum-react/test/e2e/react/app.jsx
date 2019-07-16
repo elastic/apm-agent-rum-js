@@ -88,7 +88,7 @@ class App extends React.Component {
             )}
           />
           <ApmRoute path="/home" component={MainComponent} />
-          <Route path="/about" component={MainComponent} />
+          <Route path="/about" render={() => <div>about</div>} />
           <ApmRoute path="/topics" component={MainComponent} />
           <ApmRoute path="/topic/:id" component={TopicComponent} />
           <Route
