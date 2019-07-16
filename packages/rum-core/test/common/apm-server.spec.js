@@ -25,7 +25,10 @@
 
 import ApmServer from '../../src/common/apm-server'
 import Transaction from '../../src/performance-monitoring/transaction'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { createServiceFactory } from '../'
+
+const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
 function generateTransaction(count) {
   var result = []
@@ -65,12 +68,14 @@ describe('ApmServer', function() {
   var loggingService
   var originalTimeout
   var performanceMonitoring
+
   beforeEach(function() {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
 
     serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
+    configService.setConfig(agentConfig)
     loggingService = serviceFactory.getService('LoggingService')
     apmServer = serviceFactory.getService('ApmServer')
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
@@ -177,6 +182,26 @@ describe('ApmServer', function() {
       expect(apmServer.sendTransactions).toHaveBeenCalled()
       done()
     }, 300)
+  })
+
+  it('should log errors from apm-server', done => {
+    const apmServer = new ApmServer(configService, loggingService)
+    apmServer
+      .sendTransactions([
+        {
+          id: '21312',
+          span_count: 0,
+          duration: 100,
+          type: 'app'
+        }
+      ])
+      .catch(err => {
+        const trimmedMessage = err.message.replace(/\/n/g, '').trim()
+        expect(trimmedMessage).toEqual(
+          'http://localhost:8001/intake/v2/rum/events HTTP status: 400 error validating JSON document against schema: I[#] S[#] doesn\'t validate with "transaction#"\n  I[#] S[#/allOf/1] allOf failed\n    I[#] S[#/allOf/1/required] missing properties: "trace_id"'
+        )
+      })
+      .then(done)
   })
 
   it('should report http errors for queued errors', function(done) {

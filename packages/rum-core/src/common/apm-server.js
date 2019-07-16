@@ -80,39 +80,42 @@ class ApmServer {
     })
   }
 
-  _makeHttpRequest(method, url, payload, headers) {
+  _makeHttpRequest(method, url, payload, headers = {}) {
     return new Promise(function(resolve, reject) {
       var xhr = new window.XMLHttpRequest()
       xhr[XHR_IGNORE] = true
       xhr.open(method, url, true)
       xhr.timeout = 10000
 
-      if (headers) {
-        for (var header in headers) {
-          if (headers.hasOwnProperty(header)) {
-            xhr.setRequestHeader(header, headers[header])
-          }
+      for (var header in headers) {
+        if (headers.hasOwnProperty(header)) {
+          xhr.setRequestHeader(header, headers[header])
         }
       }
 
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
-          var status = xhr.status
+          const { status, responseText } = xhr
+          // An http 4xx or 5xx error. Signal an error.
           if (status === 0 || (status > 399 && status < 600)) {
-            // An http 4xx or 5xx error. Signal an error.
-            var err = new Error(url + ' HTTP status: ' + status)
-            err.xhr = xhr
+            let message = []
+            if (responseText) {
+              const response = JSON.parse(responseText)
+              if (response.errors && response.errors.length > 0) {
+                response.errors.forEach(err => message.push(err.message))
+              }
+            }
+            const err = new Error(
+              url + ' HTTP status: ' + status + ' ' + message.join(',')
+            )
             reject(err)
           } else {
-            resolve(xhr.responseText)
+            resolve(responseText)
           }
         }
       }
 
-      xhr.onerror = function(err) {
-        reject(err)
-      }
-
+      xhr.onerror = err => reject(err)
       xhr.send(payload)
     })
   }
