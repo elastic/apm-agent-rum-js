@@ -1,3 +1,10 @@
 #!/usr/bin/env bash
 
-# TODO
+## For debugging purposes only
+node --version
+npm --version
+npx --version
+export
+
+npm install
+node ./scripts/run-benchmarks.js "$1"
