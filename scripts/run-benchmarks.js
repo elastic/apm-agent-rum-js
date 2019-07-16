@@ -54,7 +54,7 @@ function extractFields(benchResults, type = 'benchmarkjs') {
 
   switch (type) {
     case 'benchmarkjs':
-      keysToFilter = ['browser', 'suite', 'name', 'hz']
+      keysToFilter = ['browser', 'suite', 'name', 'hz', 'unit']
       benchResults = benchResults.summary
       break
   }
@@ -90,7 +90,7 @@ function runBenchmarks() {
       const commit = execSync('git', ['rev-parse', '--short', 'HEAD'])
       const branch = execSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
 
-      const output = {
+      const baseOutput = {
         process: {
           version: process.version,
           arch: process.arch,
@@ -100,23 +100,34 @@ function runBenchmarks() {
           commit,
           branch,
           agentName: 'rum-js'
-        },
-        results
+        }
       }
       /**
        * DEV - show the results in the terminal
        * CI - store the results in file and upload to ES
        */
       if (!outputFile) {
+        const output = Object.assign({}, baseOutput, { results })
         console.log(JSON.stringify(output, undefined, 2))
         return
       }
+
       /**
-       * Tear down script should take care of deleting the
-       * file once its uploaded to ES cluster
+       * NDJSON format for uploading to ES
        */
+      let ndJSONOutput =
+        '{"index": { "_index": "microbenchmarks-rum-js", "_type": "_doc"}}' +
+        '\n'
+      let resultObj = {}
+      for (let result of results) {
+        resultObj[result.name] = result
+      }
+
+      const output = Object.assign({}, baseOutput, { metrics: resultObj })
+      ndJSONOutput += JSON.stringify(output)
+
       const outputPath = join(PKG_DIR, outputFile)
-      await pWriteFile(outputPath, JSON.stringify(output))
+      await pWriteFile(outputPath, ndJSONOutput)
       console.log('Benchmark results is stored in', outputPath)
     } catch (err) {
       console.error('Error running benchmark script', err)

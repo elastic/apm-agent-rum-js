@@ -78,7 +78,8 @@ module.exports = function(config) {
               count,
               cycle,
               browser,
-              hz: `${hz} ops/sec`
+              hz,
+              unit: 'ops/sec'
             }
           }
         )
