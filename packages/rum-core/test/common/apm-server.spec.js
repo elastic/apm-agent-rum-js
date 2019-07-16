@@ -196,10 +196,14 @@ describe('ApmServer', function() {
         }
       ])
       .catch(err => {
-        const trimmedMessage = err.message.replace(/\/n/g, '').trim()
-        expect(trimmedMessage).toEqual(
-          'http://localhost:8001/intake/v2/rum/events HTTP status: 400 error validating JSON document against schema: I[#] S[#] doesn\'t validate with "transaction#"\n  I[#] S[#/allOf/1] allOf failed\n    I[#] S[#/allOf/1/required] missing properties: "trace_id"'
+        /**
+         * APM server error varies by stack, So we check for
+         * explicit characters instead of whole message
+         */
+        expect(err.message).toContain(
+          `validating JSON document against schema: I[#] S[#] doesn't validate with "transaction#"`
         )
+        expect(err.message).toContain('missing properties: "trace_id"')
       })
       .then(done)
   })
