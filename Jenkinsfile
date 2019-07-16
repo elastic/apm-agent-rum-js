@@ -126,7 +126,16 @@ pipeline {
           }
           when {
             beforeAgent true
-            expression { return params.bench_ci }
+            allOf {
+              anyOf {
+                branch 'master'
+                branch "\\d+\\.\\d+"
+                branch "v\\d?"
+                tag "v\\d+\\.\\d+\\.\\d+*"
+                expression { return params.Run_As_Master_Branch }
+              }
+              expression { return params.bench_ci }
+            }
           }
           steps {
             withGithubNotify(context: 'Benchmarks') {
