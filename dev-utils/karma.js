@@ -162,7 +162,7 @@ function prepareConfig(defaultConfig) {
     defaultConfig.coverageReporter = {
       includeAllSources: true,
       reporters: [
-        { type: 'cobertura' },
+        { type: 'cobertura', file: 'coverage-' + buildId + '-report.xml' },
         { type: 'lcov' },
         { type: 'text-summary' }
       ],

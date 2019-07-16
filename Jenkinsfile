@@ -108,6 +108,7 @@ pipeline {
           post {
             always {
               coverageReport("${BASE_DIR}/packages/**")
+              archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/packages/**/coverage/coverage-*.xml")
             }
           }
         }
