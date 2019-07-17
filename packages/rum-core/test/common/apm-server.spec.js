@@ -94,10 +94,6 @@ describe('ApmServer', function() {
 
   it('should report http errors', function(done) {
     var apmServer = new ApmServer(configService, loggingService)
-    configService.setConfig({
-      serverUrl: 'http://localhost:54321',
-      serviceName: 'test-service'
-    })
     var result = apmServer.sendTransactions([{ test: 'test' }])
     expect(result).toBeDefined()
     result.then(
@@ -209,7 +205,7 @@ describe('ApmServer', function() {
   })
 
   it('should report http errors for queued errors', function(done) {
-    spyOn(loggingService, 'warn').and.callThrough()
+    spyOn(loggingService, 'warn')
     var apmServer = new ApmServer(configService, loggingService)
     var _sendErrors = apmServer.sendErrors
     apmServer.sendErrors = function() {
@@ -230,10 +226,6 @@ describe('ApmServer', function() {
       )
       return result
     }
-    configService.setConfig({
-      serverUrl: 'http://localhost:54321',
-      serviceName: 'test-service'
-    })
     apmServer.addError({ test: 'test' })
 
     expect(loggingService.warn).not.toHaveBeenCalled()
@@ -241,7 +233,7 @@ describe('ApmServer', function() {
   })
 
   it('should report http errors for queued transactions', function(done) {
-    spyOn(loggingService, 'warn').and.callThrough()
+    spyOn(loggingService, 'warn')
     var apmServer = new ApmServer(configService, loggingService)
     var _sendTransactions = apmServer.sendTransactions
     apmServer.sendTransactions = function() {
@@ -262,10 +254,6 @@ describe('ApmServer', function() {
       )
       return result
     }
-    configService.setConfig({
-      serverUrl: 'http://localhost:54321',
-      serviceName: 'test-service'
-    })
     apmServer.addTransaction({ test: 'test' })
 
     expect(loggingService.warn).not.toHaveBeenCalled()

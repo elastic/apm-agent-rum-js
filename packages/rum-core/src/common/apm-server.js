@@ -100,9 +100,18 @@ class ApmServer {
           if (status === 0 || (status > 399 && status < 600)) {
             let message = []
             if (responseText) {
-              const response = JSON.parse(responseText)
-              if (response.errors && response.errors.length > 0) {
-                response.errors.forEach(err => message.push(err.message))
+              try {
+                const response = JSON.parse(responseText)
+                if (response.errors && response.errors.length > 0) {
+                  response.errors.forEach(err => message.push(err.message))
+                }
+              } catch (e) {
+                if (__DEV__) {
+                  loggingService.debug(
+                    'Error parsing response from APM server',
+                    e
+                  )
+                }
               }
             }
             const err = new Error(
