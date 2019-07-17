@@ -80,20 +80,7 @@ pipeline {
             }
           }
         }
-        /**
-        Execute unit tests.
-        */
-        stage('Test') {
-          steps {
-            withGithubNotify(context: 'Test', tab: 'tests') {
-              deleteDir()
-              unstash 'source'
-              dir("${BASE_DIR}"){
-                runParallelTest()
-              }
-            }
-          }
-        }
+
         /**
         Execute code coverange only once.
         */
@@ -108,6 +95,21 @@ pipeline {
           post {
             always {
               coverageReport("${BASE_DIR}/packages/**")
+              archiveArtifacts(allowEmptyArchive: true, artifacts: "**/packages/**/coverage/**")
+            }
+          }
+        }
+        /**
+        Execute unit tests.
+        */
+        stage('Test') {
+          steps {
+            withGithubNotify(context: 'Test', tab: 'tests') {
+              deleteDir()
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                runParallelTest()
+              }
             }
           }
         }
