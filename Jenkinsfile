@@ -81,6 +81,25 @@ pipeline {
           }
         }
         /**
+        Execute code coverange only once.
+        */
+        stage('Coverage') {
+          steps {
+            withGithubNotify(context: 'Coverage') {
+              // No scope is required as the coverage should run for all of them
+              runScript(label: 'coverage', stack: '7.0.0', scope: '', goal: 'coverage')
+              sh 'ls -l ${WORKSPACE}/${BASE_DIR}/packages || true'
+              sh 'find ${WORKSPACE}/${BASE_DIR}/packages -name *-report.xml || true'
+              codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
+            }
+          }
+          post {
+            always {
+              coverageReport("${BASE_DIR}/packages/**")
+            }
+          }
+        }
+        /**
         Execute unit tests.
         */
         stage('Test') {
@@ -91,23 +110,6 @@ pipeline {
               dir("${BASE_DIR}"){
                 runParallelTest()
               }
-            }
-          }
-        }
-        /**
-        Execute code coverange only once.
-        */
-        stage('Coverage') {
-          steps {
-            withGithubNotify(context: 'Coverage') {
-              // No scope is required as the coverage should run for all of them
-              runScript(label: 'coverage', stack: '7.0.0', scope: '', goal: 'coverage')
-              codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
-            }
-          }
-          post {
-            always {
-              coverageReport("${BASE_DIR}/packages/**")
             }
           }
         }
