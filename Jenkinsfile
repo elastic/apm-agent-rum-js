@@ -89,6 +89,7 @@ pipeline {
             withGithubNotify(context: 'Coverage') {
               // No scope is required as the coverage should run for all of them
               runScript(label: 'coverage', stack: '7.0.0', scope: '', goal: 'coverage')
+              sh '''find . -name "*-report.xml" -exec grep '<source>' {} +'''
               codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
             }
           }
