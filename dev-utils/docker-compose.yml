@@ -149,8 +149,8 @@ services:
         set -eo pipefail
         npm run ${GOAL}
         ## Workaround to enable the cobertura source code navigation in Jenkins
-        find . -name "*-report.xml" -exec grep '<source>' {} +
         find . -name "*-report.xml" -exec sed -i "s#/app/#${WORKSPACE}/${BASE_DIR}/#g" {} +"
+        find . -name "*-report.xml" -exec grep '<source>' {} +
     mem_limit: 2000m
 #    cpus: 0.5
     depends_on:
