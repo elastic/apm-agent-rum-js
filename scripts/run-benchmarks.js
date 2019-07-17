@@ -87,7 +87,13 @@ function runBenchmarks() {
         console.warn('No benchmarks results found', 'Skipping this run')
         process.exit(1)
       }
-      const commit = execSync('git', ['rev-parse', '--short', 'HEAD'])
+      const gitlog = execSync('git', [
+        'log',
+        '-1',
+        '--pretty=%h,%s',
+        '--no-merges'
+      ])
+      const [commit, commitMessage] = gitlog.split(',')
       const branch = execSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
 
       const baseOutput = {
@@ -98,6 +104,7 @@ function runBenchmarks() {
         },
         meta: {
           commit,
+          commitMessage,
           branch,
           agentName: 'rum-js'
         }
