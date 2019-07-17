@@ -135,6 +135,7 @@ services:
       - MODE=${MODE}
       - GOAL=${GOAL}
       - WORKSPACE=${WORKSPACE}
+      - BASE_DIR=${BASE_DIR}
     command: >
       /bin/bash -c "set -x
         id
@@ -149,7 +150,7 @@ services:
         npm run ${GOAL}
         ## Workaround to enable the cobertura source code navigation in Jenkins
         find . -name "*-report.xml" -exec grep '<source>' {} +
-        find . -name "*-report.xml" -exec sed -i "s#/app/#${WORKSPACE}/#g" {} +"
+        find . -name "*-report.xml" -exec sed -i "s#/app/#${WORKSPACE}/${BASE_DIR}/#g" {} +"
     mem_limit: 2000m
 #    cpus: 0.5
     depends_on:
