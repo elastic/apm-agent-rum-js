@@ -105,6 +105,13 @@ pipeline {
               codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
             }
           }
+          post {
+            always {
+              coverageReport("${BASE_DIR}/packages/**")
+              publishCoverage(adapters: [coberturaAdapter("${BASE_DIR}/packages/**/coverage-*-report.xml")],
+                              sourceFileResolver: sourceFiles('STORE_ALL_BUILD'))
+            }
+          }
         }
         /**
         Build the documentation.

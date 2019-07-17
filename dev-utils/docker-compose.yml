@@ -134,6 +134,8 @@ services:
       - SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}
       - MODE=${MODE}
       - GOAL=${GOAL}
+      - WORKSPACE=${WORKSPACE}
+      - BASE_DIR=${BASE_DIR}
     command: >
       /bin/bash -c "set -x
         id
