@@ -134,6 +134,7 @@ services:
       - SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}
       - MODE=${MODE}
       - GOAL=${GOAL}
+      - WORKSPACE=${WORKSPACE}
     command: >
       /bin/bash -c "set -x
         id
@@ -145,7 +146,9 @@ services:
         npm install
         npm install puppeteer --unsafe-perm=true --allow-root
         set -eo pipefail
-        npm run ${GOAL}"
+        npm run ${GOAL}
+        ## Workaround to enable the cobertura source code navigation in Jenkins
+        find . -name "*-report.xml" -exec sed -i "s#/app/#${WORKSPACE}/#g" {} +"
     mem_limit: 2000m
 #    cpus: 0.5
     depends_on:
