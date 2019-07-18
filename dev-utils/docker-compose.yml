@@ -181,7 +181,7 @@ services:
         npm install
         npm install puppeteer --unsafe-perm=true --allow-root
         set -eo pipefail
-        node ./scripts/run-benchmarks.js ${REPORT_FILE}"
+        node ./scripts/benchmarks.js ${REPORT_FILE}"
     mem_limit: 2000m
     volumes:
       - ..:/app

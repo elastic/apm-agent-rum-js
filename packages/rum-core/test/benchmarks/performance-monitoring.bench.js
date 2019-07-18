@@ -23,8 +23,8 @@
  *
  */
 
-import { generateTestTransaction } from './index'
-import { createServiceFactory } from '../../src/index'
+import { generateTestTransaction } from './'
+import { createServiceFactory } from '../../'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 

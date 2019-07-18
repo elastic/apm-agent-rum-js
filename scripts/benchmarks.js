@@ -123,8 +123,7 @@ function runBenchmarks() {
        * NDJSON format for uploading to ES
        */
       let ndJSONOutput =
-        '{"index": { "_index": "microbenchmarks-rum-js", "_type": "_doc"}}' +
-        '\n'
+        '{"index": { "_index": "benchmarks-rum-js", "_type": "_doc"}}' + '\n'
       let resultObj = {}
       for (let result of results) {
         resultObj[result.name] = result
