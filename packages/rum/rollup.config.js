@@ -34,40 +34,71 @@ const OUTPUT_DIR = join(__dirname, 'dist', 'rollup')
 const SRC_DIR = join(__dirname, 'src')
 const BABEL_CONFIG = join(__dirname, 'babel.config.js')
 
-const prodConfig = input => ({
-  input,
-  output: {
-    dir: OUTPUT_DIR,
-    entryFileNames: '[name].[format].min.js',
-    name: 'elasticApm',
-    format: 'umd',
-    exports: 'named',
-    sourcemap: true
-  },
-  plugins: [
-    resolve({
-      mainFields: ['module', 'main'],
-      browser: true
-    }),
-    commonjs({
-      include: /\/node_modules\//,
-      namedExports: {
-        'es6-promise': ['polyfill']
-      }
-    }),
-    replace({
-      'process.env.NODE_ENV': JSON.stringify('production')
-    }),
-    babel({
-      configFile: BABEL_CONFIG
-    }),
-    uglify({
-      sourcemap: true
-    })
-  ]
-})
+const createConfig = config => {
+  const { input, env } = config
+  const isProd = env === 'production'
+  const fileName = isProd ? '[name].[format].min.js' : '[name].umd.js'
 
-export default [
-  prodConfig({ 'elastic-apm-rum': join(SRC_DIR, 'index.js') }),
-  prodConfig({ 'elastic-apm-opentracing': join(SRC_DIR, 'opentracing.js') })
-]
+  return {
+    input,
+    output: {
+      dir: OUTPUT_DIR,
+      name: 'elasticApm',
+      entryFileNames: fileName,
+      format: 'umd',
+      exports: 'named',
+      sourcemap: isProd ? true : false
+    },
+    onwarn: (warning, next) => {
+      if (warning.code === 'CIRCULAR_DEPENDENCY') return
+      next(warning)
+    },
+    plugins: [
+      resolve({
+        mainFields: ['module', 'main'],
+        browser: true
+      }),
+      commonjs({
+        include: /\/node_modules\//,
+        namedExports: {
+          'es6-promise': ['polyfill']
+        }
+      }),
+      replace({
+        'process.env.NODE_ENV': env
+      }),
+      babel({
+        exclude: 'node_modules/**',
+        configFile: BABEL_CONFIG
+      })
+    ].concat(
+      isProd
+        ? [
+            uglify({
+              sourcemap: true
+            })
+          ]
+        : []
+    )
+  }
+}
+
+/**
+ * Create config for DEV & PROD for both
+ * rum and opentracing entry points
+ */
+
+const modes = ['development', 'production']
+const rumEntry = { 'elastic-apm-rum': join(SRC_DIR, 'index.js') }
+const opentracingEntry = {
+  'elastic-apm-opentracing': join(SRC_DIR, 'opentracing.js')
+}
+
+const configs = []
+
+for (let mode of modes) {
+  configs.push(createConfig({ input: rumEntry, env: mode }))
+  configs.push(createConfig({ input: opentracingEntry, env: mode }))
+}
+
+export default configs

@@ -102,6 +102,7 @@
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "rollup": "^1.16.5",
+    "rollup-plugin-analyzer": "^3.1.2",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.0.1",
     "rollup-plugin-node-resolve": "^5.2.0",

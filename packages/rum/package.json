@@ -14,8 +14,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "webpack && npm run build:main",
-    "build:dev": "webpack -w",
+    "build": "rollup -c && npm run build:main",
     "build:main": "npx babel src -d dist/lib --config-file ../../babel.node.js",
     "build:e2e": "node ../../dev-utils/run-script.js buildE2eBundles packages/rum/test/e2e",
     "bundlesize": "npm run build && bundlesize",
