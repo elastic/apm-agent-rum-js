@@ -25,7 +25,10 @@
 
 import ApmServer from '../../src/common/apm-server'
 import Transaction from '../../src/performance-monitoring/transaction'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { createServiceFactory } from '../'
+
+const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
 function generateTransaction(count) {
   var result = []
@@ -65,12 +68,14 @@ describe('ApmServer', function() {
   var loggingService
   var originalTimeout
   var performanceMonitoring
+
   beforeEach(function() {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
 
     serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
+    configService.setConfig(agentConfig)
     loggingService = serviceFactory.getService('LoggingService')
     apmServer = serviceFactory.getService('ApmServer')
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
@@ -179,8 +184,48 @@ describe('ApmServer', function() {
     }, 300)
   })
 
+  it('should capture errors logs from apm-server', done => {
+    spyOn(loggingService, 'warn').and.callFake((failedMsg, error) => {
+      expect(failedMsg).toEqual('Failed sending transactions!')
+      /**
+       * APM server error varies by stack, So we check for
+       * explicit characters instead of whole message
+       */
+      expect(error.message).toContain(
+        'validating JSON document against schema: I[#] S[#] doesn\'t validate with "transaction#'
+      )
+      expect(error.message).toContain('missing properties: "trace_id"')
+      done()
+    })
+    const apmServer = new ApmServer(configService, loggingService)
+
+    apmServer.addTransaction({
+      id: '21312',
+      span_count: 0,
+      duration: 100,
+      type: 'app'
+    })
+    apmServer.transactionQueue.flush()
+  })
+
+  it('should log parse error when response is invalid', done => {
+    spyOn(loggingService, 'debug').and.callFake(message => {
+      expect(message).toEqual('Error parsing response from APM server')
+      done()
+    })
+    const apmServer = new ApmServer(configService, loggingService)
+
+    const error = apmServer._constructError({
+      url: 'http://localhost:54321',
+      status: 0,
+      responseText: 'abc'
+    })
+
+    expect(error.message).toEqual('http://localhost:54321 HTTP status: 0')
+  })
+
   it('should report http errors for queued errors', function(done) {
-    spyOn(loggingService, 'warn').and.callThrough()
+    spyOn(loggingService, 'warn')
     var apmServer = new ApmServer(configService, loggingService)
     var _sendErrors = apmServer.sendErrors
     apmServer.sendErrors = function() {
@@ -212,7 +257,7 @@ describe('ApmServer', function() {
   })
 
   it('should report http errors for queued transactions', function(done) {
-    spyOn(loggingService, 'warn').and.callThrough()
+    spyOn(loggingService, 'warn')
     var apmServer = new ApmServer(configService, loggingService)
     var _sendTransactions = apmServer.sendTransactions
     apmServer.sendTransactions = function() {
@@ -251,7 +296,7 @@ describe('ApmServer', function() {
       errorThrottleInterval: 200
     })
     spyOn(apmServer, 'sendErrors')
-    spyOn(loggingService, 'warn').and.callThrough()
+    spyOn(loggingService, 'warn')
 
     var errors = generateErrors(6)
     errors.forEach(apmServer.addError.bind(apmServer))
@@ -281,7 +326,7 @@ describe('ApmServer', function() {
       transactionThrottleInterval: 200
     })
     spyOn(apmServer, 'sendTransactions')
-    spyOn(loggingService, 'warn').and.callThrough()
+    spyOn(loggingService, 'warn')
 
     var transactions = generateTransaction(6)
     transactions.forEach(apmServer.addTransaction.bind(apmServer))
@@ -304,6 +349,7 @@ describe('ApmServer', function() {
   })
 
   it('should ignore undefined payload', function() {
+    spyOn(loggingService, 'warn')
     configService.setConfig({
       serviceName: 'serviceName'
     })
