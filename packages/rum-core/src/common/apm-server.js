@@ -125,7 +125,10 @@ class ApmServer {
         }
       }
 
-      xhr.onerror = err => reject(err)
+      xhr.onerror = () => {
+        const { status, responseText } = xhr
+        reject({ url, status, responseText })
+      }
       xhr.send(payload)
     })
   }
