@@ -80,6 +80,24 @@ class ApmServer {
     })
   }
 
+  _constructError(reason) {
+    const { url, status, responseText } = reason
+    let message = url + ' HTTP status: ' + status
+    if (__DEV__ && responseText) {
+      try {
+        const serverErrors = []
+        const response = JSON.parse(responseText)
+        if (response.errors && response.errors.length > 0) {
+          response.errors.forEach(err => serverErrors.push(err.message))
+          message += ' ' + serverErrors.join(',')
+        }
+      } catch (e) {
+        this._loggingService.debug('Error parsing response from APM server', e)
+      }
+    }
+    return new Error(message)
+  }
+
   _makeHttpRequest(method, url, payload, headers) {
     return new Promise(function(resolve, reject) {
       var xhr = new window.XMLHttpRequest()
@@ -97,22 +115,20 @@ class ApmServer {
 
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
-          var status = xhr.status
+          const { status, responseText } = xhr
+          // An http 4xx or 5xx error. Signal an error.
           if (status === 0 || (status > 399 && status < 600)) {
-            // An http 4xx or 5xx error. Signal an error.
-            var err = new Error(url + ' HTTP status: ' + status)
-            err.xhr = xhr
-            reject(err)
+            reject({ url, status, responseText })
           } else {
-            resolve(xhr.responseText)
+            resolve(responseText)
           }
         }
       }
 
-      xhr.onerror = function(err) {
-        reject(err)
+      xhr.onerror = () => {
+        const { status, responseText } = xhr
+        reject({ url, status, responseText })
       }
-
       xhr.send(payload)
     })
   }
@@ -124,53 +140,53 @@ class ApmServer {
   }
 
   initErrorQueue() {
-    var apmServer = this
     if (this.errorQueue) {
       this.errorQueue.flush()
     }
-    this.errorQueue = this._createQueue(function(errors) {
-      var p = apmServer.sendErrors(errors)
+    this.errorQueue = this._createQueue(errors => {
+      var p = this.sendErrors(errors)
       if (p) {
-        p.then(undefined, function(reason) {
-          apmServer._loggingService.warn('Failed sending errors!', reason)
+        p.catch(reason => {
+          this._loggingService.warn(
+            'Failed sending errors!',
+            this._constructError(reason)
+          )
         })
       }
     })
 
-    var limit = apmServer._configService.get('errorThrottleLimit')
-    var interval = apmServer._configService.get('errorThrottleInterval')
+    var limit = this._configService.get('errorThrottleLimit')
+    var interval = this._configService.get('errorThrottleInterval')
 
     this.throttleAddError = throttle(
       this.errorQueue.add.bind(this.errorQueue),
-      function() {
-        apmServer._loggingService.warn('Dropped error due to throttling!')
-      },
+      () => this._loggingService.warn('Dropped error due to throttling!'),
       { limit, interval }
     )
   }
 
   initTransactionQueue() {
-    var apmServer = this
     if (this.transactionQueue) {
       this.transactionQueue.flush()
     }
-    this.transactionQueue = this._createQueue(function(transactions) {
-      var p = apmServer.sendTransactions(transactions)
+    this.transactionQueue = this._createQueue(transactions => {
+      var p = this.sendTransactions(transactions)
       if (p) {
-        p.then(undefined, function(reason) {
-          apmServer._loggingService.warn('Failed sending transactions!', reason)
+        p.catch(reason => {
+          this._loggingService.warn(
+            'Failed sending transactions!',
+            this._constructError(reason)
+          )
         })
       }
     })
 
-    var limit = apmServer._configService.get('transactionThrottleLimit')
-    var interval = apmServer._configService.get('transactionThrottleInterval')
+    var limit = this._configService.get('transactionThrottleLimit')
+    var interval = this._configService.get('transactionThrottleInterval')
 
     this.throttleAddTransaction = throttle(
       this.transactionQueue.add.bind(this.transactionQueue),
-      function() {
-        apmServer._loggingService.warn('Dropped transaction due to throttling!')
-      },
+      () => this._loggingService.warn('Dropped transaction due to throttling!'),
       { limit, interval }
     )
   }
