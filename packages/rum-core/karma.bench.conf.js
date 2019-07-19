@@ -55,34 +55,42 @@ module.exports = function(config) {
   const specPattern = `${BENCHMARKS_DIR}/**/*.bench.js`
   config.set({
     files: [specPattern],
+    autoWatch: false,
+    singleRun: true,
+    concurrency: 1,
     frameworks: ['benchmark'],
     reporters: ['benchmark', 'benchmark-json'],
     plugins: [
       'karma-webpack',
-      'karma-sourcemap-loader',
       'karma-benchmark',
       'karma-benchmark-reporter',
       'karma-benchmark-json-reporter'
     ],
-    preprocessors: {
-      [specPattern]: ['webpack', 'sourcemap']
-    },
     benchmarkJsonReporter: {
-      pathToJson: `${REPORTS_DIR}/benchmark-results.json`,
+      pathToJson: `${REPORTS_DIR}/rum-core-benchmarks.json`,
       formatOutput(results) {
-        const summary = results.map(r => {
-          return {
-            name: `${r.suite}.${r.name}`,
-            mean: r.mean,
-            hz: r.hz
+        const summary = results.map(
+          ({ suite, name, mean, count, cycle, browser, hz }) => {
+            return {
+              suite,
+              name,
+              mean,
+              count,
+              cycle,
+              browser,
+              hz,
+              unit: 'ops/sec'
+            }
           }
-        })
+        )
         console.log(JSON.stringify(summary, undefined, 2))
-        return { results }
+        return { summary }
       }
     }
   })
   const cfg = prepareConfig(config)
-  cfg.browsers = ['ChromeHeadless']
+  cfg.preprocessors = {
+    [specPattern]: ['webpack']
+  }
   config.set(cfg)
 }

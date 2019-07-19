@@ -159,5 +159,36 @@ services:
       apm:
         aliases:
           - node-puppeteer
+
+  node-benchmark:
+    build: ../.ci/docker/node-puppeteer
+    container_name: node-puppeteer
+    image: docker.elastic.co/observability-ci/node-puppeteer:8
+    environment:
+      - HOME=/app
+      - BUILD_NUMBER=${BUILD_NUMBER}
+      - BRANCH_NAME=${BRANCH_NAME}
+      - JENKINS_URL=${JENKINS_URL}
+      - REPORT_FILE=${REPORT_FILE}
+    command: >
+      /bin/bash -c "set -x
+        id
+        node --version
+        npm --version
+        npx --version
+        cd /app
+        export
+        npm install
+        npm install puppeteer --unsafe-perm=true --allow-root
+        set -eo pipefail
+        node ./scripts/benchmarks.js ${REPORT_FILE}"
+    mem_limit: 2000m
+    volumes:
+      - ..:/app
+    networks:
+      apm:
+        aliases:
+          - node-benchmark
+
 networks:
   apm:
