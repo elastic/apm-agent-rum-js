@@ -219,15 +219,16 @@ class TransactionService {
 
   shouldIgnoreTransaction(transactionName) {
     var ignoreList = this._config.get('ignoreTransactions')
-
-    for (var i = 0; i < ignoreList.length; i++) {
-      var element = ignoreList[i]
-      if (typeof element.test === 'function') {
-        if (element.test(transactionName)) {
+    if (ignoreList && ignoreList.length) {
+      for (var i = 0; i < ignoreList.length; i++) {
+        var element = ignoreList[i]
+        if (typeof element.test === 'function') {
+          if (element.test(transactionName)) {
+            return true
+          }
+        } else if (element === transactionName) {
           return true
         }
-      } else if (element === transactionName) {
-        return true
       }
     }
     return false
