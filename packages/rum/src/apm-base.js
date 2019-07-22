@@ -101,6 +101,11 @@ class ApmBase {
     return !this._disable
   }
 
+  observe(name, fn) {
+    const configService = this.serviceFactory.getService('ConfigService')
+    configService.events.observe(name, fn)
+  }
+
   /**
    * When the required config keys are invalid, the agent is deactivated with
    * logging error to the console
@@ -115,6 +120,7 @@ class ApmBase {
    *  }]
    * }
    */
+
   config(config) {
     const configService = this.serviceFactory.getService('ConfigService')
     const { missing, invalid } = configService.validate(config)

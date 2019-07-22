@@ -29,6 +29,7 @@ import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
 import { __DEV__ } from '../env'
+import { ON_TRANSACTION_START, ON_TRANSACTION_END } from '../common/constants'
 
 class TransactionService {
   constructor(logger, config) {
@@ -178,6 +179,7 @@ class TransactionService {
     if (__DEV__) {
       this._logger.debug('TransactionService.startTransaction', tr)
     }
+    this._config.events.send(ON_TRANSACTION_START, [tr])
 
     tr.onEnd = () => {
       return Promise.resolve().then(
@@ -206,6 +208,7 @@ class TransactionService {
           } else {
             this.add(tr)
           }
+          this._config.events.send(ON_TRANSACTION_END, [tr])
         },
         err => {
           if (__DEV__) {

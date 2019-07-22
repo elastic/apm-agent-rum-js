@@ -40,7 +40,9 @@ import {
   INVOKE,
   XMLHTTPREQUEST_SOURCE,
   FETCH_SOURCE,
-  HISTORY_PUSHSTATE
+  HISTORY_PUSHSTATE,
+  ON_TRANSACTION_END,
+  AFTER_EVENT
 } from '../common/constants'
 import {
   truncateModel,
@@ -58,7 +60,7 @@ class PerformanceMonitoring {
   }
 
   init() {
-    this._transactionService.subscribe(tr => {
+    this._configService.events.observe(ON_TRANSACTION_END + AFTER_EVENT, tr => {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
         this._apmServer.addTransaction(payload)

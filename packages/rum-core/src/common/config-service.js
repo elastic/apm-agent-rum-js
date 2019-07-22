@@ -25,6 +25,7 @@
 
 import { getCurrentScript, setLabel, merge, getDtHeaderValue } from './utils'
 import Subscription from '../common/subscription'
+import EventHandler from './event-handler'
 
 function getConfigFromScript() {
   var script = getCurrentScript()
@@ -109,6 +110,7 @@ class Config {
     }
 
     this._changeSubscription = new Subscription()
+    this.events = new EventHandler()
     this.filters = []
     /**
      * Packages that uses rum-core under the hood must override
