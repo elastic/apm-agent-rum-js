@@ -29,24 +29,44 @@ import { getWithTransaction } from './get-with-transaction'
 
 function getApmRoute(apm) {
   const withTransaction = getWithTransaction(apm)
-  const loggingService = apm.serviceFactory.getService('LoggingService')
+
   return class ApmRoute extends React.Component {
     constructor(props) {
       super(props)
-      const { path, component: Component } = this.props
-      this.ApmComponent = withTransaction(path, 'route-change')(Component)
+      const { path, component } = this.props
+      this.state = {
+        path,
+        apmComponent: withTransaction(path, 'route-change')(component)
+      }
+    }
+
+    /**
+     * Change the apmComponent based on the path, When the
+     * ApmRoute element is cloned using `React.CloneElement`
+     * we have to create a new ApmComponent which would capture the route
+     * transaction with new path
+     */
+    static getDerivedStateFromProps(nextProps, prevState) {
+      const { component, path } = nextProps
+      /**
+       * Start a new transaction before rendering the route
+       */
+      if (path !== prevState.path) {
+        return {
+          path,
+          apmComponent: withTransaction(path, 'route-change')(component)
+        }
+      }
+      /**
+       * No state update necessary
+       */
+      return null
     }
 
     render() {
-      if (this.ApmComponent) {
-        return <Route {...this.props} component={this.ApmComponent} />
-      } else {
-        loggingService.warn(
-          'ApmRoute is not instrumenting the route since component property is not provided.'
-        )
-        return <Route {...this.props} />
-      }
+      return <Route {...this.props} component={this.state.apmComponent} />
     }
   }
 }
+
 export { getApmRoute }

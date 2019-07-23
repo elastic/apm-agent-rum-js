@@ -36,6 +36,7 @@ class TopicComponent extends React.Component {
   componentDidMount() {
     this.fetchData()
   }
+
   fetchData() {
     var url = '/test/e2e/react/data.json'
     fetch(url)
@@ -46,6 +47,7 @@ class TopicComponent extends React.Component {
         this.setState({ userName: data.userName })
       })
   }
+
   render() {
     return (
       <div>
@@ -57,6 +59,5 @@ class TopicComponent extends React.Component {
     )
   }
 }
-
 
 export default TopicComponent

@@ -28,7 +28,7 @@ const { getBabelConfig } = require('../../dev-utils/babel')
 module.exports = function(api) {
   api.cache(true)
   let config = getBabelConfig()
-  config.presets.push(['@babel/preset-react'])
+  config.presets.push(['@babel/react'])
   config.plugins = config.plugins.concat([
     '@babel/plugin-transform-destructuring',
     '@babel/plugin-syntax-dynamic-import'

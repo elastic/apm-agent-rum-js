@@ -33,18 +33,15 @@ class MainComponent extends React.Component {
       userName: '',
       path
     }
-    // this.transaction = apm.startTransaction('Main - ' + path, 'route-change')
-    // this.transaction = apm.getCurrentTransaction()
-    this.transaction = this.props.transaction
   }
 
   componentDidMount() {
     this.fetchData()
-    // this.transaction.detectFinish()
   }
+
   fetchData() {
     var url = '/test/e2e/react/data.json'
-    const transaction = this.transaction
+    const transaction = this.props.transaction
 
     fetch(url)
       .then(resp => {
@@ -60,6 +57,7 @@ class MainComponent extends React.Component {
         this.setState({ userName: data.userName })
       })
   }
+
   render() {
     return (
       <div>

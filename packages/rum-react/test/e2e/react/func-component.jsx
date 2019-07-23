@@ -23,45 +23,28 @@
  *
  */
 
-const path = require('path')
-const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
+import React, { useEffect, useState } from 'react'
 
-module.exports = {
-  entry: path.resolve(__dirname, './app.jsx'),
-  output: { path: __dirname, filename: 'app.e2e-bundle.js' },
-  devtool: 'source-map',
-  mode: 'development',
-  performance: {
-    hints: false
-  },
-  module: {
-    rules: [
-      {
-        test: /.jsx?$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        options: {
-          presets: [
-            [
-              '@babel/preset-env',
-              {
-                targets: {
-                  ie: '11'
-                },
-                useBuiltIns: false,
-                modules: 'umd'
-              }
-            ],
-            ['@babel/preset-react']
-          ],
-          plugins: ['@babel/plugin-transform-destructuring']
-        }
+export default function FunctionalComponent(props) {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    async function dummyGet() {
+      try {
+        await fetch('./dummy')
+      } catch (_) {
+      } finally {
+        setCount(2)
       }
-    ]
-  },
-  plugins: [new EnvironmentPlugin(getWebpackEnv())],
-  resolve: {
-    extensions: ['.js', '.jsx']
-  }
+    }
+
+    dummyGet()
+  }, [])
+
+  return (
+    <div>
+      {props.match.path + '\n'}
+      {count}
+    </div>
+  )
 }
