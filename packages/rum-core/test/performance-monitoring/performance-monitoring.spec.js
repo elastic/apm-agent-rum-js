@@ -32,6 +32,7 @@ import { globalState } from '../../src/common/patching/patch-utils'
 import { SCHEDULE } from '../../src/common/constants'
 import patchSub from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
+import { ON_TRANSACTION_END } from '../../src/common/constants'
 
 const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
@@ -358,7 +359,7 @@ describe('PerformanceMonitoring', function() {
     const unMock = mockGetEntriesByType()
     const transactionService = serviceFactory.getService('TransactionService')
 
-    transactionService.subscribe(function(tr) {
+    configService.events.observe(ON_TRANSACTION_END, function(tr) {
       expect(tr.isHardNavigation).toBe(true)
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
