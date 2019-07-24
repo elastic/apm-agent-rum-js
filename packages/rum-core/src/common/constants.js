@@ -96,6 +96,7 @@ const ON_TRANSACTION_END = 'onTransactionEnd'
 
 /**
  * Event modifiers, append these to event names.
+ * Only for internal use.
  */
 const BEFORE_EVENT = '_before'
 const AFTER_EVENT = '_after'

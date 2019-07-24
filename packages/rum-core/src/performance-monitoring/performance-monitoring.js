@@ -60,6 +60,10 @@ class PerformanceMonitoring {
   }
 
   init() {
+    /**
+     * We need to run this event listener after all of user-registered listener,
+     * since this event listener adds the transaction to the queue to be send to APM Server.
+     */
     this._configService.events.observe(ON_TRANSACTION_END + AFTER_EVENT, tr => {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
