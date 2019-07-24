@@ -155,21 +155,6 @@ pipeline {
             }
           }
         }
-        /**
-        Build the documentation.
-        */
-        stage('Documentation') {
-          agent { label 'linux && immutable' }
-          steps {
-            withGithubNotify(context: 'Documentation') {
-              deleteDir()
-              unstash 'source'
-              dir("${BASE_DIR}"){
-                buildDocs(docsDir: "docs", archive: true)
-              }
-            }
-          }
-        }
         stage('Integration Tests') {
           agent none
           when {
