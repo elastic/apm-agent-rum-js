@@ -24,19 +24,50 @@
  */
 
 import React from 'react'
-import { Route } from 'react-router-dom'
-import { getWithTransaction } from './get-with-transaction'
 
-function getApmRoute(apm) {
-  const withTransaction = getWithTransaction(apm)
-
-  return class ApmRoute extends React.Component {
-    render() {
-      const { path, component } = this.props
-      const apmComponent = withTransaction(path, 'route-change')(component)
-      return <Route {...this.props} component={apmComponent} />
+class MainComponent extends React.Component {
+  constructor(props, state) {
+    super(props, state)
+    var path = this.props.match.path
+    this.state = {
+      userName: '',
+      path
     }
+  }
+
+  componentDidMount() {
+    this.fetchData()
+  }
+
+  fetchData() {
+    var url = '/test/e2e/data.json'
+    const transaction = this.props.transaction
+
+    fetch(url)
+      .then(resp => {
+        var tid = transaction && transaction.addTask()
+        var span = transaction && transaction.startSpan('Timeout span')
+        setTimeout(() => {
+          span && span.end()
+          transaction && transaction.removeTask(tid)
+        }, 500)
+        return resp.json()
+      })
+      .then(data => {
+        this.setState({ userName: data.userName })
+      })
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>
+          <span>{this.state.path}</span>
+        </h3>
+        <span>{this.state.userName}</span>
+      </div>
+    )
   }
 }
 
-export { getApmRoute }
+export default MainComponent

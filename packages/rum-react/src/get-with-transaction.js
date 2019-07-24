@@ -37,7 +37,7 @@ function getWithTransaction(apm) {
       if (!Component) {
         const loggingService = apm.serviceFactory.getService('LoggingService')
         loggingService.warn(
-          `ApmRoute is not instrumenting the route since component property is not provided`
+          `${name} is not instrumented since component property is not provided`
         )
         return Component
       }

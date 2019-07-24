@@ -23,20 +23,43 @@
  *
  */
 
-import React from 'react'
-import { Route } from 'react-router-dom'
-import { getWithTransaction } from './get-with-transaction'
+const {
+  allowSomeBrowserErrors,
+  waitForApmServerCalls
+} = require('../../../../../dev-utils/webdriver')
 
-function getApmRoute(apm) {
-  const withTransaction = getWithTransaction(apm)
+describe('General usecase with react-router', function() {
+  it('should run the react app', function() {
+    browser.url('/test/e2e/with-router/')
+    browser.waitUntil(
+      () => {
+        return $('#test-element').getText() === 'Passed'
+      },
+      5000,
+      'expected element #test-element'
+    )
 
-  return class ApmRoute extends React.Component {
-    render() {
-      const { path, component } = this.props
-      const apmComponent = withTransaction(path, 'route-change')(component)
-      return <Route {...this.props} component={apmComponent} />
-    }
-  }
-}
+    const serverCalls = waitForApmServerCalls(0, 1)
 
-export { getApmRoute }
+    expect(serverCalls.sendTransactions.length).toBe(1)
+
+    var transaction = serverCalls.sendTransactions[0].args[0][0]
+    expect(transaction.type).toBe('page-load')
+    expect(transaction.name).toBe('/home')
+    expect(transaction.spans.length).toBeGreaterThan(1)
+
+    const spanNames = [
+      'Requesting and receiving the document',
+      'Parsing the document, executing sync. scripts',
+      'GET /test/e2e/data.json',
+      'Render'
+    ]
+    var foundSpans = transaction.spans.filter(span => {
+      return spanNames.indexOf(span.name) > -1
+    })
+
+    expect(foundSpans.length).toBeGreaterThanOrEqual(4)
+
+    return allowSomeBrowserErrors()
+  })
+})

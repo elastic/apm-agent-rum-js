@@ -23,51 +23,29 @@
  *
  */
 
-import React from 'react'
+const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
 
-class MainComponent extends React.Component {
-  constructor(props, state) {
-    super(props, state)
-    var path = this.props.match.path
-    this.state = {
-      userName: '',
-      path
-    }
-  }
-
-  componentDidMount() {
-    this.fetchData()
-  }
-
-  fetchData() {
-    var url = '/test/e2e/react/data.json'
-    const transaction = this.props.transaction
-
-    fetch(url)
-      .then(resp => {
-        var tid = transaction && transaction.addTask()
-        var span = transaction && transaction.startSpan('Timeout span')
-        setTimeout(() => {
-          span && span.end()
-          transaction && transaction.removeTask(tid)
-        }, 500)
-        return resp.json()
-      })
-      .then(data => {
-        this.setState({ userName: data.userName })
-      })
-  }
-
-  render() {
-    return (
-      <div>
-        <h3>
-          <span>{this.state.path}</span>
-        </h3>
-        <span>{this.state.userName}</span>
-      </div>
+describe('Using Switch component of react router', function() {
+  it('should render the react app on route change', function() {
+    browser.url('/test/e2e/with-router/switch.html')
+    browser.waitUntil(
+      () => {
+        /**
+         * Click a link to trigger the rendering of functional componnet
+         */
+        $('#functional').click()
+        const componentContainer = $('#func-container')
+        return componentContainer.getText().indexOf('/func') !== -1
+      },
+      5000,
+      'expected functional component to be rendered'
     )
-  }
-}
 
-export default MainComponent
+    const serverCalls = waitForApmServerCalls(0, 1)
+    expect(serverCalls.sendTransactions.length).toBe(1)
+
+    const transaction = serverCalls.sendTransactions[0].args[0][0]
+    expect(transaction.type).toBe('page-load')
+    expect(transaction.name).toBe('/notfound')
+  })
+})

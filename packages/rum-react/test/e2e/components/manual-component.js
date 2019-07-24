@@ -24,8 +24,9 @@
  */
 
 import React from 'react'
+import { withTransaction } from '../../../src'
 
-class TopicComponent extends React.Component {
+class ManualComponent extends React.Component {
   constructor(props, state) {
     super(props, state)
     this.state = {
@@ -38,7 +39,7 @@ class TopicComponent extends React.Component {
   }
 
   fetchData() {
-    var url = '/test/e2e/react/data.json'
+    var url = '/test/e2e/data.json'
     fetch(url)
       .then(resp => {
         return resp.json()
@@ -49,15 +50,8 @@ class TopicComponent extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        <h3>
-          <span>{this.props.match.path}</span>
-        </h3>
-        <span>{this.state.userName}</span>
-      </div>
-    )
+    return <div>Manual</div>
   }
 }
 
-export default TopicComponent
+export default withTransaction('ManualComponent', 'component')(ManualComponent)

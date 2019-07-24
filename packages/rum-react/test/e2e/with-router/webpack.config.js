@@ -23,43 +23,51 @@
  *
  */
 
-const {
-  allowSomeBrowserErrors,
-  waitForApmServerCalls
-} = require('../../../../../dev-utils/webdriver')
+const path = require('path')
+const { EnvironmentPlugin } = require('webpack')
+const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 
-describe('ReactApp', function() {
-  it('should run the react app', function() {
-    browser.url('/test/e2e/react/')
-    browser.waitUntil(
-      () => {
-        return $('#test-element').getText() === 'Passed'
-      },
-      5000,
-      'expected element #test-element'
-    )
-
-    const serverCalls = waitForApmServerCalls(0, 1)
-
-    expect(serverCalls.sendTransactions.length).toBe(1)
-
-    var transaction = serverCalls.sendTransactions[0].args[0][0]
-    expect(transaction.type).toBe('page-load')
-    expect(transaction.name).toBe('/home')
-    expect(transaction.spans.length).toBeGreaterThan(1)
-
-    const spanNames = [
-      'Requesting and receiving the document',
-      'Parsing the document, executing sync. scripts',
-      'GET /test/e2e/react/data.json',
-      'Render'
+module.exports = {
+  entry: {
+    general: path.join(__dirname, 'general.js'),
+    switch: path.join(__dirname, 'switch.js')
+  },
+  output: {
+    path: path.resolve(__dirname),
+    filename: '[name].e2e-bundle.js'
+  },
+  devtool: false,
+  mode: 'development',
+  performance: {
+    hints: false
+  },
+  module: {
+    rules: [
+      {
+        test: /.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                targets: {
+                  ie: '11'
+                },
+                useBuiltIns: false,
+                modules: 'umd'
+              }
+            ],
+            ['@babel/preset-react']
+          ],
+          plugins: ['@babel/plugin-transform-destructuring']
+        }
+      }
     ]
-    var foundSpans = transaction.spans.filter(span => {
-      return spanNames.indexOf(span.name) > -1
-    })
-
-    expect(foundSpans.length).toBeGreaterThanOrEqual(4)
-
-    return allowSomeBrowserErrors()
-  })
-})
+  },
+  plugins: [new EnvironmentPlugin(getWebpackEnv())],
+  resolve: {
+    extensions: ['.js', '.jsx']
+  }
+}

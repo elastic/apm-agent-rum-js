@@ -23,45 +23,47 @@
  *
  */
 
-const path = require('path')
-const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
+import '@babel/polyfill'
+import 'whatwg-fetch'
+import React from 'react'
+import { render } from 'react-dom'
+import { BrowserRouter, Link, Switch } from 'react-router-dom'
+import FunctionalComponent from '../components/func-component'
+import { ApmRoute } from '../../../src'
+import createApmBase from '..'
 
-module.exports = {
-  entry: path.resolve(__dirname, './app.jsx'),
-  output: { path: __dirname, filename: 'app.e2e-bundle.js' },
-  devtool: 'source-map',
-  mode: 'development',
-  performance: {
-    hints: false
-  },
-  module: {
-    rules: [
-      {
-        test: /.jsx?$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        options: {
-          presets: [
-            [
-              '@babel/preset-env',
-              {
-                targets: {
-                  ie: '11'
-                },
-                useBuiltIns: false,
-                modules: 'umd'
-              }
-            ],
-            ['@babel/preset-react']
-          ],
-          plugins: ['@babel/plugin-transform-destructuring']
-        }
-      }
-    ]
-  },
-  plugins: [new EnvironmentPlugin(getWebpackEnv())],
-  resolve: {
-    extensions: ['.js', '.jsx']
-  }
+const apm = createApmBase({
+  debug: true,
+  serviceName: 'apm-agent-rum-switch-e2e-react',
+  serviceVersion: '0.0.1',
+  pageLoadTransactionName: '/notfound'
+})
+const NotFound = () => <div>Not Found</div>
+
+function App() {
+  return (
+    <React.Fragment>
+      <ul>
+        <li>
+          <Link id="functional" to="/func">
+            Functional
+          </Link>
+        </li>
+      </ul>
+      <Switch>
+        <ApmRoute path="/func" component={FunctionalComponent} />
+        <ApmRoute component={NotFound} />
+      </Switch>
+    </React.Fragment>
+  )
 }
+
+render(
+  <BrowserRouter basename="/test/e2e/with-router/">
+    <App />
+  </BrowserRouter>,
+  document.getElementById('app'),
+  () => {
+    apm.getCurrentTransaction().detectFinish()
+  }
+)

@@ -31,7 +31,7 @@ export default function FunctionalComponent(props) {
   useEffect(() => {
     async function dummyGet() {
       try {
-        await fetch('./dummy')
+        await fetch('/test/e2e/data.json')
       } catch (_) {
       } finally {
         setCount(2)
@@ -42,7 +42,7 @@ export default function FunctionalComponent(props) {
   }, [])
 
   return (
-    <div>
+    <div id="func-container">
       {props.match.path + '\n'}
       {count}
     </div>

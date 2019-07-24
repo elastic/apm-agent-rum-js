@@ -88,7 +88,7 @@ describe('withTransaction', function() {
     const comp = withTransaction('test-name', 'test-type')(undefined)
     expect(comp).toBe(undefined)
     expect(loggingService.warn).toHaveBeenCalledWith(
-      'ApmRoute is not instrumenting the route since component property is not provided'
+      'test-name is not instrumented since component property is not provided'
     )
   })
 })

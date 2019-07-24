@@ -95,7 +95,7 @@ describe('ApmRoute', function() {
     )
     expect(component.text()).toBe('Testing, render-test')
     expect(loggingService.warn).toHaveBeenCalledWith(
-      'ApmRoute is not instrumenting the route since component property is not provided'
+      '/ is not instrumented since component property is not provided'
     )
   })
 })
