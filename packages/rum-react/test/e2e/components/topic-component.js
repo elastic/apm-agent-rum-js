@@ -23,15 +23,41 @@
  *
  */
 
-const { getBabelConfig } = require('../../dev-utils/babel')
+import React from 'react'
 
-module.exports = function(api) {
-  api.cache(true)
-  let config = getBabelConfig()
-  config.presets.push(['@babel/react'])
-  config.plugins = config.plugins.concat([
-    '@babel/plugin-transform-destructuring',
-    '@babel/plugin-syntax-dynamic-import'
-  ])
-  return config
+class TopicComponent extends React.Component {
+  constructor(props, state) {
+    super(props, state)
+    this.state = {
+      userName: ''
+    }
+  }
+
+  componentDidMount() {
+    this.fetchData()
+  }
+
+  fetchData() {
+    var url = '/test/e2e/data.json'
+    fetch(url)
+      .then(resp => {
+        return resp.json()
+      })
+      .then(data => {
+        this.setState({ userName: data.userName })
+      })
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>
+          <span>{this.props.match.path}</span>
+        </h3>
+        <span>{this.state.userName}</span>
+      </div>
+    )
+  }
 }
+
+export default TopicComponent

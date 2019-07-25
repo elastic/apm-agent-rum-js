@@ -24,52 +24,34 @@
  */
 
 import React from 'react'
+import { withTransaction } from '../../../src'
 
-class MainComponent extends React.Component {
+class ManualComponent extends React.Component {
   constructor(props, state) {
     super(props, state)
-    var path = this.props.match.path
     this.state = {
-      userName: '',
-      path
+      userName: ''
     }
-    // this.transaction = apm.startTransaction('Main - ' + path, 'route-change')
-    // this.transaction = apm.getCurrentTransaction()
-    this.transaction = this.props.transaction
   }
 
   componentDidMount() {
     this.fetchData()
-    // this.transaction.detectFinish()
   }
-  fetchData() {
-    var url = '/test/e2e/react/data.json'
-    const transaction = this.transaction
 
+  fetchData() {
+    var url = '/test/e2e/data.json'
     fetch(url)
       .then(resp => {
-        var tid = transaction && transaction.addTask()
-        var span = transaction && transaction.startSpan('Timeout span')
-        setTimeout(() => {
-          span && span.end()
-          transaction && transaction.removeTask(tid)
-        }, 500)
         return resp.json()
       })
       .then(data => {
         this.setState({ userName: data.userName })
       })
   }
+
   render() {
-    return (
-      <div>
-        <h3>
-          <span>{this.state.path}</span>
-        </h3>
-        <span>{this.state.userName}</span>
-      </div>
-    )
+    return <div>Manual</div>
   }
 }
 
-export default MainComponent
+export default withTransaction('ManualComponent', 'component')(ManualComponent)

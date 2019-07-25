@@ -29,24 +29,14 @@ import { getWithTransaction } from './get-with-transaction'
 
 function getApmRoute(apm) {
   const withTransaction = getWithTransaction(apm)
-  const loggingService = apm.serviceFactory.getService('LoggingService')
-  return class ApmRoute extends React.Component {
-    constructor(props) {
-      super(props)
-      const { path, component: Component } = this.props
-      this.ApmComponent = withTransaction(path, 'route-change')(Component)
-    }
 
+  return class ApmRoute extends React.Component {
     render() {
-      if (this.ApmComponent) {
-        return <Route {...this.props} component={this.ApmComponent} />
-      } else {
-        loggingService.warn(
-          'ApmRoute is not instrumenting the route since component property is not provided.'
-        )
-        return <Route {...this.props} />
-      }
+      const { path, component } = this.props
+      const apmComponent = withTransaction(path, 'route-change')(component)
+      return <Route {...this.props} component={apmComponent} />
     }
   }
 }
+
 export { getApmRoute }

@@ -26,33 +26,23 @@
 import '@babel/polyfill'
 import 'whatwg-fetch'
 import React, { Suspense, lazy } from 'react'
-const ManualComponent = lazy(() => import('./manual-component.jsx'))
-import ReactDOM from 'react-dom'
-import {
-  BrowserRouter as Router,
-  Route,
-  Link,
-  Redirect
-} from 'react-router-dom'
-import { withRouter } from 'react-router'
-import MainComponent from './main-component.jsx'
-import TopicComponent from './topic-component'
-
+import { render } from 'react-dom'
+import { BrowserRouter, Route, Link, Redirect } from 'react-router-dom'
+import MainComponent from '../components/main-component'
+import TopicComponent from '../components/topic-component'
+import FunctionalComponent from '../components/func-component'
 import { ApmRoute } from '../../../src'
-import createApmBase from '../'
+import createApmBase from '..'
+
 const apm = createApmBase({
   debug: true,
-  serverUrl: 'http://localhost:8200',
-  serviceName: 'apm-agent-rum-test-e2e-react',
+  serviceName: 'apm-agent-rum-general-e2e-react',
   serviceVersion: '0.0.1'
 })
 
-var tr = apm.getCurrentTransaction()
+const ManualComponent = lazy(() => import('../components/manual-component'))
 
 class App extends React.Component {
-  constructor(props) {
-    super(props)
-  }
   render() {
     return (
       <div>
@@ -66,6 +56,9 @@ class App extends React.Component {
             </li>
             <li>
               <Link to="/manual">Manual</Link>
+            </li>
+            <li>
+              <Link to="/func">Functional</Link>
             </li>
             <li>
               <Link to="/topics">Topics</Link>
@@ -89,17 +82,16 @@ class App extends React.Component {
           />
           <ApmRoute path="/home" component={MainComponent} />
           <Route path="/about" render={() => <div>about</div>} />
+          <ApmRoute path="/func" component={FunctionalComponent} />
           <ApmRoute path="/topics" component={MainComponent} />
           <ApmRoute path="/topic/:id" component={TopicComponent} />
           <Route
             path="/manual/"
-            component={() => {
-              return (
-                <Suspense fallback={<div>Loading...</div>}>
-                  <ManualComponent />
-                </Suspense>
-              )
-            }}
+            component={() => (
+              <Suspense fallback={<div>Loading...</div>}>
+                <ManualComponent />
+              </Suspense>
+            )}
           />
         </div>
         <div id="test-element">Passed</div>
@@ -108,18 +100,16 @@ class App extends React.Component {
   }
 }
 
-App = withRouter(App)
+const tr = apm.getCurrentTransaction()
+const span = tr.startSpan('Render', 'app')
 
-function render() {
-  ReactDOM.render(
-    <Router basename="/test/e2e/react/">
-      <App />
-    </Router>,
-    document.getElementById('app')
-  )
-}
-var span = tr.startSpan('Render', 'app')
-render()
-span.end()
-
-tr.detectFinish()
+render(
+  <BrowserRouter basename="/test/e2e/with-router/">
+    <App />
+  </BrowserRouter>,
+  document.getElementById('app'),
+  () => {
+    span.end()
+    tr.detectFinish()
+  }
+)
