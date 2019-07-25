@@ -23,15 +23,29 @@
  *
  */
 
-const { getBabelConfig } = require('../../dev-utils/babel')
+const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
 
-module.exports = function(api) {
-  api.cache(true)
-  let config = getBabelConfig()
-  config.presets.push(['@babel/react'])
-  config.plugins = config.plugins.concat([
-    '@babel/plugin-transform-destructuring',
-    '@babel/plugin-syntax-dynamic-import'
-  ])
-  return config
-}
+describe('Using Switch component of react router', function() {
+  it('should render the react app on route change', function() {
+    browser.url('/test/e2e/with-router/switch.html')
+    browser.waitUntil(
+      () => {
+        /**
+         * Click a link to trigger the rendering of functional componnet
+         */
+        $('#functional').click()
+        const componentContainer = $('#func-container')
+        return componentContainer.getText().indexOf('/func') !== -1
+      },
+      5000,
+      'expected functional component to be rendered'
+    )
+
+    const serverCalls = waitForApmServerCalls(0, 1)
+    expect(serverCalls.sendTransactions.length).toBe(1)
+
+    const transaction = serverCalls.sendTransactions[0].args[0][0]
+    expect(transaction.type).toBe('page-load')
+    expect(transaction.name).toBe('/notfound')
+  })
+})

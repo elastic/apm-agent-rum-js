@@ -23,43 +23,47 @@
  *
  */
 
-const {
-  allowSomeBrowserErrors,
-  waitForApmServerCalls
-} = require('../../../../../dev-utils/webdriver')
+import '@babel/polyfill'
+import 'whatwg-fetch'
+import React from 'react'
+import { render } from 'react-dom'
+import { BrowserRouter, Link, Switch } from 'react-router-dom'
+import FunctionalComponent from '../components/func-component'
+import { ApmRoute } from '../../../src'
+import createApmBase from '..'
 
-describe('ReactApp', function() {
-  it('should run the react app', function() {
-    browser.url('/test/e2e/react/')
-    browser.waitUntil(
-      () => {
-        return $('#test-element').getText() === 'Passed'
-      },
-      5000,
-      'expected element #test-element'
-    )
-
-    const serverCalls = waitForApmServerCalls(0, 1)
-
-    expect(serverCalls.sendTransactions.length).toBe(1)
-
-    var transaction = serverCalls.sendTransactions[0].args[0][0]
-    expect(transaction.type).toBe('page-load')
-    expect(transaction.name).toBe('/home')
-    expect(transaction.spans.length).toBeGreaterThan(1)
-
-    const spanNames = [
-      'Requesting and receiving the document',
-      'Parsing the document, executing sync. scripts',
-      'GET /test/e2e/react/data.json',
-      'Render'
-    ]
-    var foundSpans = transaction.spans.filter(span => {
-      return spanNames.indexOf(span.name) > -1
-    })
-
-    expect(foundSpans.length).toBeGreaterThanOrEqual(4)
-
-    return allowSomeBrowserErrors()
-  })
+const apm = createApmBase({
+  debug: true,
+  serviceName: 'apm-agent-rum-switch-e2e-react',
+  serviceVersion: '0.0.1',
+  pageLoadTransactionName: '/notfound'
 })
+const NotFound = () => <div>Not Found</div>
+
+function App() {
+  return (
+    <React.Fragment>
+      <ul>
+        <li>
+          <Link id="functional" to="/func">
+            Functional
+          </Link>
+        </li>
+      </ul>
+      <Switch>
+        <ApmRoute path="/func" component={FunctionalComponent} />
+        <ApmRoute component={NotFound} />
+      </Switch>
+    </React.Fragment>
+  )
+}
+
+render(
+  <BrowserRouter basename="/test/e2e/with-router/">
+    <App />
+  </BrowserRouter>,
+  document.getElementById('app'),
+  () => {
+    apm.getCurrentTransaction().detectFinish()
+  }
+)

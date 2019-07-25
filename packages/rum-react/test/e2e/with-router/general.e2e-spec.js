@@ -23,15 +23,43 @@
  *
  */
 
-const { getBabelConfig } = require('../../dev-utils/babel')
+const {
+  allowSomeBrowserErrors,
+  waitForApmServerCalls
+} = require('../../../../../dev-utils/webdriver')
 
-module.exports = function(api) {
-  api.cache(true)
-  let config = getBabelConfig()
-  config.presets.push(['@babel/react'])
-  config.plugins = config.plugins.concat([
-    '@babel/plugin-transform-destructuring',
-    '@babel/plugin-syntax-dynamic-import'
-  ])
-  return config
-}
+describe('General usecase with react-router', function() {
+  it('should run the react app', function() {
+    browser.url('/test/e2e/with-router/')
+    browser.waitUntil(
+      () => {
+        return $('#test-element').getText() === 'Passed'
+      },
+      5000,
+      'expected element #test-element'
+    )
+
+    const serverCalls = waitForApmServerCalls(0, 1)
+
+    expect(serverCalls.sendTransactions.length).toBe(1)
+
+    var transaction = serverCalls.sendTransactions[0].args[0][0]
+    expect(transaction.type).toBe('page-load')
+    expect(transaction.name).toBe('/home')
+    expect(transaction.spans.length).toBeGreaterThan(1)
+
+    const spanNames = [
+      'Requesting and receiving the document',
+      'Parsing the document, executing sync. scripts',
+      'GET /test/e2e/data.json',
+      'Render'
+    ]
+    var foundSpans = transaction.spans.filter(span => {
+      return spanNames.indexOf(span.name) > -1
+    })
+
+    expect(foundSpans.length).toBeGreaterThanOrEqual(4)
+
+    return allowSomeBrowserErrors()
+  })
+})

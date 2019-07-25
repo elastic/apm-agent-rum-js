@@ -30,7 +30,6 @@ import React from 'react'
 Enzyme.configure({ adapter: new Adapter() })
 
 import { getWithTransaction } from '../../src/get-with-transaction'
-
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
 
@@ -79,11 +78,17 @@ describe('withTransaction', function() {
     )
   })
 
-  it('should return WrappedComponent if it has a falsy value', function() {
-    const withTransaction = getWithTransaction(
-      new ApmBase(createServiceFactory())
-    )
+  it('should return WrappedComponent on falsy value and log warning', function() {
+    const serviceFactory = createServiceFactory()
+    const loggingService = serviceFactory.getService('LoggingService')
+
+    spyOn(loggingService, 'warn')
+
+    const withTransaction = getWithTransaction(new ApmBase(serviceFactory))
     const comp = withTransaction('test-name', 'test-type')(undefined)
     expect(comp).toBe(undefined)
+    expect(loggingService.warn).toHaveBeenCalledWith(
+      'test-name is not instrumented since component property is not provided'
+    )
   })
 })

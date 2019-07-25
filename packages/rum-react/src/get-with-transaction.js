@@ -23,20 +23,23 @@
  *
  */
 
-/*
-    Usage:
-        - Pure function: `withTransaction('name','route-change')(Component)`
-        - As a decorator: `@withTransaction('name','route-change')`
- */
-
 import React from 'react'
 import hoistStatics from 'hoist-non-react-statics'
 
+/**
+ * Usage:
+ *  - Pure function: `withTransaction('name','route-change')(Component)`
+ *  - As a decorator: `@withTransaction('name','route-change')`
+ */
 function getWithTransaction(apm) {
   return function withTransaction(name, type) {
-    return function(WrappedComponent) {
-      if (!WrappedComponent) {
-        return WrappedComponent
+    return function(Component) {
+      if (!Component) {
+        const loggingService = apm.serviceFactory.getService('LoggingService')
+        loggingService.warn(
+          `${name} is not instrumented since component property is not provided`
+        )
+        return Component
       }
       class ApmComponent extends React.Component {
         constructor(props) {
@@ -68,17 +71,15 @@ function getWithTransaction(apm) {
 
         render() {
           // todo: should we pass the transaction down (could use react context provider instead)
-          return (
-            <WrappedComponent transaction={this.transaction} {...this.props} />
-          )
+          return <Component transaction={this.transaction} {...this.props} />
         }
       }
 
-      ApmComponent.displayName = `withTransaction(${WrappedComponent.displayName ||
-        WrappedComponent.name})`
-      ApmComponent.WrappedComponent = WrappedComponent
+      ApmComponent.displayName = `withTransaction(${Component.displayName ||
+        Component.name})`
+      ApmComponent.WrappedComponent = Component
 
-      return hoistStatics(ApmComponent, WrappedComponent)
+      return hoistStatics(ApmComponent, Component)
     }
   }
 }

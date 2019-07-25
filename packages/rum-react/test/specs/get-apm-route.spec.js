@@ -35,10 +35,8 @@ import Adapter from 'enzyme-adapter-react-16'
 Enzyme.configure({ adapter: new Adapter() })
 
 import { MemoryRouter as Router, Route } from 'react-router-dom'
-
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
-
 import { getApmRoute } from '../../src/get-apm-route'
 
 function Component(props) {
@@ -68,9 +66,13 @@ describe('ApmRoute', function() {
     expect(component.text()).toBe('Testing, ')
   })
 
-  it('should work with Route render', function() {
-    const apmBase = new ApmBase(createServiceFactory())
+  it('should work with Route render and log warning', function() {
+    const serviceFactory = createServiceFactory()
+    const apmBase = new ApmBase(serviceFactory)
+    const loggingService = serviceFactory.getService('LoggingService')
     const ApmRoute = getApmRoute(apmBase)
+
+    spyOn(loggingService, 'warn')
 
     const rendered = mount(
       <div>
@@ -92,5 +94,8 @@ describe('ApmRoute', function() {
       jasmine.objectContaining({ path: '/', render: jasmine.any(Function) })
     )
     expect(component.text()).toBe('Testing, render-test')
+    expect(loggingService.warn).toHaveBeenCalledWith(
+      '/ is not instrumented since component property is not provided'
+    )
   })
 })

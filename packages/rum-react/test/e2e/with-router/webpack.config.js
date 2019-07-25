@@ -28,9 +28,15 @@ const { EnvironmentPlugin } = require('webpack')
 const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 
 module.exports = {
-  entry: path.resolve(__dirname, './app.jsx'),
-  output: { path: __dirname, filename: 'app.e2e-bundle.js' },
-  devtool: 'source-map',
+  entry: {
+    general: path.join(__dirname, 'general.js'),
+    switch: path.join(__dirname, 'switch.js')
+  },
+  output: {
+    path: path.resolve(__dirname),
+    filename: '[name].e2e-bundle.js'
+  },
+  devtool: false,
   mode: 'development',
   performance: {
     hints: false
@@ -40,24 +46,22 @@ module.exports = {
       {
         test: /.jsx?$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                {
-                  targets: {
-                    ie: '11'
-                  },
-                  useBuiltIns: false,
-                  modules: 'umd'
-                }
-              ],
-              ['@babel/preset-react']
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                targets: {
+                  ie: '11'
+                },
+                useBuiltIns: false,
+                modules: 'umd'
+              }
             ],
-            plugins: ['@babel/plugin-transform-destructuring']
-          }
+            ['@babel/preset-react']
+          ],
+          plugins: ['@babel/plugin-transform-destructuring']
         }
       }
     ]

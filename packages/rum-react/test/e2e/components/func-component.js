@@ -23,40 +23,28 @@
  *
  */
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
-class TopicComponent extends React.Component {
-  constructor(props, state) {
-    super(props, state)
-    this.state = {
-      userName: ''
+export default function FunctionalComponent(props) {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    async function dummyGet() {
+      try {
+        await fetch('/test/e2e/data.json')
+      } catch (_) {
+      } finally {
+        setCount(2)
+      }
     }
-  }
 
-  componentDidMount() {
-    this.fetchData()
-  }
-  fetchData() {
-    var url = '/test/e2e/react/data.json'
-    fetch(url)
-      .then(resp => {
-        return resp.json()
-      })
-      .then(data => {
-        this.setState({ userName: data.userName })
-      })
-  }
-  render() {
-    return (
-      <div>
-        <h3>
-          <span>{this.props.match.path}</span>
-        </h3>
-        <span>{this.state.userName}</span>
-      </div>
-    )
-  }
+    dummyGet()
+  }, [])
+
+  return (
+    <div id="func-container">
+      {props.match.path + '\n'}
+      {count}
+    </div>
+  )
 }
-
-
-export default TopicComponent
