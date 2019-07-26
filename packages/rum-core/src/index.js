@@ -29,7 +29,7 @@ import ErrorLogging from './error-logging'
 import PerformanceMonitoring from './performance-monitoring'
 import ServiceFactory from './common/service-factory'
 import { isPlatformSupported } from './common/utils'
-import { patchAll, patchSubscription } from './common/patching'
+import { patchAll, patchEventHandler } from './common/patching'
 import { createTracer } from './opentracing'
 
 function createServiceFactory() {
@@ -44,7 +44,7 @@ export {
   createServiceFactory,
   ServiceFactory,
   patchAll,
-  patchSubscription,
+  patchEventHandler,
   isPlatformSupported,
   createTracer
 }

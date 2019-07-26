@@ -23,7 +23,7 @@
  *
  */
 
-import Subscription from '../../src/common/subscription'
+import Subscription from './subscription'
 
 function TransportMock(transport) {
   this._transport = transport

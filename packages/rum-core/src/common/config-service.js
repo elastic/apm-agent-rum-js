@@ -24,7 +24,8 @@
  */
 
 import { getCurrentScript, setLabel, merge, getDtHeaderValue } from './utils'
-import Subscription from '../common/subscription'
+import EventHandler from './event-handler'
+import { ON_CONFIG_CHANGE } from './constants'
 
 function getConfigFromScript() {
   var script = getCurrentScript()
@@ -108,7 +109,7 @@ class Config {
       context: {}
     }
 
-    this._changeSubscription = new Subscription()
+    this.events = new EventHandler()
     this.filters = []
     /**
      * Packages that uses rum-core under the hood must override
@@ -219,11 +220,7 @@ class Config {
     }
 
     this.config = merge({}, this.defaults, this.config, properties)
-    this._changeSubscription.applyAll(this, [this.config])
-  }
-
-  subscribeToChange(fn) {
-    return this._changeSubscription.subscribe(fn)
+    this.events.send(ON_CONFIG_CHANGE, [this.config])
   }
 
   /**

@@ -33,14 +33,17 @@ import {
   getLatestNonXHRSpan
 } from '../common/utils'
 import Url from '../common/url'
-import { patchSubscription } from '../common/patching'
+import { patchEventHandler } from '../common/patching'
 import { globalState } from '../common/patching/patch-utils'
 import {
   SCHEDULE,
   INVOKE,
   XMLHTTPREQUEST_SOURCE,
   FETCH_SOURCE,
-  HISTORY_PUSHSTATE
+  HISTORY_PUSHSTATE,
+  ON_TRANSACTION_END,
+  AFTER_EVENT,
+  ON_TASK
 } from '../common/constants'
 import {
   truncateModel,
@@ -58,7 +61,11 @@ class PerformanceMonitoring {
   }
 
   init() {
-    this._transactionService.subscribe(tr => {
+    /**
+     * We need to run this event listener after all of user-registered listener,
+     * since this event listener adds the transaction to the queue to be send to APM Server.
+     */
+    this._configService.events.observe(ON_TRANSACTION_END + AFTER_EVENT, tr => {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
         this._apmServer.addTransaction(payload)
@@ -74,7 +81,7 @@ class PerformanceMonitoring {
       this._configService,
       this._transactionService
     )
-    this.cancelPatchSub = patchSubscription.subscribe(patchSubFn)
+    this.cancelPatchSub = patchEventHandler.observe(ON_TASK, patchSubFn)
   }
 
   getXhrPatchSubFn() {

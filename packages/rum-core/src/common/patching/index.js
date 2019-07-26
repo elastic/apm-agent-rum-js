@@ -26,24 +26,27 @@
 import { patchXMLHttpRequest } from './xhr-patch'
 import { patchFetch } from './fetch-patch'
 import { patchHistory } from './history-patch'
-import Subscription from '../subscription'
+import EventHandler from '../event-handler'
+import { ON_TASK } from '../constants'
 
-const patchSubscription = new Subscription()
+const patchEventHandler = new EventHandler()
+
 var alreadyPatched = false
 function patchAll() {
   if (!alreadyPatched) {
     alreadyPatched = true
+    // todo: we should separate these event listeners to send individual events.
     patchXMLHttpRequest(function(event, task) {
-      patchSubscription.applyAll(this, [event, task])
+      patchEventHandler.send(ON_TASK, [event, task])
     })
     patchFetch(function(event, task) {
-      patchSubscription.applyAll(this, [event, task])
+      patchEventHandler.send(ON_TASK, [event, task])
     })
     patchHistory(function(event, task) {
-      patchSubscription.applyAll(this, [event, task])
+      patchEventHandler.send(ON_TASK, [event, task])
     })
   }
-  return patchSubscription
+  return patchEventHandler
 }
 
-export { patchAll, patchSubscription }
+export { patchAll, patchEventHandler }
