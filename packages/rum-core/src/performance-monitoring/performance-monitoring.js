@@ -33,7 +33,7 @@ import {
   getLatestNonXHRSpan
 } from '../common/utils'
 import Url from '../common/url'
-import { patchSubscription } from '../common/patching'
+import { patchEventHandler } from '../common/patching'
 import { globalState } from '../common/patching/patch-utils'
 import {
   SCHEDULE,
@@ -42,7 +42,8 @@ import {
   FETCH_SOURCE,
   HISTORY_PUSHSTATE,
   ON_TRANSACTION_END,
-  AFTER_EVENT
+  AFTER_EVENT,
+  ON_TASK
 } from '../common/constants'
 import {
   truncateModel,
@@ -80,7 +81,7 @@ class PerformanceMonitoring {
       this._configService,
       this._transactionService
     )
-    this.cancelPatchSub = patchSubscription.subscribe(patchSubFn)
+    this.cancelPatchSub = patchEventHandler.observe(ON_TASK, patchSubFn)
   }
 
   getXhrPatchSubFn() {

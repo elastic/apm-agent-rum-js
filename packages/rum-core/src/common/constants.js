@@ -95,9 +95,16 @@ const ON_TRANSACTION_START = 'onTransactionStart'
 const ON_TRANSACTION_END = 'onTransactionEnd'
 
 /**
- * Event modifiers, append these to event names.
- * Only for internal use.
+ * Internal Events
  */
+
+const ON_CONFIG_CHANGE = 'onConfigChange'
+const ON_TASK = 'onTask'
+
+/**
+ * Event modifiers, append these to event names.
+ */
+
 const BEFORE_EVENT = '_before'
 const AFTER_EVENT = '_after'
 
@@ -121,5 +128,7 @@ export {
   ON_TRANSACTION_START,
   ON_TRANSACTION_END,
   BEFORE_EVENT,
-  AFTER_EVENT
+  AFTER_EVENT,
+  ON_CONFIG_CHANGE,
+  ON_TASK
 }

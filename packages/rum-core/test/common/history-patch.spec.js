@@ -23,13 +23,14 @@
  *
  */
 
-import patchSubscription from './patch'
+import patchEventHandler from './patch'
+import { ON_TASK } from '../../src/common/constants'
 describe('historyPatch', function() {
   var events = []
   var cancelFn
 
   beforeAll(function() {
-    cancelFn = patchSubscription.subscribe(function(event, task) {
+    cancelFn = patchEventHandler.observe(ON_TASK, function(event, task) {
       events.push({
         event,
         task
