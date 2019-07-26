@@ -150,7 +150,9 @@ describe('transaction.Transaction', function() {
     transaction = new Transaction('transaction', 'transaction', {
       canReuse: true
     })
-    transaction.startSpan('span2')
+    const span2 = transaction.startSpan('span2')
+    span2.end()
+
     expect(transaction.canReuse()).toBe(true)
 
     transaction._start = transaction._start - 10000
