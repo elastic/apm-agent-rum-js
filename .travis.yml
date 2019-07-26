@@ -68,9 +68,6 @@ jobs:
       env:
         - STACK_VERSION=7.0.0
         - SCOPE=@elastic/apm-rum-react
-    - stage: test
-      script: npm run build-docs
-      name: 'Build Docs'
 addons:
   apt:
     packages:
