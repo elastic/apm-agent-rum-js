@@ -100,6 +100,7 @@ describe('TransactionService', function() {
 
     transactionService.startSpan('testSpan', 'testtype')
     var trans = transactionService.getCurrentTransaction()
+
     expect(trans.name).toBe('Unknown')
     transactionService.startTransaction('transaction', 'transaction', {
       canReuse: true
@@ -138,11 +139,12 @@ describe('TransactionService', function() {
     tr2.detectFinish()
   })
 
-  it('should reuse Transaction', function() {
+  it('should reuse Transaction that contains atleast one active span', function() {
     transactionService = new TransactionService(logger, config)
     const reusableTr = new Transaction('test-name', 'test-type', {
       canReuse: true
     })
+    reusableTr.startSpan('test')
     transactionService.setCurrentTransaction(reusableTr)
     const pageLoadTr = transactionService.startTransaction(name, 'page-load', {
       canReuse: true

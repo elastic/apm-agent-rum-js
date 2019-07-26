@@ -64,12 +64,19 @@ class Transaction extends SpanBase {
     this.addMarks({ custom })
   }
 
+  /**
+   * To avoid stale transaction capturing everything, the active
+   * transaction can be reused only on the follow conditions
+   * - current duration of transaction be must be less than the threshold
+   * - should contain atleast one active span
+   */
   canReuse(threshold = REUSABILITY_THRESHOLD) {
     return (
       !!this.options.canReuse &&
       !this.ended &&
-      performance.now() - this._start < threshold
-    ) // To avoid a stale transaction capture everything
+      performance.now() - this._start < threshold &&
+      Object.keys(this._activeSpans).length > 0
+    )
   }
 
   redefine(name, type, options) {
