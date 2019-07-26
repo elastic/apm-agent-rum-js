@@ -51,6 +51,7 @@ describe('PerformanceMonitoring', function() {
     apmServer = serviceFactory.getService('ApmServer')
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   })
+
   it('should send performance monitoring data to apm-server', function(done) {
     var tr = new Transaction('tr-name', 'tr-type', configService.config)
     var span1 = new Span('span 1', 'test-span')
@@ -204,7 +205,32 @@ describe('PerformanceMonitoring', function() {
     expect(result).toBeDefined()
   })
 
-  it('should filter transactions', function() {
+  it('should filter transactions based on duration and spans', () => {
+    configService.setConfig({
+      transactionDurationThreshold: 200
+    })
+    spyOn(logger, 'debug').and.callThrough()
+    const transaction1 = new Transaction()
+    transaction1.end()
+    transaction1._start = 0
+    transaction1._end = 201
+    expect(transaction1.duration()).toBe(201)
+    expect(performanceMonitoring.filterTransaction(transaction1)).toBe(false)
+    expect(logger.debug).toHaveBeenCalledWith(
+      'Transaction was discarded! transaction duration: 201 contains falsy value or it is greater than transactionDurationThreshold: 200 config'
+    )
+    logger.debug.calls.reset()
+
+    const transaction2 = new Transaction()
+    transaction2.end()
+    transaction2._end = transaction2._end + 100
+    expect(performanceMonitoring.filterTransaction(transaction2)).toBe(false)
+    expect(logger.debug).toHaveBeenCalledWith(
+      'Transaction was discarded! transaction does not include any spans'
+    )
+  })
+
+  it('should filter transactions based on browser responsiveness', function() {
     configService.setConfig({
       browserResponsivenessInterval: 500,
       checkBrowserResponsiveness: true,

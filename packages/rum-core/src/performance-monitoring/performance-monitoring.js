@@ -186,16 +186,24 @@ class PerformanceMonitoring {
   }
 
   filterTransaction(tr) {
-    var performanceMonitoring = this
-    var transactionDurationThreshold = this._configService.get(
+    const transactionDurationThreshold = this._configService.get(
       'transactionDurationThreshold'
     )
-    var duration = tr.duration()
-    if (
-      !duration ||
-      duration > transactionDurationThreshold ||
-      !tr.spans.length
-    ) {
+    const duration = tr.duration()
+    if (!duration || duration > transactionDurationThreshold) {
+      this._logginService.debug(
+        `Transaction was discarded! transaction duration: ${duration} contains falsy value or it is greater than transactionDurationThreshold: ${transactionDurationThreshold} config`
+      )
+
+      return false
+    }
+
+    if (tr.spans.length === 0) {
+      if (__DEV__) {
+        this._logginService.debug(
+          `Transaction was discarded! transaction does not include any spans`
+        )
+      }
       return false
     }
 
@@ -207,19 +215,17 @@ class PerformanceMonitoring {
       tr.resetSpans()
     }
 
-    var browserResponsivenessInterval = this._configService.get(
+    const browserResponsivenessInterval = this._configService.get(
       'browserResponsivenessInterval'
     )
-    var checkBrowserResponsiveness = this._configService.get(
+    const checkBrowserResponsiveness = this._configService.get(
       'checkBrowserResponsiveness'
     )
 
     if (checkBrowserResponsiveness && !tr.isHardNavigation) {
-      var buffer = performanceMonitoring._configService.get(
-        'browserResponsivenessBuffer'
-      )
+      const buffer = this._configService.get('browserResponsivenessBuffer')
 
-      var wasBrowserResponsive = performanceMonitoring.checkBrowserResponsiveness(
+      const wasBrowserResponsive = this.checkBrowserResponsiveness(
         tr,
         browserResponsivenessInterval,
         buffer
@@ -227,7 +233,7 @@ class PerformanceMonitoring {
 
       if (!wasBrowserResponsive) {
         if (__DEV__) {
-          performanceMonitoring._logginService.debug(
+          this._logginService.debug(
             'Transaction was discarded! browser was not responsive enough during the transaction.',
             ' duration:',
             duration,
