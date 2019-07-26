@@ -104,6 +104,10 @@ describe('ApmBase', function() {
     )
 
     expect(configService.get('pageLoadTransactionName')).toBe('test')
+    /**
+     * Force the page-load transaction to be reused by having an active span
+     */
+    apmBase.startSpan('dummy')
 
     var tr = apmBase.startTransaction('test-transaction', 'test-type', {
       canReuse: true
