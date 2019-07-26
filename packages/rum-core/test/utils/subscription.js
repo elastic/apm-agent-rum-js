@@ -23,6 +23,9 @@
  *
  */
 
+/**
+ * @deprecated
+ */
 class Subscription {
   constructor() {
     this.subscriptions = []

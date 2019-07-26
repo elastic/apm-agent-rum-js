@@ -25,7 +25,7 @@
 
 import { patchAll } from '../../src/common/patching/'
 
-if (!window['__patchSubscription']) {
+if (!window['__patchEventHandler']) {
   var nativeFetch = window.fetch
   if (nativeFetch) {
     window.fetch = function() {
@@ -38,7 +38,7 @@ if (!window['__patchSubscription']) {
     }
   }
   console.log('Pathching XHR and FETCH calls')
-  window['__patchSubscription'] = patchAll()
+  window['__patchEventHandler'] = patchAll()
 }
 
-export default window['__patchSubscription']
+export default window['__patchEventHandler']

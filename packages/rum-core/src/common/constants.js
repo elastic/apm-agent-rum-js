@@ -88,6 +88,26 @@ const USER_TIMING_THRESHOLD = 60
  */
 const KEYWORD_LIMIT = 1024
 
+/**
+ * Events
+ */
+const ON_TRANSACTION_START = 'onTransactionStart'
+const ON_TRANSACTION_END = 'onTransactionEnd'
+
+/**
+ * Internal Events
+ */
+
+const ON_CONFIG_CHANGE = 'onConfigChange'
+const ON_TASK = 'onTask'
+
+/**
+ * Event modifiers, append these to event names.
+ */
+
+const BEFORE_EVENT = '_before'
+const AFTER_EVENT = '_after'
+
 export {
   SCHEDULE,
   INVOKE,
@@ -104,5 +124,11 @@ export {
   NAME_UNKNOWN,
   TYPE_CUSTOM,
   USER_TIMING_THRESHOLD,
-  KEYWORD_LIMIT
+  KEYWORD_LIMIT,
+  ON_TRANSACTION_START,
+  ON_TRANSACTION_END,
+  BEFORE_EVENT,
+  AFTER_EVENT,
+  ON_CONFIG_CHANGE,
+  ON_TASK
 }

@@ -26,9 +26,9 @@
 import Transaction from './transaction'
 import { extend, getPageLoadMarks } from '../common/utils'
 import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
-import Subscription from '../common/subscription'
 import { captureHardNavigation } from './capture-hard-navigation'
 import { __DEV__ } from '../env'
+import { ON_TRANSACTION_START, ON_TRANSACTION_END } from '../common/constants'
 
 class TransactionService {
   constructor(logger, config) {
@@ -38,7 +38,6 @@ class TransactionService {
     this._config = config
     this._logger = logger
     this.currentTransaction = undefined
-    this._subscription = new Subscription()
     this._alreadyCapturedPageLoad = false
   }
 
@@ -178,6 +177,7 @@ class TransactionService {
     if (__DEV__) {
       this._logger.debug('TransactionService.startTransaction', tr)
     }
+    this._config.events.send(ON_TRANSACTION_START, [tr])
 
     tr.onEnd = () => {
       return Promise.resolve().then(
@@ -247,14 +247,10 @@ class TransactionService {
   }
 
   add(transaction) {
-    this._subscription.applyAll(this, [transaction])
+    this._config.events.send(ON_TRANSACTION_END, [transaction])
     if (__DEV__) {
       this._logger.debug('TransactionService.add', transaction)
     }
-  }
-
-  subscribe(fn) {
-    return this._subscription.subscribe(fn)
   }
 
   addTask(taskId) {

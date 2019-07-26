@@ -23,15 +23,16 @@
  *
  */
 
-import patchSubscription from './patch'
+import patchEventHandler from './patch'
 import { globalState } from '../../src/common/patching/patch-utils'
+import { ON_TASK } from '../../src/common/constants'
 
 describe('fetchPatch', function() {
   var events = []
   var cancelFn
 
   beforeAll(function() {
-    cancelFn = patchSubscription.subscribe(function(event, task) {
+    cancelFn = patchEventHandler.observe(ON_TASK, function(event, task) {
       events.push({
         event,
         task

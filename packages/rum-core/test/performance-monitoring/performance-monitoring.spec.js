@@ -29,9 +29,10 @@ import Span from '../../src/performance-monitoring/span'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { getDtHeaderValue } from '../../src/common/utils'
 import { globalState } from '../../src/common/patching/patch-utils'
-import { SCHEDULE } from '../../src/common/constants'
-import patchSub from '../common/patch'
+import { SCHEDULE, ON_TASK } from '../../src/common/constants'
+import patchEventHandler from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
+import { ON_TRANSACTION_END } from '../../src/common/constants'
 
 const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
 
@@ -358,7 +359,7 @@ describe('PerformanceMonitoring', function() {
     const unMock = mockGetEntriesByType()
     const transactionService = serviceFactory.getService('TransactionService')
 
-    transactionService.subscribe(function(tr) {
+    configService.events.observe(ON_TRANSACTION_END, function(tr) {
       expect(tr.isHardNavigation).toBe(true)
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
@@ -508,17 +509,17 @@ describe('PerformanceMonitoring', function() {
     it('should create fetch spans', function(done) {
       var fn = performanceMonitoring.getXhrPatchSubFn()
       var dTHeaderValue
-      performanceMonitoring.cancelPatchSub = patchSub.subscribe(function(
-        event,
-        task
-      ) {
-        fn(event, task)
-        if (event === SCHEDULE) {
-          dTHeaderValue = task.data.target.headers.get(
-            configService.get('distributedTracingHeaderName')
-          )
+      performanceMonitoring.cancelPatchSub = patchEventHandler.observe(
+        ON_TASK,
+        function(event, task) {
+          fn(event, task)
+          if (event === SCHEDULE) {
+            dTHeaderValue = task.data.target.headers.get(
+              configService.get('distributedTracingHeaderName')
+            )
+          }
         }
-      })
+      )
       var transactionService = performanceMonitoring._transactionService
       var tr = transactionService.startTransaction(
         'fetch transaction',
@@ -571,13 +572,13 @@ describe('PerformanceMonitoring', function() {
       var fn = performanceMonitoring.getXhrPatchSubFn()
 
       var events = []
-      performanceMonitoring.cancelPatchSub = patchSub.subscribe(function(
-        event,
-        task
-      ) {
-        events.push({ event, source: task.source })
-        fn(event, task)
-      })
+      performanceMonitoring.cancelPatchSub = patchEventHandler.observe(
+        ON_TASK,
+        function(event, task) {
+          events.push({ event, source: task.source })
+          fn(event, task)
+        }
+      )
 
       window['__fetchDelegate'] = function(request) {
         return new Promise(function(resolve) {
@@ -672,12 +673,12 @@ describe('PerformanceMonitoring', function() {
 
   it('should create Transactions on history.pushState', function() {
     var fn = performanceMonitoring.getXhrPatchSubFn()
-    performanceMonitoring.cancelPatchSub = patchSub.subscribe(function(
-      event,
-      task
-    ) {
-      fn(event, task)
-    })
+    performanceMonitoring.cancelPatchSub = patchEventHandler.observe(
+      ON_TASK,
+      function(event, task) {
+        fn(event, task)
+      }
+    )
     var transactionService = performanceMonitoring._transactionService
 
     spyOn(transactionService, 'startTransaction').and.callThrough()

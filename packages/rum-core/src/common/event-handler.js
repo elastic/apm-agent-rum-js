@@ -23,44 +23,47 @@
  *
  */
 
-import patchEventHandler from './patch'
-import { ON_TASK } from '../../src/common/constants'
-describe('historyPatch', function() {
-  var events = []
-  var cancelFn
+import { BEFORE_EVENT, AFTER_EVENT } from './constants'
 
-  beforeAll(function() {
-    cancelFn = patchEventHandler.observe(ON_TASK, function(event, task) {
-      events.push({
-        event,
-        task
-      })
-    })
-  })
+class EventHandler {
+  constructor() {
+    this.observers = {}
+  }
 
-  afterAll(function() {
-    cancelFn()
-  })
+  observe(name, fn) {
+    if (typeof fn === 'function') {
+      if (!this.observers[name]) {
+        this.observers[name] = []
+      }
+      this.observers[name].push(fn)
 
-  beforeEach(function() {
-    events = []
-  })
-
-  it('should patch history.pushState', function() {
-    history.pushState(undefined, 'test', 'test')
-
-    expect(events).toEqual([
-      {
-        event: 'invoke',
-        task: {
-          source: 'history.pushState',
-          data: {
-            state: undefined,
-            title: 'test',
-            url: 'test'
-          }
+      return () => {
+        var index = this.observers[name].indexOf(fn)
+        if (index > -1) {
+          this.observers[name].splice(index, 1)
         }
       }
-    ])
-  })
-})
+    }
+  }
+
+  sendOnly(name, args) {
+    const obs = this.observers[name]
+    if (obs) {
+      obs.forEach(fn => {
+        try {
+          fn.apply(undefined, args)
+        } catch (error) {
+          console.log(error, error.stack)
+        }
+      })
+    }
+  }
+
+  send(name, args) {
+    this.sendOnly(name + BEFORE_EVENT, args)
+    this.sendOnly(name, args)
+    this.sendOnly(name + AFTER_EVENT, args)
+  }
+}
+
+export default EventHandler
