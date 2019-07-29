@@ -64,7 +64,7 @@ const RESOURCE_INITIATOR_TYPES = [
 /**
  * The amount of time it is allowed for a transaction to be reused in another startTransaction
  */
-const REUSABILITY_THRESHOLD = 10000
+const REUSABILITY_THRESHOLD = 5000
 
 /**
  * Maximum duration of the span that is used to decide if the span is valid - 300 secs / 5 mins
