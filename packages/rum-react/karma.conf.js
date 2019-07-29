@@ -27,6 +27,11 @@ const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
 const { getGlobalConfig } = require('../../dev-utils/test-config')
 const { EnvironmentPlugin } = require('webpack')
 const { getWebpackEnv } = require('../../dev-utils/test-config')
+const {
+  getBabelConfig,
+  PACKAGE_TYPES,
+  BUNDLE_TYPES
+} = require('../../dev-utils/build')
 
 module.exports = function(config) {
   config.set(baseConfig)
@@ -39,22 +44,7 @@ module.exports = function(config) {
           test: /.jsx?$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
-          options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                {
-                  targets: {
-                    ie: '11'
-                  },
-                  useBuiltIns: false,
-                  modules: 'umd'
-                }
-              ],
-              ['@babel/preset-react']
-            ],
-            plugins: ['@babel/plugin-transform-destructuring']
-          }
+          options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.REACT)
         }
       ]
     },
@@ -64,7 +54,7 @@ module.exports = function(config) {
     }
   }
 
-  const testConfig = getGlobalConfig()
+  const testConfig = getGlobalConfig('rum-react')
   console.log('Custom Test Config:', testConfig)
   config.set(testConfig)
   const cfg = prepareConfig(config)

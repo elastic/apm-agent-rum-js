@@ -16,7 +16,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build:main",
-    "build:main": "npx babel src -d dist/lib --config-file ../../babel.node.js",
+    "build:main": "npx babel src -d dist/lib",
     "karma": "karma start",
     "karma:bench": "NODE_ENV=production karma start karma.bench.conf.js",
     "karma:coverage": "karma start --coverage --singleRun",

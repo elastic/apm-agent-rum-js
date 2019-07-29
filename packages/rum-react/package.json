@@ -23,7 +23,7 @@
     "prepublishOnly": "npm run build",
     "script": "node ../../dev-utils/run-script.js",
     "build": "npm run build:main",
-    "build:main": "npx babel src -d dist/lib --config-file ./babel.config.js",
+    "build:main": "npx babel src -d dist/lib",
     "build:e2e": "npm run script buildE2eBundles packages/rum-react/test/e2e",
     "karma": "karma start",
     "karma:coverage": "karma start --coverage --singleRun",

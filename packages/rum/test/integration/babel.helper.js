@@ -23,6 +23,6 @@
  *
  */
 
-const configFile = require.resolve('../../../../babel.node.js')
+const configFile = require.resolve('../../babel.config')
 
 require('@babel/register')({ configFile })

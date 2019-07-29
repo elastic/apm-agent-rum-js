@@ -30,8 +30,7 @@ const {
   getSauceConnectOptions,
   getBrowserList
 } = require('./test-config')
-
-const BABEL_CONFIG_FILE = require.resolve('@elastic/apm-rum/babel.config.js')
+const { getBabelConfig, BUNDLE_TYPES } = require('./build')
 
 const baseLaunchers = getBrowserList().map(launcher => ({
   base: 'SauceLabs',
@@ -66,10 +65,7 @@ const baseConfig = {
         {
           test: /\.js$/,
           loader: 'babel-loader',
-          options: {
-            configFile: BABEL_CONFIG_FILE,
-            plugins: []
-          }
+          options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV)
         }
       ]
     },
