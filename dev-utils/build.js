@@ -26,11 +26,18 @@
 const BUNDLE_TYPES = {
   NODE_DEV: 'NODE_DEV',
   NODE_PROD: 'NODE_PROD',
+  NODE_ES_PROD: 'NODE_ES_PROD',
   BROWSER_DEV: 'BROWSER_DEV',
   BROWSER_PROD: 'BROWSER_PROD'
 }
 
-const { NODE_DEV, NODE_PROD, BROWSER_DEV, BROWSER_PROD } = BUNDLE_TYPES
+const {
+  NODE_DEV,
+  NODE_PROD,
+  NODE_ES_PROD,
+  BROWSER_DEV,
+  BROWSER_PROD
+} = BUNDLE_TYPES
 
 const DEFAULT_NODE_PRESET = [
   [
@@ -84,6 +91,11 @@ function getBabelConfig(bundleType, packageType) {
     case NODE_DEV:
     case NODE_PROD:
       options = { ...options, presets: DEFAULT_NODE_PRESET }
+      if (packageType === PACKAGE_TYPES.REACT) {
+        return getReactConfig(options)
+      }
+      return options
+    case NODE_ES_PROD:
       if (packageType === PACKAGE_TYPES.REACT) {
         return getReactConfig(options)
       }
