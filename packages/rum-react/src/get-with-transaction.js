@@ -57,7 +57,7 @@ function getWithTransaction(apm) {
 
       let ApmComponent = null
       /**
-       * In react, there are two recommended ways to instantiate network requests
+       * In react, there are two recommended ways to instantiate network requests inside components
        *  - in componentDidMount lifecycle which happens before rendering the component
        *  - useEffect hook which is supported in react > 16.7.x versions
        *
