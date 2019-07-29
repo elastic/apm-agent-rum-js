@@ -190,18 +190,33 @@ class PerformanceMonitoring {
       'transactionDurationThreshold'
     )
     const duration = tr.duration()
-    if (!duration || duration > transactionDurationThreshold) {
-      this._logginService.debug(
-        `Transaction was discarded! transaction duration: ${duration} contains falsy value or it is greater than transactionDurationThreshold: ${transactionDurationThreshold} config`
-      )
 
+    if (!duration) {
+      if (__DEV__) {
+        let message = 'Transaction was discarded! '
+        if (duration === 0) {
+          message += `Transaction duration is 0`
+        } else {
+          message += `Transaction wasn't ended`
+        }
+        this._logginService.debug(message)
+      }
+      return false
+    }
+
+    if (duration > transactionDurationThreshold) {
+      if (__DEV__) {
+        this._logginService.debug(
+          `Transaction was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
+        )
+      }
       return false
     }
 
     if (tr.spans.length === 0) {
       if (__DEV__) {
         this._logginService.debug(
-          `Transaction was discarded! transaction does not include any spans`
+          `Transaction was discarded! Transaction does not include any spans`
         )
       }
       return false
@@ -234,7 +249,7 @@ class PerformanceMonitoring {
       if (!wasBrowserResponsive) {
         if (__DEV__) {
           this._logginService.debug(
-            'Transaction was discarded! browser was not responsive enough during the transaction.',
+            'Transaction was discarded! Browser was not responsive enough during the transaction.',
             ' duration:',
             duration,
             ' browserResponsivenessCounter:',

@@ -217,7 +217,7 @@ describe('PerformanceMonitoring', function() {
     expect(transaction1.duration()).toBe(201)
     expect(performanceMonitoring.filterTransaction(transaction1)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
-      'Transaction was discarded! transaction duration: 201 contains falsy value or it is greater than transactionDurationThreshold: 200 config'
+      'Transaction was discarded! Transaction duration (201) is greater than the transactionDurationThreshold configuration (200)'
     )
     logger.debug.calls.reset()
 
@@ -226,7 +226,23 @@ describe('PerformanceMonitoring', function() {
     transaction2._end = transaction2._end + 100
     expect(performanceMonitoring.filterTransaction(transaction2)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
-      'Transaction was discarded! transaction does not include any spans'
+      'Transaction was discarded! Transaction does not include any spans'
+    )
+    logger.debug.calls.reset()
+
+    const transaction3 = new Transaction()
+    expect(performanceMonitoring.filterTransaction(transaction3)).toBe(false)
+    expect(logger.debug).toHaveBeenCalledWith(
+      "Transaction was discarded! Transaction wasn't ended"
+    )
+    logger.debug.calls.reset()
+
+    const transaction4 = new Transaction()
+    transaction4.end()
+    transaction4._start = transaction4._end = 0
+    expect(performanceMonitoring.filterTransaction(transaction4)).toBe(false)
+    expect(logger.debug).toHaveBeenCalledWith(
+      'Transaction was discarded! Transaction duration is 0'
     )
   })
 
@@ -251,7 +267,7 @@ describe('PerformanceMonitoring', function() {
     var wasBrowserResponsive = performanceMonitoring.filterTransaction(tr)
     expect(wasBrowserResponsive).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
-      'Transaction was discarded! browser was not responsive enough during the transaction.',
+      'Transaction was discarded! Browser was not responsive enough during the transaction.',
       ' duration:',
       3000,
       ' browserResponsivenessCounter:',
