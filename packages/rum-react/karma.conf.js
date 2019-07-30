@@ -25,35 +25,18 @@
 
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
 const { getGlobalConfig } = require('../../dev-utils/test-config')
-const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('../../dev-utils/test-config')
 const {
-  getBabelConfig,
+  getWebpackConfig,
   PACKAGE_TYPES,
   BUNDLE_TYPES
 } = require('../../dev-utils/build')
 
 module.exports = function(config) {
   config.set(baseConfig)
-  config.webpack = {
-    devtool: 'source-map',
-    mode: 'development',
-    module: {
-      rules: [
-        {
-          test: /.jsx?$/,
-          exclude: /node_modules/,
-          loader: 'babel-loader',
-          options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.REACT)
-        }
-      ]
-    },
-    plugins: [new EnvironmentPlugin(getWebpackEnv())],
-    resolve: {
-      extensions: ['.js', '.jsx']
-    }
-  }
-
+  config.webpack = getWebpackConfig(
+    BUNDLE_TYPES.BROWSER_DEV,
+    PACKAGE_TYPES.REACT
+  )
   const testConfig = getGlobalConfig('rum-react')
   console.log('Custom Test Config:', testConfig)
   config.set(testConfig)

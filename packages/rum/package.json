@@ -14,7 +14,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "webpack && npm run build:main",
+    "build": "webpack --colors && npm run build:main",
     "build:dev": "webpack -w",
     "build:main": "npx babel src -d dist/lib",
     "build:e2e": "npm run script buildE2eBundles packages/rum/test/e2e",

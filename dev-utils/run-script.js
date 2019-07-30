@@ -95,9 +95,7 @@ function runE2eTests(configPath) {
 }
 
 function buildE2eBundles(basePath) {
-  buildE2eBundlesUtils(join(PROJECT_DIR, basePath), err => {
-    err && process.exit(2)
-  })
+  return buildE2eBundlesUtils(join(PROJECT_DIR, basePath))
 }
 
 function runSauceTests(packagePath, serve = 'true', ...scripts) {

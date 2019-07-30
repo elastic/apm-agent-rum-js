@@ -57,8 +57,7 @@ function buildE2eBundles(basePath, callback) {
     callback ||
     function(err) {
       if (err) {
-        var exitCode = 2
-        process.exit(exitCode)
+        process.exit(2)
       }
     }
 
@@ -79,22 +78,27 @@ function buildE2eBundles(basePath, callback) {
       }
     }, [])
 
-  console.log('Config Files: \n', fileList.join('\n'))
+  console.log('Webpack config files: \n', fileList.join('\n'), '\n')
   webpack(configs, (err, stats) => {
     if (err) {
-      console.log(err)
-      cb(err)
+      console.error(err)
+      return cb(err)
     }
-    if (stats.hasErrors()) console.log('There were errors while building')
 
-    const jsonStats = stats.toJson('minimal')
-    console.log(stats.toString('minimal'))
-    if (jsonStats.errors.length > 0) {
-      jsonStats.errors.forEach(function(error) {
-        console.log('Error:', error)
-      })
-      cb(jsonStats.errors)
+    const info = stats.toJson('minimal')
+    if (stats.hasErrors()) {
+      console.error('There were errors while building')
+      info.errors.forEach(err => console.error(err))
+      cb(info.errors)
     } else {
+      console.log(
+        stats.toString({
+          colors: true,
+          chunks: false,
+          assets: false,
+          modules: false
+        })
+      )
       cb()
     }
   })
