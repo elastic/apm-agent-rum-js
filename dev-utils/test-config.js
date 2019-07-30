@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  *
  */
-const defaultApmServerUrl = 'http://localhost:8200'
+const DEFAULT_APM_SERVER_URL = 'http://localhost:8200'
 
 function getSauceConnectOptions() {
   return {
@@ -42,7 +42,7 @@ function getTestEnvironmentVariables() {
     sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
     isTravis: process.env.TRAVIS,
     isJenkins: process.env.JENKINS_URL,
-    serverUrl: process.env.APM_SERVER_URL || defaultApmServerUrl,
+    serverUrl: process.env.APM_SERVER_URL || DEFAULT_APM_SERVER_URL,
     mockBackendUrl: 'http://localhost:8003'
   }
 }

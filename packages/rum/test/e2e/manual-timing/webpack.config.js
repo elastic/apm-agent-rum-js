@@ -23,13 +23,21 @@
  *
  */
 
-const path = require('path')
+const { join, resolve } = require('path')
 const { EnvironmentPlugin } = require('webpack')
 const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
+const {
+  getBabelConfig,
+  BUNDLE_TYPES
+} = require('../../../../../dev-utils/build')
 
 module.exports = {
-  entry: path.resolve(__dirname, './app.js'),
-  output: { path: __dirname, filename: 'app.e2e-bundle.js' },
+  entry: join(__dirname, './app.js'),
+  output: {
+    path: resolve(__dirname),
+    filename: 'app.e2e-bundle.js',
+    libraryTarget: 'umd'
+  },
   devtool: 'source-map',
   mode: 'development',
   module: {
@@ -37,7 +45,8 @@ module.exports = {
       {
         test: /.js?$/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV)
         }
       }
     ]

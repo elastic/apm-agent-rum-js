@@ -23,15 +23,13 @@
  *
  */
 
-const { getBabelConfig } = require('../../dev-utils/babel')
+const {
+  getBabelConfig,
+  BUNDLE_TYPES,
+  PACKAGE_TYPES
+} = require('../../dev-utils/build')
 
 module.exports = function(api) {
   api.cache(true)
-  let config = getBabelConfig()
-  config.presets.push(['@babel/react'])
-  config.plugins = config.plugins.concat([
-    '@babel/plugin-transform-destructuring',
-    '@babel/plugin-syntax-dynamic-import'
-  ])
-  return config
+  return getBabelConfig(BUNDLE_TYPES.NODE_PROD, PACKAGE_TYPES.REACT)
 }

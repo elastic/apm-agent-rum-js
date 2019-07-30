@@ -23,24 +23,9 @@
  *
  */
 
-function getBabelConfig() {
-  return {
-    comments: false,
-    presets: [
-      [
-        '@babel/preset-env',
-        {
-          targets: {
-            node: '8.0.0'
-          },
-          loose: true
-        }
-      ]
-    ],
-    plugins: []
-  }
-}
+const { getBabelConfig, BUNDLE_TYPES } = require('../../dev-utils/build')
 
-module.exports = {
-  getBabelConfig
+module.exports = function(api) {
+  api.cache(true)
+  return getBabelConfig(BUNDLE_TYPES.NODE_PROD)
 }
