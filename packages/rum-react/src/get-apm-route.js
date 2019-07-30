@@ -30,12 +30,10 @@ import { getWithTransaction } from './get-with-transaction'
 function getApmRoute(apm) {
   const withTransaction = getWithTransaction(apm)
 
-  return class ApmRoute extends React.Component {
-    render() {
-      const { path, component } = this.props
-      const apmComponent = withTransaction(path, 'route-change')(component)
-      return <Route {...this.props} component={apmComponent} />
-    }
+  return function ApmRoute(props) {
+    const { path, component } = props
+    const apmComponent = withTransaction(path, 'route-change')(component)
+    return <Route {...props} component={apmComponent} />
   }
 }
 

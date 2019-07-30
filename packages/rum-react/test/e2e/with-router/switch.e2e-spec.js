@@ -41,11 +41,20 @@ describe('Using Switch component of react router', function() {
       'expected functional component to be rendered'
     )
 
-    const serverCalls = waitForApmServerCalls(0, 1)
-    expect(serverCalls.sendTransactions.length).toBe(1)
+    const serverCalls = waitForApmServerCalls(0, 2)
+    expect(serverCalls.sendTransactions.length).toBe(2)
 
-    const transaction = serverCalls.sendTransactions[0].args[0][0]
-    expect(transaction.type).toBe('page-load')
-    expect(transaction.name).toBe('/notfound')
+    const pageLoadTransaction = serverCalls.sendTransactions[0].args[0][0]
+    expect(pageLoadTransaction.type).toBe('page-load')
+    expect(pageLoadTransaction.name).toBe('/notfound')
+
+    const routeTransaction = serverCalls.sendTransactions[1].args[0][0]
+    expect(routeTransaction.name).toBe('/func')
+    expect(routeTransaction.type).toBe('route-change')
+    /**
+     * Should include the fetch call inside useEffect hook
+     */
+    expect(routeTransaction.spans.length).toBe(1)
+    expect(routeTransaction.spans[0].name).toBe('GET /test/e2e/data.json')
   })
 })

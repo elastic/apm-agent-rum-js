@@ -27,6 +27,19 @@ import React from 'react'
 import hoistStatics from 'hoist-non-react-statics'
 
 /**
+ * Check if the given component is class based component
+ * ex: class Component extends React.Component
+ *
+ * React internally uses this logic to check if it has to call new Component or Component
+ * to decide between functional and class based components
+ * https://github.com/facebook/react/blob/769b1f270e1251d9dbdce0fcbd9e92e502d059b8/packages/react-reconciler/src/ReactFiber.js#L297-L300
+ */
+function isReactClassComponent(Component) {
+  const prototype = Component.prototype
+  return !!(prototype && prototype.isReactComponent)
+}
+
+/**
  * Usage:
  *  - Pure function: `withTransaction('name','route-change')(Component)`
  *  - As a decorator: `@withTransaction('name','route-change')`
@@ -41,37 +54,70 @@ function getWithTransaction(apm) {
         )
         return Component
       }
-      class ApmComponent extends React.Component {
-        constructor(props) {
-          super(props)
-          /**
-           * We need to start the transaction in constructor because otherwise,
-           * we won't be able to capture what happens in componentDidMount of child components.
-           */
-          this.transaction = apm.startTransaction(name, type, {
+
+      let ApmComponent = null
+      /**
+       * In react, there are two recommended ways to instantiate network requests inside components
+       *  - in componentDidMount lifecycle which happens before rendering the component
+       *  - useEffect hook which is supported in react > 16.7.x versions
+       *
+       * Since we are wrapping the underlying component that renders the route, We have to
+       * account for any network effects that happens inside these two methods to capture those
+       * requests as spans in the route-change transaction
+       *
+       * Parent component's componentDidMount and useEffect are always called after childs cDM and
+       * effects are called (Ordering is preserved). So we check for our transaction finish
+       * logic inside these methods to make sure we are capturing the span information
+       */
+      if (
+        !isReactClassComponent(Component) &&
+        typeof React.useEffect === 'function'
+      ) {
+        ApmComponent = function ApmComponent(props) {
+          const transaction = apm.startTransaction(name, type, {
             canReuse: true
           })
-        }
 
-        componentDidMount() {
-          if (this.transaction) {
-            this.transaction.detectFinish()
+          React.useEffect(() => {
+            transaction && transaction.detectFinish()
+            return () => transaction && transaction.detectFinish()
+          })
+
+          return <Component transaction={transaction} {...props} />
+        }
+      } else {
+        ApmComponent = class ApmComponent extends React.Component {
+          constructor(props) {
+            super(props)
+            /**
+             * We need to start the transaction in constructor because otherwise,
+             * we won't be able to capture what happens in componentDidMount of child
+             * components since the parent component is mounted after child
+             */
+            this.transaction = apm.startTransaction(name, type, {
+              canReuse: true
+            })
           }
-        }
 
-        componentWillUnmount() {
-          /**
-           * It is possible that the transaction has ended before this unmount event,
-           * in that case this is a noop.
-           */
-          if (this.transaction) {
-            this.transaction.detectFinish()
+          componentDidMount() {
+            if (this.transaction) {
+              this.transaction.detectFinish()
+            }
           }
-        }
 
-        render() {
-          // todo: should we pass the transaction down (could use react context provider instead)
-          return <Component transaction={this.transaction} {...this.props} />
+          componentWillUnmount() {
+            /**
+             * It is possible that the transaction has ended before this unmount event,
+             * in that case this is a noop.
+             */
+            if (this.transaction) {
+              this.transaction.detectFinish()
+            }
+          }
+
+          render() {
+            return <Component transaction={this.transaction} {...this.props} />
+          }
         }
       }
 
