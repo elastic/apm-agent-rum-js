@@ -83,9 +83,10 @@ const baseConfig = {
 function prepareConfig(config, packageName) {
   const globalConfig = getGlobalConfig(packageName)
   console.log('Global test Configuration: ', globalConfig)
+  const { agentConfig, testConfig } = globalConfig
 
-  const { isTravis, isJenkins, sauceLabs: isSauce } = globalConfig.testConfig
-  let buildId = `ApmJs-${globalConfig.agentConfig.name}`
+  const { isTravis, isJenkins, sauceLabs: isSauce } = testConfig
+  let buildId = `ApmJs-${agentConfig.name}`
 
   if (isTravis) {
     console.log('prepareConfig: Run in Travis')
