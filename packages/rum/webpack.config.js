@@ -27,6 +27,7 @@ const { join } = require('path')
 const { EnvironmentPlugin } = require('webpack')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const { getBabelConfig, BUNDLE_TYPES } = require('../../dev-utils/build')
 
 const OUTPUT_DIR = join(__dirname, 'dist', 'bundles')
 const SRC_DIR = join(__dirname, 'src')
@@ -50,9 +51,8 @@ const devConfig = entry => ({
     rules: [
       {
         test: /\.js$/,
-        use: {
-          loader: 'babel-loader'
-        }
+        loader: 'babel-loader',
+        options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV)
       }
     ]
   },

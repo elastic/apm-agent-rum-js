@@ -23,16 +23,21 @@
  *
  */
 
-const path = require('path')
+const { join, resolve } = require('path')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const { EnvironmentPlugin } = require('webpack')
 const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
+const {
+  getBabelConfig,
+  BUNDLE_TYPES
+} = require('../../../../../dev-utils/build')
 
 const optimized = {
-  entry: path.join(__dirname, './app.js'),
+  entry: join(__dirname, './app.js'),
   output: {
     filename: 'app.e2e-bundle.min.js',
-    path: path.resolve(__dirname)
+    path: resolve(__dirname),
+    libraryTarget: 'umd'
   },
   devtool: 'source-map',
   module: {
@@ -40,7 +45,8 @@ const optimized = {
       {
         test: /\.js$/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV)
         }
       }
     ]

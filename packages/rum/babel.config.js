@@ -23,21 +23,9 @@
  *
  */
 
+const { getBabelConfig, BUNDLE_TYPES } = require('../../dev-utils/build')
+
 module.exports = function(api) {
   api.cache(true)
-  return {
-    presets: [
-      [
-        '@babel/preset-env',
-        {
-          targets: {
-            ie: '11'
-          },
-          useBuiltIns: false,
-          modules: false,
-          loose: true
-        }
-      ]
-    ]
-  }
+  return getBabelConfig(BUNDLE_TYPES.NODE_PROD)
 }

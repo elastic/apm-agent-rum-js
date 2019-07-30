@@ -26,6 +26,11 @@
 const path = require('path')
 const { EnvironmentPlugin } = require('webpack')
 const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
+const {
+  getBabelConfig,
+  PACKAGE_TYPES,
+  BUNDLE_TYPES
+} = require('../../../../../dev-utils/build')
 
 module.exports = {
   entry: {
@@ -34,7 +39,8 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname),
-    filename: '[name].e2e-bundle.js'
+    filename: '[name].e2e-bundle.js',
+    libraryTarget: 'umd'
   },
   devtool: false,
   mode: 'development',
@@ -46,22 +52,9 @@ module.exports = {
       {
         test: /.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
-        options: {
-          presets: [
-            [
-              '@babel/preset-env',
-              {
-                targets: {
-                  ie: '11'
-                },
-                useBuiltIns: false,
-                modules: 'umd'
-              }
-            ],
-            ['@babel/preset-react']
-          ],
-          plugins: ['@babel/plugin-transform-destructuring']
+        use: {
+          loader: 'babel-loader',
+          options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.REACT)
         }
       }
     ]
