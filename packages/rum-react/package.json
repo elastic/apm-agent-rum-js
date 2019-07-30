@@ -40,7 +40,7 @@
     "hoist-non-react-statics": "^3.3.0"
   },
   "peerDependencies": {
-    "react": "^16.2.0",
-    "react-router-dom": "^4.2.2"
+    "react": "^16.0.0",
+    "react-router-dom": "^4.0.0"
   }
 }
