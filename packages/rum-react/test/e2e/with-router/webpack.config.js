@@ -24,10 +24,8 @@
  */
 
 const path = require('path')
-const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 const {
-  getBabelConfig,
+  getWebpackConfig,
   PACKAGE_TYPES,
   BUNDLE_TYPES
 } = require('../../../../../dev-utils/build')
@@ -42,25 +40,5 @@ module.exports = {
     filename: '[name].e2e-bundle.js',
     libraryTarget: 'umd'
   },
-  devtool: false,
-  mode: 'development',
-  performance: {
-    hints: false
-  },
-  module: {
-    rules: [
-      {
-        test: /.jsx?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.REACT)
-        }
-      }
-    ]
-  },
-  plugins: [new EnvironmentPlugin(getWebpackEnv())],
-  resolve: {
-    extensions: ['.js', '.jsx']
-  }
+  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.REACT)
 }

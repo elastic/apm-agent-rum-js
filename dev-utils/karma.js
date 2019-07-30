@@ -24,19 +24,13 @@
  */
 
 const { Server } = require('karma')
-const { EnvironmentPlugin } = require('webpack')
-const {
-  getWebpackEnv,
-  getSauceConnectOptions,
-  getBrowserList
-} = require('./test-config')
-const { getBabelConfig, BUNDLE_TYPES } = require('./build')
+const { getSauceConnectOptions, getBrowserList } = require('./test-config')
+const { getWebpackConfig, BUNDLE_TYPES } = require('./build')
 
 const baseLaunchers = getBrowserList().map(launcher => ({
   base: 'SauceLabs',
   ...launcher
 }))
-
 const specPattern = 'test/{*.spec.js,!(e2e|integration|node)/*.spec.js}'
 const { tunnelIdentifier } = getSauceConnectOptions()
 
@@ -58,20 +52,7 @@ const baseConfig = {
     'karma-webpack',
     'karma-sourcemap-loader'
   ],
-  webpack: {
-    mode: 'none',
-    module: {
-      rules: [
-        {
-          test: /\.js$/,
-          loader: 'babel-loader',
-          options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV)
-        }
-      ]
-    },
-    plugins: [new EnvironmentPlugin(getWebpackEnv())],
-    devtool: 'inline-source-map'
-  },
+  webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV),
   webpackMiddleware: {
     stats: 'errors-only'
   },

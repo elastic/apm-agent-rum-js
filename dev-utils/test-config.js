@@ -66,17 +66,6 @@ function getGlobalConfig(packageName = 'rum') {
 }
 
 /**
- * Used for injecting process.env across webpack bundles for testing
- */
-function getWebpackEnv(env = 'development') {
-  const { serverUrl } = getTestEnvironmentVariables()
-  return {
-    APM_SERVER_URL: serverUrl,
-    NODE_ENV: env
-  }
-}
-
-/**
  * Supported lowest and highest versions across major browser platform
  *
  * The list below is based purely on the market share distribution.
@@ -138,6 +127,5 @@ module.exports = {
   getSauceConnectOptions,
   getTestEnvironmentVariables,
   getGlobalConfig,
-  getWebpackEnv,
   getBrowserList
 }

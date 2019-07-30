@@ -23,6 +23,10 @@
  *
  */
 
+const { EnvironmentPlugin } = require('webpack')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const { getTestEnvironmentVariables } = require('./test-config')
+
 const BUNDLE_TYPES = {
   NODE_DEV: 'NODE_DEV',
   NODE_PROD: 'NODE_PROD',
@@ -112,8 +116,63 @@ function getBabelConfig(bundleType, packageType) {
   }
 }
 
+/**
+ * Used for injecting process.env across webpack bundles for testing
+ */
+function getWebpackEnv(env = 'development') {
+  const { serverUrl } = getTestEnvironmentVariables()
+  return {
+    APM_SERVER_URL: serverUrl,
+    NODE_ENV: env
+  }
+}
+
+function getWebpackConfig(bundleType, packageType) {
+  const isEnvProduction = [NODE_PROD, NODE_ES_PROD, BROWSER_PROD].includes(
+    bundleType
+  )
+
+  const config = {
+    stats: {
+      colors: true
+    },
+    devtool: isEnvProduction ? 'source-map' : 'cheap-module-source-map',
+    module: {
+      rules: [
+        {
+          test: /\.(js|jsx)$/,
+          exclude: /node_modules/,
+          loader: 'babel-loader',
+          options: getBabelConfig(bundleType, packageType)
+        }
+      ]
+    },
+    mode: isEnvProduction ? 'production' : 'development',
+    plugins: [new EnvironmentPlugin(getWebpackEnv())],
+    resolve: {
+      extensions: ['.js', '.jsx']
+    }
+  }
+
+  if (isEnvProduction) {
+    return Object.assign({}, config, {
+      optimization: {
+        minimizer: [
+          new UglifyJSPlugin({
+            sourceMap: true,
+            extractComments: true
+          })
+        ]
+      }
+    })
+  }
+
+  return config
+}
+
 module.exports = {
   getBabelConfig,
+  getWebpackConfig,
   BUNDLE_TYPES,
   PACKAGE_TYPES
 }
