@@ -23,13 +23,12 @@
  *
  */
 
-const {
-  getBabelConfig,
-  BUNDLE_TYPES,
-  PACKAGE_TYPES
-} = require('../../dev-utils/build')
+const { getBabelConfig, PACKAGE_TYPES } = require('../../dev-utils/build')
 
 module.exports = function(api) {
-  api.cache(true)
-  return getBabelConfig(BUNDLE_TYPES.NODE_PROD, PACKAGE_TYPES.REACT)
+  /**
+   * Reads BABEL_ENV to decide between CJS and ESM formats
+   */
+  const env = api.env()
+  return getBabelConfig(env, PACKAGE_TYPES.REACT)
 }
