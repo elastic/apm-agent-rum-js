@@ -26,7 +26,7 @@
 import { createServiceFactory } from '../'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
-const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
+const { agentConfig } = getGlobalConfig('rum-core')
 
 describe('ErrorLogging', function() {
   var testErrorMessage = 'errorevent_test_error_message'

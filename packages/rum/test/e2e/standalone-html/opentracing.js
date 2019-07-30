@@ -25,6 +25,7 @@
 
 import { testXHR, renderTestElement } from '../utils'
 import { getGlobalConfig } from '../../../../../dev-utils/test-config'
+
 const { serverUrl, mockBackendUrl } = getGlobalConfig().testConfig
 
 window.elasticApm.init({

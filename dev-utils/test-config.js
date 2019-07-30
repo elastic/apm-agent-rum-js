@@ -49,19 +49,15 @@ function getTestEnvironmentVariables() {
 
 function getGlobalConfig(packageName = 'rum') {
   const testEnv = getTestEnvironmentVariables()
-  const globalConfigs = {
+  return {
     agentConfig: {
       serverUrl: testEnv.serverUrl,
       serviceName: `test`,
       name: `${packageName}`
     },
+    testConfig: testEnv,
     useMocks: false,
     mockApmServer: false
-  }
-
-  return {
-    globalConfigs,
-    testConfig: testEnv
   }
 }
 

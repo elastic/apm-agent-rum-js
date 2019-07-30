@@ -24,7 +24,6 @@
  */
 
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
-const { getGlobalConfig } = require('../../dev-utils/test-config')
 const {
   getWebpackConfig,
   PACKAGE_TYPES,
@@ -33,13 +32,9 @@ const {
 
 module.exports = function(config) {
   config.set(baseConfig)
-  config.webpack = getWebpackConfig(
-    BUNDLE_TYPES.BROWSER_DEV,
-    PACKAGE_TYPES.REACT
-  )
-  const testConfig = getGlobalConfig('rum-react')
-  console.log('Custom Test Config:', testConfig)
-  config.set(testConfig)
-  const cfg = prepareConfig(config)
-  config.set(cfg)
+  config.set({
+    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.REACT)
+  })
+  const preparedConfig = prepareConfig(config, 'rum-react')
+  config.set(preparedConfig)
 }

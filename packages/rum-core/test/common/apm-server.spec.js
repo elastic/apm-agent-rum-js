@@ -28,7 +28,7 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { createServiceFactory } from '../'
 
-const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
+const { agentConfig } = getGlobalConfig('rum-core')
 
 function generateTransaction(count) {
   var result = []

@@ -26,7 +26,7 @@
 import { apmBase } from '../../src'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
-const { agentConfig } = getGlobalConfig().globalConfigs
+const { agentConfig } = getGlobalConfig()
 
 describe('ApmBase', function() {
   it('should not init ApmBase', function() {

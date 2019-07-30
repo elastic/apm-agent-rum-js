@@ -30,7 +30,8 @@
     "test:unit": "npm run script runUnitTests packages/rum-react",
     "test:e2e:supported": "npm run script runE2eTests packages/rum-react/wdio.conf.js",
     "test:sauce": "npm run script runSauceTests packages/rum-react true build:e2e test:unit test:e2e:supported",
-    "test": "npm run test:sauce"
+    "test": "npm run test:sauce",
+    "tdd": "karma start --auto-watch --restartOnFileChange"
   },
   "bugs": {
     "url": "https://github.com/elastic/apm-agent-rum-js/issues"

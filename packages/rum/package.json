@@ -15,7 +15,6 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "webpack --colors && npm run build:main",
-    "build:dev": "webpack -w",
     "build:main": "npx babel src -d dist/lib",
     "build:e2e": "npm run script buildE2eBundles packages/rum/test/e2e",
     "bundlesize": "npm run build && bundlesize",
@@ -28,7 +27,8 @@
     "test:e2e:supported": "npm run script runE2eTests packages/rum/wdio.conf.js",
     "test:e2e:failsafe": "npm run script runE2eTests packages/rum/wdio-failsafe.conf.js",
     "test:sauce": "npm run script runSauceTests packages/rum true test:unit test:e2e:supported test:e2e:failsafe",
-    "test": "npm-run-all build build:e2e test:node test:integration test:sauce"
+    "test": "npm-run-all build build:e2e test:node test:integration test:sauce",
+    "tdd": "karma start --auto-watch --restartOnFileChange"
   },
   "files": [
     "src",

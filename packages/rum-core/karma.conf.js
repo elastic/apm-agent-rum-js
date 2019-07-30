@@ -24,23 +24,16 @@
  */
 
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma')
-const { getGlobalConfig } = require('../../dev-utils/test-config')
 
 module.exports = function(config) {
   config.set(baseConfig)
-  const customConfig = getGlobalConfig('rum-core')
-
-  console.log('Custom Test Config:', JSON.stringify(customConfig, null, 2))
-  config.set(customConfig)
-  config.files.unshift('test/utils/polyfill.js')
+  const preparedConfig = prepareConfig(config, 'rum-core')
+  preparedConfig.files.unshift('test/utils/polyfill.js')
   /**
    * Common dependencies are hoisted to root node modules
    */
-  config.files.unshift(
+  preparedConfig.files.unshift(
     '../../node_modules/es6-promise/dist/es6-promise.auto.js'
   )
-  config.files.push({ pattern: 'src/**/*.js', included: false, watched: true })
-
-  const cfg = prepareConfig(config)
-  config.set(cfg)
+  config.set(preparedConfig)
 }
