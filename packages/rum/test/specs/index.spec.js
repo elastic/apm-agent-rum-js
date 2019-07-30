@@ -27,9 +27,8 @@ import { apmBase } from '../../src/'
 import { isPlatformSupported } from '@elastic/apm-rum-core'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
-const { globalConfigs } = getGlobalConfig()
-
 describe('index', function() {
+  const globalConfig = getGlobalConfig()
   var originalTimeout
 
   beforeEach(function() {
@@ -43,7 +42,7 @@ describe('index', function() {
 
   it('should init ApmBase', function(done) {
     var apmServer = apmBase.serviceFactory.getService('ApmServer')
-    if (globalConfigs && globalConfigs.useMocks) {
+    if (globalConfig.useMocks) {
       apmServer._makeHttpRequest = function() {
         return Promise.resolve()
       }
@@ -52,7 +51,7 @@ describe('index', function() {
     spyOn(apmServer, 'sendErrors').and.callThrough()
     spyOn(apmServer, '_postJson').and.callThrough()
 
-    const { agentConfig } = globalConfigs
+    const { agentConfig } = globalConfig
     apmBase.init({
       serverUrl: agentConfig.serverUrl,
       serviceName: agentConfig.serviceName,

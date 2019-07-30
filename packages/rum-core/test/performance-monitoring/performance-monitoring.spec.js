@@ -34,7 +34,7 @@ import patchEventHandler from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
 import { ON_TRANSACTION_END } from '../../src/common/constants'
 
-const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
+const { agentConfig } = getGlobalConfig('rum-core')
 
 describe('PerformanceMonitoring', function() {
   var serviceFactory

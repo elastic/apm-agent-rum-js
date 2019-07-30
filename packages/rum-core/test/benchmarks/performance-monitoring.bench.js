@@ -26,7 +26,8 @@
 import { generateTestTransaction } from './'
 import { createServiceFactory } from '../../'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
-const { agentConfig } = getGlobalConfig('rum-core').globalConfigs
+
+const { agentConfig } = getGlobalConfig('rum-core')
 
 suite('PerformanceMonitoring', () => {
   const serviceFactory = createServiceFactory()

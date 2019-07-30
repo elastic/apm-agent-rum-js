@@ -26,7 +26,6 @@
 const { join } = require('path')
 const { mkdirSync, existsSync } = require('fs')
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma')
-const { getGlobalConfig } = require('../../dev-utils/test-config')
 
 const BENCHMARKS_DIR = join(__dirname, 'test', 'benchmarks')
 const REPORTS_DIR = join(__dirname, 'reports')
@@ -45,16 +44,13 @@ module.exports = function(config) {
   }
 
   config.set(baseConfig)
-  const customConfig = getGlobalConfig('rum-core')
 
-  console.log(
-    'Custom test bench config:',
-    JSON.stringify(customConfig, null, 2)
-  )
-  config.set(customConfig)
   const specPattern = `${BENCHMARKS_DIR}/**/*.bench.js`
   config.set({
     files: [specPattern],
+    preprocessors: {
+      [specPattern]: ['webpack']
+    },
     autoWatch: false,
     singleRun: true,
     concurrency: 1,
@@ -88,9 +84,6 @@ module.exports = function(config) {
       }
     }
   })
-  const cfg = prepareConfig(config)
-  cfg.preprocessors = {
-    [specPattern]: ['webpack']
-  }
-  config.set(cfg)
+  const preparedConfig = prepareConfig(config)
+  config.set(preparedConfig)
 }

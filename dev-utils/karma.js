@@ -24,7 +24,11 @@
  */
 
 const { Server } = require('karma')
-const { getSauceConnectOptions, getBrowserList } = require('./test-config')
+const {
+  getSauceConnectOptions,
+  getBrowserList,
+  getGlobalConfig
+} = require('./test-config')
 const { getWebpackConfig, BUNDLE_TYPES } = require('./build')
 
 const baseLaunchers = getBrowserList().map(launcher => ({
@@ -38,7 +42,6 @@ const { tunnelIdentifier } = getSauceConnectOptions()
  * Common base config for all the mono repo packages
  */
 const baseConfig = {
-  exclude: ['e2e/**/*.*'],
   files: [specPattern],
   frameworks: ['jasmine'],
   preprocessors: {
@@ -54,8 +57,9 @@ const baseConfig = {
   ],
   webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV),
   webpackMiddleware: {
-    stats: 'errors-only'
+    logLevel: 'error'
   },
+  autoWatch: false,
   browserNoActivityTimeout: 120000,
   customLaunchers: baseLaunchers,
   browsers: [],
@@ -76,9 +80,11 @@ const baseConfig = {
   }
 }
 
-function prepareConfig(defaultConfig) {
-  const testConfig = defaultConfig.testConfig || {}
-  const agentConfig = defaultConfig.globalConfigs.agentConfig || {}
+function prepareConfig(config, packageName) {
+  const globalConfig = getGlobalConfig(packageName)
+  console.log('Global test Configuration: ', globalConfig)
+  const { agentConfig, testConfig } = globalConfig
+
   const { isTravis, isJenkins, sauceLabs: isSauce } = testConfig
   let buildId = `ApmJs-${agentConfig.name}`
 
@@ -91,8 +97,8 @@ function prepareConfig(defaultConfig) {
       ' (' +
       process.env.TRAVIS_BUILD_ID +
       ')'
-    defaultConfig.plugins.push('karma-firefox-launcher')
-    defaultConfig.browsers.push('Firefox')
+    config.plugins.push('karma-firefox-launcher')
+    config.browsers.push('Firefox')
   } else if (isJenkins) {
     console.log('prepareConfig: Run in Jenkins')
     buildId =
@@ -104,9 +110,9 @@ function prepareConfig(defaultConfig) {
       ') Elastic Stack ' +
       process.env.STACK_VERSION
 
-    defaultConfig.plugins.push('karma-chrome-launcher')
-    defaultConfig.browsers = ['ChromeHeadlessNoSandbox']
-    defaultConfig.customLaunchers = {
+    config.plugins.push('karma-chrome-launcher')
+    config.browsers = ['ChromeHeadlessNoSandbox']
+    config.customLaunchers = {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
         flags: [
@@ -116,27 +122,27 @@ function prepareConfig(defaultConfig) {
         ]
       }
     }
-    defaultConfig.plugins.push('karma-junit-reporter')
-    defaultConfig.reporters.push('junit')
-    defaultConfig.junitReporter = {
+    config.plugins.push('karma-junit-reporter')
+    config.reporters.push('junit')
+    config.junitReporter = {
       outputDir: 'reports'
     }
   } else {
     console.log('prepareConfig: Run in Default enviroment')
-    defaultConfig.plugins.push('karma-chrome-launcher')
-    defaultConfig.browsers.push('Chrome')
+    config.plugins.push('karma-chrome-launcher')
+    config.browsers.push('Chrome')
   }
 
   /**
    *  Add coverage reports and plugins required for all environments
    */
-  if (defaultConfig.coverage) {
-    defaultConfig.plugins.push('karma-coverage')
-    defaultConfig.reporters.push('coverage')
-    const babelPlugins = defaultConfig.webpack.module.rules[0].options.plugins
+  if (config.coverage) {
+    config.plugins.push('karma-coverage')
+    config.reporters.push('coverage')
+    const babelPlugins = config.webpack.module.rules[0].options.plugins
     babelPlugins.push('istanbul')
 
-    defaultConfig.coverageReporter = {
+    config.coverageReporter = {
       includeAllSources: true,
       reporters: [
         { type: 'cobertura', file: 'coverage-' + buildId + '-report.xml' },
@@ -149,23 +155,20 @@ function prepareConfig(defaultConfig) {
 
   if (isSauce) {
     console.log('prepareConfig: Run in SauceLab mode')
-    defaultConfig.sauceLabs.build = buildId
+    config.sauceLabs.build = buildId
     console.log('saucelabs.build:', buildId)
-    defaultConfig.concurrency = 3
+    config.concurrency = 3
     if (isJenkins) {
-      defaultConfig.sauceLabs.tags = [
-        testConfig.branch,
-        process.env.STACK_VERSION
-      ]
+      config.sauceLabs.tags = [testConfig.branch, process.env.STACK_VERSION]
     } else if (testConfig.branch === 'master') {
-      defaultConfig.sauceLabs.tags = [testConfig.branch]
+      config.sauceLabs.tags = [testConfig.branch]
     }
-    defaultConfig.reporters = ['dots', 'saucelabs']
-    defaultConfig.browsers = Object.keys(defaultConfig.customLaunchers)
-    defaultConfig.transports = ['polling']
+    config.reporters = ['dots', 'saucelabs']
+    config.browsers = Object.keys(config.customLaunchers)
+    config.transports = ['polling']
   }
 
-  return defaultConfig
+  return config
 }
 
 function singleRunKarma(configFile, done) {
