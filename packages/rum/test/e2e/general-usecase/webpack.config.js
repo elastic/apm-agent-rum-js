@@ -24,43 +24,17 @@
  */
 
 const { join, resolve } = require('path')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
-const { EnvironmentPlugin } = require('webpack')
-const { getWebpackEnv } = require('../../../../../dev-utils/test-config')
 const {
-  getBabelConfig,
+  getWebpackConfig,
   BUNDLE_TYPES
 } = require('../../../../../dev-utils/build')
 
-const optimized = {
-  entry: join(__dirname, './app.js'),
+module.exports = {
+  entry: join(__dirname, 'app.js'),
   output: {
     filename: 'app.e2e-bundle.min.js',
     path: resolve(__dirname),
     libraryTarget: 'umd'
   },
-  devtool: 'source-map',
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        use: {
-          loader: 'babel-loader',
-          options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV)
-        }
-      }
-    ]
-  },
-  mode: 'production',
-  optimization: {
-    minimizer: [
-      new UglifyJSPlugin({
-        sourceMap: true,
-        extractComments: true
-      })
-    ]
-  },
-  plugins: [new EnvironmentPlugin(getWebpackEnv())]
+  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD)
 }
-
-module.exports = optimized
