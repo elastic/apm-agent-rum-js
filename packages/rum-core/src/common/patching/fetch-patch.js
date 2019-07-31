@@ -26,14 +26,7 @@
 import { globalState } from './patch-utils'
 import { SCHEDULE, INVOKE, FETCH_SOURCE } from '../constants'
 
-var alreadyPatched = false
-
 export function patchFetch(callback) {
-  if (alreadyPatched) {
-    return
-  }
-  alreadyPatched = true
-
   if (!window.fetch || !window.Request) {
     return
   }
@@ -72,7 +65,7 @@ export function patchFetch(callback) {
         method: request.method,
         sync: false,
         url,
-        args: arguments,
+        args,
         aborted: false
       }
     }
