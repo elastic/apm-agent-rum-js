@@ -120,7 +120,6 @@ class ApmBase {
    *  }]
    * }
    */
-
   config(config) {
     const configService = this.serviceFactory.getService('ConfigService')
     const { missing, invalid } = configService.validate(config)
