@@ -72,6 +72,8 @@ class Config {
       serverUrl: 'http://localhost:8200',
       serverUrlPrefix: '/intake/v2/rum/events',
       active: true,
+      instrument: true,
+      disableInstrumentations: [],
       debug: false,
       logLevel: 'warn',
       browserResponsivenessInterval: 500,

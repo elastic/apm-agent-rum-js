@@ -23,30 +23,29 @@
  *
  */
 
-import { patchXMLHttpRequest } from './xhr-patch'
-import { patchFetch } from './fetch-patch'
-import { patchHistory } from './history-patch'
-import EventHandler from '../event-handler'
-import { HISTORY_CHANGE, FETCH, XMLHTTPREQUEST } from '../constants'
+import { XMLHTTPREQUEST, FETCH, HISTORY_CHANGE, TRANSACTION } from './constants'
 
-const patchEventHandler = new EventHandler()
+export function getInstrumentationFlags(disabledInstrumentations) {
+  const validInstrumentations = [
+    XMLHTTPREQUEST,
+    FETCH,
+    HISTORY_CHANGE,
+    TRANSACTION
+  ]
 
-let alreadyPatched = false
-function patchAll() {
-  if (!alreadyPatched) {
-    alreadyPatched = true
-    // todo: we should separate these event listeners to send individual events.
-    patchXMLHttpRequest(function(event, task) {
-      patchEventHandler.send(XMLHTTPREQUEST, [event, task])
-    })
-    patchFetch(function(event, task) {
-      patchEventHandler.send(FETCH, [event, task])
-    })
-    patchHistory(function(event, task) {
-      patchEventHandler.send(HISTORY_CHANGE, [event, task])
-    })
+  const flags = {
+    [XMLHTTPREQUEST]: true,
+    [FETCH]: true,
+    [HISTORY_CHANGE]: true,
+    [TRANSACTION]: true
   }
-  return patchEventHandler
-}
 
-export { patchAll, patchEventHandler }
+  for (let i = 0; i < disabledInstrumentations.length; i++) {
+    const index = validInstrumentations.indexOf(disabledInstrumentations[i])
+    if (index >= 0) {
+      status[validInstrumentations[index]] = false
+    }
+  }
+
+  return flags
+}

@@ -30,6 +30,7 @@ import PerformanceMonitoring from './performance-monitoring'
 import ServiceFactory from './common/service-factory'
 import { isPlatformSupported } from './common/utils'
 import { patchAll, patchEventHandler } from './common/patching'
+import { getInstrumentationFlags } from './common/instrument'
 import { createTracer } from './opentracing'
 
 function createServiceFactory() {
@@ -46,5 +47,6 @@ export {
   patchAll,
   patchEventHandler,
   isPlatformSupported,
+  getInstrumentationFlags,
   createTracer
 }

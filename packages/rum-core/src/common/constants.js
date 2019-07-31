@@ -89,24 +89,30 @@ const USER_TIMING_THRESHOLD = 60
 const KEYWORD_LIMIT = 1024
 
 /**
- * Events
+ * Events - to be consumed by the users
  */
-const ON_TRANSACTION_START = 'onTransactionStart'
-const ON_TRANSACTION_END = 'onTransactionEnd'
+const TRANSACTION_START = 'transaction:start'
+const TRANSACTION_END = 'transaction:end'
 
 /**
  * Internal Events
  */
+const CONFIG_CHANGE = 'config:change'
 
-const ON_CONFIG_CHANGE = 'onConfigChange'
-const ON_TASK = 'onTask'
+/**
+ * Events used to enable/disable instrumentations
+ */
+const XMLHTTPREQUEST = 'xmlhttprequest'
+const FETCH = 'fetch'
+const HISTORY_CHANGE = 'history'
+const TRANSACTION = 'transaction'
+const ERROR = 'error'
 
 /**
  * Event modifiers, append these to event names.
  */
-
-const BEFORE_EVENT = '_before'
-const AFTER_EVENT = '_after'
+const BEFORE_EVENT = ':before'
+const AFTER_EVENT = ':after'
 
 export {
   SCHEDULE,
@@ -125,10 +131,14 @@ export {
   TYPE_CUSTOM,
   USER_TIMING_THRESHOLD,
   KEYWORD_LIMIT,
-  ON_TRANSACTION_START,
-  ON_TRANSACTION_END,
+  TRANSACTION_START,
+  TRANSACTION_END,
+  CONFIG_CHANGE,
+  XMLHTTPREQUEST,
+  FETCH,
+  HISTORY_CHANGE,
+  TRANSACTION,
+  ERROR,
   BEFORE_EVENT,
-  AFTER_EVENT,
-  ON_CONFIG_CHANGE,
-  ON_TASK
+  AFTER_EVENT
 }

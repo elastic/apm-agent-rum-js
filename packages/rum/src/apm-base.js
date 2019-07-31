@@ -23,6 +23,8 @@
  *
  */
 
+import { getInstrumentationFlags } from '@elastic/apm-rum-core'
+
 class ApmBase {
   constructor(serviceFactory, disable) {
     this._disable = disable
@@ -49,16 +51,32 @@ class ApmBase {
       }
 
       this.serviceFactory.init()
-      const errorLogging = this.serviceFactory.getService('ErrorLogging')
-      errorLogging.registerGlobalEventListener()
+      /**
+       * Auto instrumentation disabled
+       * Do not register listeners for error and page-load events
+       */
+      if (!configService.get('instrument')) {
+        return this
+      }
+      const disableInstrumentations = configService.get(
+        'disableInstrumentations'
+      )
+      const flags = getInstrumentationFlags(disableInstrumentations)
 
       const performanceMonitoring = this.serviceFactory.getService(
         'PerformanceMonitoring'
       )
-      performanceMonitoring.init()
+      performanceMonitoring.init(flags)
 
-      if (configService.get('sendPageLoadTransaction')) {
-        this._sendPageLoadMetrics()
+      if (flags.error) {
+        const errorLogging = this.serviceFactory.getService('ErrorLogging')
+        errorLogging.registerGlobalEventListener()
+      }
+
+      if (flags.transaction) {
+        if (configService.get('sendPageLoadTransaction')) {
+          this._sendPageLoadMetrics()
+        }
       }
     }
     return this
