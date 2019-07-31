@@ -24,13 +24,11 @@
  */
 
 import { INVOKE, HISTORY_PUSHSTATE } from '../constants'
-var alreadyPatched = false
 
 export function patchHistory(callback) {
-  if (alreadyPatched || !window.history) {
+  if (!window.history) {
     return
   }
-  alreadyPatched = true
 
   const nativePushState = history.pushState
   if (typeof nativePushState === 'function') {

@@ -77,10 +77,7 @@ class PerformanceMonitoring {
       }
     })
 
-    const patchSubFn = this.getXhrPatchSubFn(
-      this._configService,
-      this._transactionService
-    )
+    const patchSubFn = this.getXhrPatchSubFn()
     this.cancelPatchSub = patchEventHandler.observe(ON_TASK, patchSubFn)
   }
 

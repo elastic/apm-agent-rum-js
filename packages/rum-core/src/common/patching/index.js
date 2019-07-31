@@ -31,7 +31,7 @@ import { ON_TASK } from '../constants'
 
 const patchEventHandler = new EventHandler()
 
-var alreadyPatched = false
+let alreadyPatched = false
 function patchAll() {
   if (!alreadyPatched) {
     alreadyPatched = true
