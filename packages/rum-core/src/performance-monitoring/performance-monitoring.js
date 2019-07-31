@@ -38,14 +38,10 @@ import { globalState } from '../common/patching/patch-utils'
 import {
   SCHEDULE,
   INVOKE,
-  XMLHTTPREQUEST_SOURCE,
-  FETCH_SOURCE,
-  HISTORY_PUSHSTATE,
   TRANSACTION_END,
   AFTER_EVENT,
   FETCH,
-  HISTORY_CHANGE,
-  TRANSACTION,
+  HISTORY,
   XMLHTTPREQUEST
 } from '../common/constants'
 import {
@@ -68,22 +64,20 @@ class PerformanceMonitoring {
      * We need to run this event listener after all of user-registered listener,
      * since this event listener adds the transaction to the queue to be send to APM Server.
      */
-    if (flags[TRANSACTION]) {
-      this._configService.events.observe(TRANSACTION_END + AFTER_EVENT, tr => {
-        const payload = this.createTransactionPayload(tr)
-        if (payload) {
-          this._apmServer.addTransaction(payload)
-        } else if (__DEV__) {
-          this._logginService.debug(
-            'Could not create a payload from the Transaction',
-            tr
-          )
-        }
-      })
-    }
+    this._configService.events.observe(TRANSACTION_END + AFTER_EVENT, tr => {
+      const payload = this.createTransactionPayload(tr)
+      if (payload) {
+        this._apmServer.addTransaction(payload)
+      } else if (__DEV__) {
+        this._logginService.debug(
+          'Could not create a payload from the Transaction',
+          tr
+        )
+      }
+    })
 
-    if (flags[HISTORY_CHANGE]) {
-      patchEventHandler.observe(HISTORY_CHANGE, this.getHistorySub())
+    if (flags[HISTORY]) {
+      patchEventHandler.observe(HISTORY, this.getHistorySub())
     }
 
     if (flags[XMLHTTPREQUEST]) {
@@ -93,17 +87,22 @@ class PerformanceMonitoring {
     if (flags[FETCH]) {
       patchEventHandler.observe(FETCH, this.getFetchSub())
     }
+  }
 
-    const patchSubFn = this.getXhrPatchSubFn()
-    this.cancelPatchSub = patchEventHandler.observe(ON_TASK, patchSubFn)
+  getHistorySub() {
+    const transactionService = this._transactionService
+    return (event, task) => {
+      if (task.source === HISTORY && event === INVOKE) {
+        transactionService.startTransaction(task.data.title, 'route-change', {
+          canReuse: true
+        })
+      }
+    }
   }
 
   getXHRSub() {
     return (event, task) => {
-      if (
-        task.source === XMLHTTPREQUEST_SOURCE &&
-        !globalState.fetchInProgress
-      ) {
+      if (task.source === XMLHTTPREQUEST && !globalState.fetchInProgress) {
         this.processAPICalls(event, task)
       }
     }
@@ -111,7 +110,7 @@ class PerformanceMonitoring {
 
   getFetchSub() {
     return (event, task) => {
-      if (task.source === FETCH_SOURCE) {
+      if (task.source === FETCH) {
         this.processAPICalls(event, task)
       }
     }
@@ -170,17 +169,6 @@ class PerformanceMonitoring {
 
     if (event === INVOKE && task.id) {
       transactionService.removeTask(task.id)
-    }
-  }
-
-  getHistorySub() {
-    const transactionService = this._transactionService
-    return (event, task) => {
-      if (task.source === HISTORY_PUSHSTATE && event === INVOKE) {
-        transactionService.startTransaction(task.data.title, 'route-change', {
-          canReuse: true
-        })
-      }
     }
   }
 

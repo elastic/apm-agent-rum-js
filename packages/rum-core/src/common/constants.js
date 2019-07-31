@@ -31,17 +31,6 @@ const INVOKE = 'invoke'
 const CLEAR = 'clear'
 
 /**
- * Request Sources
- */
-const FETCH_SOURCE = 'fetch'
-const XMLHTTPREQUEST_SOURCE = 'XMLHttpRequest.send'
-
-/**
- * History sources
- */
-const HISTORY_PUSHSTATE = 'history.pushState'
-
-/**
  * Event listener methods
  */
 const ADD_EVENT_LISTENER_STR = 'addEventListener'
@@ -100,12 +89,11 @@ const TRANSACTION_END = 'transaction:end'
 const CONFIG_CHANGE = 'config:change'
 
 /**
- * Events used to enable/disable instrumentations
+ * Events types that are used to toggle auto instrumentations
  */
 const XMLHTTPREQUEST = 'xmlhttprequest'
 const FETCH = 'fetch'
-const HISTORY_CHANGE = 'history'
-const TRANSACTION = 'transaction'
+const HISTORY = 'history'
 const ERROR = 'error'
 
 /**
@@ -118,9 +106,6 @@ export {
   SCHEDULE,
   INVOKE,
   CLEAR,
-  FETCH_SOURCE,
-  XMLHTTPREQUEST_SOURCE,
-  HISTORY_PUSHSTATE,
   ADD_EVENT_LISTENER_STR,
   REMOVE_EVENT_LISTENER_STR,
   RESOURCE_INITIATOR_TYPES,
@@ -136,8 +121,7 @@ export {
   CONFIG_CHANGE,
   XMLHTTPREQUEST,
   FETCH,
-  HISTORY_CHANGE,
-  TRANSACTION,
+  HISTORY,
   ERROR,
   BEFORE_EVENT,
   AFTER_EVENT

@@ -23,21 +23,20 @@
  *
  */
 
-import { XMLHTTPREQUEST, FETCH, HISTORY_CHANGE, TRANSACTION } from './constants'
+import { XMLHTTPREQUEST, FETCH, HISTORY, PAGE_LOAD } from './constants'
 
-export function getInstrumentationFlags(disabledInstrumentations) {
-  const validInstrumentations = [
-    XMLHTTPREQUEST,
-    FETCH,
-    HISTORY_CHANGE,
-    TRANSACTION
-  ]
+export function getInstrumentationFlags(instrument, disabledInstrumentations) {
+  const validInstrumentations = [XMLHTTPREQUEST, FETCH, HISTORY, PAGE_LOAD]
 
   const flags = {
-    [XMLHTTPREQUEST]: true,
-    [FETCH]: true,
-    [HISTORY_CHANGE]: true,
-    [TRANSACTION]: true
+    [XMLHTTPREQUEST]: false,
+    [FETCH]: false,
+    [HISTORY]: false,
+    [PAGE_LOAD]: false
+  }
+
+  if (!instrument) {
+    return flags
   }
 
   for (let i = 0; i < disabledInstrumentations.length; i++) {

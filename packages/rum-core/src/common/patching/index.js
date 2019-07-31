@@ -27,7 +27,7 @@ import { patchXMLHttpRequest } from './xhr-patch'
 import { patchFetch } from './fetch-patch'
 import { patchHistory } from './history-patch'
 import EventHandler from '../event-handler'
-import { HISTORY_CHANGE, FETCH, XMLHTTPREQUEST } from '../constants'
+import { HISTORY, FETCH, XMLHTTPREQUEST } from '../constants'
 
 const patchEventHandler = new EventHandler()
 
@@ -35,7 +35,6 @@ let alreadyPatched = false
 function patchAll() {
   if (!alreadyPatched) {
     alreadyPatched = true
-    // todo: we should separate these event listeners to send individual events.
     patchXMLHttpRequest(function(event, task) {
       patchEventHandler.send(XMLHTTPREQUEST, [event, task])
     })
@@ -43,7 +42,7 @@ function patchAll() {
       patchEventHandler.send(FETCH, [event, task])
     })
     patchHistory(function(event, task) {
-      patchEventHandler.send(HISTORY_CHANGE, [event, task])
+      patchEventHandler.send(HISTORY, [event, task])
     })
   }
   return patchEventHandler
