@@ -41,7 +41,7 @@ export function getInstrumentationFlags(instrument, disabledInstrumentations) {
   }
 
   Object.keys(flags).forEach(key => {
-    if (key.indexOf(disabledInstrumentations) === -1) {
+    if (disabledInstrumentations.indexOf(key) === -1) {
       flags[key] = true
     }
   })

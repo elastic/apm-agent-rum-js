@@ -59,7 +59,7 @@ class PerformanceMonitoring {
     this._transactionService = transactionService
   }
 
-  init(flags) {
+  init(flags = {}) {
     /**
      * We need to run this event listener after all of user-registered listener,
      * since this event listener adds the transaction to the queue to be send to APM Server.

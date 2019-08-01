@@ -23,21 +23,34 @@
  *
  */
 
-import { patchAll } from '../../src/common/patching/'
+import { getInstrumentationFlags } from '../../src/common/instrument'
+import {
+  PAGE_LOAD,
+  XMLHTTPREQUEST,
+  FETCH,
+  HISTORY
+} from '../../src/common/constants'
 
-if (!window['__patchEventHandler']) {
-  var nativeFetch = window.fetch
-  if (nativeFetch) {
-    window.fetch = function() {
-      var delegate = window['__fetchDelegate']
-      if (typeof delegate === 'function') {
-        return delegate.apply(this, arguments)
-      } else {
-        return nativeFetch.apply(this, arguments)
-      }
-    }
-  }
-  window['__patchEventHandler'] = patchAll()
-}
+describe('Instrumentation', function() {
+  it('disable all instrumentations when instrument config is false', () => {
+    const flags = getInstrumentationFlags(false, [])
 
-export default window['__patchEventHandler']
+    expect(flags).toEqual({
+      [PAGE_LOAD]: false,
+      [XMLHTTPREQUEST]: false,
+      [FETCH]: false,
+      [HISTORY]: false
+    })
+  })
+
+  it('disable selective instrumentations via disableInstrumentations config', () => {
+    const flags = getInstrumentationFlags(true, ['xmlhttprequest', 'history'])
+
+    expect(flags).toEqual({
+      [PAGE_LOAD]: true,
+      [XMLHTTPREQUEST]: false,
+      [FETCH]: true,
+      [HISTORY]: false
+    })
+  })
+})

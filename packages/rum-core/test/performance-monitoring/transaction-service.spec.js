@@ -28,7 +28,7 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
 import { mockGetEntriesByType } from '../utils/globals-mock'
-import { ON_TRANSACTION_END } from '../../src/common/constants'
+import { TRANSACTION_END } from '../../src/common/constants'
 
 describe('TransactionService', function() {
   var transactionService
@@ -240,7 +240,7 @@ describe('TransactionService', function() {
     config.set('capturePageLoad', true)
 
     const customTransactionService = new TransactionService(logger, config)
-    config.events.observe(ON_TRANSACTION_END, function() {
+    config.events.observe(TRANSACTION_END, function() {
       expect(tr.isHardNavigation).toBe(true)
       expect(
         tr.spans.filter(({ type }) => type === 'resource').length
@@ -339,7 +339,7 @@ describe('TransactionService', function() {
   it('should include size & server timing in page load context', done => {
     const unMock = mockGetEntriesByType()
     const customTrService = new TransactionService(logger, config)
-    config.events.observe(ON_TRANSACTION_END, function() {
+    config.events.observe(TRANSACTION_END, function() {
       expect(tr.context.response).toEqual({
         transfer_size: 26941,
         encoded_body_size: 105297,
