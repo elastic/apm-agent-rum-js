@@ -43,7 +43,7 @@ describe('ApmBase', function() {
     configService.setConfig({
       sendPageLoadTransaction: true
     })
-
+    apmBase.addFilter(() => {})
     apmBase._sendPageLoadMetrics()
     var tr = trService.getCurrentTransaction()
     expect(tr.name).toBe('Unknown')
@@ -100,35 +100,16 @@ describe('ApmBase', function() {
       disableInstrumentations: ['error'],
       sendPageLoadTransaction: true
     })
+    apmBase.addFilter(() => {})
     const transaction = trService.getCurrentTransaction()
     expect(transaction.type).toEqual('page-load')
     expect(loggingInstane.registerGlobalEventListener).not.toHaveBeenCalled()
   })
 
   it('should allow custom instrumentations via API and send to server', done => {
-    const apmBase = new ApmBase(serviceFactory, !enabled)
     const apmServer = serviceFactory.getService('ApmServer')
 
-    spyOn(apmServer, 'sendTransactions')
-
-    const flushInterval = 50
-
-    apmBase.init({
-      serviceName,
-      instrument: false,
-      flushInterval
-    })
-
-    const tr = apmBase.startTransaction('custom-tr', 'custom')
-    expect(tr).toBeDefined()
-
-    const span = apmBase.startSpan('custom-span', 'app')
-
-    span.end()
-    tr.detectFinish()
-
-    setTimeout(() => {
-      const transactions = apmServer.sendTransactions.calls.argsFor(0)[0]
+    spyOn(apmServer, 'sendTransactions').and.callFake(transactions => {
       expect(transactions.length).toBe(1)
       const { spans, name, type } = transactions[0]
       expect(name).toBe('custom-tr')
@@ -136,7 +117,20 @@ describe('ApmBase', function() {
       expect(spans[0].name).toBe('custom-span')
       expect(spans[0].type).toBe('app')
       done()
-    }, flushInterval + 10)
+    })
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+
+    apmBase.init({
+      serviceName,
+      instrument: false
+    })
+    // Drop the payload in tests
+    apmBase.addFilter(() => {})
+
+    const tr = apmBase.startTransaction('custom-tr', 'custom')
+    const span = apmBase.startSpan('custom-span', 'app')
+    span.end()
+    tr.end()
   })
 
   it('should be noop when agent is not active', done => {
