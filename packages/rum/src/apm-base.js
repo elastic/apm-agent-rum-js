@@ -24,10 +24,7 @@
  */
 
 import { getInstrumentationFlags } from '@elastic/apm-rum-core'
-import {
-  PAGE_LOAD,
-  ERROR
-} from '@elastic/apm-rum-core/dist/lib/common/constants'
+import { PAGE_LOAD, ERROR } from '@elastic/apm-rum-core'
 
 class ApmBase {
   constructor(serviceFactory, disable) {
@@ -85,23 +82,22 @@ class ApmBase {
       'TransactionService'
     )
 
-    const pageLoadTaskId = 'page-load'
     /**
      * Name of the transaction is set in transaction service to
-     * avoid duplicate the logic at multiple places
+     * avoid duplicating the logic at multiple places
      */
-    const tr = transactionService.startTransaction(undefined, 'page-load', {
+    const tr = transactionService.startTransaction(undefined, PAGE_LOAD, {
       canReuse: true
     })
 
     if (tr) {
-      tr.addTask(pageLoadTaskId)
+      tr.addTask(PAGE_LOAD)
     }
     const sendPageLoadMetrics = function sendPageLoadMetrics() {
       // to make sure PerformanceTiming.loadEventEnd has a value
       setTimeout(function() {
         if (tr) {
-          tr.removeTask(pageLoadTaskId)
+          tr.removeTask(PAGE_LOAD)
         }
       })
     }

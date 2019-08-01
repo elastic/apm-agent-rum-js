@@ -26,7 +26,7 @@
 import ApmServer from './apm-server'
 import ConfigService from './config-service'
 import LoggingService from './logging-service'
-import { ON_CONFIG_CHANGE } from './constants'
+import { CONFIG_CHANGE } from './constants'
 
 class ServiceFactory {
   constructor() {
@@ -67,7 +67,7 @@ class ServiceFactory {
     }
 
     setLogLevel(loggingService, configService)
-    configService.events.observe(ON_CONFIG_CHANGE, function() {
+    configService.events.observe(CONFIG_CHANGE, function() {
       setLogLevel(loggingService, configService)
     })
 

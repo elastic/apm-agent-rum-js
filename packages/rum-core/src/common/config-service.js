@@ -25,7 +25,7 @@
 
 import { getCurrentScript, setLabel, merge, getDtHeaderValue } from './utils'
 import EventHandler from './event-handler'
-import { ON_CONFIG_CHANGE } from './constants'
+import { CONFIG_CHANGE } from './constants'
 
 function getConfigFromScript() {
   var script = getCurrentScript()
@@ -222,7 +222,7 @@ class Config {
     }
 
     this.config = merge({}, this.defaults, this.config, properties)
-    this.events.send(ON_CONFIG_CHANGE, [this.config])
+    this.events.send(CONFIG_CHANGE, [this.config])
   }
 
   /**

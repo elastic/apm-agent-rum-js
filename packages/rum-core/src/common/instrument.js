@@ -26,8 +26,9 @@
 import { XMLHTTPREQUEST, FETCH, HISTORY, PAGE_LOAD } from './constants'
 
 export function getInstrumentationFlags(instrument, disabledInstrumentations) {
-  const validInstrumentations = [XMLHTTPREQUEST, FETCH, HISTORY, PAGE_LOAD]
-
+  /**
+   * Valid instrumentation flags
+   */
   const flags = {
     [XMLHTTPREQUEST]: false,
     [FETCH]: false,
@@ -39,12 +40,10 @@ export function getInstrumentationFlags(instrument, disabledInstrumentations) {
     return flags
   }
 
-  for (let i = 0; i < disabledInstrumentations.length; i++) {
-    const index = validInstrumentations.indexOf(disabledInstrumentations[i])
-    if (index >= 0) {
-      status[validInstrumentations[index]] = false
+  Object.keys(flags).forEach(key => {
+    if (key.indexOf(disabledInstrumentations) === -1) {
+      flags[key] = true
     }
-  }
-
+  })
   return flags
 }
