@@ -28,7 +28,8 @@ import {
   PAGE_LOAD,
   XMLHTTPREQUEST,
   FETCH,
-  HISTORY
+  HISTORY,
+  ERROR
 } from '../../src/common/constants'
 
 describe('Instrumentation', function() {
@@ -39,7 +40,8 @@ describe('Instrumentation', function() {
       [PAGE_LOAD]: false,
       [XMLHTTPREQUEST]: false,
       [FETCH]: false,
-      [HISTORY]: false
+      [HISTORY]: false,
+      [ERROR]: false
     })
   })
 
@@ -50,7 +52,8 @@ describe('Instrumentation', function() {
       [PAGE_LOAD]: true,
       [XMLHTTPREQUEST]: false,
       [FETCH]: true,
-      [HISTORY]: false
+      [HISTORY]: false,
+      [ERROR]: true
     })
   })
 })

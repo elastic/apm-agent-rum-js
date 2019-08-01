@@ -68,6 +68,77 @@ describe('ApmBase', function() {
     })
   })
 
+  it('should disable all auto instrumentations when instrument is false', () => {
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    const trService = serviceFactory.getService('TransactionService')
+    const ErrorLogging = serviceFactory.getService('ErrorLogging')
+    const loggingInstane = ErrorLogging['__proto__']
+    spyOn(loggingInstane, 'registerGlobalEventListener')
+
+    apmBase.init({
+      serviceName,
+      instrument: false,
+      sendPageLoadTransaction: true
+    })
+    /**
+     * Page load transaction and error listeners are disabled
+     */
+    expect(trService.getCurrentTransaction()).toBeUndefined()
+    expect(loggingInstane.registerGlobalEventListener).not.toHaveBeenCalled()
+  })
+
+  it('should selectively enable/disable instrumentations based on config', () => {
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    const trService = serviceFactory.getService('TransactionService')
+    const ErrorLogging = serviceFactory.getService('ErrorLogging')
+    const loggingInstane = ErrorLogging['__proto__']
+    spyOn(loggingInstane, 'registerGlobalEventListener')
+
+    apmBase.init({
+      serviceName,
+      instrument: true,
+      disableInstrumentations: ['error'],
+      sendPageLoadTransaction: true
+    })
+    const transaction = trService.getCurrentTransaction()
+    expect(transaction.type).toEqual('page-load')
+    expect(loggingInstane.registerGlobalEventListener).not.toHaveBeenCalled()
+  })
+
+  it('should allow custom instrumentations via API and send to server', done => {
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    const apmServer = serviceFactory.getService('ApmServer')
+
+    spyOn(apmServer, 'sendTransactions')
+
+    const flushInterval = 50
+
+    apmBase.init({
+      serviceName,
+      instrument: false,
+      flushInterval
+    })
+
+    const tr = apmBase.startTransaction('custom-tr', 'custom')
+    expect(tr).toBeDefined()
+
+    const span = apmBase.startSpan('custom-span', 'app')
+
+    span.end()
+    tr.detectFinish()
+
+    setTimeout(() => {
+      const transactions = apmServer.sendTransactions.calls.argsFor(0)[0]
+      expect(transactions.length).toBe(1)
+      const { spans, name, type } = transactions[0]
+      expect(name).toBe('custom-tr')
+      expect(type).toBe('custom')
+      expect(spans[0].name).toBe('custom-span')
+      expect(spans[0].type).toBe('app')
+      done()
+    }, flushInterval + 10)
+  })
+
   it('should be noop when agent is not active', done => {
     const apmBase = new ApmBase(serviceFactory, !enabled)
     const loggingService = serviceFactory.getService('LoggingService')
@@ -99,9 +170,6 @@ describe('ApmBase', function() {
     apmBase.setInitialPageLoadName('test')
     var trService = serviceFactory.getService('TransactionService')
     var configService = serviceFactory.getService('ConfigService')
-    var performanceMonitoring = serviceFactory.getService(
-      'PerformanceMonitoring'
-    )
 
     expect(configService.get('pageLoadTransactionName')).toBe('test')
 
@@ -130,7 +198,6 @@ describe('ApmBase', function() {
 
     apmBase.config({ testConfig: 'test' })
     expect(configService.config.testConfig).toBe('test')
-    performanceMonitoring.cancelPatchSub()
   })
 
   it('should instrument xhr', function(done) {
@@ -138,9 +205,6 @@ describe('ApmBase', function() {
     apmBase.init({ serviceName })
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     expect(tr).toBeDefined()
-    var performanceMonitoring = serviceFactory.getService(
-      'PerformanceMonitoring'
-    )
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -148,7 +212,6 @@ describe('ApmBase', function() {
       setTimeout(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].name).toBe('GET /')
-        performanceMonitoring.cancelPatchSub()
         done()
       })
     })
@@ -159,9 +222,6 @@ describe('ApmBase', function() {
   it('should instrument xhr when no transaction was started', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ capturePageLoad: false, serviceName })
-    var performanceMonitoring = serviceFactory.getService(
-      'PerformanceMonitoring'
-    )
     var transactionService = serviceFactory.getService('TransactionService')
     transactionService.currentTransaction = undefined
 
@@ -172,7 +232,6 @@ describe('ApmBase', function() {
       setTimeout(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].name).toBe('GET /')
-        performanceMonitoring.cancelPatchSub()
         done()
       })
     })
@@ -184,11 +243,10 @@ describe('ApmBase', function() {
 
   it('should patch xhr when not active', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ active: false })
     const loggingService = serviceFactory.getService('LoggingService')
-    spyOn(loggingService, 'info').and.callFake(msg => {
-      expect(msg).toEqual('RUM agent is inactive')
-    })
+    spyOn(loggingService, 'info')
+
+    apmBase.init({ active: false })
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -205,11 +263,13 @@ describe('ApmBase', function() {
     req.send()
     const tr = apmBase.getCurrentTransaction()
     expect(tr).toBeUndefined()
+    expect(loggingService.info).toHaveBeenCalledWith('RUM agent is inactive')
   })
 
   it('should log errors when config is invalid', () => {
     const apmBase = new ApmBase(serviceFactory, !enabled)
     const loggingService = serviceFactory.getService('LoggingService')
+    spyOn(loggingService, 'info')
     const logErrorSpy = spyOn(loggingService, 'error')
     apmBase.init({
       serverUrl: undefined,
@@ -243,11 +303,6 @@ describe('ApmBase', function() {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ serviceName })
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
-    var performanceMonitoring = serviceFactory.getService(
-      'PerformanceMonitoring'
-    )
-
-    expect(tr).toBeDefined()
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', false)
@@ -259,6 +314,5 @@ describe('ApmBase', function() {
 
     expect(tr.spans.length).toBe(1)
     expect(tr.spans[0].name).toBe('GET /')
-    performanceMonitoring.cancelPatchSub()
   })
 })

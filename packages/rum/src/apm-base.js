@@ -68,10 +68,8 @@ class ApmBase {
         errorLogging.registerGlobalEventListener()
       }
 
-      if (flags[PAGE_LOAD]) {
-        if (configService.get('sendPageLoadTransaction')) {
-          this._sendPageLoadMetrics()
-        }
+      if (flags[PAGE_LOAD] && configService.get('sendPageLoadTransaction')) {
+        this._sendPageLoadMetrics()
       }
     }
     return this
