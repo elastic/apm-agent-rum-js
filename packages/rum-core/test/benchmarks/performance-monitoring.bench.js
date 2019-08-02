@@ -29,6 +29,15 @@ import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
+function getSendTransactions(performanceMonitoring, apmServer) {
+  return function(transactions) {
+    const payload = transactions
+      .map(tr => performanceMonitoring.createTransactionPayload(tr))
+      .filter(tr => tr)
+    return apmServer.sendTransactions(payload)
+  }
+}
+
 suite('PerformanceMonitoring', () => {
   const serviceFactory = createServiceFactory()
   const performanceMonitoring = serviceFactory.getService(
@@ -37,13 +46,14 @@ suite('PerformanceMonitoring', () => {
   const apmServer = serviceFactory.getService('ApmServer')
   const _postJson = apmServer._postJson
   const configService = serviceFactory.getService('ConfigService')
-  configService.setConfig({ serviceName: 'benchmark-send-transactions' })
+  configService.setConfig({ serviceName: 'benchmark-performance-monitoring' })
   configService.setConfig(agentConfig)
 
   function ResolvedPromise() {
     return Promise.resolve()
   }
   const tr = generateTestTransaction(10)
+  const sendTransactions = getSendTransactions(performanceMonitoring, apmServer)
 
   benchmark('createTransactionPayload', function() {
     performanceMonitoring.createTransactionPayload(tr)
@@ -51,14 +61,14 @@ suite('PerformanceMonitoring', () => {
 
   benchmark('sendTransactions-no-json', function() {
     apmServer._postJson = ResolvedPromise
-    performanceMonitoring.sendTransactions([tr])
+    sendTransactions([tr])
   })
 
   benchmark(
     'sendTransactions',
     function() {
       apmServer._postJson = _postJson
-      performanceMonitoring.sendTransactions([tr])
+      sendTransactions([tr])
     },
     { delay: 1 }
   )
@@ -71,12 +81,14 @@ suite.skip('PerformanceMonitoring - Defered', function() {
   configService.setConfig({
     serviceName: 'benchmark-send-transactions-defered'
   })
+  const sendTransactions = getSendTransactions(performanceMonitoring, apmServer)
+
   benchmark(
     'sendTransactions - Defered',
     function(deferred) {
       var tr = generateTransaction()
 
-      performanceMonitoring.sendTransactions([tr]).then(() => {
+      sendTransactions([tr]).then(() => {
         deferred.resolve()
       })
     },

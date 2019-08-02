@@ -196,22 +196,6 @@ describe('PerformanceMonitoring', function() {
     expect(resp).toBe(false)
   })
 
-  it('should sendTransactionInterval', function() {
-    var tr = new Transaction('test transaction', 'transaction', {
-      transactionSampleRate: 1
-    })
-    var span = tr.startSpan('test span', 'test span thype')
-    span.end()
-    span._end += 10
-    tr.detectFinish()
-    expect(tr._end).toBeDefined()
-    if (tr._end === tr._start) {
-      tr._end = tr._end + 100
-    }
-    var result = performanceMonitoring.sendTransactions([tr])
-    expect(result).toBeDefined()
-  })
-
   it('should filter transactions based on duration and spans', () => {
     configService.setConfig({
       transactionDurationThreshold: 200
