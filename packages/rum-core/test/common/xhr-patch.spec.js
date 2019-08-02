@@ -29,14 +29,14 @@ import {
   XHR_URL
 } from '../../src/common/patching/patch-utils'
 import patchEventHandler from './patch'
-import { ON_TASK } from '../../src/common/constants'
+import { XMLHTTPREQUEST } from '../../src/common/constants'
 
 describe('xhrPatch', function() {
   var events = []
   var cancelFn
 
   beforeAll(function() {
-    cancelFn = patchEventHandler.observe(ON_TASK, function(event, task) {
+    cancelFn = patchEventHandler.observe(XMLHTTPREQUEST, function(event, task) {
       events.push({
         event,
         task
@@ -72,7 +72,7 @@ describe('xhrPatch', function() {
         {
           event: 'schedule',
           task: {
-            source: 'XMLHttpRequest.send',
+            source: XMLHTTPREQUEST,
             state: 'invoke',
             type: 'macroTask',
             ignore: undefined,
@@ -88,7 +88,7 @@ describe('xhrPatch', function() {
         {
           event: 'invoke',
           task: {
-            source: 'XMLHttpRequest.send',
+            source: XMLHTTPREQUEST,
             state: 'invoke',
             type: 'macroTask',
             ignore: undefined,

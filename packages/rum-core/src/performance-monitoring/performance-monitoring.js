@@ -38,12 +38,11 @@ import { globalState } from '../common/patching/patch-utils'
 import {
   SCHEDULE,
   INVOKE,
-  XMLHTTPREQUEST_SOURCE,
-  FETCH_SOURCE,
-  HISTORY_PUSHSTATE,
-  ON_TRANSACTION_END,
+  TRANSACTION_END,
   AFTER_EVENT,
-  ON_TASK
+  FETCH,
+  HISTORY,
+  XMLHTTPREQUEST
 } from '../common/constants'
 import {
   truncateModel,
@@ -60,12 +59,12 @@ class PerformanceMonitoring {
     this._transactionService = transactionService
   }
 
-  init() {
+  init(flags = {}) {
     /**
      * We need to run this event listener after all of user-registered listener,
      * since this event listener adds the transaction to the queue to be send to APM Server.
      */
-    this._configService.events.observe(ON_TRANSACTION_END + AFTER_EVENT, tr => {
+    this._configService.events.observe(TRANSACTION_END + AFTER_EVENT, tr => {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
         this._apmServer.addTransaction(payload)
@@ -77,77 +76,99 @@ class PerformanceMonitoring {
       }
     })
 
-    const patchSubFn = this.getXhrPatchSubFn()
-    this.cancelPatchSub = patchEventHandler.observe(ON_TASK, patchSubFn)
+    if (flags[HISTORY]) {
+      patchEventHandler.observe(HISTORY, this.getHistorySub())
+    }
+
+    if (flags[XMLHTTPREQUEST]) {
+      patchEventHandler.observe(XMLHTTPREQUEST, this.getXHRSub())
+    }
+
+    if (flags[FETCH]) {
+      patchEventHandler.observe(FETCH, this.getFetchSub())
+    }
   }
 
-  getXhrPatchSubFn() {
-    var configService = this._configService
-    var transactionService = this._transactionService
-    var pm = this
-    return function(event, task) {
-      if (
-        (task.source === XMLHTTPREQUEST_SOURCE &&
-          !globalState.fetchInProgress) ||
-        task.source === FETCH_SOURCE
-      ) {
-        if (event === SCHEDULE && task.data) {
-          const requestUrl = new Url(task.data.url)
-          const spanName =
-            task.data.method +
-            ' ' +
-            (requestUrl.relative
-              ? requestUrl.path
-              : stripQueryStringFromUrl(requestUrl.href))
-          const span = transactionService.startSpan(spanName, 'external.http')
-          const taskId = transactionService.addTask()
-
-          if (!span) {
-            return
-          }
-          const isDtEnabled = configService.get('distributedTracing')
-          const dtOrigins = configService.get('distributedTracingOrigins')
-          const currentUrl = new Url(window.location.href)
-          const isSameOrigin =
-            checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
-            checkSameOrigin(requestUrl.origin, dtOrigins)
-          const target = task.data.target
-          if (isDtEnabled && isSameOrigin && target) {
-            pm.injectDtHeader(span, target)
-          }
-          span.addContext({
-            http: {
-              method: task.data.method,
-              url: requestUrl.href
-            }
-          })
-          span.sync = task.data.sync
-          task.data.span = span
-          task.id = taskId
-        }
-        if (event === INVOKE && task.data && task.data.span) {
-          if (typeof task.data.target.status !== 'undefined') {
-            task.data.span.addContext({
-              http: { status_code: task.data.target.status }
-            })
-          } else if (task.data.response) {
-            task.data.span.addContext({
-              http: { status_code: task.data.response.status }
-            })
-          }
-          task.data.span.end()
-        }
-
-        if (event === INVOKE && task.id) {
-          transactionService.removeTask(task.id)
-        }
-      }
-
-      if (task.source === HISTORY_PUSHSTATE && event === INVOKE) {
+  getHistorySub() {
+    const transactionService = this._transactionService
+    return (event, task) => {
+      if (task.source === HISTORY && event === INVOKE) {
         transactionService.startTransaction(task.data.title, 'route-change', {
           canReuse: true
         })
       }
+    }
+  }
+
+  getXHRSub() {
+    return (event, task) => {
+      if (task.source === XMLHTTPREQUEST && !globalState.fetchInProgress) {
+        this.processAPICalls(event, task)
+      }
+    }
+  }
+
+  getFetchSub() {
+    return (event, task) => {
+      if (task.source === FETCH) {
+        this.processAPICalls(event, task)
+      }
+    }
+  }
+
+  processAPICalls(event, task) {
+    const configService = this._configService
+    const transactionService = this._transactionService
+
+    if (event === SCHEDULE && task.data) {
+      const requestUrl = new Url(task.data.url)
+      const spanName =
+        task.data.method +
+        ' ' +
+        (requestUrl.relative
+          ? requestUrl.path
+          : stripQueryStringFromUrl(requestUrl.href))
+      const span = transactionService.startSpan(spanName, 'external.http')
+      const taskId = transactionService.addTask()
+
+      if (!span) {
+        return
+      }
+      const isDtEnabled = configService.get('distributedTracing')
+      const dtOrigins = configService.get('distributedTracingOrigins')
+      const currentUrl = new Url(window.location.href)
+      const isSameOrigin =
+        checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
+        checkSameOrigin(requestUrl.origin, dtOrigins)
+      const target = task.data.target
+      if (isDtEnabled && isSameOrigin && target) {
+        this.injectDtHeader(span, target)
+      }
+      span.addContext({
+        http: {
+          method: task.data.method,
+          url: requestUrl.href
+        }
+      })
+      span.sync = task.data.sync
+      task.data.span = span
+      task.id = taskId
+    }
+    if (event === INVOKE && task.data && task.data.span) {
+      if (typeof task.data.target.status !== 'undefined') {
+        task.data.span.addContext({
+          http: { status_code: task.data.target.status }
+        })
+      } else if (task.data.response) {
+        task.data.span.addContext({
+          http: { status_code: task.data.response.status }
+        })
+      }
+      task.data.span.end()
+    }
+
+    if (event === INVOKE && task.id) {
+      transactionService.removeTask(task.id)
     }
   }
 

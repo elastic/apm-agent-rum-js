@@ -36,7 +36,7 @@ import {
   SCHEDULE,
   INVOKE,
   CLEAR,
-  XMLHTTPREQUEST_SOURCE,
+  XMLHTTPREQUEST,
   ADD_EVENT_LISTENER_STR,
   REMOVE_EVENT_LISTENER_STR
 } from '../constants'
@@ -141,7 +141,7 @@ export function patchXMLHttpRequest(callback) {
     () =>
       function(self, args) {
         const task = {
-          source: XMLHTTPREQUEST_SOURCE,
+          source: XMLHTTPREQUEST,
           state: '',
           type: 'macroTask',
           ignore: self[XHR_IGNORE],

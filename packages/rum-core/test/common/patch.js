@@ -37,7 +37,6 @@ if (!window['__patchEventHandler']) {
       }
     }
   }
-  console.log('Pathching XHR and FETCH calls')
   window['__patchEventHandler'] = patchAll()
 }
 

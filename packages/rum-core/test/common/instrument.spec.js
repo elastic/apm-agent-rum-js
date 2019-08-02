@@ -23,33 +23,37 @@
  *
  */
 
-// export public core APIs.
-
-import ErrorLogging from './error-logging'
-import PerformanceMonitoring from './performance-monitoring'
-import ServiceFactory from './common/service-factory'
-import { isPlatformSupported } from './common/utils'
-import { patchAll, patchEventHandler } from './common/patching'
-import { PAGE_LOAD, ERROR } from './common/constants'
-import { getInstrumentationFlags } from './common/instrument'
-import { createTracer } from './opentracing'
-
-function createServiceFactory() {
-  const serviceFactory = new ServiceFactory()
-  serviceFactory.registerCoreServices()
-  ErrorLogging.registerServices(serviceFactory)
-  PerformanceMonitoring.registerServices(serviceFactory)
-  return serviceFactory
-}
-
-export {
-  createServiceFactory,
-  ServiceFactory,
-  patchAll,
-  patchEventHandler,
-  isPlatformSupported,
-  ERROR,
+import { getInstrumentationFlags } from '../../src/common/instrument'
+import {
   PAGE_LOAD,
-  getInstrumentationFlags,
-  createTracer
-}
+  XMLHTTPREQUEST,
+  FETCH,
+  HISTORY,
+  ERROR
+} from '../../src/common/constants'
+
+describe('Instrumentation', function() {
+  it('disable all instrumentations when instrument config is false', () => {
+    const flags = getInstrumentationFlags(false, [])
+
+    expect(flags).toEqual({
+      [PAGE_LOAD]: false,
+      [XMLHTTPREQUEST]: false,
+      [FETCH]: false,
+      [HISTORY]: false,
+      [ERROR]: false
+    })
+  })
+
+  it('disable selective instrumentations via disableInstrumentations config', () => {
+    const flags = getInstrumentationFlags(true, ['xmlhttprequest', 'history'])
+
+    expect(flags).toEqual({
+      [PAGE_LOAD]: true,
+      [XMLHTTPREQUEST]: false,
+      [FETCH]: true,
+      [HISTORY]: false,
+      [ERROR]: true
+    })
+  })
+})

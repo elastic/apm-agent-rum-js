@@ -24,7 +24,7 @@
  */
 
 import { globalState } from './patch-utils'
-import { SCHEDULE, INVOKE, FETCH_SOURCE } from '../constants'
+import { SCHEDULE, INVOKE, FETCH } from '../constants'
 
 export function patchFetch(callback) {
   if (!window.fetch || !window.Request) {
@@ -57,7 +57,7 @@ export function patchFetch(callback) {
     }
 
     const task = {
-      source: FETCH_SOURCE,
+      source: FETCH,
       state: '',
       type: 'macroTask',
       data: {

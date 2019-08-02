@@ -23,33 +23,28 @@
  *
  */
 
-// export public core APIs.
+import { XMLHTTPREQUEST, FETCH, HISTORY, PAGE_LOAD, ERROR } from './constants'
 
-import ErrorLogging from './error-logging'
-import PerformanceMonitoring from './performance-monitoring'
-import ServiceFactory from './common/service-factory'
-import { isPlatformSupported } from './common/utils'
-import { patchAll, patchEventHandler } from './common/patching'
-import { PAGE_LOAD, ERROR } from './common/constants'
-import { getInstrumentationFlags } from './common/instrument'
-import { createTracer } from './opentracing'
+export function getInstrumentationFlags(instrument, disabledInstrumentations) {
+  /**
+   * Valid instrumentation flags
+   */
+  const flags = {
+    [XMLHTTPREQUEST]: false,
+    [FETCH]: false,
+    [HISTORY]: false,
+    [PAGE_LOAD]: false,
+    [ERROR]: false
+  }
 
-function createServiceFactory() {
-  const serviceFactory = new ServiceFactory()
-  serviceFactory.registerCoreServices()
-  ErrorLogging.registerServices(serviceFactory)
-  PerformanceMonitoring.registerServices(serviceFactory)
-  return serviceFactory
-}
+  if (!instrument) {
+    return flags
+  }
 
-export {
-  createServiceFactory,
-  ServiceFactory,
-  patchAll,
-  patchEventHandler,
-  isPlatformSupported,
-  ERROR,
-  PAGE_LOAD,
-  getInstrumentationFlags,
-  createTracer
+  Object.keys(flags).forEach(key => {
+    if (disabledInstrumentations.indexOf(key) === -1) {
+      flags[key] = true
+    }
+  })
+  return flags
 }

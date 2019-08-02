@@ -23,7 +23,7 @@
  *
  */
 
-import { INVOKE, HISTORY_PUSHSTATE } from '../constants'
+import { INVOKE, HISTORY } from '../constants'
 
 export function patchHistory(callback) {
   if (!window.history) {
@@ -34,7 +34,7 @@ export function patchHistory(callback) {
   if (typeof nativePushState === 'function') {
     history.pushState = function(state, title, url) {
       const task = {
-        source: HISTORY_PUSHSTATE,
+        source: HISTORY,
         data: {
           state,
           title,

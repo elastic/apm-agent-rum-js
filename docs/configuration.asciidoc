@@ -57,6 +57,28 @@ var options = {
 ----
 
 [float]
+[[instrument]]
+=== `instrument`
+
+* *Type:* Boolean
+* *Default:* `true`
+
+A boolean specifying if the agent should automatically instrument the application to collect 
+performance metrics for the application. 
+
+NOTE: Both active and instrument needs to be true for instrumentation to be running.
+
+[float]
+[[disable-instrumentations]]
+=== `disableInstrumentations`
+
+* *Type:* Array
+* *Default:* `[]`
+
+A list of instrumentations which can be disabled. Valid options are `xmlhttprequest`, `fetch`,
+`history`, `error` and `page-load`. When disabled, no transactions/spans will be created for that type.
+
+[float]
 [[environment]]
 === `environment`
 
@@ -98,6 +120,70 @@ The agent maintains two in-memory queues to record transactions and errors when 
 This option sets the flush interval in *milliseconds* for these queues.
 
 NOTE: After each flush of the queue, the next flush isn't scheduled until an item is added to the queue.
+
+[float]
+[[page-load-trace-id]]
+=== `pageLoadTraceId`
+
+* *Type:* String
+
+Use this option to override the page load transaction's trace ID.
+
+
+[float]
+[[page-load-sampled]]
+=== `pageLoadSampled`
+
+* *Type:* String
+
+Use this option to override the page load transaction's sampled property.
+
+
+[float]
+[[page-load-span-id]]
+=== `pageLoadSpanId`
+
+* *Type:* String
+
+This option overrides the ID of the span that is generated for receiving the initial document.
+
+[float]
+[[page-load-transaction-name]]
+=== `pageLoadTransactionName`
+
+* *Type:* String
+
+This option sets the name for the page load transaction.
+See the <<custom-transaction-name,custom initial page load transaction names>> documentation for strategies on using this method.
+
+
+[float]
+[[distributed-tracing]]
+=== `distributedTracing`
+
+* *Type:* Boolean
+* *Default:* `true`
+
+Distributed tracing is enabled by default, however you can use this configuration to disable it.
+
+
+[float]
+[[distributed-tracing-origins]]
+=== `distributedTracingOrigins`
+
+* *Type:* Array
+* *Default:* `[]`
+
+This option is an array of strings and determines which origins should be monitored as part of distributed tracing.
+More specificly this option is consulted when the agent is about to add distributed tracing http header (`elastic-apm-traceparent`) to a request.
+Please note that each item in the array should be a valid url and at least include the origin part (other parts of the url are ignored).
+
+[source,js]
+----
+var options = {
+  distributedTracingOrigins: ['https://example.com']
+}
+----
 
 [float]
 [[error-throttling]]
@@ -153,67 +239,5 @@ By default the agent can only send (up to) `20` transactions every `30000` milli
 A number between `0.0` and `1.0` that specifies the sample rate of transactions, by default all transactions are sampled.
 
 
-[float]
-[[page-load-trace-id]]
-==== `pageLoadTraceId`
 
-* *Type:* String
-
-Use this option to override the page load transaction's trace ID.
-
-
-[float]
-[[page-load-sampled]]
-==== `pageLoadSampled`
-
-* *Type:* String
-
-Use this option to override the page load transaction's sampled property.
-
-
-[float]
-[[page-load-span-id]]
-==== `pageLoadSpanId`
-
-* *Type:* String
-
-This option overrides the ID of the span that is generated for receiving the initial document.
-
-[float]
-[[page-load-transaction-name]]
-==== `pageLoadTransactionName`
-
-* *Type:* String
-
-This option sets the name for the page load transaction.
-See the <<custom-transaction-name,custom initial page load transaction names>> documentation for strategies on using this method.
-
-
-[float]
-[[distributed-tracing]]
-==== `distributedTracing`
-
-* *Type:* Boolean
-* *Default:* `true`
-
-Distributed tracing is enabled by default, however you can use this configuration to disable it.
-
-
-[float]
-[[distributed-tracing-origins]]
-==== `distributedTracingOrigins`
-
-* *Type:* Array
-* *Default:* `[]`
-
-This option is an array of strings and determines which origins should be monitored as part of distributed tracing.
-More specificly this option is consulted when the agent is about to add distributed tracing http header (`elastic-apm-traceparent`) to a request.
-Please note that each item in the array should be a valid url and at least include the origin part (other parts of the url are ignored).
-
-[source,js]
-----
-var options = {
-  distributedTracingOrigins: ['https://example.com']
-}
-----
 

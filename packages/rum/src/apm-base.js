@@ -23,6 +23,9 @@
  *
  */
 
+import { getInstrumentationFlags } from '@elastic/apm-rum-core'
+import { PAGE_LOAD, ERROR } from '@elastic/apm-rum-core'
+
 class ApmBase {
   constructor(serviceFactory, disable) {
     this._disable = disable
@@ -49,15 +52,23 @@ class ApmBase {
       }
 
       this.serviceFactory.init()
-      const errorLogging = this.serviceFactory.getService('ErrorLogging')
-      errorLogging.registerGlobalEventListener()
+
+      const flags = getInstrumentationFlags(
+        configService.get('instrument'),
+        configService.get('disableInstrumentations')
+      )
 
       const performanceMonitoring = this.serviceFactory.getService(
         'PerformanceMonitoring'
       )
-      performanceMonitoring.init()
+      performanceMonitoring.init(flags)
 
-      if (configService.get('sendPageLoadTransaction')) {
+      if (flags[ERROR]) {
+        const errorLogging = this.serviceFactory.getService('ErrorLogging')
+        errorLogging.registerGlobalEventListener()
+      }
+
+      if (flags[PAGE_LOAD] && configService.get('sendPageLoadTransaction')) {
         this._sendPageLoadMetrics()
       }
     }
@@ -69,23 +80,22 @@ class ApmBase {
       'TransactionService'
     )
 
-    const pageLoadTaskId = 'page-load'
     /**
      * Name of the transaction is set in transaction service to
-     * avoid duplicate the logic at multiple places
+     * avoid duplicating the logic at multiple places
      */
-    const tr = transactionService.startTransaction(undefined, 'page-load', {
+    const tr = transactionService.startTransaction(undefined, PAGE_LOAD, {
       canReuse: true
     })
 
     if (tr) {
-      tr.addTask(pageLoadTaskId)
+      tr.addTask(PAGE_LOAD)
     }
     const sendPageLoadMetrics = function sendPageLoadMetrics() {
       // to make sure PerformanceTiming.loadEventEnd has a value
       setTimeout(function() {
         if (tr) {
-          tr.removeTask(pageLoadTaskId)
+          tr.removeTask(PAGE_LOAD)
         }
       })
     }

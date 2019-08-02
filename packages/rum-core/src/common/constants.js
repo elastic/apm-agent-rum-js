@@ -31,17 +31,6 @@ const INVOKE = 'invoke'
 const CLEAR = 'clear'
 
 /**
- * Request Sources
- */
-const FETCH_SOURCE = 'fetch'
-const XMLHTTPREQUEST_SOURCE = 'XMLHttpRequest.send'
-
-/**
- * History sources
- */
-const HISTORY_PUSHSTATE = 'history.pushState'
-
-/**
  * Event listener methods
  */
 const ADD_EVENT_LISTENER_STR = 'addEventListener'
@@ -89,32 +78,34 @@ const USER_TIMING_THRESHOLD = 60
 const KEYWORD_LIMIT = 1024
 
 /**
- * Events
+ * Events - to be consumed by the users
  */
-const ON_TRANSACTION_START = 'onTransactionStart'
-const ON_TRANSACTION_END = 'onTransactionEnd'
+const TRANSACTION_START = 'transaction:start'
+const TRANSACTION_END = 'transaction:end'
 
 /**
  * Internal Events
  */
+const CONFIG_CHANGE = 'config:change'
 
-const ON_CONFIG_CHANGE = 'onConfigChange'
-const ON_TASK = 'onTask'
+/**
+ * Events types that are used to toggle auto instrumentations
+ */
+const XMLHTTPREQUEST = 'xmlhttprequest'
+const FETCH = 'fetch'
+const HISTORY = 'history'
+const ERROR = 'error'
 
 /**
  * Event modifiers, append these to event names.
  */
-
-const BEFORE_EVENT = '_before'
-const AFTER_EVENT = '_after'
+const BEFORE_EVENT = ':before'
+const AFTER_EVENT = ':after'
 
 export {
   SCHEDULE,
   INVOKE,
   CLEAR,
-  FETCH_SOURCE,
-  XMLHTTPREQUEST_SOURCE,
-  HISTORY_PUSHSTATE,
   ADD_EVENT_LISTENER_STR,
   REMOVE_EVENT_LISTENER_STR,
   RESOURCE_INITIATOR_TYPES,
@@ -125,10 +116,13 @@ export {
   TYPE_CUSTOM,
   USER_TIMING_THRESHOLD,
   KEYWORD_LIMIT,
-  ON_TRANSACTION_START,
-  ON_TRANSACTION_END,
+  TRANSACTION_START,
+  TRANSACTION_END,
+  CONFIG_CHANGE,
+  XMLHTTPREQUEST,
+  FETCH,
+  HISTORY,
+  ERROR,
   BEFORE_EVENT,
-  AFTER_EVENT,
-  ON_CONFIG_CHANGE,
-  ON_TASK
+  AFTER_EVENT
 }
