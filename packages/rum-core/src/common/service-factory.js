@@ -32,6 +32,7 @@ class ServiceFactory {
   constructor() {
     this._serviceCreators = {}
     this._serviceInstances = {}
+    this.initialized = false
   }
 
   registerCoreServices() {
@@ -52,6 +53,10 @@ class ServiceFactory {
   }
 
   init() {
+    if (this.initialized) {
+      return
+    }
+    this.initialized = true
     var configService = this.getService('ConfigService')
     configService.init()
     var loggingService = this.getService('LoggingService')

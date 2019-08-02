@@ -26,9 +26,10 @@
 import ApmBase from '../../src/apm-base'
 import { createServiceFactory } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 var enabled = bootstrap()
-const serviceName = 'apm-base-test'
+const { serviceName } = getGlobalConfig('rum').agentConfig
 
 describe('ApmBase', function() {
   var serviceFactory
@@ -43,7 +44,6 @@ describe('ApmBase', function() {
     configService.setConfig({
       sendPageLoadTransaction: true
     })
-    apmBase.addFilter(() => {})
     apmBase._sendPageLoadMetrics()
     var tr = trService.getCurrentTransaction()
     expect(tr.name).toBe('Unknown')
@@ -97,38 +97,30 @@ describe('ApmBase', function() {
     apmBase.init({
       serviceName,
       instrument: true,
-      disableInstrumentations: ['error'],
+      disableInstrumentations: ['page-load'],
       sendPageLoadTransaction: true
     })
-    apmBase.addFilter(() => {})
-    const transaction = trService.getCurrentTransaction()
-    expect(transaction.type).toEqual('page-load')
-    expect(loggingInstane.registerGlobalEventListener).not.toHaveBeenCalled()
+    expect(trService.getCurrentTransaction()).toBeUndefined()
+    expect(loggingInstane.registerGlobalEventListener).toHaveBeenCalled()
   })
 
-  it('should allow custom instrumentations via API and send to server', done => {
-    const apmServer = serviceFactory.getService('ApmServer')
-
-    spyOn(apmServer, 'sendTransactions').and.callFake(transactions => {
-      expect(transactions.length).toBe(1)
-      const { spans, name, type } = transactions[0]
-      expect(name).toBe('custom-tr')
-      expect(type).toBe('custom')
-      expect(spans[0].name).toBe('custom-span')
-      expect(spans[0].type).toBe('app')
-      done()
-    })
+  it('should allow custom instrumentations via API when instrument is false', () => {
     const apmBase = new ApmBase(serviceFactory, !enabled)
-
     apmBase.init({
       serviceName,
-      instrument: false
+      instrument: false,
+      flushInterval: 1
     })
-    // Drop the payload in tests
+    /**
+     * Drop the payload
+     */
     apmBase.addFilter(() => {})
-
     const tr = apmBase.startTransaction('custom-tr', 'custom')
+    expect(tr.name).toBe('custom-tr')
+    expect(tr.type).toBe('custom')
     const span = apmBase.startSpan('custom-span', 'app')
+    expect(span.name).toBe('custom-span')
+    expect(span.type).toBe('app')
     span.end()
     tr.end()
   })
@@ -148,14 +140,16 @@ describe('ApmBase', function() {
     req.open('GET', '/', true)
     req.addEventListener('load', function() {
       setTimeout(() => {
+        const tr = apmBase.getCurrentTransaction()
+        expect(tr).toBeUndefined()
+        expect(loggingService.info).toHaveBeenCalledWith(
+          'RUM agent is inactive'
+        )
         done()
       })
     })
 
     req.send()
-    const tr = apmBase.getCurrentTransaction()
-    expect(tr).toBeUndefined()
-    expect(loggingService.info).toHaveBeenCalledWith('RUM agent is inactive')
   })
 
   it('should provide the public api', function() {
@@ -199,7 +193,6 @@ describe('ApmBase', function() {
     apmBase.init({ serviceName })
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     expect(tr).toBeDefined()
-
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     req.addEventListener('load', function() {
@@ -218,7 +211,6 @@ describe('ApmBase', function() {
     apmBase.init({ capturePageLoad: false, serviceName })
     var transactionService = serviceFactory.getService('TransactionService')
     transactionService.currentTransaction = undefined
-
     var tr
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -297,7 +289,6 @@ describe('ApmBase', function() {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ serviceName })
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
-
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', false)
     req.addEventListener('load', function() {
