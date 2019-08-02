@@ -26,9 +26,7 @@
 import ApmServer from './apm-server'
 import ConfigService from './config-service'
 import LoggingService from './logging-service'
-import * as patchUtils from './patching/patch-utils'
-import * as utils from './utils'
-import { ON_CONFIG_CHANGE } from './constants'
+import { CONFIG_CHANGE } from './constants'
 
 class ServiceFactory {
   constructor() {
@@ -52,20 +50,16 @@ class ServiceFactory {
         serviceFactory.getService('LoggingService')
       )
     })
-
-    this.registerServiceInstance('PatchUtils', patchUtils)
-    this.registerServiceInstance('Utils', utils)
   }
+
   init() {
     if (this.initialized) {
       return
     }
     this.initialized = true
-    var serviceFactory = this
-
-    var configService = serviceFactory.getService('ConfigService')
+    var configService = this.getService('ConfigService')
     configService.init()
-    var loggingService = serviceFactory.getService('LoggingService')
+    var loggingService = this.getService('LoggingService')
 
     function setLogLevel(loggingService, configService) {
       const debug = configService.get('debug')
@@ -78,11 +72,11 @@ class ServiceFactory {
     }
 
     setLogLevel(loggingService, configService)
-    configService.events.observe(ON_CONFIG_CHANGE, function() {
+    configService.events.observe(CONFIG_CHANGE, function() {
       setLogLevel(loggingService, configService)
     })
 
-    var apmServer = serviceFactory.getService('ApmServer')
+    var apmServer = this.getService('ApmServer')
     apmServer.init()
   }
 

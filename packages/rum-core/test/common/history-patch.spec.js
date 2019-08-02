@@ -24,13 +24,13 @@
  */
 
 import patchEventHandler from './patch'
-import { ON_TASK } from '../../src/common/constants'
+import { HISTORY } from '../../src/common/constants'
 describe('historyPatch', function() {
   var events = []
   var cancelFn
 
   beforeAll(function() {
-    cancelFn = patchEventHandler.observe(ON_TASK, function(event, task) {
+    cancelFn = patchEventHandler.observe(HISTORY, function(event, task) {
       events.push({
         event,
         task
@@ -53,7 +53,7 @@ describe('historyPatch', function() {
       {
         event: 'invoke',
         task: {
-          source: 'history.pushState',
+          source: HISTORY,
           data: {
             state: undefined,
             title: 'test',

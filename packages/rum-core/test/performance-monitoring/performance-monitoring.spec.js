@@ -29,10 +29,16 @@ import Span from '../../src/performance-monitoring/span'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { getDtHeaderValue } from '../../src/common/utils'
 import { globalState } from '../../src/common/patching/patch-utils'
-import { SCHEDULE, ON_TASK } from '../../src/common/constants'
+import {
+  SCHEDULE,
+  FETCH,
+  XMLHTTPREQUEST,
+  HISTORY
+} from '../../src/common/constants'
 import patchEventHandler from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
-import { ON_TRANSACTION_END } from '../../src/common/constants'
+import { TRANSACTION_END } from '../../src/common/constants'
+import { patchEventHandler as originalPathHandler } from '../../src/common/patching'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
@@ -401,7 +407,7 @@ describe('PerformanceMonitoring', function() {
     const unMock = mockGetEntriesByType()
     const transactionService = serviceFactory.getService('TransactionService')
 
-    configService.events.observe(ON_TRANSACTION_END, function(tr) {
+    configService.events.observe(TRANSACTION_END, function(tr) {
       expect(tr.isHardNavigation).toBe(true)
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
@@ -489,13 +495,13 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should correctly use xhr patch', function(done) {
-    var fn = performanceMonitoring.getXhrPatchSubFn()
+    var fn = performanceMonitoring.getXHRSub()
     expect(typeof fn).toBe('function')
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     spyOn(req, 'setRequestHeader').and.callThrough()
     var task = {
-      source: 'XMLHttpRequest.send',
+      source: XMLHTTPREQUEST,
       data: {
         target: req
       }
@@ -517,12 +523,12 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should consider fetchInProgress to avoid duplicate spans', function(done) {
-    var fn = performanceMonitoring.getXhrPatchSubFn()
+    var fn = performanceMonitoring.getXHRSub()
     expect(typeof fn).toBe('function')
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     var task = {
-      source: 'XMLHttpRequest.send',
+      source: XMLHTTPREQUEST,
       data: {
         target: req
       }
@@ -549,19 +555,19 @@ describe('PerformanceMonitoring', function() {
 
   if (window.fetch) {
     it('should create fetch spans', function(done) {
-      var fn = performanceMonitoring.getXhrPatchSubFn()
+      var fn = performanceMonitoring.getFetchSub()
       var dTHeaderValue
-      performanceMonitoring.cancelPatchSub = patchEventHandler.observe(
-        ON_TASK,
-        function(event, task) {
-          fn(event, task)
-          if (event === SCHEDULE) {
-            dTHeaderValue = task.data.target.headers.get(
-              configService.get('distributedTracingHeaderName')
-            )
-          }
+      const cancelFetchSub = patchEventHandler.observe(FETCH, function(
+        event,
+        task
+      ) {
+        fn(event, task)
+        if (event === SCHEDULE) {
+          dTHeaderValue = task.data.target.headers.get(
+            configService.get('distributedTracingHeaderName')
+          )
         }
-      )
+      })
       var transactionService = performanceMonitoring._transactionService
       var tr = transactionService.startTransaction(
         'fetch transaction',
@@ -581,7 +587,7 @@ describe('PerformanceMonitoring', function() {
             }
           })
           expect(dTHeaderValue).toBeDefined()
-          performanceMonitoring.cancelPatchSub()
+          cancelFetchSub()
           done()
         })
       })
@@ -592,10 +598,10 @@ describe('PerformanceMonitoring', function() {
     })
 
     it('should redact auth from xhr tasks', () => {
-      const fn = performanceMonitoring.getXhrPatchSubFn()
+      const fn = performanceMonitoring.getXHRSub()
       const transactionService = performanceMonitoring._transactionService
       const fakeXHRTask = {
-        source: 'XMLHttpRequest.send',
+        source: XMLHTTPREQUEST,
         data: {
           method: 'GET',
           url: 'https://a:b@c.com/d?e=10&f=20'
@@ -611,16 +617,18 @@ describe('PerformanceMonitoring', function() {
     })
 
     it('should not duplicate xhr spans if fetch is a polyfill', function(done) {
-      var fn = performanceMonitoring.getXhrPatchSubFn()
+      const xhrFn = performanceMonitoring.getXHRSub()
+      const fetchFn = performanceMonitoring.getFetchSub()
 
-      var events = []
-      performanceMonitoring.cancelPatchSub = patchEventHandler.observe(
-        ON_TASK,
-        function(event, task) {
-          events.push({ event, source: task.source })
-          fn(event, task)
-        }
-      )
+      const events = []
+      patchEventHandler.observe(XMLHTTPREQUEST, function(event, task) {
+        events.push({ event, source: task.source })
+        xhrFn(event, task)
+      })
+      patchEventHandler.observe(FETCH, function(event, task) {
+        events.push({ event, source: task.source })
+        fetchFn(event, task)
+      })
 
       window['__fetchDelegate'] = function(request) {
         return new Promise(function(resolve) {
@@ -662,19 +670,19 @@ describe('PerformanceMonitoring', function() {
           expect(events).toEqual([
             {
               event: 'schedule',
-              source: 'fetch'
+              source: FETCH
             },
             {
               event: 'schedule',
-              source: 'XMLHttpRequest.send'
+              source: XMLHTTPREQUEST
             },
             {
               event: 'invoke',
-              source: 'XMLHttpRequest.send'
+              source: XMLHTTPREQUEST
             },
             {
               event: 'invoke',
-              source: 'fetch'
+              source: FETCH
             }
           ])
           done()
@@ -686,7 +694,7 @@ describe('PerformanceMonitoring', function() {
   }
 
   it('should add xhr tasks', function(done) {
-    var fn = performanceMonitoring.getXhrPatchSubFn()
+    var fn = performanceMonitoring.getXHRSub()
     var transactionService = performanceMonitoring._transactionService
     var tr = transactionService.startTransaction('task transaction', 'custom')
     expect(typeof fn).toBe('function')
@@ -694,7 +702,7 @@ describe('PerformanceMonitoring', function() {
     req.open('GET', '/', true)
 
     var task = {
-      source: 'XMLHttpRequest.send',
+      source: XMLHTTPREQUEST,
       data: {
         target: req
       }
@@ -714,14 +722,9 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should create Transactions on history.pushState', function() {
-    var fn = performanceMonitoring.getXhrPatchSubFn()
-    performanceMonitoring.cancelPatchSub = patchEventHandler.observe(
-      ON_TASK,
-      function(event, task) {
-        fn(event, task)
-      }
-    )
-    var transactionService = performanceMonitoring._transactionService
+    const historySubFn = performanceMonitoring.getHistorySub()
+    const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)
+    const transactionService = performanceMonitoring._transactionService
 
     spyOn(transactionService, 'startTransaction').and.callThrough()
 
@@ -732,6 +735,25 @@ describe('PerformanceMonitoring', function() {
       'route-change',
       { canReuse: true }
     )
-    performanceMonitoring.cancelPatchSub()
+    cancelHistorySub()
+  })
+
+  it('should subscribe to events based on instrumentation flags', () => {
+    spyOn(originalPathHandler, 'observe')
+    performanceMonitoring.init({
+      [HISTORY]: false,
+      [XMLHTTPREQUEST]: true,
+      [FETCH]: true
+    })
+
+    expect(originalPathHandler.observe.calls.argsFor(0)).toEqual([
+      XMLHTTPREQUEST,
+      jasmine.any(Function)
+    ])
+
+    expect(originalPathHandler.observe.calls.argsFor(1)).toEqual([
+      FETCH,
+      jasmine.any(Function)
+    ])
   })
 })
