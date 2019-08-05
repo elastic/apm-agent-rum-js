@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.4.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.4.0...@elastic/apm-rum@4.4.1) (2019-08-05)
+
+
+### Bug Fixes
+
+* **rum:** sync version number with latest published version ([#362](https://github.com/elastic/apm-agent-rum-js/issues/362)) ([909f480](https://github.com/elastic/apm-agent-rum-js/commit/909f480))
+
+
+
+
+
 # [4.4.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.3.1...@elastic/apm-rum@4.4.0) (2019-08-05)
 
 
