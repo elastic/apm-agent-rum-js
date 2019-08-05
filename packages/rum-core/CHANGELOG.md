@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.4.0...@elastic/apm-rum-core@4.5.0) (2019-08-05)
+
+
+### Bug Fixes
+
+* **rum-core:** reduce transaction reusability threshold to 5 seconds ([#354](https://github.com/elastic/apm-agent-rum-js/issues/354)) ([dd32e41](https://github.com/elastic/apm-agent-rum-js/commit/dd32e41))
+
+
+### Features
+
+* **rum-core:** add event listeners for transactions ([#279](https://github.com/elastic/apm-agent-rum-js/issues/279)) ([d98f7c7](https://github.com/elastic/apm-agent-rum-js/commit/d98f7c7))
+* **rum-core:** provide debug logs when transaction was discarded ([#351](https://github.com/elastic/apm-agent-rum-js/issues/351)) ([d6728d8](https://github.com/elastic/apm-agent-rum-js/commit/d6728d8))
+
+
+
+
+
 # [4.4.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.3.0...@elastic/apm-rum-core@4.4.0) (2019-07-25)
 
 
