@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@0.1.1...@elastic/apm-rum-react@0.2.0) (2019-08-05)
+
+
+### Bug Fixes
+
+* **rum-react:** capture network requests inside useEffect hook ([#353](https://github.com/elastic/apm-agent-rum-js/issues/353)) ([ae25200](https://github.com/elastic/apm-agent-rum-js/commit/ae25200))
+
+
+### Features
+
+* **rum-react:** publish transpiled react elements as es modules ([#356](https://github.com/elastic/apm-agent-rum-js/issues/356)) ([7c651c7](https://github.com/elastic/apm-agent-rum-js/commit/7c651c7))
+
+
+
+
+
 ## [0.1.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@0.1.0...@elastic/apm-rum-react@0.1.1) (2019-07-25)
 
 

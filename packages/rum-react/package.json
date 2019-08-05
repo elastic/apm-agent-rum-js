@@ -1,6 +1,6 @@
 {
   "name": "@elastic/apm-rum-react",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Elastic APM Real User Monitoring for React applications",
   "author": "Hamid <h.jahtalab@gmail.com>",
   "homepage": "https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html",
