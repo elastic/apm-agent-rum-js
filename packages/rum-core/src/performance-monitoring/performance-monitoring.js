@@ -401,23 +401,6 @@ class PerformanceMonitoring {
     }
   }
 
-  sendTransactions(transactions) {
-    const payload = transactions
-      .map(tr => this.createTransactionPayload(tr))
-      .filter(tr => tr)
-
-    if (__DEV__) {
-      this._logginService.debug(
-        'Sending Transactions to apm server.',
-        transactions.length
-      )
-    }
-
-    // todo: check if transactions are already being sent
-    const promise = this._apmServer.sendTransactions(payload)
-    return promise
-  }
-
   convertTransactionsToServerModel(transactions) {
     return transactions.map(tr => this.createTransactionDataModel(tr))
   }
