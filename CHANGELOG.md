@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 4.4.1 (2019-08-05)
+
+### Bug Fixes
+
+* **rum:** sync version number with latest published version ([#362](https://github.com/elastic/apm-agent-rum-js/issues/362)) ([909f480](https://github.com/elastic/apm-agent-rum-js/commit/909f480))
+
+
 # 4.4.0 (2019-08-05)
 
 ### Bug Fixes
@@ -14,8 +21,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 * **rum:** add instrument flag to toggle instrumentations ([#360](https://github.com/elastic/apm-agent-rum-js/issues/360)) ([b7098dd](https://github.com/elastic/apm-agent-rum-js/commit/b7098dd))
 * **rum-core:** add event listeners for transactions ([#279](https://github.com/elastic/apm-agent-rum-js/issues/279)) ([d98f7c7](https://github.com/elastic/apm-agent-rum-js/commit/d98f7c7))
-* **rum-core:** provide debug logs when transaction was discarded ([#351](https://github.com/elastic/apm-agent-rum-js/issues/351)) ([d6728d8](https://github.com/elastic/apm-agent-rum-js/com
+* **rum-core:** provide debug logs when transaction was discarded ([#351](https://github.com/elastic/apm-agent-rum-js/issues/351)) ([d6728d8](https://github.com/elastic/apm-agent-rum-js/com)
 * **rum-react:** publish transpiled react elements as es modules ([#356](https://github.com/elastic/apm-agent-rum-js/issues/356)) ([7c651c7](https://github.com/elastic/apm-agent-rum-js/commit/7c651c7))
+
 
 # 4.3.1 (2019-07-25)
 
