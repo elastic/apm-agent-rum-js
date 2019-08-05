@@ -70,7 +70,18 @@ const DEFAULT_BROWSER_PRESET = [
 
 const PACKAGE_TYPES = {
   DEFAULT: 'DEFAULT',
-  REACT: 'REACT'
+  REACT: 'REACT',
+  ANGULAR: 'ANGULAR'
+}
+
+function getAngularConfig(options) {
+  return Object.assign({}, options, {
+    presets: options.presets.concat(['@babel/preset-typescript']),
+    plugins: options.plugins.concat([
+      ['@babel/plugin-proposal-decorators', { legacy: true }],
+      ['@babel/plugin-proposal-class-properties', { loose: true }]
+    ])
+  })
 }
 
 function getReactConfig(options) {
@@ -81,6 +92,15 @@ function getReactConfig(options) {
       '@babel/plugin-syntax-dynamic-import'
     ])
   })
+}
+
+function getOptions(options, packageType) {
+  if (packageType === PACKAGE_TYPES.REACT) {
+    return getReactConfig(options)
+  } else if (packageType === PACKAGE_TYPES.ANGULAR) {
+    return getAngularConfig(options)
+  }
+  return options
 }
 
 function getBabelConfig(bundleType, packageType) {
@@ -95,22 +115,13 @@ function getBabelConfig(bundleType, packageType) {
     case NODE_DEV:
     case NODE_PROD:
       options = { ...options, presets: DEFAULT_NODE_PRESET }
-      if (packageType === PACKAGE_TYPES.REACT) {
-        return getReactConfig(options)
-      }
-      return options
+      return getOptions(options, packageType)
     case NODE_ES_PROD:
-      if (packageType === PACKAGE_TYPES.REACT) {
-        return getReactConfig(options)
-      }
-      return options
+      return getOptions(options, packageType)
     case BROWSER_DEV:
     case BROWSER_PROD:
       options = { ...options, presets: DEFAULT_BROWSER_PRESET }
-      if (packageType === PACKAGE_TYPES.REACT) {
-        return getReactConfig(options)
-      }
-      return options
+      return getOptions(options, packageType)
     default:
       return options
   }

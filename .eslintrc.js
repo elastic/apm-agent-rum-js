@@ -1,5 +1,5 @@
 const { readFileSync } = require('fs')
-const { join } = require('path')
+const { join, resolve } = require('path')
 /**
  * Helps with using custom eslint rules without creating and publishing as plugin
  */
@@ -19,6 +19,13 @@ module.exports = {
     es6: true,
     browser: true
   },
+  parserOptions: {
+    ecmaVersion: 2018,
+    sourceType: 'module',
+    ecmaFeatures: {
+      legacyDecorators: true
+    }
+  },
   extends: ['plugin:prettier/recommended', 'plugin:react/recommended'],
   parser: 'babel-eslint',
   plugins: ['standard', 'rulesdir'],
@@ -33,5 +40,10 @@ module.exports = {
       }
     ],
     'react/prop-types': 0
+  },
+  settings: {
+    react: {
+      version: 'detect'
+    }
   }
 }
