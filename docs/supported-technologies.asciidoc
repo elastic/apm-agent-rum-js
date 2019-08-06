@@ -20,7 +20,7 @@ The agent also adds support for <<distributed-tracing-guide, Distributed Tracing
 The following platforms are supported:
 
 // Update this image by modifying this URL:
-// https://badges.herokuapp.com/browsers?android=5.1&firefox=52&googlechrome=49,74&iexplore=8.1&iphone=12&microsoftedge=10&safari=10.11
+// https://badges.herokuapp.com/browsers?android=5.1&firefox=52&googlechrome=49,74&iexplore=11&iphone=12&microsoftedge=17&safari=9
 // Additional information: https://github.com/exogen/badge-matrix
 image::images/compatibility.png[Elastic APM RUM Agent compatibility]
 
