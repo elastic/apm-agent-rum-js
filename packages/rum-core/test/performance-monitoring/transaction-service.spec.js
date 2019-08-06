@@ -23,6 +23,7 @@
  *
  */
 
+import { Promise } from 'es6-promise'
 import TransactionService from '../../src/performance-monitoring/transaction-service'
 import Transaction from '../../src/performance-monitoring/transaction'
 import Config from '../../src/common/config-service'

@@ -23,6 +23,7 @@
  *
  */
 
+import { Promise } from 'es6-promise'
 import Subscription from './subscription'
 
 function TransportMock(transport) {

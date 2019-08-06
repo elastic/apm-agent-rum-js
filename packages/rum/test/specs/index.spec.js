@@ -23,6 +23,7 @@
  *
  */
 
+import { Promise } from 'es6-promise'
 import { apmBase } from '../../src/'
 import { isPlatformSupported } from '@elastic/apm-rum-core'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'

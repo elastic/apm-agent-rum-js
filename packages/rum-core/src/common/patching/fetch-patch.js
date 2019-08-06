@@ -23,6 +23,7 @@
  *
  */
 
+import { Promise } from 'es6-promise'
 import { globalState } from './patch-utils'
 import { SCHEDULE, INVOKE, FETCH } from '../constants'
 

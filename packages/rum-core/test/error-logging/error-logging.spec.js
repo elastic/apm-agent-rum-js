@@ -23,6 +23,7 @@
  *
  */
 
+import { Promise } from 'es6-promise'
 import { createServiceFactory } from '../'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
