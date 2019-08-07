@@ -29,7 +29,7 @@ import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 var enabled = bootstrap()
-const { serviceName } = getGlobalConfig('rum').agentConfig
+const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
 
 describe('ApmBase', function() {
   var serviceFactory
@@ -44,6 +44,7 @@ describe('ApmBase', function() {
     configService.setConfig({
       sendPageLoadTransaction: true
     })
+    apmBase.config({ serviceName, serverUrl })
     apmBase._sendPageLoadMetrics()
     var tr = trService.getCurrentTransaction()
     expect(tr.name).toBe('Unknown')
@@ -77,6 +78,7 @@ describe('ApmBase', function() {
 
     apmBase.init({
       serviceName,
+      serverUrl,
       instrument: false,
       sendPageLoadTransaction: true
     })
@@ -96,6 +98,7 @@ describe('ApmBase', function() {
 
     apmBase.init({
       serviceName,
+      serverUrl,
       instrument: true,
       disableInstrumentations: ['page-load'],
       sendPageLoadTransaction: true
@@ -108,6 +111,7 @@ describe('ApmBase', function() {
     const apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({
       serviceName,
+      serverUrl,
       instrument: false,
       flushInterval: 1
     })
@@ -154,7 +158,7 @@ describe('ApmBase', function() {
 
   it('should provide the public api', function() {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ serviceName })
+    apmBase.init({ serviceName, serverUrl })
     apmBase.setInitialPageLoadName('test')
     var trService = serviceFactory.getService('TransactionService')
     var configService = serviceFactory.getService('ConfigService')
@@ -208,7 +212,7 @@ describe('ApmBase', function() {
 
   it('should instrument xhr when no transaction was started', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ capturePageLoad: false, serviceName })
+    apmBase.init({ capturePageLoad: false, serviceName, serverUrl })
     var transactionService = serviceFactory.getService('TransactionService')
     transactionService.currentTransaction = undefined
     var tr
@@ -287,7 +291,7 @@ describe('ApmBase', function() {
 
   it('should instrument sync xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ serviceName })
+    apmBase.init({ serviceName, serverUrl })
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', false)

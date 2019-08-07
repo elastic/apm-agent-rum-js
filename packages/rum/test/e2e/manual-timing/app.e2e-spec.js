@@ -29,7 +29,7 @@ const {
 } = require('../../../../../dev-utils/webdriver')
 
 describe('manual-timing', function() {
-  it('should run manual timing', async function() {
+  it('should run manual timing', function() {
     browser.url('/test/e2e/manual-timing/index.html')
     browser.waitUntil(
       () => {
