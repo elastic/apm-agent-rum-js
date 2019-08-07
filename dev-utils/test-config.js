@@ -75,7 +75,7 @@ function getBrowserList() {
     },
     {
       browserName: 'chrome',
-      version: '74'
+      version: '76'
     },
     {
       browserName: 'firefox',

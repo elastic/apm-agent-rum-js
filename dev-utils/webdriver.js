@@ -57,15 +57,17 @@ function isLogEntryATestFailure(entry, whitelist) {
 function assertNoBrowserErrors(whitelist) {
   return new Promise((resolve, reject) => {
     /**
-     * browser.log API is available only in chrome
+     * browser.log API is available only in chrome driver
+     * from 76 using webdriver protocol
+     *
+     * https://bugs.chromium.org/p/chromedriver/issues/detail?id=2947
      */
     if (!isChromeLatest()) {
       return resolve()
     }
-    var response = browser.getLogs('browser')
-    var failureEntries = []
-    var debugLogs = []
-    var browserLog = response
+    const failureEntries = []
+    const debugLogs = []
+    const browserLog = browser.getLogs('browser')
 
     for (var i = 0; i < browserLog.length; i++) {
       var logEntry = browserLog[i]
@@ -132,7 +134,7 @@ function handleError(done) {
 
 function getWebdriveBaseConfig(
   path,
-  specs = './test/e2e/general-usecase/*.e2e-spec.js',
+  specs = './test/e2e/**/*.e2e-spec.js',
   capabilities
 ) {
   const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
@@ -170,13 +172,6 @@ function getWebdriveBaseConfig(
     reporters: ['dot', 'spec'],
     jasmineNodeOpts: {
       defaultTimeoutInterval: 90000
-    },
-    beforeTest() {
-      /**
-       * Sets timeout for scripts executed in the browser
-       * via browser.executeAsync method
-       */
-      browser.setTimeout({ script: 20000 })
     },
     afterTest(test) {
       /**
@@ -293,7 +288,8 @@ function isChromeLatest() {
   const browserName = browser.capabilities.browserName.toLowerCase()
   const browserVersion = browser.capabilities.version
   const isChrome = browserName.indexOf('chrome') !== -1
-  const isLatest = browserVersion && Number(browserVersion.split('.')[0]) > 70
+  const isLatest =
+    isChrome && browserVersion && Number(browserVersion.split('.')[0]) >= 76
 
   return isChrome && isLatest
 }

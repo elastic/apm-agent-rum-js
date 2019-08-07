@@ -35,7 +35,7 @@ describe('manual-timing', function() {
       () => {
         return $('#test-element').getText() === 'Passed'
       },
-      20000,
+      5000,
       'expected element #test-element'
     )
 
