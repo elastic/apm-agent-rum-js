@@ -14,6 +14,17 @@ The agent automatically captures all the outgoing http requests, by instrumentin
 The agent also adds support for <<distributed-tracing-guide, Distributed Tracing>> for all outgoing requests.
 
 [float]
+[[platforms]]
+=== Platforms
+
+The following platforms are supported:
+
+// Update this image by modifying this URL:
+// https://badges.herokuapp.com/browsers?android=5.1&firefox=52&googlechrome=49,74&iexplore=11&iphone=12&microsoftedge=17&safari=9
+// Additional information: https://github.com/exogen/badge-matrix
+image::images/compatibility.png[Elastic APM RUM Agent compatibility]
+
+[float]
 [[frameworks]]
 === Frameworks
 
