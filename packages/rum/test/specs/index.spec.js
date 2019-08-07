@@ -30,6 +30,7 @@ import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 describe('index', function() {
   const globalConfig = getGlobalConfig()
+  const { serverUrl, serviceName } = globalConfig.agentConfig
   var originalTimeout
 
   beforeEach(function() {
@@ -52,10 +53,9 @@ describe('index', function() {
     spyOn(apmServer, 'sendErrors').and.callThrough()
     spyOn(apmServer, '_postJson').and.callThrough()
 
-    const { agentConfig } = globalConfig
     apmBase.init({
-      serverUrl: agentConfig.serverUrl,
-      serviceName: agentConfig.serviceName,
+      serverUrl,
+      serviceName,
       flushInterval: 100
     })
 
@@ -97,5 +97,30 @@ describe('index', function() {
         done()
       }
     }
+  })
+
+  it('should not throw erorr on global Promise patching', () => {
+    window.count = 0
+    window.Promise = {
+      delay: () => ++window.count
+    }
+    window.capturedTestErrors = []
+    window.onerror = function(err) {
+      window.capturedTestErrors.push(err)
+    }
+
+    /**
+     * Delete bootstrap cache and execute again
+     */
+    delete require.cache[require.resolve('../../src/bootstrap')]
+    const bootstrap = require('../../src/bootstrap').default
+    bootstrap()
+
+    /**
+     * Execute the patched Promise function
+     */
+    window.Promise.delay()
+    expect(window.count).toBe(1)
+    expect(window.capturedTestErrors.length).toBe(0)
   })
 })
