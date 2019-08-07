@@ -23,7 +23,6 @@
  *
  */
 
-import { Promise } from 'es6-promise'
 import { createServiceFactory } from '../'
 import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'

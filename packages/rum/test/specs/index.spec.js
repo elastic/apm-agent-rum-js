@@ -110,11 +110,11 @@ describe('index', function() {
     }
 
     /**
-     * Delete bootstrap cache and execute again
+     * Delete bootstrap and init module cache and
+     * execute module again to check if global promise is overriden
      */
-    delete require.cache[require.resolve('../../src/bootstrap')]
-    const bootstrap = require('../../src/bootstrap').default
-    bootstrap()
+    delete require.cache[require.resolve('../../src/')]
+    require('../../src/')
 
     /**
      * Execute the patched Promise function

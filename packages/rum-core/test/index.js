@@ -23,7 +23,6 @@
  *
  */
 
-import { Promise } from 'es6-promise'
 import { createServiceFactory as originalFactory } from '../src'
 
 export function createServiceFactory() {

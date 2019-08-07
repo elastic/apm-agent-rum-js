@@ -194,7 +194,7 @@ describe('ApmBase', function() {
 
   it('should instrument xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ serviceName })
+    apmBase.init({ serviceName, serverUrl })
     var tr = apmBase.startTransaction('test-transaction', 'test-type')
     expect(tr).toBeDefined()
     var req = new window.XMLHttpRequest()

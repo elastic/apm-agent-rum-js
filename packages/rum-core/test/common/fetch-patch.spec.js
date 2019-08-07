@@ -23,7 +23,6 @@
  *
  */
 
-import { Promise } from 'es6-promise'
 import patchEventHandler from './patch'
 import { globalState } from '../../src/common/patching/patch-utils'
 import { FETCH } from '../../src/common/constants'
