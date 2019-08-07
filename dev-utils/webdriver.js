@@ -57,15 +57,17 @@ function isLogEntryATestFailure(entry, whitelist) {
 function assertNoBrowserErrors(whitelist) {
   return new Promise((resolve, reject) => {
     /**
-     * browser.log API is available only in chrome
+     * browser.log API is available only in chrome driver
+     * from 76 using webdriver protocol
+     *
+     * https://bugs.chromium.org/p/chromedriver/issues/detail?id=2947
      */
-    if (!isChrome()) {
+    if (!isChromeLatest()) {
       return resolve()
     }
-    var response = browser.getLogs('browser')
-    var failureEntries = []
-    var debugLogs = []
-    var browserLog = response
+    const failureEntries = []
+    const debugLogs = []
+    const browserLog = browser.getLogs('browser')
 
     for (var i = 0; i < browserLog.length; i++) {
       var logEntry = browserLog[i]
@@ -171,19 +173,12 @@ function getWebdriveBaseConfig(
     jasmineNodeOpts: {
       defaultTimeoutInterval: 90000
     },
-    beforeTest() {
-      /**
-       * Sets timeout for scripts executed in the browser
-       * via browser.executeAsync method
-       */
-      browser.setTimeout({ script: 20000 })
-    },
     afterTest(test) {
       /**
        * Log only on failures
        * Log api is only available in chrome driver
        * */
-      if (!test.passed && isChrome()) {
+      if (!test.passed && isChromeLatest()) {
         const response = browser.getLogs('browser')
         console.log('[Browser Logs]:', JSON.stringify(response, undefined, 2))
       }
@@ -289,16 +284,21 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
   return serverCalls
 }
 
-function isChrome() {
+function isChromeLatest() {
   const browserName = browser.capabilities.browserName.toLowerCase()
-  return browserName.indexOf('chrome') !== -1
+  const browserVersion = browser.capabilities.version
+  const isChrome = browserName.indexOf('chrome') !== -1
+  const isLatest =
+    isChrome && browserVersion && Number(browserVersion.split('.')[0]) >= 76
+
+  return isChrome && isLatest
 }
 
 module.exports = {
   allowSomeBrowserErrors,
   verifyNoBrowserErrors,
   handleError,
-  isChrome,
+  isChromeLatest,
   getWebdriveBaseConfig,
   waitForApmServerCalls
 }
