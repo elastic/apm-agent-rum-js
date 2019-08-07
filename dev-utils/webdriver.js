@@ -59,7 +59,7 @@ function assertNoBrowserErrors(whitelist) {
     /**
      * browser.log API is available only in chrome
      */
-    if (!isChrome()) {
+    if (!isChromeLatest()) {
       return resolve()
     }
     var response = browser.getLogs('browser')
@@ -132,7 +132,7 @@ function handleError(done) {
 
 function getWebdriveBaseConfig(
   path,
-  specs = './test/e2e/**/*.e2e-spec.js',
+  specs = './test/e2e/general-usecase/*.e2e-spec.js',
   capabilities
 ) {
   const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
@@ -183,7 +183,7 @@ function getWebdriveBaseConfig(
        * Log only on failures
        * Log api is only available in chrome driver
        * */
-      if (!test.passed && isChrome()) {
+      if (!test.passed && isChromeLatest()) {
         const response = browser.getLogs('browser')
         console.log('[Browser Logs]:', JSON.stringify(response, undefined, 2))
       }
@@ -289,16 +289,20 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
   return serverCalls
 }
 
-function isChrome() {
+function isChromeLatest() {
   const browserName = browser.capabilities.browserName.toLowerCase()
-  return browserName.indexOf('chrome') !== -1
+  const browserVersion = browser.capabilities.version
+  const isChrome = browserName.indexOf('chrome') !== -1
+  const isLatest = browserVersion && Number(browserVersion.split('.')[0]) > 70
+
+  return isChrome && isLatest
 }
 
 module.exports = {
   allowSomeBrowserErrors,
   verifyNoBrowserErrors,
   handleError,
-  isChrome,
+  isChromeLatest,
   getWebdriveBaseConfig,
   waitForApmServerCalls
 }
