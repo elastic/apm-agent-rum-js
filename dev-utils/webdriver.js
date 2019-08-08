@@ -23,6 +23,7 @@
  *
  */
 
+const { Promise } = require('es6-promise')
 const { join } = require('path')
 const glob = require('glob')
 const { getSauceConnectOptions, getBrowserList } = require('./test-config')

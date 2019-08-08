@@ -173,7 +173,7 @@ describe('TransactionService', function() {
     unMock()
   })
 
-  it('should use initial page load name before ending the transaction', function() {
+  it('should use initial page load name before ending the transaction', function(done) {
     transactionService = new TransactionService(logger, config)
 
     const tr = transactionService.startTransaction(undefined, 'page-load')
@@ -184,9 +184,9 @@ describe('TransactionService', function() {
 
     /**
      * For page load transaction we set the transaction name using
-     * transaction.onEnd which is scheduled in microtask using Promise.resolve()
+     * transaction.onEnd
      */
-    Promise.resolve().then(() => {
+    config.events.observe(TRANSACTION_END, tr => {
       expect(tr.name).toBe('page load name')
       done()
     })

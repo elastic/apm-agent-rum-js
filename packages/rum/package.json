@@ -40,8 +40,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@elastic/apm-rum-core": "file:../rum-core",
-    "es6-promise": "^4.2.4"
+    "@elastic/apm-rum-core": "file:../rum-core"
   },
   "bundlesize": [
     {
