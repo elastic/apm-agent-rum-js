@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.4.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.4.1...@elastic/apm-rum@4.4.2) (2019-08-08)
+
+
+### Bug Fixes
+
+* **rum:** do not polyfill the global Promise variable ([#366](https://github.com/elastic/apm-agent-rum-js/issues/366)) ([f5dc95c](https://github.com/elastic/apm-agent-rum-js/commit/f5dc95c))
+
+
+
+
+
 ## [4.4.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.4.0...@elastic/apm-rum@4.4.1) (2019-08-05)
 
 
