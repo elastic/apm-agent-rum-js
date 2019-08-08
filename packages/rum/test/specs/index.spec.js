@@ -99,7 +99,7 @@ describe('index', function() {
     }
   })
 
-  it('should not throw erorr on global Promise patching', () => {
+  it('should not throw error on global Promise patching', () => {
     window.count = 0
     window.Promise = {
       delay: () => ++window.count
