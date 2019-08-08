@@ -23,6 +23,7 @@
  *
  */
 
+import { Promise } from 'es6-promise'
 import Queue from './queue'
 import throttle from './throttle'
 import NDJSON from './ndjson'

@@ -24,7 +24,6 @@
  */
 
 import { isPlatformSupported, patchAll } from '@elastic/apm-rum-core'
-import { polyfill } from 'es6-promise'
 
 var alreadyBootstrap = false
 var enabled = false
@@ -36,7 +35,6 @@ export default function bootstrap() {
   alreadyBootstrap = true
 
   if (isPlatformSupported()) {
-    polyfill()
     patchAll()
     enabled = true
   } else {

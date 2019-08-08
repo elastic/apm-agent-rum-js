@@ -23,6 +23,7 @@
  *
  */
 
+import { Promise } from 'es6-promise'
 import Transaction from './transaction'
 import { extend, getPageLoadMarks } from '../common/utils'
 import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'

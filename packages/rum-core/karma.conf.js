@@ -30,10 +30,11 @@ module.exports = function(config) {
   const preparedConfig = prepareConfig(config, 'rum-core')
   preparedConfig.files.unshift('test/utils/polyfill.js')
   /**
-   * Common dependencies are hoisted to root node modules
+   * Polyfill Promise since they are used inside the tests
    */
-  preparedConfig.files.unshift(
-    '../../node_modules/es6-promise/dist/es6-promise.auto.js'
+  const promisepolyfill = require.resolve(
+    'es6-promise/dist/es6-promise.auto.js'
   )
+  preparedConfig.files.unshift(promisepolyfill)
   config.set(preparedConfig)
 }
