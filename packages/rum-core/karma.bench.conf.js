@@ -48,9 +48,7 @@ module.exports = function(config) {
   const specPattern = `${BENCHMARKS_DIR}/**/*.bench.js`
   config.set({
     files: [specPattern],
-    preprocessors: {
-      [specPattern]: ['webpack']
-    },
+
     autoWatch: false,
     singleRun: true,
     concurrency: 1,
@@ -85,5 +83,8 @@ module.exports = function(config) {
     }
   })
   const preparedConfig = prepareConfig(config)
+  preparedConfig.preprocessors = {
+    [specPattern]: ['webpack']
+  }
   config.set(preparedConfig)
 }

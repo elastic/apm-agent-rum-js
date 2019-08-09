@@ -23,38 +23,17 @@
  *
  */
 
-const express = require('express')
-const path = require('path')
-const { elasticApmUrl, port } = require('./config')
-const { createReadStream } = require('fs')
-
-const pages = path.join(__dirname, 'pages')
-const dist = path.join(__dirname, '../../dist')
-
-module.exports = function startServer() {
-  return new Promise(resolve => {
-    const app = express()
-
-    app.get('/elastic-apm-rum.js', (req, res) => {
-      createReadStream(
-        path.join(dist, 'bundles/elastic-apm-rum.umd.min.js'),
-        'utf-8'
-      ).pipe(res)
-    })
-
-    app.set('view engine', 'ejs')
-    app.set('views', pages)
-
-    app.get('/basic', (req, res) => {
-      res.render('basic', { elasticApmUrl })
-    })
-    app.get('/heavy', (req, res) => {
-      res.render('heavy', { elasticApmUrl })
-    })
-
-    let server = app.listen(port, () => {
-      console.log(`Server listening at http://localhost:${port}`)
-      resolve(server)
-    })
-  })
+const port = 9000
+module.exports = {
+  scenarios: ['basic', 'heavy'],
+  runs: 3,
+  port,
+  elasticApmUrl: `http://localhost:${port}/elastic-apm-rum.js`,
+  chrome: {
+    samplingInterval: 200,
+    launchOptions: {
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    }
+  }
 }
