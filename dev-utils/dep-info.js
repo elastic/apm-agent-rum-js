@@ -26,30 +26,62 @@
 const { join } = require('path')
 const { readFileSync, writeFileSync, readdirSync } = require('fs')
 
-function getFileContent(directory, filename) {
-  var files = readdirSync(directory)
-  var licenseFile = files.find(f =>
-    f.toLowerCase().startsWith(filename.toLowerCase())
-  )
-  if (licenseFile) {
-    var license = readFileSync(join(directory, licenseFile), 'utf8')
-    return license
-  }
+const ROOT_DIR = join(__dirname, '../')
+const ROOT_NODE_MODULES = join(ROOT_DIR, 'node_modules')
+
+function safeReadDirSync(directory) {
+  let files = []
+  try {
+    files = readdirSync(directory)
+  } catch (_) {}
+  return files
 }
 
-function generateDependencyInfo(deps, modulesPath) {
+function getFileContent(directory, filename) {
+  const files = safeReadDirSync(directory)
+
+  const file = files.find(f =>
+    f.toLowerCase().startsWith(filename.toLowerCase())
+  )
+  let content
+  if (file) {
+    content = readFileSync(join(directory, file), 'utf8')
+  }
+  return content
+}
+
+function generateDependencyInfo(deps, modulesPath, pkgNames) {
   var allLicenses = []
   deps.forEach(d => {
-    var modulePath = join(modulesPath, d)
-    var license = getFileContent(modulePath, 'LICENSE') || rootLicense
-    var dep = {
-      name: d
+    const depModulesPath = join(modulesPath, d)
+    const rootModulesPath = join(ROOT_NODE_MODULES, d)
+
+    const dep = { name: d }
+
+    let license
+    /**
+     * If dependency is one of the internal package itself,
+     * we use the root level license info instead of package level
+     */
+    if (pkgNames.includes(d)) {
+      license = getFileContent(ROOT_DIR, 'LICENSE')
+    } else {
+      /**
+       * Search for both dep/node_modules and root/node_modules
+       * since dep node modules might be hoisted
+       */
+      license =
+        getFileContent(rootModulesPath, 'LICENSE') ||
+        getFileContent(depModulesPath, 'LICENSE')
     }
+
     if (license) {
       dep.license = license
     }
 
-    var notice = getFileContent(modulePath, 'NOTICE')
+    const notice =
+      getFileContent(rootModulesPath, 'NOTICE') ||
+      getFileContent(depModulesPath, 'NOTICE')
     if (notice) {
       dep.notice = notice
     }
@@ -58,52 +90,70 @@ function generateDependencyInfo(deps, modulesPath) {
   return allLicenses
 }
 
-function getInternalPackageNames(packageList, packagesDir) {
-  const internalPackages = []
-  for (const packageName of packageList) {
-    const packageDir = join(packagesDir, packageName)
+function getDependencies(pkgName) {
+  const packageDir = join(ROOT_NODE_MODULES, pkgName)
+  const { dependencies = {} } = JSON.parse(
+    readFileSync(join(packageDir, 'package.json'), 'utf8')
+  )
+  return dependencies
+}
+
+function updateScoreAtEachDep(score, pkgName, pkgNames) {
+  const dependencies = getDependencies(pkgName)
+
+  Object.keys(dependencies).forEach(dep => {
+    if (pkgNames.includes(dep)) {
+      updateScoreAtEachDep(score, dep, pkgNames)
+      score[pkgName] = 1 + score[dep]
+    }
+  })
+
+  return score
+}
+
+function sortPackagesByScore(pkgNames) {
+  const score = {}
+  pkgNames.forEach(pkg => {
+    score[pkg] = 0
+  })
+  for (const pkgName of pkgNames) {
+    updateScoreAtEachDep(score, pkgName, pkgNames)
+  }
+  return Object.keys(score).sort((a, b) => score[a] > score[b])
+}
+
+function mapPkgFolderToDeps(packagesDir) {
+  const packageList = readdirSync(packagesDir)
+  const pkgMap = {}
+
+  packageList.forEach(pkgName => {
+    const packageDir = join(packagesDir, pkgName)
     const { name } = JSON.parse(
       readFileSync(join(packageDir, 'package.json'), 'utf8')
     )
-
-    internalPackages.push(name)
-  }
-
-  return internalPackages
+    pkgMap[name] = pkgName
+  })
+  return pkgMap
 }
 
-function generateNotice(rootDir = '../', packagesDir = 'packages') {
-  /**
-   * Resolve in context of the file
-   */
-  rootDir = join(__dirname, rootDir)
-  packagesDir = join(rootDir, packagesDir)
+function generateNotice(packagesDir = 'packages') {
+  packagesDir = join(ROOT_DIR, packagesDir)
 
-  const packageList = readdirSync(packagesDir).reverse()
+  const pkgMap = mapPkgFolderToDeps(packagesDir)
 
-  const internalPackages = getInternalPackageNames(packageList, packagesDir)
+  const sortedPkgNames = sortPackagesByScore(Object.keys(pkgMap))
 
-  for (const packageName of packageList) {
-    const packageDir = join(packagesDir, packageName)
-    const { dependencies = {}, name } = JSON.parse(
-      readFileSync(join(packageDir, 'package.json'), 'utf8')
-    )
-    /**
-     * For internal packages, we use the root level license info
-     * instead of package level
-     */
-    let rootLicense = ''
-    if (internalPackages.indexOf(name) > -1) {
-      rootLicense = getFileContent(rootDir, 'LICENSE')
-    }
+  for (const pkgName of sortedPkgNames) {
+    const dependencies = getDependencies(pkgName)
+    const pkgFolderDir = join(packagesDir, pkgMap[pkgName])
 
     const depInfo = generateDependencyInfo(
       Object.keys(dependencies),
-      join(packageDir, 'node_modules'),
-      rootLicense
+      join(pkgFolderDir, 'node_modules'),
+      sortedPkgNames
     )
     let allLicenses = `
-${name}
+${pkgName}
 Copyright (c) 2017-present, Elasticsearch BV
 
 `
@@ -118,8 +168,9 @@ ${d.license ? d.license : ''}
 ${d.notice ? d.notice : ''}`
       }
     })
-    writeFileSync(join(packageDir, './NOTICE.txt'), allLicenses)
+    writeFileSync(join(pkgFolderDir, './NOTICE.txt'), allLicenses)
   }
+  console.log('NOTICE.txt file is generated for all packages')
 }
 
 module.exports = {
