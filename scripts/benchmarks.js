@@ -39,8 +39,10 @@ async function getAllBenchmarkResults() {
 
   for (let file of files) {
     try {
-      const benchResults = await pReadFile(file, 'utf-8')
-      const formattedResult = extractFields(JSON.parse(benchResults))
+      const benchmarksFile = await pReadFile(file, 'utf-8')
+      const parsedResults = JSON.parse(benchmarksFile)
+      const { type, summary } = parsedResults
+      const formattedResult = extractFields(summary, type)
       results.push(...formattedResult)
     } catch (err) {
       console.error('Failed to read benchmark from', file, err)
@@ -49,14 +51,15 @@ async function getAllBenchmarkResults() {
   return results
 }
 
-function extractFields(benchResults, type = 'benchmarkjs') {
+function extractFields(benchResults, type) {
   let keysToFilter = []
 
   switch (type) {
     case 'benchmarkjs':
       keysToFilter = ['browser', 'suite', 'name', 'hz', 'unit']
-      benchResults = benchResults.summary
       break
+    case 'eum':
+      keysToFilter = ['browser', 'scenario', 'name', 'mean', 'p90', 'unit']
   }
   const filteredResult = []
 
@@ -79,7 +82,7 @@ function extractFields(benchResults, type = 'benchmarkjs') {
 
 function runBenchmarks() {
   const outputFile = process.argv[2]
-  const lernaProcess = spawn('lerna', ['run', 'karma:bench', '--stream'])
+  const lernaProcess = spawn('lerna', ['run', 'bench', '--stream'])
   lernaProcess.on('close', async () => {
     try {
       const results = await getAllBenchmarkResults()

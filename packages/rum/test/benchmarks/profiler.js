@@ -42,7 +42,8 @@ function gatherRawMetrics(browser, url) {
     await client.send('Page.enable')
     await client.send('Profiler.enable')
     /**
-     * Run the CPU sampler more often to get more samples
+     * Tune the CPU sampler to get control the
+     * number of samples generated
      */
     await client.send('Profiler.setSamplingInterval', {
       interval: chrome.samplingInterval

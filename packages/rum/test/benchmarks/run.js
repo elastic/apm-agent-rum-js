@@ -146,12 +146,22 @@ function calculateResults() {
     server.close()
 
     const results = calculateResults()
-    writeFileSync(
-      join(REPORTS_DIR, 'rum-benchcmarks.json'),
-      JSON.stringify(results)
+
+    console.log(
+      '@elastic/apm-rum benchmarks',
+      JSON.stringify(results, undefined, 2)
     )
 
-    console.log('RUM benchmark results written to disk')
+    const filePath = join(REPORTS_DIR, 'rum-benchmarks.json')
+    writeFileSync(
+      filePath,
+      JSON.stringify({
+        type: 'eum',
+        summary: results
+      })
+    )
+
+    console.log('RUM benchmark results written to disk', filePath)
   } catch (e) {
     console.error('Error running RUM benchmark script', e)
   }

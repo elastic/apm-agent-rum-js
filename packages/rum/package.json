@@ -28,7 +28,8 @@
     "test:e2e:failsafe": "npm run script runE2eTests packages/rum/wdio-failsafe.conf.js",
     "test:sauce": "npm run script runSauceTests packages/rum true test:unit test:e2e:supported test:e2e:failsafe",
     "test": "npm-run-all build build:e2e test:node test:integration test:sauce",
-    "tdd": "karma start --auto-watch --restartOnFileChange"
+    "tdd": "karma start --auto-watch --restartOnFileChange",
+    "bench": "node test/benchmarks/run.js"
   },
   "files": [
     "src",

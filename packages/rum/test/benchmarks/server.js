@@ -31,6 +31,16 @@ const { createReadStream } = require('fs')
 const pages = path.join(__dirname, 'pages')
 const dist = path.join(__dirname, '../../dist')
 
+function generateImageUrls() {
+  const number = 30
+  const path = `http://localhost:${port}`
+  const urls = []
+  for (let i = 0; i < number; i++) {
+    urls.push(`${path}/images/${i}.png`)
+  }
+  return urls
+}
+
 module.exports = function startServer() {
   return new Promise(resolve => {
     const app = express()
@@ -41,6 +51,12 @@ module.exports = function startServer() {
         'utf-8'
       ).pipe(res)
     })
+    /**
+     * Generate empty responses to test payload size
+     */
+    app.get('/images*', (req, res) => {
+      res.end()
+    })
 
     app.set('view engine', 'ejs')
     app.set('views', pages)
@@ -49,7 +65,8 @@ module.exports = function startServer() {
       res.render('basic', { elasticApmUrl })
     })
     app.get('/heavy', (req, res) => {
-      res.render('heavy', { elasticApmUrl })
+      const images = generateImageUrls()
+      res.render('heavy', { elasticApmUrl, images })
     })
 
     let server = app.listen(port, () => {
