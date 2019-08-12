@@ -9,7 +9,7 @@
   },
   "scripts": {
     "version": "node scripts/prompt-release",
-    "prerelease": "npm test",
+    "prerelease": "npm test && npm run clean",
     "release": "lerna publish && npm run github-release",
     "release-package": "node scripts/publish-package",
     "github-release": "node scripts/github-release",
@@ -21,7 +21,8 @@
     "bundlesize": "lerna run bundlesize --stream",
     "serve": "node ./dev-utils/run-script.js startTestServers",
     "coverage": "lerna run build:main && lerna run karma:coverage --stream",
-    "bench:dev": "node ./scripts/benchmarks.js"
+    "bench:dev": "node ./scripts/benchmarks.js",
+    "clean": "npx lerna exec -- rm -rf dist/"
   },
   "lint-staged": {
     "*.{js,jsx}": [
