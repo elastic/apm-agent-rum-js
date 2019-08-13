@@ -25,100 +25,12 @@
 
 const { join } = require('path')
 const { writeFileSync } = require('fs')
-const stats = require('stats-lite')
 const { gatherRawMetrics, launchBrowser } = require('./profiler')
-const { runs, port, scenarios, elasticApmUrl } = require('./config')
+const { analyzeMetrics, calculateResults } = require('./analyzer')
+const { runs, port, scenarios } = require('./config')
 const startServer = require('./server')
 
 const REPORTS_DIR = join(__dirname, '../../reports')
-
-const resultMap = new Map()
-
-function getFromEntries(entries, name, key) {
-  entries = JSON.parse(entries)
-  return entries
-    .filter(entry => entry.name === name)
-    .map(entry => entry[key])[0]
-}
-
-function getUnit(metricName) {
-  let unit = 'ms'
-  if (metricName.indexOf('size') >= 0) {
-    unit = 'bytes'
-  }
-  return unit
-}
-
-async function analyzeMetrics(metric) {
-  const {
-    cpu,
-    payload,
-    navigation,
-    measure,
-    resource,
-    url,
-    browser,
-    scenario
-  } = metric
-
-  const loadTime =
-    getFromEntries(navigation, url, 'loadEventEnd') -
-    getFromEntries(navigation, url, 'fetchStart')
-  const initializationTime = getFromEntries(measure, 'init', 'duration')
-  const bundleSize = getFromEntries(resource, elasticApmUrl, 'transferSize')
-
-  /**
-   * Analysis of each run
-   */
-  const analysis = {
-    'page-load-time': loadTime,
-    'rum-init-time': initializationTime,
-    'total-cpu-time': cpu.cpuTime,
-    'rum-cpu-time': cpu.cpuTimeFiltered,
-    'payload-size': payload.size,
-    'bundle-size': bundleSize
-  }
-
-  /**
-   * Accumulate result of each run in the corresponding scenario
-   */
-  Object.keys(analysis).forEach(key => {
-    const mapKey = `${scenario}-${key}`
-
-    if (!resultMap.has(mapKey)) {
-      resultMap.set(mapKey, {
-        value: [analysis[key]],
-        url,
-        browser,
-        scenario,
-        name: key
-      })
-    } else {
-      resultMap.get(mapKey).value.push(analysis[key])
-    }
-  })
-}
-
-function calculateResults() {
-  const results = []
-  for (let obj of resultMap.values()) {
-    const { name, value, browser, scenario, url } = obj
-    const mean = stats.mean(value)
-    const p90 = stats.percentile(value, 90)
-
-    results.push({
-      scenario,
-      name,
-      mean,
-      browser,
-      url,
-      p90,
-      unit: getUnit(name)
-    })
-  }
-
-  return results
-}
 
 !(async function run() {
   try {

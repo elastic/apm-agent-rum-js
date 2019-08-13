@@ -31,8 +31,7 @@ const { createReadStream } = require('fs')
 const pages = path.join(__dirname, 'pages')
 const dist = path.join(__dirname, '../../dist')
 
-function generateImageUrls() {
-  const number = 30
+function generateImageUrls(number) {
   const path = `http://localhost:${port}`
   const urls = []
   for (let i = 0; i < number; i++) {
@@ -41,11 +40,18 @@ function generateImageUrls() {
   return urls
 }
 
+/**
+ * Avoid APM Script HTTP and Disk Cache in chrome
+ */
+function cacheBurstUrl(url) {
+  return url + '?' + Date.now()
+}
+
 module.exports = function startServer() {
   return new Promise(resolve => {
     const app = express()
 
-    app.get('/elastic-apm-rum.js', (req, res) => {
+    app.get('/elastic-apm-rum.js*', (req, res) => {
       createReadStream(
         path.join(dist, 'bundles/elastic-apm-rum.umd.min.js'),
         'utf-8'
@@ -62,11 +68,16 @@ module.exports = function startServer() {
     app.set('views', pages)
 
     app.get('/basic', (req, res) => {
-      res.render('basic', { elasticApmUrl })
+      res.setHeader('cache-control', 'no-cache, no-store, must-revalidate')
+      const bundleUrl = cacheBurstUrl(elasticApmUrl)
+      res.render('basic', { elasticApmUrl: bundleUrl })
     })
+
     app.get('/heavy', (req, res) => {
-      const images = generateImageUrls()
-      res.render('heavy', { elasticApmUrl, images })
+      res.setHeader('cache-control', 'no-cache, no-store, must-revalidate')
+      const images = generateImageUrls(30)
+      const bundleUrl = cacheBurstUrl(elasticApmUrl)
+      res.render('heavy', { elasticApmUrl: bundleUrl, images })
     })
 
     let server = app.listen(port, () => {

@@ -30,7 +30,14 @@ module.exports = {
   port,
   elasticApmUrl: `http://localhost:${port}/elastic-apm-rum.js`,
   chrome: {
-    samplingInterval: 200,
+    /**
+     * By default the CPU samples are taken at 1000 microseconds, To get
+     * more samples in each run within page-load event, we have to tune it so that
+     * number of samples are more than 50 to get clear idea of the overall profile
+     *
+     * https://chromedevtools.github.io/devtools-protocol/tot/Profiler#method-setSamplingInterval
+     */
+    cpuSamplingInterval: 200,
     launchOptions: {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']

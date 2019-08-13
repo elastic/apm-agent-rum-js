@@ -24,8 +24,8 @@
  */
 
 const puppeteer = require('puppeteer')
-const cpuprofile = require('cpuprofile-filter')
-const { chrome, elasticApmUrl } = require('./config')
+const { chrome } = require('./config')
+const { filterCpuMetrics, capturePayloadInfo } = require('./analyzer')
 
 async function launchBrowser() {
   return await puppeteer.launch(chrome.launchOptions)
@@ -46,20 +46,28 @@ function gatherRawMetrics(browser, url) {
      * number of samples generated
      */
     await client.send('Profiler.setSamplingInterval', {
-      interval: chrome.samplingInterval
+      interval: chrome.cpuSamplingInterval
     })
 
     /**
      * Result metrics that will be filled at various
-     * time throught the page lifecycle
+     * time throughout the page lifecycle
      */
     let metrics = {}
 
-    page.on('request', request => {
+    page.on('request', async request => {
       const url = request.url()
       if (url.indexOf('/intake/v2/rum/events') >= 0) {
-        const size = request.postData().length
-        metrics.payload = { size }
+        /**
+         * Stop the profiler once we post the transaction to
+         * the apm server
+         */
+        const result = await client.send('Profiler.stop')
+        const filteredCpuMetrics = filterCpuMetrics(result.profile)
+        const response = request.postData()
+        const payload = capturePayloadInfo(response)
+
+        Object.assign(metrics, { cpu: filteredCpuMetrics, payload })
         /**
          * Resolve the promise once we measure the size
          * of the payload to APM Server
@@ -69,13 +77,6 @@ function gatherRawMetrics(browser, url) {
     })
 
     client.on('Page.loadEventFired', async function() {
-      const result = await client.send('Profiler.stop')
-
-      const filteredCpuMetrics = cpuprofile.filter(result.profile, {
-        files: [elasticApmUrl]
-      })
-      Object.assign(metrics, { cpu: filteredCpuMetrics })
-
       const timings = await page.evaluate(() => {
         // Serializing the outputs otherwise it will be undefined
         return {
