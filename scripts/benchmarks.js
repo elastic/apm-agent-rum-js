@@ -59,14 +59,19 @@ function extractFields(benchResults, type) {
       keysToFilter = ['browser', 'suite', 'name', 'hz', 'unit']
       break
     case 'eum':
-      keysToFilter = ['browser', 'scenario', 'name', 'mean', 'p90', 'unit']
+      keysToFilter = '*'
   }
   const filteredResult = []
 
   for (let result of benchResults) {
     filteredResult.push(
       Object.keys(result)
-        .filter(key => keysToFilter.includes(key))
+        .filter(key => {
+          if (keysToFilter === '*') {
+            return !!key
+          }
+          return keysToFilter.includes(key)
+        })
         .reduce(
           (obj, key) => ({
             ...obj,
@@ -112,12 +117,23 @@ function runBenchmarks() {
           agentName: 'rum-js'
         }
       }
+
+      let resultObj = {}
+      for (let result of results) {
+        const metricKey = result.name || result.scenario
+        resultObj[metricKey] = result
+      }
+
+      const output = Object.assign({}, baseOutput, {
+        metrics: resultObj,
+        '@timestamp': Date.now()
+      })
+
       /**
        * DEV - show the results in the terminal
        * CI - store the results in file and upload to ES
        */
       if (!outputFile) {
-        const output = Object.assign({}, baseOutput, { results })
         console.log(JSON.stringify(output, undefined, 2))
         return
       }
@@ -127,15 +143,6 @@ function runBenchmarks() {
        */
       let ndJSONOutput =
         '{"index": { "_index": "benchmarks-rum-js", "_type": "_doc"}}' + '\n'
-      let resultObj = {}
-      for (let result of results) {
-        resultObj[result.name] = result
-      }
-
-      const output = Object.assign({}, baseOutput, {
-        metrics: resultObj,
-        '@timestamp': Date.now()
-      })
       ndJSONOutput += JSON.stringify(output)
 
       const outputPath = join(PKG_DIR, outputFile)

@@ -27,12 +27,10 @@ const cpuprofile = require('cpuprofile-filter')
 const stats = require('stats-lite')
 const { elasticApmUrl } = require('./config')
 
-const resultMap = new Map()
-
 function getFromEntries(entries, name, key) {
   entries = JSON.parse(entries)
   return entries
-    .filter(entry => entry.name === name)
+    .filter(entry => entry.name.indexOf(name) !== -1)
     .map(entry => entry[key])[0]
 }
 
@@ -40,21 +38,14 @@ function getUnit(metricName) {
   let unit = 'ms'
   if (metricName.indexOf('size') >= 0) {
     unit = 'bytes'
+  } else if (metricName === 'transactions' || metricName === 'spans') {
+    unit = 'count'
   }
   return unit
 }
 
-async function analyzeMetrics(metric) {
-  const {
-    cpu,
-    payload,
-    navigation,
-    measure,
-    resource,
-    url,
-    browser,
-    scenario
-  } = metric
+async function analyzeMetrics(metric, resultMap) {
+  const { cpu, payload, navigation, measure, resource, url, scenario } = metric
 
   const loadTime =
     getFromEntries(navigation, url, 'loadEventEnd') -
@@ -71,6 +62,8 @@ async function analyzeMetrics(metric) {
     'total-cpu-time': cpu.cpuTime,
     'rum-cpu-time': cpu.cpuTimeFiltered,
     'payload-size': payload.size,
+    transactions: payload.transactions,
+    spans: payload.spans,
     'bundle-size': bundleSize
   }
 
@@ -78,40 +71,35 @@ async function analyzeMetrics(metric) {
    * Accumulate result of each run in the corresponding scenario
    */
   Object.keys(analysis).forEach(key => {
-    const mapKey = `${scenario}-${key}`
-
-    if (!resultMap.has(mapKey)) {
-      resultMap.set(mapKey, {
-        value: [analysis[key]],
-        url,
-        browser,
-        scenario,
-        name: key
-      })
-    } else {
-      resultMap.get(mapKey).value.push(analysis[key])
+    const metricObj = resultMap.get(scenario)
+    if (!metricObj[key]) {
+      metricObj[key] = []
     }
+    metricObj[key].push(analysis[key])
   })
 }
 
-function calculateResults() {
+function calculateResults(resultMap) {
   const results = []
-  for (let obj of resultMap.values()) {
-    const { name, value, browser, scenario, url } = obj
-    const mean = stats.mean(value)
-    const p90 = stats.percentile(value, 90)
-
-    results.push({
-      scenario,
-      name,
-      mean,
-      browser,
-      url,
-      p90,
-      unit: getUnit(name)
+  for (let metricObj of resultMap.values()) {
+    let result = {}
+    Object.keys(metricObj).forEach(metricName => {
+      const value = metricObj[metricName]
+      /**
+       * deal with common data points
+       */
+      if (!Array.isArray(value)) {
+        result[metricName] = value
+      } else {
+        const unit = getUnit(metricName)
+        const mean = stats.mean(value)
+        const p90 = stats.percentile(value, 90)
+        result[`${metricName}.mean.${unit}`] = mean
+        result[`${metricName}.p90.${unit}`] = p90
+      }
     })
+    results.push(result)
   }
-
   return results
 }
 
@@ -143,9 +131,9 @@ function capturePayloadInfo(payload) {
    * the test, so hard coding number of transaction to 1
    */
   return {
-    transaction: 1,
+    transactions: 1,
     spans: started,
-    size: payload.size
+    size: payload.length
   }
 }
 

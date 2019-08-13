@@ -35,29 +35,37 @@ const REPORTS_DIR = join(__dirname, '../../reports')
 !(async function run() {
   try {
     const server = await startServer()
-    const browser = await launchBrowser()
+    /**
+     * object cache holding the metrics accumlated in each run and
+     * helps in processing the overall results
+     */
+    const resultMap = new Map()
 
     for (let scenario of scenarios) {
+      const browser = await launchBrowser()
       const url = `http://localhost:${port}/${scenario}`
       const version = await browser.version()
+
+      /**
+       * Add common set of metrics for all scenarios
+       */
+      resultMap.set(scenario, {
+        browser: version,
+        url,
+        runs,
+        scenario
+      })
       for (let i = 0; i < runs; i++) {
         const metrics = await gatherRawMetrics(browser, url)
-        /**
-         * Add common set of metrics for all scenarios
-         */
-        Object.assign(metrics, {
-          url,
-          browser: version,
-          scenario
-        })
-        await analyzeMetrics(metrics)
+        Object.assign(metrics, { scenario, url })
+        await analyzeMetrics(metrics, resultMap)
       }
+      await browser.close()
     }
 
-    await browser.close()
     server.close()
 
-    const results = calculateResults()
+    const results = calculateResults(resultMap)
 
     console.log(
       '@elastic/apm-rum benchmarks',
