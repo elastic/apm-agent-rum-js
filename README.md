@@ -12,7 +12,7 @@
 This is the official Real User Monitoring JavaScript agent.
 
 ## Documentation
-You can find our documentation [on our website](https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html).
+You can find our documentation [on our website](https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html).
 
 If you are interested in contributing to Elastic APM JavaScript agent, please see [our contributing guide](CONTRIBUTING.md).
 
