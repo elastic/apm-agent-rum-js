@@ -5,7 +5,7 @@ This is the core JavaScript module for Elastic APM.
 **Only use this package if you want to implement an integration for a framework that Elastic APM does not support yet.**
 
 ## Documentation
-You can find our documentation [on our website](https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html).
+You can find our documentation [on our website](https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html).
 
 If you are interested in contributing to Elastic APM JavaScript agent, please see [our contributing guide](CONTRIBUTING.md).
 

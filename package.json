@@ -37,7 +37,7 @@
   },
   "author": "",
   "license": "MIT",
-  "homepage": "https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html",
+  "homepage": "https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html",
   "devDependencies": {
     "@babel/cli": "^7.4.3",
     "@babel/core": "^7.2.0",
