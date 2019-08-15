@@ -1,0 +1,10 @@
+<script>
+  function initScript() {
+    performance.mark('init-start')
+    window.elasticApm.init({
+      serviceName: 'eum-benchmarks'
+    })
+    performance.measure('init', 'init-start')
+  }
+  initScript()
+</script>
