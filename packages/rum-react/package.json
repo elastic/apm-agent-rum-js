@@ -3,7 +3,7 @@
   "version": "0.2.2",
   "description": "Elastic APM Real User Monitoring for React applications",
   "author": "Hamid <h.jahtalab@gmail.com>",
-  "homepage": "https://www.elastic.co/guide/en/apm/agent/js-base/current/index.html",
+  "homepage": "https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html",
   "license": "MIT",
   "main": "dist/lib/index.js",
   "module": "dist/es/index.js",
