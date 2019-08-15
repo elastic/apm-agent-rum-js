@@ -48,9 +48,7 @@ module.exports = function(config) {
   const specPattern = `${BENCHMARKS_DIR}/**/*.bench.js`
   config.set({
     files: [specPattern],
-    preprocessors: {
-      [specPattern]: ['webpack']
-    },
+
     autoWatch: false,
     singleRun: true,
     concurrency: 1,
@@ -79,11 +77,17 @@ module.exports = function(config) {
             }
           }
         )
-        console.log(JSON.stringify(summary, undefined, 2))
-        return { summary }
+        console.log(
+          '@elastic/apm-rum-core benchmarks',
+          JSON.stringify(summary, undefined, 2)
+        )
+        return { type: 'benchmarkjs', summary }
       }
     }
   })
   const preparedConfig = prepareConfig(config)
+  preparedConfig.preprocessors = {
+    [specPattern]: ['webpack']
+  }
   config.set(preparedConfig)
 }
