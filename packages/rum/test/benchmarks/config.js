@@ -27,7 +27,7 @@ const port = 9000
 module.exports = {
   scenarios: ['basic', 'heavy'],
   runs: 3,
-  imageCount: 30,
+  noOfImages: 30,
   port,
   chrome: {
     /**

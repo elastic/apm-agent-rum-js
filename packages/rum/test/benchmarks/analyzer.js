@@ -28,7 +28,7 @@ const stats = require('stats-lite')
 const { readFileSync } = require('fs')
 const path = require('path')
 const zlib = require('zlib')
-const { runs } = require('./config')
+const { runs, noOfImages } = require('./config')
 
 const dist = path.join(__dirname, '../../dist')
 
@@ -42,7 +42,7 @@ function getMinifiedApmBundle() {
 function getApmBundleSize() {
   const content = getMinifiedApmBundle()
   /**
-   * To match the level with our bub
+   * To match the level with our bundlesize check
    */
   const gzippedContent = zlib.gzipSync(content, {
     level: 9
@@ -61,6 +61,7 @@ function getCommonFields({ version, url, scenario }) {
     'parameters.browser': version,
     'parameters.url': url,
     'parameters.runs': runs,
+    'parameters.images': scenario === 'heavy' ? noOfImages : 0,
     'bundle-size.minified.bytes': minified,
     'bundle-size.gzip.bytes': gzip
   }

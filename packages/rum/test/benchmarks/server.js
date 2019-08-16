@@ -25,15 +25,15 @@
 
 const express = require('express')
 const path = require('path')
-const { port, imageCount } = require('./config')
+const { port, noOfImages } = require('./config')
 const { getMinifiedApmBundle } = require('./analyzer')
 
 const pages = path.join(__dirname, 'pages')
 
-function generateImageUrls() {
+function generateImageUrls(port, number) {
   const path = `http://localhost:${port}`
   const urls = []
-  for (let i = 0; i < imageCount; i++) {
+  for (let i = 0; i < number; i++) {
     urls.push(`${path}/images/${i}.png`)
   }
   return urls
@@ -55,14 +55,14 @@ const APM_BUNDLE = getMinifiedApmBundle()
  */
 function getRandomBundleContent() {
   let content = APM_BUNDLE
-  content += `var script = ${Date.now()};`
+  content += `var scriptId = ${Date.now()};`
   return content
 }
 
 module.exports = function startServer() {
   return new Promise(resolve => {
     const app = express()
-
+    let server
     /**
      * Generate empty responses to test payload size
      */
@@ -80,14 +80,15 @@ module.exports = function startServer() {
 
     app.get('/heavy', (req, res) => {
       res.setHeader('cache-control', 'no-cache, no-store, must-revalidate')
-      const images = generateImageUrls()
+      const { port } = server.address()
+      const images = generateImageUrls(port, noOfImages)
       res.render('heavy', {
         apmBundleContent: getRandomBundleContent(),
         images
       })
     })
 
-    let server = app.listen(port, () => {
+    server = app.listen(port, () => {
       console.log(`Server listening at http://localhost:${port}`)
       resolve(server)
     })
