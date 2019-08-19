@@ -56,14 +56,14 @@ function gatherRawMetrics(browser, url) {
     let metrics = {}
 
     page.on('request', async request => {
-      const url = request.url()
-      if (url.indexOf('/intake/v2/rum/events') >= 0) {
+      const requestUrl = request.url()
+      if (requestUrl.indexOf('/intake/v2/rum/events') >= 0) {
         /**
          * Stop the profiler once we post the transaction to
          * the apm server
          */
         const result = await client.send('Profiler.stop')
-        const filteredCpuMetrics = filterCpuMetrics(result.profile)
+        const filteredCpuMetrics = filterCpuMetrics(result.profile, url)
         const response = request.postData()
         const payload = capturePayloadInfo(response)
 
