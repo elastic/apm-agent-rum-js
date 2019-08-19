@@ -27,8 +27,8 @@ const port = 9000
 module.exports = {
   scenarios: ['basic', 'heavy'],
   runs: 3,
+  noOfImages: 30,
   port,
-  elasticApmUrl: `http://localhost:${port}/elastic-apm-rum.js`,
   chrome: {
     /**
      * By default the CPU samples are taken at 1000 microseconds, To get

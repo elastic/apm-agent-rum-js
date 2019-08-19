@@ -25,7 +25,47 @@
 
 const cpuprofile = require('cpuprofile-filter')
 const stats = require('stats-lite')
-const { elasticApmUrl } = require('./config')
+const { readFileSync } = require('fs')
+const path = require('path')
+const zlib = require('zlib')
+const { runs, noOfImages } = require('./config')
+
+const dist = path.join(__dirname, '../../dist')
+
+function getMinifiedApmBundle() {
+  return readFileSync(
+    path.join(dist, 'bundles/elastic-apm-rum.umd.min.js'),
+    'utf-8'
+  )
+}
+
+function getApmBundleSize() {
+  const content = getMinifiedApmBundle()
+  /**
+   * To match the level with our bundlesize check
+   */
+  const gzippedContent = zlib.gzipSync(content, {
+    level: 9
+  })
+
+  return {
+    minified: content.length,
+    gzip: gzippedContent.length
+  }
+}
+
+function getCommonFields({ version, url, scenario }) {
+  const { minified, gzip } = getApmBundleSize()
+  return {
+    scenario,
+    'parameters.browser': version,
+    'parameters.url': url,
+    'parameters.runs': runs,
+    'parameters.images': scenario === 'heavy' ? noOfImages : 0,
+    'bundle-size.minified.bytes': minified,
+    'bundle-size.gzip.bytes': gzip
+  }
+}
 
 function getFromEntries(entries, name, key) {
   entries = JSON.parse(entries)
@@ -45,13 +85,17 @@ function getUnit(metricName) {
 }
 
 async function analyzeMetrics(metric, resultMap) {
-  const { cpu, payload, navigation, measure, resource, url, scenario } = metric
+  const { cpu, payload, navigation, measure, url, scenario } = metric
 
   const loadTime =
     getFromEntries(navigation, url, 'loadEventEnd') -
     getFromEntries(navigation, url, 'fetchStart')
   const initializationTime = getFromEntries(measure, 'init', 'duration')
-  const bundleSize = getFromEntries(resource, elasticApmUrl, 'transferSize')
+  const parseAndExecTime = getFromEntries(
+    measure,
+    'parse-and-execute',
+    'duration'
+  )
 
   /**
    * Analysis of each run
@@ -59,12 +103,12 @@ async function analyzeMetrics(metric, resultMap) {
   const analysis = {
     'page-load-time': loadTime,
     'rum-init-time': initializationTime,
+    'parse-and-execute-time': parseAndExecTime,
     'total-cpu-time': cpu.cpuTime,
     'rum-cpu-time': cpu.cpuTimeFiltered,
     'payload-size': payload.size,
     transactions: payload.transactions,
-    spans: payload.spans,
-    'bundle-size': bundleSize
+    spans: payload.spans
   }
 
   /**
@@ -103,9 +147,9 @@ function calculateResults(resultMap) {
   return results
 }
 
-function filterCpuMetrics(profile) {
+function filterCpuMetrics(profile, url) {
   return cpuprofile.filter(profile, {
-    files: [elasticApmUrl]
+    files: [url]
   })
 }
 
@@ -141,5 +185,8 @@ module.exports = {
   analyzeMetrics,
   calculateResults,
   filterCpuMetrics,
-  capturePayloadInfo
+  capturePayloadInfo,
+  getMinifiedApmBundle,
+  getApmBundleSize,
+  getCommonFields
 }

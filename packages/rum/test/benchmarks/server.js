@@ -25,13 +25,12 @@
 
 const express = require('express')
 const path = require('path')
-const { elasticApmUrl, port } = require('./config')
-const { createReadStream } = require('fs')
+const { port, noOfImages } = require('./config')
+const { getMinifiedApmBundle } = require('./analyzer')
 
 const pages = path.join(__dirname, 'pages')
-const dist = path.join(__dirname, '../../dist')
 
-function generateImageUrls(number) {
+function generateImageUrls(port, number) {
   const path = `http://localhost:${port}`
   const urls = []
   for (let i = 0; i < number; i++) {
@@ -41,22 +40,29 @@ function generateImageUrls(number) {
 }
 
 /**
- * Avoid APM Script HTTP and Disk Cache in chrome
+ * Strip license and sourcemap url
  */
-function cacheBurstUrl(url) {
-  return url + '?' + Date.now()
+const APM_BUNDLE = getMinifiedApmBundle()
+  .replace(
+    '/*! For license information please see elastic-apm-rum.umd.min.js.LICENSE */',
+    ''
+  )
+  .replace('//# sourceMappingURL=elastic-apm-rum.umd.min.js.map', '')
+
+/**
+ * Adding a random value at the end of the script text prevents
+ * Chrome from caching the parsed/JITed script
+ */
+function getRandomBundleContent() {
+  let content = APM_BUNDLE
+  content += `var scriptId = ${Date.now()};`
+  return content
 }
 
 module.exports = function startServer() {
   return new Promise(resolve => {
     const app = express()
-
-    app.get('/elastic-apm-rum.js*', (req, res) => {
-      createReadStream(
-        path.join(dist, 'bundles/elastic-apm-rum.umd.min.js'),
-        'utf-8'
-      ).pipe(res)
-    })
+    let server
     /**
      * Generate empty responses to test payload size
      */
@@ -69,18 +75,20 @@ module.exports = function startServer() {
 
     app.get('/basic', (req, res) => {
       res.setHeader('cache-control', 'no-cache, no-store, must-revalidate')
-      const bundleUrl = cacheBurstUrl(elasticApmUrl)
-      res.render('basic', { elasticApmUrl: bundleUrl })
+      res.render('basic', { apmBundleContent: getRandomBundleContent() })
     })
 
     app.get('/heavy', (req, res) => {
       res.setHeader('cache-control', 'no-cache, no-store, must-revalidate')
-      const images = generateImageUrls(30)
-      const bundleUrl = cacheBurstUrl(elasticApmUrl)
-      res.render('heavy', { elasticApmUrl: bundleUrl, images })
+      const { port } = server.address()
+      const images = generateImageUrls(port, noOfImages)
+      res.render('heavy', {
+        apmBundleContent: getRandomBundleContent(),
+        images
+      })
     })
 
-    let server = app.listen(port, () => {
+    server = app.listen(port, () => {
       console.log(`Server listening at http://localhost:${port}`)
       resolve(server)
     })

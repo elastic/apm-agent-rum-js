@@ -26,7 +26,11 @@
 const { join } = require('path')
 const { writeFileSync } = require('fs')
 const { gatherRawMetrics, launchBrowser } = require('./profiler')
-const { analyzeMetrics, calculateResults } = require('./analyzer')
+const {
+  analyzeMetrics,
+  calculateResults,
+  getCommonFields
+} = require('./analyzer')
 const { runs, port, scenarios } = require('./config')
 const startServer = require('./server')
 
@@ -49,12 +53,8 @@ const REPORTS_DIR = join(__dirname, '../../reports')
       /**
        * Add common set of metrics for all scenarios
        */
-      resultMap.set(scenario, {
-        browser: version,
-        url,
-        runs,
-        scenario
-      })
+      resultMap.set(scenario, getCommonFields({ version, url, scenario }))
+
       for (let i = 0; i < runs; i++) {
         const metrics = await gatherRawMetrics(browser, url)
         Object.assign(metrics, { scenario, url })
