@@ -21,7 +21,10 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build:main",
-    "build:main": "npx babel src -d dist/lib -x '.ts'"
+    "build:main": "npx babel src -d dist/lib -x '.ts'",
+    "test:unit": "node ../../dev-utils/run-script.js runUnitTests packages/rum-angular",
+    "test": "npm run test:unit",
+    "karma:dev": "karma start --auto-watch --restartOnFileChange"
   },
   "dependencies": {
     "@elastic/apm-rum": "file:../rum"

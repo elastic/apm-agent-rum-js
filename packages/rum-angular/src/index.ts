@@ -49,17 +49,27 @@ export class ApmService {
   }
 
   observe() {
-    let transaction = null
+    let transaction
     this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationStart) {
         const name = event.url
         transaction = apm.startTransaction(name, 'route-change', {
           canReuse: true
         })
-      } else if (event instanceof NavigationEnd) {
-        transaction && transaction.detectFinish()
       } else if (event instanceof NavigationError) {
         transaction && transaction.detectFinish()
+      } else if (event instanceof NavigationEnd) {
+        if (transaction) {
+          /**
+           * If there are any redirects, take care of changing the
+           * transaction name on Navigation End
+           */
+          const { url, urlAfterRedirects } = event
+          if (url !== urlAfterRedirects) {
+            transaction.name = urlAfterRedirects
+          }
+          transaction.detectFinish()
+        }
       }
     })
   }

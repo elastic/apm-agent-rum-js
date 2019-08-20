@@ -151,7 +151,7 @@ function getWebpackConfig(bundleType, packageType) {
     module: {
       rules: [
         {
-          test: /\.(js|jsx)$/,
+          test: /\.(js|jsx|ts)$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
           options: getBabelConfig(bundleType, packageType)
@@ -161,7 +161,7 @@ function getWebpackConfig(bundleType, packageType) {
     mode: isEnvProduction ? 'production' : 'development',
     plugins: [new EnvironmentPlugin(getWebpackEnv())],
     resolve: {
-      extensions: ['.js', '.jsx']
+      extensions: ['.js', '.jsx', '.ts']
     }
   }
 

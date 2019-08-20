@@ -1,0 +1,124 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2017-present, Elasticsearch BV
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
+import '../polyfill'
+import { ApmService } from '../../src'
+import { TestBed, ComponentFixture } from '@angular/core/testing'
+import { RouterTestingModule } from '@angular/router/testing'
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing'
+import { Component } from '@angular/core'
+import { Location } from '@angular/common'
+import { Routes, Router } from '@angular/router'
+import { apm } from '@elastic/apm-rum'
+
+@Component({
+  template: 'Home'
+})
+class HomeComponent {}
+
+@Component({
+  template: '<router-outlet></router-outlet>'
+})
+class AppComponent {}
+
+const routes: Routes = [
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent }
+]
+
+describe('ApmService', () => {
+  let service: ApmService
+  let router: Router
+  let location: Location
+  let fixture: ComponentFixture<AppComponent>
+  let compiled: HTMLElement
+
+  TestBed.initTestEnvironment(
+    BrowserDynamicTestingModule,
+    platformBrowserDynamicTesting()
+  )
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [RouterTestingModule.withRoutes(routes)],
+      declarations: [HomeComponent, AppComponent],
+      providers: [ApmService]
+    })
+
+    service = TestBed.get(ApmService)
+    router = TestBed.get(Router)
+    location = TestBed.get(Location)
+
+    /**
+     * Inject router manually
+     */
+    service.router = router
+    service.observe()
+
+    fixture = TestBed.createComponent(AppComponent)
+    compiled = fixture.debugElement.nativeElement
+    fixture.ngZone.run(() => {
+      router.initialNavigation()
+    })
+  })
+
+  it('navigate to "/home" should create /home transaction', done => {
+    spyOn(apm, 'startTransaction')
+    fixture.ngZone.run(() => {
+      router.navigate(['/home']).then(() => {
+        expect(location.path()).toBe('/home')
+        expect(compiled.querySelector('ng-component').textContent).toBe('Home')
+        expect(apm.startTransaction).toHaveBeenCalledWith(
+          '/home',
+          'route-change',
+          {
+            canReuse: true
+          }
+        )
+        done()
+      })
+    })
+  })
+
+  it('should set transaction name properly on redirects', done => {
+    spyOn(apm, 'startTransaction').and.callThrough()
+    const tr = apm.getCurrentTransaction()
+    fixture.ngZone.run(() => {
+      router.navigate(['/']).then(() => {
+        expect(location.path()).toBe('/home')
+        expect(compiled.querySelector('ng-component').textContent).toBe('Home')
+        expect(apm.startTransaction).toHaveBeenCalledWith('/', 'route-change', {
+          canReuse: true
+        })
+        expect(tr.name).toEqual('/home')
+
+        done()
+      })
+    })
+  })
+})
