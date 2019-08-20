@@ -126,7 +126,7 @@ you will need to configure Cross-Origin Resource Sharing (CORS).
 To configure CORS, simply:
 
 1. {apm-server-ref-v}/configuration-rum.html[Enable RUM support] in APM Server.
-2. Adjust the {apm-server-ref-v}/configuration-rum.html#_literal_allow_origins_literal[`apm-server.rum.allow_origins`] configuration.
+2. Adjust the {apm-server-ref-v}/configuration-rum.html#rum-allow-origins[`apm-server.rum.allow_origins`] configuration.
 By default, APM Server allows all origins.
 
 [float]
