@@ -31,7 +31,7 @@ const {
   createTracer
 } = require('@elastic/apm-rum/dist/lib/opentracing')
 
-describe('opentracing build', () => {
+describe('opentracing', () => {
   it('should have default and named exports', () => {
     expect(opentracing.default).toEqual(jasmine.any(Function))
     expect(createTracer).toEqual(jasmine.any(Function))
