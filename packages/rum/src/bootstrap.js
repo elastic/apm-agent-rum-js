@@ -37,7 +37,11 @@ export default function bootstrap() {
   if (isPlatformSupported()) {
     patchAll()
     enabled = true
-  } else {
+  } else if (typeof window !== 'undefined') {
+    /**
+     * Print this error message only on the browser console
+     * on unsupported browser versions
+     */
     console.log('APM: Platform is not supported!')
   }
 

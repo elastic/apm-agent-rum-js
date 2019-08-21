@@ -42,6 +42,22 @@ describe('index', function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
+  it('should log only on browser environments', () => {
+    // Pass unsupported check
+    const nowFn = window.performance.now
+    window.performance.now = undefined
+
+    spyOn(console, 'log')
+
+    delete require.cache[require.resolve('../../src/')]
+    delete require.cache[require.resolve('../../src/bootstrap')]
+    require('../../src/')
+
+    expect(console.log).toHaveBeenCalledWith('APM: Platform is not supported!')
+
+    window.performance.now = nowFn
+  })
+
   it('should init ApmBase', function(done) {
     var apmServer = apmBase.serviceFactory.getService('ApmServer')
     if (globalConfig.useMocks) {
