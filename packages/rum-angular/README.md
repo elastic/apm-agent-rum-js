@@ -1,11 +1,14 @@
-# `rum-angular`
+Elastic APM Real User Monitoring for Angular applications
 
-> TODO: description
+This package provides Real User Monitoring (RUM) for Angular applications.
 
-## Usage
+## Documentation
+You can find our documentation [on our website](https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html).
 
-```
-const rumAngular = require('rum-angular');
+If you are interested in contributing to Elastic APM JavaScript agent, please see [our contributing guide](CONTRIBUTING.md).
 
-// TODO: DEMONSTRATE API
-```
+
+## License
+This project is [MIT licensed](LICENSE).
+
+<sup><br>Made with ♥️ and ☕️ by Elastic and our community.</sup>
