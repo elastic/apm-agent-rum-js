@@ -12,7 +12,7 @@ it is need as field to store the results of the tests.
 @Field def rumTasksGen
 
 pipeline {
-  agent { label 'linux && immutable' }
+  agent none
   environment {
     REPO = 'apm-agent-rum-js'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
