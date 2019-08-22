@@ -155,13 +155,17 @@ function getWebpackConfig(bundleType, packageType) {
           exclude: /node_modules/,
           loader: 'babel-loader',
           options: getBabelConfig(bundleType, packageType)
+        },
+        {
+          test: /\.(ts|tsx)$/,
+          loader: 'ts-loader'
         }
       ]
     },
     mode: isEnvProduction ? 'production' : 'development',
     plugins: [new EnvironmentPlugin(getWebpackEnv())],
     resolve: {
-      extensions: ['.js', '.jsx', '.ts']
+      extensions: ['.js', '.jsx', '.ts', '.tsx']
     }
   }
 

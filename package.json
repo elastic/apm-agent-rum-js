@@ -117,6 +117,7 @@
     "serve-index": "^1.9.1",
     "source-map": "^0.7.0",
     "stats-lite": "^2.2.0",
+    "ts-loader": "^6.0.4",
     "typescript": "^3.5.3",
     "uglifyjs-webpack-plugin": "^2.0.1",
     "webdriverio": "^5.11.13",
@@ -128,8 +129,8 @@
   },
   "dependencies": {
     "@elastic/apm-rum": "file:packages/rum",
+    "@elastic/apm-rum-angular": "file:packages/rum-angular",
     "@elastic/apm-rum-core": "file:packages/rum-core",
-    "@elastic/apm-rum-react": "file:packages/rum-react",
-    "@elastic/apm-rum-angular": "file:packages/rum-angular"
+    "@elastic/apm-rum-react": "file:packages/rum-react"
   }
 }

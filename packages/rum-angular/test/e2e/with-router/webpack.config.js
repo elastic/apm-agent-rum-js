@@ -23,6 +23,33 @@
  *
  */
 
-import 'core-js/es7/reflect'
-import 'zone.js/dist/zone'
-import 'zone.js/dist/zone-testing'
+const path = require('path')
+const webpack = require('webpack')
+const {
+  getWebpackConfig,
+  PACKAGE_TYPES,
+  BUNDLE_TYPES
+} = require('../../../../../dev-utils/build')
+
+const config = {
+  entry: {
+    polyfills: path.join(__dirname, '../../polyfills.ts'),
+    app: path.join(__dirname, 'main.ts')
+  },
+  output: {
+    path: path.resolve(__dirname),
+    filename: '[name].e2e-bundle.js'
+  },
+  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.ANGULAR)
+}
+
+module.exports = {
+  ...config,
+  plugins: config.plugins.concat([
+    new webpack.ContextReplacementPlugin(
+      /angular(\\|\/)core/,
+      path.resolve(__dirname, 'app'),
+      {}
+    )
+  ])
+}

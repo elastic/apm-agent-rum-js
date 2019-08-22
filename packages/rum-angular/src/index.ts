@@ -31,16 +31,17 @@ import {
   NavigationError
 } from '@angular/router'
 import { Injectable } from '@angular/core'
-import { init, apm } from '@elastic/apm-rum'
+import { init as apmInit, apm } from '@elastic/apm-rum'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApmService {
-  router: Router
+  // eslint-disable-next-line
+  constructor(private router: Router) {}
 
   init(config) {
-    init(config)
+    apmInit(config)
     /**
      * Start listening to route change once we
      * intiailize to set the correct transaction names
@@ -68,7 +69,13 @@ export class ApmService {
           if (url !== urlAfterRedirects) {
             transaction.name = urlAfterRedirects
           }
-          transaction.detectFinish()
+          /**
+           * Schedule the transaction finish logic on the next
+           * micro task since most of the angular components wait for
+           * Observables resolution on ngInit to fetch the neccessary
+           * data for mounting
+           */
+          Promise.resolve(() => transaction.detectFinish())
         }
       }
     })

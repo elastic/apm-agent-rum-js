@@ -23,7 +23,8 @@
  *
  */
 
-import '../polyfill'
+import '../polyfills'
+import 'zone.js/dist/zone-testing'
 import { ApmService } from '../../src'
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
