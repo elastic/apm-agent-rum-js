@@ -37,8 +37,7 @@ import { init as apmInit, apm } from '@elastic/apm-rum'
   providedIn: 'root'
 })
 export class ApmService {
-  // eslint-disable-next-line
-  constructor(private router: Router) {}
+  constructor(public router: Router) {}
 
   init(config) {
     apmInit(config)

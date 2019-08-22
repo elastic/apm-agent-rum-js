@@ -30,7 +30,9 @@ import { Component } from '@angular/core'
   template: `
     <h1 class="title">Elastic APM with Angular Router</h1>
     <nav>
-      <a routerLink="/contacts" routerLinkActive="active">Contacts</a>
+      <a id="contacts" routerLink="/contacts" routerLinkActive="active"
+        >Contacts</a
+      >
     </nav>
     <router-outlet></router-outlet>
   `

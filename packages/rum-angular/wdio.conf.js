@@ -23,13 +23,6 @@
  *
  */
 
-const {
-  getBabelConfig,
-  PACKAGE_TYPES,
-  BUNDLE_TYPES
-} = require('../../dev-utils/build')
+const { getWebdriveBaseConfig } = require('../../dev-utils/webdriver')
 
-module.exports = function(api) {
-  api.cache(true)
-  return getBabelConfig(BUNDLE_TYPES.NODE_PROD, PACKAGE_TYPES.ANGULAR)
-}
+exports.config = getWebdriveBaseConfig(__dirname)
