@@ -75,7 +75,7 @@ export class ApmService {
            * Observables resolution on ngInit to fetch the neccessary
            * data for mounting
            */
-          Promise.resolve(() => transaction.detectFinish())
+          Promise.resolve().then(transaction.detectFinish())
         }
       }
     })
