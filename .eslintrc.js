@@ -17,7 +17,8 @@ const LICENSE_HEADER =
 module.exports = {
   env: {
     es6: true,
-    browser: true
+    browser: true,
+    node: true
   },
   parserOptions: {
     ecmaVersion: 2018,
@@ -26,7 +27,12 @@ module.exports = {
       legacyDecorators: true
     }
   },
-  extends: ['plugin:prettier/recommended', 'plugin:react/recommended'],
+  extends: [
+    'plugin:prettier/recommended',
+    'plugin:react/recommended',
+    'prettier/@typescript-eslint',
+    'plugin:@typescript-eslint/recommended'
+  ],
   parser: 'babel-eslint',
   plugins: ['standard', 'rulesdir'],
   rules: {
@@ -39,11 +45,47 @@ module.exports = {
         license: LICENSE_HEADER
       }
     ],
-    'react/prop-types': 0
+    'react/prop-types': 0,
+    '@typescript-eslint/explicit-function-return-type': 0,
+    '@typescript-eslint/no-explicit-any': 0
   },
   settings: {
     react: {
       version: 'detect'
     }
-  }
+  },
+  overrides: [
+    {
+      /**
+       * babel-eslint does not understand some of the typescript feautes
+       * so its better to use '@typescript-eslint/parser' for .ts files
+       */
+      files: ['**/*.ts'],
+      parser: '@typescript-eslint/parser',
+      plugins: ['@typescript-eslint'],
+      parserOptions: {
+        ecmaVersion: 2018,
+        sourceType: 'module'
+      }
+    },
+    {
+      /**
+       * Disable specific rule that are overrided by
+       * typescript eslint config on js files
+       */
+      files: ['**/*.js'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 0,
+        '@typescript-eslint/no-empty-function': 0,
+        '@typescript-eslint/no-use-before-define': 0,
+        '@typescript-eslint/camelcase': 0,
+        '@typescript-eslint/no-unused-vars': 0,
+        '@typescript-eslint/no-this-alias': 0,
+        'no-var': 0,
+        'prefer-const': 0,
+        'prefer-rest-params': 0,
+        'prefer-spread': 0
+      }
+    }
+  ]
 }

@@ -59,6 +59,8 @@
     "@lerna/child-process": "^3.14.2",
     "@lerna/prompt": "^3.13.0",
     "@types/jasmine": "^3.4.0",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
     "@wdio/cli": "^5.11.13",
     "@wdio/dot-reporter": "^5.11.7",
     "@wdio/jasmine-framework": "^5.11.0",

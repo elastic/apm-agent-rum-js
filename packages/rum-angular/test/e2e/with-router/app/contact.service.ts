@@ -30,7 +30,7 @@ import { HttpClient } from '@angular/common/http'
   providedIn: 'root'
 })
 export class ContactService {
-  CONTACT_URL: string = '/test/e2e/with-router/data.json'
+  CONTACT_URL = '/test/e2e/with-router/data.json'
   constructor(private http: HttpClient) {}
 
   getContacts() {

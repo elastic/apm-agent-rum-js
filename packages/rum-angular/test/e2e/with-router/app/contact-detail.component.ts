@@ -39,7 +39,7 @@ import { ContactService } from './contact.service'
 })
 export class ContactDetailComponent implements OnInit {
   contact: any
-  isDataAvailable: boolean = false
+  isDataAvailable = false
 
   constructor(
     private contactService: ContactService,
