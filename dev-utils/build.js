@@ -23,22 +23,9 @@
  *
  */
 
-const { EnvironmentPlugin, ContextReplacementPlugin } = require('webpack')
+const { EnvironmentPlugin } = require('webpack')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const { getTestEnvironmentVariables } = require('./test-config')
-const path = require('path')
-
-function getTSConfigFile(type) {
-  /**
-   * TODO: Make the package path configurable when we
-   * switch to typescript compiler in all packages
-   */
-  if (type === TS_CONFIG_TYPES.UNIT) {
-    return require.resolve('@elastic/apm-rum-angular/tsconfig.spec.json')
-  } else if (type === TS_CONFIG_TYPES.E2E) {
-    return require.resolve('@elastic/apm-rum-angular/tsconfig.e2e.json')
-  }
-}
 
 const BUNDLE_TYPES = {
   NODE_DEV: 'NODE_DEV',
@@ -87,16 +74,15 @@ const PACKAGE_TYPES = {
   ANGULAR: 'ANGULAR'
 }
 
-const TS_CONFIG_TYPES = {
-  APP: 'APP',
-  UNIT: 'UNIT',
-  E2E: 'E2E'
-}
-
 function getAngularConfig(options) {
   return Object.assign({}, options, {
     presets: options.presets.concat(['@babel/preset-typescript']),
     plugins: options.plugins.concat([
+      /**
+       * Angular dependency injection will not work
+       * if we dont have this plugin enabled
+       */
+      'babel-plugin-transform-typescript-metadata',
       ['@babel/plugin-proposal-decorators', { legacy: true }],
       ['@babel/plugin-proposal-class-properties', { loose: true }]
     ])
@@ -116,6 +102,8 @@ function getReactConfig(options) {
 function getOptions(options, packageType) {
   if (packageType === PACKAGE_TYPES.REACT) {
     return getReactConfig(options)
+  } else if (packageType === PACKAGE_TYPES.ANGULAR) {
+    return getAngularConfig(options)
   }
   return options
 }
@@ -155,7 +143,7 @@ function getWebpackEnv(env = 'development') {
   }
 }
 
-function getWebpackConfig(bundleType, packageType, tsConfigType) {
+function getWebpackConfig(bundleType, packageType) {
   const isEnvProduction = [NODE_PROD, NODE_ES_PROD, BROWSER_PROD].includes(
     bundleType
   )
@@ -169,24 +157,17 @@ function getWebpackConfig(bundleType, packageType, tsConfigType) {
     module: {
       rules: [
         {
-          test: /\.(js|jsx)$/,
+          test: /\.(js|jsx|ts)$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
           options: getBabelConfig(bundleType, packageType)
-        },
-        {
-          test: /\.(ts|tsx)$/,
-          loader: 'ts-loader',
-          options: {
-            configFile: getTSConfigFile(tsConfigType)
-          }
         }
       ]
     },
     mode: isEnvProduction ? 'production' : 'development',
     plugins: [new EnvironmentPlugin(getWebpackEnv())],
     resolve: {
-      extensions: ['.js', '.jsx', '.ts', '.tsx']
+      extensions: ['.js', '.jsx', '.ts']
     }
   }
 
@@ -213,6 +194,5 @@ module.exports = {
   getBabelConfig,
   getWebpackConfig,
   BUNDLE_TYPES,
-  PACKAGE_TYPES,
-  TS_CONFIG_TYPES
+  PACKAGE_TYPES
 }

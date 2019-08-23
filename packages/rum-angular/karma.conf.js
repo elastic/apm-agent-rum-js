@@ -27,18 +27,13 @@ const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
 const {
   getWebpackConfig,
   PACKAGE_TYPES,
-  BUNDLE_TYPES,
-  TS_CONFIG_TYPES
+  BUNDLE_TYPES
 } = require('../../dev-utils/build')
 
 module.exports = function(config) {
   config.set(baseConfig)
   config.set({
-    webpack: getWebpackConfig(
-      BUNDLE_TYPES.BROWSER_DEV,
-      PACKAGE_TYPES.ANGULAR,
-      TS_CONFIG_TYPES.UNIT
-    )
+    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.ANGULAR)
   })
   const preparedConfig = prepareConfig(config, 'rum-angular')
   config.set(preparedConfig)

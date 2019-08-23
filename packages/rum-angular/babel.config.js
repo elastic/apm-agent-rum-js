@@ -23,20 +23,12 @@
  *
  */
 
-const path = require('path')
-const {
-  getWebpackConfig,
-  PACKAGE_TYPES,
-  BUNDLE_TYPES
-} = require('../../../../../dev-utils/build')
+const { getBabelConfig, PACKAGE_TYPES } = require('../../dev-utils/build')
 
-module.exports = {
-  entry: {
-    app: path.join(__dirname, 'main.ts')
-  },
-  output: {
-    path: path.resolve(__dirname),
-    filename: '[name].e2e-bundle.js'
-  },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD, PACKAGE_TYPES.ANGULAR)
+module.exports = function(api) {
+  /**
+   * Reads BABEL_ENV to decide between CJS and ESM formats
+   */
+  const env = api.env()
+  return getBabelConfig(env, PACKAGE_TYPES.ANGULAR)
 }

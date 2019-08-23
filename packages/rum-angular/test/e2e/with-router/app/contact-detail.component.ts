@@ -52,7 +52,6 @@ export class ContactDetailComponent implements OnInit {
       this.contactService.getContacts().subscribe((contacts: any[]) => {
         this.contact = contacts.filter(({ id }) => id === contactId)[0]
         this.isDataAvailable = true
-        console.log(this.contact)
       })
     })
   }

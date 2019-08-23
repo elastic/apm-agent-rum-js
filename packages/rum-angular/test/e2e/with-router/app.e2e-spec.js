@@ -26,25 +26,25 @@
 const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
 
 describe('Angular router integration', function() {
+  beforeAll(() => browser.url('/test/e2e/with-router/'))
+
   it('should run angular app and capture route-change', function() {
-    browser.url('/test/e2e/with-router/')
+    /**
+     * Should render not found page on load
+     */
+    const notFoundElement = $('app-root h2')
+    expect(notFoundElement.getText()).toEqual('page not found')
+
     browser.waitUntil(
       () => {
-        /**
-         * Should render not found page
-         */
-        const notFoundElement = $('app-root h2')
-        expect(notFoundElement.getText()).toEqual('page not found')
-
         /**
          * route to /contacts
          */
         $('#contacts').click()
-
         const contactListElement = $('app-root app-contact-list')
-        expect(contactListElement.getText()).toContain('Name')
+        return contactListElement.getText().indexOf('Name') !== -1
       },
-      20000,
+      5000,
       'expected contact list to be rendered'
     )
 

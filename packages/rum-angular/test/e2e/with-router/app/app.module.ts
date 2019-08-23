@@ -33,6 +33,7 @@ import { ContactListComponent } from './contact-list.component'
 import { ContactDetailComponent } from './contact-detail.component'
 import { PageNotFoundComponent } from './not-found.component'
 import { ApmService } from '../../../../src'
+import { initializeApmService } from '../../../index'
 
 @NgModule({
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
@@ -47,8 +48,8 @@ import { ApmService } from '../../../../src'
 })
 export class AppModule {
   constructor(service: ApmService) {
-    service.init({
-      serviceName: 'e2e-angular',
+    initializeApmService(service, {
+      serviceName: 'e2e-angular-integration',
       debug: true
     })
   }

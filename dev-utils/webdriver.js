@@ -196,7 +196,10 @@ function getWebdriveBaseConfig(
        * */
       if (!test.passed && isChromeLatest()) {
         const response = browser.getLogs('browser')
-        console.log('[Browser Logs]:', JSON.stringify(response, undefined, 2))
+        console.log(
+          '[Chrome Browser Logs]:',
+          JSON.stringify(response, undefined, 2)
+        )
       }
     }
   }
@@ -311,7 +314,7 @@ function isChromeLatest() {
   const isLatest =
     isChrome && browserVersion && Number(browserVersion.split('.')[0]) >= 76
 
-  return isChrome && isLatest
+  return isLatest
 }
 
 module.exports = {

@@ -23,20 +23,26 @@
  *
  */
 
-const path = require('path')
-const {
-  getWebpackConfig,
-  PACKAGE_TYPES,
-  BUNDLE_TYPES
-} = require('../../../../../dev-utils/build')
+import { polyfill } from 'es6-promise'
+import { apmBase } from '@elastic/apm-rum'
+import { getGlobalConfig } from '../../../dev-utils/test-config'
+import ApmServerMock from '../../rum-core/test/utils/apm-server-mock'
 
-module.exports = {
-  entry: {
-    app: path.join(__dirname, 'main.ts')
-  },
-  output: {
-    path: path.resolve(__dirname),
-    filename: '[name].e2e-bundle.js'
-  },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD, PACKAGE_TYPES.ANGULAR)
+const globalConfig = getGlobalConfig()
+
+export function initializeApmService(service, config) {
+  /**
+   * Polyfill the global promise since webdriver
+   * functions uses promise based API
+   * ex: browser.execute, browser.executeAsy
+   */
+  polyfill()
+  console.log('E2E Global Configs', JSON.stringify(globalConfig, null, 2))
+  const apmServer = apmBase.serviceFactory.getService('ApmServer')
+  const { serverUrl } = globalConfig.agentConfig
+  config.serverUrl = serverUrl
+  const serverMock = new ApmServerMock(apmServer, globalConfig.useMocks)
+  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
+
+  return service.init(config)
 }
