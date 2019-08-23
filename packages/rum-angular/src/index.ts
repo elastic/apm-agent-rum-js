@@ -31,6 +31,7 @@ import {
   NavigationError
 } from '@angular/router'
 import { Injectable } from '@angular/core'
+import { Promise } from 'es6-promise'
 import { init as apmInit, apm } from '@elastic/apm-rum'
 
 @Injectable({

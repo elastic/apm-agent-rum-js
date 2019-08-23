@@ -5,6 +5,7 @@
   "homepage": "https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html",
   "license": "MIT",
   "main": "dist/lib/index.js",
+  "module": "dist/es/index.js",
   "files": [
     "dist"
   ],
@@ -20,18 +21,22 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "prepublishOnly": "npm run build:main",
-    "build:main": "npx babel src -d dist/lib -x '.ts'",
+    "prepublishOnly": "npm run build",
+    "build": "npm-run-all build:main build:module",
+    "build:main": "BABEL_ENV=NODE_PROD npx babel -x '.ts' src -d dist/lib ",
+    "build:module": "BABEL_ENV=NODE_ES_PROD npx babel -x '.ts' src -d dist/es",
     "build:e2e": "npm run script buildE2eBundles packages/rum-angular/test/e2e",
     "test:unit": "node ../../dev-utils/run-script.js runUnitTests packages/rum-angular",
     "test:e2e": "npm run script runE2eTests packages/rum-angular/wdio.conf.js",
-    "test:sauce": "npm run script runSauceTests packages/rum-angular true build:e2e test:e2e",
+    "test:sauce": "npm run script runSauceTests packages/rum-angular true test:unit build:e2e test:e2e",
     "test": "npm run test:sauce",
     "script": "node ../../dev-utils/run-script.js",
-    "karma:dev": "karma start --auto-watch --restartOnFileChange"
+    "karma:dev": "karma start --auto-watch --restartOnFileChange",
+    "karma:coverage": "karma start --coverage --singleRun"
   },
   "dependencies": {
-    "@elastic/apm-rum": "file:../rum"
+    "@elastic/apm-rum": "file:../rum",
+    "es6-promise": "^4.2.8"
   },
   "peerDependencies": {
     "@angular/core": "^8.0.0",
