@@ -65,95 +65,141 @@ describe('ApmService', () => {
   let fixture: ComponentFixture<AppComponent>
   let compiled: HTMLElement
 
-  beforeEach(() => {
-    ApmService.apm = apm
-  })
-
-  afterEach(() => {
-    apm.startTransaction.calls.reset()
-  })
-
   TestBed.initTestEnvironment(
     BrowserDynamicTestingModule,
     platformBrowserDynamicTesting()
   )
+  ApmService.apm = apm
 
-  beforeEach(() => {
+  function setUpAppModule() {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule.withRoutes(routes)],
       declarations: [HomeComponent, AppComponent, SlugComponent],
       providers: [ApmService]
     })
-
     service = TestBed.get(ApmService)
     router = TestBed.get(Router)
     location = TestBed.get(Location)
-
     /**
      * Inject router manually
      */
     service.router = router
-    service.observe()
 
     fixture = TestBed.createComponent(AppComponent)
     compiled = fixture.debugElement.nativeElement
-    fixture.ngZone.run(() => {
-      router.initialNavigation()
-    })
+  }
+
+  function setUpRouteNavigation() {
+    fixture.ngZone.run(() => router.initialNavigation())
+  }
+
+  afterEach(() => {
+    apm.startTransaction.calls.reset()
   })
 
-  it('navigate to "/home" should create /home transaction', done => {
-    spyOn(apm, 'startTransaction')
-    fixture.ngZone.run(() => {
-      router.navigate(['/home']).then(() => {
-        expect(location.path()).toBe('/home')
-        expect(compiled.querySelector('ng-component').textContent).toBe('Home')
-        expect(apm.startTransaction).toHaveBeenCalledWith(
-          '/home',
-          'route-change',
-          {
-            canReuse: true
-          }
-        )
-        done()
+  describe('testing init', () => {
+    beforeEach(() => {
+      setUpAppModule()
+      setUpRouteNavigation()
+    })
+
+    it('should log warning when agent is inactive', done => {
+      const loggingService = ApmService.apm.serviceFactory.getService(
+        'LoggingService'
+      )
+      spyOn(loggingService, 'warn')
+      spyOn(apm, 'startTransaction')
+      service.init({
+        active: false
       })
-    })
-  })
+      expect(loggingService.warn).toHaveBeenCalledWith(
+        'RUM agent is inactive, route-change transaction is not instrumented'
+      )
+      loggingService.warn.calls.reset()
 
-  it('should set transaction name properly on redirects', done => {
-    spyOn(apm, 'startTransaction').and.callThrough()
-    const tr = apm.getCurrentTransaction()
-    fixture.ngZone.run(() => {
-      router.navigate(['/']).then(() => {
-        expect(location.path()).toBe('/home')
-        expect(compiled.querySelector('ng-component').textContent).toBe('Home')
-        expect(apm.startTransaction).toHaveBeenCalledWith('/', 'route-change', {
-          canReuse: true
+      fixture.ngZone.run(() => {
+        router.navigate(['/home']).then(() => {
+          expect(location.path()).toBe('/home')
+          expect(compiled.querySelector('ng-component').textContent).toBe(
+            'Home'
+          )
+          expect(apm.startTransaction).not.toHaveBeenCalled()
+          done()
         })
-        expect(tr.name).toEqual('/home')
-
-        done()
       })
     })
   })
 
-  it('should set transaction name properly on parameterised urls', done => {
-    spyOn(apm, 'startTransaction').and.callThrough()
-    const tr = apm.getCurrentTransaction()
-    fixture.ngZone.run(() => {
-      router.navigate(['/slug/2']).then(() => {
-        expect(location.path()).toBe('/slug/2')
-        expect(compiled.querySelector('ng-component').textContent).toBe('Slug')
-        expect(apm.startTransaction).toHaveBeenCalledWith(
-          '/slug/2',
-          'route-change',
-          {
-            canReuse: true
-          }
-        )
-        expect(tr.name).toEqual('/slug/:id')
+  describe('testing observe', () => {
+    beforeEach(() => {
+      setUpAppModule()
+      service.observe()
+      setUpRouteNavigation()
+    })
 
-        done()
+    it('navigate to "/home" should create /home transaction', done => {
+      spyOn(apm, 'startTransaction')
+      fixture.ngZone.run(() => {
+        router.navigate(['/home']).then(() => {
+          expect(location.path()).toBe('/home')
+          expect(compiled.querySelector('ng-component').textContent).toBe(
+            'Home'
+          )
+          expect(apm.startTransaction).toHaveBeenCalledWith(
+            '/home',
+            'route-change',
+            {
+              canReuse: true
+            }
+          )
+          done()
+        })
+      })
+    })
+
+    it('should set transaction name properly on redirects', done => {
+      spyOn(apm, 'startTransaction').and.callThrough()
+      const tr = apm.getCurrentTransaction()
+      fixture.ngZone.run(() => {
+        router.navigate(['/']).then(() => {
+          expect(location.path()).toBe('/home')
+          expect(compiled.querySelector('ng-component').textContent).toBe(
+            'Home'
+          )
+          expect(apm.startTransaction).toHaveBeenCalledWith(
+            '/',
+            'route-change',
+            {
+              canReuse: true
+            }
+          )
+          expect(tr.name).toEqual('/home')
+
+          done()
+        })
+      })
+    })
+
+    it('should set transaction name properly on parameterised urls', done => {
+      spyOn(apm, 'startTransaction').and.callThrough()
+      const tr = apm.getCurrentTransaction()
+      fixture.ngZone.run(() => {
+        router.navigate(['/slug/2']).then(() => {
+          expect(location.path()).toBe('/slug/2')
+          expect(compiled.querySelector('ng-component').textContent).toBe(
+            'Slug'
+          )
+          expect(apm.startTransaction).toHaveBeenCalledWith(
+            '/slug/2',
+            'route-change',
+            {
+              canReuse: true
+            }
+          )
+          expect(tr.name).toEqual('/slug/:id')
+
+          done()
+        })
       })
     })
   })

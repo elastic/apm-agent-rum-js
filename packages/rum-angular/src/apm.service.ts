@@ -44,6 +44,20 @@ export class ApmService {
 
   init(config) {
     ApmService.apm.init(config)
+
+    const configService = ApmService.apm.serviceFactory.getService(
+      'ConfigService'
+    )
+    if (!configService.isActive()) {
+      const loggingService = ApmService.apm.serviceFactory.getService(
+        'LoggingService'
+      )
+      loggingService.warn(
+        `RUM agent is inactive, route-change transaction is not instrumented`
+      )
+      return
+    }
+
     /**
      * Start listening to route change once we
      * intiailize to set the correct transaction names
