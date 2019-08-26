@@ -29,6 +29,7 @@ import { HttpClientModule } from '@angular/common/http'
 
 import { AppRoutingModule } from './app.routing.module'
 import { AppComponent } from './app.component'
+import { HomeComponent } from './home.component'
 import { ContactListComponent } from './contact-list.component'
 import { ContactDetailComponent } from './contact-detail.component'
 import { PageNotFoundComponent } from './not-found.component'
@@ -39,6 +40,7 @@ import { initializeApmService } from '../../../index'
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   declarations: [
     AppComponent,
+    HomeComponent,
     PageNotFoundComponent,
     ContactListComponent,
     ContactDetailComponent

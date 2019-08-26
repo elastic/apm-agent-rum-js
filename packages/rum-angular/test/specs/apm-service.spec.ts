@@ -25,7 +25,7 @@
 
 import '../polyfills'
 import 'zone.js/dist/zone-testing'
-import { ApmService } from '../../src'
+import { ApmService } from '../../src/apm.service'
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
@@ -43,13 +43,19 @@ import { apm } from '@elastic/apm-rum'
 class HomeComponent {}
 
 @Component({
+  template: 'Slug'
+})
+class SlugComponent {}
+
+@Component({
   template: '<router-outlet></router-outlet>'
 })
 class AppComponent {}
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent }
+  { path: 'home', component: HomeComponent },
+  { path: 'slug/:id', component: SlugComponent }
 ]
 
 describe('ApmService', () => {
@@ -59,6 +65,14 @@ describe('ApmService', () => {
   let fixture: ComponentFixture<AppComponent>
   let compiled: HTMLElement
 
+  beforeEach(() => {
+    ApmService.apm = apm
+  })
+
+  afterEach(() => {
+    apm.startTransaction.calls.reset()
+  })
+
   TestBed.initTestEnvironment(
     BrowserDynamicTestingModule,
     platformBrowserDynamicTesting()
@@ -67,7 +81,7 @@ describe('ApmService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule.withRoutes(routes)],
-      declarations: [HomeComponent, AppComponent],
+      declarations: [HomeComponent, AppComponent, SlugComponent],
       providers: [ApmService]
     })
 
@@ -117,6 +131,27 @@ describe('ApmService', () => {
           canReuse: true
         })
         expect(tr.name).toEqual('/home')
+
+        done()
+      })
+    })
+  })
+
+  it('should set transaction name properly on parameterised urls', done => {
+    spyOn(apm, 'startTransaction').and.callThrough()
+    const tr = apm.getCurrentTransaction()
+    fixture.ngZone.run(() => {
+      router.navigate(['/slug/2']).then(() => {
+        expect(location.path()).toBe('/slug/2')
+        expect(compiled.querySelector('ng-component').textContent).toBe('Slug')
+        expect(apm.startTransaction).toHaveBeenCalledWith(
+          '/slug/2',
+          'route-change',
+          {
+            canReuse: true
+          }
+        )
+        expect(tr.name).toEqual('/slug/:id')
 
         done()
       })

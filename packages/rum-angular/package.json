@@ -26,7 +26,7 @@
     "build:main": "BABEL_ENV=NODE_PROD npx babel -x '.ts' src -d dist/lib ",
     "build:module": "BABEL_ENV=NODE_ES_PROD npx babel -x '.ts' src -d dist/es",
     "build:e2e": "npm run script buildE2eBundles packages/rum-angular/test/e2e",
-    "test:unit": "node ../../dev-utils/run-script.js runUnitTests packages/rum-angular",
+    "test:unit": "node run script runUnitTests packages/rum-angular",
     "test:e2e": "npm run script runE2eTests packages/rum-angular/wdio.conf.js",
     "test:sauce": "npm run script runSauceTests packages/rum-angular true test:unit build:e2e test:e2e",
     "test": "npm run test:sauce",

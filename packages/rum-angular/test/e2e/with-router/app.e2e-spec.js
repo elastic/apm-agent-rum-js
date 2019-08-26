@@ -32,8 +32,8 @@ describe('Angular router integration', function() {
     /**
      * Should render not found page on load
      */
-    const notFoundElement = $('app-root h2')
-    expect(notFoundElement.getText()).toEqual('page not found')
+    const notFoundElement = $('app-root app-home h2')
+    expect(notFoundElement.getText()).toEqual('Home page')
 
     browser.waitUntil(
       () => {
@@ -53,7 +53,7 @@ describe('Angular router integration', function() {
 
     const pageLoadTransaction = serverCalls.sendTransactions[0].args[0][0]
     expect(pageLoadTransaction.type).toBe('page-load')
-    expect(pageLoadTransaction.name).toBe('/')
+    expect(pageLoadTransaction.name).toBe('/home')
     expect(pageLoadTransaction.spans.length).toBeGreaterThan(1)
 
     const routeTransaction = serverCalls.sendTransactions[1].args[0][0]

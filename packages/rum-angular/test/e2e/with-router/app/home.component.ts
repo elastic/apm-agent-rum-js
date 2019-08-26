@@ -23,24 +23,12 @@
  *
  */
 
-import { NgModule } from '@angular/core'
-import { RouterModule, Routes } from '@angular/router'
+import { Component } from '@angular/core'
 
-import { HomeComponent } from './home.component'
-import { PageNotFoundComponent } from './not-found.component'
-import { ContactListComponent } from './contact-list.component'
-import { ContactDetailComponent } from './contact-detail.component'
-
-const routes: Routes = [
-  { path: 'contacts', component: ContactListComponent },
-  { path: 'contact/:id', component: ContactDetailComponent },
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent },
-  { path: '**', component: PageNotFoundComponent }
-]
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+@Component({
+  selector: 'app-home',
+  template: `
+    <h2>Home page</h2>
+  `
 })
-export class AppRoutingModule {}
+export class HomeComponent {}
