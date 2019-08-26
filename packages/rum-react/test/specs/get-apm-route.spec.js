@@ -44,8 +44,16 @@ function Component(props) {
 }
 
 describe('ApmRoute', function() {
+  let serviceFactory, configService
+
+  beforeEach(() => {
+    serviceFactory = createServiceFactory()
+    configService = serviceFactory.getService('ConfigService')
+    configService.init({ active: true })
+  })
+
   it('should work Route component', function() {
-    const ApmRoute = getApmRoute(new ApmBase(createServiceFactory()))
+    const ApmRoute = getApmRoute(new ApmBase(serviceFactory))
 
     const rendered = mount(
       <div>
@@ -67,7 +75,6 @@ describe('ApmRoute', function() {
   })
 
   it('should work with Route render and log warning', function() {
-    const serviceFactory = createServiceFactory()
     const apmBase = new ApmBase(serviceFactory)
     const loggingService = serviceFactory.getService('LoggingService')
     const ApmRoute = getApmRoute(apmBase)

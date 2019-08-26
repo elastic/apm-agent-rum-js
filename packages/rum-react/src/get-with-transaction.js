@@ -47,8 +47,16 @@ function isReactClassComponent(Component) {
 function getWithTransaction(apm) {
   return function withTransaction(name, type) {
     return function(Component) {
+      const configService = apm.serviceFactory.getService('ConfigService')
+      const loggingService = apm.serviceFactory.getService('LoggingService')
+      if (!configService.isActive()) {
+        loggingService.warn(
+          `RUM agent is inactive, route-change transaction is not instrumented`
+        )
+        return Component
+      }
+
       if (!Component) {
-        const loggingService = apm.serviceFactory.getService('LoggingService')
         loggingService.warn(
           `${name} is not instrumented since component property is not provided`
         )
