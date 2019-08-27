@@ -2,5 +2,7 @@
 == Framework-specific integrations
 
 * <<react-integration, React Integration>>
+* <<angular-integration, Angular Integration>>
 
 include::./react-integration.asciidoc[React Integration]
+include::./angular-integration.asciidoc[Angular Integration]
