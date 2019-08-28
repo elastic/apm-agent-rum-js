@@ -95,18 +95,12 @@ describe('withTransaction', function() {
   })
 
   it('should not instrument the route when rum is inactive', () => {
-    const loggingService = serviceFactory.getService('LoggingService')
     const transactionService = serviceFactory.getService('TransactionService')
-
     spyOn(transactionService, 'startTransaction')
-    spyOn(loggingService, 'warn')
 
     configService.setConfig({ active: false })
     TestComponent(new ApmBase(serviceFactory, true))
 
-    expect(loggingService.warn).toHaveBeenCalledWith(
-      'RUM agent is inactive, route-change transaction is not instrumented'
-    )
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
   })
 })
