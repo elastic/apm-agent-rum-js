@@ -41,9 +41,15 @@ const routes: Routes = [
 })
 export class AppModule {
   constructor(service: ApmService) {
-    service.init({
+    // API is exposed through this apm instance
+    const apm = service.init({
       serviceName: 'angular-app',
       serverUrl: 'http://localhost:8200'
+    })
+
+    apm.setUserContenxt({
+      'username': 'foo',
+      'id': 'bar'
     })
   }
 }
