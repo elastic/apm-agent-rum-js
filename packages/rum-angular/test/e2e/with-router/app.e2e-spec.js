@@ -30,7 +30,7 @@ describe('Angular router integration', function() {
 
   it('should run angular app and capture route-change', function() {
     /**
-     * Should render not found page on load
+     * Should render home page on load
      */
     const notFoundElement = $('app-root app-home h2')
     expect(notFoundElement.getText()).toEqual('Home page')

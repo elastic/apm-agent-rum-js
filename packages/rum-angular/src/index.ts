@@ -24,7 +24,7 @@
  */
 
 import { apm } from '@elastic/apm-rum'
-import { ApmService } from './apm.service'
+import { ApmService } from './apm-service'
 
 ApmService.apm = apm
 

@@ -43,19 +43,13 @@ export class ApmService {
   constructor(public router: Router) {}
 
   init(config) {
-    ApmService.apm.init(config)
+    const apmInstance = ApmService.apm.init(config)
 
     const configService = ApmService.apm.serviceFactory.getService(
       'ConfigService'
     )
     if (!configService.isActive()) {
-      const loggingService = ApmService.apm.serviceFactory.getService(
-        'LoggingService'
-      )
-      loggingService.warn(
-        `RUM agent is inactive, route-change transaction is not instrumented`
-      )
-      return
+      return apmInstance
     }
 
     /**
@@ -63,6 +57,7 @@ export class ApmService {
      * intiailize to set the correct transaction names
      */
     this.observe()
+    return apmInstance
   }
 
   observe() {

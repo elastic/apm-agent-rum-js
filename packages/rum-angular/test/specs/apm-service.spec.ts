@@ -25,7 +25,7 @@
 
 import '../polyfills'
 import 'zone.js/dist/zone-testing'
-import { ApmService } from '../../src/apm.service'
+import { ApmService } from '../../src/apm-service'
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import {
@@ -35,7 +35,8 @@ import {
 import { Component } from '@angular/core'
 import { Location } from '@angular/common'
 import { Routes, Router } from '@angular/router'
-import { apm } from '@elastic/apm-rum'
+import { ApmBase } from '@elastic/apm-rum'
+import { createServiceFactory } from '@elastic/apm-rum-core'
 
 @Component({
   template: 'Home'
@@ -64,12 +65,17 @@ describe('ApmService', () => {
   let location: Location
   let fixture: ComponentFixture<AppComponent>
   let compiled: HTMLElement
+  let apm
 
   TestBed.initTestEnvironment(
     BrowserDynamicTestingModule,
     platformBrowserDynamicTesting()
   )
-  ApmService.apm = apm
+
+  function setUpApm() {
+    apm = new ApmBase(createServiceFactory(), false)
+    ApmService.apm = apm
+  }
 
   function setUpAppModule() {
     TestBed.configureTestingModule({
@@ -93,29 +99,27 @@ describe('ApmService', () => {
     fixture.ngZone.run(() => router.initialNavigation())
   }
 
-  afterEach(() => {
-    apm.startTransaction.calls.reset()
-  })
-
   describe('testing init', () => {
     beforeEach(() => {
+      setUpApm()
       setUpAppModule()
       setUpRouteNavigation()
     })
 
-    it('should log warning when agent is inactive', done => {
-      const loggingService = ApmService.apm.serviceFactory.getService(
-        'LoggingService'
-      )
-      spyOn(loggingService, 'warn')
+    it('should return apm base instance on service initialization', () => {
+      const apmBase = service.init({
+        active: false
+      })
+
+      expect(apmBase instanceof ApmBase).toBeTruthy()
+      expect(apmBase.startTransaction).toBeDefined()
+    })
+
+    it('should not instrument route changes when agent is inactive', done => {
       spyOn(apm, 'startTransaction')
       service.init({
         active: false
       })
-      expect(loggingService.warn).toHaveBeenCalledWith(
-        'RUM agent is inactive, route-change transaction is not instrumented'
-      )
-      loggingService.warn.calls.reset()
 
       fixture.ngZone.run(() => {
         router.navigate(['/home']).then(() => {
@@ -132,6 +136,7 @@ describe('ApmService', () => {
 
   describe('testing observe', () => {
     beforeEach(() => {
+      setUpApm()
       setUpAppModule()
       service.observe()
       setUpRouteNavigation()
