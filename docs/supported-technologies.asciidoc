@@ -28,7 +28,7 @@ image::images/compatibility.png[Elastic APM RUM Agent compatibility]
 [[frameworks]]
 === Frameworks
 
-The agent supports integrations with different frameworks, please check <<framework-integrations, Framework Specific Integrations>> document. 
+The agent supports integrations with certain frameworks. See <<framework-integrations, Framework specific integrations>> for more information. 
 
 If you are interested in instrumenting custom metrics like rendering time or mounting time of components on frameworks like React, Angular, vue etc., please use the <<custom-transactions, Custom Transactions API>>.
 

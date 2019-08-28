@@ -19,7 +19,7 @@ npm install @elastic/apm-rum-angular --save
 The Angular integration package comes with a `ApmService` that will start subscribing to 
 https://angular.io/api/router/Event[Angular Router Events] once the service is initialised. 
 
-ApmService` must be initialized from either the application module or application component since 
+`ApmService` must be initialized from either the application module or application component since 
 the RUM agent has to start capturing all the resources and API calls as soon as possible. 
 
 
@@ -49,5 +49,5 @@ export class AppModule {
 }
 ----
 
-Once the service is initialized, Both Page load and SPA navigation events will be captured
-as transactions that has the `path` of the route as its name and `page-load` or `route-change` as type.
+Once the service is initialized, both page load and SPA navigation events will be captured
+as transactions with the `path` of the route as its name and `page-load` or `route-change` as type.
