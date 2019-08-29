@@ -53,28 +53,29 @@ function TestComponent(apm) {
 
 describe('withTransaction', function() {
   const { serverUrl, serviceName } = getGlobalConfig().agentConfig
-  let serviceFactory, configService
+  let apmBase, serviceFactory
 
   beforeEach(() => {
     serviceFactory = createServiceFactory()
-    configService = serviceFactory.getService('ConfigService')
-    configService.init({
+    apmBase = new ApmBase(serviceFactory, false)
+    apmBase.init({
       active: true,
       serverUrl,
-      serviceName
+      serviceName,
+      disableInstrumentations: ['page-load', 'error']
     })
   })
 
   it('should work if apm is disabled or not initialized', function() {
     TestComponent(new ApmBase(serviceFactory, true))
-    TestComponent(new ApmBase(serviceFactory, false))
+    TestComponent(apmBase)
   })
 
   it('should start transaction for components', function() {
     const transactionService = serviceFactory.getService('TransactionService')
     spyOn(transactionService, 'startTransaction')
 
-    TestComponent(new ApmBase(serviceFactory, false))
+    TestComponent(apmBase)
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test-transaction',
       'test-type',
@@ -86,7 +87,7 @@ describe('withTransaction', function() {
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(loggingService, 'warn')
 
-    const withTransaction = getWithTransaction(new ApmBase(serviceFactory))
+    const withTransaction = getWithTransaction(apmBase)
     const comp = withTransaction('test-name', 'test-type')(undefined)
     expect(comp).toBe(undefined)
     expect(loggingService.warn).toHaveBeenCalledWith(
@@ -98,14 +99,13 @@ describe('withTransaction', function() {
     const transactionService = serviceFactory.getService('TransactionService')
     spyOn(transactionService, 'startTransaction')
 
-    configService.setConfig({ active: false })
-    const apm = new ApmBase(serviceFactory)
-    TestComponent(apm)
+    apmBase.config({ active: false })
+    TestComponent(apmBase)
 
     function Component() {
       return <h2>Component</h2>
     }
-    const withTransaction = getWithTransaction(apm)
+    const withTransaction = getWithTransaction(apmBase)
 
     const WrappedComponent = withTransaction('test-transaction', 'test-type')(
       Component
