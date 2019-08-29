@@ -99,8 +99,18 @@ describe('withTransaction', function() {
     spyOn(transactionService, 'startTransaction')
 
     configService.setConfig({ active: false })
-    TestComponent(new ApmBase(serviceFactory, true))
+    const apm = new ApmBase(serviceFactory)
+    TestComponent(apm)
 
+    function Component() {
+      return <h2>Component</h2>
+    }
+    const withTransaction = getWithTransaction(apm)
+
+    const WrappedComponent = withTransaction('test-transaction', 'test-type')(
+      Component
+    )
+    expect(WrappedComponent).toEqual(Component)
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
   })
 })
