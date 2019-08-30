@@ -107,6 +107,7 @@ class Config {
       pageLoadTransactionName: '',
 
       transactionSampleRate: 1.0,
+      centralConfig: false,
 
       context: {}
     }
@@ -254,6 +255,21 @@ class Config {
         key: 'serviceName',
         value: properties.serviceName,
         allowed: 'a-z, A-Z, 0-9, _, -, <space>'
+      })
+    }
+
+    const sampleRate = properties.transactionSampleRate
+    if (
+      typeof sampleRate !== 'undefined' &&
+      (typeof sampleRate !== 'number' ||
+        isNaN(sampleRate) ||
+        sampleRate < 0 ||
+        sampleRate > 1)
+    ) {
+      errors.invalid.push({
+        key: 'transactionSampleRate',
+        value: sampleRate,
+        allowed: 'Number between 0 and 1'
       })
     }
 

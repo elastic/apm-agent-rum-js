@@ -108,7 +108,7 @@ $ npx lerna run --scope @elastic/apm-rum test:unit
 
 // to run tests in watch mode
 
-$ npx lerna run --scope @elastic/apm-rum tdd -- --grep <path-to-test-file>
+$ npx lerna run --scope @elastic/apm-rum karma:dev -- --grep <path-to-test-file>
 ```
 
 ##### Integration tests

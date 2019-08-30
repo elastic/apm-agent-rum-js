@@ -74,8 +74,44 @@ class ApmBase {
       if (flags[PAGE_LOAD] && configService.get('sendPageLoadTransaction')) {
         this._sendPageLoadMetrics()
       }
+
+      if (configService.get('centralConfig')) {
+        this.fetchCentralConfig()
+      }
     }
     return this
+  }
+
+  fetchCentralConfig() {
+    const apmServer = this.serviceFactory.getService('ApmServer')
+    const loggingService = this.serviceFactory.getService('LoggingService')
+    const configService = this.serviceFactory.getService('ConfigService')
+
+    return apmServer
+      .fetchConfig(
+        configService.get('serviceName'),
+        configService.get('environment')
+      )
+      .then(config => {
+        var transactionSampleRate = config['transaction_sample_rate']
+        if (transactionSampleRate) {
+          transactionSampleRate = Number(transactionSampleRate)
+          const config = { transactionSampleRate }
+          const { invalid } = configService.validate(config)
+          if (invalid.length === 0) {
+            configService.setConfig(config)
+          } else {
+            const { key, value, allowed } = invalid[0]
+            loggingService.warn(
+              `Invalid value "${value}" for ${key}. Allowed: ${allowed}.`
+            )
+          }
+        }
+        return config
+      })
+      .catch(error => {
+        loggingService.warn('Failed fetching central config:', error)
+      })
   }
 
   _sendPageLoadMetrics() {

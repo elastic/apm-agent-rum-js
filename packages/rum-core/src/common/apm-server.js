@@ -140,6 +140,29 @@ class ApmServer {
     return new Queue(onFlush, { queueLimit, flushInterval })
   }
 
+  fetchConfig(serviceName, environment) {
+    const serverUrl = this._configService.get('serverUrl')
+    var configEndpoint = `${serverUrl}/config/v1/agents`
+    if (!serviceName) {
+      return Promise.reject(
+        'serviceName is required for fetching central config.'
+      )
+    }
+    configEndpoint += `?service.name=${serviceName}`
+    if (environment) {
+      configEndpoint += `&service.environment=${environment}`
+    }
+    return this._makeHttpRequest('GET', configEndpoint)
+      .then(response => {
+        return JSON.parse(response)
+      })
+      .catch(reason => {
+        const error = this._constructError(reason)
+        this._loggingService.warn('Failed fetching config!', error)
+        return Promise.reject(error)
+      })
+  }
+
   initErrorQueue() {
     if (this.errorQueue) {
       this.errorQueue.flush()
