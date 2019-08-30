@@ -174,7 +174,7 @@ function getWebdriveBaseConfig(
     jasmineNodeOpts: {
       defaultTimeoutInterval: 90000
     },
-    onPrepare() {
+    before() {
       /**
        * Increase timeout so that executeAsyncScript does not fail
        */
