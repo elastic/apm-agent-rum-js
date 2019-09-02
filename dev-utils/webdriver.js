@@ -177,7 +177,25 @@ function getWebdriveBaseConfig(
     before() {
       /**
        * Increase timeout so that executeAsyncScript does not fail
+       *
+       * Override setTimeout command to account for issues in
+       * unsupported selenium drivers
        */
+      const browserName = getBrowserName()
+      browser.overwriteCommand(
+        'setTimeout',
+        async (origTimeout, timeoutConfig) => {
+          let result
+          try {
+            result = await origTimeout(timeoutConfig)
+          } catch (e) {
+            console.log('setTimeout command is not supported in', browserName)
+          } finally {
+            return result
+          }
+        }
+      )
+
       browser.setTimeout({
         script: 30000
       })
@@ -293,8 +311,12 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
   return serverCalls
 }
 
+function getBrowserName() {
+  return browser.capabilities.browserName.toLowerCase()
+}
+
 function isChromeLatest() {
-  const browserName = browser.capabilities.browserName.toLowerCase()
+  const browserName = getBrowserName()
   const browserVersion = browser.capabilities.version
   const isChrome = browserName.indexOf('chrome') !== -1
   const isLatest =
