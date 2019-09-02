@@ -42,20 +42,12 @@ jobs:
         - SCOPE=@elastic/apm-rum
     - stage: test
       env:
-        - STACK_VERSION=6.5.0
-        - SCOPE=@elastic/apm-rum-react
-    - stage: test
-      env:
         - STACK_VERSION=6.6.0
         - SCOPE=@elastic/apm-rum-core
     - stage: test
       env:
         - STACK_VERSION=6.6.0
         - SCOPE=@elastic/apm-rum
-    - stage: test
-      env:
-        - STACK_VERSION=6.6.0
-        - SCOPE=@elastic/apm-rum-react
     - stage: test
       env:
         - STACK_VERSION=7.0.0
