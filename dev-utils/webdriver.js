@@ -174,31 +174,20 @@ function getWebdriveBaseConfig(
     jasmineNodeOpts: {
       defaultTimeoutInterval: 90000
     },
-    before() {
+    async before() {
       /**
-       * Increase timeout so that executeAsyncScript does not fail
+       * Increase script timeout so that executeAsyncScript does not
+       * throw async script failure in 0 ms error
        *
-       * Override setTimeout command to account for issues in
-       * unsupported selenium drivers
+       * Skip setting timeouts on firefox and microsoftedge since they
+       * result in NullPointerException issue from selenium driver
        */
       const browserName = getBrowserName()
-      browser.overwriteCommand(
-        'setTimeout',
-        async (origTimeout, timeoutConfig) => {
-          let result
-          try {
-            result = await origTimeout(timeoutConfig)
-          } catch (e) {
-            console.log('setTimeout command is not supported in', browserName)
-          } finally {
-            return result
-          }
-        }
-      )
+      if (browserName === 'firefox' || browserName === 'microsoftedge') {
+        return
+      }
 
-      browser.setTimeout({
-        script: 30000
-      })
+      await browser.setTimeout({ script: 30000 })
     },
     afterTest(test) {
       /**
