@@ -29,8 +29,9 @@ const {
 } = require('../../../../../dev-utils/webdriver')
 
 describe('General usecase with react-router', function() {
+  beforeAll(() => browser.url('/test/e2e/with-router/'))
+
   it('should run the react app', function() {
-    browser.url('/test/e2e/with-router/')
     browser.waitUntil(
       () => {
         return $('#test-element').getText() === 'Passed'

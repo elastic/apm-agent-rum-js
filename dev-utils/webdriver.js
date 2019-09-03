@@ -174,6 +174,21 @@ function getWebdriveBaseConfig(
     jasmineNodeOpts: {
       defaultTimeoutInterval: 90000
     },
+    async before() {
+      /**
+       * Increase script timeout so that executeAsyncScript does not
+       * throw async script failure in 0 ms error
+       *
+       * Skip setting timeouts on firefox and microsoftedge since they
+       * result in NullPointerException issue from selenium driver
+       */
+      const browserName = getBrowserName()
+      if (browserName === 'firefox' || browserName === 'microsoftedge') {
+        return
+      }
+
+      await browser.setTimeout({ script: 30000 })
+    },
     afterTest(test) {
       /**
        * Log only on failures
@@ -285,8 +300,12 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
   return serverCalls
 }
 
+function getBrowserName() {
+  return browser.capabilities.browserName.toLowerCase()
+}
+
 function isChromeLatest() {
-  const browserName = browser.capabilities.browserName.toLowerCase()
+  const browserName = getBrowserName()
   const browserVersion = browser.capabilities.version
   const isChrome = browserName.indexOf('chrome') !== -1
   const isLatest =
