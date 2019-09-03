@@ -96,7 +96,8 @@ function buildE2eBundles(basePath, callback) {
           colors: true,
           chunks: false,
           assets: false,
-          modules: false
+          modules: false,
+          warnings: false
         })
       )
       cb()

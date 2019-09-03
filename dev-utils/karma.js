@@ -35,7 +35,8 @@ const baseLaunchers = getBrowserList().map(launcher => ({
   base: 'SauceLabs',
   ...launcher
 }))
-const specPattern = 'test/{*.spec.js,!(e2e|integration|node)/*.spec.js}'
+const specPattern =
+  'test/{*.spec.+(js|ts),!(e2e|integration|node)/*.spec.+(js|ts)}'
 const { tunnelIdentifier } = getSauceConnectOptions()
 
 /**
