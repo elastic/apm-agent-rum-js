@@ -163,6 +163,9 @@ function getWebpackConfig(bundleType, packageType) {
             extractComments: true
           })
         ]
+      },
+      performance: {
+        hints: false
       }
     })
   }
