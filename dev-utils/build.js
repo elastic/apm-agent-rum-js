@@ -70,7 +70,23 @@ const DEFAULT_BROWSER_PRESET = [
 
 const PACKAGE_TYPES = {
   DEFAULT: 'DEFAULT',
-  REACT: 'REACT'
+  REACT: 'REACT',
+  ANGULAR: 'ANGULAR'
+}
+
+function getAngularConfig(options) {
+  return Object.assign({}, options, {
+    presets: options.presets.concat(['@babel/preset-typescript']),
+    plugins: options.plugins.concat([
+      /**
+       * Angular dependency injection will not work
+       * if we dont have this plugin enabled
+       */
+      'babel-plugin-transform-typescript-metadata',
+      ['@babel/plugin-proposal-decorators', { legacy: true }],
+      ['@babel/plugin-proposal-class-properties', { loose: true }]
+    ])
+  })
 }
 
 function getReactConfig(options) {
@@ -81,6 +97,15 @@ function getReactConfig(options) {
       '@babel/plugin-syntax-dynamic-import'
     ])
   })
+}
+
+function getOptions(options, packageType) {
+  if (packageType === PACKAGE_TYPES.REACT) {
+    return getReactConfig(options)
+  } else if (packageType === PACKAGE_TYPES.ANGULAR) {
+    return getAngularConfig(options)
+  }
+  return options
 }
 
 function getBabelConfig(bundleType, packageType) {
@@ -95,22 +120,13 @@ function getBabelConfig(bundleType, packageType) {
     case NODE_DEV:
     case NODE_PROD:
       options = { ...options, presets: DEFAULT_NODE_PRESET }
-      if (packageType === PACKAGE_TYPES.REACT) {
-        return getReactConfig(options)
-      }
-      return options
+      return getOptions(options, packageType)
     case NODE_ES_PROD:
-      if (packageType === PACKAGE_TYPES.REACT) {
-        return getReactConfig(options)
-      }
-      return options
+      return getOptions(options, packageType)
     case BROWSER_DEV:
     case BROWSER_PROD:
       options = { ...options, presets: DEFAULT_BROWSER_PRESET }
-      if (packageType === PACKAGE_TYPES.REACT) {
-        return getReactConfig(options)
-      }
-      return options
+      return getOptions(options, packageType)
     default:
       return options
   }
@@ -134,13 +150,14 @@ function getWebpackConfig(bundleType, packageType) {
 
   const config = {
     stats: {
-      colors: true
+      colors: true,
+      warnings: false
     },
     devtool: isEnvProduction ? 'source-map' : 'cheap-module-source-map',
     module: {
       rules: [
         {
-          test: /\.(js|jsx)$/,
+          test: /\.(js|jsx|ts)$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
           options: getBabelConfig(bundleType, packageType)
@@ -150,7 +167,7 @@ function getWebpackConfig(bundleType, packageType) {
     mode: isEnvProduction ? 'production' : 'development',
     plugins: [new EnvironmentPlugin(getWebpackEnv())],
     resolve: {
-      extensions: ['.js', '.jsx']
+      extensions: ['.js', '.jsx', '.ts']
     }
   }
 

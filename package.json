@@ -15,7 +15,7 @@
     "github-release": "node scripts/github-release",
     "build-docs": "sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
     "lint": "npm-run-all --silent -p lint:*",
-    "lint:js": "eslint .",
+    "lint:js": "eslint . --ext .js,.jsx,.ts",
     "lint:license": "node scripts/license-checker",
     "test": "lerna run build:main && lerna run test --stream --scope=$SCOPE --no-prefix",
     "bundlesize": "lerna run bundlesize --stream",
@@ -25,7 +25,7 @@
     "clean": "npx lerna exec -- rm -rf dist/"
   },
   "lint-staged": {
-    "*.{js,jsx}": [
+    "*.{js,jsx,ts}": [
       "eslint . --fix",
       "git add"
     ]
@@ -39,16 +39,28 @@
   "license": "MIT",
   "homepage": "https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html",
   "devDependencies": {
+    "@angular/common": "^8.2.2",
+    "@angular/compiler": "^8.2.2",
+    "@angular/core": "^8.2.2",
+    "@angular/platform-browser": "^8.2.2",
+    "@angular/platform-browser-dynamic": "^8.2.2",
+    "@angular/router": "^8.2.2",
     "@babel/cli": "^7.4.3",
     "@babel/core": "^7.2.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-proposal-decorators": "^7.4.4",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/plugin-transform-destructuring": "^7.3.2",
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.4.0",
     "@lerna/child-process": "^3.14.2",
     "@lerna/prompt": "^3.13.0",
+    "@types/jasmine": "^3.4.0",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
     "@wdio/cli": "^5.11.13",
     "@wdio/dot-reporter": "^5.11.7",
     "@wdio/jasmine-framework": "^5.11.0",
@@ -60,6 +72,7 @@
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
     "babel-plugin-istanbul": "^5.1.4",
+    "babel-plugin-transform-typescript-metadata": "^0.2.2",
     "benchmark": "^2.1.4",
     "bundlesize": "^0.17.2",
     "codecov": "^3.5.0",
@@ -79,7 +92,7 @@
     "glob": "^7.1.4",
     "http-server": "^0.10.0",
     "husky": "^1.3.1",
-    "jasmine": "^2.8.0",
+    "jasmine": "^2.99.0",
     "karma": "^4.1.0",
     "karma-benchmark": "^1.0.4",
     "karma-benchmark-json-reporter": "^1.0.1",
@@ -108,15 +121,18 @@
     "serve-index": "^1.9.1",
     "source-map": "^0.7.0",
     "stats-lite": "^2.2.0",
+    "typescript": "^3.5.3",
     "uglifyjs-webpack-plugin": "^2.0.1",
     "webdriverio": "^5.11.13",
     "webpack": "^4.27.1",
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.1.2",
-    "whatwg-fetch": "^3.0.0"
+    "whatwg-fetch": "^3.0.0",
+    "zone.js": "^0.10.2"
   },
   "dependencies": {
     "@elastic/apm-rum": "file:packages/rum",
+    "@elastic/apm-rum-angular": "file:packages/rum-angular",
     "@elastic/apm-rum-core": "file:packages/rum-core",
     "@elastic/apm-rum-react": "file:packages/rum-react"
   }

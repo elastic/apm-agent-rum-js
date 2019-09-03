@@ -60,6 +60,10 @@ jobs:
       env:
         - STACK_VERSION=7.0.0
         - SCOPE=@elastic/apm-rum-react
+    - stage: test
+      env:
+        - STACK_VERSION=7.0.0
+        - SCOPE=@elastic/apm-rum-angular
 addons:
   apt:
     packages:
