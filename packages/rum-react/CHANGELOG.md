@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.3](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@0.2.2...@elastic/apm-rum-react@0.2.3) (2019-09-03)
+
+
+### Bug Fixes
+
+* **rum-react:** respect active flag in react integration ([#392](https://github.com/elastic/apm-agent-rum-js/issues/392)) ([6d7e9db](https://github.com/elastic/apm-agent-rum-js/commit/6d7e9db))
+
+
+
+
+
 ## [0.2.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@0.2.1...@elastic/apm-rum-react@0.2.2) (2019-08-08)
 
 **Note:** Version bump only for package @elastic/apm-rum-react

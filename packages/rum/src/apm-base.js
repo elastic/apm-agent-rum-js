@@ -43,7 +43,7 @@ class ApmBase {
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
-      configService.setVersion('4.4.2')
+      configService.setVersion('4.4.3')
       this.config(config)
       /**
        * Deactive agent when the active config flag is set to false
