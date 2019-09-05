@@ -30,6 +30,7 @@ import {
   USER_TIMING_THRESHOLD
 } from '../common/constants'
 import { stripQueryStringFromUrl, getServerTimingInfo } from '../common/utils'
+import { captureBreakdown } from './breakdown'
 
 /**
  * Navigation Timing Spans
@@ -232,77 +233,88 @@ function createUserTimingSpans(entries, transactionEnd) {
 
 function captureHardNavigation(transaction) {
   const perf = window.performance
-  if (transaction.isHardNavigation && perf && perf.timing) {
-    const timings = perf.timing
-    if (transaction.marks && transaction.marks.custom) {
-      var customMarks = transaction.marks.custom
-      Object.keys(customMarks).forEach(key => {
-        customMarks[key] += transaction._start
-      })
-    }
-
-    // must be zero otherwise the calculated relative _start time would be wrong
-    transaction._start = 0
-
-    /**
-     * Threshold that decides if the span must be
-     * captured as part of the page load transaction
-     *
-     * Denotes the time when the onload event fires
-     */
-    const transactionEnd = transaction._end
-
-    createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    ).forEach(span => {
-      span.traceId = transaction.traceId
-      span.sampled = transaction.sampled
-      if (span.pageResponse && transaction.options.pageLoadSpanId) {
-        span.id = transaction.options.pageLoadSpanId
-      }
-      transaction.spans.push(span)
+  if (!(transaction.isHardNavigation && perf && perf.timing)) {
+    return
+  }
+  const timings = perf.timing
+  if (transaction.marks && transaction.marks.custom) {
+    var customMarks = transaction.marks.custom
+    Object.keys(customMarks).forEach(key => {
+      customMarks[key] += transaction._start
     })
+  }
 
+  // must be zero otherwise the calculated relative _start time would be wrong
+  transaction._start = 0
+
+  /**
+   * Threshold that decides if the span must be
+   * captured as part of the page load transaction
+   *
+   * Denotes the time when the onload event fires
+   */
+  const transactionEnd = transaction._end
+
+  createNavigationTimingSpans(
+    timings,
+    timings.fetchStart,
+    transactionEnd
+  ).forEach(span => {
+    span.traceId = transaction.traceId
+    span.sampled = transaction.sampled
+    if (span.pageResponse && transaction.options.pageLoadSpanId) {
+      span.id = transaction.options.pageLoadSpanId
+    }
+    transaction.spans.push(span)
+  })
+
+  if (typeof perf.getEntriesByType === 'function') {
     /**
      * capture resource timing information as Spans during page load transaction
      */
-    if (typeof perf.getEntriesByType === 'function') {
-      const resourceEntries = perf.getEntriesByType('resource')
+    const resourceEntries = perf.getEntriesByType('resource')
 
-      const ajaxUrls = []
-      for (let i = 0; i < transaction.spans; i++) {
-        const span = transaction.spans[i]
+    const ajaxUrls = []
+    for (let i = 0; i < transaction.spans; i++) {
+      const span = transaction.spans[i]
 
-        if (span.type === 'external' && span.subType === 'http') {
-          continue
-        }
-        ajaxUrls.push(span.name.split(' ')[1])
+      if (span.type === 'external' && span.subType === 'http') {
+        continue
       }
-      createResourceTimingSpans(
-        resourceEntries,
-        ajaxUrls,
-        transactionEnd
-      ).forEach(span => transaction.spans.push(span))
+      ajaxUrls.push(span.name.split(' ')[1])
+    }
+    createResourceTimingSpans(
+      resourceEntries,
+      ajaxUrls,
+      transactionEnd
+    ).forEach(span => transaction.spans.push(span))
 
-      const userEntries = perf.getEntriesByType('measure')
-      createUserTimingSpans(userEntries, transactionEnd).forEach(span =>
-        transaction.spans.push(span)
-      )
+    /**
+     * capture user timing information as spans
+     */
+    const userEntries = perf.getEntriesByType('measure')
+    createUserTimingSpans(userEntries, transactionEnd).forEach(span =>
+      transaction.spans.push(span)
+    )
 
-      /**
-       * Add transaction context information from performance navigation timing entry level 2 API
-       */
-      let navigationEntry = perf.getEntriesByType('navigation')
-      if (navigationEntry && navigationEntry.length > 0) {
-        navigationEntry = navigationEntry[0]
-        transaction.addContext({
-          response: getResponseContext(navigationEntry)
-        })
-      }
+    /**
+     * Add transaction context information from performance navigation timing entry level 2 API
+     */
+    let navigationEntry = perf.getEntriesByType('navigation')
+    if (navigationEntry && navigationEntry.length > 0) {
+      navigationEntry = navigationEntry[0]
+      transaction.addContext({
+        response: getResponseContext(navigationEntry)
+      })
     }
   }
+
+  /**
+   * Capture breakdown charts timings during page load
+   */
+  captureBreakdown(transaction.type, timings).map(timing => {
+    transaction.breakdownTimings.push(timing)
+  })
 }
 
 export {

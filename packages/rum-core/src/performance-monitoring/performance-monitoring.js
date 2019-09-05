@@ -384,6 +384,7 @@ class PerformanceMonitoring {
       spans,
       context,
       marks: transaction.marks,
+      breakdownTimings: transaction.breakdownTimings,
       span_count: {
         started: spans.length
       },

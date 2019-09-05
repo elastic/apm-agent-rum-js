@@ -23,7 +23,7 @@
  *
  */
 
-import { isUndefined, generateRandomId, setLabel, merge } from '../common/utils'
+import { generateRandomId, setLabel, merge, getDuration } from '../common/utils'
 import { NAME_UNKNOWN, TYPE_CUSTOM } from '../common/constants'
 
 class SpanBase {
@@ -96,13 +96,7 @@ class SpanBase {
   }
 
   duration() {
-    if (isUndefined(this._end) || isUndefined(this._start)) {
-      return null
-    }
-
-    var diff = this._end - this._start
-
-    return parseFloat(diff)
+    return getDuration(this._start, this._end)
   }
 }
 

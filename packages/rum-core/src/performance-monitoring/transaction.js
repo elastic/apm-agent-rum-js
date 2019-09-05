@@ -42,6 +42,7 @@ class Transaction extends SpanBase {
     this.marks = undefined
 
     this.spans = []
+    this.breakdownTimings = []
     this._activeSpans = {}
 
     this.nextAutoTaskId = 1

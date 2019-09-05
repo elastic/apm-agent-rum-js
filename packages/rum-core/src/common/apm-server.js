@@ -236,14 +236,65 @@ class ApmServer {
   }
 
   ndjsonErrors(errors) {
-    return errors.map(function(error) {
-      return NDJSON.stringify({ error })
-    })
+    return errors.map(error => NDJSON.stringify({ error }))
+  }
+
+  prepareMetricsSet(transaction) {
+    const now = Date.now() * 1000
+    const timings = transaction.breakdownTimings
+
+    if (timings.length === 0) {
+      return ''
+    }
+    const { name, type } = transaction
+
+    const transactionMetricSet = {
+      metricset: {
+        timestamp: now,
+        transaction: { name, type },
+        samples: {
+          'transaction.duration.count': {
+            value: 1
+          },
+          'transaction.duration.sum.us': {
+            value: transaction.duration
+          },
+          'transaction.breakdown.count': {
+            value: 1
+          }
+        }
+      }
+    }
+
+    const timingSpentbyType = timings
+      .map(timing => {
+        const timingMetricSet = {
+          metricset: {
+            timestamp: now,
+            transaction: { name, type },
+            span: { type: timing.type },
+            samples: {
+              'span.self_time.count': {
+                value: timing.count
+              },
+              'span.self_time.sum.us': {
+                value: timing.duration
+              }
+            }
+          }
+        }
+        return NDJSON.stringify(timingMetricSet)
+      })
+      .join('')
+    delete transaction.breakdownTimings
+
+    return NDJSON.stringify(transactionMetricSet) + timingSpentbyType
   }
 
   ndjsonTransactions(transactions) {
     var ndjsonSpan = this.ndjsonSpan
-    return transactions.map(function(tr) {
+    return transactions.map(tr => {
+      const metricSets = this.prepareMetricsSet(tr)
       var spans = ''
       if (tr.spans) {
         spans = tr.spans
@@ -254,7 +305,7 @@ class ApmServer {
           .join('')
         delete tr.spans
       }
-      return NDJSON.stringify({ transaction: tr }) + spans
+      return NDJSON.stringify({ transaction: tr }) + spans + metricSets
     })
   }
 

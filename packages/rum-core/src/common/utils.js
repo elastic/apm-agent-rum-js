@@ -398,6 +398,13 @@ function getPageLoadMarks() {
   }
 }
 
+function getDuration(start, end) {
+  if (isUndefined(end) || isUndefined(start)) {
+    return null
+  }
+  return parseFloat(end - start)
+}
+
 export {
   extend,
   merge,
@@ -423,6 +430,7 @@ export {
   getEarliestSpan,
   getLatestNonXHRSpan,
   getPageLoadMarks,
+  getDuration,
   rng,
   checkSameOrigin,
   setLabel,
