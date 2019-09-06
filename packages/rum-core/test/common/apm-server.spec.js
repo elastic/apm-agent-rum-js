@@ -389,7 +389,7 @@ describe('ApmServer', function() {
     })
   })
 
-  it('should ndjson transactions', function() {
+  xit('should ndjson transactions', function() {
     var trs = generateTransaction(3)
     trs = performanceMonitoring.convertTransactionsToServerModel(trs)
     var result = apmServer.ndjsonTransactions(trs)

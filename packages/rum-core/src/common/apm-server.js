@@ -29,7 +29,7 @@ import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
-import { createMetricForTransactions } from './metricsets'
+import { createMetricForTransaction } from './metricsets'
 import { __DEV__ } from '../env'
 
 class ApmServer {
@@ -247,7 +247,7 @@ class ApmServer {
   ndjsonTransactions(transactions) {
     var ndjsonSpan = this.ndjsonSpan
     return transactions.map(tr => {
-      var spans = ''
+      let spans = ''
       if (tr.spans) {
         spans = tr.spans
           .map(function(sp) {
@@ -257,7 +257,14 @@ class ApmServer {
           .join('')
         delete tr.spans
       }
-      return NDJSON.stringify({ transaction: tr }) + spans
+      let breakdowns = ''
+      if (tr.breakdown) {
+        const metricSets = createMetricForTransaction(tr)
+        breakdowns = this.ndjsonMetricsets(metricSets).join('')
+        delete tr.breakdown
+      }
+
+      return NDJSON.stringify({ transaction: tr }) + spans + breakdowns
     })
   }
 
@@ -279,8 +286,6 @@ class ApmServer {
       ndjson = this.ndjsonErrors(filteredPayload.data)
     } else if (type === 'transaction') {
       ndjson = this.ndjsonTransactions(filteredPayload.data)
-      const metricSets = createMetricForTransactions(filteredPayload.data)
-      ndjson = ndjson.concat(this.ndjsonMetricsets(metricSets))
     } else {
       if (__DEV__) {
         this._loggingService.debug('Dropped payload due to unknown data type')

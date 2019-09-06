@@ -27,44 +27,41 @@ function microtime() {
   return Date.now() * 1000
 }
 
-export function createMetricForTransactions(transactions) {
+export function createMetricForTransaction(transaction) {
   const metricSets = []
-  const timestamp = microtime()
 
-  for (let i = 0; i < transactions.length; i++) {
-    const transaction = transactions[i]
-    const { name, type } = transaction
+  const timestamp = microtime()
+  const { name, type } = transaction
+  metricSets.push({
+    timestamp,
+    transaction: { name, type },
+    samples: {
+      'transaction.duration.count': {
+        value: 1
+      },
+      'transaction.duration.sum.us': {
+        value: transaction.duration
+      },
+      'transaction.breakdown.count': {
+        value: 1
+      }
+    }
+  })
+  transaction.breakdown.forEach(timing => {
     metricSets.push({
       timestamp,
       transaction: { name, type },
+      span: { type: timing.type, subtype: timing.subtype },
       samples: {
-        'transaction.duration.count': {
-          value: 1
+        'span.self_time.count': {
+          value: timing.count
         },
-        'transaction.duration.sum.us': {
-          value: transaction.duration
-        },
-        'transaction.breakdown.count': {
-          value: 1
+        'span.self_time.sum.us': {
+          value: timing.duration
         }
       }
     })
-    transaction.breakdown.forEach(timing => {
-      metricSets.push({
-        timestamp,
-        transaction: { name, type },
-        span: { type: timing.type, subtype: timing.subtype },
-        samples: {
-          'span.self_time.count': {
-            value: timing.count
-          },
-          'span.self_time.sum.us': {
-            value: timing.duration
-          }
-        }
-      })
-    })
-  }
+  })
 
   return metricSets
 }
