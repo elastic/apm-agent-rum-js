@@ -138,7 +138,7 @@ class Transaction extends SpanBase {
   }
 
   captureBreakdown() {
-    this.breakdownTimings = captureBreakdown(this.type)
+    this.breakdownTimings = captureBreakdown(this)
   }
 
   addTask(taskId) {

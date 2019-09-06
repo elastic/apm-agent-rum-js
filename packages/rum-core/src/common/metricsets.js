@@ -53,7 +53,7 @@ export function createMetricForTransactions(transactions) {
       metricSets.push({
         timestamp,
         transaction: { name, type },
-        span: { type: timing.type, subType: timing.subType },
+        span: { type: timing.type, subtype: timing.subtype },
         samples: {
           'span.self_time.count': {
             value: timing.count
