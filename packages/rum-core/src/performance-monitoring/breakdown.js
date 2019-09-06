@@ -24,36 +24,48 @@
  */
 
 import { getDuration } from '../common/utils'
+import { PAGE_LOAD } from '../common/constants'
 
 class BreakdownTiming {
-  constructor(type, duration) {
+  constructor(type, duration, subType) {
     this.type = type
+    this.subType = subType
     this.duration = duration
     this.count = 1
   }
 }
 
+/**
+ * Page load transaction breakdown timings
+ *
+ * Interested events from the Navigation timing API
+ */
 const pageLoadBreakdowns = [
   ['navigationStart', 'fetchStart', 'Request Stalled'],
   ['fetchStart', 'requestStart', 'Network'],
-  ['requestStart', 'responseStart', 'Server Response'],
-  ['domLoading', 'domInteractive', 'Document Processing'],
+  ['requestStart', 'responseStart', 'TTFB'],
+  ['domLoading', 'domInteractive', 'DOM Processing'],
   ['domInteractive', 'loadEventEnd', 'Page Render']
 ]
 
-export function captureBreakdown(type, timings) {
+/**
+ * TODO: Add transaction breakdown for other types
+ * `route-change` and `custom`
+ */
+export function captureBreakdown(type) {
   const breakdowns = []
 
-  if (type === 'page-load') {
+  if (type === PAGE_LOAD) {
+    const timings = window.performance.timing
     for (let i = 0; i < pageLoadBreakdowns.length; i++) {
-      const start = timings[pageLoadBreakdowns[i][0]]
-      const end = timings[pageLoadBreakdowns[i][1]]
+      const current = pageLoadBreakdowns[i]
+      const start = timings[current[0]]
+      const end = timings[current[1]]
       const duration = getDuration(start, end)
-
       if (duration == null) {
         continue
       }
-      const timing = new BreakdownTiming(pageLoadBreakdowns[i][2], duration)
+      const timing = new BreakdownTiming(current[2], duration)
       breakdowns.push(timing)
     }
   }

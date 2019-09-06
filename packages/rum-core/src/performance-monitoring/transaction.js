@@ -32,8 +32,8 @@ import {
   getPageMetadata,
   removeInvalidChars
 } from '../common/utils'
-
 import { REUSABILITY_THRESHOLD } from '../common/constants'
+import { captureBreakdown } from './breakdown'
 
 class Transaction extends SpanBase {
   constructor(name, type, options) {
@@ -42,13 +42,14 @@ class Transaction extends SpanBase {
     this.marks = undefined
 
     this.spans = []
-    this.breakdownTimings = []
     this._activeSpans = {}
 
     this.nextAutoTaskId = 1
     this._scheduledTasks = []
 
     this.isHardNavigation = false
+
+    this.breakdownTimings = []
 
     this.sampled = Math.random() <= this.options.transactionSampleRate
   }
@@ -132,7 +133,12 @@ class Transaction extends SpanBase {
     const metadata = getPageMetadata()
     this.addContext(metadata)
 
+    this.captureBreakdown()
     this.callOnEnd()
+  }
+
+  captureBreakdown() {
+    this.breakdownTimings = captureBreakdown(this.type)
   }
 
   addTask(taskId) {

@@ -29,6 +29,7 @@ import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
+import { createMetricForTransactions } from './metricsets'
 import { __DEV__ } from '../env'
 
 class ApmServer {
@@ -239,62 +240,13 @@ class ApmServer {
     return errors.map(error => NDJSON.stringify({ error }))
   }
 
-  prepareMetricsSet(transaction) {
-    const now = Date.now() * 1000
-    const timings = transaction.breakdownTimings
-
-    if (timings.length === 0) {
-      return ''
-    }
-    const { name, type } = transaction
-
-    const transactionMetricSet = {
-      metricset: {
-        timestamp: now,
-        transaction: { name, type },
-        samples: {
-          'transaction.duration.count': {
-            value: 1
-          },
-          'transaction.duration.sum.us': {
-            value: transaction.duration
-          },
-          'transaction.breakdown.count': {
-            value: 1
-          }
-        }
-      }
-    }
-
-    const timingSpentbyType = timings
-      .map(timing => {
-        const timingMetricSet = {
-          metricset: {
-            timestamp: now,
-            transaction: { name, type },
-            span: { type: timing.type },
-            samples: {
-              'span.self_time.count': {
-                value: timing.count
-              },
-              'span.self_time.sum.us': {
-                value: timing.duration
-              }
-            }
-          }
-        }
-        return NDJSON.stringify(timingMetricSet)
-      })
-      .join('')
-    delete transaction.breakdownTimings
-
-    return NDJSON.stringify(transactionMetricSet) + timingSpentbyType
+  ndjsonMetricsets(metricsets) {
+    return metricsets.map(metricset => NDJSON.stringify({ metricset }))
   }
 
   ndjsonTransactions(transactions) {
     var ndjsonSpan = this.ndjsonSpan
     return transactions.map(tr => {
-      const metricSets = this.prepareMetricsSet(tr)
       var spans = ''
       if (tr.spans) {
         spans = tr.spans
@@ -305,7 +257,7 @@ class ApmServer {
           .join('')
         delete tr.spans
       }
-      return NDJSON.stringify({ transaction: tr }) + spans + metricSets
+      return NDJSON.stringify({ transaction: tr }) + spans
     })
   }
 
@@ -322,12 +274,13 @@ class ApmServer {
       return
     }
 
-    const endPoint = this._configService.getEndpointUrl()
     let ndjson
     if (type === 'errors') {
       ndjson = this.ndjsonErrors(filteredPayload.data)
     } else if (type === 'transaction') {
       ndjson = this.ndjsonTransactions(filteredPayload.data)
+      const metricSets = createMetricForTransactions(filteredPayload.data)
+      ndjson = ndjson.concat(this.ndjsonMetricsets(metricSets))
     } else {
       if (__DEV__) {
         this._loggingService.debug('Dropped payload due to unknown data type')
@@ -338,6 +291,7 @@ class ApmServer {
       NDJSON.stringify({ metadata: { service: filteredPayload.service } })
     )
     const ndjsonPayload = ndjson.join('')
+    const endPoint = this._configService.getEndpointUrl()
     return this._postJson(endPoint, ndjsonPayload)
   }
 

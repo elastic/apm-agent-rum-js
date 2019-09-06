@@ -30,7 +30,6 @@ import {
   USER_TIMING_THRESHOLD
 } from '../common/constants'
 import { stripQueryStringFromUrl, getServerTimingInfo } from '../common/utils'
-import { captureBreakdown } from './breakdown'
 
 /**
  * Navigation Timing Spans
@@ -236,9 +235,10 @@ function captureHardNavigation(transaction) {
   if (!(transaction.isHardNavigation && perf && perf.timing)) {
     return
   }
-  const timings = perf.timing
-  if (transaction.marks && transaction.marks.custom) {
-    var customMarks = transaction.marks.custom
+
+  const marks = transaction.marks
+  if (marks && marks.custom) {
+    var customMarks = marks.custom
     Object.keys(customMarks).forEach(key => {
       customMarks[key] += transaction._start
     })
@@ -254,6 +254,7 @@ function captureHardNavigation(transaction) {
    * Denotes the time when the onload event fires
    */
   const transactionEnd = transaction._end
+  const timings = perf.timing
 
   createNavigationTimingSpans(
     timings,
@@ -308,13 +309,6 @@ function captureHardNavigation(transaction) {
       })
     }
   }
-
-  /**
-   * Capture breakdown charts timings during page load
-   */
-  captureBreakdown(transaction.type, timings).map(timing => {
-    transaction.breakdownTimings.push(timing)
-  })
 }
 
 export {
