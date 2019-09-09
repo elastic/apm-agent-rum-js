@@ -26,15 +26,6 @@
 import { getDuration } from '../common/utils'
 import { PAGE_LOAD } from '../common/constants'
 
-class BreakdownTiming {
-  constructor(type, duration, subtype) {
-    this.type = type
-    this.subtype = subtype
-    this.duration = duration
-    this.count = 1
-  }
-}
-
 /**
  * Page load transaction breakdown timings
  *
@@ -48,15 +39,58 @@ const pageLoadBreakdowns = [
   ['domInteractive', 'loadEventEnd', 'Page Render']
 ]
 
+function getValue(value) {
+  return { value }
+}
+
+function transactionBreakdownDetails({ name, type }) {
+  return { name, type }
+}
+
+function spanBreakdownDetails({ type, subType = undefined }) {
+  return { type, subtype: subType }
+}
+
+function getSpanBreakdown(span, transactionDetails) {
+  const duration = span.duration()
+  return {
+    transaction: transactionDetails,
+    span: spanBreakdownDetails(span),
+    samples: {
+      'span.self_time.count': getValue(1),
+      'span.self_time.sum.us': getValue(duration)
+    }
+  }
+}
+
 /**
- * Capture breakdown timings for the transaction based on the
- * type of the transaction
+ * Capture breakdown metrics for the transaction based on the
+ * transaction type
  */
 export function captureBreakdown(transcation) {
   const breakdowns = []
+  const trDuration = transcation.duration()
+  const { type, sampled } = transcation
+  const transactionBreakDownDetails = transactionBreakdownDetails(transcation)
 
-  if (transcation.type === PAGE_LOAD) {
-    const timings = window.performance.timing
+  breakdowns.push({
+    transaction: transactionBreakDownDetails,
+    samples: {
+      'transaction.duration.count': getValue(sampled ? 1 : 0),
+      'transaction.duration.sum.us': getValue(trDuration),
+      'transaction.breakdown.count': getValue(1)
+    }
+  })
+
+  /**
+   * Capture breakdown metrics only for sampled transactions
+   */
+  if (!sampled) {
+    return breakdowns
+  }
+
+  const timings = window.performance.timing
+  if (type === PAGE_LOAD && timings) {
     for (let i = 0; i < pageLoadBreakdowns.length; i++) {
       const current = pageLoadBreakdowns[i]
       const start = timings[current[0]]
@@ -65,30 +99,42 @@ export function captureBreakdown(transcation) {
       if (duration == null) {
         continue
       }
-      const timing = new BreakdownTiming(current[2], duration)
-      breakdowns.push(timing)
+      breakdowns.push(
+        getSpanBreakdown(
+          {
+            type: current[2],
+            duration: () => duration
+          },
+          transactionBreakDownDetails
+        )
+      )
     }
   } else {
     /**
      * Construct the breakdown timings based on span types
      */
     const spans = transcation.spans
-    const transactionDuration = transcation.duration()
     let childTimings = 0
     for (let i = 0; i < spans.length; i++) {
       const span = spans[i]
-      const { type, subType } = span
       const duration = span.duration()
       childTimings += duration
-      const timing = new BreakdownTiming(type, duration, subType)
-      breakdowns.push(timing)
+      breakdowns.push(getSpanBreakdown(span, transactionBreakDownDetails))
     }
     /**
      * Associate rest of the breakdown time in `app`
      */
-    if (childTimings < transactionDuration) {
-      const duration = getDuration(childTimings, transactionDuration)
-      breakdowns.push(new BreakdownTiming('app', duration))
+    if (childTimings < trDuration) {
+      const duration = getDuration(childTimings, trDuration)
+      breakdowns.push(
+        getSpanBreakdown(
+          {
+            type: 'app',
+            duration: () => duration
+          },
+          transactionBreakDownDetails
+        )
+      )
     }
   }
   return breakdowns

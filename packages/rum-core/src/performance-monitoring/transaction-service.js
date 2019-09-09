@@ -181,6 +181,14 @@ class TransactionService {
           if (this.shouldIgnoreTransaction(tr.name)) {
             return
           }
+          /**
+           * Capture breakdown metrics once the transaction is completed
+           */
+          const breakdownMetrics = this._config.get('breakdownMetrics')
+          if (breakdownMetrics) {
+            tr.captureBreakdown()
+          }
+
           if (tr.type === PAGE_LOAD) {
             /**
              * Setting the pageLoadTransactionName via configService.setConfig after

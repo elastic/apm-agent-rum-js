@@ -29,7 +29,6 @@ import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
-import { createMetricForTransaction } from './metricsets'
 import { __DEV__ } from '../env'
 
 class ApmServer {
@@ -241,7 +240,10 @@ class ApmServer {
   }
 
   ndjsonMetricsets(metricsets) {
-    return metricsets.map(metricset => NDJSON.stringify({ metricset }))
+    const timestamp = Date.now() * 1000
+    return metricsets.map(metricset =>
+      NDJSON.stringify({ timestamp, metricset })
+    )
   }
 
   ndjsonTransactions(transactions) {
@@ -259,8 +261,7 @@ class ApmServer {
       }
       let breakdowns = ''
       if (tr.breakdown) {
-        const metricSets = createMetricForTransaction(tr)
-        breakdowns = this.ndjsonMetricsets(metricSets).join('')
+        breakdowns = this.ndjsonMetricsets(tr.breakdown).join('')
         delete tr.breakdown
       }
 

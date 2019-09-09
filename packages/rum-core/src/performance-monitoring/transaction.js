@@ -133,7 +133,6 @@ class Transaction extends SpanBase {
     const metadata = getPageMetadata()
     this.addContext(metadata)
 
-    this.captureBreakdown()
     this.callOnEnd()
   }
 
