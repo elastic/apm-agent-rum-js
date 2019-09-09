@@ -79,6 +79,17 @@ A list of instrumentations which can be disabled. Valid options are `xmlhttprequ
 `history`, `error` and `page-load`. When disabled, no transactions/spans will be created for that type.
 
 [float]
+[[breakdown-metrics]]
+=== `breakdownMetrics`
+
+* *Type:* Boolean
+* *Default:* `true`
+
+Enable/disable the tracking and collection of breakdown metrics for the transaction.
+
+NOTE: This feature requires APM Server and Kibana >= 7.3.
+
+[float]
 [[environment]]
 === `environment`
 
