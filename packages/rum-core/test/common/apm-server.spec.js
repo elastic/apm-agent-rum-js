@@ -29,11 +29,12 @@ import {
   getGlobalConfig,
   isVersionInRange
 } from '../../../../dev-utils/test-config'
+import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
 import { createServiceFactory } from '../'
 
 const { agentConfig, testConfig } = getGlobalConfig('rum-core')
 
-function generateTransaction(count) {
+function generateTransaction(count, breakdown = false) {
   var result = []
   for (var i = 0; i < count; i++) {
     var tr = new Transaction('transaction #' + i, 'transaction', {})
@@ -48,9 +49,12 @@ function generateTransaction(count) {
     tr.context.page.url = 'url'
     tr._start = 10
     tr._end = 1000
-
     span1._start = 20
     span1._end = 30
+    if (breakdown) {
+      tr.sampled = true
+      tr.breakdownTimings = captureBreakdown(tr)
+    }
 
     result.push(tr)
   }
@@ -389,7 +393,7 @@ describe('ApmServer', function() {
     })
   })
 
-  xit('should ndjson transactions', function() {
+  it('should ndjson transactions', function() {
     var trs = generateTransaction(3)
     trs = performanceMonitoring.convertTransactionsToServerModel(trs)
     var result = apmServer.ndjsonTransactions(trs)
@@ -400,6 +404,24 @@ describe('ApmServer', function() {
       '{"transaction":{"id":"transaction-id-2","trace_id":"trace-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-2-1","transaction_id":"transaction-id-2","parent_id":"transaction-id-2","trace_id":"trace-id-2","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n'
     ]
     expect(result).toEqual(expected)
+  })
+
+  it('should ndjson transactions along with metricsets', function() {
+    const tr = generateTransaction(1, true)
+    jasmine.clock().install()
+    jasmine.clock().mockDate(new Date(2019, 9, 9))
+    const payload = performanceMonitoring.convertTransactionsToServerModel(tr)
+    const result = apmServer.ndjsonTransactions(payload)
+    /* eslint-disable max-len */
+    const expected = [
+      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":true}}\n',
+      '{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
+      '{"metricset":{"timestamp":1570572000000000,"transaction":{"name":"transaction #0","type":"transaction"},"samples":{"transaction.duration.count":{"value":1},"transaction.duration.sum.us":{"value":990},"transaction.breakdown.count":{"value":1}}}}\n',
+      '{"metricset":{"timestamp":1570572000000000,"transaction":{"name":"transaction #0","type":"transaction"},"span":{"type":"type"},"samples":{"span.self_time.count":{"value":1},"span.self_time.sum.us":{"value":10}}}}\n',
+      '{"metricset":{"timestamp":1570572000000000,"transaction":{"name":"transaction #0","type":"transaction"},"span":{"type":"app"},"samples":{"span.self_time.count":{"value":1},"span.self_time.sum.us":{"value":980}}}}\n'
+    ].join('')
+    expect(result).toEqual([expected])
+    jasmine.clock().uninstall()
   })
 
   if (isVersionInRange(testConfig.stackVersion, '7.3.0')) {

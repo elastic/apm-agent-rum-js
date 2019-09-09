@@ -43,7 +43,6 @@ class ApmServer {
     this.throttleAddTransaction = undefined
 
     this.initialized = false
-    this.ndjsonSpan = {}
   }
 
   init() {
@@ -241,27 +240,23 @@ class ApmServer {
 
   ndjsonMetricsets(metricsets) {
     const timestamp = Date.now() * 1000
-    return metricsets.map(metricset =>
-      NDJSON.stringify({ timestamp, metricset })
-    )
+    return metricsets
+      .map(metricset =>
+        NDJSON.stringify({ metricset: { timestamp, ...metricset } })
+      )
+      .join('')
   }
 
   ndjsonTransactions(transactions) {
-    var ndjsonSpan = this.ndjsonSpan
     return transactions.map(tr => {
       let spans = ''
       if (tr.spans) {
-        spans = tr.spans
-          .map(function(sp) {
-            ndjsonSpan.span = sp
-            return NDJSON.stringify(ndjsonSpan)
-          })
-          .join('')
+        spans = tr.spans.map(span => NDJSON.stringify({ span })).join('')
         delete tr.spans
       }
       let breakdowns = ''
       if (tr.breakdown) {
-        breakdowns = this.ndjsonMetricsets(tr.breakdown).join('')
+        breakdowns = this.ndjsonMetricsets(tr.breakdown)
         delete tr.breakdown
       }
 

@@ -76,9 +76,9 @@ export function captureBreakdown(transcation) {
   breakdowns.push({
     transaction: transactionBreakDownDetails,
     samples: {
-      'transaction.duration.count': getValue(sampled ? 1 : 0),
+      'transaction.duration.count': getValue(1),
       'transaction.duration.sum.us': getValue(trDuration),
-      'transaction.breakdown.count': getValue(1)
+      'transaction.breakdown.count': getValue(sampled ? 1 : 0)
     }
   })
 
