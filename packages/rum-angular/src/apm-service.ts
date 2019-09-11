@@ -40,7 +40,7 @@ import { Promise } from 'es6-promise'
 export class ApmService {
   static apm: any
 
-  constructor(public router: Router) {}
+  constructor(public router: Router, protected route: ActivatedRoute) {}
 
   init(config) {
     const apmInstance = ApmService.apm.init(config)
@@ -81,14 +81,28 @@ export class ApmService {
          *
          * Even If there are any redirects, the router state path
          * will be matched with the correct url on navigation end
+         *
+         * Traverse the activated route tree to figure out the nested
+         * route path
          */
-        const child: ActivatedRoute = this.router.routerState.root.firstChild
-        if (
-          child &&
-          child.snapshot.routeConfig &&
-          child.snapshot.routeConfig.path
-        ) {
-          transaction.name = '/' + child.snapshot.routeConfig.path
+        const route = this.route.firstChild
+
+        if (route) {
+          let child = route
+          let path = '/' + child.routeConfig.path
+          while (child) {
+            child = child.firstChild
+            if (child && child.routeConfig) {
+              const currentPath = child.routeConfig.path
+              /**
+               * Ignore empty path's in the route config
+               */
+              if (currentPath) {
+                path += '/' + currentPath
+              }
+            }
+          }
+          transaction.name = path
         }
         /**
          * Schedule the transaction finish logic on the next
