@@ -405,6 +405,20 @@ function getDuration(start, end) {
   return parseFloat(end - start)
 }
 
+/**
+ * Get number of microseconds elapsed since January 1, 1970 00:00:00 UTC
+ *
+ * On browsers that support DOM High resolution timestamp, this function takes care of
+ * accounting for clock drift
+ */
+function microtime() {
+  let time = Date.now()
+  if (typeof performance.now === 'function') {
+    time = performance.timing.navigationStart + performance.now()
+  }
+  return time * 1000
+}
+
 export {
   extend,
   merge,
@@ -432,6 +446,7 @@ export {
   getPageLoadMarks,
   getDuration,
   rng,
+  microtime,
   checkSameOrigin,
   setLabel,
   stripQueryStringFromUrl,

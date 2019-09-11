@@ -98,8 +98,6 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
-      apm-server:
-        condition: service_healthy
     labels:
       - "co.elatic.apm.stack-version=${STACK_VERSION}"
     networks:

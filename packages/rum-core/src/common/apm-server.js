@@ -29,6 +29,7 @@ import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
+import { microtime } from '../common/utils'
 import { __DEV__ } from '../env'
 
 class ApmServer {
@@ -239,7 +240,7 @@ class ApmServer {
   }
 
   ndjsonMetricsets(metricsets) {
-    const timestamp = Date.now() * 1000
+    const timestamp = microtime()
     return metricsets
       .map(metricset =>
         NDJSON.stringify({ metricset: { timestamp, ...metricset } })
