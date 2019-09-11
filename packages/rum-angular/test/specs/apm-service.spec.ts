@@ -32,11 +32,41 @@ import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing'
+import { NgModule } from '@angular/core'
 import { Component } from '@angular/core'
 import { Location } from '@angular/common'
 import { Routes, Router } from '@angular/router'
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
+
+@Component({
+  template: 'LazyHome'
+})
+class LazyHomeComponent {}
+
+@Component({
+  template: 'LazyDetail'
+})
+class LazyDetailComponent {}
+
+const lazyRoutes: Routes = [
+  {
+    path: '',
+    component: LazyHomeComponent,
+    children: [
+      {
+        path: ':id',
+        component: LazyDetailComponent
+      }
+    ]
+  }
+]
+
+@NgModule({
+  imports: [RouterTestingModule.withRoutes(lazyRoutes)],
+  declarations: [LazyHomeComponent, LazyDetailComponent]
+})
+class LazyModule {}
 
 @Component({
   template: 'Home'
@@ -56,6 +86,7 @@ class AppComponent {}
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
+  { path: 'lazy', loadChildren: () => LazyModule },
   { path: 'slug/:id', component: SlugComponent }
 ]
 
@@ -202,6 +233,29 @@ describe('ApmService', () => {
             }
           )
           expect(tr.name).toEqual('/slug/:id')
+
+          done()
+        })
+      })
+    })
+
+    it('should set transaction name properly for lazy loaded modules', done => {
+      spyOn(apm, 'startTransaction').and.callThrough()
+      const tr = apm.getCurrentTransaction()
+      fixture.ngZone.run(() => {
+        router.navigate(['/lazy/2']).then(() => {
+          expect(location.path()).toBe('/lazy/2')
+          expect(compiled.querySelector('ng-component').textContent).toBe(
+            'LazyHome'
+          )
+          expect(apm.startTransaction).toHaveBeenCalledWith(
+            '/lazy/2',
+            'route-change',
+            {
+              canReuse: true
+            }
+          )
+          expect(tr.name).toEqual('/lazy/:id')
 
           done()
         })
