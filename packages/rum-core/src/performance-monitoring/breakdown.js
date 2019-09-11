@@ -32,7 +32,6 @@ import { PAGE_LOAD } from '../common/constants'
  * Interested events from the Navigation timing API
  */
 const pageLoadBreakdowns = [
-  ['navigationStart', 'fetchStart', 'Request Stalled'],
   ['fetchStart', 'requestStart', 'Network'],
   ['requestStart', 'responseStart', 'TTFB'],
   ['domLoading', 'domInteractive', 'DOM Processing'],
@@ -43,19 +42,18 @@ function getValue(value) {
   return { value }
 }
 
-function transactionBreakdownDetails({ name, type }) {
-  return { name, type }
-}
-
-function spanBreakdownDetails({ type, subType = undefined }) {
-  return { type, subtype: subType }
-}
-
-function getSpanBreakdown(span, transactionDetails) {
-  const duration = span.duration()
+function getSpanBreakdown(
+  transactionDetails,
+  type,
+  duration,
+  subType = undefined
+) {
   return {
     transaction: transactionDetails,
-    span: spanBreakdownDetails(span),
+    span: {
+      type,
+      subtype: subType
+    },
     samples: {
       'span.self_time.count': getValue(1),
       'span.self_time.sum.us': getValue(duration)
@@ -70,11 +68,11 @@ function getSpanBreakdown(span, transactionDetails) {
 export function captureBreakdown(transcation) {
   const breakdowns = []
   const trDuration = transcation.duration()
-  const { type, sampled } = transcation
-  const transactionBreakDownDetails = transactionBreakdownDetails(transcation)
+  const { name, type, sampled } = transcation
+  const transactionDetails = { name, type }
 
   breakdowns.push({
-    transaction: transactionBreakDownDetails,
+    transaction: transactionDetails,
     samples: {
       'transaction.duration.count': getValue(1),
       'transaction.duration.sum.us': getValue(trDuration),
@@ -96,17 +94,11 @@ export function captureBreakdown(transcation) {
       const start = timings[current[0]]
       const end = timings[current[1]]
       const duration = getDuration(start, end)
-      if (duration == null) {
+      if (duration === 0 || duration == null) {
         continue
       }
       breakdowns.push(
-        getSpanBreakdown(
-          {
-            type: current[2],
-            duration: () => duration
-          },
-          transactionBreakDownDetails
-        )
+        getSpanBreakdown(transactionDetails, current[2], duration)
       )
     }
   } else {
@@ -117,24 +109,19 @@ export function captureBreakdown(transcation) {
     let childTimings = 0
     for (let i = 0; i < spans.length; i++) {
       const span = spans[i]
+      const { type, subType } = span
       const duration = span.duration()
       childTimings += duration
-      breakdowns.push(getSpanBreakdown(span, transactionBreakDownDetails))
+      breakdowns.push(
+        getSpanBreakdown(transactionDetails, type, duration, subType)
+      )
     }
     /**
      * Associate rest of the breakdown time in `app`
      */
     if (childTimings < trDuration) {
       const duration = getDuration(childTimings, trDuration)
-      breakdowns.push(
-        getSpanBreakdown(
-          {
-            type: 'app',
-            duration: () => duration
-          },
-          transactionBreakDownDetails
-        )
-      )
+      breakdowns.push(getSpanBreakdown(transactionDetails, 'app', duration))
     }
   }
   return breakdowns
