@@ -220,7 +220,8 @@ describe('ErrorLogging', function() {
       colno
     })
     listener('error', {
-      message: 'Script error.' + testErrorMessage
+      message: 'Script error.' + testErrorMessage,
+      error: null
     })
     listener('error', createErrorEvent(testErrorMessage))
   })
