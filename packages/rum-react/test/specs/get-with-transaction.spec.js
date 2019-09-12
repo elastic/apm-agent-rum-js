@@ -116,7 +116,7 @@ describe('withTransaction', function() {
 
   it('should not create new transaction on every render', () => {
     const transactionService = serviceFactory.getService('TransactionService')
-    spyOn(transactionService, 'startTransaction').and.callThrough()
+    spyOn(transactionService, 'startTransaction')
 
     const wrapper = TestComponent(apmBase)
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
@@ -136,5 +136,22 @@ describe('withTransaction', function() {
 
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
     expect(wrapper.text()).toBe('Testing, new-props')
+  })
+
+  it('should end transaction when component unmounts', () => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    const detectFinishSpy = jasmine.createSpy('detectFinish')
+    spyOn(transactionService, 'startTransaction').and.returnValue({
+      detectFinish: detectFinishSpy
+    })
+
+    const wrapper = TestComponent(apmBase)
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      'test-transaction',
+      'test-type',
+      { canReuse: true }
+    )
+    wrapper.unmount()
+    expect(detectFinishSpy).toHaveBeenCalled()
   })
 })
