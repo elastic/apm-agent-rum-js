@@ -65,10 +65,13 @@ function getSpanBreakdown(
  * Capture breakdown metrics for the transaction based on the
  * transaction type
  */
-export function captureBreakdown(transcation) {
+export function captureBreakdown(
+  transaction,
+  timings = window.performance.timing
+) {
   const breakdowns = []
-  const trDuration = transcation.duration()
-  const { name, type, sampled } = transcation
+  const trDuration = transaction.duration()
+  const { name, type, sampled } = transaction
   const transactionDetails = { name, type }
 
   breakdowns.push({
@@ -87,7 +90,6 @@ export function captureBreakdown(transcation) {
     return breakdowns
   }
 
-  const timings = window.performance.timing
   if (type === PAGE_LOAD && timings) {
     for (let i = 0; i < pageLoadBreakdowns.length; i++) {
       const current = pageLoadBreakdowns[i]
@@ -105,7 +107,7 @@ export function captureBreakdown(transcation) {
     /**
      * Construct the breakdown timings based on span types
      */
-    const spans = transcation.spans
+    const spans = transaction.spans
     let childTimings = 0
     for (let i = 0; i < spans.length; i++) {
       const span = spans[i]

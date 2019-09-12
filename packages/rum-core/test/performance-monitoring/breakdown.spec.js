@@ -25,11 +25,13 @@
 
 import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
 import Transaction from '../../src/performance-monitoring/transaction'
+import { PAGE_LOAD } from '../../src/common/constants'
+import { TIMING_LEVEL1_ENTRY } from '../fixtures/navigation-entries'
 
 describe('Span', () => {
-  function createTransaction(duration, sampled = true) {
+  function createTransaction(duration, sampled = true, type) {
     const name = `tr${duration}`
-    const tr = new Transaction(name, `${name}-type`)
+    const tr = new Transaction(name, type || `${name}-type`)
     tr.sampled = sampled
     tr.end()
     tr._start = 0
@@ -52,30 +54,47 @@ describe('Span', () => {
   }
 
   it('should capture breakdown for transaction', () => {
-    const breakdown = captureBreakdown(createTransaction(200, true))
-    expect(breakdown[0]).toEqual(
-      jasmine.objectContaining({
-        transaction: {
-          name: 'tr200',
-          type: 'tr200-type'
+    const breakdown = captureBreakdown(createTransaction(200))
+    expect(breakdown[0]).toEqual({
+      transaction: {
+        name: 'tr200',
+        type: 'tr200-type'
+      },
+      samples: {
+        'transaction.duration.count': {
+          value: 1
         },
-        samples: {
-          'transaction.duration.count': {
-            value: 1
-          },
-          'transaction.duration.sum.us': {
-            value: 200
-          },
-          'transaction.breakdown.count': {
-            value: 1
-          }
+        'transaction.duration.sum.us': {
+          value: 200
+        },
+        'transaction.breakdown.count': {
+          value: 1
         }
-      })
+      }
+    })
+  })
+
+  it('should capture breakdown for page-load transaction', () => {
+    const breakdown = captureBreakdown(
+      createTransaction(200, true, PAGE_LOAD),
+      TIMING_LEVEL1_ENTRY
     )
+    const spanTypes = ['Network', 'TTFB', 'DOM Processing', 'Page Render']
+
+    const spans = breakdown.slice(1)
+
+    spanTypes.forEach((type, index) => {
+      const breakdownSpan = spans[index]
+      expect(breakdownSpan.span.type).toBe(type)
+      expect(breakdownSpan.samples['span.self_time.count'].value).toBe(1)
+      expect(
+        breakdownSpan.samples['span.self_time.sum.us'].value
+      ).toBeGreaterThan(0)
+    })
   })
 
   it('should set transaction breakdown count based on sampled flag', () => {
-    const sampledBreakdown = captureBreakdown(createTransaction(100, true))
+    const sampledBreakdown = captureBreakdown(createTransaction(100))
     expect(sampledBreakdown[0].samples['transaction.breakdown.count']).toEqual({
       value: 1
     })
