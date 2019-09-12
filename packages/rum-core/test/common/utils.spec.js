@@ -317,6 +317,6 @@ describe('lib/utils', function() {
     const calculatedMicrotime = utils.microtime()
     const allowedDelta = 1000 // 1ms
     expect(realMicrotime - allowedDelta < calculatedMicrotime)
-    expect(realMicrotime + allowedDelta < calculatedMicrotime)
+    expect(realMicrotime + allowedDelta > calculatedMicrotime)
   })
 })

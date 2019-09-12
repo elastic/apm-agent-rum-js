@@ -416,7 +416,7 @@ function microtime() {
   if (typeof performance.now === 'function') {
     time = performance.timing.navigationStart + performance.now()
   }
-  return time * 1000
+  return Math.floor(time * 1000)
 }
 
 export {
