@@ -79,14 +79,13 @@ function getWithTransaction(apm) {
         typeof React.useEffect === 'function'
       ) {
         ApmComponent = function ApmComponent(props) {
-          const transaction = apm.startTransaction(name, type, {
-            canReuse: true
-          })
-
+          let transaction = null
           React.useEffect(() => {
-            transaction && transaction.detectFinish()
+            transaction = apm.startTransaction(name, type, {
+              canReuse: true
+            })
             return () => transaction && transaction.detectFinish()
-          })
+          }, [])
 
           return <Component transaction={transaction} {...props} />
         }
