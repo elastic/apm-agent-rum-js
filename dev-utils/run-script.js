@@ -89,7 +89,7 @@ function runNodeTests() {
   })
 }
 
-var cleanUps = []
+let cleanUps = []
 
 function exitHandler(exitCode) {
   console.log('Running cleanups.')
@@ -97,7 +97,7 @@ function exitHandler(exitCode) {
     try {
       f(exitCode)
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
   })
   cleanUps = []

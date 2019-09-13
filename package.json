@@ -73,7 +73,6 @@
     "babel-loader": "^8.0.4",
     "babel-plugin-istanbul": "^5.1.4",
     "babel-plugin-transform-typescript-metadata": "^0.2.2",
-    "babel-polyfill": "^6.26.0",
     "benchmark": "^2.1.4",
     "bundlesize": "^0.17.2",
     "codecov": "^3.5.0",

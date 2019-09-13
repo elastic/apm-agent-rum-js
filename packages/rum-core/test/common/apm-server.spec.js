@@ -406,11 +406,6 @@ describe('ApmServer', function() {
     it('should fetch remote config', async () => {
       var config = await apmServer.fetchConfig('nonexistent-service')
       expect(config).toEqual({})
-      try {
-      } catch (e) {
-        debugger
-        console.log(e)
-      }
 
       config = await apmServer.fetchConfig(
         'nonexistent-service',

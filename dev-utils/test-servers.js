@@ -74,7 +74,7 @@ function startBackendAgentServer(port = 8003) {
 function startApmServerProxy(port = 8001) {
   const serverUrl = DEFAULT_APM_SERVER_URL
 
-  var proxyApp = express()
+  let proxyApp = express()
   proxyApp.use(
     proxy(serverUrl, {
       userResHeaderDecorator(headers) {

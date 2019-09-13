@@ -130,11 +130,11 @@ function parseVersion(version) {
 }
 
 function isVersionInRange(version, min) {
-  var isInRange = true
+  let isInRange = true
   if (version) {
-    var parsedVersion = parseVersion(version)
+    let parsedVersion = parseVersion(version)
     if (min) {
-      var minParsed = parseVersion(min)
+      let minParsed = parseVersion(min)
       isInRange =
         isInRange &&
         parsedVersion.major >= minParsed.major &&
