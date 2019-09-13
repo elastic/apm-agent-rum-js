@@ -45,9 +45,8 @@ function TestComponent(apm) {
   expect(typeof WrappedComponent).toBe('function')
   const wrapped = mount(<WrappedComponent name="withTransaction" />)
 
-  const text = wrapped.find('h1').text()
+  let text = wrapped.find('h1').text()
   expect(text).toBe('Testing, withTransaction')
-
   return wrapped
 }
 

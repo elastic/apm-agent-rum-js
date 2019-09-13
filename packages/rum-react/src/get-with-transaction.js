@@ -76,17 +76,41 @@ function getWithTransaction(apm) {
        */
       if (
         !isReactClassComponent(Component) &&
-        typeof React.useEffect === 'function'
+        typeof React.useEffect === 'function' &&
+        typeof React.useState === 'function'
       ) {
         ApmComponent = function ApmComponent(props) {
-          React.useEffect(() => {
-            const transaction = apm.startTransaction(name, type, {
+          /**
+           * We start the transaction as soon as the ApmComponent gets rendered
+           * so that we can capture all the effects inside child components
+           *
+           * The reason why we have this transaction inside setState is that we don't
+           * want this piece of code to run on every render instead we want to
+           * start the transaction only on component mounting
+           */
+          const [transaction] = React.useState(() =>
+            apm.startTransaction(name, type, {
               canReuse: true
             })
-            return () => transaction && transaction.detectFinish()
+          )
+
+          /**
+           * React guarentess the parent component effects are run after the child components effects
+           * So once all the child components effects are run, we run the detectFinish logic
+           * which ensures if the transaction can be completed or not.
+           */
+          React.useEffect(() => {
+            transaction && transaction.detectFinish()
+            return () => {
+              /**
+               * Incase the transaction is never ended, we close the
+               * transaction when component unmounts
+               */
+              transaction && transaction.detectFinish()
+            }
           }, [])
 
-          return <Component {...props} />
+          return <Component transaction={transaction} {...props} />
         }
       } else {
         ApmComponent = class ApmComponent extends React.Component {
