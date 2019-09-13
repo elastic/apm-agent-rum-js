@@ -53,7 +53,7 @@ class ErrorLogging {
     let errorType = ''
     let errorContext = {}
     if (error && typeof error === 'object') {
-      errorMessage = error.message
+      errorMessage = errorMessage || error.message
       errorType = error.name
       errorContext = this._getErrorProperties(error)
     }
