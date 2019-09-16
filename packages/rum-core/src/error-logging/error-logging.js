@@ -48,24 +48,26 @@ class ErrorLogging {
       culprit = lastFrame.filename
     }
 
-    const message =
-      errorEvent.message || (errorEvent.error && errorEvent.error.message)
-    let errorType = errorEvent.error ? errorEvent.error.name : ''
+    const { message, error } = errorEvent
+    let errorMessage = message
+    let errorType = ''
+    let errorContext = {}
+    if (error && typeof error === 'object') {
+      errorMessage = errorMessage || error.message
+      errorType = error.name
+      errorContext = this._getErrorProperties(error)
+    }
+
     if (!errorType) {
       /**
        * Try to extract type from message formatted like
        * 'ReferenceError: Can't find variable: initHighlighting'
        */
-      if (message && message.indexOf(':') > -1) {
-        errorType = message.split(':')[0]
+      if (errorMessage && errorMessage.indexOf(':') > -1) {
+        errorType = errorMessage.split(':')[0]
       }
     }
-
     const configContext = this._configService.get('context')
-    let errorContext
-    if (typeof errorEvent.error === 'object') {
-      errorContext = this._getErrorProperties(errorEvent.error)
-    }
     const browserMetadata = getPageMetadata()
     const context = merge({}, browserMetadata, configContext, errorContext)
 
@@ -73,7 +75,7 @@ class ErrorLogging {
       id: generateRandomId(),
       culprit,
       exception: {
-        message,
+        message: errorMessage,
         stacktrace: filteredFrames,
         type: errorType
       },
