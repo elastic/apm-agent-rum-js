@@ -95,7 +95,7 @@ function getWithTransaction(apm) {
           )
 
           /**
-           * React guarentess the parent component effects are run after the child components effects
+           * React guarantees the parent component effects are run after the child components effects
            * So once all the child components effects are run, we run the detectFinish logic
            * which ensures if the transaction can be completed or not.
            */
@@ -106,7 +106,7 @@ function getWithTransaction(apm) {
                * Incase the transaction is never ended, we close the
                * transaction when component unmounts
                */
-              transaction && transaction.detectFinish()
+              transaction && transaction.end()
             }
           }, [])
 
@@ -138,7 +138,7 @@ function getWithTransaction(apm) {
              * in that case this is a noop.
              */
             if (this.transaction) {
-              this.transaction.detectFinish()
+              this.transaction.end()
             }
           }
 
