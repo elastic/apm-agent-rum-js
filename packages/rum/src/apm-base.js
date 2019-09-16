@@ -49,39 +49,52 @@ class ApmBase {
        * Deactive agent when the active config flag is set to false
        */
       const loggingService = this.serviceFactory.getService('LoggingService')
-      if (!configService.isActive()) {
+      if (configService.isActive()) {
+        this.serviceFactory.init()
+
+        const flags = getInstrumentationFlags(
+          configService.get('instrument'),
+          configService.get('disableInstrumentations')
+        )
+
+        const performanceMonitoring = this.serviceFactory.getService(
+          'PerformanceMonitoring'
+        )
+        performanceMonitoring.init(flags)
+
+        if (flags[ERROR]) {
+          const errorLogging = this.serviceFactory.getService('ErrorLogging')
+          errorLogging.registerGlobalEventListener()
+        }
+
+        const sendPageLoad = () => {
+          if (
+            flags[PAGE_LOAD] &&
+            configService.get('sendPageLoadTransaction')
+          ) {
+            this._sendPageLoadMetrics()
+          }
+        }
+        if (configService.get('centralConfig')) {
+          /**
+           * Waiting for the remote config before sending the page load transaction
+           */
+          this.fetchCentralConfig().then(sendPageLoad)
+        } else {
+          sendPageLoad()
+        }
+      } else {
         loggingService.info('RUM agent is inactive')
-        return this
-      }
-
-      this.serviceFactory.init()
-
-      const flags = getInstrumentationFlags(
-        configService.get('instrument'),
-        configService.get('disableInstrumentations')
-      )
-
-      const performanceMonitoring = this.serviceFactory.getService(
-        'PerformanceMonitoring'
-      )
-      performanceMonitoring.init(flags)
-
-      if (flags[ERROR]) {
-        const errorLogging = this.serviceFactory.getService('ErrorLogging')
-        errorLogging.registerGlobalEventListener()
-      }
-
-      if (flags[PAGE_LOAD] && configService.get('sendPageLoadTransaction')) {
-        this._sendPageLoadMetrics()
-      }
-
-      if (configService.get('centralConfig')) {
-        this.fetchCentralConfig()
       }
     }
     return this
   }
 
+  /**
+   * `fetchCentralConfig` returns a promise that will always resolve
+   * if the internal config fetch fails the the promise resolves to `undefined` otherwise
+   * it resolves to the fetched config.
+   */
   fetchCentralConfig() {
     const apmServer = this.serviceFactory.getService('ApmServer')
     const loggingService = this.serviceFactory.getService('LoggingService')
