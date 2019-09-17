@@ -38,14 +38,29 @@ import { MemoryRouter as Router, Route } from 'react-router-dom'
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
 import { getApmRoute } from '../../src/get-apm-route'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 function Component(props) {
   return <h1>Testing, {props.name}</h1>
 }
 
 describe('ApmRoute', function() {
+  const { serverUrl, serviceName } = getGlobalConfig().agentConfig
+  let serviceFactory, apmBase
+
+  beforeEach(() => {
+    serviceFactory = createServiceFactory()
+    apmBase = new ApmBase(serviceFactory, false)
+    apmBase.init({
+      active: true,
+      serverUrl,
+      serviceName,
+      disableInstrumentations: ['page-load', 'error']
+    })
+  })
+
   it('should work Route component', function() {
-    const ApmRoute = getApmRoute(new ApmBase(createServiceFactory()))
+    const ApmRoute = getApmRoute(apmBase)
 
     const rendered = mount(
       <div>
@@ -67,8 +82,6 @@ describe('ApmRoute', function() {
   })
 
   it('should work with Route render and log warning', function() {
-    const serviceFactory = createServiceFactory()
-    const apmBase = new ApmBase(serviceFactory)
     const loggingService = serviceFactory.getService('LoggingService')
     const ApmRoute = getApmRoute(apmBase)
 

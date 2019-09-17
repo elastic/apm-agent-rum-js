@@ -23,8 +23,11 @@
  *
  */
 
-import { getInstrumentationFlags } from '@elastic/apm-rum-core'
-import { PAGE_LOAD, ERROR } from '@elastic/apm-rum-core'
+import {
+  getInstrumentationFlags,
+  PAGE_LOAD,
+  ERROR
+} from '@elastic/apm-rum-core'
 
 class ApmBase {
   constructor(serviceFactory, disable) {
@@ -40,7 +43,7 @@ class ApmBase {
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
-      configService.setVersion('4.4.2')
+      configService.setVersion('4.4.4')
       this.config(config)
       /**
        * Deactive agent when the active config flag is set to false

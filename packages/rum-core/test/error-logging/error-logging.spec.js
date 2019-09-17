@@ -129,7 +129,8 @@ describe('ErrorLogging', function() {
       type: 'error',
       message: 'Uncaught Error: ' + message,
       lineno: 1,
-      filename: 'test.js'
+      filename: 'test.js',
+      error: null
     }
 
     try {
@@ -170,6 +171,31 @@ describe('ErrorLogging', function() {
         reason => {
           fail('Failed to send errors to the server, reason: ' + reason)
         }
+      )
+      .then(() => done())
+  })
+
+  it('should use message over error.message for error event', done => {
+    spyOn(apmServer, 'sendErrors').and.callThrough()
+
+    const errorEvent = createErrorEvent(testErrorMessage)
+
+    /**
+     * Override error message
+     */
+    if (errorEvent.error) {
+      errorEvent.error.message = 'Constructor Error'
+    }
+
+    errorLogging
+      .logErrorEvent(errorEvent, true)
+      .then(
+        () => {
+          expect(apmServer.sendErrors).toHaveBeenCalled()
+          const errors = apmServer.sendErrors.calls.argsFor(0)[0]
+          expect(errors[0].exception.message).toContain(testErrorMessage)
+        },
+        reason => fail(reason)
       )
       .then(() => done())
   })
@@ -217,10 +243,12 @@ describe('ErrorLogging', function() {
       message: testErrorMessage,
       filename,
       lineno,
-      colno
+      colno,
+      error: undefined
     })
     listener('error', {
-      message: 'Script error.' + testErrorMessage
+      message: 'Script error.' + testErrorMessage,
+      error: null
     })
     listener('error', createErrorEvent(testErrorMessage))
   })

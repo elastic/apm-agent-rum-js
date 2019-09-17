@@ -1,0 +1,59 @@
+[[angular-integration]]
+=== Angular integration
+
+This document covers how to use Real User Monitoring JavaScript agent with Angular applications.
+
+[[installing-angular-integration]]
+==== Installing Elastic APM Angular package
+
+Install the `@elastic/apm-rum-angular` package as a dependency to your application:
+
+[source,bash]
+----
+npm install @elastic/apm-rum-angular --save
+----
+
+[float]
+==== Instrumenting your Angular application
+
+The Angular integration package comes with a `ApmService` that will start subscribing to 
+https://angular.io/api/router/Event[Angular Router Events] once the service is initialized. 
+
+`ApmService` must be initialized from either the application module or application component since 
+the RUM agent has to start capturing all the resources and API calls as soon as possible. 
+
+
+[source,js]
+----
+import { Routes, RouterModule } from '@angular/router'
+import { ApmService } from '@elastic/apm-rum-angular'
+
+const routes: Routes = [
+  { path: 'contact', component: ContactListComponent },
+  { path: 'contact/:id', component: ContactDetailComponent }
+]
+
+@NgModule({
+  imports: [BrowserModule, RouterModule.forRoot(routes)],
+  declarations: [AppComponent, ContactListComponent, ContactDetailComponent],
+  providers: [ApmService],
+  bootstrap: [AppComponent]
+})
+export class AppModule {
+  constructor(service: ApmService) {
+    // API is exposed through this apm instance
+    const apm = service.init({
+      serviceName: 'angular-app',
+      serverUrl: 'http://localhost:8200'
+    })
+
+    apm.setUserContext({
+      'username': 'foo',
+      'id': 'bar'
+    })
+  }
+}
+----
+
+Once the service is initialized, both page load and SPA navigation events will be captured
+as transactions with the `path` of the route as its name and `page-load` or `route-change` as type.

@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 4.4.4 (2019-09-17)
+
+## Bug Fixes
+
+* **rum-core:** handle script error events properly ([#418](https://github.com/elastic/apm-agent-rum-js/issues/418)) ([c862ab7](https://github.com/elastic/apm-agent-rum-js/commit/c862ab7))
+* **rum-angular:** proper transaction name for lazy loaded routes ([#414](https://github.com/elastic/apm-agent-rum-js/issues/414)) ([4c6d120](https://github.com/elastic/apm-agent-rum-js/commit/4c6d120))
+* **rum-react:** create transaction only on component mount ([#419](https://github.com/elastic/apm-agent-rum-js/issues/419)) ([a290448](https://github.com/elastic/apm-agent-rum-js/commit/a290448))
+
+
+
+# 4.4.3 (2019-09-03)
+
+
+### Bug Fixes
+
+* **rum:** log unsupported message only on browser environment ([#382](https://github.com/elastic/apm-agent-rum-js/issues/382)) ([ff759d1](https://github.com/elastic/apm-agent-rum-js/commit/ff759d1))
+* **rum-react:** respect active flag in react integration ([#392](https://github.com/elastic/apm-agent-rum-js/issues/392)) ([6d7e9db](https://github.com/elastic/apm-agent-rum-js/commit/6d7e9db))
+
+
+### Features
+
+* **rum-angular:** angular integration with apm-rum ([#384](https://github.com/elastic/apm-agent-rum-js/issues/384)) ([6ab2450](https://github.com/elastic/apm-agent-rum-js/commit/6ab2450))
+
 # 4.4.2 (2019-08-08)
 
 

@@ -39,8 +39,10 @@ async function getAllBenchmarkResults() {
 
   for (let file of files) {
     try {
-      const benchResults = await pReadFile(file, 'utf-8')
-      const formattedResult = extractFields(JSON.parse(benchResults))
+      const benchmarksFile = await pReadFile(file, 'utf-8')
+      const parsedResults = JSON.parse(benchmarksFile)
+      const { type, summary } = parsedResults
+      const formattedResult = extractFields(summary, type)
       results.push(...formattedResult)
     } catch (err) {
       console.error('Failed to read benchmark from', file, err)
@@ -49,21 +51,27 @@ async function getAllBenchmarkResults() {
   return results
 }
 
-function extractFields(benchResults, type = 'benchmarkjs') {
+function extractFields(benchResults, type) {
   let keysToFilter = []
 
   switch (type) {
     case 'benchmarkjs':
       keysToFilter = ['browser', 'suite', 'name', 'hz', 'unit']
-      benchResults = benchResults.summary
       break
+    case 'eum':
+      keysToFilter = '*'
   }
   const filteredResult = []
 
   for (let result of benchResults) {
     filteredResult.push(
       Object.keys(result)
-        .filter(key => keysToFilter.includes(key))
+        .filter(key => {
+          if (keysToFilter === '*') {
+            return !!key
+          }
+          return keysToFilter.includes(key)
+        })
         .reduce(
           (obj, key) => ({
             ...obj,
@@ -79,7 +87,7 @@ function extractFields(benchResults, type = 'benchmarkjs') {
 
 function runBenchmarks() {
   const outputFile = process.argv[2]
-  const lernaProcess = spawn('lerna', ['run', 'karma:bench', '--stream'])
+  const lernaProcess = spawn('lerna', ['run', 'bench', '--stream'])
   lernaProcess.on('close', async () => {
     try {
       const results = await getAllBenchmarkResults()
@@ -109,12 +117,23 @@ function runBenchmarks() {
           agentName: 'rum-js'
         }
       }
+
+      let resultObj = {}
+      for (let result of results) {
+        const metricKey = result.name || result.scenario
+        resultObj[metricKey] = result
+      }
+
+      const output = Object.assign({}, baseOutput, {
+        metrics: resultObj,
+        '@timestamp': Date.now()
+      })
+
       /**
        * DEV - show the results in the terminal
        * CI - store the results in file and upload to ES
        */
       if (!outputFile) {
-        const output = Object.assign({}, baseOutput, { results })
         console.log(JSON.stringify(output, undefined, 2))
         return
       }
@@ -124,15 +143,6 @@ function runBenchmarks() {
        */
       let ndJSONOutput =
         '{"index": { "_index": "benchmarks-rum-js", "_type": "_doc"}}' + '\n'
-      let resultObj = {}
-      for (let result of results) {
-        resultObj[result.name] = result
-      }
-
-      const output = Object.assign({}, baseOutput, {
-        metrics: resultObj,
-        '@timestamp': Date.now()
-      })
       ndJSONOutput += JSON.stringify(output)
 
       const outputPath = join(PKG_DIR, outputFile)

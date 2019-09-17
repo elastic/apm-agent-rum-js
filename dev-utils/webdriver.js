@@ -174,6 +174,21 @@ function getWebdriveBaseConfig(
     jasmineNodeOpts: {
       defaultTimeoutInterval: 90000
     },
+    async before() {
+      /**
+       * Increase script timeout so that executeAsyncScript does not
+       * throw async script failure in 0 ms error
+       *
+       * Skip setting timeouts on firefox and microsoftedge since they
+       * result in NullPointerException issue from selenium driver
+       */
+      const { name } = getBrowserInfo()
+      if (name === 'firefox' || name === 'microsoftedge') {
+        return
+      }
+
+      await browser.setTimeout({ script: 30000 })
+    },
     afterTest(test) {
       /**
        * Log only on failures
@@ -181,15 +196,21 @@ function getWebdriveBaseConfig(
        * */
       if (!test.passed && isChromeLatest()) {
         const response = browser.getLogs('browser')
-        console.log('[Browser Logs]:', JSON.stringify(response, undefined, 2))
+        console.log(
+          '[Chrome Browser Logs]:',
+          JSON.stringify(response, undefined, 2)
+        )
       }
     }
   }
 }
 
 function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
+  const { name, version } = getBrowserInfo()
   console.log(
-    `Waiting for minimum ${errorCount} Errors and ${transactionCount} Transactions.`
+    `Waiting for minimum ${errorCount} Errors and ${transactionCount} Transactions in`,
+    name,
+    version
   )
   const serverCalls = browser.executeAsync(
     function(errorCount, transactionCount, done) {
@@ -277,7 +298,10 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
     throw new Error('serverCalls is undefined!')
   }
 
-  console.log(JSON.stringify(serverCalls, null, 2))
+  console.log(
+    `Payload in ${name} ${version}`,
+    JSON.stringify(serverCalls, null, 2)
+  )
   if (serverCalls.error) {
     fail(serverCalls.error)
   }
@@ -285,14 +309,20 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
   return serverCalls
 }
 
-function isChromeLatest() {
-  const browserName = browser.capabilities.browserName.toLowerCase()
-  const browserVersion = browser.capabilities.version
-  const isChrome = browserName.indexOf('chrome') !== -1
-  const isLatest =
-    isChrome && browserVersion && Number(browserVersion.split('.')[0]) >= 76
+function getBrowserInfo() {
+  const { version, browserName } = browser.capabilities
+  return {
+    name: browserName.toLowerCase(),
+    version
+  }
+}
 
-  return isChrome && isLatest
+function isChromeLatest() {
+  const { name, version } = getBrowserInfo()
+  const isChrome = name.indexOf('chrome') !== -1
+  const isLatest = isChrome && version && Number(version.split('.')[0]) >= 76
+
+  return isLatest
 }
 
 module.exports = {

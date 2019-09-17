@@ -26,7 +26,7 @@
 const elasticApm = require('@elastic/apm-rum')
 const { init: namedInit, apm, apmBase, ApmBase } = require('@elastic/apm-rum')
 
-describe('apm base build', () => {
+describe('apm base', () => {
   it('should have default and named exports', () => {
     expect(elasticApm.init).toEqual(jasmine.any(Function))
     expect(namedInit).toEqual(jasmine.any(Function))
@@ -34,5 +34,17 @@ describe('apm base build', () => {
     expect(apmBase).toEqual(jasmine.any(Object))
     expect(apmBase.init).toEqual(jasmine.any(Function))
     expect(ApmBase).toEqual(jasmine.any(Function))
+  })
+
+  it('should not log platform message on Node.js', () => {
+    spyOn(console, 'log')
+    /**
+     * Delete module cache and run bootstrap again
+     */
+    delete require.cache[require.resolve('@elastic/apm-rum')]
+    delete require.cache[require.resolve('@elastic/apm-rum/dist/lib/bootstrap')]
+    require('@elastic/apm-rum')
+
+    expect(console.log).not.toHaveBeenCalled()
   })
 })

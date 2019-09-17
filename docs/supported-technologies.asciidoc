@@ -28,12 +28,15 @@ image::images/compatibility.png[Elastic APM RUM Agent compatibility]
 [[frameworks]]
 === Frameworks
 
-The agent is framework agnostic and therefore does not instrument metrics related to rendering time or mounting time of components. If you are interested in measuring custom timings on frameworks like React, Angular, vue etc., please use the <<custom-transactions, Custom Transactions API>>.
+The agent supports integrations with certain frameworks. See <<framework-integrations, Framework specific integrations>> for more information. 
+
+If you are interested in instrumenting custom metrics like rendering time or mounting time of components on frameworks like React, Angular, vue etc., please use the <<custom-transactions, Custom Transactions API>>.
 
 [float]
 [[spa]]
 === Single Page Applications
 
-In the context of Single Page Applications, the route changes do not trigger the browser navigation event and thus the agent does not instrument them by default. 
+In the context of Single Page Applications, all the history pushstate events will be captured as transactions. 
 
-However, you can instrument your application by creating <<custom-transactions, Custom Transactions>> and also add custom spans using <<apm-start-span, Span API>>.
+However, most of these transactions can be enhanced by using framework specific integrations. For all unsupported frameworks/libraries, you can instrument the application 
+by creating <<custom-transactions, Custom Transactions>> and also add custom spans using <<apm-start-span, Span API>>.

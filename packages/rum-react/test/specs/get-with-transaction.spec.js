@@ -23,7 +23,7 @@
  *
  */
 
-import Enzyme, { render } from 'enzyme'
+import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import React from 'react'
 
@@ -32,6 +32,7 @@ Enzyme.configure({ adapter: new Adapter() })
 import { getWithTransaction } from '../../src/get-with-transaction'
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 function TestComponent(apm) {
   const withTransaction = getWithTransaction(apm)
@@ -42,35 +43,38 @@ function TestComponent(apm) {
     Component
   )
   expect(typeof WrappedComponent).toBe('function')
-  const rendered = render(<WrappedComponent name="withTransaction" />)
-  expect(rendered.length).toBe(1)
-  var node = rendered[0]
-  expect(node.name).toBe('h1')
-  expect(node.type).toBe('tag')
-  expect(rendered.text()).toBe('Testing, withTransaction')
+  const wrapped = mount(<WrappedComponent name="withTransaction" />)
+
+  let text = wrapped.find('h1').text()
+  expect(text).toBe('Testing, withTransaction')
+  return wrapped
 }
 
 describe('withTransaction', function() {
+  const { serverUrl, serviceName } = getGlobalConfig().agentConfig
+  let apmBase, serviceFactory
+
+  beforeEach(() => {
+    serviceFactory = createServiceFactory()
+    apmBase = new ApmBase(serviceFactory, false)
+    apmBase.init({
+      active: true,
+      serverUrl,
+      serviceName,
+      disableInstrumentations: ['page-load', 'error']
+    })
+  })
+
   it('should work if apm is disabled or not initialized', function() {
-    TestComponent(new ApmBase(createServiceFactory(), true))
-    TestComponent(new ApmBase(createServiceFactory(), false))
+    TestComponent(new ApmBase(serviceFactory, true))
+    TestComponent(apmBase)
   })
 
   it('should start transaction for components', function() {
-    const serviceFactory = createServiceFactory()
     const transactionService = serviceFactory.getService('TransactionService')
-
-    var apm = new ApmBase(serviceFactory, false)
-    apm.init({
-      debug: true,
-      serverUrl: 'http://localhost:8200',
-      serviceName: 'apm-agent-rum-react-integration-unit-test',
-      sendPageLoadTransaction: false
-    })
-
     spyOn(transactionService, 'startTransaction')
 
-    TestComponent(apm)
+    TestComponent(apmBase)
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test-transaction',
       'test-type',
@@ -79,16 +83,75 @@ describe('withTransaction', function() {
   })
 
   it('should return WrappedComponent on falsy value and log warning', function() {
-    const serviceFactory = createServiceFactory()
     const loggingService = serviceFactory.getService('LoggingService')
-
     spyOn(loggingService, 'warn')
 
-    const withTransaction = getWithTransaction(new ApmBase(serviceFactory))
+    const withTransaction = getWithTransaction(apmBase)
     const comp = withTransaction('test-name', 'test-type')(undefined)
     expect(comp).toBe(undefined)
     expect(loggingService.warn).toHaveBeenCalledWith(
       'test-name is not instrumented since component property is not provided'
     )
+  })
+
+  it('should not instrument the route when rum is inactive', () => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    spyOn(transactionService, 'startTransaction')
+
+    apmBase.config({ active: false })
+    TestComponent(apmBase)
+
+    function Component() {
+      return <h2>Component</h2>
+    }
+    const withTransaction = getWithTransaction(apmBase)
+
+    const WrappedComponent = withTransaction('test-transaction', 'test-type')(
+      Component
+    )
+    expect(WrappedComponent).toEqual(Component)
+    expect(transactionService.startTransaction).not.toHaveBeenCalled()
+  })
+
+  it('should not create new transaction on every render', () => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    spyOn(transactionService, 'startTransaction')
+
+    const wrapper = TestComponent(apmBase)
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      'test-transaction',
+      'test-type',
+      { canReuse: true }
+    )
+    transactionService.startTransaction.calls.reset()
+    /**
+     * Trigger rerender of component
+     */
+    wrapper
+      .setProps({
+        name: 'new-props'
+      })
+      .update()
+
+    expect(transactionService.startTransaction).not.toHaveBeenCalled()
+    expect(wrapper.text()).toBe('Testing, new-props')
+  })
+
+  it('should end transaction when component unmounts', () => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    const detectFinishSpy = jasmine.createSpy('detectFinish')
+    spyOn(transactionService, 'startTransaction').and.returnValue({
+      detectFinish: detectFinishSpy
+    })
+
+    const wrapper = TestComponent(apmBase)
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      'test-transaction',
+      'test-type',
+      { canReuse: true }
+    )
+    expect(detectFinishSpy).toHaveBeenCalled()
+    wrapper.unmount()
+    expect(detectFinishSpy).toHaveBeenCalled()
   })
 })
