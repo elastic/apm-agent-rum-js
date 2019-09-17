@@ -106,9 +106,8 @@ function getResponseContext(perfTimingEntry) {
   return respContext
 }
 
-function createNavigationTimingSpans(timings, trStart, trEnd) {
+function createNavigationTimingSpans(timings, baseTime, trStart, trEnd) {
   const spans = []
-  const baseTime = timings.fetchStart
   for (let i = 0; i < eventPairs.length; i++) {
     const start = timings[eventPairs[i][0]]
     const end = timings[eventPairs[i][1]]
@@ -235,7 +234,8 @@ function createUserTimingSpans(entries, trStart, trEnd) {
 
 function getApiSpanNames({ spans }) {
   const apiCalls = []
-  for (let i = 0; i < spans; i++) {
+
+  for (let i = 0; i < spans.length; i++) {
     const span = spans[i]
 
     if (span.type === 'external' && span.subType === 'http') {
@@ -252,7 +252,7 @@ function captureNavigation(transaction) {
    * Both start and end threshold decides if a span must be
    * captured as part of the transaction
    */
-  const { _start: trStart, _end: trEnd, type } = transaction
+  const { _end: trEnd, type } = transaction
   /**
    * Page load is considered as hard navigation and we account
    * for few extra spans than soft navigations which
@@ -276,17 +276,20 @@ function captureNavigation(transaction) {
     transaction._start = 0
 
     const timings = perf.timing
-    createNavigationTimingSpans(timings, 0, trEnd).forEach(span => {
-      span.traceId = transaction.traceId
-      span.sampled = transaction.sampled
-      if (span.pageResponse && transaction.options.pageLoadSpanId) {
-        span.id = transaction.options.pageLoadSpanId
+    createNavigationTimingSpans(timings, timings.fetchStart, 0, trEnd).forEach(
+      span => {
+        span.traceId = transaction.traceId
+        span.sampled = transaction.sampled
+        if (span.pageResponse && transaction.options.pageLoadSpanId) {
+          span.id = transaction.options.pageLoadSpanId
+        }
+        transaction.spans.push(span)
       }
-      transaction.spans.push(span)
-    })
+    )
   }
 
   if (typeof perf.getEntriesByType === 'function') {
+    const trStart = transaction._start
     /**
      * Capture resource timing information as spans
      */

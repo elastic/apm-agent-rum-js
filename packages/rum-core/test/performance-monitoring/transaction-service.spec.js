@@ -199,7 +199,7 @@ describe('TransactionService', function() {
     }
   })
 
-  xit('should capture resources from navigation timing', function(done) {
+  it('should capture resources from navigation timing', function(done) {
     const unMock = mockGetEntriesByType()
 
     config.set('active', true)
