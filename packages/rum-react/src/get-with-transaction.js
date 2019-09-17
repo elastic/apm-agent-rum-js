@@ -103,10 +103,14 @@ function getWithTransaction(apm) {
             transaction && transaction.detectFinish()
             return () => {
               /**
-               * Incase the transaction is never ended, we close the
-               * transaction when component unmounts
+               * Incase the transaction is never ended, we check if the transaction
+               * can be closed during unmount phase
+               *
+               * We call detectFinish instead of forcefully ending the transaction
+               * since it could be a redirect route and we might prematurely close
+               * the currently running transaction
                */
-              transaction && transaction.end()
+              transaction && transaction.detectFinish()
             }
           }, [])
 
@@ -127,6 +131,9 @@ function getWithTransaction(apm) {
           }
 
           componentDidMount() {
+            /**
+             * React guarantees the parent CDM runs after the child components CDM
+             */
             if (this.transaction) {
               this.transaction.detectFinish()
             }
@@ -138,7 +145,7 @@ function getWithTransaction(apm) {
              * in that case this is a noop.
              */
             if (this.transaction) {
-              this.transaction.end()
+              this.transaction.detectFinish()
             }
           }
 

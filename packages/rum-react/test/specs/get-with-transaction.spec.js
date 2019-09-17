@@ -140,10 +140,8 @@ describe('withTransaction', function() {
   it('should end transaction when component unmounts', () => {
     const transactionService = serviceFactory.getService('TransactionService')
     const detectFinishSpy = jasmine.createSpy('detectFinish')
-    const endSpy = jasmine.createSpy('endSpy')
     spyOn(transactionService, 'startTransaction').and.returnValue({
-      detectFinish: detectFinishSpy,
-      end: endSpy
+      detectFinish: detectFinishSpy
     })
 
     const wrapper = TestComponent(apmBase)
@@ -154,6 +152,6 @@ describe('withTransaction', function() {
     )
     expect(detectFinishSpy).toHaveBeenCalled()
     wrapper.unmount()
-    expect(endSpy).toHaveBeenCalled()
+    expect(detectFinishSpy).toHaveBeenCalled()
   })
 })
