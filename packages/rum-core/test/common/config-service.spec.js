@@ -226,13 +226,13 @@ describe('ConfigService', function() {
     const script = document.createElement('script')
     script.src = './elastic-script.js'
     script.setAttribute('data-service-name', 'js-core')
-    script.setAttribute('data-capture-page-load', 'false')
+    script.setAttribute('data-group-similar-spans', 'false')
     document.head.appendChild(script)
 
     const configServiceFromScript = new ConfigService()
     configServiceFromScript.init()
     expect(configServiceFromScript.get('serviceName')).toBe('js-core')
-    expect(configServiceFromScript.get('capturePageLoad')).toBe('false')
+    expect(configServiceFromScript.get('groupSimilarSpans')).toBe('false')
   })
 
   it('should remove trailing slash from serverUrl', () => {

@@ -94,16 +94,10 @@ class TransactionService {
   }
 
   capturePageLoadMetrics(tr) {
-    var capturePageLoad = this._config.get('capturePageLoad')
-    if (
-      capturePageLoad &&
-      !this._alreadyCapturedPageLoad &&
-      tr.isHardNavigation
-    ) {
+    if (!this._alreadyCapturedPageLoad) {
       captureHardNavigation(tr)
       tr.addMarks(getPageLoadMarks())
-      self._alreadyCapturedPageLoad = true
-      return true
+      this._alreadyCapturedPageLoad = true
     }
   }
 
@@ -159,8 +153,6 @@ class TransactionService {
     }
 
     if (type === PAGE_LOAD) {
-      tr.isHardNavigation = true
-
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
@@ -200,13 +192,9 @@ class TransactionService {
             if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
               tr.name = pageLoadTransactionName
             }
-            const captured = this.capturePageLoadMetrics(tr)
-            if (captured) {
-              this.add(tr)
-            }
-          } else {
-            this.add(tr)
+            this.capturePageLoadMetrics(tr)
           }
+          this.add(tr)
         },
         err => {
           if (__DEV__) {

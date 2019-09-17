@@ -33,7 +33,8 @@ import {
   SCHEDULE,
   FETCH,
   XMLHTTPREQUEST,
-  HISTORY
+  HISTORY,
+  PAGE_LOAD
 } from '../../src/common/constants'
 import patchEventHandler from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
@@ -392,7 +393,6 @@ describe('PerformanceMonitoring', function() {
     const transactionService = serviceFactory.getService('TransactionService')
 
     configService.events.observe(TRANSACTION_END, function(tr) {
-      expect(tr.isHardNavigation).toBe(true)
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
       expect(promise).toBeDefined()
@@ -407,7 +407,7 @@ describe('PerformanceMonitoring', function() {
         )
         .then(() => done())
     })
-    const tr = transactionService.startTransaction('resource-test', 'page-load')
+    const tr = transactionService.startTransaction('resource-test', PAGE_LOAD)
     tr.detectFinish()
   })
 

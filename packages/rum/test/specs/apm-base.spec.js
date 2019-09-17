@@ -214,7 +214,11 @@ describe('ApmBase', function() {
 
   it('should instrument xhr when no transaction was started', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ capturePageLoad: false, serviceName, serverUrl })
+    apmBase.init({
+      disableInstrumentations: ['page-load'],
+      serviceName,
+      serverUrl
+    })
     var transactionService = serviceFactory.getService('TransactionService')
     transactionService.currentTransaction = undefined
     var tr

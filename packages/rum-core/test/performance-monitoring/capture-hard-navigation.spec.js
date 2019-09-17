@@ -33,6 +33,7 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import resourceEntries from '../fixtures/resource-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import navTimingSpans from '../fixtures/navigation-timing-span-snapshot'
+import { PAGE_LOAD } from '../../src/common/constants'
 
 const spanSnapshot = navTimingSpans.map(mapSpan)
 
@@ -199,16 +200,14 @@ describe('Capture hard navigation', function() {
   })
 
   it('should captureHardNavigation', function() {
-    var tr = new Transaction('test', 'test')
-    tr.isHardNavigation = true
+    var tr = new Transaction('test', PAGE_LOAD)
     tr.end()
     captureHardNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
   })
 
   it('should fix custom marks when changing transaction._start', function() {
-    var tr = new Transaction('test', 'test')
-    tr.isHardNavigation = true
+    var tr = new Transaction('test', PAGE_LOAD)
     tr.mark('testMark')
     const markValue = tr.marks.custom.testMark
     const start = tr._start

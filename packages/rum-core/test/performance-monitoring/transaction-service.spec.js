@@ -28,7 +28,7 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
 import { mockGetEntriesByType } from '../utils/globals-mock'
-import { TRANSACTION_END } from '../../src/common/constants'
+import { TRANSACTION_END, PAGE_LOAD } from '../../src/common/constants'
 
 describe('TransactionService', function() {
   var transactionService
@@ -108,37 +108,6 @@ describe('TransactionService', function() {
     expect(trans.name).toBe('transaction')
   })
 
-  it('should capture page load on first transaction', function(done) {
-    // todo: can't test hard navigation metrics since karma runs tests inside an iframe
-    config.set('active', true)
-    config.set('capturePageLoad', true)
-    transactionService = new TransactionService(logger, config)
-
-    var tr1 = transactionService.startTransaction('transaction1', 'transaction')
-    var tr1DoneFn = tr1.onEnd
-    tr1.onEnd = function() {
-      tr1DoneFn()
-      expect(tr1.isHardNavigation).toBe(true)
-      tr1.spans.forEach(function(t) {
-        expect(t.duration()).toBeLessThan(5 * 60 * 1000)
-        expect(t.duration()).toBeGreaterThan(-1)
-      })
-    }
-    expect(tr1.isHardNavigation).toBe(false)
-    tr1.isHardNavigation = true
-    tr1.detectFinish()
-
-    var tr2 = transactionService.startTransaction('transaction2', 'transaction')
-    expect(tr2.isHardNavigation).toBe(false)
-    var tr2DoneFn = tr2.onEnd
-    tr2.onEnd = function() {
-      tr2DoneFn()
-      expect(tr2.isHardNavigation).toBe(false)
-      done()
-    }
-    tr2.detectFinish()
-  })
-
   it('should reuse Transaction', function() {
     transactionService = new TransactionService(logger, config)
     const reusableTr = new Transaction('test-name', 'test-type', {
@@ -155,8 +124,7 @@ describe('TransactionService', function() {
 
   it('should contain agent marks in page load transaction', function() {
     const unMock = mockGetEntriesByType()
-    const tr = new Transaction('test', 'test')
-    tr.isHardNavigation = true
+    const tr = new Transaction('test', PAGE_LOAD)
     transactionService.capturePageLoadMetrics(tr)
 
     const agentMarks = [
@@ -194,11 +162,9 @@ describe('TransactionService', function() {
 
   xit('should not add duplicate resource spans', function() {
     config.set('active', true)
-    config.set('capturePageLoad', true)
     transactionService = new TransactionService(logger, config)
 
-    var tr = transactionService.startTransaction('transaction', 'transaction')
-    tr.isHardNavigation = true
+    var tr = transactionService.startTransaction('transaction', PAGE_LOAD)
     var queryString = '?' + Date.now()
     var testUrl = '/base/test/performance/transactionService.spec.js'
 
@@ -237,11 +203,9 @@ describe('TransactionService', function() {
     const unMock = mockGetEntriesByType()
 
     config.set('active', true)
-    config.set('capturePageLoad', true)
 
     const customTransactionService = new TransactionService(logger, config)
     config.events.observe(TRANSACTION_END, function() {
-      expect(tr.isHardNavigation).toBe(true)
       expect(
         tr.spans.filter(({ type }) => type === 'resource').length
       ).toBeGreaterThanOrEqual(1)
@@ -261,7 +225,7 @@ describe('TransactionService', function() {
 
     const tr = customTransactionService.startTransaction(
       'resource-test',
-      'page-load'
+      PAGE_LOAD
     )
     tr.detectFinish()
   })
