@@ -66,7 +66,9 @@ class App extends React.Component {
               <Link to="/about">About</Link>
             </li>
             <li>
-              <Link to="/manual">Manual</Link>
+              <Link id="manual" to="/manual">
+                Manual
+              </Link>
             </li>
             <li>
               <Link to="/func">Functional</Link>

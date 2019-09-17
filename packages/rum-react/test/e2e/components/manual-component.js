@@ -51,7 +51,7 @@ class ManualComponent extends React.Component {
   }
 
   render() {
-    return <div>Manual {this.state.userName}</div>
+    return <div id="manual-container">Manual {this.state.userName}</div>
   }
 }
 

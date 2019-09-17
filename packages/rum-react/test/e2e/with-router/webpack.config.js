@@ -40,5 +40,5 @@ module.exports = {
     filename: '[name].e2e-bundle.js',
     libraryTarget: 'umd'
   },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.REACT)
+  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD, PACKAGE_TYPES.REACT)
 }
