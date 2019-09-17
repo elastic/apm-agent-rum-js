@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.4](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@0.2.3...@elastic/apm-rum-react@0.2.4) (2019-09-17)
+
+
+### Bug Fixes
+
+* **rum-react:** create transaction only on component mount ([#419](https://github.com/elastic/apm-agent-rum-js/issues/419)) ([a290448](https://github.com/elastic/apm-agent-rum-js/commit/a290448))
+
+
+
+
+
 ## [0.2.3](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@0.2.2...@elastic/apm-rum-react@0.2.3) (2019-09-03)
 
 
