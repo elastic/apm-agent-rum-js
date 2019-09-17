@@ -76,17 +76,43 @@ function getWithTransaction(apm) {
        */
       if (
         !isReactClassComponent(Component) &&
-        typeof React.useEffect === 'function'
+        typeof React.useEffect === 'function' &&
+        typeof React.useState === 'function'
       ) {
         ApmComponent = function ApmComponent(props) {
-          const transaction = apm.startTransaction(name, type, {
-            canReuse: true
-          })
+          /**
+           * We start the transaction as soon as the ApmComponent gets rendered
+           * so that we can capture all the effects inside child components
+           *
+           * The reason why we have this transaction inside setState is that we don't
+           * want this piece of code to run on every render instead we want to
+           * start the transaction only on component mounting
+           */
+          const [transaction] = React.useState(() =>
+            apm.startTransaction(name, type, {
+              canReuse: true
+            })
+          )
 
+          /**
+           * React guarantees the parent component effects are run after the child components effects
+           * So once all the child components effects are run, we run the detectFinish logic
+           * which ensures if the transaction can be completed or not.
+           */
           React.useEffect(() => {
             transaction && transaction.detectFinish()
-            return () => transaction && transaction.detectFinish()
-          })
+            return () => {
+              /**
+               * Incase the transaction is never ended, we check if the transaction
+               * can be closed during unmount phase
+               *
+               * We call detectFinish instead of forcefully ending the transaction
+               * since it could be a redirect route and we might prematurely close
+               * the currently running transaction
+               */
+              transaction && transaction.detectFinish()
+            }
+          }, [])
 
           return <Component transaction={transaction} {...props} />
         }
@@ -105,6 +131,9 @@ function getWithTransaction(apm) {
           }
 
           componentDidMount() {
+            /**
+             * React guarantees the parent CDM runs after the child components CDM
+             */
             if (this.transaction) {
               this.transaction.detectFinish()
             }

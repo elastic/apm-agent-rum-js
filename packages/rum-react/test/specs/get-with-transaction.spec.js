@@ -23,7 +23,7 @@
  *
  */
 
-import Enzyme, { render } from 'enzyme'
+import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import React from 'react'
 
@@ -43,12 +43,11 @@ function TestComponent(apm) {
     Component
   )
   expect(typeof WrappedComponent).toBe('function')
-  const rendered = render(<WrappedComponent name="withTransaction" />)
-  expect(rendered.length).toBe(1)
-  var node = rendered[0]
-  expect(node.name).toBe('h1')
-  expect(node.type).toBe('tag')
-  expect(rendered.text()).toBe('Testing, withTransaction')
+  const wrapped = mount(<WrappedComponent name="withTransaction" />)
+
+  let text = wrapped.find('h1').text()
+  expect(text).toBe('Testing, withTransaction')
+  return wrapped
 }
 
 describe('withTransaction', function() {
@@ -112,5 +111,47 @@ describe('withTransaction', function() {
     )
     expect(WrappedComponent).toEqual(Component)
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
+  })
+
+  it('should not create new transaction on every render', () => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    spyOn(transactionService, 'startTransaction')
+
+    const wrapper = TestComponent(apmBase)
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      'test-transaction',
+      'test-type',
+      { canReuse: true }
+    )
+    transactionService.startTransaction.calls.reset()
+    /**
+     * Trigger rerender of component
+     */
+    wrapper
+      .setProps({
+        name: 'new-props'
+      })
+      .update()
+
+    expect(transactionService.startTransaction).not.toHaveBeenCalled()
+    expect(wrapper.text()).toBe('Testing, new-props')
+  })
+
+  it('should end transaction when component unmounts', () => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    const detectFinishSpy = jasmine.createSpy('detectFinish')
+    spyOn(transactionService, 'startTransaction').and.returnValue({
+      detectFinish: detectFinishSpy
+    })
+
+    const wrapper = TestComponent(apmBase)
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      'test-transaction',
+      'test-type',
+      { canReuse: true }
+    )
+    expect(detectFinishSpy).toHaveBeenCalled()
+    wrapper.unmount()
+    expect(detectFinishSpy).toHaveBeenCalled()
   })
 })
