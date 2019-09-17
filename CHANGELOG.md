@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 4.4.4 (2019-09-17)
+
+## Bug Fixes
+
+* **rum-core:** handle script error events properly ([#418](https://github.com/elastic/apm-agent-rum-js/issues/418)) ([c862ab7](https://github.com/elastic/apm-agent-rum-js/commit/c862ab7))
+* **rum-angular:** proper transaction name for lazy loaded routes ([#414](https://github.com/elastic/apm-agent-rum-js/issues/414)) ([4c6d120](https://github.com/elastic/apm-agent-rum-js/commit/4c6d120))
+* **rum-react:** create transaction only on component mount ([#419](https://github.com/elastic/apm-agent-rum-js/issues/419)) ([a290448](https://github.com/elastic/apm-agent-rum-js/commit/a290448))
+
+
+
 # 4.4.3 (2019-09-03)
 
 

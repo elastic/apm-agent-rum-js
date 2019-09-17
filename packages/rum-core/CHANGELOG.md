@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.4](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.5.3...@elastic/apm-rum-core@4.5.4) (2019-09-17)
+
+
+### Bug Fixes
+
+* **rum-core:** handle script error events properly ([#418](https://github.com/elastic/apm-agent-rum-js/issues/418)) ([c862ab7](https://github.com/elastic/apm-agent-rum-js/commit/c862ab7))
+
+
+
+
+
 ## [4.5.3](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.5.2...@elastic/apm-rum-core@4.5.3) (2019-09-03)
 
 **Note:** Version bump only for package @elastic/apm-rum-core
