@@ -213,8 +213,8 @@ describe('Capture hard navigation', function() {
     tr._start = 0
     captureNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
-    const index = tr.spans.findIndex(span => span.name === xhrSpan.name)
-    expect(index).toBeGreaterThanOrEqual(0)
+    const foundSpans = tr.spans.filter(span => span.name === xhrSpan.name)
+    expect(foundSpans.length).toBe(1)
     unmock()
   })
 

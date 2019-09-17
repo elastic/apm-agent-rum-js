@@ -99,7 +99,7 @@ class App extends React.Component {
           <ApmRoute path="/topics" component={MainComponent} />
           <ApmRoute path="/topic/:id" component={TopicComponent} />
           <Route
-            path="/manual/"
+            path="/manual"
             component={() => (
               <Suspense fallback={<div>Loading...</div>}>
                 <ManualComponent />

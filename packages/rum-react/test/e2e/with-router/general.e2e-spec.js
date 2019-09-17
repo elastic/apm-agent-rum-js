@@ -64,14 +64,14 @@ describe('General usecase with react-router', function() {
     return allowSomeBrowserErrors()
   })
 
-  it('should capture resoure and user timing spans for soft navigation', function() {
+  it('should capture resoure and user timing spans for soft navigation', () => {
     browser.waitUntil(
       () => {
         /**
          * Click a link to trigger the rendering of lazy navigation
          */
         $('#manual').click()
-        const componentContainer = $('#maual-container')
+        const componentContainer = $('#manual-container')
         return componentContainer.getText().indexOf('Manual') !== -1
       },
       5000,
@@ -86,15 +86,13 @@ describe('General usecase with react-router', function() {
     expect(pageLoadTransaction.name).toBe('/home')
 
     const routeTransaction = serverCalls.sendTransactions[1].args[0][0]
-    expect(routeTransaction.name).toBe('/func')
+    expect(routeTransaction.name).toBe('ManualComponent')
     expect(routeTransaction.type).toBe('route-change')
-    expect(routeTransaction.spans.length).toBe(3)
 
     const spanTypes = ['app', 'resource', 'external']
-
-    const foundSpans = transaction.spans.filter(span => {
-      return spanTypes.indexOf(span.type) > -1
-    })
+    const foundSpans = routeTransaction.spans.filter(
+      span => spanTypes.indexOf(span.type) > -1
+    )
     expect(foundSpans.length).toBeGreaterThanOrEqual(3)
   })
 })
