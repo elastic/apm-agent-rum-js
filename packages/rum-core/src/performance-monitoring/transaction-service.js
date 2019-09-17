@@ -27,7 +27,7 @@ import { Promise } from 'es6-promise'
 import Transaction from './transaction'
 import { extend, getPageLoadMarks } from '../common/utils'
 import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
-import { captureHardNavigation } from './capture-hard-navigation'
+import { captureNavigation } from './capture-navigation'
 import { __DEV__ } from '../env'
 import { TRANSACTION_START, TRANSACTION_END } from '../common/constants'
 
@@ -94,7 +94,7 @@ class TransactionService {
 
   capturePageLoadMetrics(tr) {
     if (tr.isHardNavigation) {
-      captureHardNavigation(tr)
+      captureNavigation(tr)
       tr.addMarks(getPageLoadMarks())
     }
   }
@@ -151,8 +151,6 @@ class TransactionService {
     }
 
     if (type === PAGE_LOAD) {
-      tr.isHardNavigation = true
-
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }

@@ -25,6 +25,7 @@
 
 import Span from './span'
 import {
+  PAGE_LOAD,
   RESOURCE_INITIATOR_TYPES,
   MAX_SPAN_DURATION,
   USER_TIMING_THRESHOLD
@@ -59,18 +60,19 @@ const eventPairs = [
  * start, end, baseTime - unsigned long long(PerformanceTiming)
  * representing the moment, in milliseconds since the UNIX epoch
  *
- * transactionEnd - DOMHighResTimeStamp, measured in milliseconds.
+ * trStart & trEnd - DOMHighResTimeStamp, measured in milliseconds.
  *
  * We have to convert the long values in milliseconds before doing the comparision
  * eg: end - baseTime <= transactionEnd
  */
-function shouldCreateSpan(start, end, baseTime, transactionEnd) {
+function shouldCreateSpan(start, end, trStart, trEnd, baseTime = 0) {
   return (
     typeof start === 'number' &&
     typeof end === 'number' &&
     start >= baseTime &&
     end > start &&
-    end - baseTime <= transactionEnd &&
+    start - baseTime >= trStart &&
+    end - baseTime <= trEnd &&
     end - start < MAX_SPAN_DURATION &&
     start - baseTime < MAX_SPAN_DURATION &&
     end - baseTime < MAX_SPAN_DURATION
@@ -104,13 +106,14 @@ function getResponseContext(perfTimingEntry) {
   return respContext
 }
 
-function createNavigationTimingSpans(timings, baseTime, transactionEnd) {
+function createNavigationTimingSpans(timings, trStart, trEnd) {
   const spans = []
+  const baseTime = timings.fetchStart
   for (let i = 0; i < eventPairs.length; i++) {
     const start = timings[eventPairs[i][0]]
     const end = timings[eventPairs[i][1]]
 
-    if (!shouldCreateSpan(start, end, baseTime, transactionEnd)) {
+    if (!shouldCreateSpan(start, end, trStart, trEnd, baseTime)) {
       continue
     }
     const span = new Span(eventPairs[i][2], 'hard-navigation.browser-timing')
@@ -148,7 +151,7 @@ function createResourceTimingSpan(resourceTimingEntry) {
   return span
 }
 
-function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
+function createResourceTimingSpans(entries, filterUrls, trStart, trEnd) {
   const spans = []
   for (let i = 0; i < entries.length; i++) {
     let { initiatorType, name, startTime, responseEnd } = entries[i]
@@ -166,7 +169,7 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
      * Create spans for all known resource initiator types
      */
     if (RESOURCE_INITIATOR_TYPES.indexOf(initiatorType) !== -1) {
-      if (!shouldCreateSpan(startTime, responseEnd, 0, transactionEnd)) {
+      if (!shouldCreateSpan(startTime, responseEnd, trStart, trEnd)) {
         continue
       }
       spans.push(createResourceTimingSpan(entries[i]))
@@ -198,7 +201,7 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
        */
       if (
         !foundAjaxReq &&
-        shouldCreateSpan(startTime, responseEnd, 0, transactionEnd)
+        shouldCreateSpan(startTime, responseEnd, trStart, trEnd)
       ) {
         spans.push(createResourceTimingSpan(entries[i]))
       }
@@ -207,7 +210,7 @@ function createResourceTimingSpans(entries, filterUrls, transactionEnd) {
   return spans
 }
 
-function createUserTimingSpans(entries, transactionEnd) {
+function createUserTimingSpans(entries, trStart, trEnd) {
   const userTimingSpans = []
   for (let i = 0; i < entries.length; i++) {
     const { name, startTime, duration } = entries[i]
@@ -215,7 +218,7 @@ function createUserTimingSpans(entries, transactionEnd) {
 
     if (
       duration <= USER_TIMING_THRESHOLD ||
-      !shouldCreateSpan(startTime, end, 0, transactionEnd)
+      !shouldCreateSpan(startTime, end, trStart, trEnd)
     ) {
       continue
     }
@@ -230,33 +233,50 @@ function createUserTimingSpans(entries, transactionEnd) {
   return userTimingSpans
 }
 
-function captureHardNavigation(transaction) {
+function getApiSpanNames({ spans }) {
+  const apiCalls = []
+  for (let i = 0; i < spans; i++) {
+    const span = spans[i]
+
+    if (span.type === 'external' && span.subType === 'http') {
+      continue
+    }
+    apiCalls.push(span.name.split(' ')[1])
+  }
+  return apiCalls
+}
+
+function captureNavigation(transaction) {
   const perf = window.performance
-  if (transaction.isHardNavigation && perf && perf.timing) {
-    const timings = perf.timing
+  /**
+   * Both start and end threshold decides if a span must be
+   * captured as part of the transaction
+   */
+  const { _start: trStart, _end: trEnd, type } = transaction
+  /**
+   * Page load is considered as hard navigation and we account
+   * for few extra spans than soft navigations which
+   * happens on single page applications
+   */
+
+  if (type === PAGE_LOAD) {
+    /**
+     * Adjust custom marks properly to fit in the transaction timeframe
+     */
     if (transaction.marks && transaction.marks.custom) {
-      var customMarks = transaction.marks.custom
+      const customMarks = transaction.marks.custom
       Object.keys(customMarks).forEach(key => {
         customMarks[key] += transaction._start
       })
     }
 
-    // must be zero otherwise the calculated relative _start time would be wrong
+    /**
+     * must be zero otherwise the calculated relative _start time would be wrong
+     */
     transaction._start = 0
 
-    /**
-     * Threshold that decides if the span must be
-     * captured as part of the page load transaction
-     *
-     * Denotes the time when the onload event fires
-     */
-    const transactionEnd = transaction._end
-
-    createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      transactionEnd
-    ).forEach(span => {
+    const timings = perf.timing
+    createNavigationTimingSpans(timings, 0, trEnd).forEach(span => {
       span.traceId = transaction.traceId
       span.sampled = transaction.sampled
       if (span.pageResponse && transaction.options.pageLoadSpanId) {
@@ -264,36 +284,34 @@ function captureHardNavigation(transaction) {
       }
       transaction.spans.push(span)
     })
+  }
+
+  if (typeof perf.getEntriesByType === 'function') {
+    /**
+     * Capture resource timing information as spans
+     */
+    const resourceEntries = perf.getEntriesByType('resource')
+    const apiCalls = getApiSpanNames(transaction)
+
+    createResourceTimingSpans(
+      resourceEntries,
+      apiCalls,
+      trStart,
+      trEnd
+    ).forEach(span => transaction.spans.push(span))
 
     /**
-     * capture resource timing information as Spans during page load transaction
+     * Capture user timing measures as spans
      */
-    if (typeof perf.getEntriesByType === 'function') {
-      const resourceEntries = perf.getEntriesByType('resource')
+    const userEntries = perf.getEntriesByType('measure')
+    createUserTimingSpans(userEntries, trStart, trEnd).forEach(span =>
+      transaction.spans.push(span)
+    )
 
-      const ajaxUrls = []
-      for (let i = 0; i < transaction.spans; i++) {
-        const span = transaction.spans[i]
-
-        if (span.type === 'external' && span.subType === 'http') {
-          continue
-        }
-        ajaxUrls.push(span.name.split(' ')[1])
-      }
-      createResourceTimingSpans(
-        resourceEntries,
-        ajaxUrls,
-        transactionEnd
-      ).forEach(span => transaction.spans.push(span))
-
-      const userEntries = perf.getEntriesByType('measure')
-      createUserTimingSpans(userEntries, transactionEnd).forEach(span =>
-        transaction.spans.push(span)
-      )
-
-      /**
-       * Add transaction context information from performance navigation timing entry level 2 API
-       */
+    /**
+     * Add transaction context information from performance navigation timing entry level 2 API
+     */
+    if (type === PAGE_LOAD) {
       let navigationEntry = perf.getEntriesByType('navigation')
       if (navigationEntry && navigationEntry.length > 0) {
         navigationEntry = navigationEntry[0]
@@ -306,7 +324,7 @@ function captureHardNavigation(transaction) {
 }
 
 export {
-  captureHardNavigation,
+  captureNavigation,
   createNavigationTimingSpans,
   createResourceTimingSpans,
   createUserTimingSpans

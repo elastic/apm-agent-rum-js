@@ -393,7 +393,6 @@ describe('PerformanceMonitoring', function() {
     const transactionService = serviceFactory.getService('TransactionService')
 
     configService.events.observe(TRANSACTION_END, function(tr) {
-      expect(tr.isHardNavigation).toBe(true)
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
       expect(promise).toBeDefined()
@@ -567,7 +566,7 @@ describe('PerformanceMonitoring', function() {
           expect(tr.spans[0].context).toEqual({
             http: {
               method: 'GET',
-              url: 'http://localhost:9876/?a=b&c=d',
+              url: window.location.origin + '/?a=b&c=d',
               status_code: 200
             }
           })

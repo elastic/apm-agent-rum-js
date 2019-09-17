@@ -42,7 +42,8 @@ import {
   AFTER_EVENT,
   FETCH,
   HISTORY,
-  XMLHTTPREQUEST
+  XMLHTTPREQUEST,
+  PAGE_LOAD
 } from '../common/constants'
 import {
   truncateModel,
@@ -262,7 +263,7 @@ class PerformanceMonitoring {
       'checkBrowserResponsiveness'
     )
 
-    if (checkBrowserResponsiveness && !tr.isHardNavigation) {
+    if (checkBrowserResponsiveness && tr.type !== PAGE_LOAD) {
       const buffer = this._configService.get('browserResponsivenessBuffer')
 
       const wasBrowserResponsive = this.checkBrowserResponsiveness(
