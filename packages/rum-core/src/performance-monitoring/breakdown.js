@@ -32,8 +32,7 @@ import { PAGE_LOAD } from '../common/constants'
  * Interested events from the Navigation timing API
  */
 const pageLoadBreakdowns = [
-  ['fetchStart', 'requestStart', 'Network'],
-  ['requestStart', 'responseStart', 'TTFB'],
+  ['fetchStart', 'responseEnd', 'Network'],
   ['domLoading', 'domInteractive', 'DOM Processing'],
   ['domInteractive', 'loadEventEnd', 'Page Render']
 ]

@@ -79,7 +79,7 @@ describe('Span', () => {
       createTransaction(200, true, PAGE_LOAD),
       TIMING_LEVEL1_ENTRY
     )
-    const spanTypes = ['Network', 'TTFB', 'DOM Processing', 'Page Render']
+    const spanTypes = ['Network', 'DOM Processing', 'Page Render']
 
     const spans = breakdown.slice(1)
 
