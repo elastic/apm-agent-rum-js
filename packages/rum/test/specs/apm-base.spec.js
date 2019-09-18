@@ -76,7 +76,7 @@ describe('ApmBase', function() {
     const trService = serviceFactory.getService('TransactionService')
     const ErrorLogging = serviceFactory.getService('ErrorLogging')
     const loggingInstane = ErrorLogging['__proto__']
-    spyOn(loggingInstane, 'registerGlobalEventListener')
+    spyOn(loggingInstane, 'onUnhandledError')
 
     apmBase.init({
       serviceName,
@@ -88,7 +88,7 @@ describe('ApmBase', function() {
      * Page load transaction and error listeners are disabled
      */
     expect(trService.getCurrentTransaction()).toBeUndefined()
-    expect(loggingInstane.registerGlobalEventListener).not.toHaveBeenCalled()
+    expect(loggingInstane.onUnhandledError).not.toHaveBeenCalled()
   })
 
   it('should selectively enable/disable instrumentations based on config', () => {
@@ -96,7 +96,7 @@ describe('ApmBase', function() {
     const trService = serviceFactory.getService('TransactionService')
     const ErrorLogging = serviceFactory.getService('ErrorLogging')
     const loggingInstane = ErrorLogging['__proto__']
-    spyOn(loggingInstane, 'registerGlobalEventListener')
+    spyOn(loggingInstane, 'onUnhandledError')
 
     apmBase.init({
       serviceName,
@@ -106,7 +106,7 @@ describe('ApmBase', function() {
       sendPageLoadTransaction: true
     })
     expect(trService.getCurrentTransaction()).toBeUndefined()
-    expect(loggingInstane.registerGlobalEventListener).toHaveBeenCalled()
+    expect(loggingInstane.onUnhandledError).toHaveBeenCalled()
   })
 
   it('should allow custom instrumentations via API when instrument is false', () => {

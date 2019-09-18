@@ -34,6 +34,7 @@ describe('ErrorLogging', function() {
   var apmServer
   var errorLogging
   var transactionService
+
   beforeEach(function() {
     var serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
@@ -221,7 +222,7 @@ describe('ErrorLogging', function() {
       addedListenerTypes.push(type)
       errorLogging.logErrorEvent(event)
     })
-    errorLogging.registerGlobalEventListener()
+    errorLogging.onUnhandledError()
     expect(addedListenerTypes).toContain('error')
 
     const filename = 'filename'
@@ -284,5 +285,53 @@ describe('ErrorLogging', function() {
       expect(apmServer.sendErrors).not.toHaveBeenCalled()
       expect(apmServer.errorQueue.items.length).toBe(4)
     }
+  })
+
+  it('should capture unhandled rejection events', done => {
+    configService.set('flushInterval', 1)
+    errorLogging.onUnhandledRejection()
+
+    spyOn(apmServer, 'sendErrors').and.callFake(errors => {
+      expect(errors[0].exception.message).toBe(reason.message)
+      expect(errors[0].exception.stacktrace).toBeDefined()
+      done()
+    })
+    /**
+     * simulate window.PromiseRejectionEvent event since its not supported by
+     * all browsers
+     */
+    const reason = new Error(testErrorMessage)
+    const event = new window.Event('unhandledrejection')
+    event.reason = reason
+    window.dispatchEvent(event)
+  })
+
+  it('should handle multiple reasons for promise rejections', () => {
+    const getErrors = () => apmServer.errorQueue.items
+
+    errorLogging.logPromiseEvent({})
+    expect(getErrors().length).toBe(1)
+    expect(getErrors()[0].exception.message).toMatch(/no reason defined/)
+
+    const error = new Error(testErrorMessage)
+    errorLogging.logPromiseEvent({
+      reason: error
+    })
+    expect(getErrors()[1].exception.message).toBe(error.message)
+
+    errorLogging.logPromiseEvent({
+      reason: testErrorMessage
+    })
+    expect(getErrors()[2].exception.message).toMatch(testErrorMessage)
+
+    const errorObj = {
+      message: testErrorMessage,
+      stack: 'ReferenceError: At example.js:23'
+    }
+    errorLogging.logPromiseEvent({
+      reason: errorObj
+    })
+    expect(getErrors()[3].exception.message).toMatch(testErrorMessage)
+    expect(getErrors()[3].exception.stacktrace).toBeDefined()
   })
 })

@@ -36,5 +36,5 @@ module.exports = {
     path: resolve(__dirname),
     libraryTarget: 'umd'
   },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV)
+  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD)
 }
