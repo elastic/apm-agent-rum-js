@@ -110,10 +110,29 @@ class ErrorLogging {
     }
   }
 
-  registerGlobalEventListener() {
+  onUnhandledError() {
     window.addEventListener('error', errorEvent =>
       this.logErrorEvent(errorEvent)
     )
+  }
+
+  onUnhandledRejection() {
+    window.addEventListener('unhandledrejection', promiseRejectionEvent =>
+      this.logPromiseEvent(promiseRejectionEvent)
+    )
+  }
+
+  logPromiseEvent(promiseRejectionEvent) {
+    const prefix = 'Unhandled promise rejection: '
+    const { reason } = promiseRejectionEvent
+
+    if (reason == null) {
+      this.logError(prefix + '<no reason defined>')
+    } else if (typeof reason === 'object') {
+      this.logError(reason)
+    } else {
+      this.logError(prefix + reason)
+    }
   }
 
   logError(messageOrError) {

@@ -23,18 +23,11 @@
  *
  */
 
-const { join, resolve } = require('path')
-const {
-  getWebpackConfig,
-  BUNDLE_TYPES
-} = require('../../../../../dev-utils/build')
-
-module.exports = {
-  entry: join(__dirname, 'app.js'),
-  output: {
-    filename: 'app.e2e-bundle.min.js',
-    path: resolve(__dirname),
-    libraryTarget: 'umd'
-  },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV)
+class Timer {
+  constructor() {
+    this.start = performance.now()
+    this.end = false
+    this.count = 0
+    this.selfTime = 0
+  }
 }
