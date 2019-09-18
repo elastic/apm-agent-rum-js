@@ -301,7 +301,7 @@ describe('ErrorLogging', function() {
      * all browsers
      */
     const reason = new Error(testErrorMessage)
-    const event = new window.Event('unhandledrejection')
+    const event = new CustomEvent('unhandledrejection')
     event.reason = reason
     window.dispatchEvent(event)
   })
