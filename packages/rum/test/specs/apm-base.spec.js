@@ -42,10 +42,6 @@ describe('ApmBase', function() {
   it('should send page load metrics before or after load event', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     var trService = serviceFactory.getService('TransactionService')
-    var configService = serviceFactory.getService('ConfigService')
-    configService.setConfig({
-      sendPageLoadTransaction: true
-    })
     apmBase.config({ serviceName, serverUrl })
     apmBase._sendPageLoadMetrics()
     var tr = trService.getCurrentTransaction()
@@ -81,8 +77,7 @@ describe('ApmBase', function() {
     apmBase.init({
       serviceName,
       serverUrl,
-      instrument: false,
-      sendPageLoadTransaction: true
+      instrument: false
     })
     /**
      * Page load transaction and error listeners are disabled
@@ -102,8 +97,7 @@ describe('ApmBase', function() {
       serviceName,
       serverUrl,
       instrument: true,
-      disableInstrumentations: ['page-load'],
-      sendPageLoadTransaction: true
+      disableInstrumentations: ['page-load']
     })
     expect(trService.getCurrentTransaction()).toBeUndefined()
     expect(loggingInstane.registerGlobalEventListener).toHaveBeenCalled()

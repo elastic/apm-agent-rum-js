@@ -28,7 +28,7 @@ import { renderTestElement } from '../utils'
 
 const apm = createApmBase({
   serviceName: 'manual-timing',
-  sendPageLoadTransaction: false,
+  disableInstrumentations: ['page-load'],
   operationMode: 'manual'
 })
 

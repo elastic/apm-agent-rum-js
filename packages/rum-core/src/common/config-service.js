@@ -93,8 +93,6 @@ class Config {
       queueLimit: -1,
       flushInterval: 500,
 
-      sendPageLoadTransaction: true,
-
       distributedTracing: true,
       distributedTracingOrigins: [],
       distributedTracingHeaderValueCallback: getDtHeaderValue,
