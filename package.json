@@ -17,10 +17,10 @@
     "lint": "npm-run-all --silent -p lint:*",
     "lint:js": "eslint . --ext .js,.jsx,.ts",
     "lint:license": "node scripts/license-checker",
-    "test": "lerna run build:main && lerna run test --stream --scope=$SCOPE --no-prefix",
-    "bundlesize": "lerna run bundlesize --stream",
+    "test": "lerna run build:module && lerna run test --stream --scope=$SCOPE --no-prefix",
+    "bundlesize": "lerna run build:module && lerna run bundlesize --stream",
     "serve": "node ./dev-utils/run-script.js startTestServers",
-    "coverage": "lerna run build:main && lerna run karma:coverage --stream",
+    "coverage": "lerna run build:module && lerna run karma:coverage --stream",
     "bench:dev": "node ./scripts/benchmarks.js",
     "clean": "npx lerna exec -- rm -rf dist/"
   },
