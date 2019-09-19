@@ -39,11 +39,17 @@ const {
 } = require('./test-config')
 const { generateNotice } = require('./dep-info')
 
-const PROJECT_DIR = join(__dirname, '../')
 const { sauceLabs } = getTestEnvironmentVariables()
 
-function runUnitTests(packagePath, startSauceConnect = 'false') {
-  const karmaConfigFile = join(PROJECT_DIR, packagePath, 'karma.conf.js')
+/**
+ * gets the full working directory path where the
+ * `npm run` command was run
+ */
+const getPkgDirectory = () => process.env.INIT_CWD
+
+function runUnitTests(startSauceConnect = 'false') {
+  const pkgPath = getPkgDirectory()
+  const karmaConfigFile = join(pkgPath, 'karma.conf.js')
   if (startSauceConnect === 'true') {
     return launchSauceConnect(() => runKarma(karmaConfigFile))
   }
@@ -108,32 +114,34 @@ process.on('exit', exitHandler)
 process.on('uncaughtException', exitHandler)
 process.on('SIGINT', exitHandler)
 
-function runE2eTests(configPath) {
-  const webDriverConfig = join(PROJECT_DIR, configPath)
+function runE2eTests(configFileName = 'wdio.conf.js') {
+  const pkgPath = getPkgDirectory()
+  const webDriverConfig = join(pkgPath, configFileName)
   runE2eTestsUtils(webDriverConfig, false)
 }
 
-function buildE2eBundles(basePath) {
-  return buildE2eBundlesUtils(join(PROJECT_DIR, basePath))
+function buildE2eBundles() {
+  const pkgPath = getPkgDirectory()
+  const testPath = join(pkgPath, 'test/e2e')
+  return buildE2eBundlesUtils(testPath)
 }
 
-function runSauceTests(packagePath, serve = 'true', ...scripts) {
+function runSauceTests(serve = 'true', ...scripts) {
+  if (serve === 'true') {
+    const pkgPath = getPkgDirectory()
+    const servers = startTestServers(pkgPath)
+    cleanUps.push(() => {
+      servers.map(s => s.close())
+    })
+  }
+
   /**
    * Since there is no easy way to reuse the sauce connect tunnel even using same tunnel identifier,
    * we launch the sauce connect tunnel before starting all the saucelab tests
    */
-
-  let servers = []
-  if (serve === 'true') {
-    servers = startTestServers(join(PROJECT_DIR, packagePath))
-  }
-  cleanUps.push(() => {
-    servers.map(s => s.close())
-  })
-
   launchSauceConnect(async sauceConnectProcess => {
     if (!sauceLabs) {
-      return runUnitTests(packagePath)
+      return runUnitTests()
     }
 
     /**
