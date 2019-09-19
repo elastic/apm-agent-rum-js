@@ -153,7 +153,7 @@ describe('Span', () => {
   it('should not capture span breakdown for unsampled transaction', () => {
     const tr = createTransactionWithSpan(false)
     const breakdown = captureBreakdown(tr)
-
-    expect(breakdown[1]).not.toBeDefined()
+    expect(breakdown.length).toBe(1)
+    expect(breakdown[0].samples['transaction.breakdown.count'].value).toBe(0)
   })
 })

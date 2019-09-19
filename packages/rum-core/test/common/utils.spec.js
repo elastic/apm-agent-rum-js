@@ -311,12 +311,4 @@ describe('lib/utils', function() {
       'cache;desc=Origin cache;dur=200, edge;desc=Edge cache;dur=20, miss, app;dur=50'
     )
   })
-
-  it('get microtime should be very closer to Date.now()', () => {
-    const realMicrotime = Date.now() * 1000
-    const calculatedMicrotime = utils.microtime()
-    const allowedDelta = 1000 // 1ms
-    expect(realMicrotime - allowedDelta < calculatedMicrotime)
-    expect(realMicrotime + allowedDelta > calculatedMicrotime)
-  })
 })
