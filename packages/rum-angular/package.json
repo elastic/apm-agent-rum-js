@@ -24,7 +24,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "npm-run-all build:main build:module",
+    "build": "run-p build:main build:module",
     "build:main": "BABEL_ENV=BROWSER_PROD npx babel -x '.ts' src -d dist/lib ",
     "build:module": "BABEL_ENV=BROWSER_ESM_PROD npx babel -x '.ts' src -d dist/es",
     "build:e2e": "npm run script buildE2eBundles packages/rum-angular/test/e2e",
