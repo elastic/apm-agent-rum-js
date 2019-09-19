@@ -43,7 +43,7 @@ const { tunnelIdentifier } = getSauceConnectOptions()
  * Common base config for all the mono repo packages
  */
 const baseConfig = {
-  files: [require.resolve('@babel/polyfill/dist/polyfill.js'), specPattern],
+  files: [require.resolve('regenerator-runtime/runtime'), specPattern],
   frameworks: ['jasmine'],
   preprocessors: {
     [specPattern]: ['webpack', 'sourcemap']

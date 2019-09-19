@@ -340,4 +340,21 @@ describe('ApmBase', function() {
     await apmBase.fetchCentralConfig()
     expect(configService.get('transactionSampleRate')).toBe(0.5)
   })
+
+  it('should wait for remote config before sending the page load', done => {
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    spyOn(apmBase, 'fetchCentralConfig').and.callThrough()
+    spyOn(apmBase, '_sendPageLoadMetrics').and.callFake(() => {
+      done()
+    })
+
+    apmBase.init({
+      serviceName: 'test-service',
+      centralConfig: true,
+      serverUrl
+    })
+
+    expect(apmBase._sendPageLoadMetrics).not.toHaveBeenCalled()
+    expect(apmBase.fetchCentralConfig).toHaveBeenCalled()
+  })
 })

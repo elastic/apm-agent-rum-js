@@ -119,6 +119,7 @@
     "react-dom": "^16.2.0",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
+    "regenerator-runtime": "^0.13.3",
     "serve-index": "^1.9.1",
     "source-map": "^0.7.0",
     "stats-lite": "^2.2.0",

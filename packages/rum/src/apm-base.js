@@ -123,7 +123,7 @@ class ApmBase {
         return config
       })
       .catch(error => {
-        loggingService.warn('Failed fetching central config:', error)
+        loggingService.warn('Failed fetching config:', error)
       })
   }
 

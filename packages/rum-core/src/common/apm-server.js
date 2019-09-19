@@ -165,7 +165,6 @@ class ApmServer {
       })
       .catch(reason => {
         const error = this._constructError(reason)
-        this._loggingService.warn('Failed fetching config!', error)
         return Promise.reject(error)
       })
   }
