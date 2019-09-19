@@ -44,7 +44,6 @@ function generateTransaction(count, breakdown = false) {
     span1.end()
     span1.id = 'span-id-' + i + '-1'
     tr.end()
-    tr.ensureContext()
     tr.context.page.referer = 'referer'
     tr.context.page.url = 'url'
     tr._start = 10
