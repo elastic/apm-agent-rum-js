@@ -9,8 +9,12 @@
   "module": "dist/es/index.js",
   "source": "src/index.js",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "publishConfig": {
     "access": "public"
   },

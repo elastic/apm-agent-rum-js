@@ -4,7 +4,8 @@
   "description": "Elastic apm core",
   "license": "MIT",
   "main": "dist/lib/index.js",
-  "module": "src/index.js",
+  "module": "dist/es/index.js",
+  "source": "src/index.js",
   "sideEffects": false,
   "publishConfig": {
     "access": "public"

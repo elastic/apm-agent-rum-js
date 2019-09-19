@@ -89,24 +89,15 @@ function runNodeTests() {
   })
 }
 
-let cleanUps = []
-
-function exitHandler(exitCode) {
-  console.log('Running cleanups.')
-  cleanUps.forEach(f => {
-    try {
-      f(exitCode)
-    } catch (e) {
-      console.error(e)
+function runBundleTests() {
+  const SPEC_DIR = 'test/bundle'
+  runJasmine(SPEC_DIR, err => {
+    if (err) {
+      console.log('browser bundle tests failed:', err.message)
+      process.exit(2)
     }
   })
-  cleanUps = []
-  process.exit(exitCode)
 }
-
-process.on('exit', exitHandler)
-process.on('uncaughtException', exitHandler)
-process.on('SIGINT', exitHandler)
 
 function runE2eTests(configPath) {
   const webDriverConfig = join(PROJECT_DIR, configPath)
@@ -167,6 +158,24 @@ function runSauceTests(packagePath, serve = 'true', ...scripts) {
   })
 }
 
+let cleanUps = []
+function exitHandler(exitCode) {
+  console.log('Running cleanups.')
+  cleanUps.forEach(f => {
+    try {
+      f(exitCode)
+    } catch (e) {
+      console.error(e)
+    }
+  })
+  cleanUps = []
+  process.exit(exitCode)
+}
+
+process.on('exit', exitHandler)
+process.on('uncaughtException', exitHandler)
+process.on('SIGINT', exitHandler)
+
 const scripts = {
   launchSauceConnect,
   generateNotice,
@@ -175,6 +184,7 @@ const scripts = {
   runE2eTests,
   runIntegrationTests,
   runNodeTests,
+  runBundleTests,
   buildE2eBundles,
   startTestServers
 }
