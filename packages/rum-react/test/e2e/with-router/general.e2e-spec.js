@@ -25,7 +25,8 @@
 
 const {
   allowSomeBrowserErrors,
-  waitForApmServerCalls
+  waitForApmServerCalls,
+  getBrowserInfo
 } = require('../../../../../dev-utils/webdriver')
 
 describe('General usecase with react-router', function() {
@@ -93,6 +94,15 @@ describe('General usecase with react-router', function() {
     const foundSpans = routeTransaction.spans.filter(
       span => spanTypes.indexOf(span.type) > -1
     )
-    expect(foundSpans.length).toBeGreaterThanOrEqual(3)
+    /**
+     * `app` and `resource` span type will not be captured in safari 9 since
+     * User and Resource API is not supported.
+     */
+    const { name } = getBrowserInfo()
+    if (name.indexOf('safari') >= 0) {
+      expect(foundSpans.length).toBeGreaterThanOrEqual(1)
+    } else {
+      expect(foundSpans.length).toBeGreaterThanOrEqual(3)
+    }
   })
 })

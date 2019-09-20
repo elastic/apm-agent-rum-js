@@ -36,7 +36,9 @@ class ManualComponent extends React.Component {
 
   componentDidMount() {
     this.fetchData()
-    performance.measure('manual-component-mounted', 'manual-component-start')
+    if (typeof performance.measure === 'function') {
+      performance.measure('manual-component-mounted', 'manual-component-start')
+    }
   }
 
   fetchData() {

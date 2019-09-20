@@ -45,7 +45,9 @@ const apm = createApmBase({
  * measurements in the transaction timeframe
  */
 const ManualComponent = lazy(() => {
-  performance.mark('manual-component-start')
+  if (typeof performance.mark === 'function') {
+    performance.mark('manual-component-start')
+  }
   return new Promise(resolve => {
     setTimeout(() => {
       return resolve(import('../components/manual-component'))
