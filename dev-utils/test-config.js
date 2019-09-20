@@ -43,7 +43,8 @@ function getTestEnvironmentVariables() {
     isTravis: process.env.TRAVIS,
     isJenkins: process.env.JENKINS_URL,
     serverUrl: process.env.APM_SERVER_URL || DEFAULT_APM_SERVER_URL,
-    mockBackendUrl: 'http://localhost:8003'
+    mockBackendUrl: 'http://localhost:8003',
+    stackVersion: process.env.STACK_VERSION
   }
 }
 
@@ -118,10 +119,38 @@ function getBrowserList() {
     }
   }))
 }
+function parseVersion(version) {
+  const parts = version.split('.')
+  return {
+    full: version,
+    major: parts[0],
+    minor: parts[1],
+    patch: parts[2]
+  }
+}
+
+function isVersionInRange(version, min) {
+  let isInRange = true
+  if (version) {
+    let parsedVersion = parseVersion(version)
+    if (min) {
+      let minParsed = parseVersion(min)
+      isInRange =
+        isInRange &&
+        parsedVersion.major >= minParsed.major &&
+        parsedVersion.minor >= minParsed.minor &&
+        parsedVersion.patch >= minParsed.patch
+    }
+  }
+  return isInRange
+}
 
 module.exports = {
   getSauceConnectOptions,
   getTestEnvironmentVariables,
   getGlobalConfig,
-  getBrowserList
+  getBrowserList,
+  parseVersion,
+  isVersionInRange,
+  DEFAULT_APM_SERVER_URL
 }

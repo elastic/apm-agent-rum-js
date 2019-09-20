@@ -27,6 +27,8 @@ import ApmBase from '../../src/apm-base'
 import { createServiceFactory } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import { PAGE_LOAD } from '@elastic/apm-rum-core/src'
+import { Promise } from 'es6-promise'
 
 var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
@@ -303,5 +305,66 @@ describe('ApmBase', function() {
 
     expect(tr.spans.length).toBe(1)
     expect(tr.spans[0].name).toBe('GET /')
+  })
+
+  it('should fetch central config', done => {
+    const apmServer = serviceFactory.getService('ApmServer')
+    const configService = serviceFactory.getService('ConfigService')
+
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    apmBase.init({
+      serviceName: 'test-service',
+      disableInstrumentations: [PAGE_LOAD]
+    })
+
+    expect(configService.get('transactionSampleRate')).toBe(1.0)
+
+    function createPayloadCallback(rate) {
+      return () => {
+        return Promise.resolve(`{
+          "transaction_sample_rate": "${rate}"
+        }
+        `)
+      }
+    }
+
+    const loggingService = serviceFactory.getService('LoggingService')
+    spyOn(loggingService, 'warn')
+    apmServer._makeHttpRequest = createPayloadCallback('test')
+    apmBase
+      .fetchCentralConfig()
+      .then(() => {
+        expect(loggingService.warn).toHaveBeenCalledWith(
+          'Invalid value "NaN" for transactionSampleRate. Allowed: Number between 0 and 1.'
+        )
+        expect(configService.get('transactionSampleRate')).toBe(1)
+
+        apmServer._makeHttpRequest = createPayloadCallback('0.5')
+        apmBase
+          .fetchCentralConfig()
+          .then(() => {
+            expect(configService.get('transactionSampleRate')).toBe(0.5)
+            done()
+          })
+          .catch(fail)
+      })
+      .catch(fail)
+  })
+
+  it('should wait for remote config before sending the page load', done => {
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    spyOn(apmBase, 'fetchCentralConfig').and.callThrough()
+    spyOn(apmBase, '_sendPageLoadMetrics').and.callFake(() => {
+      done()
+    })
+
+    apmBase.init({
+      serviceName,
+      centralConfig: true,
+      serverUrl
+    })
+
+    expect(apmBase._sendPageLoadMetrics).not.toHaveBeenCalled()
+    expect(apmBase.fetchCentralConfig).toHaveBeenCalled()
   })
 })

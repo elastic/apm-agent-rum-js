@@ -45,6 +45,8 @@ services:
         -E apm-server.read_timeout=1m
         -E apm-server.shutdown_timeout=2m
         -E apm-server.write_timeout=1m
+        -E apm-server.kibana.enabled=true
+        -E apm-server.kibana.host=http://kibana:5601
         -E setup.template.settings.index.number_of_replicas=0
     cap_drop:
       - ALL
@@ -62,6 +64,8 @@ services:
 #    cpus: 0.5
     depends_on:
       elasticsearch:
+        condition: service_healthy
+      kibana:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "--write-out", "'HTTP %{http_code}'", "--silent", "--output", "/dev/null", "http://apm-server:8200/"]

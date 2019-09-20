@@ -163,6 +163,43 @@ describe('ConfigService', function() {
         }
       ]
     })
+
+    // transactionSampleRate validation
+    var sampleRateErrors = configService.validate({ transactionSampleRate: 2 })
+    expect(sampleRateErrors.invalid).toEqual([
+      {
+        key: 'transactionSampleRate',
+        value: 2,
+        allowed: 'Number between 0 and 1'
+      }
+    ])
+
+    sampleRateErrors = configService.validate({ transactionSampleRate: 'test' })
+    expect(sampleRateErrors.invalid).toEqual([
+      {
+        key: 'transactionSampleRate',
+        value: 'test',
+        allowed: 'Number between 0 and 1'
+      }
+    ])
+
+    sampleRateErrors = configService.validate({ transactionSampleRate: -1 })
+    expect(sampleRateErrors.invalid).toEqual([
+      {
+        key: 'transactionSampleRate',
+        value: -1,
+        allowed: 'Number between 0 and 1'
+      }
+    ])
+
+    sampleRateErrors = configService.validate({ transactionSampleRate: NaN })
+    expect(sampleRateErrors.invalid).toEqual([
+      {
+        key: 'transactionSampleRate',
+        value: NaN,
+        allowed: 'Number between 0 and 1'
+      }
+    ])
   })
 
   it('should addLabels', function() {

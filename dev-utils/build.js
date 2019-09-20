@@ -136,9 +136,10 @@ function getBabelConfig(bundleType, packageType) {
  * Used for injecting process.env across webpack bundles for testing
  */
 function getWebpackEnv(env = 'development') {
-  const { serverUrl } = getTestEnvironmentVariables()
+  const { serverUrl, stackVersion } = getTestEnvironmentVariables()
   return {
     APM_SERVER_URL: serverUrl,
+    STACK_VERSION: stackVersion,
     NODE_ENV: env
   }
 }
