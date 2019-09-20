@@ -76,8 +76,11 @@ class ApmServer {
   }
 
   _postJson(endPoint, payload) {
-    return this._makeHttpRequest('POST', endPoint, payload, {
-      'Content-Type': 'application/x-ndjson'
+    return this._makeHttpRequest('POST', endPoint, {
+      payload,
+      headers: {
+        'Content-Type': 'application/x-ndjson'
+      }
     })
   }
 
@@ -99,12 +102,16 @@ class ApmServer {
     return new Error(message)
   }
 
-  _makeHttpRequest(method, url, payload, headers) {
+  _makeHttpRequest(
+    method,
+    url,
+    { timeout, payload, headers } = { timeout: 10000 }
+  ) {
     return new Promise(function(resolve, reject) {
       var xhr = new window.XMLHttpRequest()
       xhr[XHR_IGNORE] = true
       xhr.open(method, url, true)
-      xhr.timeout = 10000
+      xhr.timeout = timeout
 
       if (headers) {
         for (var header in headers) {
@@ -138,6 +145,28 @@ class ApmServer {
     var queueLimit = this._configService.get('queueLimit')
     var flushInterval = this._configService.get('flushInterval')
     return new Queue(onFlush, { queueLimit, flushInterval })
+  }
+
+  fetchConfig(serviceName, environment) {
+    const serverUrl = this._configService.get('serverUrl')
+    var configEndpoint = `${serverUrl}/config/v1/agents`
+    if (!serviceName) {
+      return Promise.reject(
+        'serviceName is required for fetching central config.'
+      )
+    }
+    configEndpoint += `?service.name=${serviceName}`
+    if (environment) {
+      configEndpoint += `&service.environment=${environment}`
+    }
+    return this._makeHttpRequest('GET', configEndpoint, { timeout: 5000 })
+      .then(response => {
+        return JSON.parse(response)
+      })
+      .catch(reason => {
+        const error = this._constructError(reason)
+        return Promise.reject(error)
+      })
   }
 
   initErrorQueue() {

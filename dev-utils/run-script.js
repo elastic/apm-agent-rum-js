@@ -89,6 +89,25 @@ function runNodeTests() {
   })
 }
 
+let cleanUps = []
+
+function exitHandler(exitCode) {
+  console.log('Running cleanups.')
+  cleanUps.forEach(f => {
+    try {
+      f(exitCode)
+    } catch (e) {
+      console.error(e)
+    }
+  })
+  cleanUps = []
+  process.exit(exitCode)
+}
+
+process.on('exit', exitHandler)
+process.on('uncaughtException', exitHandler)
+process.on('SIGINT', exitHandler)
+
 function runE2eTests(configPath) {
   const webDriverConfig = join(PROJECT_DIR, configPath)
   runE2eTestsUtils(webDriverConfig, false)
@@ -103,6 +122,15 @@ function runSauceTests(packagePath, serve = 'true', ...scripts) {
    * Since there is no easy way to reuse the sauce connect tunnel even using same tunnel identifier,
    * we launch the sauce connect tunnel before starting all the saucelab tests
    */
+
+  let servers = []
+  if (serve === 'true') {
+    servers = startTestServers(join(PROJECT_DIR, packagePath))
+  }
+  cleanUps.push(() => {
+    servers.map(s => s.close())
+  })
+
   launchSauceConnect(async sauceConnectProcess => {
     if (!sauceLabs) {
       return runUnitTests(packagePath)
@@ -116,10 +144,6 @@ function runSauceTests(packagePath, serve = 'true', ...scripts) {
       process.stdout._handle.setBlocking(true)
     }
 
-    let servers = []
-    if (serve === 'true') {
-      servers = startTestServers(join(PROJECT_DIR, packagePath))
-    }
     /**
      * Decides the saucelabs test status
      */
@@ -136,9 +160,8 @@ function runSauceTests(packagePath, serve = 'true', ...scripts) {
       console.log('Sauce Tests Failed', err)
       exitCode = 1
     } finally {
-      servers.map(s => s.close())
       sauceConnectProcess.close(() => {
-        exitCode && process.exit(exitCode)
+        process.exit(exitCode)
       })
     }
   })

@@ -17,11 +17,13 @@
   "scripts": {
     "prepublishOnly": "npm run build:main",
     "build:main": "npx babel src -d dist/lib",
+    "karma:dev": "karma start --auto-watch --restartOnFileChange",
+    "bench": "NODE_ENV=production karma start karma.bench.conf.js",
     "karma:coverage": "karma start --coverage --singleRun",
-    "test:unit": "node ../../dev-utils/run-script.js runUnitTests packages/rum-core true",
-    "test": "npm run test:unit",
-    "tdd": "karma start --auto-watch --restartOnFileChange",
-    "bench": "NODE_ENV=production karma start karma.bench.conf.js"
+    "test:unit": "npm run script runUnitTests packages/rum-core",
+    "test:sauce": "npm run script runSauceTests packages/rum-core true test:unit",
+    "test": "npm run test:sauce",
+    "script": "node ../../dev-utils/run-script.js"
   },
   "files": [
     "src",

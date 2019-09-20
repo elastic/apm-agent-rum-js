@@ -25,10 +25,13 @@
 
 import ApmServer from '../../src/common/apm-server'
 import Transaction from '../../src/performance-monitoring/transaction'
-import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import {
+  getGlobalConfig,
+  isVersionInRange
+} from '../../../../dev-utils/test-config'
 import { createServiceFactory } from '../'
 
-const { agentConfig } = getGlobalConfig('rum-core')
+const { agentConfig, testConfig } = getGlobalConfig('rum-core')
 
 function generateTransaction(count) {
   var result = []
@@ -398,4 +401,23 @@ describe('ApmServer', function() {
     ]
     expect(result).toEqual(expected)
   })
+
+  if (isVersionInRange(testConfig.stackVersion, '7.3.0')) {
+    it('should fetch remote config', async () => {
+      var config = await apmServer.fetchConfig('nonexistent-service')
+      expect(config).toEqual({})
+
+      config = await apmServer.fetchConfig(
+        'nonexistent-service',
+        'nonexistent-env'
+      )
+      expect(config).toEqual({})
+
+      try {
+        config = await apmServer.fetchConfig()
+      } catch (e) {
+        expect(e).toBe('serviceName is required for fetching central config.')
+      }
+    })
+  }
 })

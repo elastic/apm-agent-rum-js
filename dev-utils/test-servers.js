@@ -25,8 +25,10 @@
 
 const express = require('express')
 const serveIndex = require('serve-index')
+const proxy = require('express-http-proxy')
 const { join } = require('path')
 const { runIntegrationTest } = require('./integration-test')
+const { DEFAULT_APM_SERVER_URL } = require('./test-config')
 
 function startBackendAgentServer(port = 8003) {
   const express = require('express')
@@ -69,6 +71,26 @@ function startBackendAgentServer(port = 8003) {
   return server
 }
 
+function startApmServerProxy(port = 8001) {
+  const serverUrl = DEFAULT_APM_SERVER_URL
+
+  let proxyApp = express()
+  proxyApp.use(
+    proxy(serverUrl, {
+      userResHeaderDecorator(headers) {
+        if (!headers['Access-Control-Allow-Origin']) {
+          headers['Access-Control-Allow-Origin'] = '*'
+        }
+        return headers
+      }
+    })
+  )
+
+  const proxyServer = proxyApp.listen(port)
+  console.log(`[APM Server Proxy] - For ${serverUrl} on: ${port}`)
+  return proxyServer
+}
+
 function startTestServers(path = join(__dirname, '../'), port = 8000) {
   const app = express()
   const staticPath = path
@@ -101,8 +123,9 @@ function startTestServers(path = join(__dirname, '../'), port = 8000) {
 
   console.log('[Static Server] - serving on: ', staticPath, port)
   const backendAgentServer = startBackendAgentServer()
+  const apmServerProxy = startApmServerProxy()
 
-  return [staticServer, backendAgentServer]
+  return [staticServer, backendAgentServer, apmServerProxy]
 }
 
 module.exports = {
