@@ -188,7 +188,7 @@ function getNavigationTimingMarks() {
 function getPaintTimingMarks() {
   var paints = {}
   var perf = window.performance
-  if (perf.getEntriesByType) {
+  if (typeof perf.getEntriesByType === 'function') {
     var entries = perf.getEntriesByType('paint')
     if (entries.length > 0) {
       var timings = perf.timing

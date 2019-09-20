@@ -39,7 +39,6 @@ class TransactionService {
     this._config = config
     this._logger = logger
     this.currentTransaction = undefined
-    this._alreadyCapturedPageLoad = false
   }
 
   ensureCurrentTransaction(options) {
@@ -94,16 +93,9 @@ class TransactionService {
   }
 
   capturePageLoadMetrics(tr) {
-    var capturePageLoad = this._config.get('capturePageLoad')
-    if (
-      capturePageLoad &&
-      !this._alreadyCapturedPageLoad &&
-      tr.isHardNavigation
-    ) {
+    if (tr.isHardNavigation) {
       captureHardNavigation(tr)
       tr.addMarks(getPageLoadMarks())
-      self._alreadyCapturedPageLoad = true
-      return true
     }
   }
 
@@ -200,13 +192,9 @@ class TransactionService {
             if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
               tr.name = pageLoadTransactionName
             }
-            const captured = this.capturePageLoadMetrics(tr)
-            if (captured) {
-              this.add(tr)
-            }
-          } else {
-            this.add(tr)
+            this.capturePageLoadMetrics(tr)
           }
+          this.add(tr)
         },
         err => {
           if (__DEV__) {

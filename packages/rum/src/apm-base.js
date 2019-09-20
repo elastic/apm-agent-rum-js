@@ -45,10 +45,10 @@ class ApmBase {
        */
       configService.setVersion('4.4.4')
       this.config(config)
+      const loggingService = this.serviceFactory.getService('LoggingService')
       /**
        * Deactive agent when the active config flag is set to false
        */
-      const loggingService = this.serviceFactory.getService('LoggingService')
       if (configService.isActive()) {
         this.serviceFactory.init()
 
@@ -67,14 +67,9 @@ class ApmBase {
           errorLogging.registerGlobalEventListener()
         }
 
-        const sendPageLoad = () => {
-          if (
-            flags[PAGE_LOAD] &&
-            configService.get('sendPageLoadTransaction')
-          ) {
-            this._sendPageLoadMetrics()
-          }
-        }
+        const sendPageLoad = () =>
+          flags[PAGE_LOAD] && this._sendPageLoadMetrics()
+
         if (configService.get('centralConfig')) {
           /**
            * Waiting for the remote config before sending the page load transaction

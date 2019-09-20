@@ -81,7 +81,6 @@ class Config {
       checkBrowserResponsiveness: true,
       groupSimilarSpans: true,
       similarSpanThreshold: 0.05,
-      capturePageLoad: true,
       ignoreTransactions: [],
       // throttlingRequestLimit: 20,
       // throttlingInterval: 30000, // 30s
@@ -93,8 +92,6 @@ class Config {
 
       queueLimit: -1,
       flushInterval: 500,
-
-      sendPageLoadTransaction: true,
 
       distributedTracing: true,
       distributedTracingOrigins: [],
