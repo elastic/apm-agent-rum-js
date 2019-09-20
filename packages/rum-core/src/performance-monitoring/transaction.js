@@ -47,6 +47,8 @@ class Transaction extends SpanBase {
     this.nextAutoTaskId = 1
     this._scheduledTasks = []
 
+    this.isHardNavigation = false
+
     this.sampled = Math.random() <= this.options.transactionSampleRate
   }
 

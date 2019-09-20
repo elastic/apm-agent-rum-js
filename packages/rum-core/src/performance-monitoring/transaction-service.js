@@ -94,7 +94,7 @@ class TransactionService {
   }
 
   capturePageLoadMetrics(tr) {
-    if (!this._alreadyCapturedPageLoad) {
+    if (!this._alreadyCapturedPageLoad && tr.isHardNavigation) {
       captureHardNavigation(tr)
       tr.addMarks(getPageLoadMarks())
       this._alreadyCapturedPageLoad = true
@@ -153,6 +153,8 @@ class TransactionService {
     }
 
     if (type === PAGE_LOAD) {
+      tr.isHardNavigation = true
+
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }

@@ -27,8 +27,7 @@ import Span from './span'
 import {
   RESOURCE_INITIATOR_TYPES,
   MAX_SPAN_DURATION,
-  USER_TIMING_THRESHOLD,
-  PAGE_LOAD
+  USER_TIMING_THRESHOLD
 } from '../common/constants'
 import { stripQueryStringFromUrl, getServerTimingInfo } from '../common/utils'
 
@@ -233,7 +232,7 @@ function createUserTimingSpans(entries, transactionEnd) {
 
 function captureHardNavigation(transaction) {
   const perf = window.performance
-  if (transaction.type === PAGE_LOAD && perf.timing) {
+  if (transaction.isHardNavigation && perf && perf.timing) {
     const timings = perf.timing
     if (transaction.marks && transaction.marks.custom) {
       var customMarks = transaction.marks.custom

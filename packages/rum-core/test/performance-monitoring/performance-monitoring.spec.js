@@ -393,6 +393,7 @@ describe('PerformanceMonitoring', function() {
     const transactionService = serviceFactory.getService('TransactionService')
 
     configService.events.observe(TRANSACTION_END, function(tr) {
+      expect(tr.isHardNavigation).toBe(true)
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
       expect(promise).toBeDefined()
