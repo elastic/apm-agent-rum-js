@@ -28,7 +28,7 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
 import { mockGetEntriesByType } from '../utils/globals-mock'
-import { TRANSACTION_END } from '../../src/common/constants'
+import { TRANSACTION_END, PAGE_LOAD } from '../../src/common/constants'
 
 describe('TransactionService', function() {
   var transactionService
@@ -194,7 +194,6 @@ describe('TransactionService', function() {
 
   xit('should not add duplicate resource spans', function() {
     config.set('active', true)
-    config.set('capturePageLoad', true)
     transactionService = new TransactionService(logger, config)
 
     var tr = transactionService.startTransaction('transaction', 'transaction')
@@ -237,7 +236,6 @@ describe('TransactionService', function() {
     const unMock = mockGetEntriesByType()
 
     config.set('active', true)
-    config.set('capturePageLoad', true)
 
     const customTransactionService = new TransactionService(logger, config)
     config.events.observe(TRANSACTION_END, function() {
@@ -261,7 +259,7 @@ describe('TransactionService', function() {
 
     const tr = customTransactionService.startTransaction(
       'resource-test',
-      'page-load'
+      PAGE_LOAD
     )
     tr.detectFinish()
   })

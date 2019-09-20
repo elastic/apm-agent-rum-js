@@ -24,10 +24,9 @@
  */
 
 import ApmBase from '../../src/apm-base'
-import { createServiceFactory } from '@elastic/apm-rum-core'
+import { createServiceFactory, PAGE_LOAD } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
-import { PAGE_LOAD } from '@elastic/apm-rum-core/src'
 import { Promise } from 'es6-promise'
 
 var enabled = bootstrap()
@@ -42,15 +41,11 @@ describe('ApmBase', function() {
   it('should send page load metrics before or after load event', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     var trService = serviceFactory.getService('TransactionService')
-    var configService = serviceFactory.getService('ConfigService')
-    configService.setConfig({
-      sendPageLoadTransaction: true
-    })
     apmBase.config({ serviceName, serverUrl })
     apmBase._sendPageLoadMetrics()
     var tr = trService.getCurrentTransaction()
     expect(tr.name).toBe('Unknown')
-    expect(tr.type).toBe('page-load')
+    expect(tr.type).toBe(PAGE_LOAD)
     spyOn(tr, 'detectFinish').and.callThrough()
     window.addEventListener('load', function() {
       setTimeout(() => {
@@ -61,7 +56,7 @@ describe('ApmBase', function() {
         apmBase._sendPageLoadMetrics()
         tr = trService.getCurrentTransaction()
         expect(tr.name).toBe('new page load')
-        expect(tr.type).toBe('page-load')
+        expect(tr.type).toBe(PAGE_LOAD)
         spyOn(tr, 'detectFinish')
         setTimeout(() => {
           expect(tr.detectFinish).toHaveBeenCalled()
@@ -81,8 +76,7 @@ describe('ApmBase', function() {
     apmBase.init({
       serviceName,
       serverUrl,
-      instrument: false,
-      sendPageLoadTransaction: true
+      instrument: false
     })
     /**
      * Page load transaction and error listeners are disabled
@@ -102,8 +96,7 @@ describe('ApmBase', function() {
       serviceName,
       serverUrl,
       instrument: true,
-      disableInstrumentations: ['page-load'],
-      sendPageLoadTransaction: true
+      disableInstrumentations: [PAGE_LOAD]
     })
     expect(trService.getCurrentTransaction()).toBeUndefined()
     expect(loggingInstane.registerGlobalEventListener).toHaveBeenCalled()
@@ -214,7 +207,11 @@ describe('ApmBase', function() {
 
   it('should instrument xhr when no transaction was started', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ capturePageLoad: false, serviceName, serverUrl })
+    apmBase.init({
+      disableInstrumentations: [PAGE_LOAD],
+      serviceName,
+      serverUrl
+    })
     var transactionService = serviceFactory.getService('TransactionService')
     transactionService.currentTransaction = undefined
     var tr
@@ -353,6 +350,7 @@ describe('ApmBase', function() {
 
   it('should wait for remote config before sending the page load', done => {
     const apmBase = new ApmBase(serviceFactory, !enabled)
+    const loggingService = serviceFactory.getService('LoggingService')
     spyOn(apmBase, 'fetchCentralConfig').and.callThrough()
     spyOn(apmBase, '_sendPageLoadMetrics').and.callFake(() => {
       done()
@@ -363,7 +361,10 @@ describe('ApmBase', function() {
       centralConfig: true,
       serverUrl
     })
-
+    /**
+     * avoid logging config fetch failure warning message in console
+     */
+    spyOn(loggingService, 'warn')
     expect(apmBase._sendPageLoadMetrics).not.toHaveBeenCalled()
     expect(apmBase.fetchCentralConfig).toHaveBeenCalled()
   })
