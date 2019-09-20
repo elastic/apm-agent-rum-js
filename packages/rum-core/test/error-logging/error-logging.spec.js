@@ -222,7 +222,7 @@ describe('ErrorLogging', function() {
       addedListenerTypes.push(type)
       errorLogging.logErrorEvent(event)
     })
-    errorLogging.onUnhandledError()
+    errorLogging.registerListeners()
     expect(addedListenerTypes).toContain('error')
 
     const filename = 'filename'
@@ -289,11 +289,11 @@ describe('ErrorLogging', function() {
 
   it('should capture unhandled rejection events', done => {
     configService.set('flushInterval', 1)
-    errorLogging.onUnhandledRejection()
+    errorLogging.registerListeners()
 
     spyOn(apmServer, 'sendErrors').and.callFake(errors => {
-      expect(errors[0].exception.message).toBe(reason.message)
-      expect(errors[0].exception.stacktrace).toBeDefined()
+      expect(errors[0].exception.message).toMatch(reason.message)
+      expect(errors[0].exception.stacktrace.length).toBeGreaterThan(0)
       done()
     })
     /**
@@ -311,13 +311,13 @@ describe('ErrorLogging', function() {
 
     errorLogging.logPromiseEvent({})
     expect(getErrors().length).toBe(1)
-    expect(getErrors()[0].exception.message).toMatch(/no reason defined/)
+    expect(getErrors()[0].exception.message).toMatch(/no reason specified/)
 
     const error = new Error(testErrorMessage)
     errorLogging.logPromiseEvent({
       reason: error
     })
-    expect(getErrors()[1].exception.message).toBe(error.message)
+    expect(getErrors()[1].exception.message).toMatch(error.message)
 
     errorLogging.logPromiseEvent({
       reason: testErrorMessage
@@ -332,6 +332,17 @@ describe('ErrorLogging', function() {
       reason: errorObj
     })
     expect(getErrors()[3].exception.message).toMatch(testErrorMessage)
-    expect(getErrors()[3].exception.stacktrace).toBeDefined()
+    expect(getErrors()[3].exception.stacktrace.length).toBeGreaterThan(0)
+
+    const errorLikeObj = {
+      message: testErrorMessage,
+      foo: 'bar'
+    }
+    errorLogging.logPromiseEvent({
+      reason: errorLikeObj
+    })
+    expect(getErrors()[4].exception.message).toMatch(testErrorMessage)
+    console.log(getErrors()[4].exception.stacktrace)
+    expect(getErrors()[4].exception.stacktrace.length).toBe(0)
   })
 })
