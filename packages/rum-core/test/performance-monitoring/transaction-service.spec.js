@@ -108,6 +108,37 @@ describe('TransactionService', function() {
     expect(trans.name).toBe('transaction')
   })
 
+  it('should capture page load on first transaction', function(done) {
+    // todo: can't test hard navigation metrics since karma runs tests inside an iframe
+    config.set('active', true)
+    config.set('capturePageLoad', true)
+    transactionService = new TransactionService(logger, config)
+
+    var tr1 = transactionService.startTransaction('transaction1', 'transaction')
+    var tr1DoneFn = tr1.onEnd
+    tr1.onEnd = function() {
+      tr1DoneFn()
+      expect(tr1.isHardNavigation).toBe(true)
+      tr1.spans.forEach(function(t) {
+        expect(t.duration()).toBeLessThan(5 * 60 * 1000)
+        expect(t.duration()).toBeGreaterThan(-1)
+      })
+    }
+    expect(tr1.isHardNavigation).toBe(false)
+    tr1.isHardNavigation = true
+    tr1.detectFinish()
+
+    var tr2 = transactionService.startTransaction('transaction2', 'transaction')
+    expect(tr2.isHardNavigation).toBe(false)
+    var tr2DoneFn = tr2.onEnd
+    tr2.onEnd = function() {
+      tr2DoneFn()
+      expect(tr2.isHardNavigation).toBe(false)
+      done()
+    }
+    tr2.detectFinish()
+  })
+
   it('should reuse Transaction', function() {
     transactionService = new TransactionService(logger, config)
     const reusableTr = new Transaction('test-name', 'test-type', {
@@ -122,23 +153,18 @@ describe('TransactionService', function() {
     expect(pageLoadTr).toBe(reusableTr)
   })
 
-  it('should contain agent marks in page load transaction', function() {
+  it('should not capture resource/user spans or marks for custom transaction', done => {
     const unMock = mockGetEntriesByType()
-    const tr = new Transaction('test', PAGE_LOAD)
-    transactionService.capturePageLoadMetrics(tr)
 
-    const agentMarks = [
-      'timeToFirstByte',
-      'domInteractive',
-      'domComplete',
-      'firstContentfulPaint'
-    ]
-
-    expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
-    agentMarks.forEach(mark => {
-      expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
+    config.events.observe(TRANSACTION_END, () => {
+      expect(tr.marks).toBeUndefined()
+      expect(tr.spans.length).toBe(0)
+      unMock()
+      done()
     })
-    unMock()
+
+    const tr = transactionService.startTransaction('test', 'custom')
+    tr.detectFinish()
   })
 
   it('should use initial page load name before ending the transaction', function(done) {
@@ -164,7 +190,8 @@ describe('TransactionService', function() {
     config.set('active', true)
     transactionService = new TransactionService(logger, config)
 
-    var tr = transactionService.startTransaction('transaction', PAGE_LOAD)
+    var tr = transactionService.startTransaction('transaction', 'transaction')
+    tr.isHardNavigation = true
     var queryString = '?' + Date.now()
     var testUrl = '/base/test/performance/transactionService.spec.js'
 
@@ -206,6 +233,7 @@ describe('TransactionService', function() {
 
     const customTransactionService = new TransactionService(logger, config)
     config.events.observe(TRANSACTION_END, function() {
+      expect(tr.isHardNavigation).toBe(true)
       expect(
         tr.spans.filter(({ type }) => type === 'resource').length
       ).toBeGreaterThanOrEqual(1)

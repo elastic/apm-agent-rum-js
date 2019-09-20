@@ -25,12 +25,15 @@
 
 import Span from './span'
 import {
-  PAGE_LOAD,
   RESOURCE_INITIATOR_TYPES,
   MAX_SPAN_DURATION,
   USER_TIMING_THRESHOLD
 } from '../common/constants'
-import { stripQueryStringFromUrl, getServerTimingInfo } from '../common/utils'
+import {
+  stripQueryStringFromUrl,
+  getServerTimingInfo,
+  getPageLoadMarks
+} from '../common/utils'
 
 /**
  * Navigation Timing Spans
@@ -252,14 +255,14 @@ function captureNavigation(transaction) {
    * Both start and end threshold decides if a span must be
    * captured as part of the transaction
    */
-  const { _end: trEnd, type } = transaction
+  const trEnd = transaction._end
   /**
    * Page load is considered as hard navigation and we account
    * for few extra spans than soft navigations which
    * happens on single page applications
    */
 
-  if (type === PAGE_LOAD) {
+  if (transaction.isHardNavigation) {
     /**
      * Adjust custom marks properly to fit in the transaction timeframe
      */
@@ -269,23 +272,31 @@ function captureNavigation(transaction) {
         customMarks[key] += transaction._start
       })
     }
-
     /**
      * must be zero otherwise the calculated relative _start time would be wrong
      */
-    transaction._start = 0
+    const trStart = 0
+    transaction._start = trStart
 
     const timings = perf.timing
-    createNavigationTimingSpans(timings, timings.fetchStart, 0, trEnd).forEach(
-      span => {
-        span.traceId = transaction.traceId
-        span.sampled = transaction.sampled
-        if (span.pageResponse && transaction.options.pageLoadSpanId) {
-          span.id = transaction.options.pageLoadSpanId
-        }
-        transaction.spans.push(span)
+    createNavigationTimingSpans(
+      timings,
+      timings.fetchStart,
+      trStart,
+      trEnd
+    ).forEach(span => {
+      span.traceId = transaction.traceId
+      span.sampled = transaction.sampled
+      if (span.pageResponse && transaction.options.pageLoadSpanId) {
+        span.id = transaction.options.pageLoadSpanId
       }
-    )
+      transaction.spans.push(span)
+    })
+
+    /**
+     * Page load marks that are gathered from navigation and paint timing API
+     */
+    transaction.addMarks(getPageLoadMarks())
   }
 
   if (typeof perf.getEntriesByType === 'function') {
@@ -314,7 +325,7 @@ function captureNavigation(transaction) {
     /**
      * Add transaction context information from performance navigation timing entry level 2 API
      */
-    if (type === PAGE_LOAD) {
+    if (transaction.isHardNavigation) {
       let navigationEntry = perf.getEntriesByType('navigation')
       if (navigationEntry && navigationEntry.length > 0) {
         navigationEntry = navigationEntry[0]

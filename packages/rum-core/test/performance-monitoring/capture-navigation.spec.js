@@ -34,7 +34,6 @@ import resourceEntries from '../fixtures/resource-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import navTimingSpans from '../fixtures/navigation-timing-span-snapshot'
 import { TIMING_LEVEL1_ENTRY as timings } from '../fixtures/navigation-entries'
-import { PAGE_LOAD } from '../../src/common/constants'
 import { mockGetEntriesByType } from '../utils/globals-mock'
 
 const spanSnapshot = navTimingSpans.map(mapSpan)
@@ -198,28 +197,55 @@ describe('Capture hard navigation', function() {
   })
 
   it('should capture spans for hard navigation', function() {
-    const tr = new Transaction('test', PAGE_LOAD)
+    var tr = new Transaction('test', 'test')
+    tr.isHardNavigation = true
     tr.end()
     captureNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
   })
 
-  it('should capture spans for soft navigation', function() {
+  it('should capture resource/user timing spans for soft navigation', function() {
     const unmock = mockGetEntriesByType()
-    const tr = new Transaction('test', 'spa')
+    const tr = new Transaction('test', 'route-change')
     const xhrSpan = tr.startSpan('GET http://example.com', 'external.http')
     xhrSpan.end()
     tr.end()
     tr._start = 0
     captureNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
-    const foundSpans = tr.spans.filter(span => span.name === xhrSpan.name)
-    expect(foundSpans.length).toBe(1)
+    const foundSpans = tr.spans.filter(
+      span =>
+        span.name === xhrSpan.name ||
+        span.type === 'resource' ||
+        span.type === 'app'
+    )
+    expect(foundSpans.length).toBeGreaterThan(3)
     unmock()
   })
 
+  it('should capture agent marks in page load transaction', function() {
+    const unMock = mockGetEntriesByType()
+    const tr = new Transaction('test', 'test')
+    tr.isHardNavigation = true
+    captureNavigation(tr)
+    tr.end()
+    const agentMarks = [
+      'timeToFirstByte',
+      'domInteractive',
+      'domComplete',
+      'firstContentfulPaint'
+    ]
+
+    expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
+    agentMarks.forEach(mark => {
+      expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
+    })
+    unMock()
+  })
+
   it('should fix custom marks when changing transaction._start', function() {
-    var tr = new Transaction('test', PAGE_LOAD)
+    var tr = new Transaction('test', 'test')
+    tr.isHardNavigation = true
     tr.mark('testMark')
     const markValue = tr.marks.custom.testMark
     const start = tr._start

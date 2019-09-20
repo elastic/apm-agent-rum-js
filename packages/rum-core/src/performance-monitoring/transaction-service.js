@@ -25,7 +25,7 @@
 
 import { Promise } from 'es6-promise'
 import Transaction from './transaction'
-import { extend, getPageLoadMarks } from '../common/utils'
+import { extend } from '../common/utils'
 import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import { captureNavigation } from './capture-navigation'
 import { __DEV__ } from '../env'
@@ -92,13 +92,6 @@ class TransactionService {
     }, interval)
   }
 
-  capturePageLoadMetrics(tr) {
-    if (tr.isHardNavigation) {
-      captureNavigation(tr)
-      tr.addMarks(getPageLoadMarks())
-    }
-  }
-
   createPerfOptions(options) {
     const config = this._config.config
     return extend(
@@ -151,6 +144,8 @@ class TransactionService {
     }
 
     if (type === PAGE_LOAD) {
+      tr.isHardNavigation = true
+
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
@@ -198,7 +193,13 @@ class TransactionService {
             if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
               tr.name = pageLoadTransactionName
             }
-            this.capturePageLoadMetrics(tr)
+          }
+          /**
+           * Do not capture timing related information for transactions
+           * other than hard(page-load) and soft(route-change) navigations
+           */
+          if (tr.isHardNavigation || tr.type === 'route-change') {
+            captureNavigation(tr)
           }
           this.add(tr)
         },
