@@ -27,7 +27,6 @@ import ApmBase from '../../src/apm-base'
 import { createServiceFactory, PAGE_LOAD } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
-import { PAGE_LOAD } from '@elastic/apm-rum-core/src'
 import { Promise } from 'es6-promise'
 
 var enabled = bootstrap()
@@ -351,6 +350,7 @@ describe('ApmBase', function() {
 
   it('should wait for remote config before sending the page load', done => {
     const apmBase = new ApmBase(serviceFactory, !enabled)
+    const loggingService = serviceFactory.getService('LoggingService')
     spyOn(apmBase, 'fetchCentralConfig').and.callThrough()
     spyOn(apmBase, '_sendPageLoadMetrics').and.callFake(() => {
       done()
@@ -361,7 +361,10 @@ describe('ApmBase', function() {
       centralConfig: true,
       serverUrl
     })
-
+    /**
+     * avoid logging config fetch failure warning message in console
+     */
+    spyOn(loggingService, 'warn')
     expect(apmBase._sendPageLoadMetrics).not.toHaveBeenCalled()
     expect(apmBase.fetchCentralConfig).toHaveBeenCalled()
   })
