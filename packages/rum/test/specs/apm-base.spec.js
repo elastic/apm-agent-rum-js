@@ -24,7 +24,7 @@
  */
 
 import ApmBase from '../../src/apm-base'
-import { createServiceFactory } from '@elastic/apm-rum-core'
+import { createServiceFactory, PAGE_LOAD } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { PAGE_LOAD } from '@elastic/apm-rum-core/src'
@@ -46,7 +46,7 @@ describe('ApmBase', function() {
     apmBase._sendPageLoadMetrics()
     var tr = trService.getCurrentTransaction()
     expect(tr.name).toBe('Unknown')
-    expect(tr.type).toBe('page-load')
+    expect(tr.type).toBe(PAGE_LOAD)
     spyOn(tr, 'detectFinish').and.callThrough()
     window.addEventListener('load', function() {
       setTimeout(() => {
@@ -57,7 +57,7 @@ describe('ApmBase', function() {
         apmBase._sendPageLoadMetrics()
         tr = trService.getCurrentTransaction()
         expect(tr.name).toBe('new page load')
-        expect(tr.type).toBe('page-load')
+        expect(tr.type).toBe(PAGE_LOAD)
         spyOn(tr, 'detectFinish')
         setTimeout(() => {
           expect(tr.detectFinish).toHaveBeenCalled()
@@ -97,7 +97,7 @@ describe('ApmBase', function() {
       serviceName,
       serverUrl,
       instrument: true,
-      disableInstrumentations: ['page-load']
+      disableInstrumentations: [PAGE_LOAD]
     })
     expect(trService.getCurrentTransaction()).toBeUndefined()
     expect(loggingInstane.registerGlobalEventListener).toHaveBeenCalled()
@@ -209,7 +209,7 @@ describe('ApmBase', function() {
   it('should instrument xhr when no transaction was started', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({
-      disableInstrumentations: ['page-load'],
+      disableInstrumentations: [PAGE_LOAD],
       serviceName,
       serverUrl
     })

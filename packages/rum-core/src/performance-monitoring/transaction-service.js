@@ -39,7 +39,6 @@ class TransactionService {
     this._config = config
     this._logger = logger
     this.currentTransaction = undefined
-    this._alreadyCapturedPageLoad = false
   }
 
   ensureCurrentTransaction(options) {
@@ -94,10 +93,9 @@ class TransactionService {
   }
 
   capturePageLoadMetrics(tr) {
-    if (!this._alreadyCapturedPageLoad && tr.isHardNavigation) {
+    if (tr.isHardNavigation) {
       captureHardNavigation(tr)
       tr.addMarks(getPageLoadMarks())
-      this._alreadyCapturedPageLoad = true
     }
   }
 
