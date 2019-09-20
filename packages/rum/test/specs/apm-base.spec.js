@@ -331,18 +331,24 @@ describe('ApmBase', function() {
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(loggingService, 'warn')
     apmServer._makeHttpRequest = createPayloadCallback('test')
-    apmBase.fetchCentralConfig().then(() => {
-      expect(loggingService.warn).toHaveBeenCalledWith(
-        'Invalid value "NaN" for transactionSampleRate. Allowed: Number between 0 and 1.'
-      )
-      expect(configService.get('transactionSampleRate')).toBe(1)
+    apmBase
+      .fetchCentralConfig()
+      .then(() => {
+        expect(loggingService.warn).toHaveBeenCalledWith(
+          'Invalid value "NaN" for transactionSampleRate. Allowed: Number between 0 and 1.'
+        )
+        expect(configService.get('transactionSampleRate')).toBe(1)
 
-      apmServer._makeHttpRequest = createPayloadCallback('0.5')
-      apmBase.fetchCentralConfig().then(() => {
-        expect(configService.get('transactionSampleRate')).toBe(0.5)
-        done()
+        apmServer._makeHttpRequest = createPayloadCallback('0.5')
+        apmBase
+          .fetchCentralConfig()
+          .then(() => {
+            expect(configService.get('transactionSampleRate')).toBe(0.5)
+            done()
+          })
+          .catch(fail)
       })
-    })
+      .catch(fail)
   })
 
   it('should wait for remote config before sending the page load', done => {
