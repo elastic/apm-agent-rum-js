@@ -293,7 +293,6 @@ describe('ErrorLogging', function() {
 
     spyOn(apmServer, 'sendErrors').and.callFake(errors => {
       expect(errors[0].exception.message).toMatch(reason.message)
-      expect(errors[0].exception.stacktrace.length).toBeGreaterThan(0)
       done()
     })
     /**
@@ -342,7 +341,6 @@ describe('ErrorLogging', function() {
       reason: errorLikeObj
     })
     expect(getErrors()[4].exception.message).toMatch(testErrorMessage)
-    console.log(getErrors()[4].exception.stacktrace)
     expect(getErrors()[4].exception.stacktrace.length).toBe(0)
   })
 })
