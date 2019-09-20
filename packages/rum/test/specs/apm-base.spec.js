@@ -28,6 +28,7 @@ import { createServiceFactory } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { PAGE_LOAD } from '@elastic/apm-rum-core/src'
+import { Promise } from 'es6-promise'
 
 var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
@@ -306,7 +307,7 @@ describe('ApmBase', function() {
     expect(tr.spans[0].name).toBe('GET /')
   })
 
-  it('should fetch central config', async () => {
+  it('should fetch central config', done => {
     const apmServer = serviceFactory.getService('ApmServer')
     const configService = serviceFactory.getService('ConfigService')
 
@@ -330,15 +331,18 @@ describe('ApmBase', function() {
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(loggingService, 'warn')
     apmServer._makeHttpRequest = createPayloadCallback('test')
-    await apmBase.fetchCentralConfig()
-    expect(loggingService.warn).toHaveBeenCalledWith(
-      'Invalid value "NaN" for transactionSampleRate. Allowed: Number between 0 and 1.'
-    )
-    expect(configService.get('transactionSampleRate')).toBe(1)
+    apmBase.fetchCentralConfig().then(() => {
+      expect(loggingService.warn).toHaveBeenCalledWith(
+        'Invalid value "NaN" for transactionSampleRate. Allowed: Number between 0 and 1.'
+      )
+      expect(configService.get('transactionSampleRate')).toBe(1)
 
-    apmServer._makeHttpRequest = createPayloadCallback('0.5')
-    await apmBase.fetchCentralConfig()
-    expect(configService.get('transactionSampleRate')).toBe(0.5)
+      apmServer._makeHttpRequest = createPayloadCallback('0.5')
+      apmBase.fetchCentralConfig().then(() => {
+        expect(configService.get('transactionSampleRate')).toBe(0.5)
+        done()
+      })
+    })
   })
 
   it('should wait for remote config before sending the page load', done => {
@@ -349,7 +353,7 @@ describe('ApmBase', function() {
     })
 
     apmBase.init({
-      serviceName: 'test-service',
+      serviceName,
       centralConfig: true,
       serverUrl
     })
