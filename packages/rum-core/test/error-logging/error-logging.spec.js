@@ -305,7 +305,7 @@ describe('ErrorLogging', function() {
     window.dispatchEvent(event)
   })
 
-  it('should handle multiple reasons for promise rejections', () => {
+  it('should handle different type of reasons for promise rejections', () => {
     const getErrors = () => apmServer.errorQueue.items
 
     errorLogging.logPromiseEvent({})
@@ -342,5 +342,24 @@ describe('ErrorLogging', function() {
     })
     expect(getErrors()[4].exception.message).toMatch(testErrorMessage)
     expect(getErrors()[4].exception.stacktrace.length).toBe(0)
+
+    errorLogging.logPromiseEvent({
+      reason: 200
+    })
+    expect(getErrors()[5].exception.message).toBe(
+      'Unhandled promise rejection: 200'
+    )
+
+    errorLogging.logPromiseEvent({
+      reason: true
+    })
+    expect(getErrors()[6].exception.message).toBe(
+      'Unhandled promise rejection: true'
+    )
+
+    errorLogging.logPromiseEvent({
+      reason: [{ a: '1' }]
+    })
+    expect(getErrors()[7]).toBeUndefined()
   })
 })

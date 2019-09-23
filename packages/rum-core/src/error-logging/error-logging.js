@@ -133,7 +133,7 @@ class ErrorLogging {
         message: prefix + reason.message,
         stack: reason.stack ? reason.stack : null
       })
-    } else {
+    } else if (typeof reason !== 'object') {
       this.logError(prefix + reason)
     }
   }
