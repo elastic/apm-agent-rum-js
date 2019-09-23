@@ -48,7 +48,7 @@ class Transaction extends SpanBase {
     this.nextAutoTaskId = 1
     this._scheduledTasks = []
 
-    this.isHardNavigation = false
+    this.captureTimings = false
 
     this.selfTime = null
     this.breakdownTimings = []

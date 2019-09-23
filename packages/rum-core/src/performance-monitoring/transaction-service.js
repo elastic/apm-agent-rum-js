@@ -26,7 +26,7 @@
 import { Promise } from 'es6-promise'
 import Transaction from './transaction'
 import { extend } from '../common/utils'
-import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
+import { PAGE_LOAD, NAME_UNKNOWN, ROUTE_CHANGE } from '../common/constants'
 import { captureNavigation } from './capture-navigation'
 import { __DEV__ } from '../env'
 import { TRANSACTION_START, TRANSACTION_END } from '../common/constants'
@@ -110,7 +110,7 @@ class TransactionService {
   startTransaction(name, type, options) {
     const perfOptions = this.createPerfOptions(options)
 
-    var tr = this.getCurrentTransaction()
+    let tr = this.getCurrentTransaction()
 
     if (!tr) {
       tr = this.createTransaction(name, type, perfOptions)
@@ -144,7 +144,7 @@ class TransactionService {
     }
 
     if (type === PAGE_LOAD) {
-      tr.isHardNavigation = true
+      tr.captureTimings = true
 
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
@@ -159,7 +159,10 @@ class TransactionService {
       if (tr.name === NAME_UNKNOWN && perfOptions.pageLoadTransactionName) {
         tr.name = perfOptions.pageLoadTransactionName
       }
+    } else if (type === ROUTE_CHANGE) {
+      tr.captureTimings = true
     }
+
     if (__DEV__) {
       this._logger.debug('TransactionService.startTransaction', tr)
     }
@@ -194,13 +197,7 @@ class TransactionService {
               tr.name = pageLoadTransactionName
             }
           }
-          /**
-           * Do not capture timing related information for transactions
-           * other than hard(page-load) and soft(route-change) navigations
-           */
-          if (tr.isHardNavigation || tr.type === 'route-change') {
-            captureNavigation(tr)
-          }
+          captureNavigation(tr)
           this.add(tr)
         },
         err => {

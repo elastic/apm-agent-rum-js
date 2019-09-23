@@ -262,7 +262,7 @@ class PerformanceMonitoring {
       'checkBrowserResponsiveness'
     )
 
-    if (checkBrowserResponsiveness && !tr.isHardNavigation) {
+    if (checkBrowserResponsiveness && !tr.captureTimings) {
       const buffer = this._configService.get('browserResponsivenessBuffer')
 
       const wasBrowserResponsive = this.checkBrowserResponsiveness(

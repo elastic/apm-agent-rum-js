@@ -35,6 +35,7 @@ import userTimingEntries from '../fixtures/user-timing-entries'
 import navTimingSpans from '../fixtures/navigation-timing-span-snapshot'
 import { TIMING_LEVEL1_ENTRY as timings } from '../fixtures/navigation-entries'
 import { mockGetEntriesByType } from '../utils/globals-mock'
+import { PAGE_LOAD, ROUTE_CHANGE } from '../../src/common/constants'
 
 const spanSnapshot = navTimingSpans.map(mapSpan)
 
@@ -197,8 +198,8 @@ describe('Capture hard navigation', function() {
   })
 
   it('should capture spans for hard navigation', function() {
-    var tr = new Transaction('test', 'test')
-    tr.isHardNavigation = true
+    const tr = new Transaction('test', PAGE_LOAD)
+    tr.captureTimings = true
     tr.end()
     captureNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
@@ -206,11 +207,12 @@ describe('Capture hard navigation', function() {
 
   it('should capture resource/user timing spans for soft navigation', function() {
     const unmock = mockGetEntriesByType()
-    const tr = new Transaction('test', 'route-change')
+    const tr = new Transaction('test', ROUTE_CHANGE)
+    tr.captureTimings = true
     const xhrSpan = tr.startSpan('GET http://example.com', 'external.http')
     xhrSpan.end()
+    tr._start = transactionStart
     tr.end()
-    tr._start = 0
     captureNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
     const foundSpans = tr.spans.filter(
@@ -219,14 +221,29 @@ describe('Capture hard navigation', function() {
         span.type === 'resource' ||
         span.type === 'app'
     )
-    expect(foundSpans.length).toBeGreaterThan(3)
+    expect(foundSpans.length).toBeGreaterThanOrEqual(3)
+    unmock()
+  })
+
+  it('should capture resource/user timings when captureTimings flag is set', function() {
+    const unmock = mockGetEntriesByType()
+    const tr = new Transaction('test', 'test')
+    tr.captureTimings = true
+    tr._start = transactionStart
+    tr.end()
+    captureNavigation(tr)
+    expect(tr.spans.length).toBeGreaterThan(1)
+    const foundSpans = tr.spans.filter(
+      span => span.type === 'resource' || span.type === 'app'
+    )
+    expect(foundSpans.length).toBeGreaterThanOrEqual(2)
     unmock()
   })
 
   it('should capture agent marks in page load transaction', function() {
     const unMock = mockGetEntriesByType()
-    const tr = new Transaction('test', 'test')
-    tr.isHardNavigation = true
+    const tr = new Transaction('test', PAGE_LOAD)
+    tr.captureTimings = true
     captureNavigation(tr)
     tr.end()
     const agentMarks = [
@@ -243,9 +260,20 @@ describe('Capture hard navigation', function() {
     unMock()
   })
 
+  it('should not capture agent marks for route-change transaction', function() {
+    const unMock = mockGetEntriesByType()
+    const tr = new Transaction('test', ROUTE_CHANGE)
+    tr.captureTimings = true
+    captureNavigation(tr)
+    tr.end()
+
+    expect(tr.marks).toBeUndefined()
+    unMock()
+  })
+
   it('should fix custom marks when changing transaction._start', function() {
-    var tr = new Transaction('test', 'test')
-    tr.isHardNavigation = true
+    const tr = new Transaction('test', PAGE_LOAD)
+    tr.captureTimings = true
     tr.mark('testMark')
     const markValue = tr.marks.custom.testMark
     const start = tr._start

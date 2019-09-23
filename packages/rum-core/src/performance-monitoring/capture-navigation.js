@@ -27,7 +27,8 @@ import Span from './span'
 import {
   RESOURCE_INITIATOR_TYPES,
   MAX_SPAN_DURATION,
-  USER_TIMING_THRESHOLD
+  USER_TIMING_THRESHOLD,
+  PAGE_LOAD
 } from '../common/constants'
 import {
   stripQueryStringFromUrl,
@@ -250,6 +251,15 @@ function getApiSpanNames({ spans }) {
 }
 
 function captureNavigation(transaction) {
+  /**
+   * Do not capture timing related information when the
+   * flag is set to false, By default both page-load and route-change
+   * transactions set this flag to true
+   */
+  if (!transaction.captureTimings) {
+    return
+  }
+
   const perf = window.performance
   /**
    * Both start and end threshold decides if a span must be
@@ -262,7 +272,7 @@ function captureNavigation(transaction) {
    * happens on single page applications
    */
 
-  if (transaction.isHardNavigation) {
+  if (transaction.type === PAGE_LOAD) {
     /**
      * Adjust custom marks properly to fit in the transaction timeframe
      */
@@ -325,7 +335,7 @@ function captureNavigation(transaction) {
     /**
      * Add transaction context information from performance navigation timing entry level 2 API
      */
-    if (transaction.isHardNavigation) {
+    if (transaction.type === PAGE_LOAD) {
       let navigationEntry = perf.getEntriesByType('navigation')
       if (navigationEntry && navigationEntry.length > 0) {
         navigationEntry = navigationEntry[0]

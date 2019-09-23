@@ -118,22 +118,22 @@ describe('TransactionService', function() {
     var tr1DoneFn = tr1.onEnd
     tr1.onEnd = function() {
       tr1DoneFn()
-      expect(tr1.isHardNavigation).toBe(true)
+      expect(tr1.captureTimings).toBe(true)
       tr1.spans.forEach(function(t) {
         expect(t.duration()).toBeLessThan(5 * 60 * 1000)
         expect(t.duration()).toBeGreaterThan(-1)
       })
     }
-    expect(tr1.isHardNavigation).toBe(false)
-    tr1.isHardNavigation = true
+    expect(tr1.captureTimings).toBe(false)
+    tr1.captureTimings = true
     tr1.detectFinish()
 
     var tr2 = transactionService.startTransaction('transaction2', 'transaction')
-    expect(tr2.isHardNavigation).toBe(false)
+    expect(tr2.captureTimings).toBe(false)
     var tr2DoneFn = tr2.onEnd
     tr2.onEnd = function() {
       tr2DoneFn()
-      expect(tr2.isHardNavigation).toBe(false)
+      expect(tr2.captureTimings).toBe(false)
       done()
     }
     tr2.detectFinish()
@@ -191,7 +191,7 @@ describe('TransactionService', function() {
     transactionService = new TransactionService(logger, config)
 
     var tr = transactionService.startTransaction('transaction', 'transaction')
-    tr.isHardNavigation = true
+    tr.captureTimings = true
     var queryString = '?' + Date.now()
     var testUrl = '/base/test/performance/transactionService.spec.js'
 
@@ -233,7 +233,7 @@ describe('TransactionService', function() {
 
     const customTransactionService = new TransactionService(logger, config)
     config.events.observe(TRANSACTION_END, function() {
-      expect(tr.isHardNavigation).toBe(true)
+      expect(tr.captureTimings).toBe(true)
       expect(
         tr.spans.filter(({ type }) => type === 'resource').length
       ).toBeGreaterThanOrEqual(1)

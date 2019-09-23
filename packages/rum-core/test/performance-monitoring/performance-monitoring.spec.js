@@ -34,11 +34,12 @@ import {
   FETCH,
   XMLHTTPREQUEST,
   HISTORY,
-  PAGE_LOAD
+  PAGE_LOAD,
+  ROUTE_CHANGE,
+  TRANSACTION_END
 } from '../../src/common/constants'
 import patchEventHandler from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
-import { TRANSACTION_END } from '../../src/common/constants'
 import { patchEventHandler as originalPathHandler } from '../../src/common/patching'
 
 const { agentConfig } = getGlobalConfig('rum-core')
@@ -393,7 +394,7 @@ describe('PerformanceMonitoring', function() {
     const transactionService = serviceFactory.getService('TransactionService')
 
     configService.events.observe(TRANSACTION_END, function(tr) {
-      expect(tr.isHardNavigation).toBe(true)
+      expect(tr.captureTimings).toBe(true)
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
       expect(promise).toBeDefined()
@@ -717,7 +718,7 @@ describe('PerformanceMonitoring', function() {
 
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test',
-      'route-change',
+      ROUTE_CHANGE,
       { canReuse: true }
     )
     cancelHistorySub()
