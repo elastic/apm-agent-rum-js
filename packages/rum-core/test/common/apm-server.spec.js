@@ -52,6 +52,7 @@ function generateTransaction(count, breakdown = false) {
     span1._end = 30
     if (breakdown) {
       tr.sampled = true
+      tr.selfTime = tr.duration() - span1.duration()
       tr.breakdownTimings = captureBreakdown(tr)
     }
 
@@ -405,7 +406,7 @@ describe('ApmServer', function() {
     expect(result).toEqual(expected)
   })
 
-  it('should ndjson transactions along with metricsets', function() {
+  it('should ndjson metricsets along with transactions', function() {
     const tr = generateTransaction(1, true)
     jasmine.clock().install()
     jasmine.clock().mockDate(new Date(0))
@@ -416,8 +417,8 @@ describe('ApmServer', function() {
       '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":true}}\n',
       '{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
       '{"metricset":{"timestamp":0,"transaction":{"name":"transaction #0","type":"transaction"},"samples":{"transaction.duration.count":{"value":1},"transaction.duration.sum.us":{"value":990},"transaction.breakdown.count":{"value":1}}}}\n',
-      '{"metricset":{"timestamp":0,"transaction":{"name":"transaction #0","type":"transaction"},"span":{"type":"type"},"samples":{"span.self_time.count":{"value":1},"span.self_time.sum.us":{"value":10}}}}\n',
-      '{"metricset":{"timestamp":0,"transaction":{"name":"transaction #0","type":"transaction"},"span":{"type":"app"},"samples":{"span.self_time.count":{"value":1},"span.self_time.sum.us":{"value":980}}}}\n'
+      '{"metricset":{"timestamp":0,"transaction":{"name":"transaction #0","type":"transaction"},"span":{"type":"app"},"samples":{"span.self_time.count":{"value":1},"span.self_time.sum.us":{"value":980}}}}\n',
+      '{"metricset":{"timestamp":0,"transaction":{"name":"transaction #0","type":"transaction"},"span":{"type":"type"},"samples":{"span.self_time.count":{"value":1},"span.self_time.sum.us":{"value":10}}}}\n'
     ].join('')
     expect(result).toEqual([expected])
     jasmine.clock().uninstall()

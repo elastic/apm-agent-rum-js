@@ -41,20 +41,51 @@ function getValue(value) {
   return { value }
 }
 
+/**
+ * Group spans based on type and subtype to capture the breakdown
+ */
+function groupSpans(transaction) {
+  const spanMap = Object.create(null)
+  const transactionSelfTime = transaction.selfTime
+  /**
+   * Add transaction self time as `app` in the breakdown
+   */
+  spanMap['app'] = {
+    count: 1,
+    duration: transactionSelfTime
+  }
+
+  const spans = transaction.spans
+  for (let i = 0; i < spans.length; i++) {
+    const span = spans[i]
+    const { type, subType } = span
+    const duration = span.duration()
+    let key = type
+    if (subType) {
+      key += '.' + subType
+    }
+    if (!spanMap[key]) {
+      spanMap[key] = {
+        duration: 0,
+        count: 0
+      }
+    }
+    spanMap[key].count++
+    spanMap[key].duration += duration
+  }
+
+  return spanMap
+}
+
 function getSpanBreakdown(
   transactionDetails,
-  type,
-  duration,
-  subType = undefined
+  { details, count = 1, duration }
 ) {
   return {
     transaction: transactionDetails,
-    span: {
-      type,
-      subtype: subType
-    },
+    span: details,
     samples: {
-      'span.self_time.count': getValue(1),
+      'span.self_time.count': getValue(count),
       'span.self_time.sum.us': getValue(duration)
     }
   }
@@ -99,31 +130,28 @@ export function captureBreakdown(
         continue
       }
       breakdowns.push(
-        getSpanBreakdown(transactionDetails, current[2], duration)
+        getSpanBreakdown(transactionDetails, {
+          details: { type: current[2] },
+          duration
+        })
       )
     }
   } else {
     /**
      * Construct the breakdown timings based on span types
      */
-    const spans = transaction.spans
-    let childTimings = 0
-    for (let i = 0; i < spans.length; i++) {
-      const span = spans[i]
-      const { type, subType } = span
-      const duration = span.duration()
-      childTimings += duration
+    const spanMap = groupSpans(transaction)
+    Object.keys(spanMap).forEach(key => {
+      const [type, subtype] = key.split('.')
+      const { duration, count } = spanMap[key]
       breakdowns.push(
-        getSpanBreakdown(transactionDetails, type, duration, subType)
+        getSpanBreakdown(transactionDetails, {
+          details: { type, subtype },
+          duration,
+          count
+        })
       )
-    }
-    /**
-     * Associate rest of the breakdown time in `app`
-     */
-    if (childTimings < trDuration) {
-      const duration = getDuration(childTimings, trDuration)
-      breakdowns.push(getSpanBreakdown(transactionDetails, 'app', duration))
-    }
+    })
   }
   return breakdowns
 }

@@ -23,7 +23,13 @@
  *
  */
 
-import { generateRandomId, setLabel, merge, getDuration } from '../common/utils'
+import {
+  generateRandomId,
+  setLabel,
+  merge,
+  getDuration,
+  now
+} from '../common/utils'
 import { NAME_UNKNOWN, TYPE_CUSTOM } from '../common/constants'
 
 class SpanBase {
@@ -43,7 +49,7 @@ class SpanBase {
     this.id = options.id || generateRandomId(16)
     this.traceId = options.traceId
     this.sampled = options.sampled
-    this._start = window.performance.now()
+    this._start = now()
     this._end = undefined
     this.ended = false
     this.onEnd = options.onEnd
@@ -81,7 +87,7 @@ class SpanBase {
       return
     }
     this.ended = true
-    this._end = window.performance.now()
+    this._end = now()
 
     this.callOnEnd()
   }

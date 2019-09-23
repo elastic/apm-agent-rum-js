@@ -398,6 +398,10 @@ function getPageLoadMarks() {
   }
 }
 
+function now() {
+  return window.performance.now()
+}
+
 function getDuration(start, end) {
   if (isUndefined(end) || isUndefined(start)) {
     return null
@@ -431,6 +435,7 @@ export {
   getLatestNonXHRSpan,
   getPageLoadMarks,
   getDuration,
+  now,
   rng,
   checkSameOrigin,
   setLabel,
