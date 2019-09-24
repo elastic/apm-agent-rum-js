@@ -45,7 +45,7 @@ function getValue(value) {
  * Group spans based on type and subtype to capture the breakdown
  */
 function groupSpans(transaction) {
-  const spanMap = Object.create(null)
+  const spanMap = {}
   const transactionSelfTime = transaction.selfTime
   /**
    * Add transaction self time as `app` in the breakdown
@@ -60,6 +60,9 @@ function groupSpans(transaction) {
     const span = spans[i]
     const { type, subType } = span
     const duration = span.duration()
+    if (duration === 0 || duration == null) {
+      continue
+    }
     let key = type
     if (subType) {
       key += '.' + subType

@@ -330,6 +330,26 @@ describe('Breakdown metrics', () => {
     })
   })
 
+  it('do not include spans with 0 duration', () => {
+    const tr = createTransaction('custom', { start: 0, end: 30 })
+    const sp1 = createSpan(tr, 'ext.http', { start: 10, end: 10 })
+    sp1.end()
+    tr.end()
+    const breakdown = getBreakdownObj(captureBreakdown(tr))
+
+    expect(breakdown.transaction).toEqual({
+      'transaction.duration.count': { value: 1 },
+      'transaction.duration.sum.us': { value: 30 },
+      'transaction.breakdown.count': { value: 1 }
+    })
+    expect(breakdown.app).toEqual({
+      'span.self_time.count': { value: 1 },
+      'span.self_time.sum.us': { value: 30 }
+    })
+
+    expect(breakdown['ext.http']).toBeUndefined()
+  })
+
   it('do not capture span breakdown for unsampled transaction', () => {
     const tr = createTransaction('unsampled')
     tr.sampled = false
