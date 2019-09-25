@@ -27,8 +27,6 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 
 describe('transaction.Transaction', function() {
-  beforeEach(function() {})
-
   it('should contain correct number of spans in the end', function(done) {
     var firstSpan = new Span('first-span-name', 'first-span')
     firstSpan.end()

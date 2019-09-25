@@ -28,7 +28,7 @@ import {
   setLabel,
   merge,
   getDuration,
-  now
+  mayBeTime
 } from '../common/utils'
 import { NAME_UNKNOWN, TYPE_CUSTOM } from '../common/constants'
 
@@ -50,7 +50,7 @@ class SpanBase {
     this.traceId = options.traceId
     this.sampled = options.sampled
     this.timestamp = options.timestamp
-    this._start = now()
+    this._start = mayBeTime(options.startTime)
     this._end = undefined
     this.ended = false
     this.onEnd = options.onEnd
@@ -83,12 +83,12 @@ class SpanBase {
     merge(this.context, context)
   }
 
-  end() {
+  end(endTime) {
     if (this.ended) {
       return
     }
     this.ended = true
-    this._end = now()
+    this._end = mayBeTime(endTime)
 
     this.callOnEnd()
   }
