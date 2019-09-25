@@ -352,4 +352,16 @@ describe('TransactionService', function() {
     const tr = customTrService.startTransaction('test', 'page-load')
     tr.detectFinish()
   })
+
+  it('should not capture breakdown metrics by default', done => {
+    config.events.observe(TRANSACTION_END, function() {
+      expect(tr1.breakdownTimings.length).toBe(0)
+      done()
+    })
+
+    const tr1 = transactionService.startTransaction('test1', 'custom')
+    const span1 = tr1.startSpan('span1', 'app')
+    span1.end()
+    tr1.detectFinish()
+  })
 })

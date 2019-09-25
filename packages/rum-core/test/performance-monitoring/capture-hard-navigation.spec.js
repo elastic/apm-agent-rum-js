@@ -33,6 +33,7 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import resourceEntries from '../fixtures/resource-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import navTimingSpans from '../fixtures/navigation-timing-span-snapshot'
+import { TIMING_LEVEL1_ENTRY as timings } from '../fixtures/navigation-entries'
 
 const spanSnapshot = navTimingSpans.map(mapSpan)
 
@@ -41,29 +42,6 @@ function mapSpan(s) {
 }
 
 describe('Capture hard navigation', function() {
-  const timings = {
-    navigationStart: 1528373292350,
-    unloadEventStart: 1528373293147,
-    unloadEventEnd: 1528373293147,
-    redirectStart: 0,
-    redirectEnd: 0,
-    fetchStart: 1528373292356,
-    domainLookupStart: 1528373292356,
-    domainLookupEnd: 1528373292356,
-    connectStart: 1528373292356,
-    connectEnd: 1528373292356,
-    secureConnectionStart: 0,
-    requestStart: 1528373292363,
-    responseStart: 1528373293142,
-    responseEnd: 1528373293303,
-    domLoading: 1528373293176,
-    domInteractive: 1528373293820,
-    domContentLoadedEventStart: 1528373293820,
-    domContentLoadedEventEnd: 1528373293854,
-    domComplete: 1528373295207,
-    loadEventStart: 1528373295208,
-    loadEventEnd: 1528373295230
-  }
   /**
    * Arbitrary value considering the transcation end would be called
    * after load event has finished

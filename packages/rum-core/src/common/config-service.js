@@ -76,6 +76,7 @@ class Config {
       disableInstrumentations: [],
       debug: false,
       logLevel: 'warn',
+      breakdownMetrics: false,
       browserResponsivenessInterval: 500,
       browserResponsivenessBuffer: 3,
       checkBrowserResponsiveness: true,

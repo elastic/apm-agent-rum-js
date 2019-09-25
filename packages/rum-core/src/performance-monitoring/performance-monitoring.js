@@ -373,7 +373,7 @@ class PerformanceMonitoring {
       return truncateModel(SPAN_MODEL, spanData)
     })
 
-    var context = merge({}, configContext, transaction.context)
+    const context = merge({}, configContext, transaction.context)
 
     const transactionData = {
       id: transaction.id,
@@ -384,6 +384,7 @@ class PerformanceMonitoring {
       spans,
       context,
       marks: transaction.marks,
+      breakdown: transaction.breakdownTimings,
       span_count: {
         started: spans.length
       },

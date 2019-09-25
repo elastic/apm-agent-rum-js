@@ -28,12 +28,13 @@ import SpanBase from './span-base'
 import {
   generateRandomId,
   merge,
+  now,
   extend,
   getPageMetadata,
   removeInvalidChars
 } from '../common/utils'
-
 import { REUSABILITY_THRESHOLD } from '../common/constants'
+import { captureBreakdown } from './breakdown'
 
 class Transaction extends SpanBase {
   constructor(name, type, options) {
@@ -49,6 +50,11 @@ class Transaction extends SpanBase {
 
     this.isHardNavigation = false
 
+    this.selfTime = null
+    this.breakdownTimings = []
+    this.childStart = 0
+    this.childDuration = 0
+
     this.sampled = Math.random() <= this.options.transactionSampleRate
   }
 
@@ -58,17 +64,15 @@ class Transaction extends SpanBase {
 
   mark(key) {
     const skey = removeInvalidChars(key)
-    const now = window.performance.now() - this._start
+    const markTime = now() - this._start
     const custom = {}
-    custom[skey] = now
+    custom[skey] = markTime
     this.addMarks({ custom })
   }
 
   canReuse(threshold = REUSABILITY_THRESHOLD) {
     return (
-      !!this.options.canReuse &&
-      !this.ended &&
-      performance.now() - this._start < threshold
+      !!this.options.canReuse && !this.ended && now() - this._start < threshold
     ) // To avoid a stale transaction capture everything
   }
 
@@ -104,6 +108,14 @@ class Transaction extends SpanBase {
     const span = new Span(name, type, opts)
     this._activeSpans[span.id] = span
 
+    /**
+     * Start child duration calculation
+     */
+    const activeChildren = Object.keys(this._activeSpans).length
+    if (activeChildren === 1) {
+      this.childStart = span._start
+    }
+
     return span
   }
 
@@ -120,18 +132,24 @@ class Transaction extends SpanBase {
       return
     }
     this.ended = true
-    this._end = window.performance.now()
+    this._end = now()
+
     // truncate active spans
     for (let sid in this._activeSpans) {
       const span = this._activeSpans[sid]
       span.type = span.type + '.truncated'
       span.end()
     }
+    this.selfTime = this.duration() - this.childDuration
 
     const metadata = getPageMetadata()
     this.addContext(metadata)
 
     this.callOnEnd()
+  }
+
+  captureBreakdown() {
+    this.breakdownTimings = captureBreakdown(this)
   }
 
   addTask(taskId) {
@@ -160,6 +178,15 @@ class Transaction extends SpanBase {
     this.spans.push(span)
     // Remove span from _activeSpans
     delete this._activeSpans[span.id]
+
+    /**
+     * Calculate child duration
+     */
+    const activeChildren = Object.keys(this._activeSpans).length
+    if (activeChildren === 0) {
+      this.childDuration += span._end - this.childStart
+      this.childStart = 0
+    }
   }
 }
 

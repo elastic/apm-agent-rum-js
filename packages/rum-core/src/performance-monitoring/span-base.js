@@ -23,12 +23,16 @@
  *
  */
 
-import { isUndefined, generateRandomId, setLabel, merge } from '../common/utils'
+import {
+  generateRandomId,
+  setLabel,
+  merge,
+  getDuration,
+  now
+} from '../common/utils'
 import { NAME_UNKNOWN, TYPE_CUSTOM } from '../common/constants'
 
 class SpanBase {
-  // context
-
   constructor(name, type, options = {}) {
     /**
      * Check for undefined and empty string
@@ -39,17 +43,17 @@ class SpanBase {
     if (!type) {
       type = TYPE_CUSTOM
     }
-    this.options = options
     this.name = name
     this.type = type
-    this.id = this.options.id || generateRandomId(16)
-    this.traceId = this.options.traceId
-    this.sampled = this.options.sampled
-    this.timestamp = this.options.timestamp || Date.now()
-    this.ended = false
-    this._start = window.performance.now()
+    this.options = options
+    this.id = options.id || generateRandomId(16)
+    this.traceId = options.traceId
+    this.sampled = options.sampled
+    this.timestamp = options.timestamp
+    this._start = now()
     this._end = undefined
-    this.onEnd = this.options.onEnd
+    this.ended = false
+    this.onEnd = options.onEnd
   }
 
   ensureContext() {
@@ -84,7 +88,7 @@ class SpanBase {
       return
     }
     this.ended = true
-    this._end = window.performance.now()
+    this._end = now()
 
     this.callOnEnd()
   }
@@ -96,13 +100,7 @@ class SpanBase {
   }
 
   duration() {
-    if (isUndefined(this._end) || isUndefined(this._start)) {
-      return null
-    }
-
-    var diff = this._end - this._start
-
-    return parseFloat(diff)
+    return getDuration(this._start, this._end)
   }
 }
 
