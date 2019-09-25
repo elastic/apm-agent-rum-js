@@ -26,7 +26,7 @@
 import resourceEntries from '../fixtures/resource-entries'
 import paintEntries from '../fixtures/paint-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
-import navigationEntries from '../fixtures/navigation-entries'
+import { TIMING_LEVEL2_ENTRIES } from '../fixtures/navigation-entries'
 
 export function mockGetEntriesByType() {
   const _getEntriesByType = window.performance.getEntriesByType
@@ -40,7 +40,7 @@ export function mockGetEntriesByType() {
     } else if (type === 'measure') {
       return userTimingEntries
     } else if (type === 'navigation') {
-      return navigationEntries
+      return TIMING_LEVEL2_ENTRIES
     } else {
       return []
     }

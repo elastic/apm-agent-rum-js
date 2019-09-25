@@ -43,7 +43,6 @@ class ApmServer {
     this.throttleAddTransaction = undefined
 
     this.initialized = false
-    this.ndjsonSpan = {}
   }
 
   init() {
@@ -236,25 +235,32 @@ class ApmServer {
   }
 
   ndjsonErrors(errors) {
-    return errors.map(function(error) {
-      return NDJSON.stringify({ error })
-    })
+    return errors.map(error => NDJSON.stringify({ error }))
+  }
+
+  ndjsonMetricsets(metricsets) {
+    const timestamp = Date.now()
+    return metricsets
+      .map(metricset =>
+        NDJSON.stringify({ metricset: { timestamp, ...metricset } })
+      )
+      .join('')
   }
 
   ndjsonTransactions(transactions) {
-    var ndjsonSpan = this.ndjsonSpan
-    return transactions.map(function(tr) {
-      var spans = ''
+    return transactions.map(tr => {
+      let spans = ''
       if (tr.spans) {
-        spans = tr.spans
-          .map(function(sp) {
-            ndjsonSpan.span = sp
-            return NDJSON.stringify(ndjsonSpan)
-          })
-          .join('')
+        spans = tr.spans.map(span => NDJSON.stringify({ span })).join('')
         delete tr.spans
       }
-      return NDJSON.stringify({ transaction: tr }) + spans
+      let breakdowns = ''
+      if (tr.breakdown) {
+        breakdowns = this.ndjsonMetricsets(tr.breakdown)
+        delete tr.breakdown
+      }
+
+      return NDJSON.stringify({ transaction: tr }) + spans + breakdowns
     })
   }
 
@@ -271,7 +277,6 @@ class ApmServer {
       return
     }
 
-    const endPoint = this._configService.getEndpointUrl()
     let ndjson
     if (type === 'errors') {
       ndjson = this.ndjsonErrors(filteredPayload.data)
@@ -287,6 +292,7 @@ class ApmServer {
       NDJSON.stringify({ metadata: { service: filteredPayload.service } })
     )
     const ndjsonPayload = ndjson.join('')
+    const endPoint = this._configService.getEndpointUrl()
     return this._postJson(endPoint, ndjsonPayload)
   }
 
