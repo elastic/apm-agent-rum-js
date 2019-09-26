@@ -78,7 +78,7 @@ describe('withTransaction', function() {
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test-transaction',
       'test-type',
-      { canReuse: true }
+      { canReuse: true, managed: true }
     )
   })
 
@@ -121,7 +121,7 @@ describe('withTransaction', function() {
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test-transaction',
       'test-type',
-      { canReuse: true }
+      { canReuse: true, managed: true }
     )
     transactionService.startTransaction.calls.reset()
     /**
@@ -148,7 +148,7 @@ describe('withTransaction', function() {
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test-transaction',
       'test-type',
-      { canReuse: true }
+      { canReuse: true, managed: true }
     )
     expect(detectFinishSpy).toHaveBeenCalled()
     wrapper.unmount()

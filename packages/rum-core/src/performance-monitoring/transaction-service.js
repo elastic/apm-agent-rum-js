@@ -94,22 +94,24 @@ class TransactionService {
 
   createPerfOptions(options) {
     const config = this._config.config
-    return extend(
-      {
-        pageLoadTraceId: config.pageLoadTraceId,
-        pageLoadSampled: config.pageLoadSampled,
-        pageLoadSpanId: config.pageLoadSpanId,
-        pageLoadTransactionName: config.pageLoadTransactionName,
-        transactionSampleRate: config.transactionSampleRate,
-        checkBrowserResponsiveness: config.checkBrowserResponsiveness
-      },
-      options
-    )
+    let presetOptions = { transactionSampleRate: config.transactionSampleRate }
+    let perfOptions = extend(presetOptions, options)
+    if (perfOptions.managed) {
+      perfOptions = extend(
+        {
+          pageLoadTraceId: config.pageLoadTraceId,
+          pageLoadSampled: config.pageLoadSampled,
+          pageLoadSpanId: config.pageLoadSpanId,
+          pageLoadTransactionName: config.pageLoadTransactionName,
+          checkBrowserResponsiveness: config.checkBrowserResponsiveness
+        },
+        perfOptions
+      )
+    }
+    return perfOptions
   }
 
-  startTransaction(name, type, options) {
-    const perfOptions = this.createPerfOptions(options)
-
+  startManagedTransaction(name, type, perfOptions) {
     let tr = this.getCurrentTransaction()
 
     if (!tr) {
@@ -163,51 +165,66 @@ class TransactionService {
       tr.captureTimings = true
     }
 
+    return tr
+  }
+
+  startTransaction(name, type, options) {
+    const perfOptions = this.createPerfOptions(options)
+    let tr
+    if (perfOptions.managed) {
+      tr = this.startManagedTransaction(name, type, perfOptions)
+    } else {
+      tr = new Transaction(name, type, perfOptions)
+    }
+
+    tr.onEnd = () => this.handleTransactionEnd(tr)
+
     if (__DEV__) {
       this._logger.debug('TransactionService.startTransaction', tr)
     }
     this._config.events.send(TRANSACTION_START, [tr])
 
-    tr.onEnd = () => {
-      return Promise.resolve().then(
-        () => {
-          if (__DEV__) {
-            this._logger.debug('TransactionService transaction finished', tr)
-          }
-          if (this.shouldIgnoreTransaction(tr.name)) {
-            return
-          }
-          /**
-           * Capture breakdown metrics once the transaction is completed
-           */
-          const breakdownMetrics = this._config.get('breakdownMetrics')
-          if (breakdownMetrics) {
-            tr.captureBreakdown()
-          }
+    return tr
+  }
 
-          if (tr.type === PAGE_LOAD) {
-            /**
-             * Setting the pageLoadTransactionName via configService.setConfig after
-             * transaction has started should also reflect the correct name.
-             */
-            const pageLoadTransactionName = this._config.get(
-              'pageLoadTransactionName'
-            )
-            if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
-              tr.name = pageLoadTransactionName
-            }
-          }
-          captureNavigation(tr)
-          this.add(tr)
-        },
-        err => {
-          if (__DEV__) {
-            this._logger.debug('TransactionService transaction onEnd', err)
+  handleTransactionEnd(tr) {
+    return Promise.resolve().then(
+      () => {
+        if (__DEV__) {
+          this._logger.debug('TransactionService transaction finished', tr)
+        }
+        if (this.shouldIgnoreTransaction(tr.name)) {
+          return
+        }
+        /**
+         * Capture breakdown metrics once the transaction is completed
+         */
+        const breakdownMetrics = this._config.get('breakdownMetrics')
+        if (breakdownMetrics) {
+          tr.captureBreakdown()
+        }
+
+        if (tr.type === PAGE_LOAD) {
+          /**
+           * Setting the pageLoadTransactionName via configService.setConfig after
+           * transaction has started should also reflect the correct name.
+           */
+          const pageLoadTransactionName = this._config.get(
+            'pageLoadTransactionName'
+          )
+          if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
+            tr.name = pageLoadTransactionName
           }
         }
-      )
-    }
-    return tr
+        captureNavigation(tr)
+        this.add(tr)
+      },
+      err => {
+        if (__DEV__) {
+          this._logger.debug('TransactionService transaction onEnd', err)
+        }
+      }
+    )
   }
 
   shouldIgnoreTransaction(transactionName) {

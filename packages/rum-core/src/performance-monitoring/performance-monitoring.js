@@ -94,6 +94,7 @@ class PerformanceMonitoring {
     return (event, task) => {
       if (task.source === HISTORY && event === INVOKE) {
         transactionService.startTransaction(task.data.title, 'route-change', {
+          managed: true,
           canReuse: true
         })
       }

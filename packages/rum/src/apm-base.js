@@ -132,6 +132,7 @@ class ApmBase {
      * avoid duplicating the logic at multiple places
      */
     const tr = transactionService.startTransaction(undefined, PAGE_LOAD, {
+      managed: true,
       canReuse: true
     })
 

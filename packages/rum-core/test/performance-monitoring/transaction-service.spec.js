@@ -36,7 +36,9 @@ describe('TransactionService', function() {
   var logger
 
   function sendPageLoadMetrics(name) {
-    var tr = transactionService.startTransaction(name, 'page-load')
+    var tr = transactionService.startTransaction(name, 'page-load', {
+      managed: true
+    })
     tr.detectFinish()
     return tr
   }
@@ -75,7 +77,11 @@ describe('TransactionService', function() {
       'transaction'
     )
     expect(result).toBeDefined()
-    result = transactionService.startTransaction('transaction2', 'transaction')
+    result = transactionService.startTransaction(
+      'transaction2',
+      'transaction',
+      { managed: true }
+    )
     expect(result.name).toBe('transaction2')
 
     var origCb = result.onEnd
@@ -103,6 +109,7 @@ describe('TransactionService', function() {
     var trans = transactionService.getCurrentTransaction()
     expect(trans.name).toBe('Unknown')
     transactionService.startTransaction('transaction', 'transaction', {
+      managed: true,
       canReuse: true
     })
     expect(trans.name).toBe('transaction')
@@ -114,7 +121,11 @@ describe('TransactionService', function() {
     config.set('capturePageLoad', true)
     transactionService = new TransactionService(logger, config)
 
-    var tr1 = transactionService.startTransaction('transaction1', 'transaction')
+    var tr1 = transactionService.startTransaction(
+      'transaction1',
+      'transaction',
+      { managed: true }
+    )
     var tr1DoneFn = tr1.onEnd
     tr1.onEnd = function() {
       tr1DoneFn()
@@ -128,7 +139,11 @@ describe('TransactionService', function() {
     tr1.captureTimings = true
     tr1.detectFinish()
 
-    var tr2 = transactionService.startTransaction('transaction2', 'transaction')
+    var tr2 = transactionService.startTransaction(
+      'transaction2',
+      'transaction',
+      { managed: true }
+    )
     expect(tr2.captureTimings).toBe(false)
     var tr2DoneFn = tr2.onEnd
     tr2.onEnd = function() {
@@ -146,6 +161,7 @@ describe('TransactionService', function() {
     })
     transactionService.setCurrentTransaction(reusableTr)
     const pageLoadTr = transactionService.startTransaction(name, 'page-load', {
+      managed: true,
       canReuse: true
     })
     pageLoadTr.detectFinish()
@@ -170,7 +186,9 @@ describe('TransactionService', function() {
   it('should use initial page load name before ending the transaction', function(done) {
     transactionService = new TransactionService(logger, config)
 
-    const tr = transactionService.startTransaction(undefined, 'page-load')
+    const tr = transactionService.startTransaction(undefined, 'page-load', {
+      managed: true
+    })
     expect(tr.name).toBe('Unknown')
 
     config.set('pageLoadTransactionName', 'page load name')
@@ -190,7 +208,9 @@ describe('TransactionService', function() {
     config.set('active', true)
     transactionService = new TransactionService(logger, config)
 
-    var tr = transactionService.startTransaction('transaction', 'transaction')
+    var tr = transactionService.startTransaction('transaction', 'transaction', {
+      managed: true
+    })
     tr.captureTimings = true
     var queryString = '?' + Date.now()
     var testUrl = '/base/test/performance/transactionService.spec.js'
@@ -253,7 +273,8 @@ describe('TransactionService', function() {
 
     const tr = customTransactionService.startTransaction(
       'resource-test',
-      PAGE_LOAD
+      PAGE_LOAD,
+      { managed: true }
     )
     tr.detectFinish()
   })
@@ -288,7 +309,7 @@ describe('TransactionService', function() {
     config.set('transactionSampleRate', 0)
     tr = transactionService.startTransaction('test', 'test')
     expect(tr.sampled).toBe(false)
-    span = transactionService.startSpan('testspan', 'test')
+    span = tr.startSpan('testspan', 'test')
     expect(span.sampled).toBe(false)
   })
 
@@ -324,7 +345,9 @@ describe('TransactionService', function() {
 
   it('should createTransaction once per startTransaction', function() {
     spyOn(transactionService, 'createTransaction').and.callThrough()
-    transactionService.startTransaction('test-name', 'test-type')
+    transactionService.startTransaction('test-name', 'test-type', {
+      managed: true
+    })
     expect(transactionService.createTransaction).toHaveBeenCalledTimes(1)
   })
 
@@ -343,7 +366,9 @@ describe('TransactionService', function() {
       unMock()
       done()
     })
-    const tr = customTrService.startTransaction('test', 'page-load')
+    const tr = customTrService.startTransaction('test', 'page-load', {
+      managed: true
+    })
     tr.detectFinish()
   })
 

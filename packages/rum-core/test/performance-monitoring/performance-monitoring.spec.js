@@ -409,7 +409,9 @@ describe('PerformanceMonitoring', function() {
         )
         .then(() => done())
     })
-    const tr = transactionService.startTransaction('resource-test', PAGE_LOAD)
+    const tr = transactionService.startTransaction('resource-test', PAGE_LOAD, {
+      managed: true
+    })
     tr.detectFinish()
   })
 
@@ -557,7 +559,8 @@ describe('PerformanceMonitoring', function() {
       var transactionService = performanceMonitoring._transactionService
       var tr = transactionService.startTransaction(
         'fetch transaction',
-        'custom'
+        'custom',
+        { managed: true }
       )
       spyOn(transactionService, 'startSpan').and.callThrough()
 
@@ -644,7 +647,8 @@ describe('PerformanceMonitoring', function() {
       var transactionService = performanceMonitoring._transactionService
       var tr = transactionService.startTransaction(
         'fetch transaction',
-        'custom'
+        'custom',
+        { managed: true }
       )
 
       var promise = window.fetch('/')
@@ -682,7 +686,9 @@ describe('PerformanceMonitoring', function() {
   it('should add xhr tasks', function(done) {
     var fn = performanceMonitoring.getXHRSub()
     var transactionService = performanceMonitoring._transactionService
-    var tr = transactionService.startTransaction('task transaction', 'custom')
+    var tr = transactionService.startTransaction('task transaction', 'custom', {
+      managed: true
+    })
     expect(typeof fn).toBe('function')
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -719,7 +725,7 @@ describe('PerformanceMonitoring', function() {
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test',
       ROUTE_CHANGE,
-      { canReuse: true }
+      { canReuse: true, managed: true }
     )
     cancelHistorySub()
   })
