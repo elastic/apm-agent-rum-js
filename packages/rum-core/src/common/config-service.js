@@ -31,7 +31,7 @@ import {
   getDtHeaderValue
 } from './utils'
 import EventHandler from './event-handler'
-import { CONFIG_CHANGE } from './constants'
+import { CONFIG_CHANGE, LOCAL_CONFIG_KEY } from './constants'
 
 function getConfigFromScript() {
   var script = getCurrentScript()
@@ -259,6 +259,17 @@ class Config {
     }
 
     return errors
+  }
+
+  getLocalConfig() {
+    let config = localStorage.getItem(LOCAL_CONFIG_KEY)
+    if (config) {
+      return JSON.parse(config)
+    }
+  }
+
+  setLocalConfig(config) {
+    localStorage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
   }
 }
 

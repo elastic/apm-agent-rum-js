@@ -426,14 +426,20 @@ describe('ApmServer', function() {
 
   if (isVersionInRange(testConfig.stackVersion, '7.3.0')) {
     it('should fetch remote config', async () => {
+      spyOn(configService, 'setLocalConfig')
+      spyOn(configService, 'getLocalConfig')
+
       var config = await apmServer.fetchConfig('nonexistent-service')
-      expect(config).toEqual({})
+      expect(configService.getLocalConfig).toHaveBeenCalled()
+      expect(configService.setLocalConfig).toHaveBeenCalled()
+
+      expect(config).toEqual({ etag: jasmine.any(String) })
 
       config = await apmServer.fetchConfig(
         'nonexistent-service',
         'nonexistent-env'
       )
-      expect(config).toEqual({})
+      expect(config).toEqual({ etag: jasmine.any(String) })
 
       try {
         config = await apmServer.fetchConfig()
