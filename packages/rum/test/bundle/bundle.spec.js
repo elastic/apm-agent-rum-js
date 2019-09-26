@@ -28,7 +28,8 @@ const webpack = require('webpack')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const rimraf = require('rimraf')
 
-const DIST_DIR = join(__dirname, 'dist')
+const PROJECT_ROOT = join(__dirname, '../../../../')
+const BUNDLE_DIST_DIR = join(PROJECT_ROOT, 'tmp', 'bundle-test')
 
 function runWebpack(config, callback) {
   const compiler = webpack(config)
@@ -49,7 +50,7 @@ function getConfig(entry) {
   return {
     entry,
     output: {
-      path: DIST_DIR,
+      path: BUNDLE_DIST_DIR,
       filename: 'bundle.js',
       libraryTarget: 'umd'
     },
@@ -60,7 +61,7 @@ function getConfig(entry) {
 
 describe('Browser bundle test', () => {
   afterEach(() => {
-    rimraf.sync(DIST_DIR)
+    rimraf.sync(BUNDLE_DIST_DIR)
   })
 
   describe('main version', () => {

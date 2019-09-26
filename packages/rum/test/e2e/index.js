@@ -24,7 +24,7 @@
  */
 
 import { polyfill } from 'es6-promise'
-import { apmBase } from '@elastic/apm-rum'
+import { apmBase } from '../../src'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import ApmServerMock from '../../../rum-core/test/utils/apm-server-mock'
 
