@@ -36,10 +36,13 @@ class ManualComponent extends React.Component {
 
   componentDidMount() {
     this.fetchData()
+    if (typeof performance.measure === 'function') {
+      performance.measure('manual-component-mounted', 'manual-component-start')
+    }
   }
 
   fetchData() {
-    var url = '/test/e2e/data.json'
+    const url = '/test/e2e/data.json'
     fetch(url)
       .then(resp => {
         return resp.json()
@@ -50,7 +53,7 @@ class ManualComponent extends React.Component {
   }
 
   render() {
-    return <div>Manual</div>
+    return <div id="manual-container">Manual {this.state.userName}</div>
   }
 }
 

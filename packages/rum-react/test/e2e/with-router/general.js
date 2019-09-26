@@ -40,7 +40,20 @@ const apm = createApmBase({
   serviceVersion: '0.0.1'
 })
 
-const ManualComponent = lazy(() => import('../components/manual-component'))
+/**
+ * Delaying the render for 70ms to capture the user timing
+ * measurements in the transaction timeframe
+ */
+const ManualComponent = lazy(() => {
+  if (typeof performance.mark === 'function') {
+    performance.mark('manual-component-start')
+  }
+  return new Promise(resolve => {
+    setTimeout(() => {
+      return resolve(import('../components/manual-component'))
+    }, 70)
+  })
+})
 
 class App extends React.Component {
   render() {
@@ -55,7 +68,9 @@ class App extends React.Component {
               <Link to="/about">About</Link>
             </li>
             <li>
-              <Link to="/manual">Manual</Link>
+              <Link id="manual" to="/manual">
+                Manual
+              </Link>
             </li>
             <li>
               <Link to="/func">Functional</Link>
@@ -86,7 +101,7 @@ class App extends React.Component {
           <ApmRoute path="/topics" component={MainComponent} />
           <ApmRoute path="/topic/:id" component={TopicComponent} />
           <Route
-            path="/manual/"
+            path="/manual"
             component={() => (
               <Suspense fallback={<div>Loading...</div>}>
                 <ManualComponent />
