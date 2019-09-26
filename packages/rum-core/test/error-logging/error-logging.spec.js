@@ -288,6 +288,27 @@ describe('ErrorLogging', function() {
   })
 
   it('should capture unhandled rejection events', done => {
+    /**
+     * Polyfilling the CustomEvent since they are available as objects
+     * in IE 9-11
+     * https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent#Polyfill
+     */
+    function createCustomEevent(event, params) {
+      params = params || { bubbles: false, cancelable: false, detail: null }
+      if (typeof window.CustomEvent === 'function') {
+        return new CustomEvent(event, params)
+      }
+
+      const evt = document.createEvent('CustomEvent')
+      evt.initCustomEvent(
+        event,
+        params.bubbles,
+        params.cancelable,
+        params.detail
+      )
+      return evt
+    }
+
     configService.set('flushInterval', 1)
     errorLogging.registerListeners()
 
@@ -300,7 +321,7 @@ describe('ErrorLogging', function() {
      * all browsers
      */
     const reason = new Error(testErrorMessage)
-    const event = new CustomEvent('unhandledrejection')
+    const event = createCustomEevent('unhandledrejection')
     event.reason = reason
     window.dispatchEvent(event)
   })
