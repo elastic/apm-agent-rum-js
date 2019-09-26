@@ -118,22 +118,22 @@ describe('TransactionService', function() {
     var tr1DoneFn = tr1.onEnd
     tr1.onEnd = function() {
       tr1DoneFn()
-      expect(tr1.isHardNavigation).toBe(true)
+      expect(tr1.captureTimings).toBe(true)
       tr1.spans.forEach(function(t) {
         expect(t.duration()).toBeLessThan(5 * 60 * 1000)
         expect(t.duration()).toBeGreaterThan(-1)
       })
     }
-    expect(tr1.isHardNavigation).toBe(false)
-    tr1.isHardNavigation = true
+    expect(tr1.captureTimings).toBe(false)
+    tr1.captureTimings = true
     tr1.detectFinish()
 
     var tr2 = transactionService.startTransaction('transaction2', 'transaction')
-    expect(tr2.isHardNavigation).toBe(false)
+    expect(tr2.captureTimings).toBe(false)
     var tr2DoneFn = tr2.onEnd
     tr2.onEnd = function() {
       tr2DoneFn()
-      expect(tr2.isHardNavigation).toBe(false)
+      expect(tr2.captureTimings).toBe(false)
       done()
     }
     tr2.detectFinish()
@@ -153,24 +153,18 @@ describe('TransactionService', function() {
     expect(pageLoadTr).toBe(reusableTr)
   })
 
-  it('should contain agent marks in page load transaction', function() {
+  it('should not capture resource/user spans or marks for custom transaction', done => {
     const unMock = mockGetEntriesByType()
-    const tr = new Transaction('test', 'test')
-    tr.isHardNavigation = true
-    transactionService.capturePageLoadMetrics(tr)
 
-    const agentMarks = [
-      'timeToFirstByte',
-      'domInteractive',
-      'domComplete',
-      'firstContentfulPaint'
-    ]
-
-    expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
-    agentMarks.forEach(mark => {
-      expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
+    config.events.observe(TRANSACTION_END, () => {
+      expect(tr.marks).toBeUndefined()
+      expect(tr.spans.length).toBe(0)
+      unMock()
+      done()
     })
-    unMock()
+
+    const tr = transactionService.startTransaction('test', 'custom')
+    tr.detectFinish()
   })
 
   it('should use initial page load name before ending the transaction', function(done) {
@@ -197,7 +191,7 @@ describe('TransactionService', function() {
     transactionService = new TransactionService(logger, config)
 
     var tr = transactionService.startTransaction('transaction', 'transaction')
-    tr.isHardNavigation = true
+    tr.captureTimings = true
     var queryString = '?' + Date.now()
     var testUrl = '/base/test/performance/transactionService.spec.js'
 
@@ -239,7 +233,7 @@ describe('TransactionService', function() {
 
     const customTransactionService = new TransactionService(logger, config)
     config.events.observe(TRANSACTION_END, function() {
-      expect(tr.isHardNavigation).toBe(true)
+      expect(tr.captureTimings).toBe(true)
       expect(
         tr.spans.filter(({ type }) => type === 'resource').length
       ).toBeGreaterThanOrEqual(1)

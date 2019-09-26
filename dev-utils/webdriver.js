@@ -331,5 +331,6 @@ module.exports = {
   handleError,
   isChromeLatest,
   getWebdriveBaseConfig,
+  getBrowserInfo,
   waitForApmServerCalls
 }

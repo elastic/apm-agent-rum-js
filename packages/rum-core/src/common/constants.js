@@ -64,6 +64,7 @@ const MAX_SPAN_DURATION = 5 * 60 * 1000
  * Transaction & Span - Name & Types
  */
 const PAGE_LOAD = 'page-load'
+const ROUTE_CHANGE = 'route-change'
 const NAME_UNKNOWN = 'Unknown'
 const TYPE_CUSTOM = 'custom'
 
@@ -112,6 +113,7 @@ export {
   REUSABILITY_THRESHOLD,
   MAX_SPAN_DURATION,
   PAGE_LOAD,
+  ROUTE_CHANGE,
   NAME_UNKNOWN,
   TYPE_CUSTOM,
   USER_TIMING_THRESHOLD,

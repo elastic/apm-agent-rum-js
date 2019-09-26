@@ -25,7 +25,8 @@
 
 const {
   allowSomeBrowserErrors,
-  waitForApmServerCalls
+  waitForApmServerCalls,
+  getBrowserInfo
 } = require('../../../../../dev-utils/webdriver')
 
 describe('General usecase with react-router', function() {
@@ -44,7 +45,7 @@ describe('General usecase with react-router', function() {
 
     expect(serverCalls.sendTransactions.length).toBe(1)
 
-    var transaction = serverCalls.sendTransactions[0].args[0][0]
+    const transaction = serverCalls.sendTransactions[0].args[0][0]
     expect(transaction.type).toBe('page-load')
     expect(transaction.name).toBe('/home')
     expect(transaction.spans.length).toBeGreaterThan(1)
@@ -62,5 +63,46 @@ describe('General usecase with react-router', function() {
     expect(foundSpans.length).toBeGreaterThanOrEqual(4)
 
     return allowSomeBrowserErrors()
+  })
+
+  it('should capture resoure and user timing spans for soft navigation', () => {
+    browser.waitUntil(
+      () => {
+        /**
+         * Click a link to trigger the rendering of lazy navigation
+         */
+        $('#manual').click()
+        const componentContainer = $('#manual-container')
+        return componentContainer.getText().indexOf('Manual') !== -1
+      },
+      5000,
+      'expected manual component to be rendered'
+    )
+
+    const serverCalls = waitForApmServerCalls(0, 2)
+    expect(serverCalls.sendTransactions.length).toBe(2)
+
+    const pageLoadTransaction = serverCalls.sendTransactions[0].args[0][0]
+    expect(pageLoadTransaction.type).toBe('page-load')
+    expect(pageLoadTransaction.name).toBe('/home')
+
+    const routeTransaction = serverCalls.sendTransactions[1].args[0][0]
+    expect(routeTransaction.name).toBe('ManualComponent')
+    expect(routeTransaction.type).toBe('route-change')
+
+    const spanTypes = ['app', 'resource', 'external']
+    const foundSpans = routeTransaction.spans.filter(
+      span => spanTypes.indexOf(span.type) > -1
+    )
+    /**
+     * `app` and `resource` span type will not be captured in safari 9 since
+     * User and Resource API is not supported.
+     */
+    const { name } = getBrowserInfo()
+    if (name.indexOf('safari') >= 0) {
+      expect(foundSpans.length).toBeGreaterThanOrEqual(1)
+    } else {
+      expect(foundSpans.length).toBeGreaterThanOrEqual(3)
+    }
   })
 })

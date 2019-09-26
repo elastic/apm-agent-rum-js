@@ -262,7 +262,11 @@ class PerformanceMonitoring {
       'checkBrowserResponsiveness'
     )
 
-    if (checkBrowserResponsiveness && !tr.isHardNavigation) {
+    /**
+     * TODO: Refactor captureTimings flag here once this PR
+     * is addressed - https://github.com/elastic/apm-agent-rum-js/issues/334
+     */
+    if (checkBrowserResponsiveness && !tr.captureTimings) {
       const buffer = this._configService.get('browserResponsivenessBuffer')
 
       const wasBrowserResponsive = this.checkBrowserResponsiveness(

@@ -47,5 +47,11 @@ export default [
     entryType: 'measure',
     name: 'measure_4',
     startTime: 2110.949999998411
+  },
+  {
+    duration: 100.7900000006484,
+    entryType: 'measure',
+    name: 'measure_5',
+    startTime: 0
   }
 ]

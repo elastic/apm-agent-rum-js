@@ -27,13 +27,15 @@ import {
   createNavigationTimingSpans,
   createResourceTimingSpans,
   createUserTimingSpans,
-  captureHardNavigation
-} from '../../src/performance-monitoring/capture-hard-navigation'
+  captureNavigation
+} from '../../src/performance-monitoring/capture-navigation'
 import Transaction from '../../src/performance-monitoring/transaction'
 import resourceEntries from '../fixtures/resource-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import navTimingSpans from '../fixtures/navigation-timing-span-snapshot'
 import { TIMING_LEVEL1_ENTRY as timings } from '../fixtures/navigation-entries'
+import { mockGetEntriesByType } from '../utils/globals-mock'
+import { PAGE_LOAD, ROUTE_CHANGE } from '../../src/common/constants'
 
 const spanSnapshot = navTimingSpans.map(mapSpan)
 
@@ -47,12 +49,15 @@ describe('Capture hard navigation', function() {
    * after load event has finished
    */
   const transactionEnd = timings.loadEventEnd + 100
+  const transactionStart = 0
   it('should createNavigationTimingSpans', function() {
     let spans = createNavigationTimingSpans(
       timings,
       timings.fetchStart,
+      transactionStart,
       transactionEnd
     )
+
     expect(spans.map(mapSpan)).toEqual([
       { name: 'Requesting and receiving the document', _end: 947, _start: 7 },
       {
@@ -71,6 +76,7 @@ describe('Capture hard navigation', function() {
       const spans = createNavigationTimingSpans(
         timingObj,
         timingObj.fetchStart,
+        transactionStart,
         transactionEnd
       )
       expect(spans).toEqual([])
@@ -83,6 +89,7 @@ describe('Capture hard navigation', function() {
       const spans = createNavigationTimingSpans(
         timingObj,
         timingObj.fetchStart,
+        transactionStart,
         transactionEnd
       )
       expect(spans.map(mapSpan)).toEqual([
@@ -107,6 +114,7 @@ describe('Capture hard navigation', function() {
       const spans = createNavigationTimingSpans(
         timingObj,
         timingObj.fetchStart,
+        transactionStart,
         transactionEnd
       )
       expect(spans.map(mapSpan)).toEqual([
@@ -115,7 +123,7 @@ describe('Capture hard navigation', function() {
       ])
     }
 
-    const timingsObj = {
+    const timingObj = {
       ...timings,
       domInteractive: 0,
       requestStart: 0,
@@ -123,8 +131,9 @@ describe('Capture hard navigation', function() {
       domContentLoadedEventEnd: 'testing'
     }
     spans = createNavigationTimingSpans(
-      timingsObj,
-      timingsObj.fetchStart,
+      timingObj,
+      timingObj.fetchStart,
+      transactionStart,
       transactionEnd
     )
     expect(spans.map(mapSpan)).toEqual([
@@ -136,6 +145,7 @@ describe('Capture hard navigation', function() {
     const spans = createResourceTimingSpans(
       resourceEntries,
       ['http://ajax-filter.test'],
+      transactionStart,
       transactionEnd
     )
     const lastSpanContext = spans[spans.length - 1].context
@@ -156,8 +166,12 @@ describe('Capture hard navigation', function() {
   })
 
   it('should createUserTimingSpans', function() {
-    const spans = createUserTimingSpans(userTimingEntries, transactionEnd)
-    expect(spans.length).toEqual(2)
+    const spans = createUserTimingSpans(
+      userTimingEntries,
+      transactionStart,
+      transactionEnd
+    )
+    expect(spans.length).toEqual(3)
     expect(spans).toEqual([
       jasmine.objectContaining({
         name: 'measure_1',
@@ -172,28 +186,101 @@ describe('Capture hard navigation', function() {
         _start: 0,
         _end: 2119.7900000006484,
         ended: true
+      }),
+      jasmine.objectContaining({
+        name: 'measure_5',
+        type: 'app',
+        _start: 0,
+        _end: 100.7900000006484,
+        ended: true
       })
     ])
   })
 
-  it('should captureHardNavigation', function() {
-    var tr = new Transaction('test', 'test')
-    tr.isHardNavigation = true
+  it('should capture spans for hard navigation', function() {
+    const tr = new Transaction('test', PAGE_LOAD)
+    tr.captureTimings = true
     tr.end()
-    captureHardNavigation(tr)
+    captureNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
   })
 
+  it('should capture resource/user timing spans for soft navigation', function() {
+    const unmock = mockGetEntriesByType()
+    const tr = new Transaction('test', ROUTE_CHANGE)
+    tr.captureTimings = true
+    const xhrSpan = tr.startSpan('GET http://example.com', 'external.http')
+    xhrSpan.end()
+    tr._start = transactionStart
+    tr.end()
+    captureNavigation(tr)
+    expect(tr.spans.length).toBeGreaterThan(1)
+    const foundSpans = tr.spans.filter(
+      span =>
+        span.name === xhrSpan.name ||
+        span.type === 'resource' ||
+        span.type === 'app'
+    )
+    expect(foundSpans.length).toBeGreaterThanOrEqual(3)
+    unmock()
+  })
+
+  it('should capture resource/user timings when captureTimings flag is set', function() {
+    const unmock = mockGetEntriesByType()
+    const tr = new Transaction('test', 'test')
+    tr.captureTimings = true
+    tr._start = transactionStart
+    tr.end()
+    captureNavigation(tr)
+    expect(tr.spans.length).toBeGreaterThan(1)
+    const foundSpans = tr.spans.filter(
+      span => span.type === 'resource' || span.type === 'app'
+    )
+    expect(foundSpans.length).toBeGreaterThanOrEqual(2)
+    unmock()
+  })
+
+  it('should capture agent marks in page load transaction', function() {
+    const unMock = mockGetEntriesByType()
+    const tr = new Transaction('test', PAGE_LOAD)
+    tr.captureTimings = true
+    captureNavigation(tr)
+    tr.end()
+    const agentMarks = [
+      'timeToFirstByte',
+      'domInteractive',
+      'domComplete',
+      'firstContentfulPaint'
+    ]
+
+    expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
+    agentMarks.forEach(mark => {
+      expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
+    })
+    unMock()
+  })
+
+  it('should not capture agent marks for route-change transaction', function() {
+    const unMock = mockGetEntriesByType()
+    const tr = new Transaction('test', ROUTE_CHANGE)
+    tr.captureTimings = true
+    captureNavigation(tr)
+    tr.end()
+
+    expect(tr.marks).toBeUndefined()
+    unMock()
+  })
+
   it('should fix custom marks when changing transaction._start', function() {
-    var tr = new Transaction('test', 'test')
-    tr.isHardNavigation = true
+    const tr = new Transaction('test', PAGE_LOAD)
+    tr.captureTimings = true
     tr.mark('testMark')
     const markValue = tr.marks.custom.testMark
     const start = tr._start
     expect(markValue).toBeGreaterThanOrEqual(0)
     expect(start).toBeGreaterThan(0)
     tr.end()
-    captureHardNavigation(tr)
+    captureNavigation(tr)
     expect(tr.marks.custom.testMark).toEqual(start + markValue)
   })
 })
