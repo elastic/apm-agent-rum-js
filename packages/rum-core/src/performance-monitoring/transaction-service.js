@@ -50,6 +50,7 @@ class TransactionService {
       return tr
     } else {
       options.canReuse = true
+      options.managed = true
       return this.createTransaction(undefined, undefined, options)
     }
   }
@@ -278,16 +279,6 @@ class TransactionService {
       tr.removeTask(taskId)
       if (__DEV__) {
         this._logger.debug('TransactionService.removeTask', taskId)
-      }
-    }
-  }
-
-  detectFinish() {
-    var tr = this.getCurrentTransaction()
-    if (tr) {
-      tr.detectFinish()
-      if (__DEV__) {
-        this._logger.debug('TransactionService.detectFinish')
       }
     }
   }
