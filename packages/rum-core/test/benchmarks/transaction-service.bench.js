@@ -42,9 +42,7 @@ suite('TransactionService', () => {
   })
 
   benchmark('custom transaction overhead', () => {
-    const tr = transactionService.startTransaction('custom', 'custom', {
-      managed: true
-    })
+    const tr = transactionService.startTransaction('custom', 'custom')
     setImmediate(() => tr.end())
   })
 

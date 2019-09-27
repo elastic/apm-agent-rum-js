@@ -26,7 +26,7 @@
 import { Promise } from 'es6-promise'
 import Transaction from './transaction'
 import { extend } from '../common/utils'
-import { PAGE_LOAD, NAME_UNKNOWN, ROUTE_CHANGE } from '../common/constants'
+import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import { captureNavigation } from './capture-navigation'
 import { __DEV__ } from '../env'
 import { TRANSACTION_START, TRANSACTION_END } from '../common/constants'
@@ -145,9 +145,9 @@ class TransactionService {
       tr = this.createTransaction(name, type, perfOptions)
     }
 
-    if (type === PAGE_LOAD) {
-      tr.captureTimings = true
+    tr.captureTimings = true
 
+    if (type === PAGE_LOAD) {
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
@@ -161,8 +161,6 @@ class TransactionService {
       if (tr.name === NAME_UNKNOWN && perfOptions.pageLoadTransactionName) {
         tr.name = perfOptions.pageLoadTransactionName
       }
-    } else if (type === ROUTE_CHANGE) {
-      tr.captureTimings = true
     }
 
     return tr

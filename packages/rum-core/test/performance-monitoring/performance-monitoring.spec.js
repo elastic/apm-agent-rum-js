@@ -248,7 +248,8 @@ describe('PerformanceMonitoring', function() {
     spyOn(logger, 'debug').and.callThrough()
     expect(logger.debug).not.toHaveBeenCalled()
     var tr = new Transaction('transaction', 'transaction', {
-      transactionSampleRate: 1
+      transactionSampleRate: 1,
+      managed: true
     })
     var span = tr.startSpan('test span', 'test span type')
     span.end()

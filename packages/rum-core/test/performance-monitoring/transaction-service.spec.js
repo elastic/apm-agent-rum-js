@@ -135,15 +135,10 @@ describe('TransactionService', function() {
         expect(t.duration()).toBeGreaterThan(-1)
       })
     }
-    expect(tr1.captureTimings).toBe(false)
-    tr1.captureTimings = true
+    expect(tr1.captureTimings).toBe(true)
     tr1.detectFinish()
 
-    var tr2 = transactionService.startTransaction(
-      'transaction2',
-      'transaction',
-      { managed: true }
-    )
+    var tr2 = transactionService.startTransaction('transaction2', 'transaction')
     expect(tr2.captureTimings).toBe(false)
     var tr2DoneFn = tr2.onEnd
     tr2.onEnd = function() {
@@ -382,5 +377,36 @@ describe('TransactionService', function() {
     const span1 = tr1.startSpan('span1', 'app')
     span1.end()
     tr1.detectFinish()
+  })
+
+  it('should create unmanaged transactions by default', () => {
+    expect(transactionService.currentTransaction).toBeUndefined()
+    const tr1 = transactionService.startTransaction('test-name', 'test-type')
+    expect(tr1.name).toBe('test-name')
+    expect(transactionService.currentTransaction).toBeUndefined()
+    spyOn(tr1, 'detectFinish')
+    transactionService.detectFinish()
+    expect(tr1.detectFinish).not.toHaveBeenCalled()
+  })
+
+  it('should create managed transactions if the managed option is provided', () => {
+    expect(transactionService.currentTransaction).toBeUndefined()
+    const tr1 = transactionService.startTransaction('test-name', 'test-type', {
+      managed: true
+    })
+    expect(tr1.name).toBe('test-name')
+    expect(transactionService.currentTransaction).toBe(tr1)
+
+    const span = transactionService.startSpan(
+      'test-span-name',
+      'test-span-type'
+    )
+    span.end()
+    expect(tr1.spans[0]).toBe(span)
+    spyOn(tr1, 'detectFinish').and.callThrough()
+    spyOn(tr1, 'end')
+    transactionService.detectFinish()
+    expect(tr1.detectFinish).toHaveBeenCalled()
+    expect(tr1.end).toHaveBeenCalled()
   })
 })
