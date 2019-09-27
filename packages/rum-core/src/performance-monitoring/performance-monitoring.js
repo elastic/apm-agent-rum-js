@@ -263,7 +263,7 @@ class PerformanceMonitoring {
       'checkBrowserResponsiveness'
     )
 
-    if (checkBrowserResponsiveness && tr.options.managed) {
+    if (checkBrowserResponsiveness && tr.options.checkBrowserResponsiveness) {
       const buffer = this._configService.get('browserResponsivenessBuffer')
 
       const wasBrowserResponsive = this.checkBrowserResponsiveness(

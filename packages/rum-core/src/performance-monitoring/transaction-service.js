@@ -43,7 +43,7 @@ class TransactionService {
 
   ensureCurrentTransaction(options) {
     if (!options) {
-      options = this.createPerfOptions()
+      options = this.createOptions()
     }
     var tr = this.getCurrentTransaction()
     if (tr) {
@@ -93,7 +93,7 @@ class TransactionService {
     }, interval)
   }
 
-  createPerfOptions(options) {
+  createOptions(options) {
     const config = this._config.config
     let presetOptions = { transactionSampleRate: config.transactionSampleRate }
     let perfOptions = extend(presetOptions, options)
@@ -149,6 +149,7 @@ class TransactionService {
     tr.captureTimings = true
 
     if (type === PAGE_LOAD) {
+      tr.options.checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
@@ -168,7 +169,7 @@ class TransactionService {
   }
 
   startTransaction(name, type, options) {
-    const perfOptions = this.createPerfOptions(options)
+    const perfOptions = this.createOptions(options)
     let tr
     if (perfOptions.managed) {
       tr = this.startManagedTransaction(name, type, perfOptions)

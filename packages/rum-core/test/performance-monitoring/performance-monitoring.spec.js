@@ -249,7 +249,8 @@ describe('PerformanceMonitoring', function() {
     expect(logger.debug).not.toHaveBeenCalled()
     var tr = new Transaction('transaction', 'transaction', {
       transactionSampleRate: 1,
-      managed: true
+      managed: true,
+      checkBrowserResponsiveness: true
     })
     var span = tr.startSpan('test span', 'test span type')
     span.end()

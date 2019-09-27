@@ -400,20 +400,33 @@ describe('TransactionService', function() {
     expect(tr1.name).toBe('test-name')
     expect(transactionService.currentTransaction).toBe(tr1)
 
+    const tr2 = transactionService.startTransaction(
+      'unmanaged-name',
+      'unmanaged-type'
+    )
+    expect(transactionService.currentTransaction).toBe(tr1)
+
     const span = transactionService.startSpan(
       'test-span-name',
       'test-span-type'
     )
     span.end()
     expect(tr1.spans[0]).toBe(span)
+    expect(tr2.spans.length).toBe(0)
+    spyOn(tr2, 'addTask').and.callThrough()
+    spyOn(tr2, 'removeTask').and.callThrough()
+    spyOn(tr2, 'end')
     spyOn(tr1, 'addTask').and.callThrough()
     spyOn(tr1, 'removeTask').and.callThrough()
     spyOn(tr1, 'end')
     transactionService.addTask('taskId')
     expect(tr1.addTask).toHaveBeenCalledWith('taskId')
+    expect(tr2.addTask).not.toHaveBeenCalled()
 
     transactionService.removeTask('taskId')
     expect(tr1.removeTask).toHaveBeenCalledWith('taskId')
     expect(tr1.end).toHaveBeenCalled()
+    expect(tr2.removeTask).not.toHaveBeenCalled()
+    expect(tr2.end).not.toHaveBeenCalled()
   })
 })
