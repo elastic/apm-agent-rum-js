@@ -4,7 +4,8 @@
   "description": "Elastic apm core",
   "license": "MIT",
   "main": "dist/lib/index.js",
-  "module": "src/index.js",
+  "module": "dist/es/index.js",
+  "source": "src/index.js",
   "sideEffects": false,
   "publishConfig": {
     "access": "public"
@@ -15,8 +16,10 @@
     "directory": "packages/rum-core"
   },
   "scripts": {
-    "prepublishOnly": "npm run build:main",
-    "build:main": "npx babel src -d dist/lib",
+    "prepublishOnly": "npm run build",
+    "build": "run-p build:*",
+    "build:main": "BABEL_ENV=BROWSER_PROD npx babel src -d dist/lib",
+    "build:module": "BABEL_ENV=BROWSER_ESM_PROD npx babel src -d dist/es",
     "karma:dev": "karma start --auto-watch --restartOnFileChange",
     "bench": "NODE_ENV=production karma start karma.bench.conf.js",
     "karma:coverage": "karma start --coverage --singleRun",

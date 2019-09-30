@@ -7,9 +7,14 @@
   "license": "MIT",
   "main": "dist/lib/index.js",
   "module": "dist/es/index.js",
+  "source": "src/index.js",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -20,18 +25,17 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "script": "node ../../dev-utils/run-script.js",
-    "build": "npm-run-all build:main build:module",
-    "build:main": "BABEL_ENV=NODE_PROD npx babel src -d dist/lib",
-    "build:module": "BABEL_ENV=NODE_ES_PROD npx babel src -d dist/es",
+    "build": "run-p build:main build:module",
+    "build:main": "BABEL_ENV=BROWSER_PROD npx babel src -d dist/lib",
+    "build:module": "BABEL_ENV=BROWSER_ESM_PROD npx babel src -d dist/es",
     "build:e2e": "npm run script buildE2eBundles packages/rum-react/test/e2e",
-    "karma": "karma start",
     "karma:dev": "karma start --auto-watch --restartOnFileChange",
     "karma:coverage": "karma start --coverage --singleRun",
     "test:unit": "npm run script runUnitTests packages/rum-react",
     "test:e2e:supported": "npm run script runE2eTests packages/rum-react/wdio.conf.js",
     "test:sauce": "npm run script runSauceTests packages/rum-react true build:e2e test:unit test:e2e:supported",
-    "test": "npm run test:sauce"
+    "test": "npm run test:sauce",
+    "script": "node ../../dev-utils/run-script.js"
   },
   "bugs": {
     "url": "https://github.com/elastic/apm-agent-rum-js/issues"
