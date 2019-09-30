@@ -34,6 +34,7 @@ describe('ErrorLogging', function() {
   var apmServer
   var errorLogging
   var transactionService
+
   beforeEach(function() {
     var serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
@@ -223,7 +224,7 @@ describe('ErrorLogging', function() {
       addedListenerTypes.push(type)
       errorLogging.logErrorEvent(event)
     })
-    errorLogging.registerGlobalEventListener()
+    errorLogging.registerListeners()
     expect(addedListenerTypes).toContain('error')
 
     const filename = 'filename'
@@ -286,5 +287,102 @@ describe('ErrorLogging', function() {
       expect(apmServer.sendErrors).not.toHaveBeenCalled()
       expect(apmServer.errorQueue.items.length).toBe(4)
     }
+  })
+
+  it('should capture unhandled rejection events', done => {
+    /**
+     * Polyfilling the CustomEvent since they are available as objects
+     * in IE 9-11
+     * https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent#Polyfill
+     */
+    function createCustomEevent(event, params) {
+      params = params || { bubbles: false, cancelable: false, detail: null }
+      if (typeof window.CustomEvent === 'function') {
+        return new CustomEvent(event, params)
+      }
+
+      const evt = document.createEvent('CustomEvent')
+      evt.initCustomEvent(
+        event,
+        params.bubbles,
+        params.cancelable,
+        params.detail
+      )
+      return evt
+    }
+
+    configService.set('flushInterval', 1)
+    errorLogging.registerListeners()
+
+    spyOn(apmServer, 'sendErrors').and.callFake(errors => {
+      expect(errors[0].exception.message).toMatch(reason.message)
+      done()
+    })
+    /**
+     * simulate window.PromiseRejectionEvent event since its not supported by
+     * all browsers
+     */
+    const reason = new Error(testErrorMessage)
+    const event = createCustomEevent('unhandledrejection')
+    event.reason = reason
+    window.dispatchEvent(event)
+  })
+
+  it('should handle different type of reasons for promise rejections', () => {
+    const getErrors = () => apmServer.errorQueue.items
+
+    errorLogging.logPromiseEvent({})
+    expect(getErrors().length).toBe(1)
+    expect(getErrors()[0].exception.message).toMatch(/no reason specified/)
+
+    const error = new Error(testErrorMessage)
+    errorLogging.logPromiseEvent({
+      reason: error
+    })
+    expect(getErrors()[1].exception.message).toMatch(error.message)
+
+    errorLogging.logPromiseEvent({
+      reason: testErrorMessage
+    })
+    expect(getErrors()[2].exception.message).toMatch(testErrorMessage)
+
+    const errorObj = {
+      message: testErrorMessage,
+      stack: 'ReferenceError: At example.js:23'
+    }
+    errorLogging.logPromiseEvent({
+      reason: errorObj
+    })
+    expect(getErrors()[3].exception.message).toMatch(testErrorMessage)
+    expect(getErrors()[3].exception.stacktrace.length).toBeGreaterThan(0)
+
+    const errorLikeObj = {
+      message: testErrorMessage,
+      foo: 'bar'
+    }
+    errorLogging.logPromiseEvent({
+      reason: errorLikeObj
+    })
+    expect(getErrors()[4].exception.message).toMatch(testErrorMessage)
+    expect(getErrors()[4].exception.stacktrace.length).toBe(0)
+
+    errorLogging.logPromiseEvent({
+      reason: 200
+    })
+    expect(getErrors()[5].exception.message).toBe(
+      'Unhandled promise rejection: 200'
+    )
+
+    errorLogging.logPromiseEvent({
+      reason: true
+    })
+    expect(getErrors()[6].exception.message).toBe(
+      'Unhandled promise rejection: true'
+    )
+
+    errorLogging.logPromiseEvent({
+      reason: [{ a: '1' }]
+    })
+    expect(getErrors()[7]).toBeUndefined()
   })
 })

@@ -64,7 +64,7 @@ class ApmBase {
 
         if (flags[ERROR]) {
           const errorLogging = this.serviceFactory.getService('ErrorLogging')
-          errorLogging.registerGlobalEventListener()
+          errorLogging.registerListeners()
         }
 
         const sendPageLoad = () =>
