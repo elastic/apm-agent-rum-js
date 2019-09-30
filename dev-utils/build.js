@@ -30,48 +30,45 @@ const { getTestEnvironmentVariables } = require('./test-config')
 const BUNDLE_TYPES = {
   NODE_DEV: 'NODE_DEV',
   NODE_PROD: 'NODE_PROD',
-  NODE_ES_PROD: 'NODE_ES_PROD',
+  NODE_ESM_PROD: 'NODE_ESM_PROD',
   BROWSER_DEV: 'BROWSER_DEV',
-  BROWSER_PROD: 'BROWSER_PROD'
+  BROWSER_PROD: 'BROWSER_PROD',
+  BROWSER_ESM_PROD: 'BROWSER_ESM_PROD'
 }
 
 const {
-  NODE_DEV,
   NODE_PROD,
-  NODE_ES_PROD,
+  NODE_ESM_PROD,
   BROWSER_DEV,
-  BROWSER_PROD
+  BROWSER_PROD,
+  BROWSER_ESM_PROD
 } = BUNDLE_TYPES
-
-const DEFAULT_NODE_PRESET = [
-  [
-    '@babel/preset-env',
-    {
-      targets: {
-        node: true
-      },
-      loose: true
-    }
-  ]
-]
-
-const DEFAULT_BROWSER_PRESET = [
-  [
-    '@babel/preset-env',
-    {
-      targets: {
-        ie: '11'
-      },
-      modules: false,
-      loose: true
-    }
-  ]
-]
 
 const PACKAGE_TYPES = {
   DEFAULT: 'DEFAULT',
   REACT: 'REACT',
   ANGULAR: 'ANGULAR'
+}
+
+function getBabelPresetEnv(bundleType) {
+  const isBrowser = [BROWSER_DEV, BROWSER_PROD, BROWSER_ESM_PROD].includes(
+    bundleType
+  )
+  /**
+   * Decides transformation of ES6 module syntax to another module type.
+   */
+  const shipESModule = [NODE_ESM_PROD, BROWSER_ESM_PROD].includes(bundleType)
+
+  return [
+    [
+      '@babel/preset-env',
+      {
+        targets: isBrowser ? { ie: '11' } : { node: true },
+        modules: shipESModule ? false : 'auto',
+        loose: true
+      }
+    ]
+  ]
 }
 
 function getAngularConfig(options) {
@@ -113,23 +110,11 @@ function getBabelConfig(bundleType, packageType) {
     comments: false,
     babelrc: false,
     exclude: '/**/node_modules/**',
-    presets: [],
+    presets: getBabelPresetEnv(bundleType),
     plugins: []
   }
-  switch (bundleType) {
-    case NODE_DEV:
-    case NODE_PROD:
-      options = { ...options, presets: DEFAULT_NODE_PRESET }
-      return getOptions(options, packageType)
-    case NODE_ES_PROD:
-      return getOptions(options, packageType)
-    case BROWSER_DEV:
-    case BROWSER_PROD:
-      options = { ...options, presets: DEFAULT_BROWSER_PRESET }
-      return getOptions(options, packageType)
-    default:
-      return options
-  }
+
+  return getOptions(options, packageType)
 }
 
 /**
@@ -145,9 +130,12 @@ function getWebpackEnv(env = 'development') {
 }
 
 function getWebpackConfig(bundleType, packageType) {
-  const isEnvProduction = [NODE_PROD, NODE_ES_PROD, BROWSER_PROD].includes(
-    bundleType
-  )
+  const isEnvProduction = [
+    NODE_PROD,
+    NODE_ESM_PROD,
+    BROWSER_PROD,
+    BROWSER_ESM_PROD
+  ].includes(bundleType)
 
   const config = {
     stats: {

@@ -23,9 +23,9 @@
  *
  */
 
-const { getBabelConfig, BUNDLE_TYPES } = require('../../dev-utils/build')
+const { getBabelConfig } = require('../../dev-utils/build')
 
 module.exports = function(api) {
-  api.cache(true)
-  return getBabelConfig(BUNDLE_TYPES.NODE_PROD)
+  const env = api.env()
+  return getBabelConfig(env)
 }

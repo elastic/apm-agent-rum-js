@@ -23,6 +23,26 @@
  *
  */
 
-import createApmBase from '../../../rum/test/e2e'
+import { polyfill } from 'es6-promise'
+import { apmBase } from '@elastic/apm-rum'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import ApmServerMock from '../../../rum-core/test/utils/apm-server-mock'
 
-export default createApmBase
+const globalConfig = getGlobalConfig()
+
+export default function createApmBase(config) {
+  /**
+   * Polyfill the global promise since webdriver
+   * functions uses promise based API
+   * ex: browser.execute, browser.executeAsync
+   */
+  polyfill()
+  console.log('E2E Global Configs', JSON.stringify(globalConfig, null, 2))
+  const apmServer = apmBase.serviceFactory.getService('ApmServer')
+  const { serverUrl } = globalConfig.agentConfig
+  config.serverUrl = serverUrl
+  const serverMock = new ApmServerMock(apmServer, globalConfig.useMocks)
+  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
+
+  return apmBase.init(config)
+}

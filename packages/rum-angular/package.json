@@ -6,8 +6,10 @@
   "license": "MIT",
   "main": "dist/lib/index.js",
   "module": "dist/es/index.js",
+  "source": "src/index.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "publishConfig": {
     "access": "public"
@@ -22,9 +24,9 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "npm-run-all build:main build:module",
-    "build:main": "BABEL_ENV=NODE_PROD npx babel -x '.ts' src -d dist/lib ",
-    "build:module": "BABEL_ENV=NODE_ES_PROD npx babel -x '.ts' src -d dist/es",
+    "build": "run-p build:main build:module",
+    "build:main": "BABEL_ENV=BROWSER_PROD npx babel -x '.ts' src -d dist/lib ",
+    "build:module": "BABEL_ENV=BROWSER_ESM_PROD npx babel -x '.ts' src -d dist/es",
     "build:e2e": "npm run script buildE2eBundles packages/rum-angular/test/e2e",
     "test:unit": "npm run script runUnitTests packages/rum-angular",
     "test:e2e": "npm run script runE2eTests packages/rum-angular/wdio.conf.js",
