@@ -36,7 +36,9 @@ describe('TransactionService', function() {
   var logger
 
   function sendPageLoadMetrics(name) {
-    var tr = transactionService.startTransaction(name, 'page-load')
+    var tr = transactionService.startTransaction(name, 'page-load', {
+      managed: true
+    })
     tr.detectFinish()
     return tr
   }
@@ -75,7 +77,11 @@ describe('TransactionService', function() {
       'transaction'
     )
     expect(result).toBeDefined()
-    result = transactionService.startTransaction('transaction2', 'transaction')
+    result = transactionService.startTransaction(
+      'transaction2',
+      'transaction',
+      { managed: true }
+    )
     expect(result.name).toBe('transaction2')
 
     var origCb = result.onEnd
@@ -88,10 +94,9 @@ describe('TransactionService', function() {
     transactionService.addTask('task1')
     var span = transactionService.startSpan('test', 'test')
     span.end()
-    transactionService.detectFinish()
+    result.detectFinish()
     expect(result.onEnd).not.toHaveBeenCalled()
     transactionService.removeTask('task1')
-    transactionService.detectFinish()
     expect(result.onEnd).toHaveBeenCalled()
   })
 
@@ -103,6 +108,7 @@ describe('TransactionService', function() {
     var trans = transactionService.getCurrentTransaction()
     expect(trans.name).toBe('Unknown')
     transactionService.startTransaction('transaction', 'transaction', {
+      managed: true,
       canReuse: true
     })
     expect(trans.name).toBe('transaction')
@@ -114,7 +120,11 @@ describe('TransactionService', function() {
     config.set('capturePageLoad', true)
     transactionService = new TransactionService(logger, config)
 
-    var tr1 = transactionService.startTransaction('transaction1', 'transaction')
+    var tr1 = transactionService.startTransaction(
+      'transaction1',
+      'transaction',
+      { managed: true }
+    )
     var tr1DoneFn = tr1.onEnd
     tr1.onEnd = function() {
       tr1DoneFn()
@@ -124,8 +134,7 @@ describe('TransactionService', function() {
         expect(t.duration()).toBeGreaterThan(-1)
       })
     }
-    expect(tr1.captureTimings).toBe(false)
-    tr1.captureTimings = true
+    expect(tr1.captureTimings).toBe(true)
     tr1.detectFinish()
 
     var tr2 = transactionService.startTransaction('transaction2', 'transaction')
@@ -146,6 +155,7 @@ describe('TransactionService', function() {
     })
     transactionService.setCurrentTransaction(reusableTr)
     const pageLoadTr = transactionService.startTransaction(name, 'page-load', {
+      managed: true,
       canReuse: true
     })
     pageLoadTr.detectFinish()
@@ -170,7 +180,9 @@ describe('TransactionService', function() {
   it('should use initial page load name before ending the transaction', function(done) {
     transactionService = new TransactionService(logger, config)
 
-    const tr = transactionService.startTransaction(undefined, 'page-load')
+    const tr = transactionService.startTransaction(undefined, 'page-load', {
+      managed: true
+    })
     expect(tr.name).toBe('Unknown')
 
     config.set('pageLoadTransactionName', 'page load name')
@@ -190,7 +202,9 @@ describe('TransactionService', function() {
     config.set('active', true)
     transactionService = new TransactionService(logger, config)
 
-    var tr = transactionService.startTransaction('transaction', 'transaction')
+    var tr = transactionService.startTransaction('transaction', 'transaction', {
+      managed: true
+    })
     tr.captureTimings = true
     var queryString = '?' + Date.now()
     var testUrl = '/base/test/performance/transactionService.spec.js'
@@ -253,7 +267,8 @@ describe('TransactionService', function() {
 
     const tr = customTransactionService.startTransaction(
       'resource-test',
-      PAGE_LOAD
+      PAGE_LOAD,
+      { managed: true }
     )
     tr.detectFinish()
   })
@@ -288,7 +303,7 @@ describe('TransactionService', function() {
     config.set('transactionSampleRate', 0)
     tr = transactionService.startTransaction('test', 'test')
     expect(tr.sampled).toBe(false)
-    span = transactionService.startSpan('testspan', 'test')
+    span = tr.startSpan('testspan', 'test')
     expect(span.sampled).toBe(false)
   })
 
@@ -324,7 +339,9 @@ describe('TransactionService', function() {
 
   it('should createTransaction once per startTransaction', function() {
     spyOn(transactionService, 'createTransaction').and.callThrough()
-    transactionService.startTransaction('test-name', 'test-type')
+    transactionService.startTransaction('test-name', 'test-type', {
+      managed: true
+    })
     expect(transactionService.createTransaction).toHaveBeenCalledTimes(1)
   })
 
@@ -343,7 +360,9 @@ describe('TransactionService', function() {
       unMock()
       done()
     })
-    const tr = customTrService.startTransaction('test', 'page-load')
+    const tr = customTrService.startTransaction('test', 'page-load', {
+      managed: true
+    })
     tr.detectFinish()
   })
 
@@ -357,5 +376,57 @@ describe('TransactionService', function() {
     const span1 = tr1.startSpan('span1', 'app')
     span1.end()
     tr1.detectFinish()
+  })
+
+  it('should create unmanaged transactions by default', () => {
+    expect(transactionService.currentTransaction).toBeUndefined()
+    const tr1 = transactionService.startTransaction('test-name', 'test-type')
+    expect(tr1.name).toBe('test-name')
+    expect(transactionService.currentTransaction).toBeUndefined()
+    spyOn(tr1, 'removeTask')
+    spyOn(tr1, 'startSpan')
+    transactionService.removeTask('testId')
+    expect(tr1.removeTask).not.toHaveBeenCalled()
+    transactionService.startSpan('test-name', 'test-type')
+    expect(tr1.startSpan).not.toHaveBeenCalled()
+    expect(tr1.spans.length).toBe(0)
+  })
+
+  it('should create managed transactions if the managed option is provided', () => {
+    expect(transactionService.currentTransaction).toBeUndefined()
+    const tr1 = transactionService.startTransaction('test-name', 'test-type', {
+      managed: true
+    })
+    expect(tr1.name).toBe('test-name')
+    expect(transactionService.currentTransaction).toBe(tr1)
+
+    const tr2 = transactionService.startTransaction(
+      'unmanaged-name',
+      'unmanaged-type'
+    )
+    expect(transactionService.currentTransaction).toBe(tr1)
+
+    const span = transactionService.startSpan(
+      'test-span-name',
+      'test-span-type'
+    )
+    span.end()
+    expect(tr1.spans[0]).toBe(span)
+    expect(tr2.spans.length).toBe(0)
+    spyOn(tr2, 'addTask').and.callThrough()
+    spyOn(tr2, 'removeTask').and.callThrough()
+    spyOn(tr2, 'end')
+    spyOn(tr1, 'addTask').and.callThrough()
+    spyOn(tr1, 'removeTask').and.callThrough()
+    spyOn(tr1, 'end')
+    transactionService.addTask('taskId')
+    expect(tr1.addTask).toHaveBeenCalledWith('taskId')
+    expect(tr2.addTask).not.toHaveBeenCalled()
+
+    transactionService.removeTask('taskId')
+    expect(tr1.removeTask).toHaveBeenCalledWith('taskId')
+    expect(tr1.end).toHaveBeenCalled()
+    expect(tr2.removeTask).not.toHaveBeenCalled()
+    expect(tr2.end).not.toHaveBeenCalled()
   })
 })

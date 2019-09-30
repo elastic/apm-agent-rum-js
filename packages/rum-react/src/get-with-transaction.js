@@ -90,6 +90,7 @@ function getWithTransaction(apm) {
            */
           const [transaction] = React.useState(() =>
             apm.startTransaction(name, type, {
+              managed: true,
               canReuse: true
             })
           )
@@ -126,6 +127,7 @@ function getWithTransaction(apm) {
              * components since the parent component is mounted after child
              */
             this.transaction = apm.startTransaction(name, type, {
+              managed: true,
               canReuse: true
             })
           }

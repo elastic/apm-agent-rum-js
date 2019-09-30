@@ -66,6 +66,7 @@ export class ApmService {
       if (event instanceof NavigationStart) {
         const name = event.url
         transaction = ApmService.apm.startTransaction(name, 'route-change', {
+          managed: true,
           canReuse: true
         })
       } else if (event instanceof NavigationError) {

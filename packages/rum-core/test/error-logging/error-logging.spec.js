@@ -97,7 +97,9 @@ describe('ErrorLogging', function() {
 
   it('should include transaction details on error', done => {
     spyOn(apmServer, 'sendErrors').and.callThrough()
-    var transaction = transactionService.startTransaction('test', 'dummy')
+    var transaction = transactionService.startTransaction('test', 'dummy', {
+      managed: true
+    })
     try {
       throw new Error('Test Error')
     } catch (error) {

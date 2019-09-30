@@ -35,7 +35,9 @@ suite('TransactionService', () => {
   })
 
   benchmark('page-load transaction overhead', () => {
-    const tr = transactionService.startTransaction('/index', 'page-load')
+    const tr = transactionService.startTransaction('/index', 'page-load', {
+      managed: true
+    })
     setImmediate(() => tr.end())
   })
 

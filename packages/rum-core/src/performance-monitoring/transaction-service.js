@@ -26,7 +26,7 @@
 import { Promise } from 'es6-promise'
 import Transaction from './transaction'
 import { extend } from '../common/utils'
-import { PAGE_LOAD, NAME_UNKNOWN, ROUTE_CHANGE } from '../common/constants'
+import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import { captureNavigation } from './capture-navigation'
 import { __DEV__ } from '../env'
 import { TRANSACTION_START, TRANSACTION_END } from '../common/constants'
@@ -43,13 +43,14 @@ class TransactionService {
 
   ensureCurrentTransaction(options) {
     if (!options) {
-      options = this.createPerfOptions()
+      options = this.createOptions()
     }
     var tr = this.getCurrentTransaction()
     if (tr) {
       return tr
     } else {
       options.canReuse = true
+      options.managed = true
       return this.createTransaction(undefined, undefined, options)
     }
   }
@@ -92,24 +93,26 @@ class TransactionService {
     }, interval)
   }
 
-  createPerfOptions(options) {
+  createOptions(options) {
     const config = this._config.config
-    return extend(
-      {
-        pageLoadTraceId: config.pageLoadTraceId,
-        pageLoadSampled: config.pageLoadSampled,
-        pageLoadSpanId: config.pageLoadSpanId,
-        pageLoadTransactionName: config.pageLoadTransactionName,
-        transactionSampleRate: config.transactionSampleRate,
-        checkBrowserResponsiveness: config.checkBrowserResponsiveness
-      },
-      options
-    )
+    let presetOptions = { transactionSampleRate: config.transactionSampleRate }
+    let perfOptions = extend(presetOptions, options)
+    if (perfOptions.managed) {
+      perfOptions = extend(
+        {
+          pageLoadTraceId: config.pageLoadTraceId,
+          pageLoadSampled: config.pageLoadSampled,
+          pageLoadSpanId: config.pageLoadSpanId,
+          pageLoadTransactionName: config.pageLoadTransactionName,
+          checkBrowserResponsiveness: config.checkBrowserResponsiveness
+        },
+        perfOptions
+      )
+    }
+    return perfOptions
   }
 
-  startTransaction(name, type, options) {
-    const perfOptions = this.createPerfOptions(options)
-
+  startManagedTransaction(name, type, perfOptions) {
     let tr = this.getCurrentTransaction()
 
     if (!tr) {
@@ -143,9 +146,10 @@ class TransactionService {
       tr = this.createTransaction(name, type, perfOptions)
     }
 
-    if (type === PAGE_LOAD) {
-      tr.captureTimings = true
+    tr.captureTimings = true
 
+    if (type === PAGE_LOAD) {
+      tr.options.checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
@@ -159,55 +163,68 @@ class TransactionService {
       if (tr.name === NAME_UNKNOWN && perfOptions.pageLoadTransactionName) {
         tr.name = perfOptions.pageLoadTransactionName
       }
-    } else if (type === ROUTE_CHANGE) {
-      tr.captureTimings = true
     }
+
+    return tr
+  }
+
+  startTransaction(name, type, options) {
+    const perfOptions = this.createOptions(options)
+    let tr
+    if (perfOptions.managed) {
+      tr = this.startManagedTransaction(name, type, perfOptions)
+    } else {
+      tr = new Transaction(name, type, perfOptions)
+    }
+
+    tr.onEnd = () => this.handleTransactionEnd(tr)
 
     if (__DEV__) {
       this._logger.debug('TransactionService.startTransaction', tr)
     }
     this._config.events.send(TRANSACTION_START, [tr])
 
-    tr.onEnd = () => {
-      return Promise.resolve().then(
-        () => {
-          if (__DEV__) {
-            this._logger.debug('TransactionService transaction finished', tr)
-          }
-          if (this.shouldIgnoreTransaction(tr.name)) {
-            return
-          }
-          /**
-           * Capture breakdown metrics once the transaction is completed
-           */
-          const breakdownMetrics = this._config.get('breakdownMetrics')
-          if (breakdownMetrics) {
-            tr.captureBreakdown()
-          }
+    return tr
+  }
 
-          if (tr.type === PAGE_LOAD) {
-            /**
-             * Setting the pageLoadTransactionName via configService.setConfig after
-             * transaction has started should also reflect the correct name.
-             */
-            const pageLoadTransactionName = this._config.get(
-              'pageLoadTransactionName'
-            )
-            if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
-              tr.name = pageLoadTransactionName
-            }
-          }
-          captureNavigation(tr)
-          this.add(tr)
-        },
-        err => {
-          if (__DEV__) {
-            this._logger.debug('TransactionService transaction onEnd', err)
+  handleTransactionEnd(tr) {
+    return Promise.resolve().then(
+      () => {
+        if (__DEV__) {
+          this._logger.debug('TransactionService transaction finished', tr)
+        }
+        if (this.shouldIgnoreTransaction(tr.name)) {
+          return
+        }
+        /**
+         * Capture breakdown metrics once the transaction is completed
+         */
+        const breakdownMetrics = this._config.get('breakdownMetrics')
+        if (breakdownMetrics) {
+          tr.captureBreakdown()
+        }
+
+        if (tr.type === PAGE_LOAD) {
+          /**
+           * Setting the pageLoadTransactionName via configService.setConfig after
+           * transaction has started should also reflect the correct name.
+           */
+          const pageLoadTransactionName = this._config.get(
+            'pageLoadTransactionName'
+          )
+          if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
+            tr.name = pageLoadTransactionName
           }
         }
-      )
-    }
-    return tr
+        captureNavigation(tr)
+        this.add(tr)
+      },
+      err => {
+        if (__DEV__) {
+          this._logger.debug('TransactionService transaction onEnd', err)
+        }
+      }
+    )
   }
 
   shouldIgnoreTransaction(transactionName) {
@@ -263,16 +280,6 @@ class TransactionService {
       tr.removeTask(taskId)
       if (__DEV__) {
         this._logger.debug('TransactionService.removeTask', taskId)
-      }
-    }
-  }
-
-  detectFinish() {
-    var tr = this.getCurrentTransaction()
-    if (tr) {
-      tr.detectFinish()
-      if (__DEV__) {
-        this._logger.debug('TransactionService.detectFinish')
       }
     }
   }
