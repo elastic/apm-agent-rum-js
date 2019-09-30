@@ -50,7 +50,7 @@ class Tracer extends otTracer {
   }
 
   _startSpan(name, options) {
-    var spanOptions = {}
+    var spanOptions = { managed: true }
     if (options) {
       spanOptions.timestamp = options.startTime
       if (options.childOf) {

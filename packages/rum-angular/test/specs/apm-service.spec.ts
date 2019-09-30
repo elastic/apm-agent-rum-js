@@ -185,6 +185,7 @@ describe('ApmService', () => {
             '/home',
             'route-change',
             {
+              managed: true,
               canReuse: true
             }
           )
@@ -206,6 +207,7 @@ describe('ApmService', () => {
             '/',
             'route-change',
             {
+              managed: true,
               canReuse: true
             }
           )
@@ -229,6 +231,7 @@ describe('ApmService', () => {
             '/slug/2',
             'route-change',
             {
+              managed: true,
               canReuse: true
             }
           )
@@ -252,6 +255,7 @@ describe('ApmService', () => {
             '/lazy/2',
             'route-change',
             {
+              managed: true,
               canReuse: true
             }
           )

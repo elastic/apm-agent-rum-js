@@ -161,6 +161,7 @@ describe('ApmBase', function() {
     expect(configService.get('pageLoadTransactionName')).toBe('test')
 
     var tr = apmBase.startTransaction('test-transaction', 'test-type', {
+      managed: true,
       canReuse: true
     })
     expect(tr).toBeDefined()
@@ -190,7 +191,9 @@ describe('ApmBase', function() {
   it('should instrument xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ serviceName, serverUrl })
-    var tr = apmBase.startTransaction('test-transaction', 'test-type')
+    var tr = apmBase.startTransaction('test-transaction', 'test-type', {
+      managed: true
+    })
     expect(tr).toBeDefined()
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -291,7 +294,9 @@ describe('ApmBase', function() {
   it('should instrument sync xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ serviceName, serverUrl })
-    var tr = apmBase.startTransaction('test-transaction', 'test-type')
+    var tr = apmBase.startTransaction('test-transaction', 'test-type', {
+      managed: true
+    })
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', false)
     req.addEventListener('load', function() {
