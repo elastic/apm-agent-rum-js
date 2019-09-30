@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.4.4...@elastic/apm-rum@4.5.0) (2019-09-30)
+
+
+### Bug Fixes
+
+* **rum:** publish all packages as transpiled modules ([#432](https://github.com/elastic/apm-agent-rum-js/issues/432)) ([1f4ee87](https://github.com/elastic/apm-agent-rum-js/commit/1f4ee87))
+
+
+### Features
+
+* Introduce managed transaction option ([#440](https://github.com/elastic/apm-agent-rum-js/issues/440)) ([a08f210](https://github.com/elastic/apm-agent-rum-js/commit/a08f210))
+* Support central config management ([#415](https://github.com/elastic/apm-agent-rum-js/issues/415)) ([1382cc9](https://github.com/elastic/apm-agent-rum-js/commit/1382cc9))
+* **rum-core:** capture unhandled promise rejection as errors ([#427](https://github.com/elastic/apm-agent-rum-js/issues/427)) ([ef34ccc](https://github.com/elastic/apm-agent-rum-js/commit/ef34ccc))
+
+
+
+
+
 ## [4.4.4](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.4.3...@elastic/apm-rum@4.4.4) (2019-09-17)
 
 **Note:** Version bump only for package @elastic/apm-rum
