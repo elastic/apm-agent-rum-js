@@ -28,8 +28,7 @@ import {
   Event,
   NavigationStart,
   NavigationEnd,
-  NavigationError,
-  ActivatedRoute
+  NavigationError
 } from '@angular/router'
 import { Injectable } from '@angular/core'
 import { Promise } from 'es6-promise'
@@ -40,7 +39,7 @@ import { Promise } from 'es6-promise'
 export class ApmService {
   static apm: any
 
-  constructor(public router: Router, protected route: ActivatedRoute) {}
+  constructor(public router: Router) {}
 
   init(config) {
     const apmInstance = ApmService.apm.init(config)
@@ -63,15 +62,16 @@ export class ApmService {
   observe() {
     let transaction
     this.router.events.subscribe((event: Event) => {
-      if (event instanceof NavigationStart) {
-        const name = event.url
+      const instanceName = event.constructor.name
+      if (instanceName === NavigationStart.name) {
+        const name = (event as NavigationStart).url
         transaction = ApmService.apm.startTransaction(name, 'route-change', {
           managed: true,
           canReuse: true
         })
-      } else if (event instanceof NavigationError) {
+      } else if (instanceName === NavigationError.name) {
         transaction && transaction.detectFinish()
-      } else if (event instanceof NavigationEnd) {
+      } else if (instanceName === NavigationEnd.name) {
         if (!transaction) {
           return
         }
@@ -86,7 +86,7 @@ export class ApmService {
          * Traverse the activated route tree to figure out the nested
          * route path
          */
-        const route = this.route.firstChild
+        const route = this.router.routerState.root.firstChild
 
         if (route) {
           let child = route
