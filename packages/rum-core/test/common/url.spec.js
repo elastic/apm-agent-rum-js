@@ -101,8 +101,45 @@ describe('Url parser', function() {
     var result = new Url('?param=value')
     expect(result).toEqual(
       jasmine.objectContaining({
-        path: '',
+        path: '/',
         query: '?param=value'
+      })
+    )
+  })
+
+  it('should parse url correctly without /', () => {
+    expect(new Url('api/foo')).toEqual(
+      jasmine.objectContaining({
+        path: '/api/foo',
+        query: '',
+        hash: '',
+        relative: true,
+        protocol: 'http:'
+      })
+    )
+
+    expect(new Url('api/foo?a=b')).toEqual(
+      jasmine.objectContaining({
+        path: '/api/foo',
+        query: '?a=b',
+        hash: ''
+      })
+    )
+
+    expect(new Url('api/foo#fragment')).toEqual(
+      jasmine.objectContaining({
+        path: '/api/foo',
+        hash: '#fragment'
+      })
+    )
+  })
+
+  it('should inherit protocol for relative urls with protocols', () => {
+    expect(new Url('//foo.com/bar')).toEqual(
+      jasmine.objectContaining({
+        path: '/bar',
+        host: 'foo.com',
+        protocol: 'http:'
       })
     )
   })
