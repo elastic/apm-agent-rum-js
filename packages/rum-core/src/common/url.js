@@ -71,6 +71,14 @@ class Url {
     // Sanitize what is left of the address
     address = address.replace('\\', '/')
 
+    /**
+     * When the authority component is absent the URL starts with a path component.
+     * By setting it as NaN, we set the remaining parsed address to path
+     */
+    if (!slashes) {
+      instructions[2] = [NaN, 'path']
+    }
+
     let index
     for (let i = 0; i < instructions.length; i++) {
       const instruction = instructions[i]
@@ -102,6 +110,7 @@ class Url {
       } else {
         /** NaN condition */
         this[key] = address
+        address = ''
       }
       /**
        * Default values for all keys from location if url is relative
@@ -115,9 +124,17 @@ class Url {
       if (instruction[3]) this[key] = this[key].toLowerCase()
     }
 
+    /**
+     * if the URL is relative, prepend the path with `/`
+     * to construct the href correctly
+     */
+    if (relative && this.path.charAt(0) !== '/') {
+      this.path = '/' + this.path
+    }
+
     this.relative = relative
 
-    this.protocol = protocol || location.protocol || ''
+    this.protocol = protocol || location.protocol
 
     this.origin =
       this.protocol && this.host && this.protocol !== 'file:'
