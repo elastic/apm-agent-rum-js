@@ -26,24 +26,6 @@ jobs:
   allow_failures:
     - script: npm run bundlesize
   include:
-    - stage: check
-      script: npm run lint
-      name: 'Lint'
-    - stage: check
-      script: npm run bundlesize
-      name: 'Analyse size of JS bundles'
-    - stage: test
-      env:
-        - STACK_VERSION=7.3.0
-        - SCOPE=@elastic/apm-rum-core
-    - stage: test
-      env:
-        - STACK_VERSION=7.3.0
-        - SCOPE=@elastic/apm-rum
-    - stage: test
-      env:
-        - STACK_VERSION=7.3.0
-        - SCOPE=@elastic/apm-rum-react
     - stage: test
       env:
         - STACK_VERSION=7.3.0
