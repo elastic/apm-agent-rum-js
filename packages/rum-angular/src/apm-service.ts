@@ -23,13 +23,7 @@
  *
  */
 
-import {
-  Router,
-  Event,
-  NavigationStart,
-  NavigationEnd,
-  NavigationError
-} from '@angular/router'
+import { Router, NavigationStart } from '@angular/router'
 import { Injectable } from '@angular/core'
 import { Promise } from 'es6-promise'
 
@@ -61,17 +55,17 @@ export class ApmService {
 
   observe() {
     let transaction
-    this.router.events.subscribe((event: Event) => {
-      const instanceName = event.constructor.name
-      if (instanceName === NavigationStart.name) {
+    this.router.events.subscribe(event => {
+      const eventName = event.toString()
+      if (eventName.indexOf('NavigationStart') >= 0) {
         const name = (event as NavigationStart).url
         transaction = ApmService.apm.startTransaction(name, 'route-change', {
           managed: true,
           canReuse: true
         })
-      } else if (instanceName === NavigationError.name) {
+      } else if (eventName.indexOf('NavigationError') >= 0) {
         transaction && transaction.detectFinish()
-      } else if (instanceName === NavigationEnd.name) {
+      } else if (eventName.indexOf('NavigationEnd') >= 0) {
         if (!transaction) {
           return
         }
