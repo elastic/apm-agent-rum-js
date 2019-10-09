@@ -23,9 +23,10 @@
  *
  */
 
-import { NgModule } from '@angular/core'
+import { NgModule, Inject } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { HttpClientModule } from '@angular/common/http'
+import { Router } from '@angular/router'
 
 import { AppRoutingModule } from './app.routing.module'
 import { AppComponent } from './app.component'
@@ -45,11 +46,17 @@ import { initializeApmService } from '../../../index'
     ContactListComponent,
     ContactDetailComponent
   ],
-  providers: [ApmService],
+  providers: [
+    {
+      provide: ApmService,
+      useClass: ApmService,
+      deps: [Router]
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(service: ApmService) {
+  constructor(@Inject(ApmService) service: ApmService) {
     initializeApmService(service, {
       serviceName: 'e2e-angular-integration',
       debug: true
