@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.6.0...@elastic/apm-rum-core@4.6.1) (2019-10-09)
+
+
+### Bug Fixes
+
+* **rum-core:** handle relative urls without slash properly ([#446](https://github.com/elastic/apm-agent-rum-js/issues/446)) ([288e8b1](https://github.com/elastic/apm-agent-rum-js/commit/288e8b1))
+
+
+
+
+
 # [4.6.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.5.4...@elastic/apm-rum-core@4.6.0) (2019-09-30)
 
 

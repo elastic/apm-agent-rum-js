@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@0.2.0...@elastic/apm-rum-angular@0.2.1) (2019-10-09)
+
+
+### Bug Fixes
+
+* **rum-angular:** use explicit angular injection for service ([#449](https://github.com/elastic/apm-agent-rum-js/issues/449)) ([b88356f](https://github.com/elastic/apm-agent-rum-js/commit/b88356f))
+
+
+
+
+
 # [0.2.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@0.1.1...@elastic/apm-rum-angular@0.2.0) (2019-09-30)
 
 
