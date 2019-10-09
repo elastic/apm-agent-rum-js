@@ -3,15 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 4.5.0 (2019-10-09)
+
+### Bug Fixes
+
+* Handle relative urls without slash properly ([#446](https://github.com/elastic/apm-agent-rum-js/issues/446)) ([288e8b1](https://github.com/elastic/apm-agent-rum-js/commit/288e8b1))
+* Use explicit angular injection for service ([#449](https://github.com/elastic/apm-agent-rum-js/issues/449)) ([b88356f](https://github.com/elastic/apm-agent-rum-js/commit/b88356f))
+
+
 # 4.5.0 (2019-09-30)
 
-
-## Bug Fixes
+### Bug Fixes
 
 * Publish all packages as transpiled modules ([#432](https://github.com/elastic/apm-agent-rum-js/issues/432)) ([1f4ee87](https://github.com/elastic/apm-agent-rum-js/commit/1f4ee87))
 
 
-## Features
+### Features
 
 * Introduce managed transaction option ([#440](https://github.com/elastic/apm-agent-rum-js/issues/440)) ([a08f210](https://github.com/elastic/apm-agent-rum-js/commit/a08f210))
 * Capture unhandled promise rejection as errors ([#427](https://github.com/elastic/apm-agent-rum-js/issues/427)) ([ef34ccc](https://github.com/elastic/apm-agent-rum-js/commit/ef34ccc))
@@ -21,7 +28,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 # 4.4.4 (2019-09-17)
 
-## Bug Fixes
+### Bug Fixes
 
 * **rum-core:** handle script error events properly ([#418](https://github.com/elastic/apm-agent-rum-js/issues/418)) ([c862ab7](https://github.com/elastic/apm-agent-rum-js/commit/c862ab7))
 * **rum-angular:** proper transaction name for lazy loaded routes ([#414](https://github.com/elastic/apm-agent-rum-js/issues/414)) ([4c6d120](https://github.com/elastic/apm-agent-rum-js/commit/4c6d120))
