@@ -61,8 +61,8 @@ describe('ConfigService', function() {
   it('should return undefined if the config does not exists', function() {
     expect(configService.get('context')).toEqual({})
     expect(configService.get('context.user')).toBe(undefined)
-    configService.set('context.user', { test: 'test' })
-    expect(configService.get('context.user')).toEqual({ test: 'test' })
+    configService.setUserContext({ id: 'test' })
+    expect(configService.get('context.user')).toEqual({ id: 'test' })
     expect(configService.get('nonexisting.nonexisting')).toBe(undefined)
     expect(configService.get('context.nonexisting.nonexisting')).toBe(undefined)
   })
@@ -96,8 +96,17 @@ describe('ConfigService', function() {
 
   it('should set userContext and customContext', function() {
     configService.setCustomContext({ test: 'test' })
-    var customContext = configService.get('context.custom')
-    expect(customContext).toEqual({ test: 'test' })
+    expect(configService.get('context.custom')).toEqual({ test: 'test' })
+
+    configService.setCustomContext({ test: 'test2', foo: 'bar', bar: 'baz' })
+    expect(configService.get('context.custom')).toEqual({
+      test: 'test2',
+      foo: 'bar',
+      bar: 'baz'
+    })
+
+    configService.setUserContext({ test: 'test', username: {} })
+    expect(configService.get('context.user')).toEqual({})
 
     configService.setUserContext({
       test: 'test',
@@ -105,25 +114,23 @@ describe('ConfigService', function() {
       username: 'username',
       email: 'email'
     })
-    var userContext = configService.get('context.user')
-    expect(userContext).toEqual({
+    expect(configService.get('context.user')).toEqual({
       id: 'userId',
       username: 'username',
       email: 'email'
     })
 
     configService.setUserContext({
-      test: 'test',
+      foo: 'bar',
       id: 1,
       username: 1,
       email: 'email'
     })
-    userContext = configService.get('context.user')
-    expect(userContext).toEqual({ id: 1, email: 'email' })
-
-    configService.setUserContext({ test: 'test', username: {} })
-    userContext = configService.get('context.user')
-    expect(userContext).toEqual({})
+    expect(configService.get('context.user')).toEqual({
+      id: 1,
+      email: 'email',
+      username: 'username'
+    })
   })
 
   it('should validate required config options', () => {

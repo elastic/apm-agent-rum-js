@@ -68,8 +68,10 @@ describe('TransactionService', function() {
   })
 
   it('should start transaction', function(done) {
-    config.set('active', true)
-    config.set('browserResponsivenessInterval', true)
+    config.setConfig({
+      browserResponsivenessInterval: true
+    })
+
     transactionService = new TransactionService(logger, config)
 
     var result = transactionService.startTransaction(
@@ -101,7 +103,6 @@ describe('TransactionService', function() {
   })
 
   it('should create a reusable transaction on the first span', function() {
-    config.set('active', true)
     transactionService = new TransactionService(logger, config)
 
     transactionService.startSpan('testSpan', 'testtype')
@@ -116,8 +117,9 @@ describe('TransactionService', function() {
 
   it('should capture page load on first transaction', function(done) {
     // todo: can't test hard navigation metrics since karma runs tests inside an iframe
-    config.set('active', true)
-    config.set('capturePageLoad', true)
+    config.setConfig({
+      capturePageLoad: true
+    })
     transactionService = new TransactionService(logger, config)
 
     var tr1 = transactionService.startTransaction(
@@ -185,7 +187,9 @@ describe('TransactionService', function() {
     })
     expect(tr.name).toBe('Unknown')
 
-    config.set('pageLoadTransactionName', 'page load name')
+    config.setConfig({
+      pageLoadTransactionName: 'page load name'
+    })
     tr.detectFinish()
 
     /**
@@ -199,7 +203,6 @@ describe('TransactionService', function() {
   })
 
   xit('should not add duplicate resource spans', function() {
-    config.set('active', true)
     transactionService = new TransactionService(logger, config)
 
     var tr = transactionService.startTransaction('transaction', 'transaction', {
@@ -243,8 +246,6 @@ describe('TransactionService', function() {
   it('should capture resources from navigation timing', function(done) {
     const unMock = mockGetEntriesByType()
 
-    config.set('active', true)
-
     const customTransactionService = new TransactionService(logger, config)
     config.events.observe(TRANSACTION_END, function() {
       expect(tr.captureTimings).toBe(true)
@@ -274,7 +275,9 @@ describe('TransactionService', function() {
   })
 
   it('should ignore transactions that match the list', function() {
-    config.set('ignoreTransactions', ['transaction1', /transaction2/])
+    config.setConfig({
+      ignoreTransactions: ['transaction1', /transaction2/]
+    })
     transactionService = new TransactionService(logger, config)
 
     expect(
@@ -289,7 +292,9 @@ describe('TransactionService', function() {
       )
     ).toBeTruthy()
 
-    config.set('ignoreTransactions', [])
+    config.setConfig({
+      ignoreTransactions: []
+    })
   })
 
   it('should apply sampling to transactions', function() {
@@ -300,7 +305,9 @@ describe('TransactionService', function() {
     var span = transactionService.startSpan('testspan', 'test')
     expect(span.sampled).toBe(true)
 
-    config.set('transactionSampleRate', 0)
+    config.setConfig({
+      transactionSampleRate: 0
+    })
     tr = transactionService.startTransaction('test', 'test')
     expect(tr.sampled).toBe(false)
     span = tr.startSpan('testspan', 'test')

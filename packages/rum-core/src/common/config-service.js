@@ -23,7 +23,13 @@
  *
  */
 
-import { getCurrentScript, setLabel, merge, getDtHeaderValue } from './utils'
+import {
+  getCurrentScript,
+  setLabel,
+  merge,
+  extend,
+  getDtHeaderValue
+} from './utils'
 import EventHandler from './event-handler'
 import { CONFIG_CHANGE } from './constants'
 
@@ -159,26 +165,6 @@ class Config {
     return this.config.serverUrl + this.config.serverUrlPrefix
   }
 
-  set(key, value) {
-    var levels = key.split('.')
-    var maxLevel = levels.length - 1
-    var target = this.config
-
-    for (let i = 0; i < maxLevel + 1; i++) {
-      const level = levels[i]
-      if (!level) {
-        continue
-      }
-      if (i === maxLevel) {
-        target[level] = value
-      } else {
-        var obj = target[level] || {}
-        target[level] = obj
-        target = obj
-      }
-    }
-  }
-
   setUserContext(userContext = {}) {
     const context = {}
     const { id, username, email } = userContext
@@ -192,13 +178,14 @@ class Config {
     if (typeof email === 'string') {
       context.email = email
     }
-    this.set('context.user', context)
+    this.config.context.user = extend(this.config.context.user || {}, context)
   }
 
-  setCustomContext(customContext) {
-    if (customContext && typeof customContext === 'object') {
-      this.set('context.custom', customContext)
-    }
+  setCustomContext(customContext = {}) {
+    this.config.context.custom = extend(
+      this.config.context.custom || {},
+      customContext
+    )
   }
 
   addLabels(tags) {
