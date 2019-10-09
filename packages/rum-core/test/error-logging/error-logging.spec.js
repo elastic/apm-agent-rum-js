@@ -311,7 +311,9 @@ describe('ErrorLogging', function() {
       return evt
     }
 
-    configService.set('flushInterval', 1)
+    configService.setConfig({
+      flushInterval: 1
+    })
     errorLogging.registerListeners()
 
     spyOn(apmServer, 'sendErrors').and.callFake(errors => {
