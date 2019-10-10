@@ -158,9 +158,9 @@ Arguments:
 * `type` - The type of the transaction (string). Defaults to `custom`
 
 
-Use this method to create a custom transaction.
-
-NOTE: Calling this method would result in ending the current transaction and replacing it with the new transaction.
+Use this method to create a custom transaction. 
+By default, custom transactions are not managed by the agent, therefore 
+they need to be ended manually.
 
 NOTE: This method returns `undefined` if apm is disabled or if <<active,active>> flag is set to `false` in the config.
 

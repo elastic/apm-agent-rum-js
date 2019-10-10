@@ -35,6 +35,7 @@ fetch(url)
 ----
 
 
-NOTE: There can only be one active transaction at any time.
+NOTE: By default custom transactions are not managed by the agent, therefore,
+the agent does not create spans based on <<supported-technologies,automatic instrumentations>>, e.g. XHR instrumentation.
  
 NOTE: Transactions are queued and sent together automatically after `Transaction.end` is called.
