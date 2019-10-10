@@ -33,11 +33,13 @@ import {
   SCHEDULE,
   FETCH,
   XMLHTTPREQUEST,
-  HISTORY
+  HISTORY,
+  PAGE_LOAD,
+  ROUTE_CHANGE,
+  TRANSACTION_END
 } from '../../src/common/constants'
 import patchEventHandler from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
-import { TRANSACTION_END } from '../../src/common/constants'
 import { patchEventHandler as originalPathHandler } from '../../src/common/patching'
 
 const { agentConfig } = getGlobalConfig('rum-core')
@@ -246,7 +248,9 @@ describe('PerformanceMonitoring', function() {
     spyOn(logger, 'debug').and.callThrough()
     expect(logger.debug).not.toHaveBeenCalled()
     var tr = new Transaction('transaction', 'transaction', {
-      transactionSampleRate: 1
+      transactionSampleRate: 1,
+      managed: true,
+      checkBrowserResponsiveness: true
     })
     var span = tr.startSpan('test span', 'test span type')
     span.end()
@@ -392,7 +396,7 @@ describe('PerformanceMonitoring', function() {
     const transactionService = serviceFactory.getService('TransactionService')
 
     configService.events.observe(TRANSACTION_END, function(tr) {
-      expect(tr.isHardNavigation).toBe(true)
+      expect(tr.captureTimings).toBe(true)
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
       expect(promise).toBeDefined()
@@ -407,7 +411,9 @@ describe('PerformanceMonitoring', function() {
         )
         .then(() => done())
     })
-    const tr = transactionService.startTransaction('resource-test', 'page-load')
+    const tr = transactionService.startTransaction('resource-test', PAGE_LOAD, {
+      managed: true
+    })
     tr.detectFinish()
   })
 
@@ -555,7 +561,8 @@ describe('PerformanceMonitoring', function() {
       var transactionService = performanceMonitoring._transactionService
       var tr = transactionService.startTransaction(
         'fetch transaction',
-        'custom'
+        'custom',
+        { managed: true }
       )
       spyOn(transactionService, 'startSpan').and.callThrough()
 
@@ -642,7 +649,8 @@ describe('PerformanceMonitoring', function() {
       var transactionService = performanceMonitoring._transactionService
       var tr = transactionService.startTransaction(
         'fetch transaction',
-        'custom'
+        'custom',
+        { managed: true }
       )
 
       var promise = window.fetch('/')
@@ -680,7 +688,9 @@ describe('PerformanceMonitoring', function() {
   it('should add xhr tasks', function(done) {
     var fn = performanceMonitoring.getXHRSub()
     var transactionService = performanceMonitoring._transactionService
-    var tr = transactionService.startTransaction('task transaction', 'custom')
+    var tr = transactionService.startTransaction('task transaction', 'custom', {
+      managed: true
+    })
     expect(typeof fn).toBe('function')
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -716,8 +726,8 @@ describe('PerformanceMonitoring', function() {
 
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test',
-      'route-change',
-      { canReuse: true }
+      ROUTE_CHANGE,
+      { canReuse: true, managed: true }
     )
     cancelHistorySub()
   })

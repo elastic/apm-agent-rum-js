@@ -24,9 +24,10 @@
  */
 
 import ApmBase from '../../src/apm-base'
-import { createServiceFactory } from '@elastic/apm-rum-core'
+import { createServiceFactory, PAGE_LOAD } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import { Promise } from 'es6-promise'
 
 var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
@@ -40,15 +41,11 @@ describe('ApmBase', function() {
   it('should send page load metrics before or after load event', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     var trService = serviceFactory.getService('TransactionService')
-    var configService = serviceFactory.getService('ConfigService')
-    configService.setConfig({
-      sendPageLoadTransaction: true
-    })
     apmBase.config({ serviceName, serverUrl })
     apmBase._sendPageLoadMetrics()
     var tr = trService.getCurrentTransaction()
     expect(tr.name).toBe('Unknown')
-    expect(tr.type).toBe('page-load')
+    expect(tr.type).toBe(PAGE_LOAD)
     spyOn(tr, 'detectFinish').and.callThrough()
     window.addEventListener('load', function() {
       setTimeout(() => {
@@ -59,7 +56,7 @@ describe('ApmBase', function() {
         apmBase._sendPageLoadMetrics()
         tr = trService.getCurrentTransaction()
         expect(tr.name).toBe('new page load')
-        expect(tr.type).toBe('page-load')
+        expect(tr.type).toBe(PAGE_LOAD)
         spyOn(tr, 'detectFinish')
         setTimeout(() => {
           expect(tr.detectFinish).toHaveBeenCalled()
@@ -74,19 +71,18 @@ describe('ApmBase', function() {
     const trService = serviceFactory.getService('TransactionService')
     const ErrorLogging = serviceFactory.getService('ErrorLogging')
     const loggingInstane = ErrorLogging['__proto__']
-    spyOn(loggingInstane, 'registerGlobalEventListener')
+    spyOn(loggingInstane, 'registerListeners')
 
     apmBase.init({
       serviceName,
       serverUrl,
-      instrument: false,
-      sendPageLoadTransaction: true
+      instrument: false
     })
     /**
      * Page load transaction and error listeners are disabled
      */
     expect(trService.getCurrentTransaction()).toBeUndefined()
-    expect(loggingInstane.registerGlobalEventListener).not.toHaveBeenCalled()
+    expect(loggingInstane.registerListeners).not.toHaveBeenCalled()
   })
 
   it('should selectively enable/disable instrumentations based on config', () => {
@@ -94,17 +90,16 @@ describe('ApmBase', function() {
     const trService = serviceFactory.getService('TransactionService')
     const ErrorLogging = serviceFactory.getService('ErrorLogging')
     const loggingInstane = ErrorLogging['__proto__']
-    spyOn(loggingInstane, 'registerGlobalEventListener')
+    spyOn(loggingInstane, 'registerListeners')
 
     apmBase.init({
       serviceName,
       serverUrl,
       instrument: true,
-      disableInstrumentations: ['page-load'],
-      sendPageLoadTransaction: true
+      disableInstrumentations: [PAGE_LOAD]
     })
     expect(trService.getCurrentTransaction()).toBeUndefined()
-    expect(loggingInstane.registerGlobalEventListener).toHaveBeenCalled()
+    expect(loggingInstane.registerListeners).toHaveBeenCalled()
   })
 
   it('should allow custom instrumentations via API when instrument is false', () => {
@@ -166,6 +161,7 @@ describe('ApmBase', function() {
     expect(configService.get('pageLoadTransactionName')).toBe('test')
 
     var tr = apmBase.startTransaction('test-transaction', 'test-type', {
+      managed: true,
       canReuse: true
     })
     expect(tr).toBeDefined()
@@ -195,7 +191,9 @@ describe('ApmBase', function() {
   it('should instrument xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ serviceName, serverUrl })
-    var tr = apmBase.startTransaction('test-transaction', 'test-type')
+    var tr = apmBase.startTransaction('test-transaction', 'test-type', {
+      managed: true
+    })
     expect(tr).toBeDefined()
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -212,7 +210,11 @@ describe('ApmBase', function() {
 
   it('should instrument xhr when no transaction was started', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
-    apmBase.init({ capturePageLoad: false, serviceName, serverUrl })
+    apmBase.init({
+      disableInstrumentations: [PAGE_LOAD],
+      serviceName,
+      serverUrl
+    })
     var transactionService = serviceFactory.getService('TransactionService')
     transactionService.currentTransaction = undefined
     var tr
@@ -292,7 +294,9 @@ describe('ApmBase', function() {
   it('should instrument sync xhr', function(done) {
     var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ serviceName, serverUrl })
-    var tr = apmBase.startTransaction('test-transaction', 'test-type')
+    var tr = apmBase.startTransaction('test-transaction', 'test-type', {
+      managed: true
+    })
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', false)
     req.addEventListener('load', function() {
@@ -303,5 +307,70 @@ describe('ApmBase', function() {
 
     expect(tr.spans.length).toBe(1)
     expect(tr.spans[0].name).toBe('GET /')
+  })
+
+  it('should fetch central config', done => {
+    const apmServer = serviceFactory.getService('ApmServer')
+    const configService = serviceFactory.getService('ConfigService')
+
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    apmBase.init({
+      serviceName: 'test-service',
+      disableInstrumentations: [PAGE_LOAD]
+    })
+
+    expect(configService.get('transactionSampleRate')).toBe(1.0)
+
+    function createPayloadCallback(rate) {
+      return () => {
+        return Promise.resolve(`{
+          "transaction_sample_rate": "${rate}"
+        }
+        `)
+      }
+    }
+
+    const loggingService = serviceFactory.getService('LoggingService')
+    spyOn(loggingService, 'warn')
+    apmServer._makeHttpRequest = createPayloadCallback('test')
+    apmBase
+      .fetchCentralConfig()
+      .then(() => {
+        expect(loggingService.warn).toHaveBeenCalledWith(
+          'Invalid value "NaN" for transactionSampleRate. Allowed: Number between 0 and 1.'
+        )
+        expect(configService.get('transactionSampleRate')).toBe(1)
+
+        apmServer._makeHttpRequest = createPayloadCallback('0.5')
+        apmBase
+          .fetchCentralConfig()
+          .then(() => {
+            expect(configService.get('transactionSampleRate')).toBe(0.5)
+            done()
+          })
+          .catch(fail)
+      })
+      .catch(fail)
+  })
+
+  it('should wait for remote config before sending the page load', done => {
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    const loggingService = serviceFactory.getService('LoggingService')
+    spyOn(apmBase, 'fetchCentralConfig').and.callThrough()
+    spyOn(apmBase, '_sendPageLoadMetrics').and.callFake(() => {
+      done()
+    })
+
+    apmBase.init({
+      serviceName,
+      centralConfig: true,
+      serverUrl
+    })
+    /**
+     * avoid logging config fetch failure warning message in console
+     */
+    spyOn(loggingService, 'warn')
+    expect(apmBase._sendPageLoadMetrics).not.toHaveBeenCalled()
+    expect(apmBase.fetchCentralConfig).toHaveBeenCalled()
   })
 })

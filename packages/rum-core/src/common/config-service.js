@@ -23,7 +23,13 @@
  *
  */
 
-import { getCurrentScript, setLabel, merge, getDtHeaderValue } from './utils'
+import {
+  getCurrentScript,
+  setLabel,
+  merge,
+  extend,
+  getDtHeaderValue
+} from './utils'
 import EventHandler from './event-handler'
 import { CONFIG_CHANGE } from './constants'
 
@@ -76,12 +82,12 @@ class Config {
       disableInstrumentations: [],
       debug: false,
       logLevel: 'warn',
+      breakdownMetrics: false,
       browserResponsivenessInterval: 500,
       browserResponsivenessBuffer: 3,
       checkBrowserResponsiveness: true,
       groupSimilarSpans: true,
       similarSpanThreshold: 0.05,
-      capturePageLoad: true,
       ignoreTransactions: [],
       // throttlingRequestLimit: 20,
       // throttlingInterval: 30000, // 30s
@@ -94,8 +100,6 @@ class Config {
       queueLimit: -1,
       flushInterval: 500,
 
-      sendPageLoadTransaction: true,
-
       distributedTracing: true,
       distributedTracingOrigins: [],
       distributedTracingHeaderValueCallback: getDtHeaderValue,
@@ -107,6 +111,7 @@ class Config {
       pageLoadTransactionName: '',
 
       transactionSampleRate: 1.0,
+      centralConfig: false,
 
       context: {}
     }
@@ -160,26 +165,6 @@ class Config {
     return this.config.serverUrl + this.config.serverUrlPrefix
   }
 
-  set(key, value) {
-    var levels = key.split('.')
-    var maxLevel = levels.length - 1
-    var target = this.config
-
-    for (let i = 0; i < maxLevel + 1; i++) {
-      const level = levels[i]
-      if (!level) {
-        continue
-      }
-      if (i === maxLevel) {
-        target[level] = value
-      } else {
-        var obj = target[level] || {}
-        target[level] = obj
-        target = obj
-      }
-    }
-  }
-
   setUserContext(userContext = {}) {
     const context = {}
     const { id, username, email } = userContext
@@ -193,13 +178,14 @@ class Config {
     if (typeof email === 'string') {
       context.email = email
     }
-    this.set('context.user', context)
+    this.config.context.user = extend(this.config.context.user || {}, context)
   }
 
-  setCustomContext(customContext) {
-    if (customContext && typeof customContext === 'object') {
-      this.set('context.custom', customContext)
-    }
+  setCustomContext(customContext = {}) {
+    this.config.context.custom = extend(
+      this.config.context.custom || {},
+      customContext
+    )
   }
 
   addLabels(tags) {
@@ -254,6 +240,21 @@ class Config {
         key: 'serviceName',
         value: properties.serviceName,
         allowed: 'a-z, A-Z, 0-9, _, -, <space>'
+      })
+    }
+
+    const sampleRate = properties.transactionSampleRate
+    if (
+      typeof sampleRate !== 'undefined' &&
+      (typeof sampleRate !== 'number' ||
+        isNaN(sampleRate) ||
+        sampleRate < 0 ||
+        sampleRate > 1)
+    ) {
+      errors.invalid.push({
+        key: 'transactionSampleRate',
+        value: sampleRate,
+        allowed: 'Number between 0 and 1'
       })
     }
 

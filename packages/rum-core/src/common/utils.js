@@ -188,7 +188,7 @@ function getNavigationTimingMarks() {
 function getPaintTimingMarks() {
   var paints = {}
   var perf = window.performance
-  if (perf.getEntriesByType) {
+  if (typeof perf.getEntriesByType === 'function') {
     var entries = perf.getEntriesByType('paint')
     if (entries.length > 0) {
       var timings = perf.timing
@@ -398,6 +398,17 @@ function getPageLoadMarks() {
   }
 }
 
+function now() {
+  return window.performance.now()
+}
+
+function getDuration(start, end) {
+  if (isUndefined(end) || isUndefined(start)) {
+    return null
+  }
+  return parseFloat(end - start)
+}
+
 export {
   extend,
   merge,
@@ -423,6 +434,8 @@ export {
   getEarliestSpan,
   getLatestNonXHRSpan,
   getPageLoadMarks,
+  getDuration,
+  now,
   rng,
   checkSameOrigin,
   setLabel,

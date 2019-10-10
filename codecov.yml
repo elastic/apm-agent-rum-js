@@ -10,6 +10,7 @@ coverage:
       default:
         target: 80%
         threshold: 1
-    patch:
-      default:
-        target: auto
+        if_not_found: success  # if parent is not found report status as success, error, or failure
+        if_ci_failed: error    # if ci fails report status as success, error, or failure
+        base: parent           # will always use the parent commit to compare against.
+      patch: off #https://docs.codecov.io/docs/commit-status#section-patch-status

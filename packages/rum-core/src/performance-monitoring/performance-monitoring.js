@@ -94,6 +94,7 @@ class PerformanceMonitoring {
     return (event, task) => {
       if (task.source === HISTORY && event === INVOKE) {
         transactionService.startTransaction(task.data.title, 'route-change', {
+          managed: true,
           canReuse: true
         })
       }
@@ -262,7 +263,7 @@ class PerformanceMonitoring {
       'checkBrowserResponsiveness'
     )
 
-    if (checkBrowserResponsiveness && !tr.isHardNavigation) {
+    if (checkBrowserResponsiveness && tr.options.checkBrowserResponsiveness) {
       const buffer = this._configService.get('browserResponsivenessBuffer')
 
       const wasBrowserResponsive = this.checkBrowserResponsiveness(
@@ -373,7 +374,7 @@ class PerformanceMonitoring {
       return truncateModel(SPAN_MODEL, spanData)
     })
 
-    var context = merge({}, configContext, transaction.context)
+    const context = merge({}, configContext, transaction.context)
 
     const transactionData = {
       id: transaction.id,
@@ -384,6 +385,7 @@ class PerformanceMonitoring {
       spans,
       context,
       marks: transaction.marks,
+      breakdown: transaction.breakdownTimings,
       span_count: {
         started: spans.length
       },

@@ -16,8 +16,8 @@ npm install @elastic/apm-rum-angular --save
 [float]
 ==== Instrumenting your Angular application
 
-The Angular integration package comes with a `ApmService` that will start subscribing to 
-https://angular.io/api/router/Event[Angular Router Events] once the service is initialized. 
+The Angular integration package comes with a `ApmService` which uses Angular Depedency injection pattern and 
+will start subscribing to https://angular.io/api/router/Event[Angular Router Events] once the service is initialized. 
 
 `ApmService` must be initialized from either the application module or application component since 
 the RUM agent has to start capturing all the resources and API calls as soon as possible. 
@@ -25,7 +25,8 @@ the RUM agent has to start capturing all the resources and API calls as soon as 
 
 [source,js]
 ----
-import { Routes, RouterModule } from '@angular/router'
+import { NgModule, Inject } from '@angular/core'
+import { Routes, Router, RouterModule } from '@angular/router'
 import { ApmService } from '@elastic/apm-rum-angular'
 
 const routes: Routes = [
@@ -36,11 +37,15 @@ const routes: Routes = [
 @NgModule({
   imports: [BrowserModule, RouterModule.forRoot(routes)],
   declarations: [AppComponent, ContactListComponent, ContactDetailComponent],
-  providers: [ApmService],
+  providers: [{
+    provide: ApmService,
+    useClass: ApmService,
+    deps: [Router]
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(service: ApmService) {
+  constructor(@Inject(ApmService) service: ApmService) {
     // API is exposed through this apm instance
     const apm = service.init({
       serviceName: 'angular-app',

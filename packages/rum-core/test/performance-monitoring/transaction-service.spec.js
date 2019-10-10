@@ -28,7 +28,7 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
 import { mockGetEntriesByType } from '../utils/globals-mock'
-import { TRANSACTION_END } from '../../src/common/constants'
+import { TRANSACTION_END, PAGE_LOAD } from '../../src/common/constants'
 
 describe('TransactionService', function() {
   var transactionService
@@ -36,7 +36,9 @@ describe('TransactionService', function() {
   var logger
 
   function sendPageLoadMetrics(name) {
-    var tr = transactionService.startTransaction(name, 'page-load')
+    var tr = transactionService.startTransaction(name, 'page-load', {
+      managed: true
+    })
     tr.detectFinish()
     return tr
   }
@@ -66,8 +68,10 @@ describe('TransactionService', function() {
   })
 
   it('should start transaction', function(done) {
-    config.set('active', true)
-    config.set('browserResponsivenessInterval', true)
+    config.setConfig({
+      browserResponsivenessInterval: true
+    })
+
     transactionService = new TransactionService(logger, config)
 
     var result = transactionService.startTransaction(
@@ -75,7 +79,11 @@ describe('TransactionService', function() {
       'transaction'
     )
     expect(result).toBeDefined()
-    result = transactionService.startTransaction('transaction2', 'transaction')
+    result = transactionService.startTransaction(
+      'transaction2',
+      'transaction',
+      { managed: true }
+    )
     expect(result.name).toBe('transaction2')
 
     var origCb = result.onEnd
@@ -88,21 +96,20 @@ describe('TransactionService', function() {
     transactionService.addTask('task1')
     var span = transactionService.startSpan('test', 'test')
     span.end()
-    transactionService.detectFinish()
+    result.detectFinish()
     expect(result.onEnd).not.toHaveBeenCalled()
     transactionService.removeTask('task1')
-    transactionService.detectFinish()
     expect(result.onEnd).toHaveBeenCalled()
   })
 
   it('should create a reusable transaction on the first span', function() {
-    config.set('active', true)
     transactionService = new TransactionService(logger, config)
 
     transactionService.startSpan('testSpan', 'testtype')
     var trans = transactionService.getCurrentTransaction()
     expect(trans.name).toBe('Unknown')
     transactionService.startTransaction('transaction', 'transaction', {
+      managed: true,
       canReuse: true
     })
     expect(trans.name).toBe('transaction')
@@ -110,30 +117,34 @@ describe('TransactionService', function() {
 
   it('should capture page load on first transaction', function(done) {
     // todo: can't test hard navigation metrics since karma runs tests inside an iframe
-    config.set('active', true)
-    config.set('capturePageLoad', true)
+    config.setConfig({
+      capturePageLoad: true
+    })
     transactionService = new TransactionService(logger, config)
 
-    var tr1 = transactionService.startTransaction('transaction1', 'transaction')
+    var tr1 = transactionService.startTransaction(
+      'transaction1',
+      'transaction',
+      { managed: true }
+    )
     var tr1DoneFn = tr1.onEnd
     tr1.onEnd = function() {
       tr1DoneFn()
-      expect(tr1.isHardNavigation).toBe(true)
+      expect(tr1.captureTimings).toBe(true)
       tr1.spans.forEach(function(t) {
         expect(t.duration()).toBeLessThan(5 * 60 * 1000)
         expect(t.duration()).toBeGreaterThan(-1)
       })
     }
-    expect(tr1.isHardNavigation).toBe(false)
-    tr1.isHardNavigation = true
+    expect(tr1.captureTimings).toBe(true)
     tr1.detectFinish()
 
     var tr2 = transactionService.startTransaction('transaction2', 'transaction')
-    expect(tr2.isHardNavigation).toBe(false)
+    expect(tr2.captureTimings).toBe(false)
     var tr2DoneFn = tr2.onEnd
     tr2.onEnd = function() {
       tr2DoneFn()
-      expect(tr2.isHardNavigation).toBe(false)
+      expect(tr2.captureTimings).toBe(false)
       done()
     }
     tr2.detectFinish()
@@ -146,6 +157,7 @@ describe('TransactionService', function() {
     })
     transactionService.setCurrentTransaction(reusableTr)
     const pageLoadTr = transactionService.startTransaction(name, 'page-load', {
+      managed: true,
       canReuse: true
     })
     pageLoadTr.detectFinish()
@@ -153,33 +165,31 @@ describe('TransactionService', function() {
     expect(pageLoadTr).toBe(reusableTr)
   })
 
-  it('should contain agent marks in page load transaction', function() {
+  it('should not capture resource/user spans or marks for custom transaction', done => {
     const unMock = mockGetEntriesByType()
-    const tr = new Transaction('test', 'test')
-    tr.isHardNavigation = true
-    transactionService.capturePageLoadMetrics(tr)
 
-    const agentMarks = [
-      'timeToFirstByte',
-      'domInteractive',
-      'domComplete',
-      'firstContentfulPaint'
-    ]
-
-    expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
-    agentMarks.forEach(mark => {
-      expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
+    config.events.observe(TRANSACTION_END, () => {
+      expect(tr.marks).toBeUndefined()
+      expect(tr.spans.length).toBe(0)
+      unMock()
+      done()
     })
-    unMock()
+
+    const tr = transactionService.startTransaction('test', 'custom')
+    tr.detectFinish()
   })
 
   it('should use initial page load name before ending the transaction', function(done) {
     transactionService = new TransactionService(logger, config)
 
-    const tr = transactionService.startTransaction(undefined, 'page-load')
+    const tr = transactionService.startTransaction(undefined, 'page-load', {
+      managed: true
+    })
     expect(tr.name).toBe('Unknown')
 
-    config.set('pageLoadTransactionName', 'page load name')
+    config.setConfig({
+      pageLoadTransactionName: 'page load name'
+    })
     tr.detectFinish()
 
     /**
@@ -193,12 +203,12 @@ describe('TransactionService', function() {
   })
 
   xit('should not add duplicate resource spans', function() {
-    config.set('active', true)
-    config.set('capturePageLoad', true)
     transactionService = new TransactionService(logger, config)
 
-    var tr = transactionService.startTransaction('transaction', 'transaction')
-    tr.isHardNavigation = true
+    var tr = transactionService.startTransaction('transaction', 'transaction', {
+      managed: true
+    })
+    tr.captureTimings = true
     var queryString = '?' + Date.now()
     var testUrl = '/base/test/performance/transactionService.spec.js'
 
@@ -236,12 +246,9 @@ describe('TransactionService', function() {
   it('should capture resources from navigation timing', function(done) {
     const unMock = mockGetEntriesByType()
 
-    config.set('active', true)
-    config.set('capturePageLoad', true)
-
     const customTransactionService = new TransactionService(logger, config)
     config.events.observe(TRANSACTION_END, function() {
-      expect(tr.isHardNavigation).toBe(true)
+      expect(tr.captureTimings).toBe(true)
       expect(
         tr.spans.filter(({ type }) => type === 'resource').length
       ).toBeGreaterThanOrEqual(1)
@@ -261,13 +268,16 @@ describe('TransactionService', function() {
 
     const tr = customTransactionService.startTransaction(
       'resource-test',
-      'page-load'
+      PAGE_LOAD,
+      { managed: true }
     )
     tr.detectFinish()
   })
 
   it('should ignore transactions that match the list', function() {
-    config.set('ignoreTransactions', ['transaction1', /transaction2/])
+    config.setConfig({
+      ignoreTransactions: ['transaction1', /transaction2/]
+    })
     transactionService = new TransactionService(logger, config)
 
     expect(
@@ -282,7 +292,9 @@ describe('TransactionService', function() {
       )
     ).toBeTruthy()
 
-    config.set('ignoreTransactions', [])
+    config.setConfig({
+      ignoreTransactions: []
+    })
   })
 
   it('should apply sampling to transactions', function() {
@@ -293,10 +305,12 @@ describe('TransactionService', function() {
     var span = transactionService.startSpan('testspan', 'test')
     expect(span.sampled).toBe(true)
 
-    config.set('transactionSampleRate', 0)
+    config.setConfig({
+      transactionSampleRate: 0
+    })
     tr = transactionService.startTransaction('test', 'test')
     expect(tr.sampled).toBe(false)
-    span = transactionService.startSpan('testspan', 'test')
+    span = tr.startSpan('testspan', 'test')
     expect(span.sampled).toBe(false)
   })
 
@@ -332,7 +346,9 @@ describe('TransactionService', function() {
 
   it('should createTransaction once per startTransaction', function() {
     spyOn(transactionService, 'createTransaction').and.callThrough()
-    transactionService.startTransaction('test-name', 'test-type')
+    transactionService.startTransaction('test-name', 'test-type', {
+      managed: true
+    })
     expect(transactionService.createTransaction).toHaveBeenCalledTimes(1)
   })
 
@@ -351,7 +367,73 @@ describe('TransactionService', function() {
       unMock()
       done()
     })
-    const tr = customTrService.startTransaction('test', 'page-load')
+    const tr = customTrService.startTransaction('test', 'page-load', {
+      managed: true
+    })
     tr.detectFinish()
+  })
+
+  it('should not capture breakdown metrics by default', done => {
+    config.events.observe(TRANSACTION_END, function() {
+      expect(tr1.breakdownTimings.length).toBe(0)
+      done()
+    })
+
+    const tr1 = transactionService.startTransaction('test1', 'custom')
+    const span1 = tr1.startSpan('span1', 'app')
+    span1.end()
+    tr1.detectFinish()
+  })
+
+  it('should create unmanaged transactions by default', () => {
+    expect(transactionService.currentTransaction).toBeUndefined()
+    const tr1 = transactionService.startTransaction('test-name', 'test-type')
+    expect(tr1.name).toBe('test-name')
+    expect(transactionService.currentTransaction).toBeUndefined()
+    spyOn(tr1, 'removeTask')
+    spyOn(tr1, 'startSpan')
+    transactionService.removeTask('testId')
+    expect(tr1.removeTask).not.toHaveBeenCalled()
+    transactionService.startSpan('test-name', 'test-type')
+    expect(tr1.startSpan).not.toHaveBeenCalled()
+    expect(tr1.spans.length).toBe(0)
+  })
+
+  it('should create managed transactions if the managed option is provided', () => {
+    expect(transactionService.currentTransaction).toBeUndefined()
+    const tr1 = transactionService.startTransaction('test-name', 'test-type', {
+      managed: true
+    })
+    expect(tr1.name).toBe('test-name')
+    expect(transactionService.currentTransaction).toBe(tr1)
+
+    const tr2 = transactionService.startTransaction(
+      'unmanaged-name',
+      'unmanaged-type'
+    )
+    expect(transactionService.currentTransaction).toBe(tr1)
+
+    const span = transactionService.startSpan(
+      'test-span-name',
+      'test-span-type'
+    )
+    span.end()
+    expect(tr1.spans[0]).toBe(span)
+    expect(tr2.spans.length).toBe(0)
+    spyOn(tr2, 'addTask').and.callThrough()
+    spyOn(tr2, 'removeTask').and.callThrough()
+    spyOn(tr2, 'end')
+    spyOn(tr1, 'addTask').and.callThrough()
+    spyOn(tr1, 'removeTask').and.callThrough()
+    spyOn(tr1, 'end')
+    transactionService.addTask('taskId')
+    expect(tr1.addTask).toHaveBeenCalledWith('taskId')
+    expect(tr2.addTask).not.toHaveBeenCalled()
+
+    transactionService.removeTask('taskId')
+    expect(tr1.removeTask).toHaveBeenCalledWith('taskId')
+    expect(tr1.end).toHaveBeenCalled()
+    expect(tr2.removeTask).not.toHaveBeenCalled()
+    expect(tr2.end).not.toHaveBeenCalled()
   })
 })

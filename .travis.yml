@@ -14,7 +14,7 @@ cache:
 
 env:
   global:
-    - APM_SERVER_PORT=8001
+    - APM_SERVER_PORT=8200
     - APM_SERVER_URL=http://localhost:8001
     - MODE=saucelabs
 
@@ -34,19 +34,19 @@ jobs:
       name: 'Analyse size of JS bundles'
     - stage: test
       env:
-        - STACK_VERSION=7.0.0
+        - STACK_VERSION=7.3.0
         - SCOPE=@elastic/apm-rum-core
     - stage: test
       env:
-        - STACK_VERSION=7.0.0
+        - STACK_VERSION=7.3.0
         - SCOPE=@elastic/apm-rum
     - stage: test
       env:
-        - STACK_VERSION=7.0.0
+        - STACK_VERSION=7.3.0
         - SCOPE=@elastic/apm-rum-react
     - stage: test
       env:
-        - STACK_VERSION=7.0.0
+        - STACK_VERSION=7.3.0
         - SCOPE=@elastic/apm-rum-angular
 addons:
   apt:

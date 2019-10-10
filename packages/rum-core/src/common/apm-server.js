@@ -43,7 +43,6 @@ class ApmServer {
     this.throttleAddTransaction = undefined
 
     this.initialized = false
-    this.ndjsonSpan = {}
   }
 
   init() {
@@ -76,8 +75,11 @@ class ApmServer {
   }
 
   _postJson(endPoint, payload) {
-    return this._makeHttpRequest('POST', endPoint, payload, {
-      'Content-Type': 'application/x-ndjson'
+    return this._makeHttpRequest('POST', endPoint, {
+      payload,
+      headers: {
+        'Content-Type': 'application/x-ndjson'
+      }
     })
   }
 
@@ -99,12 +101,16 @@ class ApmServer {
     return new Error(message)
   }
 
-  _makeHttpRequest(method, url, payload, headers) {
+  _makeHttpRequest(
+    method,
+    url,
+    { timeout, payload, headers } = { timeout: 10000 }
+  ) {
     return new Promise(function(resolve, reject) {
       var xhr = new window.XMLHttpRequest()
       xhr[XHR_IGNORE] = true
       xhr.open(method, url, true)
-      xhr.timeout = 10000
+      xhr.timeout = timeout
 
       if (headers) {
         for (var header in headers) {
@@ -138,6 +144,28 @@ class ApmServer {
     var queueLimit = this._configService.get('queueLimit')
     var flushInterval = this._configService.get('flushInterval')
     return new Queue(onFlush, { queueLimit, flushInterval })
+  }
+
+  fetchConfig(serviceName, environment) {
+    const serverUrl = this._configService.get('serverUrl')
+    var configEndpoint = `${serverUrl}/config/v1/agents`
+    if (!serviceName) {
+      return Promise.reject(
+        'serviceName is required for fetching central config.'
+      )
+    }
+    configEndpoint += `?service.name=${serviceName}`
+    if (environment) {
+      configEndpoint += `&service.environment=${environment}`
+    }
+    return this._makeHttpRequest('GET', configEndpoint, { timeout: 5000 })
+      .then(response => {
+        return JSON.parse(response)
+      })
+      .catch(reason => {
+        const error = this._constructError(reason)
+        return Promise.reject(error)
+      })
   }
 
   initErrorQueue() {
@@ -207,25 +235,32 @@ class ApmServer {
   }
 
   ndjsonErrors(errors) {
-    return errors.map(function(error) {
-      return NDJSON.stringify({ error })
-    })
+    return errors.map(error => NDJSON.stringify({ error }))
+  }
+
+  ndjsonMetricsets(metricsets) {
+    const timestamp = Date.now()
+    return metricsets
+      .map(metricset =>
+        NDJSON.stringify({ metricset: { timestamp, ...metricset } })
+      )
+      .join('')
   }
 
   ndjsonTransactions(transactions) {
-    var ndjsonSpan = this.ndjsonSpan
-    return transactions.map(function(tr) {
-      var spans = ''
+    return transactions.map(tr => {
+      let spans = ''
       if (tr.spans) {
-        spans = tr.spans
-          .map(function(sp) {
-            ndjsonSpan.span = sp
-            return NDJSON.stringify(ndjsonSpan)
-          })
-          .join('')
+        spans = tr.spans.map(span => NDJSON.stringify({ span })).join('')
         delete tr.spans
       }
-      return NDJSON.stringify({ transaction: tr }) + spans
+      let breakdowns = ''
+      if (tr.breakdown) {
+        breakdowns = this.ndjsonMetricsets(tr.breakdown)
+        delete tr.breakdown
+      }
+
+      return NDJSON.stringify({ transaction: tr }) + spans + breakdowns
     })
   }
 
@@ -242,7 +277,6 @@ class ApmServer {
       return
     }
 
-    const endPoint = this._configService.getEndpointUrl()
     let ndjson
     if (type === 'errors') {
       ndjson = this.ndjsonErrors(filteredPayload.data)
@@ -258,6 +292,7 @@ class ApmServer {
       NDJSON.stringify({ metadata: { service: filteredPayload.service } })
     )
     const ndjsonPayload = ndjson.join('')
+    const endPoint = this._configService.getEndpointUrl()
     return this._postJson(endPoint, ndjsonPayload)
   }
 

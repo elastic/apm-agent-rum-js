@@ -23,12 +23,13 @@
  *
  */
 
+import { PAGE_LOAD } from '@elastic/apm-rum-core'
 import createApmBase from '../'
 import { renderTestElement } from '../utils'
 
 const apm = createApmBase({
   serviceName: 'manual-timing',
-  sendPageLoadTransaction: false,
+  disableInstrumentations: [PAGE_LOAD],
   operationMode: 'manual'
 })
 
