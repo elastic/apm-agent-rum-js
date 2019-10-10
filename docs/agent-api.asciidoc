@@ -152,7 +152,7 @@ Arguments:
 
 
 Use this method to create a custom transaction. 
-By default, custom transaction are not managed by the agent, therefore 
+By default, custom transactions are not managed by the agent, therefore 
 they need to be ended manually.
 
 NOTE: This method returns `undefined` if apm is disabled or if <<active,active>> flag is set to `false` in the config.
