@@ -46,7 +46,6 @@ pipeline {
   }
   stages {
     stage('Initializing'){
-      agent { label 'linux && immutable' }
       options { skipDefaultCheckout() }
       environment {
         PATH = "${env.PATH}:${env.WORKSPACE}/bin"
@@ -119,8 +118,6 @@ pipeline {
         Run Benchmarks and send the results to ES.
         */
         stage('Benchmarks') {
-          agent { label 'linux && immutable' }
-          options { skipDefaultCheckout() }
           environment {
             REPORT_FILE = 'apm-agent-benchmark-results.json'
           }
@@ -202,7 +199,7 @@ class RumParallelTaskGenerator extends DefaultParallelTaskGenerator {
   */
   public Closure generateStep(x, y){
     return {
-      steps.node('linux && immutable && docker'){
+      steps.node('linux && immutable'){
         def label = "${this.tag}:${x}#${y}"
         try {
           steps.runScript(label: label, stack: x, scope: y)
