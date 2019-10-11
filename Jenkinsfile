@@ -147,7 +147,12 @@ pipeline {
           post {
             always {
               archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
-              sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+              catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
+                sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+              }
+              catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                deleteDir()
+              }
             }
           }
         }
