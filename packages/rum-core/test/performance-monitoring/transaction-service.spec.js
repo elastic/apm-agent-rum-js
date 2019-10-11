@@ -25,6 +25,7 @@
 
 import TransactionService from '../../src/performance-monitoring/transaction-service'
 import Transaction from '../../src/performance-monitoring/transaction'
+import Span from '../../src/performance-monitoring/span'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
 import { mockGetEntriesByType } from '../utils/globals-mock'
@@ -435,5 +436,119 @@ describe('TransactionService', function() {
     expect(tr1.end).toHaveBeenCalled()
     expect(tr2.removeTask).not.toHaveBeenCalled()
     expect(tr2.end).not.toHaveBeenCalled()
+  })
+
+  it('should not produce negative durations while adjusting to the spans', () => {
+    const transaction = transactionService.startTransaction(
+      'transaction',
+      'transaction'
+    )
+    let span = transaction.startSpan('test', 'test')
+    span.end()
+    span._end += 100
+    span = transaction.startSpan('test', 'external.http')
+
+    span.end()
+    span._start = 10000000
+    span._end = 11000000
+    transaction.end()
+    transactionService.adjustTransactionTime(transaction)
+    expect(span.duration()).toBe(0)
+  })
+
+  it('should adjust transaction start based on earliest span start', done => {
+    const firstSpan = new Span('first-span-name', 'first-span')
+    firstSpan.end()
+
+    const transaction = transactionService.startTransaction('/', 'transaction')
+    transaction.onEnd = () => {
+      transactionService.adjustTransactionTime(transaction)
+      expect(transaction._start).toBe(firstSpan._start)
+      expect(transaction._end).toBeGreaterThanOrEqual(lastSpan._end)
+      done()
+    }
+    transaction.spans.push(firstSpan)
+
+    const lastSpan = transaction.startSpan('last-span-name', 'last-span')
+    lastSpan.end()
+
+    transaction.detectFinish()
+  })
+
+  it('should adjust transaction end based on latest span end', done => {
+    const transaction = transactionService.startTransaction('/', 'transaction')
+    const transactionStart = transaction._start
+
+    const firstSpan = transaction.startSpan('first-span-name', 'first-span')
+    firstSpan.end()
+    const longSpan = transaction.startSpan('long-span-name', 'long-span')
+    const lastSpan = transaction.startSpan('last-span-name', 'last-span')
+    lastSpan.end()
+    longSpan.end()
+    longSpan.end += 500
+
+    transaction.onEnd = () => {
+      transactionService.adjustTransactionTime(transaction)
+      expect(transaction._start).toBe(transactionStart)
+      expect(transaction._end).toBeGreaterThanOrEqual(longSpan._end)
+      done()
+    }
+    transaction.detectFinish()
+  })
+
+  it('should truncate active spans after transaction ends', () => {
+    const transaction = transactionService.startTransaction(
+      'transaction',
+      'transaction'
+    )
+    const span = transaction.startSpan('test', 'test')
+    expect(transaction.spans.length).toBe(0)
+    expect(Object.keys(transaction._activeSpans).length).toBe(1)
+    transaction.end()
+
+    transactionService.adjustTransactionTime(transaction)
+    expect(transaction.spans.length).toBe(1)
+    expect(Object.keys(transaction._activeSpans).length).toBe(0)
+    expect(span.type).toContain('.truncated')
+  })
+
+  it('should account for spans start > transaction start during breakdown', done => {
+    config.setConfig({
+      breakdownMetrics: true
+    })
+    const tr = transactionService.startTransaction('transaction', 'custom', {
+      startTime: 10
+    })
+    const sp1 = tr.startSpan('foo', 'ext.http', { startTime: 0 })
+    sp1.end(15)
+    const sp2 = tr.startSpan('bar', 'ext.http', { startTime: 5 })
+    sp2.end(30)
+
+    config.events.observe(TRANSACTION_END, () => {
+      const breakdown = tr.breakdownTimings
+      expect(breakdown[0].samples).toEqual({
+        'transaction.duration.count': { value: 1 },
+        'transaction.duration.sum.us': { value: 30 },
+        'transaction.breakdown.count': { value: 1 }
+      })
+      expect(breakdown[1]).toEqual({
+        transaction: { name: 'transaction', type: 'custom' },
+        span: { type: 'app', subtype: undefined },
+        samples: {
+          'span.self_time.count': { value: 1 },
+          'span.self_time.sum.us': { value: 0 }
+        }
+      })
+      expect(breakdown[2]).toEqual({
+        transaction: { name: 'transaction', type: 'custom' },
+        span: { type: 'ext', subtype: 'http' },
+        samples: {
+          'span.self_time.count': { value: 2 },
+          'span.self_time.sum.us': { value: 40 }
+        }
+      })
+      done()
+    })
+    tr.end(30)
   })
 })
