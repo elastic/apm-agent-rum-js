@@ -163,6 +163,7 @@ services:
       apm:
         aliases:
           - node-puppeteer
+    user: ${USER_ID}
 
   node-benchmark:
     build: ../.ci/docker/node-puppeteer
@@ -193,6 +194,7 @@ services:
       apm:
         aliases:
           - node-benchmark
+    user: ${USER_ID}
 
 networks:
   apm:
