@@ -85,6 +85,9 @@ class ApmServer {
 
   _constructError(reason) {
     const { url, status, responseText } = reason
+    /**
+     * The `reason` could be a different type, e.g. an Error
+     */
     if (typeof status == 'undefined') {
       return reason
     }
@@ -170,11 +173,11 @@ class ApmServer {
     return this._makeHttpRequest('GET', configEndpoint, { timeout: 5000 })
       .then(xhr => {
         const { status, responseText } = xhr
-        const etag = xhr.getResponseHeader('etag')
         if (status === 304) {
           return localConfig
         } else {
           let remoteConfig = JSON.parse(responseText)
+          const etag = xhr.getResponseHeader('etag')
           if (etag) {
             remoteConfig.etag = etag.replace(/["]/g, '')
             this._configService.setLocalConfig(remoteConfig)

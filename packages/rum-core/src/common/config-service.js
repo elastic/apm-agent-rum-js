@@ -262,14 +262,18 @@ class Config {
   }
 
   getLocalConfig() {
-    let config = localStorage.getItem(LOCAL_CONFIG_KEY)
+    let config = sessionStorage.getItem(LOCAL_CONFIG_KEY)
     if (config) {
       return JSON.parse(config)
     }
   }
 
   setLocalConfig(config) {
-    localStorage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
+    if (config) {
+      sessionStorage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
+    } else {
+      sessionStorage.removeItem(LOCAL_CONFIG_KEY)
+    }
   }
 }
 

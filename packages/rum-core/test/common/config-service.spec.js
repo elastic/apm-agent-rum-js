@@ -253,4 +253,14 @@ describe('ConfigService', function() {
     )
     expect(configService.get('serverUrl')).toEqual('http://localhost:8080')
   })
+
+  it('should store configuration in sessionConfig', () => {
+    let config = configService.getLocalConfig()
+    expect(config).toBe(undefined)
+    configService.setLocalConfig({ key: 'value' })
+
+    config = configService.getLocalConfig()
+    expect(config).toEqual({ key: 'value' })
+    configService.setLocalConfig()
+  })
 })

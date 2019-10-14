@@ -447,5 +447,28 @@ describe('ApmServer', function() {
         expect(e).toBe('serviceName is required for fetching central config.')
       }
     })
+
+    it('should use local config if available', async () => {
+      configService.setLocalConfig({
+        transaction_sample_rate: '0.5',
+        etag: 'test'
+      })
+
+      apmServer._makeHttpRequest = () => {
+        return Promise.resolve({
+          status: 304
+        })
+      }
+
+      let config = await apmServer.fetchConfig(
+        'nonexistent-service',
+        'nonexistent-env'
+      )
+      expect(config).toEqual({
+        transaction_sample_rate: '0.5',
+        etag: 'test'
+      })
+      configService.setLocalConfig()
+    })
   }
 })
