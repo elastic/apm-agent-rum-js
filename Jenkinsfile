@@ -118,6 +118,7 @@ pipeline {
         Run Benchmarks and send the results to ES.
         */
         stage('Benchmarks') {
+          agent { label 'metal' }
           environment {
             REPORT_FILE = 'apm-agent-benchmark-results.json'
           }
@@ -126,9 +127,7 @@ pipeline {
             allOf {
               anyOf {
                 branch 'master'
-                branch "\\d+\\.\\d+"
-                branch "v\\d?"
-                tag "v\\d+\\.\\d+\\.\\d+*"
+                tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
                 expression { return params.Run_As_Master_Branch }
               }
               expression { return params.bench_ci }
@@ -148,7 +147,12 @@ pipeline {
           post {
             always {
               archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
-              sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+              catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
+                sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+              }
+              catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                deleteDir()
+              }
             }
           }
         }
