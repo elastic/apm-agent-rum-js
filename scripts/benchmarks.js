@@ -89,7 +89,9 @@ function runBenchmarks() {
   const outputFile = process.argv[2]
   const lernaProcess = spawn('lerna', ['run', 'bench', '--stream'])
   lernaProcess.on('exit', code => {
-    process.exit(code)
+    if (code !== 0) {
+      process.exit(code)
+    }
   })
   lernaProcess.on('close', async () => {
     try {
