@@ -163,6 +163,7 @@ services:
       apm:
         aliases:
           - node-puppeteer
+    user: ${USER_ID}
 
   node-benchmark:
     build: ../.ci/docker/node-puppeteer
@@ -185,6 +186,7 @@ services:
         npm install
         npm install puppeteer --unsafe-perm=true --allow-root
         set -eo pipefail
+        npx lerna run build:module
         node ./scripts/benchmarks.js ${REPORT_FILE}"
     mem_limit: 2000m
     volumes:
@@ -193,6 +195,7 @@ services:
       apm:
         aliases:
           - node-benchmark
+    user: ${USER_ID}
 
 networks:
   apm:

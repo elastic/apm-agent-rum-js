@@ -88,6 +88,11 @@ function extractFields(benchResults, type) {
 function runBenchmarks() {
   const outputFile = process.argv[2]
   const lernaProcess = spawn('lerna', ['run', 'bench', '--stream'])
+  lernaProcess.on('exit', code => {
+    if (code !== 0) {
+      process.exit(code)
+    }
+  })
   lernaProcess.on('close', async () => {
     try {
       const results = await getAllBenchmarkResults()
@@ -134,7 +139,11 @@ function runBenchmarks() {
        * CI - store the results in file and upload to ES
        */
       if (!outputFile) {
-        console.log(JSON.stringify(output, undefined, 2))
+        console.log(
+          'Benchmark Results:',
+          '\n',
+          JSON.stringify(output, undefined, 2)
+        )
         return
       }
 
@@ -150,6 +159,7 @@ function runBenchmarks() {
       console.log('Benchmark results is stored in', outputPath)
     } catch (err) {
       console.error('Error running benchmark script', err)
+      process.exit(2)
     }
   })
 }
