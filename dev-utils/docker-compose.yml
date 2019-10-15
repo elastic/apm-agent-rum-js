@@ -186,6 +186,7 @@ services:
         npm install
         npm install puppeteer --unsafe-perm=true --allow-root
         set -eo pipefail
+        npx lerna run build:module
         node ./scripts/benchmarks.js ${REPORT_FILE}"
     mem_limit: 2000m
     volumes:
