@@ -125,7 +125,7 @@ async function analyzeMetrics(metric, resultMap) {
 
 function calculateResults(resultMap) {
   const results = []
-  for (let metricObj of resultMap.values()) {
+  for (const metricObj of resultMap.values()) {
     let result = {}
     Object.keys(metricObj).forEach(metricName => {
       const value = metricObj[metricName]

@@ -63,6 +63,8 @@ function registerEventListener(target) {
 describe('xhrPatch', function() {
   function mapEvent(event) {
     delete event.task.data.target
+    delete event.task.data.span
+    delete event.task.id
     event.task.data.args = [].slice.call(event.task.data.args)
     return event
   }

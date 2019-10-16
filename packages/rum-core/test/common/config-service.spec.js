@@ -230,19 +230,6 @@ describe('ConfigService', function() {
     })
   })
 
-  it('should set config from script data attributes', () => {
-    const script = document.createElement('script')
-    script.src = './elastic-script.js'
-    script.setAttribute('data-service-name', 'js-core')
-    script.setAttribute('data-group-similar-spans', 'false')
-    document.head.appendChild(script)
-
-    const configServiceFromScript = new ConfigService()
-    configServiceFromScript.init()
-    expect(configServiceFromScript.get('serviceName')).toBe('js-core')
-    expect(configServiceFromScript.get('groupSimilarSpans')).toBe('false')
-  })
-
   it('should remove trailing slash from serverUrl', () => {
     configService.setConfig({
       serviceName: 'aabc',
@@ -263,5 +250,20 @@ describe('ConfigService', function() {
     config = configService.getLocalConfig()
     expect(config).toEqual({ key: 'value' })
     sessionStorage.removeItem(LOCAL_CONFIG_KEY)
+  })
+})
+
+describe('ConfigService with side effects', () => {
+  it('should set config from script data attributes', () => {
+    const script = document.createElement('script')
+    script.src = './elastic-script.js'
+    script.setAttribute('data-service-name', 'js-core')
+    script.setAttribute('data-group-similar-spans', 'false')
+    document.head.appendChild(script)
+
+    const configServiceFromScript = new ConfigService()
+    configServiceFromScript.init()
+    expect(configServiceFromScript.get('serviceName')).toBe('js-core')
+    expect(configServiceFromScript.get('groupSimilarSpans')).toBe('false')
   })
 })

@@ -125,7 +125,7 @@ class Transaction extends SpanBase {
     this._end = getTime(endTime)
 
     // truncate active spans
-    for (let sid in this._activeSpans) {
+    for (const sid in this._activeSpans) {
       const span = this._activeSpans[sid]
       span.type = span.type + '.truncated'
       span.end(endTime)
