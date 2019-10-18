@@ -35,6 +35,7 @@ describe('APM route hooks', () => {
   beforeEach(() => {
     apm = new ApmBase(createServiceFactory(), false)
   })
+
   const App = {
     name: 'App',
     template: `<div id="app"><router-view /></div>`
