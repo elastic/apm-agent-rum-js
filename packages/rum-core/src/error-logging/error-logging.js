@@ -24,7 +24,12 @@
  */
 
 import { createStackTraces, filterInvalidFrames } from './stack-trace'
-import { getPageMetadata, generateRandomId, merge } from '../common/utils'
+import {
+  getPageMetadata,
+  generateRandomId,
+  merge,
+  extend
+} from '../common/utils'
 import { truncateModel, ERROR_MODEL } from '../common/truncate'
 
 class ErrorLogging {
@@ -67,11 +72,22 @@ class ErrorLogging {
         errorType = errorMessage.split(':')[0]
       }
     }
+    const currentTransaction = this._transactionService.getCurrentTransaction()
+    const transactionContext = currentTransaction
+      ? currentTransaction.context
+      : {}
     const configContext = this._configService.get('context')
-    const browserMetadata = getPageMetadata()
-    const context = merge({}, browserMetadata, configContext, errorContext)
+    const pageMetadata = getPageMetadata()
 
-    const errorObject = {
+    const context = merge(
+      {},
+      pageMetadata,
+      transactionContext,
+      configContext,
+      errorContext
+    )
+
+    let errorObject = {
       id: generateRandomId(),
       culprit,
       exception: {
@@ -82,15 +98,16 @@ class ErrorLogging {
       context
     }
 
-    const currentTransaction = this._transactionService.getCurrentTransaction()
     if (currentTransaction) {
-      errorObject.trace_id = currentTransaction.traceId
-      errorObject.parent_id = currentTransaction.id
-      errorObject.transaction_id = currentTransaction.id
-      errorObject.transaction = {
-        type: currentTransaction.type,
-        sampled: currentTransaction.sampled
-      }
+      errorObject = extend(errorObject, {
+        trace_id: currentTransaction.traceId,
+        parent_id: currentTransaction.id,
+        transaction_id: currentTransaction.id,
+        transaction: {
+          type: currentTransaction.type,
+          sampled: currentTransaction.sampled
+        }
+      })
     }
     return truncateModel(ERROR_MODEL, errorObject)
   }

@@ -98,7 +98,7 @@ describe('ErrorLogging', function() {
 
   it('should include transaction details on error', done => {
     spyOn(apmServer, 'sendErrors').and.callThrough()
-    var transaction = transactionService.startTransaction('test', 'dummy', {
+    const transaction = transactionService.startTransaction('test', 'dummy', {
       managed: true
     })
     try {
@@ -122,7 +122,10 @@ describe('ErrorLogging', function() {
           },
           reason => fail(reason)
         )
-        .then(() => done())
+        .then(() => {
+          transaction.end()
+          done()
+        })
     }
   })
 
@@ -152,6 +155,42 @@ describe('ErrorLogging', function() {
     }
     return errorEvent
   }
+
+  it('should include context info on error', () => {
+    const transaction = transactionService.startTransaction('test', 'dummy', {
+      managed: true
+    })
+    transaction.addContext({
+      managed: true,
+      dummy: {
+        foo: 'bar',
+        bar: 20
+      }
+    })
+    configService.setUserContext({
+      id: 12,
+      username: 'test'
+    })
+    const errorEvent = {
+      error: new Error(testErrorMessage)
+    }
+    const errorData = errorLogging.createErrorDataModel(errorEvent)
+    expect(errorData.context).toEqual(
+      jasmine.objectContaining({
+        page: {
+          referer: jasmine.any(String),
+          url: jasmine.any(String)
+        },
+        managed: true,
+        dummy: {
+          foo: 'bar',
+          bar: 20
+        },
+        user: { id: 12, username: 'test' }
+      })
+    )
+    transaction.end()
+  })
 
   it('should support ErrorEvent', function(done) {
     spyOn(apmServer, 'sendErrors').and.callThrough()
