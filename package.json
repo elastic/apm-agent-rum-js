@@ -77,6 +77,7 @@
     "benchmark": "^2.1.4",
     "bundlesize": "^0.17.2",
     "codecov": "^3.5.0",
+    "core-js": "^3.3.2",
     "cpuprofile-filter": "^1.1.0",
     "ejs": "^2.6.2",
     "enzyme": "^3.9.0",
