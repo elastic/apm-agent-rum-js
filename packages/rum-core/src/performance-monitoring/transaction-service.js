@@ -222,11 +222,10 @@ class TransactionService {
         if (breakdownMetrics) {
           tr.captureBreakdown()
         }
-
+        this._config.events.send(TRANSACTION_END, [tr])
         if (__DEV__) {
           this._logger.debug('TransactionService transaction ended', tr)
         }
-        this._config.events.send(TRANSACTION_END, [tr])
       },
       err => {
         if (__DEV__) {

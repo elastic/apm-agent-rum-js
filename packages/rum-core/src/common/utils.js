@@ -402,7 +402,7 @@ function now() {
   return window.performance.now()
 }
 
-function mayBeTime(time) {
+function getTime(time) {
   return typeof time === 'number' && time >= 0 ? time : now()
 }
 
@@ -440,7 +440,7 @@ export {
   getPageLoadMarks,
   getDuration,
   now,
-  mayBeTime,
+  getTime,
   rng,
   checkSameOrigin,
   setLabel,

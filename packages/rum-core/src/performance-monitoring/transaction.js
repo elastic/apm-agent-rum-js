@@ -29,7 +29,7 @@ import {
   generateRandomId,
   merge,
   now,
-  mayBeTime,
+  getTime,
   extend,
   getPageMetadata,
   removeInvalidChars
@@ -122,7 +122,7 @@ class Transaction extends SpanBase {
       return
     }
     this.ended = true
-    this._end = mayBeTime(endTime)
+    this._end = getTime(endTime)
 
     // truncate active spans
     for (let sid in this._activeSpans) {
