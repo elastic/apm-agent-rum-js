@@ -98,11 +98,19 @@ function getReactConfig(options) {
   })
 }
 
+function getVueConfig(options) {
+  return Object.assign({}, options, {
+    plugins: options.plugins.concat(['@babel/plugin-syntax-dynamic-import'])
+  })
+}
+
 function getOptions(options, packageType) {
   if (packageType === PACKAGE_TYPES.REACT) {
     return getReactConfig(options)
   } else if (packageType === PACKAGE_TYPES.ANGULAR) {
     return getAngularConfig(options)
+  } else if (packageType === PACKAGE_TYPES.VUE) {
+    return getVueConfig(options)
   }
   return options
 }

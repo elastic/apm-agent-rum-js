@@ -29,7 +29,7 @@
     "karma:dev": "karma start --auto-watch --restartOnFileChange",
     "karma:coverage": "karma start --coverage --singleRun",
     "test:unit": "npm run script runUnitTests packages/rum-vue",
-    "test:e2e": "",
+    "test:e2e": "npm run script runE2eTests packages/rum-vue/wdio.conf.js",
     "test:sauce": "npm run script runSauceTests packages/rum-vue true build:e2e test:unit test:e2e",
     "test": "npm run test:sauce",
     "script": "node ../../dev-utils/run-script.js"

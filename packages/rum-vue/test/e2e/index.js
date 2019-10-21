@@ -23,28 +23,23 @@
  *
  */
 
-export function routeHooks(router, apm) {
-  let transaction
-  router.beforeResolve((to, from, next) => {
-    /**
-     * Get the last matched route record which acts as stack when
-     * route changes are pushed and popped out of the stack
-     */
-    const matched = to.matched || []
-    let path = to.path
-    if (matched.length > 0) {
-      path = matched[matched.length - 1].path || path
-    }
-    transaction = apm.startTransaction(path, 'route-change', {
-      managed: true,
-      canReuse: true
-    })
-    next()
-  })
+import { polyfill } from 'es6-promise'
+import { apmBase } from '@elastic/apm-rum'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import ApmServerMock from '@elastic/apm-rum-core/test/utils/apm-server-mock'
 
-  router.afterEach(() => {
-    if (transaction) {
-      Promise.resolve().then(() => transaction.detectFinish())
-    }
-  })
+const globalConfig = getGlobalConfig()
+
+export function getApmBase() {
+  /**
+   * Polyfill the global promise since webdriver
+   * functions uses promise based API
+   * ex: browser.execute, browser.executeAsy
+   */
+  polyfill()
+  console.log('E2E Global Configs', JSON.stringify(globalConfig, null, 2))
+  const apmServer = apmBase.serviceFactory.getService('ApmServer')
+  const serverMock = new ApmServerMock(apmServer, globalConfig.useMocks)
+  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
+  return apmBase
 }

@@ -22,3 +22,69 @@
  * THE SOFTWARE.
  *
  */
+
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import FetchComponent from './components/Fetch.vue'
+import { getApmBase } from './'
+import { ApmVuePlugin } from '../../src'
+
+Vue.use(VueRouter)
+
+const Home = { template: '<div>home</div>' }
+const Lazy = () =>
+  import(/* webpackChunkName: "lazy" */ './components/Lazy.vue')
+
+const router = new VueRouter({
+  mode: 'history',
+  base: 'test/e2e/',
+  routes: [
+    { path: '/', component: Home },
+    { path: '/lazy', component: Lazy },
+    {
+      path: '/lazy/:params*',
+      name: 'lazy params',
+      component: () =>
+        new Promise(resolve => {
+          setTimeout(() => {
+            resolve({
+              template: `
+              <div>
+                <h2>Lazy with params</h2>
+                <pre>{{ $route.path }}</pre>
+              </div>`
+            })
+          }, 200)
+        })
+    },
+    {
+      path: '/fetch',
+      component: FetchComponent
+    }
+  ]
+})
+
+Vue.use(ApmVuePlugin, {
+  router,
+  apm: getApmBase(),
+  config: {
+    serviceName: 'rum-e2e-vue',
+    debug: true
+  }
+})
+
+new Vue({
+  router,
+  template: `
+    <div id="app">
+      <h1>Vue E2E Test with Lazy loaded routes</h1>
+      <ul>
+        <li><router-link to="/">Home</router-link></li>
+        <li><router-link to="/lazy">Lazy</router-link></li>
+        <li><router-link id="fetch" to="/fetch">Fetch</router-link></li>
+        <li><router-link to="/lazy/b/c">Lazy with params</router-link></li>
+      </ul>
+      <router-view class="view"></router-view>
+    </div>
+  `
+}).$mount('#app')
