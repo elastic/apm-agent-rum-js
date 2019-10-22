@@ -25,7 +25,7 @@
 
 import { Promise } from 'es6-promise'
 import Transaction from './transaction'
-import { extend } from '../common/utils'
+import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
 import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import { captureNavigation } from './capture-navigation'
 import { __DEV__ } from '../env'
@@ -190,20 +190,12 @@ class TransactionService {
   handleTransactionEnd(tr) {
     return Promise.resolve().then(
       () => {
-        if (__DEV__) {
-          this._logger.debug('TransactionService transaction finished', tr)
-        }
         if (this.shouldIgnoreTransaction(tr.name)) {
+          if (__DEV__) {
+            this._logger.debug('TransactionService transaction is ignored', tr)
+          }
           return
         }
-        /**
-         * Capture breakdown metrics once the transaction is completed
-         */
-        const breakdownMetrics = this._config.get('breakdownMetrics')
-        if (breakdownMetrics) {
-          tr.captureBreakdown()
-        }
-
         if (tr.type === PAGE_LOAD) {
           /**
            * Setting the pageLoadTransactionName via configService.setConfig after
@@ -217,7 +209,23 @@ class TransactionService {
           }
         }
         captureNavigation(tr)
-        this.add(tr)
+
+        /**
+         * Adjust transaction start time with span timings and
+         * truncate spans that goes beyond transaction timeframe
+         */
+        this.adjustTransactionTime(tr)
+        /**
+         * Capture breakdown metrics once the transaction is completed
+         */
+        const breakdownMetrics = this._config.get('breakdownMetrics')
+        if (breakdownMetrics) {
+          tr.captureBreakdown()
+        }
+        this._config.events.send(TRANSACTION_END, [tr])
+        if (__DEV__) {
+          this._logger.debug('TransactionService transaction ended', tr)
+        }
       },
       err => {
         if (__DEV__) {
@@ -225,6 +233,43 @@ class TransactionService {
         }
       }
     )
+  }
+
+  adjustTransactionTime(transaction) {
+    /**
+     * Adjust start time of the transaction
+     */
+    const spans = transaction.spans
+    const earliestSpan = getEarliestSpan(spans)
+
+    if (earliestSpan && earliestSpan._start < transaction._start) {
+      transaction._start = earliestSpan._start
+    }
+
+    /**
+     * Adjust end time of the transaction to match the latest
+     * span end time
+     */
+    const latestSpan = getLatestNonXHRSpan(spans)
+    if (latestSpan && latestSpan._end > transaction._end) {
+      transaction._end = latestSpan._end
+    }
+
+    /**
+     * Set all spans that are longer than the transaction to
+     * be truncated spans
+     */
+    const transactionEnd = transaction._end
+    for (let i = 0; i < spans.length; i++) {
+      const span = spans[i]
+      if (span._end > transactionEnd) {
+        span._end = transactionEnd
+        span.type += '.truncated'
+      }
+      if (span._start > transactionEnd) {
+        span._start = transactionEnd
+      }
+    }
   }
 
   shouldIgnoreTransaction(transactionName) {
@@ -253,13 +298,6 @@ class TransactionService {
       }
       var span = trans.startSpan(name, type, options)
       return span
-    }
-  }
-
-  add(transaction) {
-    this._config.events.send(TRANSACTION_END, [transaction])
-    if (__DEV__) {
-      this._logger.debug('TransactionService.add', transaction)
     }
   }
 
