@@ -24,6 +24,7 @@
  */
 
 import ConfigService from '../../src/common/config-service'
+import { LOCAL_CONFIG_KEY } from '../../src/common/constants'
 
 describe('ConfigService', function() {
   var configService
@@ -261,6 +262,6 @@ describe('ConfigService', function() {
 
     config = configService.getLocalConfig()
     expect(config).toEqual({ key: 'value' })
-    configService.setLocalConfig()
+    sessionStorage.removeItem(LOCAL_CONFIG_KEY)
   })
 })

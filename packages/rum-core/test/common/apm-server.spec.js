@@ -33,6 +33,7 @@ import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
 import { createServiceFactory } from '../'
 
 const { agentConfig, testConfig } = getGlobalConfig('rum-core')
+import { LOCAL_CONFIG_KEY } from '../../src/common/constants'
 
 function generateTransaction(count, breakdown = false) {
   var result = []
@@ -468,7 +469,7 @@ describe('ApmServer', function() {
         transaction_sample_rate: '0.5',
         etag: 'test'
       })
-      configService.setLocalConfig()
+      sessionStorage.removeItem(LOCAL_CONFIG_KEY)
     })
   }
 })

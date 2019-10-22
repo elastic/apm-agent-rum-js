@@ -271,8 +271,6 @@ class Config {
   setLocalConfig(config) {
     if (config) {
       sessionStorage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
-    } else {
-      sessionStorage.removeItem(LOCAL_CONFIG_KEY)
     }
   }
 }
