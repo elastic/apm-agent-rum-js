@@ -29,39 +29,12 @@ import { PAGE_LOAD } from '../../src/common/constants'
 import { TIMING_LEVEL1_ENTRY } from '../fixtures/navigation-entries'
 
 describe('Breakdown metrics', () => {
-  let now
-
-  let originalNowFn
-  beforeAll(() => {
-    originalNowFn = window.performance.now
-    window.performance.now = () => now
-  })
-
-  afterAll(() => {
-    window.performance.now = originalNowFn
-  })
-
-  function createTransaction(type, { start = 0, end = 20 } = {}) {
-    now = start
-    const tr = new Transaction('trname', type)
+  function createTransaction(type, { start = 0 } = {}) {
+    const tr = new Transaction('trname', type, {
+      startTime: start
+    })
     tr.sampled = true
-    const trEnd = tr.end
-    tr.end = () => {
-      now = end
-      trEnd.apply(tr)
-    }
     return tr
-  }
-
-  function createSpan(transaction, type, { start, end }) {
-    now = start
-    const span = transaction.startSpan('spanname', type)
-    const spanEnd = span.end
-    span.end = () => {
-      now = end
-      spanEnd.apply(span)
-    }
-    return span
   }
 
   /**
@@ -123,7 +96,7 @@ describe('Breakdown metrics', () => {
 
   it('breakdown with only transaction', () => {
     const tr = createTransaction('custom')
-    tr.end()
+    tr.end(20)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
 
     expect(breakdown.details).toEqual({
@@ -146,9 +119,10 @@ describe('Breakdown metrics', () => {
   })
 
   it('transaction with single span', () => {
-    const tr = createTransaction('custom', { end: 40 })
-    createSpan(tr, 'foo', { start: 20, end: 40 }).end()
-    tr.end()
+    const tr = createTransaction('custom')
+    const span = tr.startSpan('foo', 'bar', { startTime: 20 })
+    span.end(40)
+    tr.end(40)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
 
     expect(breakdown.transaction).toEqual({
@@ -162,16 +136,17 @@ describe('Breakdown metrics', () => {
       'span.self_time.sum.us': { value: 20 }
     })
 
-    expect(breakdown.foo).toEqual({
+    expect(breakdown.bar).toEqual({
       'span.self_time.count': { value: 1 },
       'span.self_time.sum.us': { value: 20 }
     })
   })
 
   it('transaction with single app sub span', () => {
-    const tr = createTransaction('custom', { start: 0, end: 30 })
-    createSpan(tr, 'app', { start: 15, end: 20 }).end()
-    tr.end()
+    const tr = createTransaction('custom')
+    const span = tr.startSpan('foo', 'app', { startTime: 15 })
+    span.end(20)
+    tr.end(30)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
 
     expect(breakdown.transaction).toEqual({
@@ -187,12 +162,12 @@ describe('Breakdown metrics', () => {
   })
 
   it('transaction with parallel sub spans', () => {
-    const tr = createTransaction('custom', { start: 0, end: 50 })
-    const sp1 = createSpan(tr, 'ext.http', { start: 20, end: 40 })
-    const sp2 = createSpan(tr, 'ext.http', { start: 20, end: 40 })
-    sp1.end()
-    sp2.end()
-    tr.end()
+    const tr = createTransaction('custom')
+    const sp1 = tr.startSpan('foo', 'ext.http', { startTime: 20 })
+    const sp2 = tr.startSpan('bar', 'ext.http', { startTime: 20 })
+    sp1.end(40)
+    sp2.end(40)
+    tr.end(50)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
     expect(breakdown.transaction).toEqual({
       'transaction.duration.count': { value: 1 },
@@ -210,12 +185,12 @@ describe('Breakdown metrics', () => {
   })
 
   it('transaction with overlapping sub spans', () => {
-    const tr = createTransaction('custom', { start: 0, end: 30 })
-    const sp1 = createSpan(tr, 'ext.http', { start: 10, end: 20 })
-    const sp2 = createSpan(tr, 'ext.http', { start: 15, end: 25 })
-    sp1.end()
-    sp2.end()
-    tr.end()
+    const tr = createTransaction('custom')
+    const sp1 = tr.startSpan('foo', 'ext.http', { startTime: 10 })
+    const sp2 = tr.startSpan('bar', 'ext.http', { startTime: 15 })
+    sp1.end(20)
+    sp2.end(25)
+    tr.end(30)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
     expect(breakdown.transaction).toEqual({
       'transaction.duration.count': { value: 1 },
@@ -233,14 +208,14 @@ describe('Breakdown metrics', () => {
   })
 
   it('transaction with sequential sub spans', () => {
-    const tr = createTransaction('custom', { start: 0, end: 40 })
-    const sp1 = createSpan(tr, 'ext.http', { start: 10, end: 20 })
-    sp1.end()
-    const sp2 = createSpan(tr, 'ext.http', { start: 20, end: 30 })
-    sp2.end()
-    const sp3 = createSpan(tr, 'ext.http', { start: 30, end: 40 })
-    sp3.end()
-    tr.end()
+    const tr = createTransaction('custom')
+    const sp1 = tr.startSpan('foo', 'ext.http', { startTime: 10 })
+    sp1.end(20)
+    const sp2 = tr.startSpan('bar', 'ext.http', { startTime: 20 })
+    sp2.end(30)
+    const sp3 = tr.startSpan('baz', 'ext.http', { startTime: 30 })
+    sp3.end(40)
+    tr.end(40)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
 
     expect(breakdown.transaction).toEqual({
@@ -259,12 +234,12 @@ describe('Breakdown metrics', () => {
   })
 
   it('transaction with spans covering app time', () => {
-    const tr = createTransaction('custom', { start: 0, end: 30 })
-    const span1 = createSpan(tr, 'ext.http', { start: 0, end: 15 })
-    span1.end()
-    const span2 = createSpan(tr, 'ext.http', { start: 15, end: 30 })
-    span2.end()
-    tr.end()
+    const tr = createTransaction('custom')
+    const sp1 = tr.startSpan('foo', 'ext.http', { startTime: 0 })
+    sp1.end(15)
+    const sp2 = tr.startSpan('bar', 'ext.http', { startTime: 15 })
+    sp2.end(30)
+    tr.end(30)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
 
     expect(breakdown.transaction).toEqual({
@@ -283,12 +258,12 @@ describe('Breakdown metrics', () => {
   })
 
   it('transaction with different span types', () => {
-    const tr = createTransaction('custom', { start: 0, end: 30 })
-    const sp1 = createSpan(tr, 'foo', { start: 5, end: 20 })
-    const sp2 = createSpan(tr, 'bar', { start: 15, end: 25 })
-    sp1.end()
-    sp2.end()
-    tr.end()
+    const tr = createTransaction('custom')
+    const sp1 = tr.startSpan('foo', 'foo', { startTime: 5 })
+    const sp2 = tr.startSpan('bar', 'bar', { startTime: 15 })
+    sp1.end(20)
+    sp2.end(25)
+    tr.end(30)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
     expect(breakdown.transaction).toEqual({
       'transaction.duration.count': { value: 1 },
@@ -310,10 +285,10 @@ describe('Breakdown metrics', () => {
   })
 
   it('transaction with spans extending beyond end', () => {
-    const tr = createTransaction('custom', { start: 0, end: 30 })
-    const sp1 = createSpan(tr, 'ext.http', { start: 20, end: 40 })
-    tr.end()
-    sp1.end()
+    const tr = createTransaction('custom')
+    const sp1 = tr.startSpan('foo', 'ext.http', { startTime: 20 })
+    tr.end(30)
+    sp1.end(40)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
     expect(breakdown.transaction).toEqual({
       'transaction.duration.count': { value: 1 },
@@ -322,19 +297,42 @@ describe('Breakdown metrics', () => {
     })
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 10 }
+      'span.self_time.sum.us': { value: 20 }
     })
     expect(breakdown['ext.truncated']).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 20 }
+      'span.self_time.sum.us': { value: 10 }
+    })
+  })
+
+  it('transaction with spans in different order', () => {
+    const tr = createTransaction('custom')
+    const sp1 = tr.startSpan('foo', 'ext.http', { startTime: 25 })
+    const sp2 = tr.startSpan('foo', 'ext.http', { startTime: 20 })
+    sp1.end(40)
+    sp2.end(30)
+    tr.end(50)
+    const breakdown = getBreakdownObj(captureBreakdown(tr))
+    expect(breakdown.transaction).toEqual({
+      'transaction.duration.count': { value: 1 },
+      'transaction.duration.sum.us': { value: 50 },
+      'transaction.breakdown.count': { value: 1 }
+    })
+    expect(breakdown.app).toEqual({
+      'span.self_time.count': { value: 1 },
+      'span.self_time.sum.us': { value: 30 }
+    })
+    expect(breakdown['ext.http']).toEqual({
+      'span.self_time.count': { value: 2 },
+      'span.self_time.sum.us': { value: 25 }
     })
   })
 
   it('do not include spans with 0 duration', () => {
-    const tr = createTransaction('custom', { start: 0, end: 30 })
-    const sp1 = createSpan(tr, 'ext.http', { start: 10, end: 10 })
-    sp1.end()
-    tr.end()
+    const tr = createTransaction('custom')
+    const sp1 = tr.startSpan('foo', 'ext.http', { startTime: 20 })
+    sp1.end(20)
+    tr.end(30)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
 
     expect(breakdown.transaction).toEqual({
@@ -353,7 +351,7 @@ describe('Breakdown metrics', () => {
   it('do not capture span breakdown for unsampled transaction', () => {
     const tr = createTransaction('unsampled')
     tr.sampled = false
-    createSpan(tr, 'resource', { start: 10, end: 20 }).end()
+    tr.startSpan('foo', 'ext.http', { startTime: 10 }).end(20)
     tr.end()
 
     const breakdown = captureBreakdown(tr)

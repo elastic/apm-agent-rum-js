@@ -402,6 +402,10 @@ function now() {
   return window.performance.now()
 }
 
+function getTime(time) {
+  return typeof time === 'number' && time >= 0 ? time : now()
+}
+
 function getDuration(start, end) {
   if (isUndefined(end) || isUndefined(start)) {
     return null
@@ -436,6 +440,7 @@ export {
   getPageLoadMarks,
   getDuration,
   now,
+  getTime,
   rng,
   checkSameOrigin,
   setLabel,

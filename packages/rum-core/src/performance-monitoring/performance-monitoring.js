@@ -28,9 +28,7 @@ import {
   isDtHeaderValid,
   merge,
   parseDtHeaderValue,
-  getEarliestSpan,
-  stripQueryStringFromUrl,
-  getLatestNonXHRSpan
+  stripQueryStringFromUrl
 } from '../common/utils'
 import Url from '../common/url'
 import { patchEventHandler } from '../common/patching'
@@ -290,44 +288,6 @@ class PerformanceMonitoring {
     return true
   }
 
-  adjustTransactionTime(transaction) {
-    /**
-     * Adjust start time of the transaction
-     */
-    const spans = transaction.spans
-    const earliestSpan = getEarliestSpan(spans)
-
-    if (earliestSpan && earliestSpan._start < transaction._start) {
-      transaction._start = earliestSpan._start
-    }
-
-    /**
-     * Adjust end time of the transaction to match the latest
-     * span end time
-     */
-    const latestSpan = getLatestNonXHRSpan(spans)
-    if (latestSpan && latestSpan._end > transaction._end) {
-      transaction._end = latestSpan._end
-    }
-
-    /**
-     * Set all spans that are longer than the transaction to
-     * be truncated spans
-     */
-    const transactionEnd = transaction._end
-    for (let i = 0; i < spans.length; i++) {
-      const span = spans[i]
-
-      if (span._end > transactionEnd) {
-        span._end = transactionEnd
-        span.type += '.truncated'
-      }
-      if (span._start > transactionEnd) {
-        span._start = transactionEnd
-      }
-    }
-  }
-
   prepareTransaction(transaction) {
     transaction.spans.sort(function(spanA, spanB) {
       return spanA._start - spanB._start
@@ -395,7 +355,6 @@ class PerformanceMonitoring {
   }
 
   createTransactionPayload(transaction) {
-    this.adjustTransactionTime(transaction)
     this.prepareTransaction(transaction)
     const filtered = this.filterTransaction(transaction)
     if (filtered) {

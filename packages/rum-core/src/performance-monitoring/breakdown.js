@@ -41,12 +41,59 @@ function getValue(value) {
   return { value }
 }
 
+function calculateSelfTime(transaction) {
+  const { spans, _start, _end } = transaction
+  /**
+   * When there are no spans transaction duration accounts for
+   * the overall self time
+   */
+  if (spans.length === 0) {
+    return transaction.duration()
+  }
+  /**
+   * The below selfTime calculation logic assumes the spans are sorted
+   * based on the start time
+   */
+  spans.sort((span1, span2) => span1._start - span2._start)
+
+  let span = spans[0]
+  let spanEnd = span._end
+  let spanStart = span._start
+
+  let lastContinuousEnd = spanEnd
+  let selfTime = spanStart - _start
+
+  for (let i = 1; i < spans.length; i++) {
+    span = spans[i]
+    spanStart = span._start
+    spanEnd = span._end
+
+    /**
+     * Add the gaps between the spans to the self time
+     */
+    if (spanStart > lastContinuousEnd) {
+      selfTime += spanStart - lastContinuousEnd
+      lastContinuousEnd = spanEnd
+    } else if (spanEnd > lastContinuousEnd) {
+      lastContinuousEnd = spanEnd
+    }
+  }
+  /**
+   * Add the remaining gaps in transaction duration to
+   * the self time of the transaction
+   */
+  if (lastContinuousEnd < _end) {
+    selfTime += _end - lastContinuousEnd
+  }
+  return selfTime
+}
+
 /**
  * Group spans based on type and subtype to capture the breakdown
  */
 function groupSpans(transaction) {
   const spanMap = {}
-  const transactionSelfTime = transaction.selfTime
+  const transactionSelfTime = calculateSelfTime(transaction)
   /**
    * Add transaction self time as `app` in the breakdown
    */
@@ -58,11 +105,11 @@ function groupSpans(transaction) {
   const spans = transaction.spans
   for (let i = 0; i < spans.length; i++) {
     const span = spans[i]
-    const { type, subType } = span
     const duration = span.duration()
     if (duration === 0 || duration == null) {
       continue
     }
+    const { type, subType } = span
     let key = type
     if (subType) {
       key += '.' + subType
