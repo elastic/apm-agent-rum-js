@@ -313,6 +313,9 @@ describe('ApmBase', function() {
     const apmServer = serviceFactory.getService('ApmServer')
     const configService = serviceFactory.getService('ConfigService')
 
+    spyOn(configService, 'setLocalConfig')
+    spyOn(configService, 'getLocalConfig')
+
     const apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({
       serviceName: 'test-service',
@@ -323,10 +326,19 @@ describe('ApmBase', function() {
 
     function createPayloadCallback(rate) {
       return () => {
-        return Promise.resolve(`{
+        const responseText = `{
           "transaction_sample_rate": "${rate}"
         }
-        `)
+        `
+        return Promise.resolve({
+          responseText,
+          getResponseHeader(headerName) {
+            if (headerName == 'etag') {
+              return '"test"'
+            }
+          },
+          status: 200
+        })
       }
     }
 

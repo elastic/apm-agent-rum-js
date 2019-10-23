@@ -80,8 +80,16 @@ function startApmServerProxy(port = 8001) {
       userResHeaderDecorator(headers) {
         if (!headers['Access-Control-Allow-Origin']) {
           headers['Access-Control-Allow-Origin'] = '*'
+          headers['Access-Control-Expose-Headers'] = 'ETag'
         }
         return headers
+      },
+      proxyReqOptDecorator(proxyReqOpts, srcReq) {
+        const { ifnonematch } = srcReq.query
+        if (ifnonematch) {
+          proxyReqOpts.headers['If-None-Match'] = `"${ifnonematch}"`
+        }
+        return proxyReqOpts
       }
     })
   )
