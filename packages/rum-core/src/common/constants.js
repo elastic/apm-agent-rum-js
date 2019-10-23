@@ -103,6 +103,12 @@ const ERROR = 'error'
 const BEFORE_EVENT = ':before'
 const AFTER_EVENT = ':after'
 
+/**
+ * Local Config Key used storing the remote config in the localStorage
+ */
+
+const LOCAL_CONFIG_KEY = 'elastic_apm_config'
+
 export {
   SCHEDULE,
   INVOKE,
@@ -126,5 +132,6 @@ export {
   HISTORY,
   ERROR,
   BEFORE_EVENT,
-  AFTER_EVENT
+  AFTER_EVENT,
+  LOCAL_CONFIG_KEY
 }
