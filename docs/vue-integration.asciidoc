@@ -1,0 +1,89 @@
+[[vue-integration]]
+=== Vue integration
+
+This document covers how to use Real User Monitoring JavaScript agent with Vue applications.
+
+[[installing-vue-integration]]
+==== Installing Elastic APM Vue package
+
+Install the `@elastic/apm-rum-vue` package as a dependency to your application:
+
+[source,bash]
+----
+npm install --save @elastic/apm-rum-vue 
+----
+
+[float]
+==== Instrumenting your Vue application
+
+The package exposes `ApmVuePlugin` which is a Vue Plugin and can be installed in your application using `Vue.use` method. 
+
+[source,js]
+----
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import { ApmVuePlugin } from '@elastic/apm-rum-vue'
+
+const Home = { template: '<div>home</div>' }
+
+Vue.use(VueRouter)
+
+const router = VueRouter({
+  mode: 'history',
+  routes: [
+    { path: '/', component: Home }
+  ]
+})
+
+Vue.use(ApmVuePlugin, {
+  router,
+  config: {
+    serviceName: 'app-name',
+    // agent configuration
+  }
+})
+
+// app specific code
+----
+
+
+[float]
+==== Accessing agent instance inside components
+
+Instance of the agent can be accessed inside all the components using `this.$apm`
+
+[source,html]
+----
+<template>
+  <h1>Current Transaction Name</h1>
+  <h2>{{ name }}</h2>
+</template>
+<script>
+export default {
+  name: 'test',
+  data () {
+    return {
+      name: null
+    }
+  },
+  created () {
+    this.getName()
+  }
+  methods: {
+    getName() {
+      let transaction = this.$apm.getCurrenTransaction()
+      if (transaction) {
+        this.name = transaction.name
+      }
+    }
+  }
+}
+</script>
+----
+
+
+`ApmVuePlugin` uses the Navigation guards functionality provided by the VueRouter and will not work
+with any other router instance provided via the plugin options. 
+
+Once the plugin is initialized, both page load and SPA navigation events will be captured
+as transactions with the `path` of the route as its name and `page-load` or `route-change` as type.
