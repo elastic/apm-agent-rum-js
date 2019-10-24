@@ -1,0 +1,35 @@
+[[breakdown-metrics-docs]]
+== Breakdown Metrics
+
+Breakdown metrics help you visualize where your application is spending most of their time, allowing you to get to the root cause of a performance problem quickly.
+The metrics are calculated for each transaction based on the corresponding types.
+
+[float]
+[[page-load-breakdown]]
+=== Page load breakdown
+
+Page load transactions breakdown aligns closely with the processsing model of the https://www.w3.org/TR/navigation-timing/#processing-model[Navigation Timing API] 
+available in the browsers. The different types of metrics are
+
+* `DNS` - Duration of the DNS query for the current page.
+
+* `TCP` - How long it took to establish the TCP connection to the server. Includes the TLS negotitaion time for HTTPS pages.
+
+* `Request` - The time elapsed between the browser making the HTTP request and receiving the first bytee of the response. 
+   Also referred as TTFB(Time for First Byte).
+
+* `Response` - The elapsed time between the first and the last byte of the response. Referred commonly as Content Download time.
+
+* `Processing` - Time taken to render the current page, It includes downloading necessary resources (JavaScript, Images, CSS etc) 
+   required by the page.
+
+* `Load` - Duration of the `on load` event after the browser is done dowloading the document and resources required for rendering the page.
+
+[float]
+[[other-transaction-breakdown]]
+=== Other transaction types
+
+For other transactions including SPA navigations and user created ones, the breakdown metrics is calculated based on the spans associated with the transaction. 
+
+Example - If a SPA navigation transaction (route-change) spends 20% of the time downloading resources and 80% of the time waiting for the API call response, then
+transaction breakdown would indicate time spent by span type as `resource` - 20% and `http` - 80%.
