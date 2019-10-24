@@ -23,27 +23,12 @@
  *
  */
 
-import { polyfill } from 'es6-promise'
-import { apmBase } from '@elastic/apm-rum'
-import { getGlobalConfig } from '../../../../dev-utils/test-config'
-import ApmServerMock from '@elastic/apm-rum-core/test/utils/apm-server-mock'
+/**
+ * Polyfill Object.assign which is used in @vue/test-utils
+ */
+import 'core-js/es/object/assign'
 
-const globalConfig = getGlobalConfig()
-
-export function getApmBase() {
-  /**
-   * Polyfill the global promise since webdriver
-   * functions uses promise based API
-   * ex: browser.execute, browser.executeAsy
-   */
-  polyfill()
-  console.log('E2E Global Configs', JSON.stringify(globalConfig, null, 2))
-  const apmServer = apmBase.serviceFactory.getService('ApmServer')
-  const serverMock = new ApmServerMock(apmServer, globalConfig.useMocks)
-  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
-  return apmBase
-}
-
-export function getServerUrl() {
-  return globalConfig.agentConfig.serverUrl
-}
+/**
+ * Polyfill Promise
+ */
+import 'es6-promise/auto'

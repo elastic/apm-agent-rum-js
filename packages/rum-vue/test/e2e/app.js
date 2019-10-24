@@ -26,7 +26,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import FetchComponent from './components/Fetch.vue'
-import { getApmBase } from './'
+import { getApmBase, getServerUrl } from './'
 import { ApmVuePlugin } from '../../src'
 
 Vue.use(VueRouter)
@@ -69,6 +69,7 @@ Vue.use(ApmVuePlugin, {
   apm: getApmBase(),
   config: {
     serviceName: 'rum-e2e-vue',
+    serverUrl: getServerUrl(),
     debug: true
   }
 })
