@@ -38,5 +38,5 @@ module.exports = {
     path: path.resolve(__dirname),
     filename: 'app.e2e-bundle.js'
   },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.VUE)
+  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD, PACKAGE_TYPES.VUE)
 }
