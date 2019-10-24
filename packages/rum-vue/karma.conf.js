@@ -36,10 +36,5 @@ module.exports = function(config) {
     webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.VUE)
   })
   const preparedConfig = prepareConfig(config, 'rum-vue')
-  /**
-   * Polyfill Object.assign which is used in @vue/test-utils
-   */
-  const assignPolyfill = require.resolve('core-js/es/object/assign')
-  preparedConfig.files.unshift(assignPolyfill)
   config.set(preparedConfig)
 }

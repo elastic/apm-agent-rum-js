@@ -27,5 +27,5 @@
  * Polyfills required for Angular to work on all browsers
  * https://angular.io/guide/browser-support#polyfills-for-non-cli-users
  */
-import 'core-js/client/shim'
+import 'core-js'
 import 'zone.js/dist/zone'

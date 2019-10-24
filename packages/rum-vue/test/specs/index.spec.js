@@ -23,6 +23,10 @@
  *
  */
 
+/**
+ * Polyfill Object.assign which is used in @vue/test-utils
+ */
+import 'core-js/es/object/assign'
 import { createLocalVue, mount } from '@vue/test-utils'
 import VueRouter from 'vue-router'
 import { ApmBase } from '@elastic/apm-rum'
