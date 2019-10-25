@@ -26,8 +26,7 @@
 import { noop } from './utils'
 
 class LoggingService {
-  constructor(spec) {
-    if (!spec) spec = {}
+  constructor(spec = {}) {
     this.levels = ['trace', 'debug', 'info', 'warn', 'error']
     this.level = spec.level || 'info'
     this.prefix = spec.prefix || ''
@@ -65,13 +64,10 @@ class LoggingService {
         }
         var args = arguments
         if (prefix) {
-          if (typeof prefix === 'function') prefix = prefix(level)
           args[0] = prefix + args[0]
         }
         if (console) {
-          var realMethod = console[normalizedLevel]
-            ? console[normalizedLevel]
-            : console.log
+          var realMethod = console[normalizedLevel] || console.log
           if (typeof realMethod === 'function') {
             realMethod.apply(console, args)
           }

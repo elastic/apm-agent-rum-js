@@ -42,7 +42,9 @@ class ServiceFactory {
       return new ConfigService()
     })
     this.registerServiceCreator('LoggingService', function() {
-      return new LoggingService()
+      return new LoggingService({
+        prefix: '[JS Agent] '
+      })
     })
     this.registerServiceCreator('ApmServer', function() {
       return new ApmServer(

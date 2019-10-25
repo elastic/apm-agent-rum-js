@@ -33,9 +33,6 @@ import { TRANSACTION_START, TRANSACTION_END } from '../common/constants'
 
 class TransactionService {
   constructor(logger, config) {
-    if (__DEV__ && typeof config === 'undefined') {
-      logger.debug('TransactionService: config is not provided')
-    }
     this._config = config
     this._logger = logger
     this.currentTransaction = undefined
@@ -79,7 +76,7 @@ class TransactionService {
     var interval = this._config.get('browserResponsivenessInterval')
     if (typeof interval === 'undefined') {
       if (__DEV__) {
-        this._logger.debug('browserResponsivenessInterval is undefined!')
+        this._logger.debug('browserResponsivenessInterval config is undefined!')
       }
       return
     }
@@ -125,11 +122,10 @@ class TransactionService {
        */
       if (__DEV__) {
         this._logger.debug(
-          'Redefining the current transaction',
-          tr,
-          name,
-          type,
-          perfOptions
+          'Redefining current transaction from',
+          { name: tr.name, type: tr.type },
+          'to',
+          { name, type, options: perfOptions }
         )
       }
       /**
@@ -140,7 +136,7 @@ class TransactionService {
       tr.redefine(name, undefined, perfOptions)
     } else {
       if (__DEV__) {
-        this._logger.debug('Ending old transaction', tr)
+        this._logger.debug('ending old transaction', tr)
       }
       tr.end()
       tr = this.createTransaction(name, type, perfOptions)
@@ -180,7 +176,7 @@ class TransactionService {
     tr.onEnd = () => this.handleTransactionEnd(tr)
 
     if (__DEV__) {
-      this._logger.debug('TransactionService.startTransaction', tr)
+      this._logger.debug('startTransaction', { name: tr.name, type: tr.type })
     }
     this._config.events.send(TRANSACTION_START, [tr])
 
@@ -190,13 +186,14 @@ class TransactionService {
   handleTransactionEnd(tr) {
     return Promise.resolve().then(
       () => {
-        if (this.shouldIgnoreTransaction(tr.name)) {
+        const { name, type } = tr
+        if (this.shouldIgnoreTransaction(name)) {
           if (__DEV__) {
-            this._logger.debug('TransactionService transaction is ignored', tr)
+            this._logger.debug(`transaction is ignored`, { name, type })
           }
           return
         }
-        if (tr.type === PAGE_LOAD) {
+        if (type === PAGE_LOAD) {
           /**
            * Setting the pageLoadTransactionName via configService.setConfig after
            * transaction has started should also reflect the correct name.
@@ -204,7 +201,7 @@ class TransactionService {
           const pageLoadTransactionName = this._config.get(
             'pageLoadTransactionName'
           )
-          if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
+          if (name === NAME_UNKNOWN && pageLoadTransactionName) {
             tr.name = pageLoadTransactionName
           }
         }
@@ -224,12 +221,12 @@ class TransactionService {
         }
         this._config.events.send(TRANSACTION_END, [tr])
         if (__DEV__) {
-          this._logger.debug('TransactionService transaction ended', tr)
+          this._logger.debug('transaction ended', tr)
         }
       },
       err => {
         if (__DEV__) {
-          this._logger.debug('TransactionService transaction onEnd', err)
+          this._logger.debug('error ending transaction', err)
         }
       }
     )
@@ -294,7 +291,12 @@ class TransactionService {
 
     if (trans) {
       if (__DEV__) {
-        this._logger.debug('TransactionService.startSpan', name, type)
+        this._logger.debug(
+          'startSpan',
+          { name, type },
+          'on transaction',
+          trans.name
+        )
       }
       var span = trans.startSpan(name, type, options)
       return span
@@ -306,7 +308,7 @@ class TransactionService {
     if (tr) {
       var taskId = tr.addTask(taskId)
       if (__DEV__) {
-        this._logger.debug('TransactionService.addTask', taskId)
+        this._logger.debug('addTask', taskId, 'on transaction', tr.name)
       }
     }
     return taskId
@@ -317,7 +319,7 @@ class TransactionService {
     if (tr) {
       tr.removeTask(taskId)
       if (__DEV__) {
-        this._logger.debug('TransactionService.removeTask', taskId)
+        this._logger.debug('removeTask', taskId, 'on transaction', tr.name)
       }
     }
   }
