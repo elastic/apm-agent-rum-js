@@ -83,7 +83,7 @@ A list of instrumentations which can be disabled. Valid options are `xmlhttprequ
 === `environment`
 
 * *Type:* String
-* *Default:* ``
+* *Default:* `''`
 
 Environment where the service being monitored is deployed, e.g. "production", "development", "test", etc.
 
@@ -238,6 +238,24 @@ By default the agent can only send (up to) `20` transactions every `30000` milli
 
 A number between `0.0` and `1.0` that specifies the sample rate of transactions, by default all transactions are sampled.
 
+
+[float]
+[[central-config]]
+==== `centralConfig`
+
+* *Type:* Boolean
+* *Default:* `false`
+
+This option activates APM Agent Configuration via Kibana.
+When set to `true`, the agent starts fetching configurations via the APM Server during the initialization phase.
+These central configurations are cached in `sessionStorage`, and will not be fetched again until
+the session is closed and/or `sessionStorage` is cleared.
+ In most cases, this means when the tab/window of the page is closed.
+
+NOTE: Currently, only <<transaction-sample-rate, transaction sample rate>> can be configured via Kibana.
+
+NOTE: This feature requires APM Server v7.5 or later and that the APM Server is configured with `kibana.enabled: true`.
+More information is available in {apm-app-ref}/agent-configuration.html[APM Agent configuration].
 
 
 
