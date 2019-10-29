@@ -23,15 +23,28 @@
  *
  */
 
+import { Promise } from 'es6-promise'
+
 export function routeHooks(router, apm) {
   let transaction
-  router.beforeResolve((to, from, next) => {
+
+  function scheduleTransactionFinish() {
+    if (transaction) {
+      Promise.resolve().then(() => transaction.detectFinish())
+    }
+  }
+
+  router.beforeEach((to, from, next) => {
+    const matched = to.matched || []
+    let path = to.path
     /**
      * Get the last matched route record which acts as stack when
      * route changes are pushed and popped out of the stack
+     *
+     * Also account for the slug pattern on the routes, to.path always
+     * resolves the current slug param, but we need need to
+     * use the slug pattern for the transaction namee
      */
-    const matched = to.matched || []
-    let path = to.path
     if (matched.length > 0) {
       path = matched[matched.length - 1].path || path
     }
@@ -42,9 +55,10 @@ export function routeHooks(router, apm) {
     next()
   })
 
-  router.afterEach(() => {
-    if (transaction) {
-      Promise.resolve().then(() => transaction.detectFinish())
-    }
-  })
+  router.afterEach(scheduleTransactionFinish)
+  /**
+   * hanbdle when the navigation is cancelled in `beforeEach` hook of components
+   * where `next(error)` is called
+   */
+  router.onError(scheduleTransactionFinish)
 }

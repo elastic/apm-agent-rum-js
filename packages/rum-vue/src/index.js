@@ -26,16 +26,18 @@
 import { apmBase } from '@elastic/apm-rum'
 import { routeHooks } from './route-hooks'
 
-export function ApmVuePlugin(Vue, options) {
-  const { router, apm = apmBase, config } = options
-  /**
-   * Initialize the APM with the config
-   */
-  const apmInstance = apm.init(config)
+export const ApmVuePlugin = {
+  install: (Vue, options) => {
+    const { router, apm = apmBase, config } = options
+    /**
+     * Initialize the APM with the config
+     */
+    const apmInstance = apm.init(config)
 
-  routeHooks(router, apm)
-  /**
-   * Provide it via $apm to be accessed in all Vue Components
-   */
-  Vue.prototype.$apm = apmInstance
+    routeHooks(router, apm)
+    /**
+     * Provide it via $apm to be accessed in all Vue Components
+     */
+    Vue.prototype.$apm = apmInstance
+  }
 }

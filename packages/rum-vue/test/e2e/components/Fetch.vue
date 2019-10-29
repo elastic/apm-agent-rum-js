@@ -12,25 +12,25 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       loading: false,
       data: null,
       error: null
     }
   },
-  created () {
+  created() {
     this.fetchData()
   },
   watch: {
-    '$route': 'fetchData'
+    $route: 'fetchData'
   },
   methods: {
-    fetchData () {
+    fetchData() {
       const url = '/test/e2e/data.json'
       this.error = this.data = null
       this.loading = true
-      
+
       fetch(url)
         .then(resp => {
           this.loading = false
@@ -38,10 +38,22 @@ export default {
         })
         .then(data => {
           this.data = data
-        }).catch(err => {
+        })
+        .catch(err => {
           this.error = err
         })
     }
+  },
+  beforeRouteEnter(to, from, next) {
+    if (typeof performance.mark === 'function') {
+      performance.mark('before-enter-start')
+    }
+    setTimeout(() => {
+      if (typeof performance.measure === 'function') {
+        performance.measure('route-enter', 'before-enter-start')
+      }
+      next()
+    }, 70)
   }
 }
 </script>

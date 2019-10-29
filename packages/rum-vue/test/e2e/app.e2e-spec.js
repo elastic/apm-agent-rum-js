@@ -23,7 +23,10 @@
  *
  */
 
-const { waitForApmServerCalls } = require('../../../../dev-utils/webdriver')
+const {
+  waitForApmServerCalls,
+  getBrowserInfo
+} = require('../../../../dev-utils/webdriver')
 
 describe('Vue router integration', function() {
   beforeAll(() => browser.url('/test/e2e/'))
@@ -53,7 +56,20 @@ describe('Vue router integration', function() {
     const routeTransaction = serverCalls.sendTransactions[1].args[0][0]
     expect(routeTransaction.name).toBe('/fetch')
     expect(routeTransaction.type).toBe('route-change')
-    expect(routeTransaction.spans.length).toBe(1)
-    expect(routeTransaction.spans[0].name).toBe('GET /test/e2e/data.json')
+
+    const spanTypes = ['app', 'external']
+    const foundSpans = routeTransaction.spans.filter(
+      span => spanTypes.indexOf(span.type) > -1
+    )
+    /**
+     * `app` span type will not be captured in safari 9 since
+     * User Timing API is not supported.
+     */
+    const { name } = getBrowserInfo()
+    if (name.indexOf('safari') >= 0) {
+      expect(foundSpans.length).toEqual(1)
+    } else {
+      expect(foundSpans.length).toEqual(2)
+    }
   })
 })

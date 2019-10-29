@@ -26,7 +26,5 @@
 /**
  * Polyfills for unsupported browsers
  * - Object.assign is used in @vue/test-utils
- * - Promise since its used in tests
  */
 import 'core-js/es/object/assign'
-import 'es6-promise/auto'
