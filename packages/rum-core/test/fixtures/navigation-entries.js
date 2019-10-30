@@ -24,27 +24,27 @@
  */
 
 export const TIMING_LEVEL1_ENTRY = {
-  navigationStart: 1528373292350,
-  unloadEventStart: 1528373293147,
-  unloadEventEnd: 1528373293147,
+  navigationStart: 1572362095174,
+  unloadEventStart: 0,
+  unloadEventEnd: 0,
   redirectStart: 0,
   redirectEnd: 0,
-  fetchStart: 1528373292356,
-  domainLookupStart: 1528373292356,
-  domainLookupEnd: 1528373292356,
-  connectStart: 1528373292356,
-  connectEnd: 1528373292356,
-  secureConnectionStart: 0,
-  requestStart: 1528373292363,
-  responseStart: 1528373293142,
-  responseEnd: 1528373293303,
-  domLoading: 1528373293176,
-  domInteractive: 1528373293820,
-  domContentLoadedEventStart: 1528373293820,
-  domContentLoadedEventEnd: 1528373293854,
-  domComplete: 1528373295207,
-  loadEventStart: 1528373295208,
-  loadEventEnd: 1528373295230
+  fetchStart: 1572362095181,
+  domainLookupStart: 1572362095182,
+  domainLookupEnd: 1572362095201,
+  connectStart: 1572362095201,
+  connectEnd: 1572362095269,
+  secureConnectionStart: 1572362095229,
+  requestStart: 1572362095270,
+  responseStart: 1572362095320,
+  responseEnd: 1572362095390,
+  domLoading: 1572362095346,
+  domInteractive: 1572362095723,
+  domContentLoadedEventStart: 1572362095815,
+  domContentLoadedEventEnd: 1572362095835,
+  domComplete: 1572362096143,
+  loadEventStart: 1572362096143,
+  loadEventEnd: 1572362096145
 }
 
 export const TIMING_LEVEL2_ENTRIES = [
