@@ -64,7 +64,14 @@ describe('Breakdown metrics', () => {
     const pageLoadTransaction = createTransaction(PAGE_LOAD)
     pageLoadTransaction.end()
     const breakdown = captureBreakdown(pageLoadTransaction, TIMING_LEVEL1_ENTRY)
-    const spanTypes = ['Network', 'DOM Processing', 'Page Render']
+    const spanTypes = [
+      'DNS',
+      'TCP',
+      'Request',
+      'Response',
+      'Processing',
+      'Load'
+    ]
 
     const spans = breakdown.slice(1)
 

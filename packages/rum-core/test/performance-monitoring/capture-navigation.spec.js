@@ -59,14 +59,16 @@ describe('Capture hard navigation', function() {
     )
 
     expect(spans.map(mapSpan)).toEqual([
-      { name: 'Requesting and receiving the document', _end: 947, _start: 7 },
+      { name: 'Domain lookup', _end: 20, _start: 1 },
+      { name: 'Making a connection to the server', _end: 88, _start: 20 },
+      { name: 'Requesting and receiving the document', _end: 209, _start: 89 },
       {
         name: 'Parsing the document, executing sync. scripts',
-        _end: 1464,
-        _start: 820
+        _end: 542,
+        _start: 165
       },
-      { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
+      { name: 'Fire "DOMContentLoaded" event', _end: 654, _start: 634 },
+      { name: 'Fire "load" event', _end: 964, _start: 962 }
     ])
 
     const fetchStartValues = [undefined, null, Number(new Date()), 0, 1]
@@ -93,13 +95,15 @@ describe('Capture hard navigation', function() {
         transactionEnd
       )
       expect(spans.map(mapSpan)).toEqual([
+        { name: 'Domain lookup', _end: 20, _start: 1 },
+        { name: 'Making a connection to the server', _end: 88, _start: 20 },
         {
           name: 'Parsing the document, executing sync. scripts',
-          _end: 1464,
-          _start: 820
+          _end: 542,
+          _start: 165
         },
-        { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-        { name: 'Fire "load" event', _end: 2874, _start: 2852 }
+        { name: 'Fire "DOMContentLoaded" event', _end: 654, _start: 634 },
+        { name: 'Fire "load" event', _end: 964, _start: 962 }
       ])
     }
 
@@ -118,8 +122,10 @@ describe('Capture hard navigation', function() {
         transactionEnd
       )
       expect(spans.map(mapSpan)).toEqual([
-        { name: 'Fire "DOMContentLoaded" event', _end: 1498, _start: 1464 },
-        { name: 'Fire "load" event', _end: 2874, _start: 2852 }
+        { name: 'Domain lookup', _end: 20, _start: 1 },
+        { name: 'Making a connection to the server', _end: 88, _start: 20 },
+        { name: 'Fire "DOMContentLoaded" event', _end: 654, _start: 634 },
+        { name: 'Fire "load" event', _end: 964, _start: 962 }
       ])
     }
 
@@ -137,7 +143,9 @@ describe('Capture hard navigation', function() {
       transactionEnd
     )
     expect(spans.map(mapSpan)).toEqual([
-      { name: 'Fire "load" event', _end: 2874, _start: 2852 }
+      { name: 'Domain lookup', _end: 20, _start: 1 },
+      { name: 'Making a connection to the server', _end: 88, _start: 20 },
+      { name: 'Fire "load" event', _end: 964, _start: 962 }
     ])
   })
 
