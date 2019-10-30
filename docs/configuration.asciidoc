@@ -120,7 +120,7 @@ Enable/disable the tracking and collection of breakdown metrics for the transact
 NOTE: This feature requires APM Server and Kibana >= 7.4.
 
 NOTE: Breakdown distribution for the transaction varies depending on the type of the transaction.
-To understand the different types, refer <<breakdown-metrics-docs, Breakdown metrics docs>>
+To understand the different types, see <<breakdown-metrics-docs>>
 
 [float]
 [[flush-interval]]

@@ -13,6 +13,8 @@ The agent automatically captures all the outgoing http requests, by instrumentin
 
 The agent also adds support for <<distributed-tracing-guide, Distributed Tracing>> for all outgoing requests.
 
+For all transactions, the agent automatically captures <<breakdown-metrics-docs, breakdown metrics>>.
+
 [float]
 [[platforms]]
 === Platforms
