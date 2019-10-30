@@ -145,7 +145,7 @@ NOTE: The payload will be dropped if one of the filters return a falsy value.
 
 [source,js]
 ----
-apm.startTransaction(name, type)
+apm.startTransaction(name, type, options)
 ----
 
 
@@ -157,10 +157,29 @@ Arguments:
 
 * `type` - The type of the transaction (string). Defaults to `custom`
 
+* `options` - Options to modify the created transaction (object). 
+This argument is optional. The following options are supported:
+
+** `managed` - Controls whether the transaction is managed by the agent or not. Defaults to `false`.
 
 Use this method to create a custom transaction. 
-By default, custom transactions are not managed by the agent, therefore 
-they need to be ended manually.
+
+By default, custom transactions are not managed by the agent, however, you can start a managed transaction
+ by passing `{ managed: true }` as the `options` argument.
+
+There are some differences between managed and unmanaged transactions:
+
+* For managed transactions, the agent keeps track of the relevant tasks during the lifetime of the transaction
+ and automatically ends it once all of the tasks are finished. Unmanaged transactions need to be ended
+ manually by calling the <<transaction-end,`end`>> method.
+
+* Managed transactions include information captured via our auto-instrumentations (e.g. XHR spans).
+ See <<supported-technologies, Supported Technologies>> for a list of instrumentations.
+
+* There can only be one managed transaction at any given time --
+ starting a second managed transaction will end the previous one.
+ There are no limits for unmanaged transactions.
+
 
 NOTE: This method returns `undefined` if apm is disabled or if <<active,active>> flag is set to `false` in the config.
 
