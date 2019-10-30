@@ -157,8 +157,10 @@ Arguments:
 
 * `type` - The type of the transaction (string). Defaults to `custom`
 
-* `options` - Options to modify the created transaction (object). Defaults to `undefined`
+* `options` - Options to modify the created transaction (object). 
+This argument is optional. The following options are supported:
 
+** `managed` - Controls whether the transaction is managed by the agent or not. Defaults to `false`.
 
 Use this method to create a custom transaction. 
 
@@ -167,15 +169,15 @@ By default, custom transactions are not managed by the agent, however, you can s
 
 There are some differences between managed and unmanaged transactions:
 
-* For managed transactions, the agent keeps track of the relevant tasks during the life time of the transaction
- and would automatically end it once all of the tasks are finished. Unmanaged transactions need to be ended
- manually by calling the <<transaction-end, `end`>> method.
+* For managed transactions, the agent keeps track of the relevant tasks during the lifetime of the transaction
+ and automatically ends it once all of the tasks are finished. Unmanaged transactions need to be ended
+ manually by calling the <<transaction-end,`end`>> method.
 
-* Managed transactions would include extra information created via our auto-instrumentations (e.g. XHR spans),
- see <<supported-technologies, Supported Technologies>> for a list of these instrumentations.
+* Managed transactions include information captured via our auto-instrumentations (e.g. XHR spans).
+ See <<supported-technologies, Supported Technologies>> for a list of instrumentations.
 
-* There can only be one managed transaction at any given time,
- starting a second managed transaction would result in ending the previous one.
+* There can only be one managed transaction at any given time --
+ starting a second managed transaction will end the previous one.
  There are no limits for unmanaged transactions.
 
 
