@@ -41,7 +41,7 @@ export const TIMING_LEVEL1_ENTRY = {
   domLoading: 1572362095346,
   domInteractive: 1572362095723,
   domContentLoadedEventStart: 1572362095815,
-  domContentLoadedEventEnd: 1572362095815,
+  domContentLoadedEventEnd: 1572362095835,
   domComplete: 1572362096143,
   loadEventStart: 1572362096143,
   loadEventEnd: 1572362096145

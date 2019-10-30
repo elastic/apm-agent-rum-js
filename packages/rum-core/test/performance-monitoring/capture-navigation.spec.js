@@ -67,6 +67,7 @@ describe('Capture hard navigation', function() {
         _end: 542,
         _start: 165
       },
+      { name: 'Fire "DOMContentLoaded" event', _end: 654, _start: 634 },
       { name: 'Fire "load" event', _end: 964, _start: 962 }
     ])
 
@@ -101,6 +102,7 @@ describe('Capture hard navigation', function() {
           _end: 542,
           _start: 165
         },
+        { name: 'Fire "DOMContentLoaded" event', _end: 654, _start: 634 },
         { name: 'Fire "load" event', _end: 964, _start: 962 }
       ])
     }
@@ -122,6 +124,7 @@ describe('Capture hard navigation', function() {
       expect(spans.map(mapSpan)).toEqual([
         { name: 'Domain lookup', _end: 20, _start: 1 },
         { name: 'Making a connection to the server', _end: 88, _start: 20 },
+        { name: 'Fire "DOMContentLoaded" event', _end: 654, _start: 634 },
         { name: 'Fire "load" event', _end: 964, _start: 962 }
       ])
     }
