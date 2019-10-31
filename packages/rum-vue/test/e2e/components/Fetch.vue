@@ -45,15 +45,14 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    if (typeof performance.mark === 'function') {
-      performance.mark('before-enter-start')
-    }
-    setTimeout(() => {
-      if (typeof performance.measure === 'function') {
-        performance.measure('route-enter', 'before-enter-start')
-      }
-      next()
-    }, 70)
+    /**
+     * Creating a custom span to verify if its getting captured in
+     * route-change transaction
+     */
+    next(vue => {
+      const span = vue.$apm.startSpan('before-enter')
+      span.end()
+    })
   }
 }
 </script>

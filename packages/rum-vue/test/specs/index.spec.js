@@ -54,11 +54,11 @@ describe('APM route hooks', () => {
   }
   const Foo = { template: '<div>foo</div>' }
 
-  function mountApp(routes) {
+  function mountApp(routes, mode = 'history') {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     const router = new VueRouter({
-      mode: 'history',
+      mode,
       routes
     })
     localVue.use(ApmVuePlugin, {
@@ -150,5 +150,32 @@ describe('APM route hooks', () => {
   it('should expose the $apm on the vue instance', () => {
     const { wrapper } = mountApp([])
     expect(wrapper.vm.$apm).toEqual(apm)
+  })
+
+  describe('vue router hash mode', () => {
+    it('should use the slug id for transaction name', () => {
+      const { router, wrapper } = mountApp(
+        [
+          {
+            path: '/foo/:id',
+            component: Foo
+          }
+        ],
+        'hash'
+      )
+      spyOn(apm, 'startTransaction')
+      router.push('/foo/1')
+
+      expect(apm.startTransaction).toHaveBeenCalledWith(
+        '/foo/:id',
+        'route-change',
+        {
+          managed: true,
+          canReuse: true
+        }
+      )
+      expect(wrapper.find(Foo).exists()).toBe(true)
+      wrapper.destroy()
+    })
   })
 })

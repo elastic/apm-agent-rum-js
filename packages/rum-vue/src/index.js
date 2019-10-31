@@ -32,12 +32,12 @@ export const ApmVuePlugin = {
     /**
      * Initialize the APM with the config
      */
-    const apmInstance = apm.init(config)
+    apm.init(config)
 
     routeHooks(router, apm)
     /**
      * Provide it via $apm to be accessed in all Vue Components
      */
-    Vue.prototype.$apm = apmInstance
+    Vue.prototype.$apm = apm
   }
 }

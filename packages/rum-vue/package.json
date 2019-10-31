@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@elastic/apm-rum": "file:../rum",
-    "es6-promise": "^4.2.8"
+    "@elastic/apm-rum-core": "file:../rum-core"
   },
   "peerDependencies": {
     "vue-router": "^3.0.0"

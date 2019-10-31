@@ -23,16 +23,10 @@
  *
  */
 
-import { Promise } from 'es6-promise'
+import { scheduleMacroTask } from '@elastic/apm-rum-core'
 
 export function routeHooks(router, apm) {
   let transaction
-
-  function scheduleTransactionFinish() {
-    if (transaction) {
-      Promise.resolve().then(() => transaction.detectFinish())
-    }
-  }
 
   router.beforeEach((to, from, next) => {
     const matched = to.matched || []
@@ -55,10 +49,16 @@ export function routeHooks(router, apm) {
     next()
   })
 
-  router.afterEach(scheduleTransactionFinish)
+  router.afterEach(() => {
+    if (transaction) {
+      scheduleMacroTask(() => transaction.detectFinish())
+    }
+  })
   /**
    * hanbdle when the navigation is cancelled in `beforeEach` hook of components
    * where `next(error)` is called
    */
-  router.onError(scheduleTransactionFinish)
+  router.onError(() => {
+    transaction && transaction.end()
+  })
 }
