@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import { scheduleMacroTask } from '@elastic/apm-rum-core'
+
 export default {
   data() {
     return {
@@ -51,7 +53,7 @@ export default {
      */
     next(vue => {
       const span = vue.$apm.startSpan('before-enter')
-      span.end()
+      scheduleMacroTask(() => span.end())
     })
   }
 }
