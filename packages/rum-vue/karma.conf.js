@@ -23,9 +23,18 @@
  *
  */
 
-/**
- * Polyfills required for Angular to work on all browsers
- * https://angular.io/guide/browser-support#polyfills-for-non-cli-users
- */
-import 'core-js'
-import 'zone.js/dist/zone'
+const { baseConfig, prepareConfig } = require('../../dev-utils/karma')
+const {
+  getWebpackConfig,
+  PACKAGE_TYPES,
+  BUNDLE_TYPES
+} = require('../../dev-utils/build')
+
+module.exports = function(config) {
+  config.set(baseConfig)
+  config.set({
+    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.VUE)
+  })
+  const preparedConfig = prepareConfig(config, 'rum-vue')
+  config.set(preparedConfig)
+}

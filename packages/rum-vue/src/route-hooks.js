@@ -23,9 +23,42 @@
  *
  */
 
-/**
- * Polyfills required for Angular to work on all browsers
- * https://angular.io/guide/browser-support#polyfills-for-non-cli-users
- */
-import 'core-js'
-import 'zone.js/dist/zone'
+import { scheduleMacroTask } from '@elastic/apm-rum-core'
+
+export function routeHooks(router, apm) {
+  let transaction
+
+  router.beforeEach((to, from, next) => {
+    const matched = to.matched || []
+    let path = to.path
+    /**
+     * Get the last matched route record which acts as stack when
+     * route changes are pushed and popped out of the stack
+     *
+     * Also account for the slug pattern on the routes, to.path always
+     * resolves the current slug param, but we need need to
+     * use the slug pattern for the transaction namee
+     */
+    if (matched.length > 0) {
+      path = matched[matched.length - 1].path || path
+    }
+    transaction = apm.startTransaction(path, 'route-change', {
+      managed: true,
+      canReuse: true
+    })
+    next()
+  })
+
+  router.afterEach(() => {
+    if (transaction) {
+      scheduleMacroTask(() => transaction.detectFinish())
+    }
+  })
+  /**
+   * hanbdle when the navigation is cancelled in `beforeEach` hook of components
+   * where `next(error)` is called
+   */
+  router.onError(() => {
+    transaction && transaction.end()
+  })
+}

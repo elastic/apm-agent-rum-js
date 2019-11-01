@@ -23,9 +23,21 @@
  *
  */
 
-/**
- * Polyfills required for Angular to work on all browsers
- * https://angular.io/guide/browser-support#polyfills-for-non-cli-users
- */
-import 'core-js'
-import 'zone.js/dist/zone'
+import { apmBase } from '@elastic/apm-rum'
+import { routeHooks } from './route-hooks'
+
+export const ApmVuePlugin = {
+  install: (Vue, options) => {
+    const { router, apm = apmBase, config } = options
+    /**
+     * Initialize the APM with the config
+     */
+    apm.init(config)
+
+    routeHooks(router, apm)
+    /**
+     * Provide it via $apm to be accessed in all Vue Components
+     */
+    Vue.prototype.$apm = apm
+  }
+}
