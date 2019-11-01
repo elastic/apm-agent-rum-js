@@ -25,6 +25,7 @@
 
 const { EnvironmentPlugin } = require('webpack')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const VuePlugin = require('vue-loader/lib/plugin')
 const { getTestEnvironmentVariables } = require('./test-config')
 
 const BUNDLE_TYPES = {
@@ -47,7 +48,8 @@ const {
 const PACKAGE_TYPES = {
   DEFAULT: 'DEFAULT',
   REACT: 'REACT',
-  ANGULAR: 'ANGULAR'
+  ANGULAR: 'ANGULAR',
+  VUE: 'VUE'
 }
 
 function getBabelPresetEnv(bundleType) {
@@ -96,11 +98,19 @@ function getReactConfig(options) {
   })
 }
 
+function getVueConfig(options) {
+  return Object.assign({}, options, {
+    plugins: options.plugins.concat(['@babel/plugin-syntax-dynamic-import'])
+  })
+}
+
 function getOptions(options, packageType) {
   if (packageType === PACKAGE_TYPES.REACT) {
     return getReactConfig(options)
   } else if (packageType === PACKAGE_TYPES.ANGULAR) {
     return getAngularConfig(options)
+  } else if (packageType === PACKAGE_TYPES.VUE) {
+    return getVueConfig(options)
   }
   return options
 }
@@ -150,6 +160,10 @@ function getWebpackConfig(bundleType, packageType) {
           exclude: /node_modules/,
           loader: 'babel-loader',
           options: getBabelConfig(bundleType, packageType)
+        },
+        {
+          test: /\.vue$/,
+          use: 'vue-loader'
         }
       ]
     },
@@ -158,6 +172,17 @@ function getWebpackConfig(bundleType, packageType) {
     resolve: {
       extensions: ['.js', '.jsx', '.ts']
     }
+  }
+
+  if (packageType === PACKAGE_TYPES.VUE) {
+    config.plugins.push(new VuePlugin())
+    Object.assign(config, {
+      resolve: {
+        alias: {
+          vue$: 'vue/dist/vue.esm.js'
+        }
+      }
+    })
   }
 
   if (isEnvProduction) {

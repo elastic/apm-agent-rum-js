@@ -48,6 +48,10 @@ jobs:
       env:
         - STACK_VERSION=7.3.0
         - SCOPE=@elastic/apm-rum-angular
+    - stage: test
+      env:
+        - STACK_VERSION=7.3.0
+        - SCOPE=@elastic/apm-rum-vue
 addons:
   apt:
     packages:

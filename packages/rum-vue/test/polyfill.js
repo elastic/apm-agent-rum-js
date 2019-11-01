@@ -24,8 +24,7 @@
  */
 
 /**
- * Polyfills required for Angular to work on all browsers
- * https://angular.io/guide/browser-support#polyfills-for-non-cli-users
+ * Polyfills for unsupported browsers
+ * - Object.assign is used in @vue/test-utils
  */
-import 'core-js'
-import 'zone.js/dist/zone'
+import 'core-js/es/object/assign'

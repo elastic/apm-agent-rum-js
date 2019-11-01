@@ -1,0 +1,55 @@
+{
+  "name": "@elastic/apm-rum-vue",
+  "version": "0.0.0",
+  "description": "Elastic APM Real User Monitoring for Vue applications",
+  "keywords": [
+    "elastic",
+    "apm",
+    "vue",
+    "vue-router"
+  ],
+  "homepage": "https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html",
+  "license": "MIT",
+  "main": "dist/lib/index.js",
+  "module": "dist/es/index.js",
+  "source": "src/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "build": "run-p build:main build:module",
+    "build:main": "BABEL_ENV=BROWSER_PROD npx babel src -d dist/lib",
+    "build:module": "BABEL_ENV=BROWSER_ESM_PROD npx babel src -d dist/es",
+    "build:e2e": "npm run script buildE2eBundles packages/rum-vue/test/e2e",
+    "karma:dev": "karma start --auto-watch --restartOnFileChange",
+    "karma:coverage": "karma start --coverage --singleRun",
+    "test:unit": "npm run script runUnitTests packages/rum-vue",
+    "test:e2e": "npm run script runE2eTests packages/rum-vue/wdio.conf.js",
+    "test:sauce": "npm run script runSauceTests packages/rum-vue true build:e2e test:unit test:e2e",
+    "test": "npm run test:sauce",
+    "script": "node ../../dev-utils/run-script.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elastic/apm-agent-rum-js.git",
+    "directory": "packages/rum-vue"
+  },
+  "bugs": {
+    "url": "https://github.com/elastic/apm-agent-rum-js/issues"
+  },
+  "dependencies": {
+    "@elastic/apm-rum": "file:../rum",
+    "@elastic/apm-rum-core": "file:../rum-core"
+  },
+  "peerDependencies": {
+    "vue-router": "^3.0.0"
+  }
+}

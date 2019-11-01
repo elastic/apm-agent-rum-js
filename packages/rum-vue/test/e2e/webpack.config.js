@@ -23,9 +23,20 @@
  *
  */
 
-/**
- * Polyfills required for Angular to work on all browsers
- * https://angular.io/guide/browser-support#polyfills-for-non-cli-users
- */
-import 'core-js'
-import 'zone.js/dist/zone'
+const path = require('path')
+const {
+  getWebpackConfig,
+  BUNDLE_TYPES,
+  PACKAGE_TYPES
+} = require('../../../../dev-utils/build')
+
+module.exports = {
+  entry: {
+    app: path.join(__dirname, 'app.js')
+  },
+  output: {
+    path: path.resolve(__dirname),
+    filename: 'app.e2e-bundle.js'
+  },
+  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD, PACKAGE_TYPES.VUE)
+}

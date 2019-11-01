@@ -61,6 +61,7 @@
     "@types/jasmine": "^3.4.0",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
+    "@vue/test-utils": "^1.0.0-beta.29",
     "@wdio/cli": "^5.11.13",
     "@wdio/dot-reporter": "^5.11.7",
     "@wdio/jasmine-framework": "^5.11.0",
@@ -76,6 +77,7 @@
     "benchmark": "^2.1.4",
     "bundlesize": "^0.17.2",
     "codecov": "^3.5.0",
+    "core-js": "^3.3.2",
     "cpuprofile-filter": "^1.1.0",
     "ejs": "^2.6.2",
     "enzyme": "^3.9.0",
@@ -126,6 +128,10 @@
     "stats-lite": "^2.2.0",
     "typescript": "^3.5.3",
     "uglifyjs-webpack-plugin": "^2.0.1",
+    "vue": "^2.6.10",
+    "vue-loader": "^15.7.1",
+    "vue-router": "^3.1.3",
+    "vue-template-compiler": "^2.6.10",
     "webdriverio": "^5.11.13",
     "webpack": "^4.27.1",
     "webpack-bundle-analyzer": "^3.3.2",
@@ -137,6 +143,7 @@
     "@elastic/apm-rum": "file:packages/rum",
     "@elastic/apm-rum-angular": "file:packages/rum-angular",
     "@elastic/apm-rum-core": "file:packages/rum-core",
-    "@elastic/apm-rum-react": "file:packages/rum-react"
+    "@elastic/apm-rum-react": "file:packages/rum-react",
+    "@elastic/apm-rum-vue": "file:packages/rum-vue"
   }
 }

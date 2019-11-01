@@ -24,6 +24,7 @@
  */
 
 import rng from 'uuid/lib/rng-browser'
+import { Promise } from 'es6-promise'
 
 const slice = [].slice
 
@@ -413,6 +414,10 @@ function getDuration(start, end) {
   return parseFloat(end - start)
 }
 
+function scheduleMacroTask(callback) {
+  Promise.resolve().then(callback)
+}
+
 export {
   extend,
   merge,
@@ -443,6 +448,7 @@ export {
   getTime,
   rng,
   checkSameOrigin,
+  scheduleMacroTask,
   setLabel,
   stripQueryStringFromUrl,
   find,
