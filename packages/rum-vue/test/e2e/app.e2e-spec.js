@@ -53,11 +53,7 @@ describe('Vue router integration', function() {
     const routeTransaction = serverCalls.sendTransactions[1].args[0][0]
     expect(routeTransaction.name).toBe('/fetch')
     expect(routeTransaction.type).toBe('route-change')
-
-    const spanNames = ['before-enter', 'GET /test/e2e/data.json']
-    const foundSpans = routeTransaction.spans.filter(
-      span => spanNames.indexOf(span.name) > -1
-    )
-    expect(foundSpans.length).toBeGreaterThanOrEqual(1)
+    expect(routeTransaction.spans.length).toBe(1)
+    expect(routeTransaction.spans[0].name).toBe('GET /test/e2e/data.json')
   })
 })

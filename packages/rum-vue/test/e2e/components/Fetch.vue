@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import { scheduleMacroTask } from '@elastic/apm-rum-core'
-
 export default {
   data() {
     return {
@@ -45,16 +43,6 @@ export default {
           this.error = err
         })
     }
-  },
-  beforeRouteEnter(to, from, next) {
-    /**
-     * Creating a custom span to verify if its getting captured in
-     * route-change transaction
-     */
-    next(vue => {
-      const span = vue.$apm.startSpan('before-enter')
-      scheduleMacroTask(() => span.end())
-    })
   }
 }
 </script>

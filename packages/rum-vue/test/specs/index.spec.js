@@ -152,6 +152,43 @@ describe('APM route hooks', () => {
     expect(wrapper.vm.$apm).toEqual(apm)
   })
 
+  it('should capture spans inside component route guard', done => {
+    const Span = {
+      template: `<div>Span</div>`,
+      beforeRouteEnter(to, from, next) {
+        setTimeout(() => {
+          const span = apm.startSpan('before-route-enter')
+          span.end()
+          next()
+        }, 0)
+      }
+    }
+    const { router, wrapper } = mountApp([
+      {
+        path: '/spans/:id',
+        component: Span
+      }
+    ])
+    spyOn(apm, 'startTransaction')
+    router.push('/spans/1')
+
+    expect(apm.startTransaction).toHaveBeenCalledWith(
+      '/spans/:id',
+      'route-change',
+      {
+        managed: true,
+        canReuse: true
+      }
+    )
+    router.afterEach(() => {
+      const tr = apm.getCurrentTransaction()
+      expect(tr.spans[0].name).toBe('before-route-enter')
+      expect(wrapper.find(Span).exists()).toBe(true)
+      wrapper.destroy()
+      done()
+    })
+  })
+
   describe('vue router hash mode', () => {
     it('should use the slug id for transaction name', () => {
       const { router, wrapper } = mountApp(
