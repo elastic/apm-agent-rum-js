@@ -29,4 +29,6 @@ include::./distributed-tracing-guide.asciidoc[]
 
 include::./opentracing.asciidoc[]
 
+include::./breakdown-metrics.asciidoc[]
+
 include::./release-notes.asciidoc[]
