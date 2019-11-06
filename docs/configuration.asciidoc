@@ -108,6 +108,20 @@ This option is useful when you want to report an issue with the agent to us.
 
 Possible levels are: `trace`, `debug`, `info`, `warn`, `error`.
 
+[float]
+[[breakdown-metrics]]
+=== `breakdownMetrics`
+
+* *Type:* Boolean
+* *Default:* `false`
+
+Enable/disable the tracking and collection of breakdown metrics for the transaction.
+
+NOTE: This feature requires APM Server and Kibana >= 7.4. Setting this flag to `true` with older APM server version
+would break the RUM payload from reaching the server.
+
+NOTE: Breakdown distribution for the transaction varies depending on the type of the transaction.
+To understand the different types, see <<breakdown-metrics-docs>>
 
 [float]
 [[flush-interval]]
