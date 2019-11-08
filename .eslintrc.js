@@ -57,8 +57,8 @@ module.exports = {
   overrides: [
     {
       /**
-       * babel-eslint does not understand some of the typescript feautes
-       * so its better to use '@typescript-eslint/parser' for .ts files
+       * babel-eslint does not understand some of the typescript features
+       * so it's better to use '@typescript-eslint/parser' for .ts files
        */
       files: ['**/*.ts'],
       parser: '@typescript-eslint/parser',
