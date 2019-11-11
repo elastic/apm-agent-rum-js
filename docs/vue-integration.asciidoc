@@ -55,35 +55,31 @@ Instance of the agent can be accessed inside all the components using `this.$apm
 [source,html]
 ----
 <template>
-  <h1>Current Transaction Name</h1>
-  <h2>{{ name }}</h2>
+  <div>Component timings as span</div>
 </template>
+
 <script>
 export default {
-  name: 'test',
-  data () {
+  data() {
     return {
-      name: null
+      span: null
     }
   },
-  created () {
-    this.getName()
-  }
-  methods: {
-    getName() {
-      let transaction = this.$apm.getCurrenTransaction()
-      if (transaction) {
-        this.name = transaction.name
-      }
-    }
+  created() {
+    this.span = this.$apm.startSpan('create-mount-duration', 'custom')
+  },
+  mounted() {
+    this.span && this.span.end()
   }
 }
+</script>
+
 </script>
 ----
 
 
-`ApmVuePlugin` uses the Navigation guards functionality provided by the VueRouter and will not work
-with any other router instance provided via the plugin options. 
+`ApmVuePlugin` expects the router option to be an instance of VueRouter since it uses the 
+navigation guards functionality.
 
 Once the plugin is initialized, both page load and SPA navigation events will be captured
 as transactions with the `path` of the route as its name and `page-load` or `route-change` as type.
