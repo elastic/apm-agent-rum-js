@@ -43,7 +43,7 @@ class ServiceFactory {
     })
     this.registerServiceCreator('LoggingService', function() {
       return new LoggingService({
-        prefix: '[JS Agent] '
+        prefix: '[Elastic APM] '
       })
     })
     this.registerServiceCreator('ApmServer', function() {

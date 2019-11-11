@@ -203,39 +203,39 @@ describe('PerformanceMonitoring', function() {
       transactionDurationThreshold: 200
     })
     spyOn(logger, 'debug').and.callThrough()
-    const transaction1 = new Transaction('test')
+    const transaction1 = new Transaction('test', 'custom', { id: 1 })
     transaction1.end()
     transaction1._start = 0
     transaction1._end = 201
     expect(transaction1.duration()).toBe(201)
     expect(performanceMonitoring.filterTransaction(transaction1)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
-      'Transaction(test) was discarded! Transaction duration (201) is greater than the transactionDurationThreshold configuration (200)'
+      'Transaction(1, test) was discarded! Transaction duration (201) is greater than the transactionDurationThreshold configuration (200)'
     )
     logger.debug.calls.reset()
 
-    const transaction2 = new Transaction('test2')
+    const transaction2 = new Transaction('test2', 'custom', { id: 2 })
     transaction2.end()
     transaction2._end = transaction2._end + 100
     expect(performanceMonitoring.filterTransaction(transaction2)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
-      'Transaction(test2) was discarded! Transaction does not include any spans'
+      'Transaction(2, test2) was discarded! Transaction does not include any spans'
     )
     logger.debug.calls.reset()
 
-    const transaction3 = new Transaction()
+    const transaction3 = new Transaction(null, null, { id: 3 })
     expect(performanceMonitoring.filterTransaction(transaction3)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
-      "Transaction(Unknown) was discarded! Transaction wasn't ended"
+      "Transaction(3, Unknown) was discarded! Transaction wasn't ended"
     )
     logger.debug.calls.reset()
 
-    const transaction4 = new Transaction()
+    const transaction4 = new Transaction('', '', { id: 4 })
     transaction4.end()
     transaction4._start = transaction4._end = 0
     expect(performanceMonitoring.filterTransaction(transaction4)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
-      'Transaction(Unknown) was discarded! Transaction duration is 0'
+      'Transaction(4, Unknown) was discarded! Transaction duration is 0'
     )
   })
 
@@ -248,6 +248,7 @@ describe('PerformanceMonitoring', function() {
     spyOn(logger, 'debug').and.callThrough()
     expect(logger.debug).not.toHaveBeenCalled()
     var tr = new Transaction('transaction', 'transaction', {
+      id: 212,
       transactionSampleRate: 1,
       managed: true,
       checkBrowserResponsiveness: true
@@ -262,7 +263,7 @@ describe('PerformanceMonitoring', function() {
     var wasBrowserResponsive = performanceMonitoring.filterTransaction(tr)
     expect(wasBrowserResponsive).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
-      'Transaction(transaction) was discarded! Browser was not responsive enough during the transaction.',
+      'Transaction(212, transaction) was discarded! Browser was not responsive enough during the transaction.',
       ' duration:',
       3000,
       ' browserResponsivenessCounter:',

@@ -122,10 +122,10 @@ class TransactionService {
        */
       if (__DEV__) {
         this._logger.debug(
-          'Redefining current transaction from',
-          { name: tr.name, type: tr.type },
+          `redefining transaction(${tr.id}, ${tr.name}, ${tr.type})`,
           'to',
-          { name, type, options: perfOptions }
+          `(${name}, ${type})`,
+          tr
         )
       }
       /**
@@ -136,7 +136,7 @@ class TransactionService {
       tr.redefine(name, undefined, perfOptions)
     } else {
       if (__DEV__) {
-        this._logger.debug('ending old transaction', tr)
+        this._logger.debug(`ending old transaction(${tr.id}, ${tr.name})`, tr)
       }
       tr.end()
       tr = this.createTransaction(name, type, perfOptions)
@@ -176,7 +176,7 @@ class TransactionService {
     tr.onEnd = () => this.handleTransactionEnd(tr)
 
     if (__DEV__) {
-      this._logger.debug('startTransaction', { name: tr.name, type: tr.type })
+      this._logger.debug(`startTransaction(${tr.id}, ${tr.name}, ${tr.type})`)
     }
     this._config.events.send(TRANSACTION_START, [tr])
 
@@ -189,7 +189,9 @@ class TransactionService {
         const { name, type } = tr
         if (this.shouldIgnoreTransaction(name)) {
           if (__DEV__) {
-            this._logger.debug(`transaction is ignored`, { name, type })
+            this._logger.debug(
+              `transaction(${tr.id}, ${name}, ${type}) is ignored`
+            )
           }
           return
         }
@@ -221,12 +223,15 @@ class TransactionService {
         }
         this._config.events.send(TRANSACTION_END, [tr])
         if (__DEV__) {
-          this._logger.debug('transaction ended', tr)
+          this._logger.debug(`end transaction(${tr.id}, ${tr.name})`, tr)
         }
       },
       err => {
         if (__DEV__) {
-          this._logger.debug('error ending transaction', err)
+          this._logger.debug(
+            `error ending transaction(${tr.id}, ${tr.name})`,
+            err
+          )
         }
       }
     )
@@ -287,18 +292,16 @@ class TransactionService {
   }
 
   startSpan(name, type, options) {
-    var trans = this.ensureCurrentTransaction()
+    const tr = this.ensureCurrentTransaction()
 
-    if (trans) {
+    if (tr) {
+      const span = tr.startSpan(name, type, options)
       if (__DEV__) {
         this._logger.debug(
-          'startSpan',
-          { name, type },
-          'on transaction',
-          trans.name
+          `startSpan(${name}, ${type})`,
+          `on transaction(${tr.id}, ${tr.name})`
         )
       }
-      var span = trans.startSpan(name, type, options)
       return span
     }
   }
@@ -308,7 +311,10 @@ class TransactionService {
     if (tr) {
       var taskId = tr.addTask(taskId)
       if (__DEV__) {
-        this._logger.debug('addTask', taskId, 'on transaction', tr.name)
+        this._logger.debug(
+          `addTask(${taskId})`,
+          `on transaction(${tr.id}, ${tr.name})`
+        )
       }
     }
     return taskId
@@ -319,7 +325,10 @@ class TransactionService {
     if (tr) {
       tr.removeTask(taskId)
       if (__DEV__) {
-        this._logger.debug('removeTask', taskId, 'on transaction', tr.name)
+        this._logger.debug(
+          `removeTask(${taskId})`,
+          `on transaction(${tr.id}, ${tr.name})`
+        )
       }
     }
   }
