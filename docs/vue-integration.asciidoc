@@ -1,0 +1,85 @@
+[[vue-integration]]
+=== Vue integration
+
+This document covers how to use Real User Monitoring JavaScript agent with Vue applications.
+
+[[installing-vue-integration]]
+==== Installing Elastic APM Vue package
+
+Install the `@elastic/apm-rum-vue` package as a dependency to your application:
+
+[source,bash]
+----
+npm install --save @elastic/apm-rum-vue 
+----
+
+[float]
+==== Instrumenting your Vue application
+
+The package exposes `ApmVuePlugin` which is a Vue Plugin and can be installed in your application using `Vue.use` method. 
+
+[source,js]
+----
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import { ApmVuePlugin } from '@elastic/apm-rum-vue'
+
+const Home = { template: '<div>home</div>' }
+
+Vue.use(VueRouter)
+
+const router = VueRouter({
+  mode: 'history',
+  routes: [
+    { path: '/', component: Home }
+  ]
+})
+
+Vue.use(ApmVuePlugin, {
+  router,
+  config: {
+    serviceName: 'app-name',
+    // agent configuration
+  }
+})
+
+// app specific code
+----
+
+
+[float]
+==== Accessing agent instance inside components
+
+Instance of the agent can be accessed inside all the components using `this.$apm`
+
+[source,html]
+----
+<template>
+  <div>Component timings as span</div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      span: null
+    }
+  },
+  created() {
+    this.span = this.$apm.startSpan('create-mount-duration', 'custom')
+  },
+  mounted() {
+    this.span && this.span.end()
+  }
+}
+</script>
+
+</script>
+----
+
+
+`ApmVuePlugin` expects the router option to be an instance of VueRouter since it uses the 
+navigation guards functionality.
+
+Once the plugin is initialized, both page load and SPA navigation events will be captured
+as transactions with the `path` of the route as its name and `page-load` or `route-change` as type.
