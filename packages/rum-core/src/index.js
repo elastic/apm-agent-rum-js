@@ -28,7 +28,7 @@
 import ErrorLogging from './error-logging'
 import PerformanceMonitoring from './performance-monitoring'
 import ServiceFactory from './common/service-factory'
-import { isPlatformSupported, scheduleMacroTask } from './common/utils'
+import { isPlatformSupported, scheduleMicroTask } from './common/utils'
 import { patchAll, patchEventHandler } from './common/patching'
 import { PAGE_LOAD, ERROR } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
@@ -52,5 +52,5 @@ export {
   PAGE_LOAD,
   getInstrumentationFlags,
   createTracer,
-  scheduleMacroTask
+  scheduleMicroTask
 }

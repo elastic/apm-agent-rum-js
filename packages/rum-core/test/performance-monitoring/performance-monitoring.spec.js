@@ -597,11 +597,11 @@ describe('PerformanceMonitoring', function() {
             },
             {
               event: 'invoke',
-              source: XMLHTTPREQUEST
+              source: FETCH
             },
             {
               event: 'invoke',
-              source: FETCH
+              source: XMLHTTPREQUEST
             }
           ])
           done()

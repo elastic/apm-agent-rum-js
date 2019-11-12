@@ -32,6 +32,8 @@ import {
   XHR_IGNORE
 } from './patch-utils'
 
+import { scheduleMacroTask } from '../utils'
+
 import {
   SCHEDULE,
   INVOKE,
@@ -63,6 +65,7 @@ export function patchXMLHttpRequest(callback) {
   }
 
   const READY_STATE_CHANGE = 'readystatechange'
+  const LOAD = 'load'
 
   function invokeTask(task) {
     task.state = INVOKE
@@ -89,6 +92,8 @@ export function patchXMLHttpRequest(callback) {
     if (listener) {
       oriRemoveListener.call(target, READY_STATE_CHANGE, listener)
     }
+
+    var earlierEvent = false
     const newListener = (target[XHR_LISTENER] = () => {
       if (target.readyState === target.DONE) {
         // sometimes on some browsers XMLHttpRequest will fire onreadystatechange with
@@ -98,12 +103,21 @@ export function patchXMLHttpRequest(callback) {
           XMLHttpRequest[XHR_SCHEDULED] &&
           task.state === SCHEDULE
         ) {
-          invokeTask(task)
+          if (earlierEvent) {
+            scheduleMacroTask(() => {
+              if (task.state === SCHEDULE) {
+                invokeTask(task)
+              }
+            })
+          } else {
+            earlierEvent = true
+          }
         }
       }
     })
 
     oriAddListener.call(target, READY_STATE_CHANGE, newListener)
+    oriAddListener.call(target, LOAD, newListener)
 
     const storedTask = target[XHR_TASK]
     if (!storedTask) {

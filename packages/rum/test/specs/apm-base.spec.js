@@ -28,6 +28,7 @@ import { createServiceFactory, PAGE_LOAD } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { Promise } from 'es6-promise'
+import { scheduleTaskCycles } from '../../../rum-core/test'
 
 var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
@@ -198,11 +199,11 @@ describe('ApmBase', function() {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     req.addEventListener('load', function() {
-      setTimeout(() => {
+      scheduleTaskCycles(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].name).toBe('GET /')
         done()
-      })
+      }, 2)
     })
 
     req.send()
@@ -221,11 +222,11 @@ describe('ApmBase', function() {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     req.addEventListener('load', function() {
-      setTimeout(() => {
+      scheduleTaskCycles(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].name).toBe('GET /')
         done()
-      })
+      }, 2)
     })
     req.send()
     tr = apmBase.getCurrentTransaction()
