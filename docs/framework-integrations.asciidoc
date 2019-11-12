@@ -6,3 +6,4 @@
 
 include::./react-integration.asciidoc[React Integration]
 include::./angular-integration.asciidoc[Angular Integration]
+include::./vue-integration.asciidoc[Vue Integration]
