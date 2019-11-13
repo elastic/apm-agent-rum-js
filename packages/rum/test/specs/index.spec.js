@@ -53,7 +53,9 @@ describe('index', function() {
     delete require.cache[require.resolve('../../src/bootstrap')]
     require('../../src/')
 
-    expect(console.log).toHaveBeenCalledWith('APM: Platform is not supported!')
+    expect(console.log).toHaveBeenCalledWith(
+      '[Elastic APM] platform is not supported!'
+    )
 
     window.performance.now = nowFn
   })

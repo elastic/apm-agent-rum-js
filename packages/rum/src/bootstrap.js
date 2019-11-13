@@ -42,7 +42,7 @@ export default function bootstrap() {
      * Print this error message only on the browser console
      * on unsupported browser versions
      */
-    console.log('APM: Platform is not supported!')
+    console.log('[Elastic APM] platform is not supported!')
   }
 
   return enabled

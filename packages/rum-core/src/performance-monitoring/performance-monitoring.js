@@ -66,11 +66,6 @@ class PerformanceMonitoring {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
         this._apmServer.addTransaction(payload)
-      } else if (__DEV__) {
-        this._logginService.debug(
-          'Could not create a payload from the Transaction',
-          tr
-        )
       }
     })
 
@@ -217,7 +212,7 @@ class PerformanceMonitoring {
 
     if (!duration) {
       if (__DEV__) {
-        let message = 'Transaction was discarded! '
+        let message = `transaction(${tr.id}, ${tr.name}) was discarded! `
         if (duration === 0) {
           message += `Transaction duration is 0`
         } else {
@@ -231,7 +226,9 @@ class PerformanceMonitoring {
     if (duration > transactionDurationThreshold) {
       if (__DEV__) {
         this._logginService.debug(
-          `Transaction was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
+          `transaction(${tr.id}, ${
+            tr.name
+          }) was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
         )
       }
       return false
@@ -240,7 +237,9 @@ class PerformanceMonitoring {
     if (tr.spans.length === 0) {
       if (__DEV__) {
         this._logginService.debug(
-          `Transaction was discarded! Transaction does not include any spans`
+          `transaction(${tr.id}, ${
+            tr.name
+          }) was discarded! Transaction does not include any spans`
         )
       }
       return false
@@ -273,7 +272,9 @@ class PerformanceMonitoring {
       if (!wasBrowserResponsive) {
         if (__DEV__) {
           this._logginService.debug(
-            'Transaction was discarded! Browser was not responsive enough during the transaction.',
+            `transaction(${tr.id}, ${
+              tr.name
+            }) was discarded! Browser was not responsive enough during the transaction.`,
             ' duration:',
             duration,
             ' browserResponsivenessCounter:',
