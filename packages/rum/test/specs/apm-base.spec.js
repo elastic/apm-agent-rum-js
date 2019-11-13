@@ -268,7 +268,7 @@ describe('ApmBase', function() {
       serviceName: ''
     })
     expect(loggingService.error).toHaveBeenCalledWith(
-      `RUM Agent isn't correctly configured: Missing config - serverUrl, serviceName`
+      `RUM agent isn't correctly configured. serverUrl, serviceName is missing`
     )
     const configService = serviceFactory.getService('ConfigService')
     expect(configService.get('active')).toEqual(false)
@@ -279,7 +279,7 @@ describe('ApmBase', function() {
       serviceName: 'abc.def'
     })
     expect(loggingService.error).toHaveBeenCalledWith(
-      `RUM Agent isn't correctly configured: Missing config - serverUrl, serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
+      `RUM agent isn't correctly configured. serverUrl is missing, serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
     )
 
     logErrorSpy.calls.reset()
@@ -287,7 +287,7 @@ describe('ApmBase', function() {
       serviceName: 'abc.def'
     })
     expect(loggingService.error).toHaveBeenCalledWith(
-      `RUM Agent isn't correctly configured: serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
+      `RUM agent isn't correctly configured. serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
     )
   })
 
@@ -349,7 +349,7 @@ describe('ApmBase', function() {
       .fetchCentralConfig()
       .then(() => {
         expect(loggingService.warn).toHaveBeenCalledWith(
-          'Invalid value "NaN" for transactionSampleRate. Allowed: Number between 0 and 1.'
+          'invalid value "NaN" for transactionSampleRate. Allowed: Number between 0 and 1.'
         )
         expect(configService.get('transactionSampleRate')).toBe(1)
 

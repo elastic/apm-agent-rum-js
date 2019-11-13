@@ -136,7 +136,10 @@ class TransactionService {
       tr.redefine(name, undefined, perfOptions)
     } else {
       if (__DEV__) {
-        this._logger.debug(`ending old transaction(${tr.id}, ${tr.name})`, tr)
+        this._logger.debug(
+          `ending previous transaction(${tr.id}, ${tr.name})`,
+          tr
+        )
       }
       tr.end()
       tr = this.createTransaction(name, type, perfOptions)
