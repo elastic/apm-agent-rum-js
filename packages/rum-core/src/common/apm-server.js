@@ -262,12 +262,7 @@ class ApmServer {
   }
 
   ndjsonMetricsets(metricsets) {
-    const timestamp = Date.now() * 1000
-    return metricsets
-      .map(metricset =>
-        NDJSON.stringify({ metricset: { timestamp, ...metricset } })
-      )
-      .join('')
+    return metricsets.map(metricset => NDJSON.stringify({ metricset })).join('')
   }
 
   ndjsonTransactions(transactions) {
