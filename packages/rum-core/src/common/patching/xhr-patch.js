@@ -93,24 +93,31 @@ export function patchXMLHttpRequest(callback) {
       oriRemoveListener.call(target, READY_STATE_CHANGE, listener)
     }
 
-    var earlierEvent = false
-    const newListener = (target[XHR_LISTENER] = () => {
-      if (target.readyState === target.DONE) {
-        // sometimes on some browsers XMLHttpRequest will fire onreadystatechange with
-        // readyState=4 multiple times, so we need to check task state here
-        if (
-          !data.aborted &&
-          XMLHttpRequest[XHR_SCHEDULED] &&
-          task.state === SCHEDULE
-        ) {
-          if (earlierEvent) {
-            scheduleMacroTask(() => {
-              if (task.state === SCHEDULE) {
-                invokeTask(task)
-              }
-            })
-          } else {
-            earlierEvent = true
+    let earlierEvent
+    const newListener = (target[XHR_LISTENER] = ({ type }) => {
+      /**
+       * In certain frameworks (e.g. angular/http) the http request is aborted
+       * as soon as it completes, and that causes the state of the XHR to change.
+       * See https://github.com/angular/angular/issues/33822 for more.
+       */
+      if (earlierEvent) {
+        if (earlierEvent != type) {
+          scheduleMacroTask(() => {
+            if (task.state !== INVOKE) {
+              invokeTask(task)
+            }
+          })
+        }
+      } else {
+        if (target.readyState === target.DONE) {
+          // sometimes on some browsers XMLHttpRequest will fire onreadystatechange with
+          // readyState=4 multiple times, so we need to check task state here
+          if (
+            !data.aborted &&
+            XMLHttpRequest[XHR_SCHEDULED] &&
+            task.state === SCHEDULE
+          ) {
+            earlierEvent = type
           }
         }
       }

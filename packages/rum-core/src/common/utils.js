@@ -415,7 +415,7 @@ function getDuration(start, end) {
 }
 
 function scheduleMacroTask(callback) {
-  setTimeout(callback)
+  setTimeout(callback, 0)
 }
 
 function scheduleMicroTask(callback) {
