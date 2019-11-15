@@ -25,6 +25,8 @@
 
 import { createServiceFactory as originalFactory } from '../src'
 
+import { scheduleMacroTask } from '../src/common/utils'
+
 export function createServiceFactory() {
   var serviceFactory = originalFactory()
   if (window.globalConfigs && window.globalConfigs.useMocks) {
@@ -34,4 +36,12 @@ export function createServiceFactory() {
     }
   }
   return serviceFactory
+}
+
+export function scheduleTaskCycles(callback, cycles = 0) {
+  if (cycles > 0) {
+    scheduleMacroTask(scheduleTaskCycles.bind(this, callback, cycles - 1))
+  } else {
+    callback()
+  }
 }

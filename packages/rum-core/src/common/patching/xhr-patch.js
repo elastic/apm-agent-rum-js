@@ -32,6 +32,8 @@ import {
   XHR_IGNORE
 } from './patch-utils'
 
+import { scheduleMacroTask } from '../utils'
+
 import {
   SCHEDULE,
   INVOKE,
@@ -63,6 +65,7 @@ export function patchXMLHttpRequest(callback) {
   }
 
   const READY_STATE_CHANGE = 'readystatechange'
+  const LOAD = 'load'
 
   function invokeTask(task) {
     task.state = INVOKE
@@ -88,22 +91,47 @@ export function patchXMLHttpRequest(callback) {
 
     if (listener) {
       oriRemoveListener.call(target, READY_STATE_CHANGE, listener)
+      oriRemoveListener.call(target, LOAD, listener)
     }
-    const newListener = (target[XHR_LISTENER] = () => {
-      if (target.readyState === target.DONE) {
-        // sometimes on some browsers XMLHttpRequest will fire onreadystatechange with
-        // readyState=4 multiple times, so we need to check task state here
-        if (
-          !data.aborted &&
-          XMLHttpRequest[XHR_SCHEDULED] &&
-          task.state === SCHEDULE
-        ) {
-          invokeTask(task)
+
+    let earlierEvent
+    const newListener = (target[XHR_LISTENER] = ({ type }) => {
+      /**
+       * In certain frameworks (e.g. angular/http) the http request is aborted
+       * as soon as it completes, and that causes the state of the XHR to change.
+       * See https://github.com/angular/angular/issues/33822 for more.
+       */
+      if (earlierEvent) {
+        if (earlierEvent != type) {
+          scheduleMacroTask(() => {
+            /**
+             * This check is necessary since the readystatechange event can be fired
+             * multiple times (e.g. in IE) and since we schedule a macro task
+             * to invoke the task, we need to make sure that we don't invoke
+             * the task multiple times.
+             */
+            if (task.state !== INVOKE) {
+              invokeTask(task)
+            }
+          })
+        }
+      } else {
+        if (target.readyState === target.DONE) {
+          // sometimes on some browsers XMLHttpRequest will fire onreadystatechange with
+          // readyState=4 multiple times, so we need to check task state here
+          if (
+            !data.aborted &&
+            XMLHttpRequest[XHR_SCHEDULED] &&
+            task.state === SCHEDULE
+          ) {
+            earlierEvent = type
+          }
         }
       }
     })
 
     oriAddListener.call(target, READY_STATE_CHANGE, newListener)
+    oriAddListener.call(target, LOAD, newListener)
 
     const storedTask = target[XHR_TASK]
     if (!storedTask) {

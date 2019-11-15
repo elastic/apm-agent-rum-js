@@ -415,6 +415,10 @@ function getDuration(start, end) {
 }
 
 function scheduleMacroTask(callback) {
+  setTimeout(callback, 0)
+}
+
+function scheduleMicroTask(callback) {
   Promise.resolve().then(callback)
 }
 
@@ -449,6 +453,7 @@ export {
   rng,
   checkSameOrigin,
   scheduleMacroTask,
+  scheduleMicroTask,
   setLabel,
   stripQueryStringFromUrl,
   find,
