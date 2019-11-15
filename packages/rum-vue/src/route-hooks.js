@@ -23,7 +23,7 @@
  *
  */
 
-import { scheduleMacroTask } from '@elastic/apm-rum-core'
+import { scheduleMicroTask } from '@elastic/apm-rum-core'
 
 export function routeHooks(router, apm) {
   let transaction
@@ -51,7 +51,7 @@ export function routeHooks(router, apm) {
 
   router.afterEach(() => {
     if (transaction) {
-      scheduleMacroTask(() => transaction.detectFinish())
+      scheduleMicroTask(() => transaction.detectFinish())
     }
   })
   /**

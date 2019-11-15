@@ -28,35 +28,45 @@ import {
   XHR_METHOD,
   XHR_URL
 } from '../../src/common/patching/patch-utils'
+
+import { scheduleMacroTask } from '../../src/common/utils'
 import patchEventHandler from './patch'
 import { XMLHTTPREQUEST } from '../../src/common/constants'
+import { scheduleTaskCycles } from '../'
 
-describe('xhrPatch', function() {
-  var events = []
-  var cancelFn
+function registerEventListener(target) {
+  let events = []
 
-  beforeAll(function() {
-    cancelFn = patchEventHandler.observe(XMLHTTPREQUEST, function(event, task) {
+  let cancelFn = patchEventHandler.observe(XMLHTTPREQUEST, function(
+    event,
+    task
+  ) {
+    if (!target || target === task.data.target) {
       events.push({
         event,
         task
       })
-    })
+    }
   })
 
-  afterAll(function() {
-    cancelFn()
-  })
+  return done => {
+    if (done) {
+      cancelFn()
+      if (typeof done === 'function') {
+        scheduleMacroTask(done)
+      }
+    }
+    return events
+  }
+}
 
+describe('xhrPatch', function() {
   function mapEvent(event) {
     delete event.task.data.target
     event.task.data.args = [].slice.call(event.task.data.args)
     return event
   }
 
-  beforeEach(function() {
-    events = []
-  })
   it('should have correct url and method', function() {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
@@ -66,65 +76,71 @@ describe('xhrPatch', function() {
 
   it('should produce events', function(done) {
     var req = new window.XMLHttpRequest()
+    let getEvents = registerEventListener(req)
     req.open('GET', '/', true)
     req.addEventListener('load', function() {
-      expect(events.map(mapEvent)).toEqual([
-        {
-          event: 'schedule',
-          task: {
-            source: XMLHTTPREQUEST,
-            state: 'invoke',
-            type: 'macroTask',
-            ignore: undefined,
-            data: {
-              method: 'GET',
-              url: '/',
-              sync: false,
-              args: [],
-              aborted: false
+      scheduleTaskCycles(() => {
+        expect(getEvents().map(mapEvent)).toEqual([
+          {
+            event: 'schedule',
+            task: {
+              source: XMLHTTPREQUEST,
+              state: 'invoke',
+              type: 'macroTask',
+              ignore: undefined,
+              data: {
+                method: 'GET',
+                url: '/',
+                sync: false,
+                args: [],
+                aborted: false
+              }
+            }
+          },
+          {
+            event: 'invoke',
+            task: {
+              source: XMLHTTPREQUEST,
+              state: 'invoke',
+              type: 'macroTask',
+              ignore: undefined,
+              data: {
+                method: 'GET',
+                url: '/',
+                sync: false,
+                args: [],
+                aborted: false
+              }
             }
           }
-        },
-        {
-          event: 'invoke',
-          task: {
-            source: XMLHTTPREQUEST,
-            state: 'invoke',
-            type: 'macroTask',
-            ignore: undefined,
-            data: {
-              method: 'GET',
-              url: '/',
-              sync: false,
-              args: [],
-              aborted: false
-            }
-          }
-        }
-      ])
-      done()
+        ])
+        getEvents(done)
+      }, 2)
     })
 
     req.send()
   })
 
-  it('should work with synchronous xhr', function(done) {
+  it('should work with synchronous xhr', function() {
     var req = new window.XMLHttpRequest()
+    let getEvents = registerEventListener(req)
     req.open('GET', '/', false)
-    req.addEventListener('load', function() {
-      done()
-    })
 
     req.send()
-    expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+    expect(getEvents().map(e => e.event)).toEqual(['schedule', 'invoke'])
   })
 
   it('should work with failing xhr', function(done) {
     var req = new window.XMLHttpRequest()
+    let getEvents = registerEventListener(req)
     req.open('GET', '/test.json', true)
     req.addEventListener('load', function() {
-      expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-      done()
+      scheduleTaskCycles(() => {
+        expect(getEvents(done).map(e => e.event)).toEqual([
+          'schedule',
+          'invoke'
+        ])
+      }, 2)
     })
 
     req.send()
@@ -132,28 +148,31 @@ describe('xhrPatch', function() {
 
   it('should work with aborted xhr', function() {
     var req = new XMLHttpRequest()
+    let getEvents = registerEventListener(req)
     req.open('GET', '/', true)
 
     req.send()
     req.abort()
-    expect(events.map(e => e.event)).toEqual(['schedule', 'clear'])
+    expect(getEvents(true).map(e => e.event)).toEqual(['schedule', 'clear'])
   })
 
   it('should work properly when send request multiple times on single xmlRequest instance', function(done) {
     const req = new XMLHttpRequest()
-    req.open('get', '/', true)
+    let getEvents = registerEventListener(req)
+    req.open('get', '/?multiple1', true)
     req.send()
     req.onload = function() {
       req.onload = null
-      req.open('get', '/', true)
+      req.open('get', '/?multiple2', true)
       req.onload = function() {
-        expect(events.map(e => e.event)).toEqual([
-          'schedule',
-          'invoke',
-          'schedule',
-          'invoke'
-        ])
-        done()
+        scheduleTaskCycles(() => {
+          expect(getEvents(done).map(e => e.event)).toEqual([
+            'schedule',
+            'schedule',
+            'invoke',
+            'invoke'
+          ])
+        }, 2)
       }
       expect(() => {
         req.send()
@@ -207,9 +226,10 @@ describe('xhrPatch', function() {
     req.send()
   })
 
-  it('should preserve other setters', function() {
+  it('should preserve other setters', done => {
     const req = new XMLHttpRequest()
-    req.open('get', '/', true)
+    req.open('get', '/?preserve', true)
+    req.addEventListener('load', done)
     req.send()
     try {
       req.responseType = 'document'
@@ -231,13 +251,52 @@ describe('xhrPatch', function() {
 
   it('should consider xhr ignore', function(done) {
     var req = new window.XMLHttpRequest()
+    let getEvents = registerEventListener(req)
     req[XHR_IGNORE] = true
-    req.open('GET', '/')
+    req.open('GET', '/?ignoretest')
     req.addEventListener('load', function() {
-      done()
+      expect(getEvents(done).map(e => e.event)).toEqual([])
     })
 
     req.send()
-    expect(events.map(e => e.event)).toEqual([])
+    expect(getEvents().map(e => e.event)).toEqual([])
+  })
+
+  it('should consider load events registered on XHR', done => {
+    var req = new window.XMLHttpRequest()
+    let getEvents = registerEventListener(req)
+    req.open('GET', '/?loadtest')
+
+    var earlierEvent = false
+    function checkEvents() {
+      if (earlierEvent) {
+        expect(getEvents().map(e => e.event)).toEqual(['schedule'])
+
+        scheduleTaskCycles(() => {
+          expect(getEvents(done).map(e => e.event)).toEqual([
+            'schedule',
+            'invoke'
+          ])
+        }, 2)
+      } else {
+        expect(getEvents().map(e => e.event)).toEqual(['schedule'])
+        earlierEvent = true
+      }
+    }
+
+    req.addEventListener('readystatechange', () => {
+      if (req.readyState === req.DONE) {
+        checkEvents()
+      }
+    })
+    req.addEventListener('load', function() {
+      checkEvents()
+    })
+
+    req.send()
+    req.addEventListener('load', function() {
+      expect(getEvents().map(e => e.event)).toEqual(['schedule'])
+    })
+    expect(getEvents().map(e => e.event)).toEqual(['schedule'])
   })
 })
