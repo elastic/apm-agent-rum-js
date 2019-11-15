@@ -3,6 +3,7 @@
 
 * <<react-integration, React Integration>>
 * <<angular-integration, Angular Integration>>
+* <<vue-integration, Vue Integration>>
 
 include::./react-integration.asciidoc[React Integration]
 include::./angular-integration.asciidoc[Angular Integration]
