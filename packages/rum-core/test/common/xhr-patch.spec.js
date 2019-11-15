@@ -255,11 +255,11 @@ describe('xhrPatch', function() {
     req[XHR_IGNORE] = true
     req.open('GET', '/?ignoretest')
     req.addEventListener('load', function() {
-      getEvents(true)
+      expect(getEvents(done).map(e => e.event)).toEqual([])
     })
 
     req.send()
-    expect(getEvents(done).map(e => e.event)).toEqual([])
+    expect(getEvents().map(e => e.event)).toEqual([])
   })
 
   it('should consider load events registered on XHR', done => {

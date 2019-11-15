@@ -91,6 +91,7 @@ export function patchXMLHttpRequest(callback) {
 
     if (listener) {
       oriRemoveListener.call(target, READY_STATE_CHANGE, listener)
+      oriRemoveListener.call(target, LOAD, listener)
     }
 
     let earlierEvent
@@ -103,6 +104,12 @@ export function patchXMLHttpRequest(callback) {
       if (earlierEvent) {
         if (earlierEvent != type) {
           scheduleMacroTask(() => {
+            /**
+             * This check is necessary since the readystatechange event can be fired
+             * multiple times (e.g. in IE) and since we schedule a macro task
+             * to invoke the task, we need to make sure that we don't invoke
+             * the task multiple times.
+             */
             if (task.state !== INVOKE) {
               invokeTask(task)
             }
