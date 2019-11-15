@@ -250,3 +250,41 @@ Use this method to manually send an error to APM Server:
 ----
 apm.captureError(new Error('<error-message>'))
 ----
+
+
+[float]
+[[observe]]
+==== `apm.observe()`
+
+[source,js]
+----
+apm.observe(name, callback)
+----
+
+Arguments:
+
+* `name` - The name of the event.
+
+* `callback` - A callback function to execute once the event is fired.
+
+
+Use this method to listen for RUM agent internal events. 
+
+The following events are supported for the transaction lifecycle:
+
+* `transaction:start` event is fired on every transaction start. 
+* `transaction:end` event is fired on transaciton end and before it is added to the queue to be sent to APM Server.
+
+The callback function for these events receives the corresponding transaction object
+ as its only argument. The transaction object can be modified through
+ methods and properties documented in <<transaction-api,Transaction API>>:
+
+[source,js]
+----
+apm.observe('transaction:start', function (transaction) {
+  if (transaction.type === 'custom') {
+    transaction.name = window.document.title
+    transaction.addLabels({ 'custom-label': 'custom-value' })
+  }
+})
+----
