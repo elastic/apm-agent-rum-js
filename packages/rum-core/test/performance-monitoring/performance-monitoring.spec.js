@@ -540,11 +540,17 @@ describe('PerformanceMonitoring', function() {
       const fetchFn = performanceMonitoring.getFetchSub()
 
       const events = []
-      patchEventHandler.observe(XMLHTTPREQUEST, function(event, task) {
+      const cancelXHRSub = patchEventHandler.observe(XMLHTTPREQUEST, function(
+        event,
+        task
+      ) {
         events.push({ event, source: task.source })
         xhrFn(event, task)
       })
-      patchEventHandler.observe(FETCH, function(event, task) {
+      const cancelFetchSub = patchEventHandler.observe(FETCH, function(
+        event,
+        task
+      ) {
         events.push({ event, source: task.source })
         fetchFn(event, task)
       })
@@ -605,6 +611,8 @@ describe('PerformanceMonitoring', function() {
               source: XMLHTTPREQUEST
             }
           ])
+          cancelXHRSub()
+          cancelFetchSub()
           done()
         })
       })
