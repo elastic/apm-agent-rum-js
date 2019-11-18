@@ -170,6 +170,7 @@ function getWebpackConfig(bundleType, packageType) {
     mode: isEnvProduction ? 'production' : 'development',
     plugins: [new EnvironmentPlugin(getWebpackEnv())],
     resolve: {
+      mainFields: ['source', 'browser', 'module', 'main'],
       extensions: ['.js', '.jsx', '.ts']
     }
   }
