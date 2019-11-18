@@ -154,7 +154,7 @@ class ApmServer {
 
   fetchConfig(serviceName, environment) {
     const serverUrl = this._configService.get('serverUrl')
-    var configEndpoint = `${serverUrl}/config/v1/agents`
+    var configEndpoint = `${serverUrl}/config/v1/rum/agents`
     if (!serviceName) {
       return Promise.reject(
         'serviceName is required for fetching central config.'
