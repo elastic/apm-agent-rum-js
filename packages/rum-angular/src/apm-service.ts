@@ -25,7 +25,7 @@
 
 import { Router, NavigationStart } from '@angular/router'
 import { Injectable } from '@angular/core'
-import { Promise } from 'es6-promise'
+import { scheduleMicroTask } from '@elastic/apm-rum-core'
 
 @Injectable({
   providedIn: 'root'
@@ -105,7 +105,7 @@ export class ApmService {
          * Observables resolution on ngInit to fetch the neccessary
          * data for mounting
          */
-        Promise.resolve().then(() => transaction.detectFinish())
+        scheduleMicroTask(() => transaction.detectFinish())
       }
     })
   }
