@@ -34,23 +34,23 @@ jobs:
       name: 'Analyse size of JS bundles'
     - stage: test
       env:
-        - STACK_VERSION=7.3.0
+        - STACK_VERSION=8.0.0-SNAPSHOT
         - SCOPE=@elastic/apm-rum-core
     - stage: test
       env:
-        - STACK_VERSION=7.3.0
+        - STACK_VERSION=8.0.0-SNAPSHOT
         - SCOPE=@elastic/apm-rum
     - stage: test
       env:
-        - STACK_VERSION=7.3.0
+        - STACK_VERSION=8.0.0-SNAPSHOT
         - SCOPE=@elastic/apm-rum-react
     - stage: test
       env:
-        - STACK_VERSION=7.3.0
+        - STACK_VERSION=8.0.0-SNAPSHOT
         - SCOPE=@elastic/apm-rum-angular
     - stage: test
       env:
-        - STACK_VERSION=7.3.0
+        - STACK_VERSION=8.0.0-SNAPSHOT
         - SCOPE=@elastic/apm-rum-vue
 addons:
   apt:

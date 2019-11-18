@@ -75,24 +75,7 @@ function startApmServerProxy(port = 8001) {
   const serverUrl = DEFAULT_APM_SERVER_URL
 
   let proxyApp = express()
-  proxyApp.use(
-    proxy(serverUrl, {
-      userResHeaderDecorator(headers) {
-        if (!headers['Access-Control-Allow-Origin']) {
-          headers['Access-Control-Allow-Origin'] = '*'
-          headers['Access-Control-Expose-Headers'] = 'ETag'
-        }
-        return headers
-      },
-      proxyReqOptDecorator(proxyReqOpts, srcReq) {
-        const { ifnonematch } = srcReq.query
-        if (ifnonematch) {
-          proxyReqOpts.headers['If-None-Match'] = `"${ifnonematch}"`
-        }
-        return proxyReqOpts
-      }
-    })
-  )
+  proxyApp.use(proxy(serverUrl))
 
   const proxyServer = proxyApp.listen(port)
   console.log(`[APM Server Proxy] - For ${serverUrl} on: ${port}`)
