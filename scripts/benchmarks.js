@@ -37,7 +37,7 @@ async function getAllBenchmarkResults() {
   const results = []
   const files = glob.sync(`${PKG_DIR}/packages/**/reports/*-benchmarks.json`)
 
-  for (const file of files) {
+  for (let file of files) {
     try {
       const benchmarksFile = await pReadFile(file, 'utf-8')
       const parsedResults = JSON.parse(benchmarksFile)
@@ -63,7 +63,7 @@ function extractFields(benchResults, type) {
   }
   const filteredResult = []
 
-  for (const result of benchResults) {
+  for (let result of benchResults) {
     filteredResult.push(
       Object.keys(result)
         .filter(key => {
@@ -124,7 +124,7 @@ function runBenchmarks() {
       }
 
       let resultObj = {}
-      for (const result of results) {
+      for (let result of results) {
         const metricKey = result.name || result.scenario
         resultObj[metricKey] = result
       }

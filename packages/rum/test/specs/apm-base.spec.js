@@ -45,12 +45,14 @@ describe('ApmBase', function() {
   it('should send page load metrics after load event', done => {
     apmBase.config({ serviceName, serverUrl })
     apmBase._sendPageLoadMetrics()
-    const tr = apmBase.getCurrentTransaction()
+    var tr = apmBase.getCurrentTransaction()
     expect(tr.name).toBe('Unknown')
     expect(tr.type).toBe(PAGE_LOAD)
     spyOn(tr, 'detectFinish').and.callThrough()
+
     apmBase.setInitialPageLoadName('new page load')
     apmBase.observe(TRANSACTION_END, endedTr => {
+      expect(document.readyState).toBe('complete')
       expect(tr.detectFinish).toHaveBeenCalled()
       expect(endedTr.name).toBe('new page load')
       expect(endedTr.type).toBe(PAGE_LOAD)
