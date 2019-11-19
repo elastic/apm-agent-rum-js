@@ -56,6 +56,11 @@ const baseConfig = {
     'karma-webpack',
     'karma-sourcemap-loader'
   ],
+  client: {
+    jasmine: {
+      random: false
+    }
+  },
   webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV),
   webpackMiddleware: {
     logLevel: 'error'
