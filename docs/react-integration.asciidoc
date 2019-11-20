@@ -94,3 +94,35 @@ export default withTransaction('AboutComponent', 'component')(AboutComponent)
 
 NOTE: `withTransaction` accepts two parameters, "transaction name" and "transaction type". 
 If these parameters are not provided, the defaults documented in <<transaction-api, Transaction API>> will be used.
+
+
+[float]
+===== Instrumenting lazy loaded routes
+
+When the route is rendered lazily with components using `React.lazy` or a similar API, it is currently not possible to
+auto instrument the components dependencies via `ApmRoute`. To instrument these lazy rendered routes and capture the spans 
+associated with the components, you'll need to manually instrument the code with the `withTransaction` API.
+
+[source,js]
+----
+import React, { Component, Suspense, lazy } from 'react'
+import { Route, Switch } from 'react-router-dom'
+import { withTransaction } from '@elastic/apm-rum-react'
+
+const Loading = () => <div>Loading</div>
+const LazyRouteComponent = lazy(() => import('./lazy-component'))
+
+function Routes() {
+  return (
+    <Suspense fallback={Loading()}>
+      <Switch>
+        <Route path="/lazy" component={LazyRouteComponent} />
+      </Switch>
+    </Suspense>
+  )
+}
+
+// lazy-component.jsx
+class LazyComponent extends Component {}
+export default withTransaction('LazyComponent', 'component')(LazyComponent)
+----
