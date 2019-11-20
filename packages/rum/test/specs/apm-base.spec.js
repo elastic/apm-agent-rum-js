@@ -25,6 +25,7 @@
 
 import ApmBase from '../../src/apm-base'
 import { createServiceFactory, PAGE_LOAD } from '@elastic/apm-rum-core'
+import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
 import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { Promise } from 'es6-promise'
@@ -64,6 +65,23 @@ describe('ApmBase', function() {
           done()
         })
       })
+    })
+  })
+
+  it('should end page-load transaction on load without waiting for tasks', done => {
+    const apmBase = new ApmBase(serviceFactory, !enabled)
+    apmBase.config({ serviceName, serverUrl })
+    apmBase._sendPageLoadMetrics()
+    apmBase.addFilter(() => {})
+    const tr = apmBase.getCurrentTransaction()
+    tr.addTask('trying to hold')
+    spyOn(tr, 'end').and.callThrough()
+    apmBase.observe(TRANSACTION_END, pageloadTr => {
+      expect(pageloadTr.type).toBe(PAGE_LOAD)
+      expect(document.readyState).toBe('complete')
+      expect(tr.end).toHaveBeenCalled()
+      expect(tr._scheduledTasks.length).toBeGreaterThan(0)
+      done()
     })
   })
 

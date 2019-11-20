@@ -25,6 +25,7 @@
 
 import {
   getInstrumentationFlags,
+  scheduleMacroTask,
   PAGE_LOAD,
   ERROR
 } from '@elastic/apm-rum-core'
@@ -126,7 +127,6 @@ class ApmBase {
     const transactionService = this.serviceFactory.getService(
       'TransactionService'
     )
-
     /**
      * Name of the transaction is set in transaction service to
      * avoid duplicating the logic at multiple places
@@ -135,15 +135,15 @@ class ApmBase {
       managed: true,
       canReuse: true
     })
-
     if (tr) {
       tr.addTask(PAGE_LOAD)
     }
-    const sendPageLoadMetrics = function sendPageLoadMetrics() {
-      // to make sure PerformanceTiming.loadEventEnd has a value
-      setTimeout(function() {
+    // to make sure PerformanceTiming.loadEventEnd has a value
+    const sendPageLoadMetrics = () => {
+      scheduleMacroTask(() => {
         if (tr) {
           tr.removeTask(PAGE_LOAD)
+          tr.end()
         }
       })
     }
