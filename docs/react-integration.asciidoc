@@ -99,9 +99,9 @@ If these parameters are not provided, the defaults documented in <<transaction-a
 [float]
 ===== Instrumenting lazy loaded routes
 
-When the route is rendered lazily with components using `React.lazy` or similar API, It is currently not possible to
-auto instrument the components dependencies via `ApmRoute`. To instrument those lazy rendered routes and capture the spans 
-associated with the components, The user would need to manually instrument the code via `withTransaction` API.
+When the route is rendered lazily with components using `React.lazy` or a similar API, it is currently not possible to
+auto instrument the components dependencies via `ApmRoute`. To instrument these lazy rendered routes and capture the spans 
+associated with the components, you'll need to manually instrument the code with the `withTransaction` API.
 
 [source,js]
 ----
