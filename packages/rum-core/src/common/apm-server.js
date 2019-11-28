@@ -80,11 +80,17 @@ class ApmServer {
       headers: {
         'Content-Type': 'application/x-ndjson'
       }
-    })
+    }).then(({ responseText }) => responseText)
   }
 
   _constructError(reason) {
     const { url, status, responseText } = reason
+    /**
+     * The `reason` could be a different type, e.g. an Error
+     */
+    if (typeof status == 'undefined') {
+      return reason
+    }
     let message = url + ' HTTP status: ' + status
     if (__DEV__ && responseText) {
       try {
@@ -127,7 +133,7 @@ class ApmServer {
           if (status === 0 || (status > 399 && status < 600)) {
             reject({ url, status, responseText })
           } else {
-            resolve(responseText)
+            resolve(xhr)
           }
         }
       }
@@ -148,7 +154,7 @@ class ApmServer {
 
   fetchConfig(serviceName, environment) {
     const serverUrl = this._configService.get('serverUrl')
-    var configEndpoint = `${serverUrl}/config/v1/agents`
+    var configEndpoint = `${serverUrl}/config/v1/rum/agents`
     if (!serviceName) {
       return Promise.reject(
         'serviceName is required for fetching central config.'
@@ -158,9 +164,26 @@ class ApmServer {
     if (environment) {
       configEndpoint += `&service.environment=${environment}`
     }
+
+    let localConfig = this._configService.getLocalConfig()
+    if (localConfig) {
+      configEndpoint += `&ifnonematch=${localConfig.etag}`
+    }
+
     return this._makeHttpRequest('GET', configEndpoint, { timeout: 5000 })
-      .then(response => {
-        return JSON.parse(response)
+      .then(xhr => {
+        const { status, responseText } = xhr
+        if (status === 304) {
+          return localConfig
+        } else {
+          let remoteConfig = JSON.parse(responseText)
+          const etag = xhr.getResponseHeader('etag')
+          if (etag) {
+            remoteConfig.etag = etag.replace(/["]/g, '')
+            this._configService.setLocalConfig(remoteConfig)
+          }
+          return remoteConfig
+        }
       })
       .catch(reason => {
         const error = this._constructError(reason)
@@ -239,12 +262,7 @@ class ApmServer {
   }
 
   ndjsonMetricsets(metricsets) {
-    const timestamp = Date.now()
-    return metricsets
-      .map(metricset =>
-        NDJSON.stringify({ metricset: { timestamp, ...metricset } })
-      )
-      .join('')
+    return metricsets.map(metricset => NDJSON.stringify({ metricset })).join('')
   }
 
   ndjsonTransactions(transactions) {

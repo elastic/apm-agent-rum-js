@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.5.1...@elastic/apm-rum@4.6.0) (2019-11-19)
+
+
+### Bug Fixes
+
+* **rum-core:** schedule xhr invoke task as a macro task ([#480](https://github.com/elastic/apm-agent-rum-js/issues/480)) ([d4f181f](https://github.com/elastic/apm-agent-rum-js/commit/d4f181f)), closes [#390](https://github.com/elastic/apm-agent-rum-js/issues/390)
+
+
+### Features
+
+* **rum-core:** improve the debug logs with transaction details ([#469](https://github.com/elastic/apm-agent-rum-js/issues/469)) ([b9629b4](https://github.com/elastic/apm-agent-rum-js/commit/b9629b4))
+* **rum-core:** use etag for fetching config ([#439](https://github.com/elastic/apm-agent-rum-js/issues/439)) ([bac0e15](https://github.com/elastic/apm-agent-rum-js/commit/bac0e15))
+
+
+
+
+
 ## [4.5.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.5.0...@elastic/apm-rum@4.5.1) (2019-10-09)
 
 **Note:** Version bump only for package @elastic/apm-rum

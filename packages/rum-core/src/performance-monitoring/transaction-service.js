@@ -25,7 +25,7 @@
 
 import { Promise } from 'es6-promise'
 import Transaction from './transaction'
-import { extend } from '../common/utils'
+import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
 import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import { captureNavigation } from './capture-navigation'
 import { __DEV__ } from '../env'
@@ -33,9 +33,6 @@ import { TRANSACTION_START, TRANSACTION_END } from '../common/constants'
 
 class TransactionService {
   constructor(logger, config) {
-    if (__DEV__ && typeof config === 'undefined') {
-      logger.debug('TransactionService: config is not provided')
-    }
     this._config = config
     this._logger = logger
     this.currentTransaction = undefined
@@ -79,7 +76,7 @@ class TransactionService {
     var interval = this._config.get('browserResponsivenessInterval')
     if (typeof interval === 'undefined') {
       if (__DEV__) {
-        this._logger.debug('browserResponsivenessInterval is undefined!')
+        this._logger.debug('browserResponsivenessInterval config is undefined!')
       }
       return
     }
@@ -125,11 +122,10 @@ class TransactionService {
        */
       if (__DEV__) {
         this._logger.debug(
-          'Redefining the current transaction',
-          tr,
-          name,
-          type,
-          perfOptions
+          `redefining transaction(${tr.id}, ${tr.name}, ${tr.type})`,
+          'to',
+          `(${name}, ${type})`,
+          tr
         )
       }
       /**
@@ -140,7 +136,10 @@ class TransactionService {
       tr.redefine(name, undefined, perfOptions)
     } else {
       if (__DEV__) {
-        this._logger.debug('Ending old transaction', tr)
+        this._logger.debug(
+          `ending previous transaction(${tr.id}, ${tr.name})`,
+          tr
+        )
       }
       tr.end()
       tr = this.createTransaction(name, type, perfOptions)
@@ -180,7 +179,7 @@ class TransactionService {
     tr.onEnd = () => this.handleTransactionEnd(tr)
 
     if (__DEV__) {
-      this._logger.debug('TransactionService.startTransaction', tr)
+      this._logger.debug(`startTransaction(${tr.id}, ${tr.name}, ${tr.type})`)
     }
     this._config.events.send(TRANSACTION_START, [tr])
 
@@ -190,21 +189,16 @@ class TransactionService {
   handleTransactionEnd(tr) {
     return Promise.resolve().then(
       () => {
-        if (__DEV__) {
-          this._logger.debug('TransactionService transaction finished', tr)
-        }
-        if (this.shouldIgnoreTransaction(tr.name)) {
+        const { name, type } = tr
+        if (this.shouldIgnoreTransaction(name)) {
+          if (__DEV__) {
+            this._logger.debug(
+              `transaction(${tr.id}, ${name}, ${type}) is ignored`
+            )
+          }
           return
         }
-        /**
-         * Capture breakdown metrics once the transaction is completed
-         */
-        const breakdownMetrics = this._config.get('breakdownMetrics')
-        if (breakdownMetrics) {
-          tr.captureBreakdown()
-        }
-
-        if (tr.type === PAGE_LOAD) {
+        if (type === PAGE_LOAD) {
           /**
            * Setting the pageLoadTransactionName via configService.setConfig after
            * transaction has started should also reflect the correct name.
@@ -212,19 +206,75 @@ class TransactionService {
           const pageLoadTransactionName = this._config.get(
             'pageLoadTransactionName'
           )
-          if (tr.name === NAME_UNKNOWN && pageLoadTransactionName) {
+          if (name === NAME_UNKNOWN && pageLoadTransactionName) {
             tr.name = pageLoadTransactionName
           }
         }
         captureNavigation(tr)
-        this.add(tr)
+
+        /**
+         * Adjust transaction start time with span timings and
+         * truncate spans that goes beyond transaction timeframe
+         */
+        this.adjustTransactionTime(tr)
+        /**
+         * Capture breakdown metrics once the transaction is completed
+         */
+        const breakdownMetrics = this._config.get('breakdownMetrics')
+        if (breakdownMetrics) {
+          tr.captureBreakdown()
+        }
+        this._config.events.send(TRANSACTION_END, [tr])
+        if (__DEV__) {
+          this._logger.debug(`end transaction(${tr.id}, ${tr.name})`, tr)
+        }
       },
       err => {
         if (__DEV__) {
-          this._logger.debug('TransactionService transaction onEnd', err)
+          this._logger.debug(
+            `error ending transaction(${tr.id}, ${tr.name})`,
+            err
+          )
         }
       }
     )
+  }
+
+  adjustTransactionTime(transaction) {
+    /**
+     * Adjust start time of the transaction
+     */
+    const spans = transaction.spans
+    const earliestSpan = getEarliestSpan(spans)
+
+    if (earliestSpan && earliestSpan._start < transaction._start) {
+      transaction._start = earliestSpan._start
+    }
+
+    /**
+     * Adjust end time of the transaction to match the latest
+     * span end time
+     */
+    const latestSpan = getLatestNonXHRSpan(spans)
+    if (latestSpan && latestSpan._end > transaction._end) {
+      transaction._end = latestSpan._end
+    }
+
+    /**
+     * Set all spans that are longer than the transaction to
+     * be truncated spans
+     */
+    const transactionEnd = transaction._end
+    for (let i = 0; i < spans.length; i++) {
+      const span = spans[i]
+      if (span._end > transactionEnd) {
+        span._end = transactionEnd
+        span.type += '.truncated'
+      }
+      if (span._start > transactionEnd) {
+        span._start = transactionEnd
+      }
+    }
   }
 
   shouldIgnoreTransaction(transactionName) {
@@ -245,21 +295,17 @@ class TransactionService {
   }
 
   startSpan(name, type, options) {
-    var trans = this.ensureCurrentTransaction()
+    const tr = this.ensureCurrentTransaction()
 
-    if (trans) {
+    if (tr) {
+      const span = tr.startSpan(name, type, options)
       if (__DEV__) {
-        this._logger.debug('TransactionService.startSpan', name, type)
+        this._logger.debug(
+          `startSpan(${name}, ${type})`,
+          `on transaction(${tr.id}, ${tr.name})`
+        )
       }
-      var span = trans.startSpan(name, type, options)
       return span
-    }
-  }
-
-  add(transaction) {
-    this._config.events.send(TRANSACTION_END, [transaction])
-    if (__DEV__) {
-      this._logger.debug('TransactionService.add', transaction)
     }
   }
 
@@ -268,7 +314,10 @@ class TransactionService {
     if (tr) {
       var taskId = tr.addTask(taskId)
       if (__DEV__) {
-        this._logger.debug('TransactionService.addTask', taskId)
+        this._logger.debug(
+          `addTask(${taskId})`,
+          `on transaction(${tr.id}, ${tr.name})`
+        )
       }
     }
     return taskId
@@ -279,7 +328,10 @@ class TransactionService {
     if (tr) {
       tr.removeTask(taskId)
       if (__DEV__) {
-        this._logger.debug('TransactionService.removeTask', taskId)
+        this._logger.debug(
+          `removeTask(${taskId})`,
+          `on transaction(${tr.id}, ${tr.name})`
+        )
       }
     }
   }

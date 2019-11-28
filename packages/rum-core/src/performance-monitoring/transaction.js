@@ -29,6 +29,7 @@ import {
   generateRandomId,
   merge,
   now,
+  getTime,
   extend,
   getPageMetadata,
   removeInvalidChars
@@ -50,10 +51,7 @@ class Transaction extends SpanBase {
 
     this.captureTimings = false
 
-    this.selfTime = null
     this.breakdownTimings = []
-    this.childStart = 0
-    this.childDuration = 0
 
     this.sampled = Math.random() <= this.options.transactionSampleRate
   }
@@ -108,14 +106,6 @@ class Transaction extends SpanBase {
     const span = new Span(name, type, opts)
     this._activeSpans[span.id] = span
 
-    /**
-     * Start child duration calculation
-     */
-    const activeChildren = Object.keys(this._activeSpans).length
-    if (activeChildren === 1) {
-      this.childStart = span._start
-    }
-
     return span
   }
 
@@ -127,20 +117,19 @@ class Transaction extends SpanBase {
     if (this.isFinished()) this.end()
   }
 
-  end() {
+  end(endTime) {
     if (this.ended) {
       return
     }
     this.ended = true
-    this._end = now()
+    this._end = getTime(endTime)
 
     // truncate active spans
     for (let sid in this._activeSpans) {
       const span = this._activeSpans[sid]
       span.type = span.type + '.truncated'
-      span.end()
+      span.end(endTime)
     }
-    this.selfTime = this.duration() - this.childDuration
 
     const metadata = getPageMetadata()
     this.addContext(metadata)
@@ -178,15 +167,6 @@ class Transaction extends SpanBase {
     this.spans.push(span)
     // Remove span from _activeSpans
     delete this._activeSpans[span.id]
-
-    /**
-     * Calculate child duration
-     */
-    const activeChildren = Object.keys(this._activeSpans).length
-    if (activeChildren === 0) {
-      this.childDuration += span._end - this.childStart
-      this.childStart = 0
-    }
   }
 }
 

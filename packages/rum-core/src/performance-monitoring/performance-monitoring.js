@@ -28,9 +28,7 @@ import {
   isDtHeaderValid,
   merge,
   parseDtHeaderValue,
-  getEarliestSpan,
-  stripQueryStringFromUrl,
-  getLatestNonXHRSpan
+  stripQueryStringFromUrl
 } from '../common/utils'
 import Url from '../common/url'
 import { patchEventHandler } from '../common/patching'
@@ -68,11 +66,6 @@ class PerformanceMonitoring {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
         this._apmServer.addTransaction(payload)
-      } else if (__DEV__) {
-        this._logginService.debug(
-          'Could not create a payload from the Transaction',
-          tr
-        )
       }
     })
 
@@ -219,7 +212,7 @@ class PerformanceMonitoring {
 
     if (!duration) {
       if (__DEV__) {
-        let message = 'Transaction was discarded! '
+        let message = `transaction(${tr.id}, ${tr.name}) was discarded! `
         if (duration === 0) {
           message += `Transaction duration is 0`
         } else {
@@ -233,7 +226,9 @@ class PerformanceMonitoring {
     if (duration > transactionDurationThreshold) {
       if (__DEV__) {
         this._logginService.debug(
-          `Transaction was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
+          `transaction(${tr.id}, ${
+            tr.name
+          }) was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
         )
       }
       return false
@@ -242,7 +237,9 @@ class PerformanceMonitoring {
     if (tr.spans.length === 0) {
       if (__DEV__) {
         this._logginService.debug(
-          `Transaction was discarded! Transaction does not include any spans`
+          `transaction(${tr.id}, ${
+            tr.name
+          }) was discarded! Transaction does not include any spans`
         )
       }
       return false
@@ -275,7 +272,9 @@ class PerformanceMonitoring {
       if (!wasBrowserResponsive) {
         if (__DEV__) {
           this._logginService.debug(
-            'Transaction was discarded! Browser was not responsive enough during the transaction.',
+            `transaction(${tr.id}, ${
+              tr.name
+            }) was discarded! Browser was not responsive enough during the transaction.`,
             ' duration:',
             duration,
             ' browserResponsivenessCounter:',
@@ -288,44 +287,6 @@ class PerformanceMonitoring {
       }
     }
     return true
-  }
-
-  adjustTransactionTime(transaction) {
-    /**
-     * Adjust start time of the transaction
-     */
-    const spans = transaction.spans
-    const earliestSpan = getEarliestSpan(spans)
-
-    if (earliestSpan && earliestSpan._start < transaction._start) {
-      transaction._start = earliestSpan._start
-    }
-
-    /**
-     * Adjust end time of the transaction to match the latest
-     * span end time
-     */
-    const latestSpan = getLatestNonXHRSpan(spans)
-    if (latestSpan && latestSpan._end > transaction._end) {
-      transaction._end = latestSpan._end
-    }
-
-    /**
-     * Set all spans that are longer than the transaction to
-     * be truncated spans
-     */
-    const transactionEnd = transaction._end
-    for (let i = 0; i < spans.length; i++) {
-      const span = spans[i]
-
-      if (span._end > transactionEnd) {
-        span._end = transactionEnd
-        span.type += '.truncated'
-      }
-      if (span._start > transactionEnd) {
-        span._start = transactionEnd
-      }
-    }
   }
 
   prepareTransaction(transaction) {
@@ -395,7 +356,6 @@ class PerformanceMonitoring {
   }
 
   createTransactionPayload(transaction) {
-    this.adjustTransactionTime(transaction)
     this.prepareTransaction(transaction)
     const filtered = this.filterTransaction(transaction)
     if (filtered) {

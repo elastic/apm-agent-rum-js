@@ -28,6 +28,7 @@ import { createServiceFactory, PAGE_LOAD } from '@elastic/apm-rum-core'
 import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { Promise } from 'es6-promise'
+import { scheduleTaskCycles } from '../../../rum-core/test'
 
 var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
@@ -198,11 +199,11 @@ describe('ApmBase', function() {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     req.addEventListener('load', function() {
-      setTimeout(() => {
+      scheduleTaskCycles(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].name).toBe('GET /')
         done()
-      })
+      }, 2)
     })
 
     req.send()
@@ -221,11 +222,11 @@ describe('ApmBase', function() {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     req.addEventListener('load', function() {
-      setTimeout(() => {
+      scheduleTaskCycles(() => {
         expect(tr.spans.length).toBe(1)
         expect(tr.spans[0].name).toBe('GET /')
         done()
-      })
+      }, 2)
     })
     req.send()
     tr = apmBase.getCurrentTransaction()
@@ -268,7 +269,7 @@ describe('ApmBase', function() {
       serviceName: ''
     })
     expect(loggingService.error).toHaveBeenCalledWith(
-      `RUM Agent isn't correctly configured: Missing config - serverUrl, serviceName`
+      `RUM agent isn't correctly configured. serverUrl, serviceName is missing`
     )
     const configService = serviceFactory.getService('ConfigService')
     expect(configService.get('active')).toEqual(false)
@@ -279,7 +280,7 @@ describe('ApmBase', function() {
       serviceName: 'abc.def'
     })
     expect(loggingService.error).toHaveBeenCalledWith(
-      `RUM Agent isn't correctly configured: Missing config - serverUrl, serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
+      `RUM agent isn't correctly configured. serverUrl is missing, serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
     )
 
     logErrorSpy.calls.reset()
@@ -287,7 +288,7 @@ describe('ApmBase', function() {
       serviceName: 'abc.def'
     })
     expect(loggingService.error).toHaveBeenCalledWith(
-      `RUM Agent isn't correctly configured: serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
+      `RUM agent isn't correctly configured. serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
     )
   })
 
@@ -313,6 +314,9 @@ describe('ApmBase', function() {
     const apmServer = serviceFactory.getService('ApmServer')
     const configService = serviceFactory.getService('ConfigService')
 
+    spyOn(configService, 'setLocalConfig')
+    spyOn(configService, 'getLocalConfig')
+
     const apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({
       serviceName: 'test-service',
@@ -323,10 +327,19 @@ describe('ApmBase', function() {
 
     function createPayloadCallback(rate) {
       return () => {
-        return Promise.resolve(`{
+        const responseText = `{
           "transaction_sample_rate": "${rate}"
         }
-        `)
+        `
+        return Promise.resolve({
+          responseText,
+          getResponseHeader(headerName) {
+            if (headerName == 'etag') {
+              return '"test"'
+            }
+          },
+          status: 200
+        })
       }
     }
 
@@ -337,7 +350,7 @@ describe('ApmBase', function() {
       .fetchCentralConfig()
       .then(() => {
         expect(loggingService.warn).toHaveBeenCalledWith(
-          'Invalid value "NaN" for transactionSampleRate. Allowed: Number between 0 and 1.'
+          'invalid value "NaN" for transactionSampleRate. Allowed: Number between 0 and 1.'
         )
         expect(configService.get('transactionSampleRate')).toBe(1)
 

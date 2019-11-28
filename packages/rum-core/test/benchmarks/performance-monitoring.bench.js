@@ -24,7 +24,7 @@
  */
 
 import { generateTestTransaction } from './'
-import { createServiceFactory } from '../../'
+import { createServiceFactory } from '../../src'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig('rum-core')

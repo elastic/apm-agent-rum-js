@@ -24,6 +24,7 @@
  */
 
 import rng from 'uuid/lib/rng-browser'
+import { Promise } from 'es6-promise'
 
 const slice = [].slice
 
@@ -402,11 +403,23 @@ function now() {
   return window.performance.now()
 }
 
+function getTime(time) {
+  return typeof time === 'number' && time >= 0 ? time : now()
+}
+
 function getDuration(start, end) {
   if (isUndefined(end) || isUndefined(start)) {
     return null
   }
   return parseFloat(end - start)
+}
+
+function scheduleMacroTask(callback) {
+  setTimeout(callback, 0)
+}
+
+function scheduleMicroTask(callback) {
+  Promise.resolve().then(callback)
 }
 
 export {
@@ -436,8 +449,11 @@ export {
   getPageLoadMarks,
   getDuration,
   now,
+  getTime,
   rng,
   checkSameOrigin,
+  scheduleMacroTask,
+  scheduleMicroTask,
   setLabel,
   stripQueryStringFromUrl,
   find,

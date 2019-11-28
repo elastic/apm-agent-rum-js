@@ -32,6 +32,8 @@ import {
   XHR_IGNORE
 } from './patch-utils'
 
+import { scheduleMacroTask } from '../utils'
+
 import {
   SCHEDULE,
   INVOKE,
@@ -63,55 +65,78 @@ export function patchXMLHttpRequest(callback) {
   }
 
   const READY_STATE_CHANGE = 'readystatechange'
+  const LOAD = 'load'
 
   function invokeTask(task) {
     task.state = INVOKE
-    if (!task.ignore) {
-      callback(INVOKE, task)
-    }
+    callback(INVOKE, task)
   }
 
   function scheduleTask(task) {
     XMLHttpRequest[XHR_SCHEDULED] = false
     task.state = SCHEDULE
-    if (!task.ignore) {
-      callback(SCHEDULE, task)
-    }
-    const data = task.data
-    const target = data.target
-    // remove existing event listener
-    const listener = target[XHR_LISTENER]
+    callback(SCHEDULE, task)
+
+    const { aborted, target } = task.data
     if (!oriAddListener) {
       oriAddListener = target[ADD_EVENT_LISTENER_STR]
       oriRemoveListener = target[REMOVE_EVENT_LISTENER_STR]
     }
 
+    // remove existing event listener
+    const listener = target[XHR_LISTENER]
     if (listener) {
       oriRemoveListener.call(target, READY_STATE_CHANGE, listener)
+      oriRemoveListener.call(target, LOAD, listener)
     }
-    const newListener = (target[XHR_LISTENER] = () => {
-      if (target.readyState === target.DONE) {
-        // sometimes on some browsers XMLHttpRequest will fire onreadystatechange with
-        // readyState=4 multiple times, so we need to check task state here
-        if (
-          !data.aborted &&
-          XMLHttpRequest[XHR_SCHEDULED] &&
-          task.state === SCHEDULE
-        ) {
-          invokeTask(task)
+
+    let earlierEvent
+    const newListener = (target[XHR_LISTENER] = ({ type }) => {
+      /**
+       * In certain frameworks (e.g. angular/http) the http request is aborted
+       * as soon as it completes, and that causes the state of the XHR to change.
+       * See https://github.com/angular/angular/issues/33822 for more.
+       */
+      if (earlierEvent) {
+        if (earlierEvent != type) {
+          scheduleMacroTask(() => {
+            /**
+             * This check is necessary since the readystatechange event can be fired
+             * multiple times (e.g. in IE) and since we schedule a macro task
+             * to invoke the task, we need to make sure that we don't invoke
+             * the task multiple times.
+             */
+            if (task.state !== INVOKE) {
+              invokeTask(task)
+            }
+          })
+        }
+      } else {
+        if (target.readyState === target.DONE) {
+          /**
+           * On some browsers XMLHttpRequest will fire onreadystatechange with
+           * readyState=4 multiple times, so we need to check task state here
+           */
+          if (
+            !aborted &&
+            XMLHttpRequest[XHR_SCHEDULED] &&
+            task.state === SCHEDULE
+          ) {
+            earlierEvent = type
+          }
         }
       }
     })
-
+    /**
+     * Register event listeners for readystatechange and load events
+     */
     oriAddListener.call(target, READY_STATE_CHANGE, newListener)
+    oriAddListener.call(target, LOAD, newListener)
 
     const storedTask = target[XHR_TASK]
     if (!storedTask) {
       target[XHR_TASK] = task
     }
-    var result = sendNative.apply(target, data.args)
-    XMLHttpRequest[XHR_SCHEDULED] = true
-    return result
   }
 
   function clearTask(task) {
@@ -128,9 +153,11 @@ export function patchXMLHttpRequest(callback) {
     'open',
     () =>
       function(self, args) {
-        self[XHR_METHOD] = args[0]
-        self[XHR_URL] = args[1]
-        self[XHR_SYNC] = args[2] === false
+        if (!self[XHR_IGNORE]) {
+          self[XHR_METHOD] = args[0]
+          self[XHR_URL] = args[1]
+          self[XHR_SYNC] = args[2] === false
+        }
         return openNative.apply(self, args)
       }
   )
@@ -140,22 +167,25 @@ export function patchXMLHttpRequest(callback) {
     'send',
     () =>
       function(self, args) {
+        if (self[XHR_IGNORE]) {
+          return sendNative.apply(self, args)
+        }
+
         const task = {
           source: XMLHTTPREQUEST,
           state: '',
           type: 'macroTask',
-          ignore: self[XHR_IGNORE],
           data: {
             target: self,
             method: self[XHR_METHOD],
             sync: self[XHR_SYNC],
             url: self[XHR_URL],
-            args,
             aborted: false
           }
         }
-        var result = scheduleTask(task)
-
+        scheduleTask(task)
+        const result = sendNative.apply(self, args)
+        XMLHttpRequest[XHR_SCHEDULED] = true
         if (self[XHR_SYNC]) {
           invokeTask(task)
         }
@@ -168,13 +198,15 @@ export function patchXMLHttpRequest(callback) {
     'abort',
     () =>
       function(self, args) {
-        const task = self[XHR_TASK]
-        if (task && typeof task.type === 'string') {
-          // If the XHR has already been aborted, do nothing.
-          if (task.data && task.data.aborted) {
-            return
+        if (!self[XHR_IGNORE]) {
+          const task = self[XHR_TASK]
+          if (task && typeof task.type === 'string') {
+            // If the XHR has already been aborted, do nothing.
+            if (task.data && task.data.aborted) {
+              return
+            }
+            clearTask(task)
           }
-          clearTask(task)
         }
         return abortNative.apply(self, args)
       }

@@ -42,7 +42,9 @@ class ServiceFactory {
       return new ConfigService()
     })
     this.registerServiceCreator('LoggingService', function() {
-      return new LoggingService()
+      return new LoggingService({
+        prefix: '[Elastic APM] '
+      })
     })
     this.registerServiceCreator('ApmServer', function() {
       return new ApmServer(

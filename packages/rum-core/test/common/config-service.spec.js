@@ -24,6 +24,7 @@
  */
 
 import ConfigService from '../../src/common/config-service'
+import { LOCAL_CONFIG_KEY } from '../../src/common/constants'
 
 describe('ConfigService', function() {
   var configService
@@ -252,5 +253,15 @@ describe('ConfigService', function() {
       'http://localhost:8080/rum/events'
     )
     expect(configService.get('serverUrl')).toEqual('http://localhost:8080')
+  })
+
+  it('should store configuration in sessionConfig', () => {
+    let config = configService.getLocalConfig()
+    expect(config).toBe(undefined)
+    configService.setLocalConfig({ key: 'value' })
+
+    config = configService.getLocalConfig()
+    expect(config).toEqual({ key: 'value' })
+    sessionStorage.removeItem(LOCAL_CONFIG_KEY)
   })
 })
