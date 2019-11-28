@@ -63,7 +63,6 @@ function registerEventListener(target) {
 describe('xhrPatch', function() {
   function mapEvent(event) {
     delete event.task.data.target
-    event.task.data.args = [].slice.call(event.task.data.args)
     return event
   }
 
@@ -87,12 +86,10 @@ describe('xhrPatch', function() {
               source: XMLHTTPREQUEST,
               state: 'invoke',
               type: 'macroTask',
-              ignore: undefined,
               data: {
                 method: 'GET',
                 url: '/',
                 sync: false,
-                args: [],
                 aborted: false
               }
             }
@@ -103,12 +100,10 @@ describe('xhrPatch', function() {
               source: XMLHTTPREQUEST,
               state: 'invoke',
               type: 'macroTask',
-              ignore: undefined,
               data: {
                 method: 'GET',
                 url: '/',
                 sync: false,
-                args: [],
                 aborted: false
               }
             }
@@ -249,12 +244,14 @@ describe('xhrPatch', function() {
     expect(func).not.toThrow()
   })
 
-  it('should consider xhr ignore', function(done) {
+  it('should not create events and pollute xhr when ignore flag is true', function(done) {
     var req = new window.XMLHttpRequest()
     let getEvents = registerEventListener(req)
     req[XHR_IGNORE] = true
     req.open('GET', '/?ignoretest')
     req.addEventListener('load', function() {
+      expect(req[XHR_METHOD]).toBeUndefined()
+      expect(req[XHR_URL]).toBeUndefined()
       expect(getEvents(done).map(e => e.event)).toEqual([])
     })
 
