@@ -37,7 +37,7 @@ const { runs, noOfImages } = require('./config')
 
 const dist = path.join(__dirname, '../../dist')
 
-function customApmBuild() {
+function customApmBuild(filename) {
   /**
    * Match it with the default webpack prod build of elasticApm
    * expect the function names are not mangled
@@ -45,8 +45,8 @@ function customApmBuild() {
   const config = {
     entry: path.join(__dirname, '../../src/index.js'),
     output: {
-      filename: '[name].umd.js',
-      path: path.join(dist, ' bundles'),
+      filename,
+      path: path.join(dist, 'bundles'),
       library: '[name]',
       libraryTarget: 'umd'
     },
@@ -58,20 +58,18 @@ function customApmBuild() {
       if (err) {
         reject(err)
       }
+      console.info('custom apm build - ', filename, 'generated')
       resolve()
     })
   })
 }
 
-function getMinifiedApmBundle() {
-  return readFileSync(
-    path.join(dist, 'bundles/elastic-apm-rum.umd.min.js'),
-    'utf-8'
-  )
+function getMinifiedApmBundle(filename) {
+  return readFileSync(path.join(dist, 'bundles', filename), 'utf-8')
 }
 
 function getApmBundleSize() {
-  const content = getMinifiedApmBundle()
+  const content = getMinifiedApmBundle('elastic-apm-rum.umd.min.js')
   /**
    * To match the level with our bundlesize check
    */

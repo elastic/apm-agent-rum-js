@@ -42,8 +42,10 @@ const REPORTS_DIR = join(__dirname, '../../reports')
     /**
      * Generate custom apm build
      */
-    await customApmBuild()
-    const server = await startServer()
+    const filename = 'apm-rum-with-name.umd.min.js'
+    await customApmBuild(filename)
+
+    const server = await startServer(filename)
     /**
      * object cache holding the metrics accumlated in each run and
      * helps in processing the overall results
