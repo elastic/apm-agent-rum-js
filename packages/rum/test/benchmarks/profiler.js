@@ -25,7 +25,11 @@
 
 const puppeteer = require('puppeteer')
 const { chrome } = require('./config')
-const { filterCpuMetrics, capturePayloadInfo } = require('./analyzer')
+const {
+  filterCpuMetrics,
+  capturePayloadInfo,
+  getMemoryAllocationPerFunction
+} = require('./analyzer')
 
 async function launchBrowser() {
   return await puppeteer.launch(chrome.launchOptions)
@@ -41,6 +45,7 @@ function gatherRawMetrics(browser, url) {
      */
     await client.send('Page.enable')
     await client.send('Profiler.enable')
+    await client.send('HeapProfiler.enable')
     /**
      * Tune the CPU sampler to get control the
      * number of samples generated
@@ -63,11 +68,18 @@ function gatherRawMetrics(browser, url) {
          * the apm server
          */
         const result = await client.send('Profiler.stop')
+        const sample = await client.send('HeapProfiler.stopSampling')
+
+        const memoryMetrics = getMemoryAllocationPerFunction(sample)
         const filteredCpuMetrics = filterCpuMetrics(result.profile, url)
         const response = request.postData()
         const payload = capturePayloadInfo(response)
 
-        Object.assign(metrics, { cpu: filteredCpuMetrics, payload })
+        Object.assign(metrics, {
+          cpu: filteredCpuMetrics,
+          payload,
+          memory: memoryMetrics
+        })
         /**
          * Resolve the promise once we measure the size
          * of the payload to APM Server
@@ -91,9 +103,17 @@ function gatherRawMetrics(browser, url) {
       Object.assign(metrics, timings)
     })
     /**
-     * Start the profiler before navigating to the URL
+     * Perform a garbage collection to do a clean check everytime
+     */
+    await client.send('HeapProfiler.collectGarbage')
+    /**
+     * Start the CPU and Memory profiler before navigating to the URL
      */
     await client.send('Profiler.start')
+    await client.send('HeapProfiler.startSampling', {
+      interval: chrome.memorySamplingInterval
+    })
+
     await page.goto(url)
   })
 }

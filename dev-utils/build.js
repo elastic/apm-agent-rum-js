@@ -192,7 +192,10 @@ function getWebpackConfig(bundleType, packageType) {
         minimizer: [
           new UglifyJSPlugin({
             sourceMap: true,
-            extractComments: true
+            extractComments: true,
+            uglifyOptions: {
+              keep_fnames: true
+            }
           })
         ]
       },

@@ -38,6 +38,7 @@ module.exports = {
      * https://chromedevtools.github.io/devtools-protocol/tot/Profiler#method-setSamplingInterval
      */
     cpuSamplingInterval: 200,
+    memorySamplingInterval: 10,
     launchOptions: {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']

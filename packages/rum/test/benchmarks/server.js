@@ -59,7 +59,7 @@ function getRandomBundleContent() {
   return content
 }
 
-module.exports = function startServer() {
+const startServer = (module.exports = () => {
   return new Promise(resolve => {
     const app = express()
     let server
@@ -93,4 +93,10 @@ module.exports = function startServer() {
       resolve(server)
     })
   })
-}
+})
+
+!(async () => {
+  if (require.main === module) {
+    await startServer()
+  }
+})()

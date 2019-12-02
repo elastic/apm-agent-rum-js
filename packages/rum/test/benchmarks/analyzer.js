@@ -28,9 +28,40 @@ const stats = require('stats-lite')
 const { readFileSync } = require('fs')
 const path = require('path')
 const zlib = require('zlib')
+const webpack = require('webpack')
+const {
+  getWebpackConfig,
+  BUNDLE_TYPES
+} = require('../../../../dev-utils/build')
 const { runs, noOfImages } = require('./config')
 
 const dist = path.join(__dirname, '../../dist')
+
+function customApmBuild() {
+  /**
+   * Match it with the default webpack prod build of elasticApm
+   * expect the function names are not mangled
+   */
+  const config = {
+    entry: path.join(__dirname, '../../src/index.js'),
+    output: {
+      filename: '[name].umd.js',
+      path: path.join(dist, ' bundles'),
+      library: '[name]',
+      libraryTarget: 'umd'
+    },
+    ...getWebpackConfig(BUNDLE_TYPES.BROWSER_ESM_PROD)
+  }
+
+  return new Promise((resolve, reject) => {
+    webpack(config, err => {
+      if (err) {
+        reject(err)
+      }
+      resolve()
+    })
+  })
+}
 
 function getMinifiedApmBundle() {
   return readFileSync(
@@ -85,7 +116,7 @@ function getUnit(metricName) {
 }
 
 async function analyzeMetrics(metric, resultMap) {
-  const { cpu, payload, navigation, measure, url, scenario } = metric
+  const { cpu, payload, navigation, measure, url, scenario, memory } = metric
 
   const loadTime =
     getFromEntries(navigation, url, 'loadEventEnd') -
@@ -108,7 +139,8 @@ async function analyzeMetrics(metric, resultMap) {
     'rum-cpu-time': cpu.cpuTimeFiltered,
     'payload-size': payload.size,
     transactions: payload.transactions,
-    spans: payload.spans
+    spans: payload.spans,
+    memory
   }
 
   /**
@@ -130,9 +162,20 @@ function calculateResults(resultMap) {
     Object.keys(metricObj).forEach(metricName => {
       const value = metricObj[metricName]
       /**
-       * deal with common data points
+       * Add consumed memory in bytes per each function to the result
        */
-      if (!Array.isArray(value)) {
+      if (metricName === 'memory') {
+        const reducedValue = value.reduce((acc, curr) => {
+          acc.push(...curr)
+          return acc
+        }, [])
+        reducedValue.forEach(obj => {
+          result[`memory.${obj.name}.bytes`] = obj.size
+        })
+      } else if (!Array.isArray(value)) {
+        /**
+         * deal with common data points
+         */
         result[metricName] = value
       } else {
         const unit = getUnit(metricName)
@@ -181,12 +224,57 @@ function capturePayloadInfo(payload) {
   }
 }
 
+function getMemoryAllocationPerFunction({ profile }) {
+  const allocations = []
+  /**
+   * Whitelist built functions from the sample
+   */
+  const whitelist = [
+    '(V8 API)',
+    '(BYTECODE_COMPILER)',
+    '__webpack_require__',
+    'scriptId'
+  ]
+
+  function traverseChild(obj) {
+    const { callFrame, selfSize } = obj
+    const { functionName } = callFrame
+
+    if (
+      selfSize > 0 &&
+      functionName !== '' &&
+      !whitelist.includes(functionName)
+    ) {
+      allocations.push({
+        name: functionName,
+        size: selfSize
+      })
+    }
+
+    if (Array.isArray(obj.children)) {
+      obj.children.forEach(child => traverseChild(child))
+    }
+  }
+  /**
+   * Build the allocation tree starting from the 'root'
+   */
+  profile.head.children.forEach(c => {
+    traverseChild(c)
+  })
+
+  allocations.sort((a, b) => b.size - a.size)
+
+  return allocations
+}
+
 module.exports = {
   analyzeMetrics,
+  customApmBuild,
   calculateResults,
   filterCpuMetrics,
   capturePayloadInfo,
   getMinifiedApmBundle,
   getApmBundleSize,
-  getCommonFields
+  getCommonFields,
+  getMemoryAllocationPerFunction
 }
