@@ -1,20 +1,6 @@
 [[supported-technologies]]
 == Supported Technologies
 
-The Elastic APM RUM JavaScript agent gives you detailed performance metrics of your web page by automatically instrumenting the following:
-
-* Page load metrics
-* Load time of Static Assets
-* API requests (XMLHttpRequest and Fetch)
-
-The agent uses the https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API[Navigation Timing API] and https://developer.mozilla.org/en-US/docs/Web/API/Resource_Timing_API[Resource Timing API] available in the browsers to instrument the page load performance and static assets load times.
-
-The agent automatically captures all the outgoing http requests, by instrumenting both XHR and Fetch API requests from the web page to the backend servers.
-
-The agent also adds support for <<distributed-tracing-guide, Distributed Tracing>> for all outgoing requests.
-
-For all transactions, the agent automatically captures <<breakdown-metrics-docs, breakdown metrics>>.
-
 [float]
 [[platforms]]
 === Platforms
@@ -30,15 +16,16 @@ image::images/compatibility.png[Elastic APM RUM Agent compatibility]
 [[frameworks]]
 === Frameworks
 
-The agent supports integrations with certain frameworks. See <<framework-integrations, Framework specific integrations>> for more information. 
+The agent supports <<framework-integrations,integrations with certain frameworks>>.
 
-If you are interested in instrumenting custom metrics like rendering time or mounting time of components on frameworks like React, Angular, vue etc., please use the <<custom-transactions, Custom Transactions API>>.
+To instrument custom metrics, like rendering time or mounting time of components on frameworks like React, Angular, Vue,
+etc., use the <<custom-transactions,custom transactions API>>.
 
 [float]
 [[spa]]
 === Single Page Applications
 
-In the context of Single Page Applications, all the history pushstate events will be captured as transactions. 
-
-However, most of these transactions can be enhanced by using framework specific integrations. For all unsupported frameworks/libraries, you can instrument the application 
-by creating <<custom-transactions, Custom Transactions>> and also add custom spans using <<apm-start-span, Span API>>.
+All history `pushState` events will be captured as transactions. 
+Most of these transactions can be enhanced by using framework specific integrations.
+For all unsupported frameworks/libraries, you can instrument the application 
+by creating <<custom-transactions,custom transactions>> and custom spans with the <<apm-start-span,span API>>.

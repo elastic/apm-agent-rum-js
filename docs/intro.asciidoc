@@ -1,11 +1,30 @@
 [[intro]]
 == Introduction
 
-Welcome to the APM Real User Monitoring (RUM) JavaScript Agent documentation.
+The Elastic APM RUM JavaScript Agent provides detailed performance metrics and error tracking of your web applications.
+It has built-in support for popular platforms and frameworks, and an API for custom instrumentation.
 
-The Elastic APM RUM JavaScript agent sends performance metrics and errors to the APM Server.
+The Agent also supports <<distributed-tracing-guide,distributed tracing>> for all outgoing requests.
+This enables you to analyze performance throughout your microservice architecture -- all in one view.
 
-NOTE: The APM JavaScript agent is compatible with APM Server v6.5+.
+[float]
+[[how-it-works]]
+=== How does the Agent work?
+
+The RUM Agent automatically instruments the following:
+
+* Page load metrics
+* Load time of Static Assets
+* API requests (XMLHttpRequest and Fetch)
+
+The agent uses the https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API[Navigation Timing API]
+and https://developer.mozilla.org/en-US/docs/Web/API/Resource_Timing_API[Resource Timing API]
+available in the browser to instrument the page load performance and static assets load times.
+
+The agent automatically captures all outgoing http requests,
+by instrumenting both XHR and Fetch API requests from the webpage to backend servers.
+
+For all transactions, the agent automatically captures <<breakdown-metrics-docs, breakdown metrics>>.
 
 [float]
 [[additional-components]]
@@ -14,15 +33,25 @@ NOTE: The APM JavaScript agent is compatible with APM Server v6.5+.
 APM Agents work in conjunction with the {apm-server-ref-v}/index.html[APM Server], {ref}/index.html[Elasticsearch], and {kibana-ref}/index.html[Kibana].
 Please view the {apm-overview-ref-v}/index.html[APM Overview] for details on how these components work together.
 
-You will also need to {apm-server-ref-v}/rum.html[enable frontend endpoints in the `apm-server` configuration].
-
 [[getting-started]]
-== Getting started
+== Set up the Agent
 
-* <<using-package-managers>>
-* <<using-script-tags>>
-* <<using-production-build>>
+To start reporting your web page performance to Elastic APM,
+you must first {apm-server-ref-v}/configuration-rum.html[enable the RUM endpoint] in your `apm-server` configuration. 
+
+Once the APM Server endpoint has been configured, you can:
+
+* <<install-the-agent>>
 * <<configuring-cors>>
+
+[[install-the-agent]]
+=== Install the Agent
+
+There are three ways to use the APM RUM Agent:
+
+* <<using-package-managers>>: Install the Agent as a dependency to your application.
+* <<using-script-tags>>: Add a `<script>` tag to the HTML page.
+* <<using-production-build>>: Optimized bundles.
 
 [float]
 [[using-package-managers]]
@@ -75,7 +104,6 @@ https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG
 
 NOTE: Currently the optimized(minified + gzipped) JavaScript bundle size is about 16KiB.
 
-
 [float]
 [[using-production-build]]
 === Using Production Build
@@ -117,16 +145,15 @@ plugins: [
 ]
 ----
 
-[float]
 [[configuring-cors]]
-=== Configuring CORS
+=== Configure CORS
 
 If APM Server is deployed in an origin different than the page's origin,
 you will need to configure Cross-Origin Resource Sharing (CORS).
-To configure CORS, simply:
 
-1. {apm-server-ref-v}/configuration-rum.html[Enable RUM support] in APM Server.
-2. Adjust the {apm-server-ref-v}/configuration-rum.html#rum-allow-origins[`apm-server.rum.allow_origins`] configuration.
+A list of permitted origins can be supplied to the
+{apm-server-ref-v}/configuration-rum.html#rum-allow-origins[`apm-server.rum.allow_origins`]
+configuration option.
 By default, APM Server allows all origins.
 
 [float]
