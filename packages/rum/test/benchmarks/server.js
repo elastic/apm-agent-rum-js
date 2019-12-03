@@ -99,6 +99,6 @@ const startServer = (module.exports = filename => {
 
 !(async () => {
   if (require.main === module) {
-    await startServer()
+    await startServer('elastic-apm-rum.umd.min.js')
   }
 })()
