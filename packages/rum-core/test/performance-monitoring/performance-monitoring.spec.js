@@ -678,4 +678,46 @@ describe('PerformanceMonitoring', function() {
       jasmine.any(Function)
     ])
   })
+
+  it('should create http-request transaction if no current transaction exist', done => {
+    const transactionService = serviceFactory.getService('TransactionService')
+
+    var req = new window.XMLHttpRequest()
+    req.open('GET', '/')
+
+    var task = {
+      source: XMLHTTPREQUEST,
+      data: {
+        target: req,
+        method: 'GET'
+      }
+    }
+
+    spyOn(transactionService, 'startTransaction').and.callThrough()
+
+    performanceMonitoring.processAPICalls('schedule', task)
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      'GET /',
+      'http-request',
+      jasmine.objectContaining({ managed: true })
+    )
+
+    var tr = transactionService.getCurrentTransaction()
+    expect(tr).toBeDefined()
+
+    setTimeout(() => {
+      performanceMonitoring.processAPICalls('invoke', task)
+      expect(tr.ended).toBe(true)
+      var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
+      var promise = apmServer.sendTransactions(payload)
+      promise
+        .catch(reason => {
+          fail(
+            'Failed sending http-request transaction to the server, reason: ' +
+              reason
+          )
+        })
+        .then(() => done())
+    }, 100)
+  })
 })

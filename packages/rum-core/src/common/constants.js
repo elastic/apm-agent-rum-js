@@ -65,8 +65,9 @@ const MAX_SPAN_DURATION = 5 * 60 * 1000
  */
 const PAGE_LOAD = 'page-load'
 const ROUTE_CHANGE = 'route-change'
-const NAME_UNKNOWN = 'Unknown'
 const TYPE_CUSTOM = 'custom'
+const HTTP_REQUEST_TYPE = 'http-request'
+const NAME_UNKNOWN = 'Unknown'
 
 /**
  * Check only for long tasks that are more than 60ms
@@ -133,5 +134,6 @@ export {
   ERROR,
   BEFORE_EVENT,
   AFTER_EVENT,
-  LOCAL_CONFIG_KEY
+  LOCAL_CONFIG_KEY,
+  HTTP_REQUEST_TYPE
 }
