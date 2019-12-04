@@ -24,6 +24,7 @@
  */
 
 import SpanBase from './span-base'
+import { addSpanContext } from '../common/context'
 
 class Span extends SpanBase {
   constructor(name, type, options) {
@@ -38,6 +39,11 @@ class Span extends SpanBase {
       this.action = fields[2]
     }
     this.sync = this.options.sync
+  }
+
+  end(endTime, data) {
+    super.end(endTime)
+    addSpanContext(this, data)
   }
 }
 

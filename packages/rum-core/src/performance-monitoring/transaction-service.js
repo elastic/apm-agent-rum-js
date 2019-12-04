@@ -34,6 +34,7 @@ import {
   TRANSACTION_END,
   BROWSER_RESPONSIVENESS_INTERVAL
 } from '../common/constants'
+import { addTransactionContext } from '../common/context'
 import { __DEV__ } from '../env'
 
 class TransactionService {
@@ -221,6 +222,9 @@ class TransactionService {
         if (breakdownMetrics) {
           tr.captureBreakdown()
         }
+        const configContext = this._config.get('context')
+        addTransactionContext(tr, configContext)
+
         this._config.events.send(TRANSACTION_END, [tr])
         if (__DEV__) {
           this._logger.debug(`end transaction(${tr.id}, ${tr.name})`, tr)

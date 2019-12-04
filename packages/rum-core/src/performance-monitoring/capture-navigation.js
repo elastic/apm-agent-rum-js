@@ -30,11 +30,7 @@ import {
   USER_TIMING_THRESHOLD,
   PAGE_LOAD
 } from '../common/constants'
-import {
-  stripQueryStringFromUrl,
-  getServerTimingInfo,
-  getPageLoadMarks
-} from '../common/utils'
+import { stripQueryStringFromUrl, getPageLoadMarks } from '../common/utils'
 
 /**
  * Navigation Timing Spans
@@ -83,33 +79,6 @@ function shouldCreateSpan(start, end, trStart, trEnd, baseTime = 0) {
   )
 }
 
-/**
- * Both Navigation and Resource timing level 2 exposes these below information
- *
- * for CORS requests without Timing-Allow-Origin header, transferSize & encodedBodySize will be 0
- */
-function getResponseContext(perfTimingEntry) {
-  const {
-    transferSize,
-    encodedBodySize,
-    decodedBodySize,
-    serverTiming
-  } = perfTimingEntry
-
-  const respContext = {
-    transfer_size: transferSize,
-    encoded_body_size: encodedBodySize,
-    decoded_body_size: decodedBodySize
-  }
-  const serverTimingStr = getServerTimingInfo(serverTiming)
-  if (serverTimingStr) {
-    respContext.headers = {
-      'server-timing': serverTimingStr
-    }
-  }
-  return respContext
-}
-
 function createNavigationTimingSpans(timings, baseTime, trStart, trEnd) {
   const spans = []
   for (let i = 0; i < eventPairs.length; i++) {
@@ -124,8 +93,7 @@ function createNavigationTimingSpans(timings, baseTime, trStart, trEnd) {
       span.pageResponse = true
     }
     span._start = start - baseTime
-    span.ended = true
-    span._end = end - baseTime
+    span.end(end - baseTime)
     spans.push(span)
   }
   return spans
@@ -139,18 +107,9 @@ function createResourceTimingSpan(resourceTimingEntry) {
   }
   const spanName = stripQueryStringFromUrl(name)
   const span = new Span(spanName, kind)
-  /**
-   * Add context information for spans
-   */
-  span.addContext({
-    http: {
-      url: name,
-      response: getResponseContext(resourceTimingEntry)
-    }
-  })
+
   span._start = startTime
-  span.end()
-  span._end = responseEnd
+  span.end(responseEnd, { url: name, entry: resourceTimingEntry })
   return span
 }
 
@@ -228,8 +187,7 @@ function createUserTimingSpans(entries, trStart, trEnd) {
     const kind = 'app'
     const span = new Span(name, kind)
     span._start = startTime
-    span.end()
-    span._end = end
+    span.end(end)
 
     userTimingSpans.push(span)
   }
@@ -331,19 +289,6 @@ function captureNavigation(transaction) {
     createUserTimingSpans(userEntries, trStart, trEnd).forEach(span =>
       transaction.spans.push(span)
     )
-
-    /**
-     * Add transaction context information from performance navigation timing entry level 2 API
-     */
-    if (transaction.type === PAGE_LOAD) {
-      let navigationEntry = perf.getEntriesByType('navigation')
-      if (navigationEntry && navigationEntry.length > 0) {
-        navigationEntry = navigationEntry[0]
-        transaction.addContext({
-          response: getResponseContext(navigationEntry)
-        })
-      }
-    }
   }
 }
 

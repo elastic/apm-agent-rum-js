@@ -58,7 +58,7 @@ const RULES = [
   ['?', 'query'],
   ['/', 'path'],
   ['@', 'auth', 1],
-  [NaN, 'host', undefined, 1] //
+  [NaN, 'host', undefined, 1]
 ]
 const PROTOCOL_REGEX = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i
 
@@ -135,6 +135,20 @@ class Url {
     this.relative = relative
 
     this.protocol = protocol || location.protocol
+
+    /**
+     * Construct port and hostname from host and assign defaults based
+     * on http and https protocols
+     */
+    if (/:\d+$/.test(this.host)) {
+      const value = this.host.split(':')
+      this.port = value[1]
+      this.hostname = value[0]
+    } else {
+      this.hostname = this.host
+      this.port =
+        this.protocol === 'http:' ? 80 : this.protocol === 'https:' ? 443 : ''
+    }
 
     this.origin =
       this.protocol && this.host && this.protocol !== 'file:'
