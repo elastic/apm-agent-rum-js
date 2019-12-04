@@ -29,6 +29,7 @@ const { readFileSync } = require('fs')
 const path = require('path')
 const zlib = require('zlib')
 const webpack = require('webpack')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const {
   getWebpackConfig,
   BUNDLE_TYPES
@@ -40,7 +41,7 @@ const dist = path.join(__dirname, '../../dist')
 function customApmBuild(filename) {
   /**
    * Match it with the default webpack prod build of elasticApm
-   * expect the function names are not mangled
+   * expect function names are not mangled and source map is not generated
    */
   const config = {
     entry: path.join(__dirname, '../../src/index.js'),
@@ -50,7 +51,21 @@ function customApmBuild(filename) {
       library: '[name]',
       libraryTarget: 'umd'
     },
-    ...getWebpackConfig(BUNDLE_TYPES.BROWSER_ESM_PROD)
+    ...getWebpackConfig(BUNDLE_TYPES.BROWSER_ESM_PROD),
+    ...{
+      devtool: false,
+      optimization: {
+        minimizer: [
+          new UglifyJSPlugin({
+            sourceMap: false,
+            extractComments: true,
+            uglifyOptions: {
+              keep_fnames: true
+            }
+          })
+        ]
+      }
+    }
   }
 
   return new Promise((resolve, reject) => {
@@ -225,9 +240,9 @@ function capturePayloadInfo(payload) {
 function getMemoryAllocationPerFunction({ profile }) {
   const allocations = []
   /**
-   * Whitelist built functions from the sample
+   * exclude Function names from the memory sample
    */
-  const whitelist = [
+  const excludeFunctionNames = [
     '(V8 API)',
     '(BYTECODE_COMPILER)',
     '__webpack_require__',
@@ -241,7 +256,7 @@ function getMemoryAllocationPerFunction({ profile }) {
     if (
       selfSize > 0 &&
       functionName !== '' &&
-      !whitelist.includes(functionName)
+      !excludeFunctionNames.includes(functionName)
     ) {
       allocations.push({
         name: functionName,

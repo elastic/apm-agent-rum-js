@@ -49,7 +49,7 @@ function getRandomBundleContent(apmBundle) {
   return content
 }
 
-const startServer = (module.exports = filename => {
+function startServer(filename) {
   return new Promise(resolve => {
     /**
      * Strip license and sourcemap url
@@ -95,7 +95,9 @@ const startServer = (module.exports = filename => {
       resolve(server)
     })
   })
-})
+}
+
+module.exports = startServer
 
 !(async () => {
   if (require.main === module) {
