@@ -1,4 +1,5 @@
 :pull: https://github.com/elastic/apm-agent-rum-js/pull/
+:commit: https://github.com/elastic/apm-agent-rum-js/commit/
 
 [[release-notes]]
 == Release notes
