@@ -1,7 +1,7 @@
 [[intro]]
 == Introduction
 
-The Elastic APM RUM JavaScript Agent provides detailed performance metrics and error tracking of your web applications.
+The Elastic APM Real User Monitoring (RUM) JavaScript Agent provides detailed performance metrics and error tracking of your web applications.
 It has built-in support for popular platforms and frameworks, and an API for custom instrumentation.
 
 The Agent also supports <<distributed-tracing-guide,distributed tracing>> for all outgoing requests.
