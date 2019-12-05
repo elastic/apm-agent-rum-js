@@ -1,0 +1,151 @@
+[[getting-started]]
+== Set up the Agent
+
+To start reporting your web page performance to Elastic APM,
+you must first {apm-server-ref-v}/configuration-rum.html[enable the RUM endpoint] in your `apm-server` configuration. 
+
+Once the APM Server endpoint has been configured, you can:
+
+* <<install-the-agent>>
+* <<configuring-cors>>
+
+[[install-the-agent]]
+=== Install the Agent
+
+There are three ways to use the APM RUM Agent:
+
+* <<using-package-managers>>: Install the Agent as a dependency to your application.
+* <<using-script-tags>>: Add a `<script>` tag to the HTML page.
+* <<using-production-build>>: Optimized bundles.
+
+[float]
+[[using-package-managers]]
+=== Using Package Managers
+
+Install the APM agent for JavaScript as a dependency to your application:
+
+[source,bash]
+----
+npm install @elastic/apm-rum --save
+----
+
+Configure the agent:
+
+[source,js]
+----
+import { init as initApm } from '@elastic/apm-rum'
+const apm = initApm({
+  
+  // Set required service name (allowed characters: a-z, A-Z, 0-9, -, _, and space)
+  serviceName: '',
+
+  // Set custom APM Server URL (default: http://localhost:8200)
+  serverUrl: 'http://localhost:8200',
+  
+  // Set service version (required for sourcemap feature)
+  serviceVersion: ''
+})
+----
+
+[float]
+[[using-script-tags]]
+=== Using Script Tags
+
+Add a <script> tag to the HTML page and use the `elasticApm` global object to load and initialize the agent:
+
+NOTE: Please download the latest version of JavaScript agent from https://github.com/elastic/apm-agent-rum-js/releases/latest[GitHub] or
+https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG] and host the file in your Server/CDN before deploying to production.
+
+[source,html]
+----
+<script src="https://your-cdn-host.com/path/to/elastic-apm-rum.umd.min.js" crossorigin></script>
+<script>
+  elasticApm.init({
+    serviceName: '',
+    serverUrl: 'http://localhost:8200',
+  })
+</script>
+----
+
+NOTE: Currently the optimized(minified + gzipped) JavaScript bundle size is about 16KiB.
+
+[float]
+[[using-production-build]]
+=== Using Production Build
+
+By default, RUM agent logs all the debug messages to the browser console. These logs are very useful in development. However, they make the RUM agent bundle size larger so you should make sure to use the optimized production version when deploying your application.
+
+You can find instructions for building optimized code below for different bundlers
+
+[float]
+==== Webpack
+For optimized webpack production build, include the Environment/Define plugin in the webpack configuration.
+
+[source, js]
+----
+const { EnvironmentPlugin } = require('webpack')
+
+plugins: [
+  new EnvironmentPlugin({
+    NODE_ENV: 'production'
+  })
+]
+----
+
+You can learn more about this in https://webpack.js.org/plugins/environment-plugin[Webpack documentation].
+
+[float]
+==== Rollup
+
+For optimized rollup production build, include the replace plugin which ensures the right build environment is used. 
+
+[source, js]
+----
+const replace = require('rollup-plugin-replace')
+
+plugins: [
+  replace({
+    'process.env.NODE_ENV': 'production'
+  })
+]
+----
+
+[[configuring-cors]]
+=== Configure CORS
+
+If APM Server is deployed in an origin different than the page's origin,
+you will need to configure Cross-Origin Resource Sharing (CORS).
+
+A list of permitted origins can be supplied to the
+{apm-server-ref-v}/configuration-rum.html#rum-allow-origins[`apm-server.rum.allow_origins`]
+configuration option.
+By default, APM Server allows all origins.
+
+[float]
+==== How CORS works
+
+When the RUM agent makes it's initial `POST` request, the browser will check to see if it is a cross-origin request.
+If it is, the browser automatically makes a preflight `OPTIONS` request to the server to ensure the original `POST` request is allowed.
+If this `OPTIONS` check passes, then the original `POST` request is allowed.
+This request will fail if RUM support is not configured in the APM Server.
+
+If you use a proxy, the preflight request headers may be necessary for your configuration:
+
+[source,js]
+----
+Access-Control-Request-Headers: Content-Type
+Access-Control-Request-Method: POST
+Origin: [request-origin]
+----
+
+The response should include these headers:
+
+[source,js]
+----
+Access-Control-Allow-Headers: Content-Type
+Access-Control-Allow-Methods: POST, OPTIONS
+Access-Control-Allow-Origin: [request-origin]
+----
+
+TIP: To learn more about CORS, see the MDN page on
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing].

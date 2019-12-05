@@ -1,7 +1,7 @@
 [[custom-transaction-name]]
 === Custom initial page load transaction names
 
-Correctly setting initial page load transaction names is vital to ensuring the best experience when viewing application performance metrics in the Kibana UI.
+Correctly setting initial page load transaction names is vital to ensuring the best experience when viewing application performance metrics in the APM app.
 
 Let's look at an example to understand why. Here are a few URLs you might find on elastic.co:
 
@@ -19,7 +19,7 @@ https://www.elastic.co/guide/en/infrastructure/guide/current/index.html
 ----
 
 By default, <<transaction-name,`transaction.name`>> is set to `Unknown`.
-This means that when viewing transactions in the Kibana UI,
+This means that when viewing transactions in the APM app,
 all transactions will be grouped under the common transaction name of `Unknown`.
 Grouping every transaction (especially unrelated ones) into one group doesn't make much sense.
 To fix this, you can use the API to change the default initial page load transaction name with the <<page-load-transaction-name,`pageLoadTransactionName`>> configuration option.

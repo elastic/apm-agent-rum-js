@@ -1,5 +1,4 @@
-:branch: current
-:server-branch: 6.5
+include::{asciidoc-dir}/../../shared/versions/stack/current.asciidoc[]
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
 ifdef::env-github[]
@@ -13,22 +12,22 @@ include::./intro.asciidoc[]
 
 include::./supported-technologies.asciidoc[]
 
-include::./sourcemap.asciidoc[]
+include::./configuration.asciidoc[]
 
 include::./api.asciidoc[]
 
-include::./configuration.asciidoc[]
+include::./sourcemap.asciidoc[]
 
 include::./framework-integrations.asciidoc[]
+
+include::./distributed-tracing-guide.asciidoc[]
+
+include::./breakdown-metrics.asciidoc[]
+
+include::./opentracing.asciidoc[]
 
 include::./advanced-topics.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
-
-include::./distributed-tracing-guide.asciidoc[]
-
-include::./opentracing.asciidoc[]
-
-include::./breakdown-metrics.asciidoc[]
 
 include::./release-notes.asciidoc[]
