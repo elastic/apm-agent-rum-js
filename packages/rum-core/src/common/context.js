@@ -68,7 +68,7 @@ function getExternalContext(data) {
   const { url, method, target, response } = data
   const parsedUrl = new Url(url)
 
-  const { href, port, protocol, hostname } = parsedUrl
+  const { href, port, protocol, hostname, origin } = parsedUrl
   const isDefaultPort = port === '80' || port === '443'
 
   const context = {
@@ -86,8 +86,9 @@ function getExternalContext(data) {
       port
     }
   }
+
   let statusCode
-  if (target && typeof target.status !== 'undefined') {
+  if (target) {
     statusCode = target.status
   } else if (response) {
     statusCode = response.status

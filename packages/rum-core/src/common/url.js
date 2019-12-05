@@ -142,8 +142,8 @@ class Url {
      */
     if (/:\d+$/.test(this.host)) {
       const value = this.host.split(':')
-      this.port = value[1]
-      this.hostname = value[0]
+      this.port = value.pop()
+      this.hostname = value.join(':')
     } else {
       this.hostname = this.host
       this.port =
