@@ -56,7 +56,7 @@ but are relevant in the context of Elastic APM.
 
 The following tags are relevant only to the root spans, which are
 translated to Elastic APM transactions.
-These tags appear in the "User" tab on the transaction details page in the Elastic APM UI.
+These tags appear in the "User" tab on the transaction details page in the Elastic APM app.
 
 - `user.id` - sets the user id
 - `user.email` - sets the user email
