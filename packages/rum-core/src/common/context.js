@@ -88,7 +88,7 @@ function getExternalContext(data) {
   }
 
   let statusCode
-  if (target) {
+  if (target && typeof target.status !== 'undefined') {
     statusCode = target.status
   } else if (response) {
     statusCode = response.status
