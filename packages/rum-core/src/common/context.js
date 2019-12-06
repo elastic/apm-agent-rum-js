@@ -27,6 +27,9 @@ import Url from './url'
 import { PAGE_LOAD } from './constants'
 import { getPageMetadata, getServerTimingInfo } from './utils'
 
+const LEFT_SQUARE_BRACKET = 91 // [
+const RIGHT_SQUARE_BRACKET = 93 // ]
+
 /**
  * Both Navigation and Resource timing level 2 exposes these below information
  *
@@ -54,13 +57,53 @@ function getResponseContext(perfTimingEntry) {
   return respContext
 }
 
+function getDestination(parsedUrl) {
+  const { port, protocol, hostname, origin } = parsedUrl
+
+  const isDefaultSchemeAndPort =
+    (protocol === 'http:' && port === '80') ||
+    (protocol === 'https:' && port === '443')
+
+  /**
+   * If hostname begins with [ and ends with ] then its an IPV6 address
+   *
+   * since address and port are recorded separately, we are recording the
+   * info in canonical form without square brackets
+   *
+   * IPv6 check is done here instead of in the URL parser to keep the URL parser
+   * functionality minimal and it also makes things easier for service construction
+   */
+  const ipv6Hostname =
+    hostname.charCodeAt(0) === LEFT_SQUARE_BRACKET &&
+    hostname.charCodeAt(hostname.length - 1) === RIGHT_SQUARE_BRACKET
+
+  let address = hostname
+  if (ipv6Hostname) {
+    address = hostname.slice(1, -1)
+  }
+
+  return {
+    service: {
+      name: !isDefaultSchemeAndPort ? origin : protocol + '//' + hostname,
+      resource: hostname + ':' + port,
+      type: 'external'
+    },
+    address,
+    port
+  }
+}
+
 function getResourceContext(data) {
   const { entry, url } = data
+  const parsedUrl = new Url(url)
+
+  const destination = getDestination(parsedUrl)
   return {
     http: {
       url,
       response: getResponseContext(entry)
-    }
+    },
+    destination
   }
 }
 
@@ -68,23 +111,14 @@ function getExternalContext(data) {
   const { url, method, target, response } = data
   const parsedUrl = new Url(url)
 
-  const { href, port, protocol, hostname, origin } = parsedUrl
-  const isDefaultPort = port === '80' || port === '443'
+  const destination = getDestination(parsedUrl)
 
   const context = {
     http: {
       method,
-      url: href
+      url: parsedUrl.href
     },
-    destination: {
-      service: {
-        name: !isDefaultPort ? origin : protocol + '//' + hostname,
-        resource: hostname + ':' + port,
-        type: 'external'
-      },
-      address: hostname,
-      port
-    }
+    destination
   }
 
   let statusCode

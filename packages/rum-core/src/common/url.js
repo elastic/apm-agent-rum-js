@@ -147,7 +147,11 @@ class Url {
     } else {
       this.hostname = this.host
       this.port =
-        this.protocol === 'http:' ? 80 : this.protocol === 'https:' ? 443 : ''
+        this.protocol === 'http:'
+          ? '80'
+          : this.protocol === 'https:'
+          ? '443'
+          : ''
     }
 
     this.origin =

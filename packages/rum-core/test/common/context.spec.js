@@ -31,12 +31,21 @@ import { PAGE_LOAD } from '../../src/common/constants'
 import { mockGetEntriesByType } from '../utils/globals-mock'
 
 describe('Context', () => {
-  function createSpanWithData(url) {
+  function createSpanWithData(url, isXHR = true) {
     const span = new Span(`GET ${url}`, 'external')
     const data = {
       url,
-      method: 'GET',
-      response: {
+      method: 'GET'
+    }
+    /**
+     * Testing for both XHR and Fetch spans
+     */
+    if (isXHR) {
+      data.target = {
+        status: 200
+      }
+    } else {
+      data.response = {
         status: 200
       }
     }
@@ -66,7 +75,7 @@ describe('Context', () => {
     })
 
     url = 'https://www.elastic.co:443/products/apm'
-    span = createSpanWithData(url)
+    span = createSpanWithData(url, false)
     expect(span.context).toEqual({
       http: {
         method: 'GET',
@@ -84,7 +93,7 @@ describe('Context', () => {
       }
     })
 
-    url = 'http://[::1]/'
+    url = 'http://[::1]'
     span = createSpanWithData(url)
     expect(span.context).toEqual({
       http: {
@@ -98,8 +107,27 @@ describe('Context', () => {
           resource: '[::1]:80',
           type: 'external'
         },
-        address: '[::1]',
-        port: 80
+        address: '::1',
+        port: '80'
+      }
+    })
+
+    url = 'https://[::1]:80/'
+    span = createSpanWithData(url)
+    expect(span.context).toEqual({
+      http: {
+        method: 'GET',
+        url,
+        status_code: 200
+      },
+      destination: {
+        service: {
+          name: 'https://[::1]:80',
+          resource: '[::1]:80',
+          type: 'external'
+        },
+        address: '::1',
+        port: '80'
       }
     })
   })
@@ -120,6 +148,15 @@ describe('Context', () => {
           encoded_body_size: 97717,
           decoded_body_size: 97717
         }
+      },
+      destination: {
+        service: {
+          name: 'http://example.com',
+          resource: 'example.com:80',
+          type: 'external'
+        },
+        address: 'example.com',
+        port: '80'
       }
     })
   })
