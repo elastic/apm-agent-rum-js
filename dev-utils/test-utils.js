@@ -179,9 +179,8 @@ function runSauceConnect(config, callback) {
 }
 
 function runKarma(configFile) {
-  const server = new Server(
-    { configFile, singleRun: true, logLevel: 'debug' },
-    exitCode => process.exit(exitCode)
+  const server = new Server({ configFile, singleRun: true }, exitCode =>
+    process.exit(exitCode)
   )
   server.start()
 }
