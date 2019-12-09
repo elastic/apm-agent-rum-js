@@ -31,16 +31,6 @@ import { getGlobalConfig } from '../../../../dev-utils/test-config'
 describe('index', function() {
   const globalConfig = getGlobalConfig()
   const { serverUrl, serviceName } = globalConfig.agentConfig
-  var originalTimeout
-
-  beforeEach(function() {
-    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000
-  })
-
-  afterEach(function() {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
-  })
 
   it('should log only on browser environments', () => {
     // Pass unsupported check

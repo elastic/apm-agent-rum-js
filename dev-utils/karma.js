@@ -57,7 +57,9 @@ const baseConfig = {
   ],
   client: {
     jasmine: {
-      random: false
+      random: false,
+      failFast: true,
+      timeoutInterval: 30000
     }
   },
   webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV),
@@ -162,7 +164,6 @@ function prepareConfig(config, packageName) {
     console.log('prepareConfig: Run in SauceLab mode')
     config.sauceLabs.build = buildId
     console.log('saucelabs.build:', buildId)
-    config.concurrency = 3
     if (isJenkins) {
       config.sauceLabs.tags = [testConfig.branch, process.env.STACK_VERSION]
     } else if (testConfig.branch === 'master') {
