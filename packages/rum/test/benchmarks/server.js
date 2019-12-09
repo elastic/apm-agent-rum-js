@@ -40,27 +40,27 @@ function generateImageUrls(port, number) {
 }
 
 /**
- * Strip license and sourcemap url
- */
-const APM_BUNDLE = getMinifiedApmBundle()
-  .replace(
-    '/*! For license information please see elastic-apm-rum.umd.min.js.LICENSE */',
-    ''
-  )
-  .replace('//# sourceMappingURL=elastic-apm-rum.umd.min.js.map', '')
-
-/**
  * Adding a random value at the end of the script text prevents
  * Chrome from caching the parsed/JITed script
  */
-function getRandomBundleContent() {
-  let content = APM_BUNDLE
+function getRandomBundleContent(apmBundle) {
+  let content = apmBundle
   content += `var scriptId = ${Date.now()};`
   return content
 }
 
-module.exports = function startServer() {
+function startServer(filename) {
   return new Promise(resolve => {
+    /**
+     * Strip license and sourcemap url
+     */
+    const apmBundle = getMinifiedApmBundle(filename)
+      .replace(
+        `/*! For license information please see ${filename}.LICENSE */`,
+        ''
+      )
+      .replace(`//# sourceMappingURL=${filename}.map`, '')
+
     const app = express()
     let server
     /**
@@ -75,7 +75,9 @@ module.exports = function startServer() {
 
     app.get('/basic', (req, res) => {
       res.setHeader('cache-control', 'no-cache, no-store, must-revalidate')
-      res.render('basic', { apmBundleContent: getRandomBundleContent() })
+      res.render('basic', {
+        apmBundleContent: getRandomBundleContent(apmBundle)
+      })
     })
 
     app.get('/heavy', (req, res) => {
@@ -83,7 +85,7 @@ module.exports = function startServer() {
       const { port } = server.address()
       const images = generateImageUrls(port, noOfImages)
       res.render('heavy', {
-        apmBundleContent: getRandomBundleContent(),
+        apmBundleContent: getRandomBundleContent(apmBundle),
         images
       })
     })
@@ -94,3 +96,11 @@ module.exports = function startServer() {
     })
   })
 }
+
+module.exports = startServer
+
+!(async () => {
+  if (require.main === module) {
+    await startServer('elastic-apm-rum.umd.min.js')
+  }
+})()
