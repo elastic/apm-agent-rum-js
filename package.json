@@ -61,7 +61,7 @@
     "@types/jasmine": "^3.5.0",
     "@typescript-eslint/eslint-plugin": "^2.10.0",
     "@typescript-eslint/parser": "^2.10.0",
-    "@vue/test-utils": "^1.0.0-beta.30",
+    "@vue/test-utils": "^1.0.0-beta.29",
     "@wdio/cli": "^5.16.13",
     "@wdio/dot-reporter": "^5.16.5",
     "@wdio/jasmine-framework": "^5.16.13",

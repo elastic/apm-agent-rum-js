@@ -23,7 +23,6 @@
  *
  */
 
-const { Server } = require('karma')
 const {
   getSauceConnectOptions,
   getBrowserList,
@@ -177,19 +176,8 @@ function prepareConfig(config, packageName) {
   return config
 }
 
-function singleRunKarma(configFile, done) {
-  new Server(
-    {
-      configFile,
-      singleRun: true
-    },
-    done
-  ).start()
-}
-
 module.exports = {
   prepareConfig,
   baseConfig,
-  baseLaunchers,
-  singleRunKarma
+  baseLaunchers
 }
