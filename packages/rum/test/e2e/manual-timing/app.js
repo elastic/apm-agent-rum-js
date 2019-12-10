@@ -33,7 +33,11 @@ const apm = createApmBase({
   operationMode: 'manual'
 })
 
-const transaction = apm.startTransaction('transaction-name', 'transaction-type')
+const transaction = apm.startTransaction(
+  'transaction-name',
+  'transaction-type',
+  { managed: true }
+)
 transaction.addTask('load-event')
 window.addEventListener('load', function() {
   transaction.mark('load-event')
