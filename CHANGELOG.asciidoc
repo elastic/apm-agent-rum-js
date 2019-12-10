@@ -20,8 +20,7 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 * Cool new feature: {pull}2526[#2526] {commit}d4f181f[#d4f181f]
 
 [float]
-===== Features
-Performance Improvements
+===== Performance Improvements
 
 [float]
 ===== Bug fixes
