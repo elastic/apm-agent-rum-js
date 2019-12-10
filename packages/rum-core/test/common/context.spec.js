@@ -79,7 +79,7 @@ describe('Context', () => {
     expect(span.context).toEqual({
       http: {
         method: 'GET',
-        url,
+        url: 'https://www.elastic.co/products/apm',
         status_code: 200
       },
       destination: {
@@ -112,6 +112,10 @@ describe('Context', () => {
       }
     })
 
+    /**
+     * Explicit test to account for service name
+     * default scheme and port
+     */
     url = 'https://[::1]:80/'
     span = createSpanWithData(url)
     expect(span.context).toEqual({
@@ -153,7 +157,7 @@ describe('Context', () => {
         service: {
           name: 'http://example.com',
           resource: 'example.com:80',
-          type: 'external'
+          type: 'resource'
         },
         address: 'example.com',
         port: '80'

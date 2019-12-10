@@ -29,6 +29,18 @@ import { getPageMetadata, getServerTimingInfo } from './utils'
 
 const LEFT_SQUARE_BRACKET = 91 // [
 const RIGHT_SQUARE_BRACKET = 93 // ]
+const EXTERNAL = 'external'
+const RESOURCE = 'resource'
+
+/**
+ * Get the port number including the default ports
+ */
+function getPortNumber(port, protocol) {
+  if (port === '') {
+    port = protocol === 'http:' ? '80' : protocol === 'https:' ? '443' : ''
+  }
+  return port
+}
 
 /**
  * Both Navigation and Resource timing level 2 exposes these below information
@@ -57,12 +69,10 @@ function getResponseContext(perfTimingEntry) {
   return respContext
 }
 
-function getDestination(parsedUrl) {
-  const { port, protocol, hostname, origin } = parsedUrl
+function getDestination(parsedUrl, type) {
+  const { port, protocol, hostname, host } = parsedUrl
 
-  const isDefaultSchemeAndPort =
-    (protocol === 'http:' && port === '80') ||
-    (protocol === 'https:' && port === '443')
+  const portNumber = getPortNumber(port, protocol)
 
   /**
    * If hostname begins with [ and ends with ] then its an IPV6 address
@@ -84,12 +94,12 @@ function getDestination(parsedUrl) {
 
   return {
     service: {
-      name: !isDefaultSchemeAndPort ? origin : protocol + '//' + hostname,
-      resource: hostname + ':' + port,
-      type: 'external'
+      name: protocol + '//' + host,
+      resource: hostname + ':' + portNumber,
+      type
     },
     address,
-    port
+    port: portNumber
   }
 }
 
@@ -97,7 +107,7 @@ function getResourceContext(data) {
   const { entry, url } = data
   const parsedUrl = new Url(url)
 
-  const destination = getDestination(parsedUrl)
+  const destination = getDestination(parsedUrl, RESOURCE)
   return {
     http: {
       url,
@@ -111,7 +121,7 @@ function getExternalContext(data) {
   const { url, method, target, response } = data
   const parsedUrl = new Url(url)
 
-  const destination = getDestination(parsedUrl)
+  const destination = getDestination(parsedUrl, EXTERNAL)
 
   const context = {
     http: {
@@ -138,10 +148,10 @@ export function addSpanContext(span, data) {
   const { type } = span
   let context
   switch (type) {
-    case 'external':
+    case EXTERNAL:
       context = getExternalContext(data)
       break
-    case 'resource':
+    case RESOURCE:
       context = getResourceContext(data)
       break
   }
