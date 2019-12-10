@@ -28,7 +28,8 @@ import {
   isDtHeaderValid,
   merge,
   parseDtHeaderValue,
-  stripQueryStringFromUrl
+  stripQueryStringFromUrl,
+  getDtHeaderValue
 } from '../common/utils'
 import Url from '../common/url'
 import { patchEventHandler } from '../common/patching'
@@ -41,7 +42,10 @@ import {
   FETCH,
   HISTORY,
   XMLHTTPREQUEST,
-  HTTP_REQUEST_TYPE
+  HTTP_REQUEST_TYPE,
+  BROWSER_RESPONSIVENESS_INTERVAL,
+  BROWSER_RESPONSIVENESS_BUFFER,
+  SIMILAR_SPAN_THRESHOLD_PERCENTAGE
 } from '../common/constants'
 import {
   truncateModel,
@@ -178,11 +182,7 @@ class PerformanceMonitoring {
   injectDtHeader(span, target) {
     var configService = this._configService
     var headerName = configService.get('distributedTracingHeaderName')
-    var headerValueCallback = configService.get(
-      'distributedTracingHeaderValueCallback'
-    )
-
-    var headerValue = headerValueCallback(span)
+    var headerValue = getDtHeaderValue(span)
     var isHeaderValid = isDtHeaderValid(headerValue)
     if (headerName && headerValue && isHeaderValid) {
       if (typeof target.setRequestHeader === 'function') {
@@ -258,21 +258,12 @@ class PerformanceMonitoring {
       tr.resetSpans()
     }
 
-    const browserResponsivenessInterval = this._configService.get(
-      'browserResponsivenessInterval'
-    )
     const checkBrowserResponsiveness = this._configService.get(
       'checkBrowserResponsiveness'
     )
 
     if (checkBrowserResponsiveness && tr.options.checkBrowserResponsiveness) {
-      const buffer = this._configService.get('browserResponsivenessBuffer')
-
-      const wasBrowserResponsive = this.checkBrowserResponsiveness(
-        tr,
-        browserResponsivenessInterval,
-        buffer
-      )
+      const wasBrowserResponsive = this.checkBrowserResponsiveness(tr)
 
       if (!wasBrowserResponsive) {
         if (__DEV__) {
@@ -281,9 +272,7 @@ class PerformanceMonitoring {
             ' duration:',
             duration,
             ' browserResponsivenessCounter:',
-            tr.browserResponsivenessCounter,
-            'interval:',
-            browserResponsivenessInterval
+            tr.browserResponsivenessCounter
           )
         }
         return false
@@ -298,11 +287,7 @@ class PerformanceMonitoring {
     })
 
     if (this._configService.get('groupSimilarSpans')) {
-      var similarSpanThreshold = this._configService.get('similarSpanThreshold')
-      transaction.spans = this.groupSmallContinuouslySimilarSpans(
-        transaction,
-        similarSpanThreshold
-      )
+      transaction.spans = this.groupSmallContinuouslySimilarSpans(transaction)
     }
 
     transaction.spans = transaction.spans.filter(function(span) {
@@ -370,7 +355,7 @@ class PerformanceMonitoring {
     return transactions.map(tr => this.createTransactionDataModel(tr))
   }
 
-  groupSmallContinuouslySimilarSpans(transaction, threshold) {
+  groupSmallContinuouslySimilarSpans(transaction) {
     var transDuration = transaction.duration()
     var spans = []
     var lastCount = 1
@@ -385,8 +370,9 @@ class PerformanceMonitoring {
           lastSpan.subType === span.subType &&
           lastSpan.action === span.action &&
           lastSpan.name === span.name &&
-          span.duration() / transDuration < threshold &&
-          (span._start - lastSpan._end) / transDuration < threshold
+          span.duration() / transDuration < SIMILAR_SPAN_THRESHOLD_PERCENTAGE &&
+          (span._start - lastSpan._end) / transDuration <
+            SIMILAR_SPAN_THRESHOLD_PERCENTAGE
 
         var isLastSpan = transaction.spans.length === index + 1
 
@@ -408,17 +394,12 @@ class PerformanceMonitoring {
     return spans
   }
 
-  checkBrowserResponsiveness(transaction, interval, buffer) {
-    var counter = transaction.browserResponsivenessCounter
-    if (typeof interval === 'undefined' || typeof counter === 'undefined') {
-      return true
-    }
+  checkBrowserResponsiveness(transaction) {
+    const counter = transaction.browserResponsivenessCounter
+    const duration = transaction.duration()
+    const expectedCount = Math.floor(duration / BROWSER_RESPONSIVENESS_INTERVAL)
 
-    var duration = transaction.duration()
-    var expectedCount = Math.floor(duration / interval)
-    var wasBrowserResponsive = counter + buffer >= expectedCount
-
-    return wasBrowserResponsive
+    return counter + BROWSER_RESPONSIVENESS_BUFFER >= expectedCount
   }
 }
 
