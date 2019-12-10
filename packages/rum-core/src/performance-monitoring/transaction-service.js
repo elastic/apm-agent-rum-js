@@ -144,7 +144,7 @@ class TransactionService {
 
     tr.captureTimings = true
 
-    if (type === PAGE_LOAD) {
+    if (tr.type === PAGE_LOAD) {
       tr.options.checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
