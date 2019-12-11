@@ -52,10 +52,11 @@ describe('ApmBase', function() {
 
     apmBase.setInitialPageLoadName('new page load')
     apmBase.observe(TRANSACTION_END, endedTr => {
+      expect(endedTr).toEqual(tr)
       expect(document.readyState).toBe('complete')
       expect(tr.detectFinish).toHaveBeenCalled()
-      expect(endedTr.name).toBe('new page load')
-      expect(endedTr.type).toBe(PAGE_LOAD)
+      expect(tr.name).toBe('new page load')
+      expect(tr.type).toBe(PAGE_LOAD)
       done()
     })
   })

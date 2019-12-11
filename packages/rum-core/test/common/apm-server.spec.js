@@ -74,15 +74,26 @@ describe('ApmServer', function() {
   var apmServer
   var configService
   var loggingService
+  var originalTimeout
   var performanceMonitoring
 
   beforeEach(function() {
+    /**
+     * Setting longer timeout to mitigate if the connection
+     * to APM server takes longer than the default timeout
+     */
+    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
     serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
     configService.setConfig(agentConfig)
     loggingService = serviceFactory.getService('LoggingService')
     apmServer = serviceFactory.getService('ApmServer')
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+  })
+
+  afterEach(function() {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
   it('should not send transctions when the list is empty', function() {
