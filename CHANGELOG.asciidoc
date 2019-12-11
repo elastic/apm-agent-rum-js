@@ -1,1 +1,504 @@
-This is a placeholder file. Release notes are published in CHANGELOG.md
+ifdef::env-github[]
+NOTE: Release notes are best read in our documentation at
+https://www.elastic.co/guide/en/apm/agent/rum-js/current/release-notes.html[elastic.co]
+endif::[]
+
+////
+All notable changes to this project will be documented in this file.
+See Conventional Commits (https://conventionalcommits.org) for commit guidelines.
+////
+
+////
+[[release-notes-x.x.x]]
+==== x.x.x (YYYY/MM/DD)
+
+[float]
+===== Breaking changes
+
+[float]
+===== Features
+* Cool new feature: {pull}2526[#2526] {commit}d4f181f[#d4f181f]
+
+[float]
+===== Performance Improvements
+
+[float]
+===== Bug fixes
+////
+
+[[release-notes-4.x]]
+=== RUM JS Agent version 4.x
+
+[[release-notes-4.6.0]]
+==== 4.6.0 (2019-11-19)
+
+[float]
+===== Bug Fixes
+* **rum-core:** Improve capturing multiple XHRs, by scheduling macro tasks {pull}480[#480] {commit}d4f181f[d4f181f], closes {pull}390[#390]
+* **rum-core:** Ensure context metadata is shallow merged on transaction {pull}453[#453] {commit}30b954e[30b954e]
+
+[float]
+===== Features
+* **rum-core:** Improve the debug logs with transaction details {pull}469[#469] {commit}b9629b4[b9629b4]
+* **rum-core:** First draft of central configuration management (Alpha) {pull}439[#439] {commit}bac0e15[bac0e15]
+* **rum-core:** Add breakdowns based on navigation timing {pull}464[#464] {commit}61ed16b[61ed16b]
+* **rum-core:** Copy transaction context info to error {pull}458[#458] {commit}fa81fb7[fa81fb7]
+* **rum-vue:** Vue router integration with rum agent {pull}460[#460] {commit}228e157[228e157]
+
+[[release-notes-4.5.1]]
+==== 4.5.1 (2019-10-09)
+
+[float]
+===== Bug Fixes
+* Handle relative urls without slash properly {pull}446[#446] {commit}288e8b1[288e8b1]
+* Use explicit angular injection for service {pull}449[#449] {commit}b88356f[b88356f]
+
+[[release-notes-4.5.0]]
+==== 4.5.0 (2019-09-30)
+
+[float]
+===== Bug Fixes
+* Publish all packages as transpiled modules {pull}432[#432] {commit}1f4ee87[1f4ee87]
+
+[float]
+===== Features
+* Introduce managed transaction option {pull}440[#440] {commit}a08f210[a08f210]
+* Capture unhandled promise rejection as errors {pull}427[#427] {commit}ef34ccc[ef34ccc]
+* Capture resource and user timing spans for soft navigation {pull}423[#423] {commit}d461ae5[d461ae5]
+* Support central config management (pre-alpha) {pull}415[#415] {commit}1382cc9[1382cc9]
+* Breakdown graphs for transaction (pre-alpha) {pull}412[#412] {commit}28df070[28df070]
+
+[[release-notes-4.4.4]]
+==== 4.4.4 (2019-09-17)
+
+[float]
+===== Bug Fixes
+* **rum-core:** handle script error events properly {pull}418[#418] {commit}c862ab7[c862ab7]
+* **rum-angular:** proper transaction name for lazy loaded routes {pull}414[#414] {commit}4c6d120[4c6d120]
+* **rum-react:** create transaction only on component mount {pull}419[#419] {commit}a290448[a290448]
+
+[[release-notes-4.4.3]]
+==== 4.4.3 (2019-09-03)
+
+[float]
+===== Bug Fixes
+* **rum:** log unsupported message only on browser environment {pull}382[#382] {commit}ff759d1[ff759d1]
+* **rum-react:** respect active flag in react integration {pull}392[#392] {commit}6d7e9db[6d7e9db]
+
+[float]
+===== Features
+* **rum-angular:** angular integration with apm-rum {pull}384[#384] {commit}6ab2450[6ab2450]
+
+[[release-notes-4.4.2]]
+==== 4.4.2 (2019-08-08)
+
+[float]
+===== Bug Fixes
+* **rum:** do not polyfill the global Promise variable {pull}366[#366] {commit}f5dc95c[f5dc95c]
+
+[[release-notes-4.4.1]]
+==== 4.4.1 (2019-08-05)
+
+[float]
+===== Bug Fixes
+* **rum:** sync version number with latest published version {pull}362[#362] {commit}909f480[909f480]
+
+[[release-notes-4.4.0]]
+==== 4.4.0 (2019-08-05)
+
+[float]
+===== Bug Fixes
+* **rum-core:** reduce transaction reusability threshold to 5 seconds {pull}354[#354] {commit}dd32e41[dd32e41]
+* **rum-react:** capture network requests inside useEffect hook {pull}353[#353] {commit}ae25200[ae25200]
+
+[float]
+===== Features
+* **rum:** add instrument flag to toggle instrumentations {pull}360[#360] {commit}b7098dd[b7098dd]
+* **rum-core:** add event listeners for transactions {pull}279[#279] {commit}d98f7c7[d98f7c7]
+* **rum-core:** provide debug logs when transaction was discarded {pull}351[#351] {commit}d6728d8[d6728d8]
+* **rum-react:** publish transpiled react elements as es modules {pull}356[#356] {commit}7c651c7[7c651c7]
+
+[[release-notes-4.3.1]]
+==== 4.3.1 (2019-07-25)
+
+[float]
+===== Bug Fixes
+* **rum-core:** check ignoreTransactions config value {pull}337[#337] {commit}aff6bc8[aff6bc8]
+* **rum-react:** check component in withTransaction {pull}328[#328] {commit}e348874[e348874]
+* **rum-react:** render the correct component when using ApmRoute with Switch {pull}342[#342] {commit}0b3f0a0[0b3f0a0]
+
+[float]
+===== Features
+* **rum-core:** add size & server timing information to traces {pull}206[#206] {commit}c743f70[c743f70]
+* **rum-core:** improve error message on payload failure {pull}330[#330] {commit}73e7015[73e7015]
+
+[[release-notes-4.3.0]]
+==== 4.3.0 (2019-07-11)
+
+[float]
+===== Bug Fixes
+* **rum:core:** send labels via context.tags in the payload {pull}316[#316] {commit}526c3e7[526c3e7]
+
+[float]
+===== Features
+* Initial react integration {pull}265[#265] {commit}83cbebd[83cbebd]
+
+[[release-notes-4.2.0]]
+==== 4.2.0 (2019-07-08)
+
+[float]
+===== Bug Fixes
+* **rum-core:** remove sensitive info from span context {pull}274[#274] {commit}b073f7f[b073f7f]
+
+[float]
+===== Features
+* **rum:** better log message on invalid configuration {pull}216[#216] {commit}b65a806[b65a806]
+* **rum-core:** add user timing spans to the page-load transaction {pull}276[#276] {commit}11a62f1[11a62f1]
+
+[float]
+===== Performance Improvements
+* **rum:** remove debug logs on production build {pull}245[#245] {commit}2565844[2565844]
+* **rum-core:** check span validition before creating arbitrary spans {pull}277[#277] {commit}dcba903[dcba903]
+
+[[release-notes-4.1.2]]
+==== 4.1.2 (2019-06-20)
+
+[float]
+===== Bug Fixes
+* **rum-core:** avoid creating multiple transactions in startTransaction {pull}296[#296] {commit}70c3fb4[70c3fb4]
+
+[[release-notes-4.1.1]]
+==== 4.1.1 (2019-06-12)
+
+[float]
+===== Bug Fixes
+* **rum:** Fix the agent version in the bundles
+
+[[release-notes-4.1.0]]
+==== 4.1.0 (2019-06-12)
+
+[float]
+===== Bug Fixes
+* **rum-core:** capture all spans as part of page-load transaction {pull}273[#273] {commit}0122bf7[0122bf7]
+
+[float]
+===== Features
+* **rum:** deprecate addTags in favor of addLabels {pull}270[#270] {commit}3e313d3[3e313d3]
+* **rum-core:** patch history API {pull}259[#259] {commit}be58997[be58997]
+* **rum-core:** use error event instead of global onerror method {pull}281[#281] {commit}ef61121[ef61121]
+
+[float]
+===== Performance Improvements
+* **rum-core:** refactor transaction & stack service to improve bundlesize {pull}233[#233] {commit}f2b2562[f2b2562]
+
+[[release-notes-4.0.2]]
+==== 4.0.2 (2019-05-29)
+
+[float]
+===== Bug Fixes
+* **rum:** return noop agent when config is inactive {pull}239[#239] {commit}7deef2d[7deef2d]
+* **rum-core:** apply truncation on keyword fields in payload {pull}241[#241] {commit}8a3927b[8a3927b]
+* **rum-core:** hardcode agent name and version in service metadata {pull}236[#236] {commit}a90337d[a90337d]
+* **rum-core:** in truncate check for empty values {pull}256[#256] {commit}cccb172[cccb172]
+
+[float]
+===== Performance Improvements
+* **rum:** move to ES6 modules to reduce bundle size {pull}237[#237] {commit}7aa4351[7aa4351]
+
+[[release-notes-4.0.1]]
+==== 4.0.1 (2019-03-21)
+
+[float]
+===== Bug Fixes
+* **rum-core:** fix custom marks for page-load {pull}225[#225] {commit}6cd392a[6cd392a], closes {pull}221[#221]
+* **rum:** keep page load transaction until load {pull}224[#224] {commit}29afb27[29afb27]
+
+[[release-notes-4.0.0]]
+==== 4.0.0 (2019-03-11)
+
+[float]
+===== Features
+* **rum-core:** add service env to metadata payload {pull}198[#198] {commit}adc038b[adc038b]
+* **rum-core:** Add task API {pull}194[#194] {commit}0153229[0153229]
+* **rum-core:** measure all resource entries in page load {pull}173[#173] {commit}7cd4e0d[7cd4e0d]
+
+[float]
+===== Performance Improvements
+* **rum-core:** avoid url parsing on resource timing entries {pull}174[#174] {commit}54ea6b9[54ea6b9]
+
+[float]
+===== BREAKING CHANGES
+* move IE 10 and Android 4 to unsupported list {commit}16f4440[16f4440], closes {pull}196[#196]
+* Rename the final JS bundles (#202) {commit}68b37d[68b37d]
+* resolve main field to source file (#179) {commit}923405[923405]
+
+[[release-notes-3.x]]
+=== RUM JS Agent version 3.x
+
+[[release-notes-3.0.0]]
+==== 3.0.0 (2019-01-29)
+
+[float]
+===== BREAKING CHANGE
+* remove setTags in favor of addTags API ([#28](https://github.com/elastic/apm-agent-js-core/issues/28))
+* introduce subtype and action in Spans {commit}#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7[#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7]
+
+[float]
+===== Features
+* add OpenTracing support {pull}138[#138] {commit}0cff389[0cff389]
+* include transaction flags on error {pull}29[29] {commit}36c13f3[36c13f3]
+* send span sync field to apm server {pull}17[17] {commit}abad58b[abad58b]
+* add addContext and addTags to Spans and Transactions {pull}16[16] {commit}de0d72b[de0d72b]
+* add paint timing mark to page-load transaction {pull}14[14] {commit}544530a[544530a]
+
+[float]
+===== Bug Fixes
+* propagate transaction ID for unsampled transactions {pull}30[30] {commit}3884806[3884806]
+* remove invalid chars in span tags and marks {pull}34[34] {commit}9bdc575[9bdc575]
+* Bundling -  moving to webpack 4 and babel 7 {pull}123[#123] {commit}0ae3f53[0ae3f53]
+* remove query strings from xhr and fetch span name {pull}24[24] {commit}cc82e92[cc82e92]
+* set pageLoadTransactionName when transaction ends from configs {pull}25[25] {commit}afdacee[afdacee]
+
+[float]
+===== Performance Improvements
+* introduce minimal url parser to reduce bundle size {pull}32[32] {commit}2000ee2[2000ee2]
+
+[[release-notes-2.x]]
+=== RUM JS Agent version 2.x
+
+[[release-notes-2.2.0]]
+==== 2.2.0 (2018-12-05)
+
+[float]
+===== Features
+* introduce subtype and action in Spans {commit}#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7[#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7]
+
+[[release-notes-2.1.1]]
+==== 2.1.1 (2018-12-05)
+
+[float]
+===== Bug Fixes
+* use dist package for url-parse to avoid packaging issues {pull}10[10] {commit}9018a8d[9018a8d]
+
+[float]
+===== Features
+* introduce subtype and action in Spans {pull}9[9] {commit}5fd4af7[5fd4af7]
+
+[[release-notes-2.1.0]]
+==== 2.1.0 (2018-12-03)
+
+[float]
+===== Features
+* instrument fetch API {commit}2375a60[2375a60]
+
+[[release-notes-2.0.0]]
+==== 2.0.0 (2018-11-14)
+
+[float]
+===== BREAKING CHANGES
+* use apm-server intake/v2 (APM Server v6.5+)
+
+[float]
+===== Bug Fixes
+* start page load transaction immediately after init {commit}3b80bdb[3b80bdb]
+* use pageLoadTransactionName config option {commit}d3d3587[d3d3587]
+* adopt the w3c dt header flag proposal {commit}ff0fdfc[ff0fdfc]
+* don't startSpan after transaction has ended {commit}137bd63[137bd63]
+* filter out invalid spans {commit}c9fb0e1[c9fb0e1]
+* ignore apm-server xhrs {commit}5527cca[5527cca]
+* merging two spans related to fetching the initial document {commit}6ee4108[6ee4108]
+* set pageLoadTraceId on page load transacton start {commit}c6510ca[c6510ca]
+* set the sync property on xhr spans {commit}4283e85[4283e85]
+* shorten page load config options {commit}2550c24[2550c24]
+* truncate active spans on transaction end {commit}a28759c[a28759c]
+* validate DT header {commit}5aa1cc1[5aa1cc1]
+
+[float]
+===== Features
+* add allowed origins for distributed tracing {commit}0812ff7[0812ff7]
+* add DT header to same origin http requests {commit}a60d6d9[a60d6d9]
+* add DT page load trace id config option {commit}149ebaa[149ebaa]
+* add pageLoadTransactionName config option {commit}a2644df[a2644df]
+* add parent_id to spans {commit}21934b3[21934b3]
+* add sampling for transactions {commit}8105e0c[8105e0c]
+* generate random ids based on DT guidelines {commit}8fd2581[8fd2581]
+* provide span_count.started {commit}f3effcf[f3effcf]
+* use correct id format for transactions and spans {commit}d44592e[d44592e]
+
+[[release-notes-1.x]]
+=== RUM JS Agent version 1.x
+
+[[release-notes-1.0.0]]
+==== 1.0.0 (2018-08-23)
+
+[float]
+===== BREAKING CHANGES
+* use /v1/rum endpoint (APM Server v6.4+)
+
+[[release-notes-0.x]]
+=== RUM JS Agent version 0.x
+
+[[release-notes-0.10.3]]
+==== 0.10.3 (2018-08-20)
+
+[float]
+===== Bug Fixes
+* check marks are greater than fetchStart {commit}6d35eaa[6d35eaa]
+
+[float]
+===== Features
+* add transactionDurationThreshold config option {commit}67f5c5d[67f5c5d]
+
+[[release-notes-0.10.2]]
+==== 0.10.2 (2018-08-16)
+
+[float]
+===== Bug Fixes
+* check for undefined span when the agent is not active {commit}3613b01[3613b01]
+
+[[release-notes-0.10.1]]
+==== 0.10.1 (2018-08-14)
+
+[float]
+===== Bug Fixes
+* update elastic-apm-js-core to 0.8.1
+* filter out transactions with zero spans
+
+[[release-notes-0.10.0]]
+==== 0.10.0 (2018-08-07)
+
+[float]
+===== Features
+* instrument XHR {commit}3c6a9e5[3c6a9e5]
+
+[[release-notes-0.9.1]]
+==== 0.9.1 (2018-06-22)
+
+[float]
+===== Bug Fixes
+* update elastic-apm-js-core to 0.7.1
+* consolidate Transaction and Error contexts
+
+[[release-notes-0.9.0]]
+==== 0.9.0 (2018-06-15)
+
+[float]
+===== BREAKING CHANGES
+* update elastic-apm-js-core to 0.7.0
+* remove timestamp on error and transaction payload
+* supporting apm-server 6.3
+
+[float]
+===== Bug Fixes
+* update span.context.http.url structure {commit}40d6bb2[40d6bb2]
+
+[[release-notes-0.8.2]]
+==== 0.8.2 (2018-06-12)
+
+[float]
+===== Bug Fixes
+* update elastic-apm-js-core 0.6.2 {commit}b3807e0[b3807e0]
+* remove marks before fetchStart to align with resource spans
+* spans generated from navigation and resource timing apis
+
+[[release-notes-0.8.1]]
+==== 0.8.1 (2018-05-28)
+
+[float]
+===== Features
+* add transaction custom marks API {commit}4d2b71b[4d2b71b]
+
+[[release-notes-0.8.0]]
+==== 0.8.0 (2018-05-23)
+
+[float]
+===== BREAKING CHANGES
+* rename hasRouterLibrary to sendPageLoadTransaction
+
+[[release-notes-0.7.0]]
+==== 0.7.0 (2018-04-30)
+
+[float]
+===== Features
+* exposed api initial draft {commit}9187726[9187726]
+
+[[release-notes-0.6.1]]
+==== 0.6.1 (2018-04-10)
+
+[float]
+===== Bug Fixes
+* update to elastic-apm-js-core 0.4.3 {commit}1e307ac[1e307ac]
+
+[[release-notes-0.6.0]]
+==== 0.6.0 (2018-04-04)
+
+[float]
+===== Features
+* add addFilter api {commit}60e9ad5[60e9ad5]
+
+[[release-notes-0.5.0]]
+==== 0.5.0 (2018-03-09)
+
+[float]
+===== Features
+* add apm.setTags {commit}523280a[523280a]
+* update to elastic-apm-js-core 0.3.0 {commit}a436334[a436334]
+
+[[release-notes-0.4.1]]
+==== 0.4.1 (2018-02-20)
+
+[float]
+===== Bug Fixes
+* send page load metrics even after load event {commit}abe3680[abe3680]
+
+[float]
+===== Features
+* upgrade to elastic-apm-js-core 0.2.2 {commit}c2a6469[c2a6469]
+  * enforce server string limit
+  * set descriptive names for navigation timing spans
+
+[[release-notes-0.4.0]]
+==== 0.4.0 (2018-02-07)
+
+[float]
+===== Features
+* Remove elastic-apm-js-zone dependency (Reducing the size of the bundle)
+* Use es6-promise
+* Queue Errors and Transactions before sending
+* Throttle adding Errors and Transactions
+
+[[release-notes-0.3.0]]
+==== 0.3.0 (2018-01-11)
+
+[float]
+===== Bug Fixes
+* **ApmBase:** Disable the module if running on nodejs {commit}2bf4199[2bf4199]
+* upgrade to elastic-apm-js-core 0.1.7 {commit}325a918[325a918]
+
+[float]
+===== Features
+* add captureError to ApmBase {commit}04436b4[04436b4]
+* add setUserContext and setCustomContext {commit}86b4ccc[86b4ccc]
+
+[[release-notes-0.2.0]]
+==== 0.2.0 (2017-12-20)
+
+[float]
+===== BREAKING CHANGES
+* init returns ApmServer instance instead of ServiceFactory
+
+[[release-notes-0.1.1]]
+==== 0.1.1 (2017-12-20)
+
+[float]
+===== Bug Fixes
+* typo serviceUrl {commit}9ff81a7[9ff81a7]
+
+[[release-notes-0.1.0]]
+==== 0.1.0 (2017-12-13)
+
+[float]
+===== BREAKING CHANGES
+* upgrading to apm-agent-js-core@0.1.0 {commit}150bc66[150bc66]
+* rename apiOrigin to serverUrl
+* rename app to service
