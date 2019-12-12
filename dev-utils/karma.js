@@ -23,7 +23,6 @@
  *
  */
 
-const { Server } = require('karma')
 const {
   getSauceConnectOptions,
   getBrowserList,
@@ -56,6 +55,13 @@ const baseConfig = {
     'karma-webpack',
     'karma-sourcemap-loader'
   ],
+  client: {
+    jasmine: {
+      random: false,
+      failFast: true,
+      timeoutInterval: 30000
+    }
+  },
   webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV),
   webpackMiddleware: {
     logLevel: 'error'
@@ -158,7 +164,6 @@ function prepareConfig(config, packageName) {
     console.log('prepareConfig: Run in SauceLab mode')
     config.sauceLabs.build = buildId
     console.log('saucelabs.build:', buildId)
-    config.concurrency = 3
     if (isJenkins) {
       config.sauceLabs.tags = [testConfig.branch, process.env.STACK_VERSION]
     } else if (testConfig.branch === 'master') {
@@ -172,19 +177,8 @@ function prepareConfig(config, packageName) {
   return config
 }
 
-function singleRunKarma(configFile, done) {
-  new Server(
-    {
-      configFile,
-      singleRun: true
-    },
-    done
-  ).start()
-}
-
 module.exports = {
   prepareConfig,
   baseConfig,
-  baseLaunchers,
-  singleRunKarma
+  baseLaunchers
 }

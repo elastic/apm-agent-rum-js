@@ -39,9 +39,10 @@ function TestComponent(apm) {
   function Component(props) {
     return <h1>Testing, {props.name}</h1>
   }
-  const WrappedComponent = withTransaction('test-transaction', 'test-type')(
-    Component
-  )
+  const WrappedComponent = withTransaction(
+    'test-transaction',
+    'test-type'
+  )(Component)
   expect(typeof WrappedComponent).toBe('function')
   const wrapped = mount(<WrappedComponent name="withTransaction" />)
 
@@ -78,7 +79,10 @@ describe('withTransaction', function() {
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test-transaction',
       'test-type',
-      { canReuse: true, managed: true }
+      {
+        canReuse: true,
+        managed: true
+      }
     )
   })
 
@@ -106,9 +110,10 @@ describe('withTransaction', function() {
     }
     const withTransaction = getWithTransaction(apmBase)
 
-    const WrappedComponent = withTransaction('test-transaction', 'test-type')(
-      Component
-    )
+    const WrappedComponent = withTransaction(
+      'test-transaction',
+      'test-type'
+    )(Component)
     expect(WrappedComponent).toEqual(Component)
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
   })
@@ -121,7 +126,10 @@ describe('withTransaction', function() {
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test-transaction',
       'test-type',
-      { canReuse: true, managed: true }
+      {
+        canReuse: true,
+        managed: true
+      }
     )
     transactionService.startTransaction.calls.reset()
     /**
@@ -148,7 +156,10 @@ describe('withTransaction', function() {
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
       'test-transaction',
       'test-type',
-      { canReuse: true, managed: true }
+      {
+        canReuse: true,
+        managed: true
+      }
     )
     expect(detectFinishSpy).toHaveBeenCalled()
     wrapper.unmount()

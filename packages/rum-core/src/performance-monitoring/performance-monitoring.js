@@ -235,9 +235,7 @@ class PerformanceMonitoring {
     if (duration > transactionDurationThreshold) {
       if (__DEV__) {
         this._logginService.debug(
-          `transaction(${tr.id}, ${
-            tr.name
-          }) was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
+          `transaction(${tr.id}, ${tr.name}) was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
         )
       }
       return false
@@ -246,9 +244,7 @@ class PerformanceMonitoring {
     if (tr.spans.length === 0) {
       if (__DEV__) {
         this._logginService.debug(
-          `transaction(${tr.id}, ${
-            tr.name
-          }) was discarded! Transaction does not include any spans`
+          `transaction(${tr.id}, ${tr.name}) was discarded! Transaction does not include any spans`
         )
       }
       return false
@@ -281,9 +277,7 @@ class PerformanceMonitoring {
       if (!wasBrowserResponsive) {
         if (__DEV__) {
           this._logginService.debug(
-            `transaction(${tr.id}, ${
-              tr.name
-            }) was discarded! Browser was not responsive enough during the transaction.`,
+            `transaction(${tr.id}, ${tr.name}) was discarded! Browser was not responsive enough during the transaction.`,
             ' duration:',
             duration,
             ' browserResponsivenessCounter:',
