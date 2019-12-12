@@ -24,7 +24,7 @@
  */
 
 const { EnvironmentPlugin } = require('webpack')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 const VuePlugin = require('vue-loader/lib/plugin')
 const { getTestEnvironmentVariables } = require('./test-config')
 
@@ -147,9 +147,13 @@ function getWebpackConfig(bundleType, packageType) {
     BROWSER_ESM_PROD
   ].includes(bundleType)
 
+  const mode = isEnvProduction ? 'production' : 'development'
+
   const config = {
     stats: {
       colors: true,
+      assets: true,
+      modules: false,
       warnings: false
     },
     devtool: isEnvProduction ? 'source-map' : 'cheap-module-source-map',
@@ -167,8 +171,8 @@ function getWebpackConfig(bundleType, packageType) {
         }
       ]
     },
-    mode: isEnvProduction ? 'production' : 'development',
-    plugins: [new EnvironmentPlugin(getWebpackEnv())],
+    mode,
+    plugins: [new EnvironmentPlugin(getWebpackEnv(mode))],
     resolve: {
       mainFields: ['source', 'browser', 'module', 'main'],
       extensions: ['.js', '.jsx', '.ts']
@@ -189,8 +193,9 @@ function getWebpackConfig(bundleType, packageType) {
   if (isEnvProduction) {
     return Object.assign({}, config, {
       optimization: {
+        minimize: true,
         minimizer: [
-          new UglifyJSPlugin({
+          new TerserPlugin({
             sourceMap: true,
             extractComments: true
           })

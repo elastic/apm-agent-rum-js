@@ -26,8 +26,7 @@
 const { join } = require('path')
 const { EnvironmentPlugin } = require('webpack')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
-const { getBabelConfig, BUNDLE_TYPES } = require('../../dev-utils/build')
+const { BUNDLE_TYPES, getWebpackConfig } = require('../../dev-utils/build')
 
 const OUTPUT_DIR = join(__dirname, 'dist', 'bundles')
 const SRC_DIR = join(__dirname, 'src')
@@ -41,26 +40,8 @@ const devConfig = entry => ({
     library: '[name]',
     libraryTarget: 'umd'
   },
-  mode: 'development',
-  stats: {
-    assets: true,
-    modules: false
-  },
-  node: false,
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        options: getBabelConfig(BUNDLE_TYPES.BROWSER_DEV)
-      }
-    ]
-  },
-  plugins: [
-    new EnvironmentPlugin({
-      NODE_ENV: 'development'
-    })
-  ]
+  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV),
+  node: false
 })
 
 const prodConfig = name => ({
@@ -68,16 +49,7 @@ const prodConfig = name => ({
     filename: '[name].umd.min.js',
     path: OUTPUT_DIR
   },
-  mode: 'production',
-  devtool: 'source-map',
-  optimization: {
-    minimizer: [
-      new UglifyJSPlugin({
-        sourceMap: true,
-        extractComments: true
-      })
-    ]
-  },
+  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD),
   performance: {
     hints: 'warning',
     maxAssetSize: 65 * 1024 // 65 kB
@@ -99,18 +71,15 @@ const prodConfig = name => ({
 const rumDevConfig = devConfig({
   'elastic-apm-rum': join(SRC_DIR, 'index.js')
 })
-
-const rumProdConfig = Object.assign({}, rumDevConfig, prodConfig('apm-rum'))
+const rumProdConfig = { ...rumDevConfig, ...prodConfig('apm-rum') }
 
 const rumOpenTracingDevConfig = devConfig({
   'elastic-apm-opentracing': join(SRC_DIR, 'opentracing.js')
 })
-
-const rumOpenTracingProdConfig = Object.assign(
-  {},
-  rumOpenTracingDevConfig,
-  prodConfig('apm-opentracing')
-)
+const rumOpenTracingProdConfig = {
+  ...rumOpenTracingDevConfig,
+  ...prodConfig('apm-opentracing')
+}
 
 module.exports = [
   rumDevConfig,

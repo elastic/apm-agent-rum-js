@@ -29,7 +29,7 @@ const { readFileSync } = require('fs')
 const path = require('path')
 const zlib = require('zlib')
 const webpack = require('webpack')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 const {
   getWebpackConfig,
   BUNDLE_TYPES
@@ -55,11 +55,12 @@ function customApmBuild(filename) {
     ...{
       devtool: false,
       optimization: {
+        minimize: true,
         minimizer: [
-          new UglifyJSPlugin({
+          new TerserPlugin({
             sourceMap: false,
             extractComments: true,
-            uglifyOptions: {
+            terserOptions: {
               keep_fnames: true
             }
           })
