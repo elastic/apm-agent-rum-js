@@ -178,22 +178,22 @@ describe('PerformanceMonitoring', function() {
     tr.end(400)
 
     tr.browserResponsivenessCounter = 0
-    var resp = performanceMonitoring.checkBrowserResponsiveness(tr)
+    var resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
     expect(resp).toBe(true)
 
     tr._end = 1001
     tr.browserResponsivenessCounter = 2
-    resp = performanceMonitoring.checkBrowserResponsiveness(tr)
+    resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
     expect(resp).toBe(true)
 
     tr._end = 1601
     tr.browserResponsivenessCounter = 2
-    resp = performanceMonitoring.checkBrowserResponsiveness(tr)
+    resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
     expect(resp).toBe(true)
 
-    tr._end = 3501
+    tr._end = 3001
     tr.browserResponsivenessCounter = 3
-    resp = performanceMonitoring.checkBrowserResponsiveness(tr)
+    resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
     expect(resp).toBe(false)
   })
 

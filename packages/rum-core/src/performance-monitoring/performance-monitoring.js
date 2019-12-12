@@ -45,7 +45,7 @@ import {
   HTTP_REQUEST_TYPE,
   BROWSER_RESPONSIVENESS_INTERVAL,
   BROWSER_RESPONSIVENESS_BUFFER,
-  SIMILAR_SPAN_THRESHOLD_PERCENTAGE
+  SIMILAR_SPAN_TO_TRANSACTION_RATIO
 } from '../common/constants'
 import {
   truncateModel,
@@ -263,7 +263,11 @@ class PerformanceMonitoring {
     )
 
     if (checkBrowserResponsiveness && tr.options.checkBrowserResponsiveness) {
-      const wasBrowserResponsive = this.checkBrowserResponsiveness(tr)
+      const wasBrowserResponsive = this.checkBrowserResponsiveness(
+        tr,
+        BROWSER_RESPONSIVENESS_INTERVAL,
+        BROWSER_RESPONSIVENESS_BUFFER
+      )
 
       if (!wasBrowserResponsive) {
         if (__DEV__) {
@@ -287,7 +291,10 @@ class PerformanceMonitoring {
     })
 
     if (this._configService.get('groupSimilarSpans')) {
-      transaction.spans = this.groupSmallContinuouslySimilarSpans(transaction)
+      transaction.spans = this.groupSmallContinuouslySimilarSpans(
+        transaction,
+        SIMILAR_SPAN_TO_TRANSACTION_RATIO
+      )
     }
 
     transaction.spans = transaction.spans.filter(function(span) {
@@ -355,7 +362,7 @@ class PerformanceMonitoring {
     return transactions.map(tr => this.createTransactionDataModel(tr))
   }
 
-  groupSmallContinuouslySimilarSpans(transaction) {
+  groupSmallContinuouslySimilarSpans(transaction, threshold) {
     var transDuration = transaction.duration()
     var spans = []
     var lastCount = 1
@@ -370,9 +377,8 @@ class PerformanceMonitoring {
           lastSpan.subType === span.subType &&
           lastSpan.action === span.action &&
           lastSpan.name === span.name &&
-          span.duration() / transDuration < SIMILAR_SPAN_THRESHOLD_PERCENTAGE &&
-          (span._start - lastSpan._end) / transDuration <
-            SIMILAR_SPAN_THRESHOLD_PERCENTAGE
+          span.duration() / transDuration < threshold &&
+          (span._start - lastSpan._end) / transDuration < threshold
 
         var isLastSpan = transaction.spans.length === index + 1
 
@@ -394,12 +400,12 @@ class PerformanceMonitoring {
     return spans
   }
 
-  checkBrowserResponsiveness(transaction) {
+  checkBrowserResponsiveness(transaction, interval, buffer) {
     const counter = transaction.browserResponsivenessCounter
     const duration = transaction.duration()
-    const expectedCount = Math.floor(duration / BROWSER_RESPONSIVENESS_INTERVAL)
+    const expectedCount = Math.floor(duration / interval)
 
-    return counter + BROWSER_RESPONSIVENESS_BUFFER >= expectedCount
+    return counter + buffer >= expectedCount
   }
 }
 
