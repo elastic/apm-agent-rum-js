@@ -678,4 +678,78 @@ describe('PerformanceMonitoring', function() {
       jasmine.any(Function)
     ])
   })
+
+  function createXHRTask(method, url) {
+    let req = new window.XMLHttpRequest()
+    req.open(method, url)
+
+    let task = {
+      source: XMLHTTPREQUEST,
+      data: {
+        target: req,
+        method,
+        url
+      }
+    }
+    return task
+  }
+
+  it('should create http-request transaction if no current transaction exist', done => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    spyOn(transactionService, 'startTransaction').and.callThrough()
+
+    let task = createXHRTask('GET', '/')
+
+    performanceMonitoring.processAPICalls('schedule', task)
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      'GET /',
+      'http-request',
+      jasmine.objectContaining({ managed: true })
+    )
+
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr).toBeDefined()
+
+    setTimeout(() => {
+      performanceMonitoring.processAPICalls('invoke', task)
+      expect(tr.ended).toBe(true)
+      let payload = performanceMonitoring.convertTransactionsToServerModel([tr])
+      let promise = apmServer.sendTransactions(payload)
+      promise
+        .catch(reason => {
+          fail(
+            'Failed sending http-request transaction to the server, reason: ' +
+              reason
+          )
+        })
+        .then(() => done())
+    }, 100)
+  })
+
+  it('should include multiple XHRs in the same transaction', () => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    spyOn(transactionService, 'startTransaction').and.callThrough()
+
+    let task1 = createXHRTask('GET', '/first')
+    performanceMonitoring.processAPICalls('schedule', task1)
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr).toBeDefined()
+    expect(tr.name).toBe('GET /first')
+
+    let task2 = createXHRTask('GET', '/second')
+    performanceMonitoring.processAPICalls('schedule', task2)
+    performanceMonitoring.processAPICalls('invoke', task1)
+    expect(tr.ended).toBeFalsy()
+    performanceMonitoring.processAPICalls('invoke', task2)
+    expect(tr.ended).toBe(true)
+    expect(tr.spans.length).toBe(2)
+    expect(tr.spans.map(s => s.name)).toEqual(['GET /first', 'GET /second'])
+
+    let task3 = createXHRTask('GET', '/third')
+    performanceMonitoring.processAPICalls('schedule', task3)
+    tr = transactionService.getCurrentTransaction()
+    expect(tr.name).toBe('GET /third')
+    performanceMonitoring.processAPICalls('invoke', task3)
+    expect(tr.ended).toBe(true)
+  })
 })
