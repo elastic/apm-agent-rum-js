@@ -40,7 +40,8 @@ import {
   AFTER_EVENT,
   FETCH,
   HISTORY,
-  XMLHTTPREQUEST
+  XMLHTTPREQUEST,
+  HTTP_REQUEST_TYPE
 } from '../common/constants'
 import {
   truncateModel,
@@ -62,6 +63,7 @@ class PerformanceMonitoring {
      * We need to run this event listener after all of user-registered listener,
      * since this event listener adds the transaction to the queue to be send to APM Server.
      */
+
     this._configService.events.observe(TRANSACTION_END + AFTER_EVENT, tr => {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
@@ -122,6 +124,13 @@ class PerformanceMonitoring {
         (requestUrl.relative
           ? requestUrl.path
           : stripQueryStringFromUrl(requestUrl.href))
+
+      if (!transactionService.getCurrentTransaction()) {
+        transactionService.startTransaction(spanName, HTTP_REQUEST_TYPE, {
+          managed: true
+        })
+      }
+
       const span = transactionService.startSpan(spanName, 'external.http')
       const taskId = transactionService.addTask()
 
