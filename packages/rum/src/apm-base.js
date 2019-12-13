@@ -123,15 +123,11 @@ class ApmBase {
   }
 
   _sendPageLoadMetrics() {
-    const transactionService = this.serviceFactory.getService(
-      'TransactionService'
-    )
-
     /**
      * Name of the transaction is set in transaction service to
      * avoid duplicating the logic at multiple places
      */
-    const tr = transactionService.startTransaction(undefined, PAGE_LOAD, {
+    const tr = this.startTransaction(undefined, PAGE_LOAD, {
       managed: true,
       canReuse: true
     })

@@ -44,17 +44,16 @@ class TransactionService {
   }
 
   ensureCurrentTransaction(options) {
+    const tr = this.getCurrentTransaction()
+    if (tr) {
+      return tr
+    }
     if (!options) {
       options = this.createOptions()
     }
-    var tr = this.getCurrentTransaction()
-    if (tr) {
-      return tr
-    } else {
-      options.canReuse = true
-      options.managed = true
-      return this.createTransaction(undefined, undefined, options)
-    }
+    options.canReuse = true
+    options.managed = true
+    return this.createTransaction(undefined, undefined, options)
   }
 
   getCurrentTransaction() {
@@ -68,9 +67,9 @@ class TransactionService {
   }
 
   createTransaction(name, type, options) {
-    var tr = new Transaction(name, type, options)
+    const tr = new Transaction(name, type, options)
     this.setCurrentTransaction(tr)
-    if (options.checkBrowserResponsiveness) {
+    if (type !== PAGE_LOAD && options.checkBrowserResponsiveness) {
       this.startCounter(tr)
     }
     return tr
