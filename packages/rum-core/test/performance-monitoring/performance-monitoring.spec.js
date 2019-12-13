@@ -172,12 +172,11 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should calculate browser responsiveness', function() {
-    var tr = new Transaction('transaction', 'transaction', {})
-    tr.end()
+    const tr = new Transaction('transaction', 'transaction', {
+      startTime: 1
+    })
+    tr.end(400)
 
-    tr._start = 1
-
-    tr._end = 400
     tr.browserResponsivenessCounter = 0
     var resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
     expect(resp).toBe(true)
@@ -241,9 +240,7 @@ describe('PerformanceMonitoring', function() {
 
   it('should filter transactions based on browser responsiveness', function() {
     configService.setConfig({
-      browserResponsivenessInterval: 500,
-      checkBrowserResponsiveness: true,
-      browserResponsivenessBuffer: 2
+      checkBrowserResponsiveness: true
     })
     spyOn(logger, 'debug').and.callThrough()
     expect(logger.debug).not.toHaveBeenCalled()
@@ -251,25 +248,22 @@ describe('PerformanceMonitoring', function() {
       id: 212,
       transactionSampleRate: 1,
       managed: true,
-      checkBrowserResponsiveness: true
+      checkBrowserResponsiveness: true,
+      startTime: 1
     })
     var span = tr.startSpan('test span', 'test span type')
     span.end()
-    tr.end()
-    tr._start = 1
+    tr.end(3501)
 
-    tr._end = 3001
     tr.browserResponsivenessCounter = 3
     var wasBrowserResponsive = performanceMonitoring.filterTransaction(tr)
     expect(wasBrowserResponsive).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
       'transaction(212, transaction) was discarded! Browser was not responsive enough during the transaction.',
       ' duration:',
-      3000,
+      3500,
       ' browserResponsivenessCounter:',
-      3,
-      'interval:',
-      500
+      3
     )
   })
 

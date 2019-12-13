@@ -28,7 +28,8 @@ import {
   isDtHeaderValid,
   merge,
   parseDtHeaderValue,
-  stripQueryStringFromUrl
+  stripQueryStringFromUrl,
+  getDtHeaderValue
 } from '../common/utils'
 import Url from '../common/url'
 import { patchEventHandler } from '../common/patching'
@@ -41,7 +42,10 @@ import {
   FETCH,
   HISTORY,
   XMLHTTPREQUEST,
-  HTTP_REQUEST_TYPE
+  HTTP_REQUEST_TYPE,
+  BROWSER_RESPONSIVENESS_INTERVAL,
+  BROWSER_RESPONSIVENESS_BUFFER,
+  SIMILAR_SPAN_TO_TRANSACTION_RATIO
 } from '../common/constants'
 import {
   truncateModel,
@@ -178,11 +182,7 @@ class PerformanceMonitoring {
   injectDtHeader(span, target) {
     var configService = this._configService
     var headerName = configService.get('distributedTracingHeaderName')
-    var headerValueCallback = configService.get(
-      'distributedTracingHeaderValueCallback'
-    )
-
-    var headerValue = headerValueCallback(span)
+    var headerValue = getDtHeaderValue(span)
     var isHeaderValid = isDtHeaderValid(headerValue)
     if (headerName && headerValue && isHeaderValid) {
       if (typeof target.setRequestHeader === 'function') {
@@ -258,20 +258,15 @@ class PerformanceMonitoring {
       tr.resetSpans()
     }
 
-    const browserResponsivenessInterval = this._configService.get(
-      'browserResponsivenessInterval'
-    )
     const checkBrowserResponsiveness = this._configService.get(
       'checkBrowserResponsiveness'
     )
 
     if (checkBrowserResponsiveness && tr.options.checkBrowserResponsiveness) {
-      const buffer = this._configService.get('browserResponsivenessBuffer')
-
       const wasBrowserResponsive = this.checkBrowserResponsiveness(
         tr,
-        browserResponsivenessInterval,
-        buffer
+        BROWSER_RESPONSIVENESS_INTERVAL,
+        BROWSER_RESPONSIVENESS_BUFFER
       )
 
       if (!wasBrowserResponsive) {
@@ -281,9 +276,7 @@ class PerformanceMonitoring {
             ' duration:',
             duration,
             ' browserResponsivenessCounter:',
-            tr.browserResponsivenessCounter,
-            'interval:',
-            browserResponsivenessInterval
+            tr.browserResponsivenessCounter
           )
         }
         return false
@@ -298,10 +291,9 @@ class PerformanceMonitoring {
     })
 
     if (this._configService.get('groupSimilarSpans')) {
-      var similarSpanThreshold = this._configService.get('similarSpanThreshold')
       transaction.spans = this.groupSmallContinuouslySimilarSpans(
         transaction,
-        similarSpanThreshold
+        SIMILAR_SPAN_TO_TRANSACTION_RATIO
       )
     }
 
@@ -409,16 +401,11 @@ class PerformanceMonitoring {
   }
 
   checkBrowserResponsiveness(transaction, interval, buffer) {
-    var counter = transaction.browserResponsivenessCounter
-    if (typeof interval === 'undefined' || typeof counter === 'undefined') {
-      return true
-    }
+    const counter = transaction.browserResponsivenessCounter
+    const duration = transaction.duration()
+    const expectedCount = Math.floor(duration / interval)
 
-    var duration = transaction.duration()
-    var expectedCount = Math.floor(duration / interval)
-    var wasBrowserResponsive = counter + buffer >= expectedCount
-
-    return wasBrowserResponsive
+    return counter + buffer >= expectedCount
   }
 }
 

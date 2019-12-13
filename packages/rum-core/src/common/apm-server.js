@@ -29,6 +29,7 @@ import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
+import { SERVER_URL_PREFIX } from './constants'
 import { __DEV__ } from '../env'
 
 class ApmServer {
@@ -310,7 +311,7 @@ class ApmServer {
       NDJSON.stringify({ metadata: { service: filteredPayload.service } })
     )
     const ndjsonPayload = ndjson.join('')
-    const endPoint = this._configService.getEndpointUrl()
+    const endPoint = this._configService.get('serverUrl') + SERVER_URL_PREFIX
     return this._postJson(endPoint, ndjsonPayload)
   }
 

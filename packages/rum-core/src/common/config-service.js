@@ -23,13 +23,7 @@
  *
  */
 
-import {
-  getCurrentScript,
-  setLabel,
-  merge,
-  extend,
-  getDtHeaderValue
-} from './utils'
+import { getCurrentScript, setLabel, merge, extend } from './utils'
 import EventHandler from './event-handler'
 import { CONFIG_CHANGE, LOCAL_CONFIG_KEY } from './constants'
 
@@ -76,21 +70,16 @@ class Config {
       serviceVersion: '',
       environment: '',
       serverUrl: 'http://localhost:8200',
-      serverUrlPrefix: '/intake/v2/rum/events',
       active: true,
       instrument: true,
       disableInstrumentations: [],
       debug: false,
       logLevel: 'warn',
       breakdownMetrics: false,
-      browserResponsivenessInterval: 500,
-      browserResponsivenessBuffer: 3,
       checkBrowserResponsiveness: true,
       groupSimilarSpans: true,
       similarSpanThreshold: 0.05,
       ignoreTransactions: [],
-      // throttlingRequestLimit: 20,
-      // throttlingInterval: 30000, // 30s
       errorThrottleLimit: 20,
       errorThrottleInterval: 30000,
       transactionThrottleLimit: 20,
@@ -102,7 +91,6 @@ class Config {
 
       distributedTracing: true,
       distributedTracingOrigins: [],
-      distributedTracingHeaderValueCallback: getDtHeaderValue,
       distributedTracingHeaderName: 'elastic-apm-traceparent',
 
       pageLoadTraceId: '',
@@ -161,10 +149,6 @@ class Config {
     }, this.config)
   }
 
-  getEndpointUrl() {
-    return this.config.serverUrl + this.config.serverUrlPrefix
-  }
-
   setUserContext(userContext = {}) {
     const context = {}
     const { id, username, email } = userContext
@@ -200,8 +184,8 @@ class Config {
     /**
      * Normalize config
      *
-     * Remove all trailing slash for serverUrl since serverUrlPrefix
-     * includes a forward slash for the path
+     * Remove all trailing slash for serverUrl since SERVER_URL_PREFIX
+     * already includes a forward slash for the path
      */
     if (properties.serverUrl) {
       properties.serverUrl = properties.serverUrl.replace(/\/+$/, '')
