@@ -24,13 +24,13 @@
  */
 
 const { join } = require('path')
-const { EnvironmentPlugin } = require('webpack')
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-const { BUNDLE_TYPES, getWebpackConfig } = require('../../dev-utils/build')
+const {
+  BUNDLE_TYPES,
+  getWebpackReleaseConfig
+} = require('../../dev-utils/build')
 
 const OUTPUT_DIR = join(__dirname, 'dist', 'bundles')
 const SRC_DIR = join(__dirname, 'src')
-const REPORTS_DIR = join(__dirname, 'reports')
 
 const devConfig = entry => ({
   entry,
@@ -40,8 +40,7 @@ const devConfig = entry => ({
     library: '[name]',
     libraryTarget: 'umd'
   },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV),
-  node: false
+  ...getWebpackReleaseConfig(BUNDLE_TYPES.BROWSER_DEV)
 })
 
 const prodConfig = name => ({
@@ -49,23 +48,7 @@ const prodConfig = name => ({
     filename: '[name].umd.min.js',
     path: OUTPUT_DIR
   },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD),
-  performance: {
-    hints: 'warning',
-    maxAssetSize: 65 * 1024 // 65 kB
-  },
-  plugins: [
-    new EnvironmentPlugin({
-      NODE_ENV: 'production'
-    }),
-    new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      reportFilename: join(REPORTS_DIR, `${name}-report.html`),
-      generateStatsFile: true,
-      statsFilename: join(REPORTS_DIR, `${name}-stats.json`),
-      openAnalyzer: false
-    })
-  ]
+  ...getWebpackReleaseConfig(BUNDLE_TYPES.BROWSER_PROD, name)
 })
 
 const rumDevConfig = devConfig({

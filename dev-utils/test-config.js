@@ -44,7 +44,7 @@ function getTestEnvironmentVariables() {
     isJenkins: process.env.JENKINS_URL,
     serverUrl: process.env.APM_SERVER_URL || DEFAULT_APM_SERVER_URL,
     mockBackendUrl: 'http://localhost:8003',
-    stackVersion: process.env.STACK_VERSION
+    stackVersion: process.env.STACK_VERSION || ''
   }
 }
 
