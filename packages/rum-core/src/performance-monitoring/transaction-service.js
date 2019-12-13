@@ -26,10 +26,15 @@
 import { Promise } from 'es6-promise'
 import Transaction from './transaction'
 import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
-import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import { captureNavigation } from './capture-navigation'
+import {
+  PAGE_LOAD,
+  NAME_UNKNOWN,
+  TRANSACTION_START,
+  TRANSACTION_END,
+  BROWSER_RESPONSIVENESS_INTERVAL
+} from '../common/constants'
 import { __DEV__ } from '../env'
-import { TRANSACTION_START, TRANSACTION_END } from '../common/constants'
 
 class TransactionService {
   constructor(logger, config) {
@@ -73,21 +78,13 @@ class TransactionService {
 
   startCounter(transaction) {
     transaction.browserResponsivenessCounter = 0
-    var interval = this._config.get('browserResponsivenessInterval')
-    if (typeof interval === 'undefined') {
-      if (__DEV__) {
-        this._logger.debug('browserResponsivenessInterval config is undefined!')
-      }
-      return
-    }
-
     const id = setInterval(function() {
       if (transaction.ended) {
         window.clearInterval(id)
       } else {
         transaction.browserResponsivenessCounter++
       }
-    }, interval)
+    }, BROWSER_RESPONSIVENESS_INTERVAL)
   }
 
   createOptions(options) {
@@ -147,7 +144,7 @@ class TransactionService {
 
     tr.captureTimings = true
 
-    if (type === PAGE_LOAD) {
+    if (tr.type === PAGE_LOAD) {
       tr.options.checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId

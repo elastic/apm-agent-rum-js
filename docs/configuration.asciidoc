@@ -272,4 +272,23 @@ NOTE: This feature requires APM Server v7.5 or later and that the APM Server is 
 More information is available in {apm-app-ref}/agent-configuration.html[APM Agent configuration].
 
 
+[float]
+[[ignore-transactions]]
+==== `ignoreTransactions`
 
+
+* *Type:* Array
+* *Default:* `[]`
+
+Array containing a list of transactions names that should be ignored when sending the payload to the APM server.
+It can be set to an array containing one or more Strings or RegExp objects. If an element in the array is a String, an exact match will be performed. 
+If an element in the array is a RegExp object, its test function will be called with the name of the transation.
+
+[source,js]
+----
+const options = {
+  ignoreTransactions: [/login*/, '/app']
+}
+----
+
+NOTE: Spans that are captured as part of the ignored transactions would also be ignored.

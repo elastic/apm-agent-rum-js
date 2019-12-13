@@ -69,10 +69,6 @@ describe('TransactionService', function() {
   })
 
   it('should start transaction', function(done) {
-    config.setConfig({
-      browserResponsivenessInterval: true
-    })
-
     transactionService = new TransactionService(logger, config)
 
     var result = transactionService.startTransaction(

@@ -246,12 +246,8 @@ describe('ConfigService', function() {
   it('should remove trailing slash from serverUrl', () => {
     configService.setConfig({
       serviceName: 'aabc',
-      serverUrl: 'http://localhost:8080/////',
-      serverUrlPrefix: '/rum/events'
+      serverUrl: 'http://localhost:8080/////'
     })
-    expect(configService.getEndpointUrl()).toEqual(
-      'http://localhost:8080/rum/events'
-    )
     expect(configService.get('serverUrl')).toEqual('http://localhost:8080')
   })
 
