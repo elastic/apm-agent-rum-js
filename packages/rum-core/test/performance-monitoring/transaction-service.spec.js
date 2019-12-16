@@ -341,12 +341,12 @@ describe('TransactionService', function() {
     })
   })
 
-  it('should createTransaction once per startTransaction', function() {
-    spyOn(transactionService, 'createTransaction').and.callThrough()
+  it('should ensureCurrentTransaction once per startTransaction', function() {
+    spyOn(transactionService, 'ensureCurrentTransaction').and.callThrough()
     transactionService.startTransaction('test-name', 'test-type', {
       managed: true
     })
-    expect(transactionService.createTransaction).toHaveBeenCalledTimes(1)
+    expect(transactionService.ensureCurrentTransaction).toHaveBeenCalledTimes(1)
   })
 
   it('should include size & server timing in page load context', done => {
@@ -546,5 +546,13 @@ describe('TransactionService', function() {
       done()
     })
     tr.end(30)
+  })
+
+  it('should start temporary transaction on startSpan', () => {
+    expect(transactionService.getCurrentTransaction()).toBeUndefined()
+    transactionService.startSpan('test', 'test')
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr).toBeDefined()
+    expect(tr.type).toBe('temporary')
   })
 })

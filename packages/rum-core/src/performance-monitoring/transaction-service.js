@@ -32,7 +32,8 @@ import {
   NAME_UNKNOWN,
   TRANSACTION_START,
   TRANSACTION_END,
-  BROWSER_RESPONSIVENESS_INTERVAL
+  BROWSER_RESPONSIVENESS_INTERVAL,
+  TEMPORARY_TYPE
 } from '../common/constants'
 import { __DEV__ } from '../env'
 
@@ -43,18 +44,18 @@ class TransactionService {
     this.currentTransaction = undefined
   }
 
-  ensureCurrentTransaction(options) {
-    if (!options) {
-      options = this.createOptions()
-    }
-    var tr = this.getCurrentTransaction()
+  ensureCurrentTransaction(name, type, options) {
+    let tr = this.getCurrentTransaction()
     if (tr) {
       return tr
     } else {
-      options.canReuse = true
-      options.managed = true
-      return this.createTransaction(undefined, undefined, options)
+      tr = new Transaction(name, type, options)
+      this.setCurrentTransaction(tr)
+      if (options && options.checkBrowserResponsiveness) {
+        this.startCounter(tr)
+      }
     }
+    return tr
   }
 
   getCurrentTransaction() {
@@ -65,15 +66,6 @@ class TransactionService {
 
   setCurrentTransaction(value) {
     this.currentTransaction = value
-  }
-
-  createTransaction(name, type, options) {
-    var tr = new Transaction(name, type, options)
-    this.setCurrentTransaction(tr)
-    if (options.checkBrowserResponsiveness) {
-      this.startCounter(tr)
-    }
-    return tr
   }
 
   startCounter(transaction) {
@@ -110,7 +102,7 @@ class TransactionService {
     let tr = this.getCurrentTransaction()
 
     if (!tr) {
-      tr = this.createTransaction(name, type, perfOptions)
+      tr = this.ensureCurrentTransaction(name, type, perfOptions)
     } else if (tr.canReuse() && perfOptions.canReuse) {
       /*
        * perfOptions could also have `canReuse:true` in which case we
@@ -139,7 +131,7 @@ class TransactionService {
         )
       }
       tr.end()
-      tr = this.createTransaction(name, type, perfOptions)
+      tr = this.ensureCurrentTransaction(name, type, perfOptions)
     }
 
     tr.captureTimings = true
@@ -187,7 +179,8 @@ class TransactionService {
     return Promise.resolve().then(
       () => {
         const { name, type } = tr
-        if (this.shouldIgnoreTransaction(name)) {
+
+        if (this.shouldIgnoreTransaction(name) || type === TEMPORARY_TYPE) {
           if (__DEV__) {
             this._logger.debug(
               `transaction(${tr.id}, ${name}, ${type}) is ignored`
@@ -195,6 +188,7 @@ class TransactionService {
           }
           return
         }
+
         if (type === PAGE_LOAD) {
           /**
            * Setting the pageLoadTransactionName via configService.setConfig after
@@ -292,7 +286,14 @@ class TransactionService {
   }
 
   startSpan(name, type, options) {
-    const tr = this.ensureCurrentTransaction()
+    const tr = this.ensureCurrentTransaction(
+      undefined,
+      TEMPORARY_TYPE,
+      this.createOptions({
+        canReuse: true,
+        managed: true
+      })
+    )
 
     if (tr) {
       const span = tr.startSpan(name, type, options)
@@ -307,7 +308,15 @@ class TransactionService {
   }
 
   addTask(taskId) {
-    var tr = this.ensureCurrentTransaction()
+    const tr = this.ensureCurrentTransaction(
+      undefined,
+      TEMPORARY_TYPE,
+      this.createOptions({
+        canReuse: true,
+        managed: true
+      })
+    )
+
     if (tr) {
       var taskId = tr.addTask(taskId)
       if (__DEV__) {
