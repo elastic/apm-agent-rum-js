@@ -99,7 +99,7 @@ function getDestination(parsedUrl, type) {
       type
     },
     address,
-    port: portNumber
+    port: Number(portNumber)
   }
 }
 

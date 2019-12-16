@@ -505,7 +505,7 @@ describe('PerformanceMonitoring', function() {
                 type: 'external'
               },
               address: 'localhost',
-              port: '9876'
+              port: 9876
             }
           })
           expect(dTHeaderValue).toBeDefined()

@@ -70,7 +70,7 @@ describe('Context', () => {
           type: 'external'
         },
         address: 'testing.local',
-        port: '1234'
+        port: 1234
       }
     })
 
@@ -89,7 +89,7 @@ describe('Context', () => {
           type: 'external'
         },
         address: 'www.elastic.co',
-        port: '443'
+        port: 443
       }
     })
 
@@ -108,7 +108,7 @@ describe('Context', () => {
           type: 'external'
         },
         address: '::1',
-        port: '80'
+        port: 80
       }
     })
 
@@ -131,7 +131,7 @@ describe('Context', () => {
           type: 'external'
         },
         address: '::1',
-        port: '80'
+        port: 80
       }
     })
   })
@@ -160,7 +160,7 @@ describe('Context', () => {
           type: 'resource'
         },
         address: 'example.com',
-        port: '80'
+        port: 80
       }
     })
   })
