@@ -42,6 +42,7 @@ class TransactionService {
     this._config = config
     this._logger = logger
     this.currentTransaction = undefined
+    this.respIntervalId = undefined
   }
 
   ensureCurrentTransaction(name, type, options) {
@@ -51,9 +52,6 @@ class TransactionService {
     } else {
       tr = new Transaction(name, type, options)
       this.setCurrentTransaction(tr)
-      if (options && options.checkBrowserResponsiveness) {
-        this.startCounter(tr)
-      }
     }
     return tr
   }
@@ -68,15 +66,28 @@ class TransactionService {
     this.currentTransaction = value
   }
 
-  startCounter(transaction) {
-    transaction.browserResponsivenessCounter = 0
-    const id = setInterval(function() {
-      if (transaction.ended) {
-        window.clearInterval(id)
-      } else {
-        transaction.browserResponsivenessCounter++
+  ensureRespInterval() {
+    let currentTr = this.getCurrentTransaction()
+
+    const clearRespInterval = () => {
+      window.clearInterval(this.respIntervalId)
+      this.respIntervalId = undefined
+    }
+
+    if (currentTr && currentTr.options.checkBrowserResponsiveness) {
+      if (typeof this.respIntervalId === 'undefined') {
+        this.respIntervalId = setInterval(() => {
+          let tr = this.getCurrentTransaction()
+          if (tr) {
+            tr.browserResponsivenessCounter++
+          } else {
+            clearRespInterval()
+          }
+        }, BROWSER_RESPONSIVENESS_INTERVAL)
       }
-    }, BROWSER_RESPONSIVENESS_INTERVAL)
+    } else if (typeof this.respIntervalId !== 'undefined') {
+      clearRespInterval()
+    }
   }
 
   createOptions(options) {
@@ -152,6 +163,8 @@ class TransactionService {
         tr.name = perfOptions.pageLoadTransactionName
       }
     }
+
+    this.ensureRespInterval()
 
     return tr
   }

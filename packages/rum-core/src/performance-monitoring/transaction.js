@@ -54,6 +54,7 @@ class Transaction extends SpanBase {
     this.breakdownTimings = []
 
     this.sampled = Math.random() <= this.options.transactionSampleRate
+    this.browserResponsivenessCounter = 0
   }
 
   addMarks(obj) {
