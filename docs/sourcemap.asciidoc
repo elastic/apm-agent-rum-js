@@ -16,9 +16,9 @@ First, you need to configure webpack to generate source maps and provide the ser
 
 [source,js]
 ----
-var webpack = require('webpack')
-var serviceVersion = require("./package.json").version
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const webpack = require('webpack')
+const serviceVersion = require("./package.json").version
+const TerserPlugin = require('terser-webpack-plugin');
 module.exports = {
   entry: 'app.js',
   output: {
@@ -28,7 +28,7 @@ module.exports = {
   devtool: 'source-map',
   plugins: [
     new webpack.DefinePlugin({'serviceVersion': JSON.stringify(serviceVersion)}),
-    new UglifyJSPlugin({
+    new TerserPlugin({
       sourceMap: true
     })
   ]
@@ -39,10 +39,10 @@ Or you can use current git commit hash:
 
 [source,js]
 ----
-var webpack = require('webpack')
-var git = require('git-rev-sync')
-var serviceVersion = git.short()
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const webpack = require('webpack')
+const git = require('git-rev-sync')
+const serviceVersion = git.short()
+const TerserPlugin = require('terser-webpack-plugin');
 module.exports = {
   entry: 'app.js',
   output: {
@@ -52,7 +52,7 @@ module.exports = {
   devtool: 'source-map',
   plugins: [
     new webpack.DefinePlugin({'serviceVersion': JSON.stringify(serviceVersion)}),
-    new UglifyJSPlugin({
+    new TerserPlugin({
       sourceMap: true
     })
   ]
