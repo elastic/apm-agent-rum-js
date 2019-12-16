@@ -23,9 +23,11 @@
  *
  */
 
+const { join } = require('path')
 const { EnvironmentPlugin } = require('webpack')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 const VuePlugin = require('vue-loader/lib/plugin')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const { getTestEnvironmentVariables } = require('./test-config')
 
 const BUNDLE_TYPES = {
@@ -139,7 +141,7 @@ function getWebpackEnv(env = 'development') {
   }
 }
 
-function getWebpackConfig(bundleType, packageType) {
+function isProduction(bundleType) {
   const isEnvProduction = [
     NODE_PROD,
     NODE_ESM_PROD,
@@ -147,12 +149,24 @@ function getWebpackConfig(bundleType, packageType) {
     BROWSER_ESM_PROD
   ].includes(bundleType)
 
-  const config = {
+  return isEnvProduction
+}
+
+function getCommonWebpackConfig(bundleType, packageType) {
+  const isEnvProduction = isProduction(bundleType)
+  const mode = isEnvProduction ? 'production' : 'development'
+
+  return {
+    devtool: isEnvProduction ? 'source-map' : false,
+    mode,
     stats: {
       colors: true,
-      warnings: false
+      assets: true,
+      modules: false
     },
-    devtool: isEnvProduction ? 'source-map' : 'cheap-module-source-map',
+    performance: {
+      hints: false
+    },
     module: {
       rules: [
         {
@@ -160,46 +174,83 @@ function getWebpackConfig(bundleType, packageType) {
           exclude: /node_modules/,
           loader: 'babel-loader',
           options: getBabelConfig(bundleType, packageType)
-        },
-        {
-          test: /\.vue$/,
-          use: 'vue-loader'
         }
       ]
     },
-    mode: isEnvProduction ? 'production' : 'development',
-    plugins: [new EnvironmentPlugin(getWebpackEnv())],
-    resolve: {
-      mainFields: ['source', 'browser', 'module', 'main'],
-      extensions: ['.js', '.jsx', '.ts']
+    plugins: [new EnvironmentPlugin(getWebpackEnv(mode))],
+    ...(isEnvProduction
+      ? {
+          optimization: {
+            minimize: true,
+            minimizer: [
+              new TerserPlugin({
+                sourceMap: true,
+                extractComments: true
+              })
+            ]
+          }
+        }
+      : {})
+  }
+}
+
+/**
+ * Webpack config that are used across Unit, Integration and E2E Tests
+ */
+function getWebpackConfig(bundleType, packageType) {
+  const config = {
+    ...getCommonWebpackConfig(bundleType, packageType),
+    ...{
+      resolve: {
+        mainFields: ['source', 'browser', 'module', 'main'],
+        extensions: ['.js', '.jsx', '.ts']
+      }
     }
   }
 
   if (packageType === PACKAGE_TYPES.VUE) {
-    config.plugins.push(new VuePlugin())
-    Object.assign(config, {
-      resolve: {
-        alias: {
-          vue$: 'vue/dist/vue.esm.js'
-        }
-      }
+    config.module.rules.push({
+      test: /\.vue$/,
+      use: 'vue-loader'
     })
+    config.plugins.push(new VuePlugin())
+    config.resolve.alias = {
+      vue$: 'vue/dist/vue.esm.js'
+    }
+  }
+  return config
+}
+
+/**
+ * Webpack config which handles how the RUM and Opentracing bundles
+ * are built for releases
+ */
+function getWebpackReleaseConfig(bundleType, name) {
+  const isEnvProduction = isProduction(bundleType)
+  const REPORTS_DIR = join(__dirname, '..', 'packages', 'rum', 'reports')
+
+  const config = {
+    ...getCommonWebpackConfig(bundleType),
+    node: false
   }
 
   if (isEnvProduction) {
-    return Object.assign({}, config, {
-      optimization: {
-        minimizer: [
-          new UglifyJSPlugin({
-            sourceMap: true,
-            extractComments: true
-          })
-        ]
-      },
-      performance: {
-        hints: false
-      }
-    })
+    /**
+     * Warns if the ungzipped bundle size is more than 60 kB
+     */
+    config.performance = {
+      hints: 'warning',
+      maxAssetSize: 60 * 1024 // 60 kB
+    }
+    config.plugins.push(
+      new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        reportFilename: join(REPORTS_DIR, `${name}-report.html`),
+        generateStatsFile: true,
+        statsFilename: join(REPORTS_DIR, `${name}-stats.json`),
+        openAnalyzer: false
+      })
+    )
   }
 
   return config
@@ -208,6 +259,7 @@ function getWebpackConfig(bundleType, packageType) {
 module.exports = {
   getBabelConfig,
   getWebpackConfig,
+  getWebpackReleaseConfig,
   BUNDLE_TYPES,
   PACKAGE_TYPES
 }
