@@ -33,22 +33,22 @@ const OUTPUT_DIR = join(__dirname, 'dist', 'bundles')
 const SRC_DIR = join(__dirname, 'src')
 
 const devConfig = entry => ({
+  ...getWebpackReleaseConfig(BUNDLE_TYPES.BROWSER_DEV),
   entry,
   output: {
     filename: '[name].umd.js',
     path: OUTPUT_DIR,
     library: '[name]',
     libraryTarget: 'umd'
-  },
-  ...getWebpackReleaseConfig(BUNDLE_TYPES.BROWSER_DEV)
+  }
 })
 
 const prodConfig = name => ({
+  ...getWebpackReleaseConfig(BUNDLE_TYPES.BROWSER_PROD, name),
   output: {
     filename: '[name].umd.min.js',
     path: OUTPUT_DIR
-  },
-  ...getWebpackReleaseConfig(BUNDLE_TYPES.BROWSER_PROD, name)
+  }
 })
 
 const rumDevConfig = devConfig({
