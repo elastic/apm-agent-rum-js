@@ -341,12 +341,12 @@ describe('TransactionService', function() {
     })
   })
 
-  it('should createTransaction once per startTransaction', function() {
-    spyOn(transactionService, 'createTransaction').and.callThrough()
+  it('should ensureCurrentTransaction once per startTransaction', function() {
+    spyOn(transactionService, 'ensureCurrentTransaction').and.callThrough()
     transactionService.startTransaction('test-name', 'test-type', {
       managed: true
     })
-    expect(transactionService.createTransaction).toHaveBeenCalledTimes(1)
+    expect(transactionService.ensureCurrentTransaction).toHaveBeenCalledTimes(1)
   })
 
   it('should include size & server timing in page load context', done => {
@@ -546,5 +546,64 @@ describe('TransactionService', function() {
       done()
     })
     tr.end(30)
+  })
+
+  it('should start temporary transaction on startSpan', () => {
+    expect(transactionService.getCurrentTransaction()).toBeUndefined()
+    transactionService.startSpan('test', 'test')
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr).toBeDefined()
+    expect(tr.type).toBe('temporary')
+  })
+
+  it('should only call setInterval once for current transaction', () => {
+    let origSetInterval = window.setInterval
+    let origClearInterval = window.clearInterval
+    let count = 0
+    let callback
+
+    window.setInterval = cb => {
+      callback = cb
+      return count++
+    }
+
+    let clearCount = 0
+
+    window.clearInterval = () => {
+      clearCount++
+    }
+
+    var tr = transactionService.startTransaction('test', 'test', {
+      managed: true,
+      canReuse: true
+    })
+    expect(transactionService.getCurrentTransaction()).toBe(tr)
+    expect(count).toBe(1)
+    expect(transactionService.respIntervalId).toBe(0)
+
+    transactionService.startTransaction('test 1', 'test', {
+      managed: true,
+      canReuse: true
+    })
+    expect(transactionService.getCurrentTransaction()).toBe(tr)
+    expect(tr.name).toBe('test 1')
+    expect(count).toBe(1)
+
+    transactionService.startTransaction('test 2', 'test', {
+      managed: true,
+      canReuse: false
+    })
+    expect(transactionService.getCurrentTransaction()).not.toBe(tr)
+    expect(count).toBe(1)
+    expect(clearCount).toBe(0)
+    tr = transactionService.getCurrentTransaction()
+    tr.end()
+
+    callback()
+    expect(transactionService.respIntervalId).toBe(undefined)
+    expect(clearCount).toBe(1)
+
+    window.clearInterval = origClearInterval
+    window.setInterval = origSetInterval
   })
 })
