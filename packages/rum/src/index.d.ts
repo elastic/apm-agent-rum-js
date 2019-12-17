@@ -24,10 +24,13 @@
  */
 
 declare module '@elastic/apm-rum' {
+  type Init = (options?: AgentConfigOptions) => ApmBase
+  const init: Init
+
   class ApmBase {
-    init(options?: AgentConfigOptions): ApmBase
+    init: Init
     isEnabled(): boolean
-    observe(name: TransactionEvents, callback: Function): void
+    observe(name: TransactionEvents, callback: (tr: Transaction) => void): void
     config(options?: AgentConfigOptions): void
     setUserContext(user: UserObject): void
     setCustomContext(custom: object): void
@@ -37,13 +40,18 @@ declare module '@elastic/apm-rum' {
       name?: string,
       type?: string,
       options?: TransactionOptions
-    ): Transaction | null
-    startSpan(name?: string, type?: string, options?: SpanOptions): Span | null
-    getCurrentTransaction(): Transaction | null
+    ): Transaction | undefined
+    startSpan(
+      name?: string,
+      type?: string,
+      options?: SpanOptions
+    ): Span | undefined
+    getCurrentTransaction(): Transaction | undefined
     captureError(error: Error | string): void
     addFilter(fn: FilterFn): void
   }
-  export = ApmBase
+  export { init, ApmBase as apm, ApmBase as apmBase, ApmBase }
+  export default init
 }
 
 declare class BaseSpan {
@@ -56,7 +64,11 @@ declare class BaseSpan {
 }
 
 declare class Transaction extends BaseSpan {
-  startSpan(name?: string, type?: string, options?: SpanOptions): Span | null
+  startSpan(
+    name?: string,
+    type?: string,
+    options?: SpanOptions
+  ): Span | undefined
   addTask(taskId: TaskId): TaskId
   removeTask(taskId: TaskId): void
   mark(key: string): void
@@ -76,11 +88,11 @@ interface AgentConfigOptions {
   active?: boolean
   instrument?: boolean
   debug?: boolean
-  disableInstrumentations?: InstrumentationTypes
+  disableInstrumentations?: Array<InstrumentationTypes>
   logLevel?: string
-  breakdownMetrics?: false
-  checkBrowserResponsiveness?: true
-  groupSimilarSpans?: true
+  breakdownMetrics?: boolean
+  checkBrowserResponsiveness?: boolean
+  groupSimilarSpans?: boolean
   ignoreTransactions?: Array<string | RegExp>
   errorThrottleLimit?: number
   errorThrottleInterval?: number
@@ -88,7 +100,7 @@ interface AgentConfigOptions {
   transactionThrottleInterval?: number
   transactionDurationThreshold?: number
   flushInterval?: number
-  distributedTracing?: true
+  distributedTracing?: boolean
   distributedTracingOrigins?: Array<string>
   distributedTracingHeaderName?: string
   pageLoadTraceId?: string
@@ -126,10 +138,9 @@ type Payload = { [key: string]: any }
 type TaskId = string | number
 type LabelValue = string
 type TransactionEvents = 'transaction:start' | 'transaction:end'
-type InstrumentationTypes = [
-  'page-load',
-  'error',
-  'history',
-  'fetch',
-  'xmlhttprequest'
-]
+type InstrumentationTypes =
+  | 'page-load'
+  | 'error'
+  | 'history'
+  | 'fetch'
+  | 'xmlhttprequest'
