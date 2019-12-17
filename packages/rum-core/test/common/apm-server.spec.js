@@ -45,8 +45,6 @@ function generateTransaction(count, breakdown = false) {
     span1.end()
     span1.id = 'span-id-' + i + '-1'
     tr.end()
-    tr.context.page.referer = 'referer'
-    tr.context.page.url = 'url'
     tr._start = 10
     tr._end = 1000
     span1._start = 20
@@ -403,9 +401,9 @@ describe('ApmServer', function() {
     var result = apmServer.ndjsonTransactions(trs)
     /* eslint-disable max-len */
     var expected = [
-      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
-      '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
-      '{"transaction":{"id":"transaction-id-2","trace_id":"trace-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-2-1","transaction_id":"transaction-id-2","parent_id":"transaction-id-2","trace_id":"trace-id-2","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n'
+      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
+      '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
+      '{"transaction":{"id":"transaction-id-2","trace_id":"trace-id-2","name":"transaction #2","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-2-1","transaction_id":"transaction-id-2","parent_id":"transaction-id-2","trace_id":"trace-id-2","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n'
     ]
     expect(result).toEqual(expected)
   })
@@ -416,7 +414,7 @@ describe('ApmServer', function() {
     const result = apmServer.ndjsonTransactions(payload)
     /* eslint-disable max-len */
     const expected = [
-      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":true}}\n',
+      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":true}}\n',
       '{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
       '{"metricset":{"transaction":{"name":"transaction #0","type":"transaction"},"samples":{"transaction.duration.count":{"value":1},"transaction.duration.sum.us":{"value":990},"transaction.breakdown.count":{"value":1}}}}\n',
       '{"metricset":{"transaction":{"name":"transaction #0","type":"transaction"},"span":{"type":"app"},"samples":{"span.self_time.count":{"value":1},"span.self_time.sum.us":{"value":980}}}}\n',

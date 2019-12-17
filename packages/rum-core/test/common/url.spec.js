@@ -223,4 +223,49 @@ describe('Url parser', function() {
       })
     )
   })
+
+  it('should parse port and hostname correctly for different schemes', () => {
+    expect(new Url('http://test.com')).toEqual(
+      jasmine.objectContaining({
+        port: '',
+        host: 'test.com',
+        hostname: 'test.com'
+      })
+    )
+    expect(new Url('https://test.com')).toEqual(
+      jasmine.objectContaining({
+        port: '',
+        host: 'test.com',
+        hostname: 'test.com'
+      })
+    )
+    expect(new Url('https://test.com:443')).toEqual(
+      jasmine.objectContaining({
+        port: '',
+        host: 'test.com',
+        hostname: 'test.com'
+      })
+    )
+    expect(new Url('https://test.com:80')).toEqual(
+      jasmine.objectContaining({
+        port: '80',
+        host: 'test.com:80',
+        hostname: 'test.com'
+      })
+    )
+    expect(new Url('http://[::1]/')).toEqual(
+      jasmine.objectContaining({
+        port: '',
+        host: '[::1]',
+        hostname: '[::1]'
+      })
+    )
+    expect(new Url('https://[::1]:8080/')).toEqual(
+      jasmine.objectContaining({
+        port: '8080',
+        host: '[::1]:8080',
+        hostname: '[::1]'
+      })
+    )
+  })
 })

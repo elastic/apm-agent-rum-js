@@ -76,13 +76,6 @@ describe('transaction.Transaction', function() {
     tr.end()
   })
 
-  it('should store context.page.url', function() {
-    var tr = new Transaction('/', 'transaction')
-    tr.detectFinish()
-    var location = tr.context.page.url
-    expect(location).toBe(window.location.href)
-  })
-
   it('should redefine transaction', function() {
     var tr = new Transaction('/', 'transaction')
     tr.redefine('name', 'type', { test: 'test' })

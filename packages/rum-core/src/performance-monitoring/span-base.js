@@ -77,10 +77,10 @@ class SpanBase {
     keys.forEach(k => setLabel(k, tags[k], ctx.tags))
   }
 
-  addContext(context) {
-    if (!context) return
+  addContext(...context) {
+    if (context.length === 0) return
     this.ensureContext()
-    merge(this.context, context)
+    merge(this.context, ...context)
   }
 
   end(endTime) {
