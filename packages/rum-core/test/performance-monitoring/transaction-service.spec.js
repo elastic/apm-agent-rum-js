@@ -606,4 +606,47 @@ describe('TransactionService', function() {
     window.clearInterval = origClearInterval
     window.setInterval = origSetInterval
   })
+
+  it('should redefine type based on the defined order', () => {
+    transactionService.startSpan('span 1', 'span-type')
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr.type).toBe('temporary')
+
+    transactionService.startTransaction('test 1', 'random-type', {
+      managed: true,
+      canReuse: true
+    })
+
+    tr = transactionService.getCurrentTransaction()
+    expect(tr.type).toBe('temporary')
+
+    transactionService.startTransaction('test 1', 'route-change', {
+      managed: true,
+      canReuse: true
+    })
+
+    tr = transactionService.getCurrentTransaction()
+    expect(tr.type).toBe('route-change')
+
+    transactionService.startTransaction('test 1', 'page-load', {
+      managed: true,
+      canReuse: true
+    })
+
+    tr = transactionService.getCurrentTransaction()
+    expect(tr.type).toBe('page-load')
+
+    transactionService.startTransaction('test 1', 'route-change', {
+      managed: true,
+      canReuse: true
+    })
+
+    transactionService.startTransaction('test 1', 'random-type', {
+      managed: true,
+      canReuse: true
+    })
+
+    tr = transactionService.getCurrentTransaction()
+    expect(tr.type).toBe('page-load')
+  })
 })
