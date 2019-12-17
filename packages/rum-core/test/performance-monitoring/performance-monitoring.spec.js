@@ -497,6 +497,15 @@ describe('PerformanceMonitoring', function() {
               method: 'GET',
               url: 'http://localhost:9876/?a=b&c=d',
               status_code: 200
+            },
+            destination: {
+              service: {
+                name: 'http://localhost:9876',
+                resource: 'localhost:9876',
+                type: 'external'
+              },
+              address: 'localhost',
+              port: 9876
             }
           })
           expect(dTHeaderValue).toBeDefined()

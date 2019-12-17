@@ -26,6 +26,7 @@
 import { Promise } from 'es6-promise'
 import { globalState } from './patch-utils'
 import { SCHEDULE, INVOKE, FETCH } from '../constants'
+import { scheduleMicroTask } from '../utils'
 
 export function patchFetch(callback) {
   if (!window.fetch || !window.Request) {
@@ -85,18 +86,17 @@ export function patchFetch(callback) {
       }
 
       promise.then(
-        function(response) {
+        response => {
           resolve(response)
-
           // invokeTask in the next execution cycle to let the promise resolution complete
-          Promise.resolve().then(() => {
+          scheduleMicroTask(() => {
             task.data.response = response
             invokeTask(task)
           })
         },
-        function(error) {
+        error => {
           reject(error)
-          Promise.resolve().then(() => {
+          scheduleMicroTask(() => {
             task.data.error = error
             invokeTask(task)
           })

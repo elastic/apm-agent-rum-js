@@ -26,7 +26,6 @@
 import {
   checkSameOrigin,
   isDtHeaderValid,
-  merge,
   parseDtHeaderValue,
   stripQueryStringFromUrl,
   getDtHeaderValue
@@ -121,9 +120,10 @@ class PerformanceMonitoring {
     const transactionService = this._transactionService
 
     if (event === SCHEDULE && task.data) {
-      const requestUrl = new Url(task.data.url)
+      const data = task.data
+      const requestUrl = new Url(data.url)
       const spanName =
-        task.data.method +
+        data.method +
         ' ' +
         (requestUrl.relative
           ? requestUrl.path
@@ -147,35 +147,20 @@ class PerformanceMonitoring {
       const isSameOrigin =
         checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
         checkSameOrigin(requestUrl.origin, dtOrigins)
-      const target = task.data.target
+      const target = data.target
       if (isDtEnabled && isSameOrigin && target) {
         this.injectDtHeader(span, target)
       }
-      span.addContext({
-        http: {
-          method: task.data.method,
-          url: requestUrl.href
-        }
-      })
-      span.sync = task.data.sync
-      task.data.span = span
+      span.sync = data.sync
+      data.span = span
       task.id = taskId
-    }
-    if (event === INVOKE && task.data && task.data.span) {
-      if (typeof task.data.target.status !== 'undefined') {
-        task.data.span.addContext({
-          http: { status_code: task.data.target.status }
-        })
-      } else if (task.data.response) {
-        task.data.span.addContext({
-          http: { status_code: task.data.response.status }
-        })
+    } else if (event === INVOKE) {
+      if (task.data && task.data.span) {
+        task.data.span.end(null, task.data)
       }
-      task.data.span.end()
-    }
-
-    if (event === INVOKE && task.id) {
-      transactionService.removeTask(task.id)
+      if (task.id) {
+        transactionService.removeTask(task.id)
+      }
     }
   }
 
@@ -203,13 +188,6 @@ class PerformanceMonitoring {
     var headerName = configService.get('distributedTracingHeaderName')
     if (target) {
       return parseDtHeaderValue(target[headerName])
-    }
-  }
-
-  setTransactionContext(transaction) {
-    var context = this._configService.get('context')
-    if (context) {
-      transaction.addContext(context)
     }
   }
 
@@ -304,12 +282,9 @@ class PerformanceMonitoring {
         span._end <= transaction._end
       )
     })
-
-    this.setTransactionContext(transaction)
   }
 
   createTransactionDataModel(transaction) {
-    const configContext = this._configService.get('context')
     const transactionStart = transaction._start
 
     const spans = transaction.spans.map(function(span) {
@@ -330,8 +305,6 @@ class PerformanceMonitoring {
       return truncateModel(SPAN_MODEL, spanData)
     })
 
-    const context = merge({}, configContext, transaction.context)
-
     const transactionData = {
       id: transaction.id,
       trace_id: transaction.traceId,
@@ -339,7 +312,7 @@ class PerformanceMonitoring {
       type: transaction.type,
       duration: transaction.duration(),
       spans,
-      context,
+      context: transaction.context,
       marks: transaction.marks,
       breakdown: transaction.breakdownTimings,
       span_count: {

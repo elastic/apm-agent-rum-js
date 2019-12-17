@@ -46,6 +46,20 @@
  */
 
 /**
+ * Add default ports for other protocols(ws, wss) after
+ * RUM agent starts instrumenting those
+ */
+function isDefaultPort(port, protocol) {
+  switch (protocol) {
+    case 'http:':
+      return port === '80'
+    case 'https:':
+      return port === '443'
+  }
+  return true
+}
+
+/**
  * Order of the RULES are very important
  *
  * RULE[0] -> for checking the index of the character on the URL
@@ -58,7 +72,7 @@ const RULES = [
   ['?', 'query'],
   ['/', 'path'],
   ['@', 'auth', 1],
-  [NaN, 'host', undefined, 1] //
+  [NaN, 'host', undefined, 1]
 ]
 const PROTOCOL_REGEX = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i
 
@@ -135,6 +149,26 @@ class Url {
     this.relative = relative
 
     this.protocol = protocol || location.protocol
+
+    /**
+     * Construct port and hostname from host
+     *
+     * Port numbers are not added for default ports of a given protocol
+     * and hostname would match host when port is not present
+     */
+    this.hostname = this.host
+    this.port = ''
+    if (/:\d+$/.test(this.host)) {
+      const value = this.host.split(':')
+      const port = value.pop()
+      const hostname = value.join(':')
+      if (isDefaultPort(port, this.protocol)) {
+        this.host = hostname
+      } else {
+        this.port = port
+      }
+      this.hostname = hostname
+    }
 
     this.origin =
       this.protocol && this.host && this.protocol !== 'file:'
