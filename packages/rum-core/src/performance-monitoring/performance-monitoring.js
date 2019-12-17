@@ -236,11 +236,7 @@ class PerformanceMonitoring {
       tr.resetSpans()
     }
 
-    const checkBrowserResponsiveness = this._configService.get(
-      'checkBrowserResponsiveness'
-    )
-
-    if (checkBrowserResponsiveness && tr.options.checkBrowserResponsiveness) {
+    if (tr.options.checkBrowserResponsiveness) {
       const wasBrowserResponsive = this.checkBrowserResponsiveness(
         tr,
         BROWSER_RESPONSIVENESS_INTERVAL,
