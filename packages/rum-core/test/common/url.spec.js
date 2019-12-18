@@ -271,10 +271,13 @@ describe('Url parser', function() {
 })
 
 /**
+ * Test native URL implementation only on supported platforms
  * In IE 11 - window.URL is not supported but it exists as an object
- * Run these tests only on supported platforms
+ * Microsoft Edge URL parsing for IPv6 is broken on `host` and `hostnames`
  */
-if (window.URL.toString().indexOf('native code') !== -1) {
+const userAgent = window.navigator.userAgent
+const browsersToIgnore = /(Trident|Edge)/
+if (userAgent && !browsersToIgnore.test(userAgent)) {
   describe('Native URL API Compatability', () => {
     function commonFields(url) {
       const native = new URL(url)
