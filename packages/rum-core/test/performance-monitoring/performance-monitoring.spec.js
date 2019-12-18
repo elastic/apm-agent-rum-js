@@ -213,15 +213,6 @@ describe('PerformanceMonitoring', function() {
     )
     logger.debug.calls.reset()
 
-    const transaction2 = new Transaction('test2', 'custom', { id: 2 })
-    transaction2.end()
-    transaction2._end = transaction2._end + 100
-    expect(performanceMonitoring.filterTransaction(transaction2)).toBe(false)
-    expect(logger.debug).toHaveBeenCalledWith(
-      'transaction(2, test2) was discarded! Transaction does not include any spans'
-    )
-    logger.debug.calls.reset()
-
     const transaction3 = new Transaction(null, null, { id: 3 })
     expect(performanceMonitoring.filterTransaction(transaction3)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
@@ -371,8 +362,6 @@ describe('PerformanceMonitoring', function() {
       tr._end += 100
     }
     expect(tr.duration()).toBeGreaterThan(0)
-    expect(tr.spans.length).toBe(0)
-    expect(performanceMonitoring.filterTransaction(tr)).toBe(false)
 
     const tr2 = new Transaction('unsampled', 'test', {
       transactionSampleRate: 0
