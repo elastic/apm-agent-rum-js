@@ -33,7 +33,8 @@ import {
   TRANSACTION_START,
   TRANSACTION_END,
   BROWSER_RESPONSIVENESS_INTERVAL,
-  TEMPORARY_TYPE
+  TEMPORARY_TYPE,
+  TRANSACTION_TYPE_ORDER
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__ } from '../env'
@@ -67,15 +68,13 @@ class TransactionService {
     this.currentTransaction = value
   }
 
-  ensureRespInterval() {
-    let currentTr = this.getCurrentTransaction()
-
+  ensureRespInterval(checkBrowserResponsiveness) {
     const clearRespInterval = () => {
-      window.clearInterval(this.respIntervalId)
+      clearInterval(this.respIntervalId)
       this.respIntervalId = undefined
     }
 
-    if (currentTr && currentTr.options.checkBrowserResponsiveness) {
+    if (checkBrowserResponsiveness) {
       if (typeof this.respIntervalId === 'undefined') {
         this.respIntervalId = setInterval(() => {
           let tr = this.getCurrentTransaction()
@@ -130,11 +129,22 @@ class TransactionService {
         )
       }
       /**
-       * We want to keep the type in it's original value, therefore,
-       * passing undefined as type. For example, in the case of a page-load
-       * we want to keep the type but redefine the name to the first route.
+       * We only update based precedence defined in TRANSACTION_TYPE_ORDER.
+       * If either orders don't exist we also don't redefine the type.
        */
-      tr.redefine(name, undefined, perfOptions)
+
+      let redefineType
+      let currentTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(tr.type)
+      let redefineTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(type)
+      if (
+        currentTypeOrder !== -1 &&
+        redefineTypeOrder !== -1 &&
+        redefineTypeOrder < currentTypeOrder
+      ) {
+        redefineType = type
+      }
+
+      tr.redefine(name, redefineType, perfOptions)
     } else {
       if (__DEV__) {
         this._logger.debug(
@@ -165,7 +175,7 @@ class TransactionService {
       }
     }
 
-    this.ensureRespInterval()
+    this.ensureRespInterval(tr.options.checkBrowserResponsiveness)
 
     return tr
   }
