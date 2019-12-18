@@ -145,7 +145,6 @@ describe('ApmBase', function() {
   it('should provide the public api', function() {
     apmBase.init({ serviceName, serverUrl })
     apmBase.setInitialPageLoadName('test')
-    var trService = serviceFactory.getService('TransactionService')
     var configService = serviceFactory.getService('ConfigService')
 
     expect(configService.get('pageLoadTransactionName')).toBe('test')
@@ -167,7 +166,6 @@ describe('ApmBase', function() {
     )
 
     expect(apmBase.getCurrentTransaction()).toBe(tr)
-    expect(apmBase.getTransactionService()).toBe(trService)
 
     var filter = function() {}
     apmBase.addFilter(filter)
