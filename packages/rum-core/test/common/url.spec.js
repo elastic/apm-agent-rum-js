@@ -270,25 +270,72 @@ describe('Url parser', function() {
   })
 })
 
-describe('Native URL API Compatability', () => {
-  function commonFields(url) {
-    const native = new URL(url)
-    const polyfill = new Url(url)
-    expect(native.href).toBe(polyfill.href)
-    expect(native.origin).toBe(polyfill.origin)
-    expect(native.protocol).toBe(polyfill.protocol)
-    expect(native.host).toBe(polyfill.host)
-    expect(native.hostname).toBe(polyfill.hostname)
-    expect(native.port).toBe(polyfill.port)
-  }
+/**
+ * In IE 11 - window.URL is not supported but it exists as an object
+ * Run these tests only on supported platforms
+ */
+if (window.URL.toString().indexOf('native code') !== -1) {
+  describe('Native URL API Compatability', () => {
+    function commonFields(url) {
+      const native = new URL(url)
+      const polyfill = new Url(url)
+      expect(native.href).toBe(polyfill.href)
+      expect(native.origin).toBe(polyfill.origin)
+      expect(native.protocol).toBe(polyfill.protocol)
+      expect(native.host).toBe(polyfill.host)
+      expect(native.hostname).toBe(polyfill.hostname)
+      expect(native.port).toBe(polyfill.port)
+      expect(native.hash).toBe(polyfill.hash)
+    }
 
-  it('should be close to native implementation on most of the fields', () => {
-    commonFields('http://test.com/path')
-    commonFields('https://test.com/path')
-    commonFields('https://test.com:443/path')
-    commonFields('https://test.com:8080/path')
-    commonFields('http://[::1]/')
-    commonFields('https://[::1]:8080/')
-    commonFields('http://a@b?@c')
+    it('should be close to native implementation for most fields', () => {
+      commonFields('http://test.com/path')
+      commonFields('https://test.com/path')
+      commonFields('https://test.com:443/path#d')
+      commonFields('https://test.com:8080/path?a=c#d')
+      commonFields('http://[::1]/')
+      commonFields('https://[::1]:8080/')
+    })
+
+    it('field names that are different name from native', () => {
+      const url = 'http://localhost:8080/a?b=c&d=e'
+      const native = new URL(url)
+      const polyfill = new Url(url)
+
+      expect(native.pathname).toBe(polyfill.path)
+      expect(native.search).toBe(polyfill.query)
+    })
+
+    it('url with authentication parsing varies', () => {
+      let url = 'http://a@b?@c'
+      let native = new URL(url)
+      let polyfill = new Url(url)
+
+      expect(native.username).toBe(polyfill.auth)
+      expect(native.host).toBe(polyfill.host)
+      expect(native.search).toBe(polyfill.query)
+
+      url = 'http://a:b@c/'
+      native = new URL(url)
+      polyfill = new Url(url)
+
+      expect(`${native.username}:${native.password}`).toBe(polyfill.auth)
+      expect(native.href).toBe(url)
+      expect(polyfill.href).toBe('http://[REDACTED]:[REDACTED]@c/')
+    })
+
+    it('relative URL parsing varies ', () => {
+      let url = '/test/?a=b'
+      /**
+       * Native URL expects a origin parameter
+       * Polyfill uses the current location by default
+       */
+      let native = new URL(url, window.location.origin)
+      let polyfill = new Url(url)
+
+      expect(native.href).toBe(polyfill.href)
+      expect(native.origin).toBe(polyfill.origin)
+      expect(native.pathname).toBe(polyfill.path)
+    })
   })
-})
+}
