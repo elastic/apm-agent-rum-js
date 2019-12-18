@@ -219,15 +219,6 @@ class PerformanceMonitoring {
       return false
     }
 
-    if (tr.spans.length === 0) {
-      if (__DEV__) {
-        this._logginService.debug(
-          `transaction(${tr.id}, ${tr.name}) was discarded! Transaction does not include any spans`
-        )
-      }
-      return false
-    }
-
     /**
      * In case of unsampled transaction, send only the transaction to apm server
      *  without any spans to reduce the payload size
