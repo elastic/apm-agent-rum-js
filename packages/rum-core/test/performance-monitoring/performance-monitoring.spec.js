@@ -29,7 +29,7 @@ import Span from '../../src/performance-monitoring/span'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { getDtHeaderValue } from '../../src/common/utils'
 import { globalState } from '../../src/common/patching/patch-utils'
-import { patchEventHandler as originalPathHandler } from '../../src/common/patching'
+import { patchEventHandler as originalPatchHandler } from '../../src/common/patching'
 import {
   SCHEDULE,
   FETCH,
@@ -673,19 +673,19 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should subscribe to events based on instrumentation flags', () => {
-    spyOn(originalPathHandler, 'observe')
+    spyOn(originalPatchHandler, 'observe')
     performanceMonitoring.init({
       [HISTORY]: false,
       [XMLHTTPREQUEST]: true,
       [FETCH]: true
     })
 
-    expect(originalPathHandler.observe.calls.argsFor(0)).toEqual([
+    expect(originalPatchHandler.observe.calls.argsFor(0)).toEqual([
       XMLHTTPREQUEST,
       jasmine.any(Function)
     ])
 
-    expect(originalPathHandler.observe.calls.argsFor(1)).toEqual([
+    expect(originalPatchHandler.observe.calls.argsFor(1)).toEqual([
       FETCH,
       jasmine.any(Function)
     ])
@@ -768,7 +768,7 @@ describe('PerformanceMonitoring', function() {
   it('should send span context destination details to apm-server', done => {
     const transactionService = serviceFactory.getService('TransactionService')
 
-    const tr = transactionService.startTransaction('with-context', 'custom', {})
+    const tr = transactionService.startTransaction('with-context', 'custom')
     const data = {
       url: 'http://localhost:3000/b/c',
       method: 'GET',
@@ -796,6 +796,9 @@ describe('PerformanceMonitoring', function() {
       const payload = performanceMonitoring.convertTransactionsToServerModel([
         tr
       ])
+      expect(payload[0].spans[0].context.destination).toBeDefined()
+      expect(payload[0].spans[1].context.destination).toBeDefined()
+
       apmServer
         .sendTransactions(payload)
         .catch(reason => {
