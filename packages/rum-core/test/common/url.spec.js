@@ -269,3 +269,26 @@ describe('Url parser', function() {
     )
   })
 })
+
+describe('Native URL API Compatability', () => {
+  function commonFields(url) {
+    const native = new URL(url)
+    const polyfill = new Url(url)
+    expect(native.href).toBe(polyfill.href)
+    expect(native.origin).toBe(polyfill.origin)
+    expect(native.protocol).toBe(polyfill.protocol)
+    expect(native.host).toBe(polyfill.host)
+    expect(native.hostname).toBe(polyfill.hostname)
+    expect(native.port).toBe(polyfill.port)
+  }
+
+  it('should be close to native implementation on most of the fields', () => {
+    commonFields('http://test.com/path')
+    commonFields('https://test.com/path')
+    commonFields('https://test.com:443/path')
+    commonFields('https://test.com:8080/path')
+    commonFields('http://[::1]/')
+    commonFields('https://[::1]:8080/')
+    commonFields('http://a@b?@c')
+  })
+})

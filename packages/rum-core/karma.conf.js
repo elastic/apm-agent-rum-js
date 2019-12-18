@@ -37,4 +37,5 @@ module.exports = function(config) {
   )
   preparedConfig.files.unshift(promisepolyfill)
   config.set(preparedConfig)
+  config.files = ['test/common/url.spec.js']
 }
