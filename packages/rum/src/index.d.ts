@@ -37,13 +37,13 @@ declare module '@elastic/apm-rum' {
     addLabels(labels: Labels): void
     setInitialPageLoadName(name: string): void
     startTransaction(
-      name?: string,
-      type?: string,
+      name?: string | null,
+      type?: string | null,
       options?: TransactionOptions
     ): Transaction | undefined
     startSpan(
-      name?: string,
-      type?: string,
+      name?: string | null,
+      type?: string | null,
       options?: SpanOptions
     ): Span | undefined
     getCurrentTransaction(): Transaction | undefined
@@ -59,14 +59,15 @@ declare class BaseSpan {
   type: string
 
   addLabels(labels: Labels): void
+  addContext(context: object): void
   end(endTime?: number): void
   duration(): number | null
 }
 
 declare class Transaction extends BaseSpan {
   startSpan(
-    name?: string,
-    type?: string,
+    name?: string | null,
+    type?: string | null,
     options?: SpanOptions
   ): Span | undefined
   addTask(taskId: TaskId): TaskId
@@ -89,7 +90,7 @@ interface AgentConfigOptions {
   instrument?: boolean
   debug?: boolean
   disableInstrumentations?: Array<InstrumentationTypes>
-  logLevel?: string
+  logLevel?: LogLevel
   breakdownMetrics?: boolean
   checkBrowserResponsiveness?: boolean
   groupSimilarSpans?: boolean
@@ -137,6 +138,7 @@ type Payload = { [key: string]: any }
 
 type TaskId = string | number
 type LabelValue = string
+type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error'
 type TransactionEvents = 'transaction:start' | 'transaction:end'
 type InstrumentationTypes =
   | 'page-load'
