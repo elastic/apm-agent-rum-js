@@ -50,6 +50,13 @@ const RESPONSE_MODEL = {
   }
 }
 
+const DESTINATION_MODEL = {
+  address: [KEYWORD_LIMIT],
+  service: {
+    '*': [KEYWORD_LIMIT, true]
+  }
+}
+
 const CONTEXT_MODEL = {
   user: {
     id: true,
@@ -63,6 +70,7 @@ const CONTEXT_MODEL = {
   http: {
     response: RESPONSE_MODEL
   },
+  destination: DESTINATION_MODEL,
   /** Transactions */
   response: RESPONSE_MODEL
 }
@@ -174,5 +182,6 @@ export {
   SPAN_MODEL,
   TRANSACTION_MODEL,
   ERROR_MODEL,
-  METADATA_MODEL
+  METADATA_MODEL,
+  RESPONSE_MODEL
 }
