@@ -725,16 +725,15 @@ describe('PerformanceMonitoring', function() {
     setTimeout(() => {
       performanceMonitoring.processAPICalls('invoke', task)
       expect(tr.ended).toBe(true)
-      let payload = performanceMonitoring.convertTransactionsToServerModel([tr])
-      let promise = apmServer.sendTransactions(payload)
-      promise
-        .catch(reason => {
-          fail(
-            'Failed sending http-request transaction to the server, reason: ' +
-              reason
-          )
-        })
-        .then(() => done())
+      const payload = performanceMonitoring.convertTransactionsToServerModel([
+        tr
+      ])
+
+      apmServer.sendTransactions(payload).then(done, reason => {
+        done.fail(
+          `Failed sending http-request transaction to the server, reason: ${reason}`
+        )
+      })
     }, 100)
   })
 
@@ -799,14 +798,11 @@ describe('PerformanceMonitoring', function() {
       expect(payload[0].spans[0].context.destination).toBeDefined()
       expect(payload[0].spans[1].context.destination).toBeDefined()
 
-      apmServer
-        .sendTransactions(payload)
-        .catch(reason => {
-          fail(
-            'Failed sending span destination context details, reason: ' + reason
-          )
-        })
-        .then(() => done())
+      apmServer.sendTransactions(payload).then(done, reason => {
+        done.fail(
+          `Failed sending span destination context details, reason: ${reason}`
+        )
+      })
     })
 
     tr.end()
