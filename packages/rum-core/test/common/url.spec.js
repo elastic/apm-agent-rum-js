@@ -273,12 +273,10 @@ describe('Url parser', function() {
 /**
  * Test native URL implementation only on supported platforms
  * In IE 11 - window.URL is not supported but it exists as an object
- * Microsoft Edge URL parsing for IPv6 is broken on `host` and `hostnames`
  */
 const userAgent = window.navigator.userAgent
-const browsersToIgnore = /(Trident|Edge)/
-if (userAgent && !browsersToIgnore.test(userAgent)) {
-  describe('Native URL API Compatability', () => {
+if (window.URL.toString().indexOf('native code') !== -1) {
+  describe('Native URL API Compatibility', () => {
     function commonFields(url) {
       const native = new URL(url)
       const polyfill = new Url(url)
@@ -296,8 +294,6 @@ if (userAgent && !browsersToIgnore.test(userAgent)) {
       commonFields('https://test.com/path')
       commonFields('https://test.com:443/path#d')
       commonFields('https://test.com:8080/path?a=c#d')
-      commonFields('http://[::1]/')
-      commonFields('https://[::1]:8080/')
     })
 
     it('field names that are different name from native', () => {
@@ -339,6 +335,25 @@ if (userAgent && !browsersToIgnore.test(userAgent)) {
       expect(native.href).toBe(polyfill.href)
       expect(native.origin).toBe(polyfill.origin)
       expect(native.pathname).toBe(polyfill.path)
+    })
+
+    /**
+     * Microsoft Edge URL parsing for IPv6  works differently
+     * for `host` and `hostnames`
+     */
+    const isMsEdge = /Edge/.test(userAgent)
+
+    it('IPv6 parisng works different in Edge native URL implementation', () => {
+      const url = 'http://[::1]:8080/'
+
+      if (isMsEdge) {
+        const native = new URL(url)
+        expect(native.host).toBe('::1:8080')
+        expect(native.hotname).toBe('::1')
+        expect(native.origin).toBe('http://::1:8080')
+      } else {
+        commonFields(url)
+      }
     })
   })
 }
