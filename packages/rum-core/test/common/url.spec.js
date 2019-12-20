@@ -305,24 +305,6 @@ if (window.URL.toString().indexOf('native code') !== -1) {
       expect(native.search).toBe(polyfill.query)
     })
 
-    it('url with authentication parsing varies', () => {
-      let url = 'http://a@b?@c'
-      let native = new URL(url)
-      let polyfill = new Url(url)
-
-      expect(native.username).toBe(polyfill.auth)
-      expect(native.host).toBe(polyfill.host)
-      expect(native.search).toBe(polyfill.query)
-
-      url = 'http://a:b@c/'
-      native = new URL(url)
-      polyfill = new Url(url)
-
-      expect(`${native.username}:${native.password}`).toBe(polyfill.auth)
-      expect(native.href).toBe(url)
-      expect(polyfill.href).toBe('http://[REDACTED]:[REDACTED]@c/')
-    })
-
     it('relative URL parsing varies ', () => {
       let url = '/test/?a=b'
       /**
@@ -337,23 +319,47 @@ if (window.URL.toString().indexOf('native code') !== -1) {
       expect(native.pathname).toBe(polyfill.path)
     })
 
+    const isMsEdge = /Edge/.test(userAgent)
     /**
      * Microsoft Edge URL parsing for IPv6  works differently
      * for `host` and `hostnames`
      */
-    const isMsEdge = /Edge/.test(userAgent)
 
-    it('IPv6 parisng works different in Edge native URL implementation', () => {
+    it('should parse IPv6 addres correctly', () => {
       const url = 'http://[::1]:8080/'
 
       if (isMsEdge) {
         const native = new URL(url)
         expect(native.host).toBe('::1:8080')
-        expect(native.hotname).toBe('::1')
+        expect(native.hostname).toBe('::1')
         expect(native.origin).toBe('http://::1:8080')
       } else {
         commonFields(url)
       }
     })
+
+    /**
+     * Microsoft Edge URL parsing would throw Security Error
+     * when URL has a username and password fields associated.
+     */
+    if (!isMsEdge) {
+      it('url with authentication parsing varies', () => {
+        let url = 'http://a@b?@c'
+        let native = new URL(url)
+        let polyfill = new Url(url)
+
+        expect(native.username).toBe(polyfill.auth)
+        expect(native.host).toBe(polyfill.host)
+        expect(native.search).toBe(polyfill.query)
+
+        url = 'http://a:b@c/'
+        native = new URL(url)
+        polyfill = new Url(url)
+
+        expect(`${native.username}:${native.password}`).toBe(polyfill.auth)
+        expect(native.href).toBe(url)
+        expect(polyfill.href).toBe('http://[REDACTED]:[REDACTED]@c/')
+      })
+    }
   })
 }
