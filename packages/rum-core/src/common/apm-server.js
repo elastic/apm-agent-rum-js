@@ -63,7 +63,7 @@ class ApmServer {
         name: cfg.get('serviceName'),
         version: cfg.get('serviceVersion'),
         agent: {
-          name: 'js-base',
+          name: 'rum-js',
           version: cfg.version
         },
         language: {
