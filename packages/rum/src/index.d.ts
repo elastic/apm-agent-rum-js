@@ -83,33 +83,28 @@ declare class Span extends BaseSpan {
 
 interface AgentConfigOptions {
   serviceName?: string
-  serviceVersion?: string
-  environment?: string
   serverUrl?: string
+  serviceVersion?: string
   active?: boolean
   instrument?: boolean
-  debug?: boolean
   disableInstrumentations?: Array<InstrumentationTypes>
+  environment?: string
   logLevel?: LogLevel
   breakdownMetrics?: boolean
-  checkBrowserResponsiveness?: boolean
-  groupSimilarSpans?: boolean
-  ignoreTransactions?: Array<string | RegExp>
+  flushInterval?: number
+  pageLoadTraceId?: string
+  pageLoadSampled?: boolean
+  pageLoadSpanId?: string
+  pageLoadTransactionName?: string
+  distributedTracing?: boolean
+  distributedTracingOrigins?: Array<string>
   errorThrottleLimit?: number
   errorThrottleInterval?: number
   transactionThrottleLimit?: number
   transactionThrottleInterval?: number
-  transactionDurationThreshold?: number
-  flushInterval?: number
-  distributedTracing?: boolean
-  distributedTracingOrigins?: Array<string>
-  distributedTracingHeaderName?: string
-  pageLoadTraceId?: string
-  pageLoadSpanId?: string
-  pageLoadSampled?: boolean
-  pageLoadTransactionName?: string
   transactionSampleRate?: number
   centralConfig?: boolean
+  ignoreTransactions?: Array<string | RegExp>
 }
 
 interface TransactionOptions {
