@@ -27,7 +27,6 @@ import { ApmBase, init } from '@elastic/apm-rum'
 
 const config: AgentConfigOptions = {
   active: true,
-  debug: true,
   logLevel: 'info',
   distributedTracing: true,
   disableInstrumentations: ['xmlhttprequest', 'page-load']
