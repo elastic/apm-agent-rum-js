@@ -31,8 +31,8 @@ For all transactions, the agent automatically captures <<breakdown-metrics-docs,
 ==== Page load metrics
 
 The RUM agent tries to capture the overall user experience on how the page is loaded/rendered as part of the page load Transaction.
-It includes all the dependent resources such as JavaSript, Stylesheets, Images, etc. which are included as part of the page. In addition
-to capturing the resource timing information as Spans, the transaction also includes navigation spans that are associated along with the rest
+It includes all of the dependent resources, like JavaScript, stylesheets, images, etc., which are included as part of the page. In addition
+to capturing the resource timing information as Spans, the transaction also includes navigation spans that are associated with the rest
 of the captured information to make the waterfall more appealing.
 
 * `Domain lookup` - Duration of the DNS query for the current page (domainLookupEnd - domainLookupStart).
