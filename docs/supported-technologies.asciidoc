@@ -11,23 +11,23 @@ to capturing the resource timing information as Spans, the transaction also incl
 of the captured information to make the waterfall more appealing.
 
 `Domain lookup`::
-Duration of the DNS query for the current page (domainLookupEnd - domainLookupStart).
+Duration of the DNS query for the current page: `domainLookupEnd` - `domainLookupStart`.
 
 `Making a connection to the server`::
-Duration of TCP connection to the server. Includes the TLS negotiation time for HTTPS pages (connectEnd - connectStart).
+Duration of the TCP connection to the server, including the TLS negotiation time for HTTPS pages: `connectEnd` - `connectStart`.
 
 `Requesting and receiving the document`::
-Overall response time of the server including the last byte (responseEnd - requestStart).
+Overall response time of the server including the last byte: `responseEnd` - `requestStart`.
 
 `Parsing the document, executing sync. scripts`::
-HTML document parsing time including synchronous Stylesheets and Script tags (domInteractive - domLoading).
+HTML document parsing time, including synchronous Stylesheets and Script: `tagsdomInteractive` - `domLoading`.
 
 `Fire "DOMContentLoaded" event`::
-Triggered when the browser completed parsing the document. Helpful when there are multiple listeners or logic
-is executed (domContentLoadedEventEnd - domContentLoadedEventStart)
+Triggered when the browser completes parsing the document. Helpful when there are multiple listeners, or logic
+is executed: `domContentLoadedEventEnd` - `domContentLoadedEventStart`.
 
 `Fire "load" event`::
-Trigged when the browser finishes loading its document and depedent resources (loadEventEnd - loadEventStart).
+Trigged when the browser finishes loading its document and dependent resources: `loadEventEnd` - `loadEventStart`.
 
 
 To capture the overall user experience of the page including all of the above information plus additional resource requests that might be
