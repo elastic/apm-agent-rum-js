@@ -13,7 +13,7 @@ available in the browser. The different types of metrics are:
 
 * `DNS` - Duration of the DNS query for the current page (domainLookupEnd - domainLookupStart).
 
-* `TCP` - How long it took to establish the TCP connection to the server. Includes the TLS negotitaion time for HTTPS pages (connectEnd - connectStart).
+* `TCP` - How long it took to establish the TCP connection to the server. Includes the TLS negotiation time for HTTPS pages (connectEnd - connectStart).
 
 * `Request` - The time elapsed between the browser making the HTTP request and receiving the first byte of the response (responseStart - requestStart). 
    Also referred as TTFB (Time to First Byte).
