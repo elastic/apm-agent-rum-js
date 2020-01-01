@@ -37,7 +37,7 @@ export function routeHooks(router, apm) {
      *
      * Also account for the slug pattern on the routes, to.path always
      * resolves the current slug param, but we need need to
-     * use the slug pattern for the transaction namee
+     * use the slug pattern for the transaction name
      */
     if (matched.length > 0) {
       path = matched[matched.length - 1].path || path
@@ -55,7 +55,7 @@ export function routeHooks(router, apm) {
     }
   })
   /**
-   * hanbdle when the navigation is cancelled in `beforeEach` hook of components
+   * handle when the navigation is cancelled in `beforeEach` hook of components
    * where `next(error)` is called
    */
   router.onError(() => {
