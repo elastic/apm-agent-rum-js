@@ -34,7 +34,13 @@ export const ApmVuePlugin = {
      */
     apm.init(config)
 
-    routeHooks(router, apm)
+    /**
+     * Hook router if provided
+     */
+    if (router) {
+      routeHooks(router, apm)
+    }
+
     /**
      * Provide it via $apm to be accessed in all Vue Components
      */
