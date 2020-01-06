@@ -5,6 +5,7 @@
   "main": "dist/lib/index.js",
   "module": "dist/es/index.js",
   "source": "src/index.js",
+  "types": "src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/elastic/apm-agent-rum-js.git",
@@ -24,6 +25,7 @@
     "karma:dev": "karma start --auto-watch --restartOnFileChange",
     "karma:coverage": "karma start --coverage --singleRun",
     "script": "node ../../dev-utils/run-script.js",
+    "test:types": "tsc --project test/types/tsconfig.json",
     "test:node": "npm run script runNodeTests",
     "test:bundle": "npm run script runBundleTests",
     "test:integration": "npm run script runIntegrationTests",
@@ -31,7 +33,7 @@
     "test:e2e:supported": "npm run script runE2eTests packages/rum/wdio.conf.js",
     "test:e2e:failsafe": "npm run script runE2eTests packages/rum/wdio-failsafe.conf.js",
     "test:sauce": "npm run script runSauceTests packages/rum true test:unit test:e2e:supported test:e2e:failsafe",
-    "test": "run-s build:e2e test:node test:bundle test:integration test:sauce",
+    "test": "run-s build:e2e test:types test:node test:bundle test:integration test:sauce",
     "bench": "npm run build:umd && node test/benchmarks/run.js"
   },
   "files": [
