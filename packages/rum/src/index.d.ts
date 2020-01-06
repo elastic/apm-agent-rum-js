@@ -30,7 +30,7 @@ declare module '@elastic/apm-rum' {
   class ApmBase {
     init: Init
     /**
-     * undocumented, specific to library internals
+     * undocumented, might be removed in future versions
      */
     isEnabled(): boolean
     observe(name: TransactionEvents, callback: (tr: Transaction) => void): void
@@ -62,7 +62,7 @@ declare class BaseSpan {
 
   addLabels(labels: Labels): void
   /**
-   * undocumented, specific to library internals
+   * undocumented, might be removed in future versions
    */
   addContext(context: object): void
   end(endTime?: number): void
@@ -77,19 +77,19 @@ declare class Transaction extends BaseSpan {
   ): Span | undefined
   mark(key: string): void
   /**
-   * undocumented, specific to library internals
+   * undocumented, might be removed in future versions
    */
   addTask(taskId: TaskId): TaskId
   /**
-   * undocumented, specific to library internals
+   * undocumented, might be removed in future versions
    */
   removeTask(taskId: TaskId): void
   /**
-   * undocumented, specific to library internals
+   * undocumented, might be removed in future versions
    */
   captureBreakdown(): void
   /**
-   * undocumented, specific to library internals
+   * undocumented, might be removed in future versions
    */
   isFinished(): boolean
 }
@@ -127,18 +127,18 @@ interface AgentConfigOptions {
 interface TransactionOptions {
   managed?: boolean
   /**
-   * undocumented, specific to library internals
+   * undocumented, might be removed in future versions
    */
   startTime?: number
   /**
-   * undocumented, specific to library internals
+   * undocumented, might be removed in future versions
    */
   canReuse?: boolean
 }
 
 interface SpanOptions {
   /**
-   * undocumented, specific to library internals
+   * undocumented, might be removed in future versions
    */
   startTime?: number
   sync: boolean
