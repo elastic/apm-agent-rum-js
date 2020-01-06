@@ -54,15 +54,17 @@ describe('APM route hooks', () => {
   }
   const Foo = { template: '<div>foo</div>' }
 
-  function mountApp(routes, mode = 'history') {
+  function mountApp(routes, options = {}) {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
+    const { mode = 'history', passRouter = true } = options
+
     const router = new VueRouter({
       mode,
       routes
     })
     localVue.use(ApmVuePlugin, {
-      router,
+      router: passRouter ? router : undefined,
       apm,
       config: {
         serviceName: 'test'
@@ -189,6 +191,63 @@ describe('APM route hooks', () => {
     })
   })
 
+  it('should consider router as optional', () => {
+    const { router, wrapper } = mountApp(
+      [
+        {
+          path: '/home',
+          component: Home
+        }
+      ],
+      { passRouter: false }
+    )
+
+    spyOn(apm, 'startTransaction')
+    router.push('/home')
+
+    expect(apm.startTransaction).not.toHaveBeenCalled()
+
+    expect(wrapper.find(Home).exists()).toBe(true)
+    wrapper.destroy()
+  })
+
+  it('should end transaction on navigation error', done => {
+    const endSpy = jasmine.createSpy('endSpy')
+    const ErrorSpan = {
+      template: `<div>Span</div>`,
+      beforeRouteEnter() {
+        throw new Error('Nav Error')
+      }
+    }
+    const { router, wrapper } = mountApp([
+      {
+        path: '/error',
+        component: ErrorSpan
+      }
+    ])
+
+    router.onError(() => {
+      expect(endSpy).toHaveBeenCalled()
+      done()
+    })
+
+    spyOn(apm, 'startTransaction').and.returnValue({
+      end: endSpy
+    })
+    router.push('/error')
+
+    expect(apm.startTransaction).toHaveBeenCalledWith(
+      '/error',
+      'route-change',
+      {
+        managed: true,
+        canReuse: true
+      }
+    )
+    expect(wrapper.find(ErrorSpan).exists()).toBe(false)
+    wrapper.destroy()
+  })
+
   describe('vue router hash mode', () => {
     it('should use the slug id for transaction name', () => {
       const { router, wrapper } = mountApp(
@@ -198,7 +257,9 @@ describe('APM route hooks', () => {
             component: Foo
           }
         ],
-        'hash'
+        {
+          mode: 'hash'
+        }
       )
       spyOn(apm, 'startTransaction')
       router.push('/foo/1')
