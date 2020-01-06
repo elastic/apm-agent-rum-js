@@ -41,8 +41,6 @@ const apm = new ApmBase()
 
 apm.init(config)
 
-apm.config(config)
-
 apm.observe('transaction:start', transaction => {
   transaction.addLabels({
     test: 'test'
