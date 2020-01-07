@@ -23,11 +23,21 @@
  *
  */
 
-import { apm } from '@elastic/apm-rum'
-import { ApmService } from './apm-service'
-import { ApmErrorHandler } from './error-handler'
+import { ErrorHandler } from '@angular/core'
 
-ApmService.apm = apm
-ApmErrorHandler.apm = apm
+export class ApmErrorHandler implements ErrorHandler {
+  static apm: any
 
-export { ApmService, ApmErrorHandler }
+  handleError(error) {
+    const loggingService = ApmErrorHandler.apm.serviceFactory.getService(
+      'LoggingService'
+    )
+    /**
+     * since browser console shows the place from where console.error was called,
+     * we use the original error stack instead of logging service internal stack
+     */
+    const originalStack = error ? error.stack : error
+    loggingService.error(originalStack)
+    ApmErrorHandler.apm.captureError(error)
+  }
+}
