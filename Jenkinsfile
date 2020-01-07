@@ -271,11 +271,11 @@ def runParallelTest(){
   }
 }
 
-def runScript(Map agrs = [:]){
-  def stack = agrs.stack
-  def scope = agrs.scope
-  def label = agrs.label
-  def goal = agrs.get('goal', 'test')
+def runScript(Map args = [:]){
+  def stack = args.stack
+  def scope = args.scope
+  def label = args.label
+  def goal = args.get('goal', 'test')
 
   deleteDir()
   unstash 'source'
