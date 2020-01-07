@@ -66,7 +66,7 @@ as transactions with the `path` of the route as its name and `page-load` or `rou
 [float]
 ==== Capturing errors in Angular applications
 
-By default, when an error is thrown inside the Angular application, the default error handler printss
+By default, when an error is thrown inside the Angular application, the default error handler prints
 the error messages to the console without rethrowing them as browser events.
 
 `ApmErrorHandler` provides a centralized error handling which captures and reports the errors
