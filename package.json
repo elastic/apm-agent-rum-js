@@ -79,6 +79,7 @@
     "codecov": "^3.6.1",
     "core-js": "^3.5.0",
     "cpuprofile-filter": "^1.1.0",
+    "devtools": "^5.18.4",
     "ejs": "^2.7.4",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
