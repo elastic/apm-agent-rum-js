@@ -39,8 +39,8 @@ apmBase.addLabels({})
 
 // dummy service factory
 const serviceFactory = {
-  getService() {
-    return null
+  getService(name: string) {
+    return name
   }
 }
 
