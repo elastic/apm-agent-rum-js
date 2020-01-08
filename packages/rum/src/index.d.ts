@@ -160,7 +160,7 @@ interface Labels {
  * once available
  */
 interface ServiceFactory {
-  getService: () => any
+  getService: (name: string) => any
 }
 
 type FilterFn = (payload: Payload) => Payload | boolean | void
