@@ -23,28 +23,23 @@
  *
  */
 
-const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
-const {
-  getWebpackConfig,
-  PACKAGE_TYPES,
-  BUNDLE_TYPES
-} = require('../../dev-utils/build')
+// This file is required by karma.conf.js and loads recursively all the .spec and framework files
 
-/**
- * Set up the angular teting configuration and
- * recursively loads all `.spec.ts` files
- */
-const specFiles = require.resolve('./test/specs/test.ts')
+import '../polyfills'
+import { getTestBed } from '@angular/core/testing'
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing'
 
-module.exports = function(config) {
-  config.set(baseConfig)
-  const preparedConfig = {
-    ...prepareConfig(config, 'rum-angular'),
-    files: [specFiles],
-    preprocessors: {
-      [specFiles]: ['webpack', 'sourcemap']
-    },
-    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.ANGULAR)
-  }
-  config.set(preparedConfig)
-}
+declare const require: any
+
+// First, initialize the Angular testing environment.
+getTestBed().initTestEnvironment(
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting()
+)
+// Then we find all the tests.
+const context = require.context('./', true, /\.spec\.ts$/)
+// And load the modules.
+context.keys().map(context)

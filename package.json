@@ -104,6 +104,7 @@
     "karma-failed-reporter": "^0.0.3",
     "karma-firefox-launcher": "^1.2.0",
     "karma-jasmine": "^2.0.1",
+    "karma-jasmine-html-reporter": "^1.5.1",
     "karma-junit-reporter": "^2.0.1",
     "karma-sauce-launcher": "^2.0.2",
     "karma-sourcemap-loader": "^0.3.7",

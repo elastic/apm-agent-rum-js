@@ -49,13 +49,15 @@ const baseConfig = {
   },
   plugins: [
     'karma-sauce-launcher',
-    'karma-failed-reporter',
     'karma-jasmine',
+    'karma-failed-reporter',
+    'karma-jasmine-html-reporter',
     'karma-spec-reporter',
     'karma-webpack',
     'karma-sourcemap-loader'
   ],
   client: {
+    clearContext: false, // make Jasmine Spec Runner output visible in browsers
     jasmine: {
       random: false,
       failFast: true,
@@ -71,7 +73,7 @@ const baseConfig = {
   customLaunchers: baseLaunchers,
   browsers: [],
   captureTimeout: 120000, // on saucelabs it takes some time to capture browser
-  reporters: ['spec', 'failed'],
+  reporters: ['spec', 'failed', 'kjhtml'],
   sauceLabs: {
     testName: 'ApmJs',
     startConnect: false,
