@@ -31,11 +31,10 @@ import { createServiceFactory } from '@elastic/apm-rum-core'
 
 describe('ApmErrorHandler', () => {
   let errorHandler: ApmErrorHandler
-  const serviceFactory = createServiceFactory()
   let apm
 
   function setUpApm() {
-    apm = new ApmBase(serviceFactory, false)
+    apm = new ApmBase(createServiceFactory(), false)
     ApmErrorHandler.apm = apm
   }
 
@@ -58,14 +57,17 @@ describe('ApmErrorHandler', () => {
 
   it('should capture errors on app', () => {
     expect(errorHandler).toBeInstanceOf(ApmErrorHandler)
-    const loggingService = serviceFactory.getService('LoggingService')
     spyOn(apm, 'captureError')
-    spyOn(loggingService, 'error')
-
+    /**
+     * We extend the angular default error handler which logs
+     * the error to console, so we fake that in this test
+     * to avoids logs in stdout
+     */
+    spyOn(ErrorHandler.prototype, 'handleError').and.callFake(() => undefined)
     const testError = new Error('Test')
     errorHandler.handleError(testError)
 
     expect(apm.captureError).toHaveBeenCalledWith(testError)
-    expect(loggingService.error).toHaveBeenCalledWith(testError.stack)
+    expect(ErrorHandler.prototype.handleError).toHaveBeenCalled()
   })
 })

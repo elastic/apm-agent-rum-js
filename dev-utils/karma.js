@@ -51,7 +51,6 @@ const baseConfig = {
     'karma-sauce-launcher',
     'karma-jasmine',
     'karma-failed-reporter',
-    'karma-jasmine-html-reporter',
     'karma-spec-reporter',
     'karma-webpack',
     'karma-sourcemap-loader'
@@ -73,7 +72,7 @@ const baseConfig = {
   customLaunchers: baseLaunchers,
   browsers: [],
   captureTimeout: 120000, // on saucelabs it takes some time to capture browser
-  reporters: ['spec', 'failed', 'kjhtml'],
+  reporters: ['spec', 'failed'],
   sauceLabs: {
     testName: 'ApmJs',
     startConnect: false,

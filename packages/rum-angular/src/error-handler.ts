@@ -25,19 +25,11 @@
 
 import { ErrorHandler } from '@angular/core'
 
-export class ApmErrorHandler implements ErrorHandler {
+export class ApmErrorHandler extends ErrorHandler {
   static apm: any
 
   handleError(error) {
-    const loggingService = ApmErrorHandler.apm.serviceFactory.getService(
-      'LoggingService'
-    )
-    /**
-     * since browser console shows the place from where console.error was called,
-     * we use the original error stack instead of logging service internal stack
-     */
-    const originalStack = error ? error.stack : error
-    loggingService.error(originalStack)
-    ApmErrorHandler.apm.captureError(error)
+    ApmErrorHandler.apm.captureError(error.originalError || error)
+    super.handleError(error)
   }
 }
