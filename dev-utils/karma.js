@@ -57,7 +57,7 @@ const baseConfig = {
     'karma-sourcemap-loader'
   ],
   client: {
-    clearContext: false, // make Jasmine Spec Runner output visible in browsers
+    // clearContext: false, // make Jasmine Spec Runner output visible in browsers
     jasmine: {
       random: false,
       failFast: true,
