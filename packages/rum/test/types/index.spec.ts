@@ -37,7 +37,14 @@ const apmBase = init(config)
 
 apmBase.addLabels({})
 
-const apm = new ApmBase()
+// dummy service factory
+const serviceFactory = {
+  getService(name: string) {
+    return name
+  }
+}
+
+const apm = new ApmBase(serviceFactory, false)
 
 apm.init(config)
 
