@@ -28,6 +28,7 @@ declare module '@elastic/apm-rum' {
   const init: Init
 
   class ApmBase {
+    constructor(serviceFactory: ServiceFactory, disable: boolean)
     init: Init
     /**
      * undocumented, might be removed in future versions
@@ -152,6 +153,14 @@ interface UserObject {
 
 interface Labels {
   [key: string]: LabelValue
+}
+
+/**
+ * TODO: Will be imported from @elastic/apm-rum-core typings
+ * once available
+ */
+interface ServiceFactory {
+  getService: (name: string) => any
 }
 
 type FilterFn = (payload: Payload) => Payload | boolean | void
