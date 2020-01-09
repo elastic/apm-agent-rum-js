@@ -37,9 +37,16 @@ async function launchBrowser() {
 
 function gatherRawMetrics(browser, url) {
   return new Promise(async resolve => {
-    const page = await browser.newPage()
+    /**
+     * Create a separate browsing context for each run
+     */
+    const context = await browser.createIncognitoBrowserContext()
+    const page = await context.newPage()
     const client = await page.target().createCDPSession()
-
+    /**
+     * Disable cache for each run
+     */
+    await page.setCacheEnabled(false)
     /**
      * Enable events from Chrome devtools protocol
      */
