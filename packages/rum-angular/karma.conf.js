@@ -30,21 +30,11 @@ const {
   BUNDLE_TYPES
 } = require('../../dev-utils/build')
 
-/**
- * Set up the angular teting configuration and
- * recursively loads all `.spec.ts` files
- */
-const specFiles = require.resolve('./test/specs/test.ts')
-
 module.exports = function(config) {
   config.set(baseConfig)
-  const preparedConfig = {
-    ...prepareConfig(config, 'rum-angular'),
-    files: [specFiles],
-    preprocessors: {
-      [specFiles]: ['webpack', 'sourcemap']
-    },
+  config.set({
     webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.ANGULAR)
-  }
+  })
+  const preparedConfig = prepareConfig(config, 'rum-angular')
   config.set(preparedConfig)
 }

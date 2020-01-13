@@ -22,9 +22,13 @@
  * THE SOFTWARE.
  *
  */
-
+import '../polyfills'
 import { ApmService } from '../../src/apm-service'
 import { TestBed, ComponentFixture } from '@angular/core/testing'
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing'
 import { NgModule, Component } from '@angular/core'
 import { Routes, Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
@@ -97,6 +101,11 @@ describe('ApmService', () => {
   }
 
   function setUpAppModule() {
+    TestBed.resetTestEnvironment()
+    TestBed.initTestEnvironment(
+      BrowserDynamicTestingModule,
+      platformBrowserDynamicTesting()
+    )
     TestBed.configureTestingModule({
       imports: [RouterTestingModule.withRoutes(routes)],
       declarations: [HomeComponent, AppComponent, SlugComponent],

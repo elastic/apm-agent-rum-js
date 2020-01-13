@@ -22,9 +22,14 @@
  * THE SOFTWARE.
  *
  */
+
 import '../polyfills'
 import { ApmErrorHandler } from '../../src/error-handler'
 import { TestBed } from '@angular/core/testing'
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing'
 import { ErrorHandler } from '@angular/core'
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
@@ -39,6 +44,11 @@ describe('ApmErrorHandler', () => {
   }
 
   function setUpAppModule() {
+    TestBed.resetTestEnvironment()
+    TestBed.initTestEnvironment(
+      BrowserDynamicTestingModule,
+      platformBrowserDynamicTesting()
+    )
     TestBed.configureTestingModule({
       providers: [
         {
