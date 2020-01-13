@@ -28,6 +28,9 @@ declare module '@elastic/apm-rum' {
   const init: Init
 
   class ApmBase {
+    /**
+     * undocumented, might be removed in future versions
+     */
     serviceFactory: ServiceFactory
     constructor(serviceFactory: ServiceFactory, disable: boolean)
     init: Init
