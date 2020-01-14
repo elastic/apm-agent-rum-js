@@ -116,7 +116,7 @@ describe('ApmBase', function() {
     tr.end()
   })
 
-  it('should be noop when agent is not active', done => {
+  it('should be noop for auto instrumentaion when agent is not active', done => {
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(loggingService, 'info')
 
@@ -140,6 +140,22 @@ describe('ApmBase', function() {
     })
 
     req.send()
+  })
+
+  it('should be noop when API methods are used and agent is not active', () => {
+    const loggingService = serviceFactory.getService('LoggingService')
+    spyOn(loggingService, 'info')
+
+    apmBase.init({
+      active: false
+    })
+    expect(loggingService.info).toHaveBeenCalledWith('RUM agent is inactive')
+    const tr = apmBase.startTransaction('test')
+    const span = apmBase.startSpan('span1')
+
+    expect(tr).toBeUndefined()
+    expect(span).toBeUndefined()
+    expect(apmBase.getCurrentTransaction()).toBeUndefined()
   })
 
   it('should provide the public api', function() {
