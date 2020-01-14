@@ -28,6 +28,10 @@ declare module '@elastic/apm-rum' {
   const init: Init
 
   class ApmBase {
+    /**
+     * undocumented, might be removed in future versions
+     */
+    serviceFactory: ServiceFactory
     constructor(serviceFactory: ServiceFactory, disable: boolean)
     init: Init
     /**
@@ -53,8 +57,9 @@ declare module '@elastic/apm-rum' {
     captureError(error: Error | string): void
     addFilter(fn: FilterFn): void
   }
-  export { init, ApmBase as apm, ApmBase as apmBase, ApmBase }
+  const apmBase: ApmBase
   export default init
+  export { init, apmBase, ApmBase, apmBase as apm }
 }
 
 declare class BaseSpan {
@@ -160,6 +165,7 @@ interface Labels {
  * once available
  */
 interface ServiceFactory {
+  registerServiceInstance(name: string, instance: any): void
   getService: (name: string) => any
 }
 
