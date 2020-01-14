@@ -23,6 +23,7 @@
  *
  */
 
+import { compress } from 'compress-payload'
 import Queue from './queue'
 import throttle from './throttle'
 import NDJSON from './ndjson'
@@ -77,12 +78,15 @@ class ApmServer {
   }
 
   _postJson(endPoint, payload) {
-    return this._makeHttpRequest('POST', endPoint, {
-      payload,
-      headers: {
-        'Content-Type': 'application/x-ndjson'
-      }
-    }).then(({ responseText }) => responseText)
+    return compress(payload).then(blob =>
+      this._makeHttpRequest('POST', endPoint, {
+        payload: blob,
+        headers: {
+          'Content-Type': 'application/x-ndjson',
+          'Content-Encoding': 'gzip'
+        }
+      }).then(({ responseText }) => responseText)
+    )
   }
 
   _constructError(reason) {
