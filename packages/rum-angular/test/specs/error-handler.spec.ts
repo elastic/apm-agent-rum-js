@@ -23,7 +23,6 @@
  *
  */
 
-import '../polyfills'
 import { ApmErrorHandler } from '../../src/error-handler'
 import { TestBed } from '@angular/core/testing'
 import {

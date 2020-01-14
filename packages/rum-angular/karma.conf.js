@@ -30,11 +30,17 @@ const {
   BUNDLE_TYPES
 } = require('../../dev-utils/build')
 
+const polyfills = require.resolve('./test/polyfills.ts')
+
 module.exports = function(config) {
   config.set(baseConfig)
+  const preparedConfig = prepareConfig(config, 'rum-angular')
+  preparedConfig.files.unshift(polyfills)
   config.set({
+    preprocessors: {
+      [polyfills]: ['webpack', 'sourcemap']
+    },
     webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.ANGULAR)
   })
-  const preparedConfig = prepareConfig(config, 'rum-angular')
   config.set(preparedConfig)
 }

@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  *
  */
-import '../polyfills'
+
 import { ApmService } from '../../src/apm-service'
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import {
