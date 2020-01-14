@@ -79,6 +79,7 @@ class ApmBase {
           sendPageLoad()
         }
       } else {
+        this._disable = true
         loggingService.info('RUM agent is inactive')
       }
     }
