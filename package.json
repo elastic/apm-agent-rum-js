@@ -124,7 +124,6 @@
     "regenerator-runtime": "^0.13.3",
     "rimraf": "^3.0.0",
     "serve-index": "^1.9.1",
-    "source-map": "^0.7.0",
     "stats-lite": "^2.2.0",
     "terser-webpack-plugin": "^2.3.0",
     "typescript": "^3.7.3",
