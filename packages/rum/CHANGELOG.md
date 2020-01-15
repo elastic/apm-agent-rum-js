@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.7.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.6.0...@elastic/apm-rum@4.7.0) (2020-01-15)
+
+
+### Bug Fixes
+
+* **rum:** add constructor types for ApmBase class ([#562](https://github.com/elastic/apm-agent-rum-js/issues/562)) ([273f63f](https://github.com/elastic/apm-agent-rum-js/commit/273f63fe3763c5566c45ce02755279ccc7faabb3))
+* **rum:** noop for API when agent is inactive ([#569](https://github.com/elastic/apm-agent-rum-js/issues/569)) ([77d4f6d](https://github.com/elastic/apm-agent-rum-js/commit/77d4f6da20bf113bf803652fd01c8d785eea3722))
+
+
+### Features
+
+* **rum:** add typescript typings ([#537](https://github.com/elastic/apm-agent-rum-js/issues/537)) ([dc4f391](https://github.com/elastic/apm-agent-rum-js/commit/dc4f391fe228a01b7b8e640a73127257a52d5d52))
+* capture http-request transactions ([#517](https://github.com/elastic/apm-agent-rum-js/issues/517)) ([27ed994](https://github.com/elastic/apm-agent-rum-js/commit/27ed994ea9866e4493015eb3817ab12266f572a5))
+
+
+
+
+
 # [4.6.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.5.1...@elastic/apm-rum@4.6.0) (2019-11-19)
 
 
