@@ -10,14 +10,14 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 
 ////
 [[release-notes-x.x.x]]
-==== x.x.x (YYYY/MM/DD)
+==== x.x.x (YYYY-MM-DD)
 
 [float]
 ===== Breaking changes
 
 [float]
 ===== Features
-* Cool new feature: {pull}2526[#2526] {commit}d4f181f[#d4f181f]
+* Cool new feature: {issue}X[#X]
 
 [float]
 ===== Performance Improvements
@@ -28,6 +28,31 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 
 [[release-notes-4.x]]
 === RUM JS Agent version 4.x
+
+[[release-notes-4.7.0]]
+==== 4.7.0 (2020-01-15)
+
+[float]
+===== Features
+* Add TypeScript typings {issue}70[#70]
+* Capture standalone HTTP requests as a transaction {issue}60[#60]
+* Enrich span context with destination metadata {issue}513[#513] {issue}490[#490]
+* The agent now sends transactions with no spans {issue}461[#461]
+* Angular: Provide ErrorHandler for angular {issue}545[#545]
+
+
+
+[float]
+===== Performance Improvements
+* Reduce bundlesize by converting undocumented configs to constants {issue}502[#502]
+
+
+[float]
+===== Bug fixes
+* The agent now avoids sending any payload when it's inactive {issue}566[#566]
+* Fix the priority of redefining transaction types {issue}411[#411]
+
+
 
 [[release-notes-4.6.0]]
 ==== 4.6.0 (2019-11-19)
