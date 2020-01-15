@@ -26,9 +26,9 @@
 import {
   checkSameOrigin,
   isDtHeaderValid,
-  merge,
   parseDtHeaderValue,
-  stripQueryStringFromUrl
+  stripQueryStringFromUrl,
+  getDtHeaderValue
 } from '../common/utils'
 import Url from '../common/url'
 import { patchEventHandler } from '../common/patching'
@@ -40,7 +40,11 @@ import {
   AFTER_EVENT,
   FETCH,
   HISTORY,
-  XMLHTTPREQUEST
+  XMLHTTPREQUEST,
+  HTTP_REQUEST_TYPE,
+  BROWSER_RESPONSIVENESS_INTERVAL,
+  BROWSER_RESPONSIVENESS_BUFFER,
+  SIMILAR_SPAN_TO_TRANSACTION_RATIO
 } from '../common/constants'
 import {
   truncateModel,
@@ -62,6 +66,7 @@ class PerformanceMonitoring {
      * We need to run this event listener after all of user-registered listener,
      * since this event listener adds the transaction to the queue to be send to APM Server.
      */
+
     this._configService.events.observe(TRANSACTION_END + AFTER_EVENT, tr => {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
@@ -115,13 +120,21 @@ class PerformanceMonitoring {
     const transactionService = this._transactionService
 
     if (event === SCHEDULE && task.data) {
-      const requestUrl = new Url(task.data.url)
+      const data = task.data
+      const requestUrl = new Url(data.url)
       const spanName =
-        task.data.method +
+        data.method +
         ' ' +
         (requestUrl.relative
           ? requestUrl.path
           : stripQueryStringFromUrl(requestUrl.href))
+
+      if (!transactionService.getCurrentTransaction()) {
+        transactionService.startTransaction(spanName, HTTP_REQUEST_TYPE, {
+          managed: true
+        })
+      }
+
       const span = transactionService.startSpan(spanName, 'external.http')
       const taskId = transactionService.addTask()
 
@@ -134,46 +147,27 @@ class PerformanceMonitoring {
       const isSameOrigin =
         checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
         checkSameOrigin(requestUrl.origin, dtOrigins)
-      const target = task.data.target
+      const target = data.target
       if (isDtEnabled && isSameOrigin && target) {
         this.injectDtHeader(span, target)
       }
-      span.addContext({
-        http: {
-          method: task.data.method,
-          url: requestUrl.href
-        }
-      })
-      span.sync = task.data.sync
-      task.data.span = span
+      span.sync = data.sync
+      data.span = span
       task.id = taskId
-    }
-    if (event === INVOKE && task.data && task.data.span) {
-      if (typeof task.data.target.status !== 'undefined') {
-        task.data.span.addContext({
-          http: { status_code: task.data.target.status }
-        })
-      } else if (task.data.response) {
-        task.data.span.addContext({
-          http: { status_code: task.data.response.status }
-        })
+    } else if (event === INVOKE) {
+      if (task.data && task.data.span) {
+        task.data.span.end(null, task.data)
       }
-      task.data.span.end()
-    }
-
-    if (event === INVOKE && task.id) {
-      transactionService.removeTask(task.id)
+      if (task.id) {
+        transactionService.removeTask(task.id)
+      }
     }
   }
 
   injectDtHeader(span, target) {
     var configService = this._configService
     var headerName = configService.get('distributedTracingHeaderName')
-    var headerValueCallback = configService.get(
-      'distributedTracingHeaderValueCallback'
-    )
-
-    var headerValue = headerValueCallback(span)
+    var headerValue = getDtHeaderValue(span)
     var isHeaderValid = isDtHeaderValid(headerValue)
     if (headerName && headerValue && isHeaderValid) {
       if (typeof target.setRequestHeader === 'function') {
@@ -194,13 +188,6 @@ class PerformanceMonitoring {
     var headerName = configService.get('distributedTracingHeaderName')
     if (target) {
       return parseDtHeaderValue(target[headerName])
-    }
-  }
-
-  setTransactionContext(transaction) {
-    var context = this._configService.get('context')
-    if (context) {
-      transaction.addContext(context)
     }
   }
 
@@ -226,20 +213,7 @@ class PerformanceMonitoring {
     if (duration > transactionDurationThreshold) {
       if (__DEV__) {
         this._logginService.debug(
-          `transaction(${tr.id}, ${
-            tr.name
-          }) was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
-        )
-      }
-      return false
-    }
-
-    if (tr.spans.length === 0) {
-      if (__DEV__) {
-        this._logginService.debug(
-          `transaction(${tr.id}, ${
-            tr.name
-          }) was discarded! Transaction does not include any spans`
+          `transaction(${tr.id}, ${tr.name}) was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
         )
       }
       return false
@@ -253,34 +227,21 @@ class PerformanceMonitoring {
       tr.resetSpans()
     }
 
-    const browserResponsivenessInterval = this._configService.get(
-      'browserResponsivenessInterval'
-    )
-    const checkBrowserResponsiveness = this._configService.get(
-      'checkBrowserResponsiveness'
-    )
-
-    if (checkBrowserResponsiveness && tr.options.checkBrowserResponsiveness) {
-      const buffer = this._configService.get('browserResponsivenessBuffer')
-
+    if (tr.options.checkBrowserResponsiveness) {
       const wasBrowserResponsive = this.checkBrowserResponsiveness(
         tr,
-        browserResponsivenessInterval,
-        buffer
+        BROWSER_RESPONSIVENESS_INTERVAL,
+        BROWSER_RESPONSIVENESS_BUFFER
       )
 
       if (!wasBrowserResponsive) {
         if (__DEV__) {
           this._logginService.debug(
-            `transaction(${tr.id}, ${
-              tr.name
-            }) was discarded! Browser was not responsive enough during the transaction.`,
+            `transaction(${tr.id}, ${tr.name}) was discarded! Browser was not responsive enough during the transaction.`,
             ' duration:',
             duration,
             ' browserResponsivenessCounter:',
-            tr.browserResponsivenessCounter,
-            'interval:',
-            browserResponsivenessInterval
+            tr.browserResponsivenessCounter
           )
         }
         return false
@@ -295,10 +256,9 @@ class PerformanceMonitoring {
     })
 
     if (this._configService.get('groupSimilarSpans')) {
-      var similarSpanThreshold = this._configService.get('similarSpanThreshold')
       transaction.spans = this.groupSmallContinuouslySimilarSpans(
         transaction,
-        similarSpanThreshold
+        SIMILAR_SPAN_TO_TRANSACTION_RATIO
       )
     }
 
@@ -309,12 +269,9 @@ class PerformanceMonitoring {
         span._end <= transaction._end
       )
     })
-
-    this.setTransactionContext(transaction)
   }
 
   createTransactionDataModel(transaction) {
-    const configContext = this._configService.get('context')
     const transactionStart = transaction._start
 
     const spans = transaction.spans.map(function(span) {
@@ -335,8 +292,6 @@ class PerformanceMonitoring {
       return truncateModel(SPAN_MODEL, spanData)
     })
 
-    const context = merge({}, configContext, transaction.context)
-
     const transactionData = {
       id: transaction.id,
       trace_id: transaction.traceId,
@@ -344,7 +299,7 @@ class PerformanceMonitoring {
       type: transaction.type,
       duration: transaction.duration(),
       spans,
-      context,
+      context: transaction.context,
       marks: transaction.marks,
       breakdown: transaction.breakdownTimings,
       span_count: {
@@ -406,16 +361,11 @@ class PerformanceMonitoring {
   }
 
   checkBrowserResponsiveness(transaction, interval, buffer) {
-    var counter = transaction.browserResponsivenessCounter
-    if (typeof interval === 'undefined' || typeof counter === 'undefined') {
-      return true
-    }
+    const counter = transaction.browserResponsivenessCounter
+    const duration = transaction.duration()
+    const expectedCount = Math.floor(duration / interval)
 
-    var duration = transaction.duration()
-    var expectedCount = Math.floor(duration / interval)
-    var wasBrowserResponsive = counter + buffer >= expectedCount
-
-    return wasBrowserResponsive
+    return counter + buffer >= expectedCount
   }
 }
 

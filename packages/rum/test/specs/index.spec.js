@@ -108,6 +108,7 @@ describe('index', function() {
             },
             reason => {
               fail('Failed sending error:', reason)
+              done()
             }
           )
         }, 200)

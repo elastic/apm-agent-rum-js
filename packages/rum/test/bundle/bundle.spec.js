@@ -25,7 +25,7 @@
 
 const { join } = require('path')
 const webpack = require('webpack')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 const rimraf = require('rimraf')
 
 const PROJECT_ROOT = join(__dirname, '../../../../')
@@ -55,7 +55,10 @@ function getConfig(entry) {
       libraryTarget: 'umd'
     },
     mode: 'none',
-    plugins: [new UglifyJSPlugin({})]
+    optimization: {
+      minimize: true,
+      minimizer: [new TerserPlugin()]
+    }
   }
 }
 

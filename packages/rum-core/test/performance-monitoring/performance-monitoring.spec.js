@@ -29,6 +29,7 @@ import Span from '../../src/performance-monitoring/span'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { getDtHeaderValue } from '../../src/common/utils'
 import { globalState } from '../../src/common/patching/patch-utils'
+import { patchEventHandler as originalPatchHandler } from '../../src/common/patching'
 import {
   SCHEDULE,
   FETCH,
@@ -40,7 +41,7 @@ import {
 } from '../../src/common/constants'
 import patchEventHandler from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
-import { patchEventHandler as originalPathHandler } from '../../src/common/patching'
+import resourceEntries from '../fixtures/resource-entries'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
@@ -172,12 +173,11 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should calculate browser responsiveness', function() {
-    var tr = new Transaction('transaction', 'transaction', {})
-    tr.end()
+    const tr = new Transaction('transaction', 'transaction', {
+      startTime: 1
+    })
+    tr.end(400)
 
-    tr._start = 1
-
-    tr._end = 400
     tr.browserResponsivenessCounter = 0
     var resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
     expect(resp).toBe(true)
@@ -214,15 +214,6 @@ describe('PerformanceMonitoring', function() {
     )
     logger.debug.calls.reset()
 
-    const transaction2 = new Transaction('test2', 'custom', { id: 2 })
-    transaction2.end()
-    transaction2._end = transaction2._end + 100
-    expect(performanceMonitoring.filterTransaction(transaction2)).toBe(false)
-    expect(logger.debug).toHaveBeenCalledWith(
-      'transaction(2, test2) was discarded! Transaction does not include any spans'
-    )
-    logger.debug.calls.reset()
-
     const transaction3 = new Transaction(null, null, { id: 3 })
     expect(performanceMonitoring.filterTransaction(transaction3)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
@@ -241,9 +232,7 @@ describe('PerformanceMonitoring', function() {
 
   it('should filter transactions based on browser responsiveness', function() {
     configService.setConfig({
-      browserResponsivenessInterval: 500,
-      checkBrowserResponsiveness: true,
-      browserResponsivenessBuffer: 2
+      checkBrowserResponsiveness: true
     })
     spyOn(logger, 'debug').and.callThrough()
     expect(logger.debug).not.toHaveBeenCalled()
@@ -251,25 +240,22 @@ describe('PerformanceMonitoring', function() {
       id: 212,
       transactionSampleRate: 1,
       managed: true,
-      checkBrowserResponsiveness: true
+      checkBrowserResponsiveness: true,
+      startTime: 1
     })
     var span = tr.startSpan('test span', 'test span type')
     span.end()
-    tr.end()
-    tr._start = 1
+    tr.end(3501)
 
-    tr._end = 3001
     tr.browserResponsivenessCounter = 3
     var wasBrowserResponsive = performanceMonitoring.filterTransaction(tr)
     expect(wasBrowserResponsive).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
       'transaction(212, transaction) was discarded! Browser was not responsive enough during the transaction.',
       ' duration:',
-      3000,
+      3500,
       ' browserResponsivenessCounter:',
-      3,
-      'interval:',
-      500
+      3
     )
   })
 
@@ -377,8 +363,6 @@ describe('PerformanceMonitoring', function() {
       tr._end += 100
     }
     expect(tr.duration()).toBeGreaterThan(0)
-    expect(tr.spans.length).toBe(0)
-    expect(performanceMonitoring.filterTransaction(tr)).toBe(false)
 
     const tr2 = new Transaction('unsampled', 'test', {
       transactionSampleRate: 0
@@ -503,6 +487,15 @@ describe('PerformanceMonitoring', function() {
               method: 'GET',
               url: 'http://localhost:9876/?a=b&c=d',
               status_code: 200
+            },
+            destination: {
+              service: {
+                name: 'http://localhost:9876',
+                resource: 'localhost:9876',
+                type: 'external'
+              },
+              address: 'localhost',
+              port: 9876
             }
           })
           expect(dTHeaderValue).toBeDefined()
@@ -540,11 +533,17 @@ describe('PerformanceMonitoring', function() {
       const fetchFn = performanceMonitoring.getFetchSub()
 
       const events = []
-      patchEventHandler.observe(XMLHTTPREQUEST, function(event, task) {
+      const cancelXHRSub = patchEventHandler.observe(XMLHTTPREQUEST, function(
+        event,
+        task
+      ) {
         events.push({ event, source: task.source })
         xhrFn(event, task)
       })
-      patchEventHandler.observe(FETCH, function(event, task) {
+      const cancelFetchSub = patchEventHandler.observe(FETCH, function(
+        event,
+        task
+      ) {
         events.push({ event, source: task.source })
         fetchFn(event, task)
       })
@@ -605,6 +604,8 @@ describe('PerformanceMonitoring', function() {
               source: XMLHTTPREQUEST
             }
           ])
+          cancelXHRSub()
+          cancelFetchSub()
           done()
         })
       })
@@ -661,21 +662,138 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should subscribe to events based on instrumentation flags', () => {
-    spyOn(originalPathHandler, 'observe')
+    spyOn(originalPatchHandler, 'observe')
     performanceMonitoring.init({
       [HISTORY]: false,
       [XMLHTTPREQUEST]: true,
       [FETCH]: true
     })
 
-    expect(originalPathHandler.observe.calls.argsFor(0)).toEqual([
+    expect(originalPatchHandler.observe.calls.argsFor(0)).toEqual([
       XMLHTTPREQUEST,
       jasmine.any(Function)
     ])
 
-    expect(originalPathHandler.observe.calls.argsFor(1)).toEqual([
+    expect(originalPatchHandler.observe.calls.argsFor(1)).toEqual([
       FETCH,
       jasmine.any(Function)
     ])
+  })
+
+  function createXHRTask(method, url) {
+    let req = new window.XMLHttpRequest()
+    req.open(method, url)
+
+    let task = {
+      source: XMLHTTPREQUEST,
+      data: {
+        target: req,
+        method,
+        url
+      }
+    }
+    return task
+  }
+
+  it('should create http-request transaction if no current transaction exist', done => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    spyOn(transactionService, 'startTransaction').and.callThrough()
+
+    let task = createXHRTask('GET', '/')
+
+    performanceMonitoring.processAPICalls('schedule', task)
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      'GET /',
+      'http-request',
+      jasmine.objectContaining({ managed: true })
+    )
+
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr).toBeDefined()
+
+    setTimeout(() => {
+      performanceMonitoring.processAPICalls('invoke', task)
+      expect(tr.ended).toBe(true)
+      const payload = performanceMonitoring.convertTransactionsToServerModel([
+        tr
+      ])
+
+      apmServer.sendTransactions(payload).then(done, reason => {
+        done.fail(
+          `Failed sending http-request transaction to the server, reason: ${reason}`
+        )
+      })
+    }, 100)
+  })
+
+  it('should include multiple XHRs in the same transaction', () => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    spyOn(transactionService, 'startTransaction').and.callThrough()
+
+    let task1 = createXHRTask('GET', '/first')
+    performanceMonitoring.processAPICalls('schedule', task1)
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr).toBeDefined()
+    expect(tr.name).toBe('GET /first')
+
+    let task2 = createXHRTask('GET', '/second')
+    performanceMonitoring.processAPICalls('schedule', task2)
+    performanceMonitoring.processAPICalls('invoke', task1)
+    expect(tr.ended).toBeFalsy()
+    performanceMonitoring.processAPICalls('invoke', task2)
+    expect(tr.ended).toBe(true)
+    expect(tr.spans.length).toBe(2)
+    expect(tr.spans.map(s => s.name)).toEqual(['GET /first', 'GET /second'])
+
+    let task3 = createXHRTask('GET', '/third')
+    performanceMonitoring.processAPICalls('schedule', task3)
+    tr = transactionService.getCurrentTransaction()
+    expect(tr.name).toBe('GET /third')
+    performanceMonitoring.processAPICalls('invoke', task3)
+    expect(tr.ended).toBe(true)
+  })
+
+  it('should send span context destination details to apm-server', done => {
+    const transactionService = serviceFactory.getService('TransactionService')
+
+    const tr = transactionService.startTransaction('with-context', 'custom')
+    const data = {
+      url: 'http://localhost:3000/b/c',
+      method: 'GET',
+      target: {
+        status: 200
+      }
+    }
+    const xhrSpan = tr.startSpan(`GET ${data.url}`, 'external')
+    xhrSpan.end(null, data)
+
+    const resourceUrl = 'http://example.com'
+    const rtData = {
+      url: resourceUrl,
+      entry: resourceEntries.filter(({ name }) => name === resourceUrl)[0]
+    }
+    const rtSpan = tr.startSpan(rtData.url, 'resource')
+    rtSpan.end(null, rtData)
+
+    configService.events.observe(TRANSACTION_END, () => {
+      expect(tr.spans.length).toBe(2)
+      const [span1, span2] = tr.spans
+      expect(span1.context.destination).toBeDefined()
+      expect(span2.context.destination).toBeDefined()
+
+      const payload = performanceMonitoring.convertTransactionsToServerModel([
+        tr
+      ])
+      expect(payload[0].spans[0].context.destination).toBeDefined()
+      expect(payload[0].spans[1].context.destination).toBeDefined()
+
+      apmServer.sendTransactions(payload).then(done, reason => {
+        done.fail(
+          `Failed sending span destination context details, reason: ${reason}`
+        )
+      })
+    })
+
+    tr.end()
   })
 })

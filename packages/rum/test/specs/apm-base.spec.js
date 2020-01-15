@@ -25,6 +25,7 @@
 
 import ApmBase from '../../src/apm-base'
 import { createServiceFactory, PAGE_LOAD } from '@elastic/apm-rum-core'
+import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
 import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { Promise } from 'es6-promise'
@@ -34,41 +35,33 @@ var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
 
 describe('ApmBase', function() {
-  var serviceFactory
+  let serviceFactory
+  let apmBase
   beforeEach(function() {
     serviceFactory = createServiceFactory()
+    apmBase = new ApmBase(serviceFactory, !enabled)
   })
 
-  it('should send page load metrics before or after load event', function(done) {
-    var apmBase = new ApmBase(serviceFactory, !enabled)
-    var trService = serviceFactory.getService('TransactionService')
+  it('should send page load metrics after load event', done => {
     apmBase.config({ serviceName, serverUrl })
     apmBase._sendPageLoadMetrics()
-    var tr = trService.getCurrentTransaction()
+    var tr = apmBase.getCurrentTransaction()
     expect(tr.name).toBe('Unknown')
     expect(tr.type).toBe(PAGE_LOAD)
     spyOn(tr, 'detectFinish').and.callThrough()
-    window.addEventListener('load', function() {
-      setTimeout(() => {
-        expect(tr.detectFinish).toHaveBeenCalled()
-        apmBase.setInitialPageLoadName('new page load')
-        expect(document.readyState).toBe('complete')
 
-        apmBase._sendPageLoadMetrics()
-        tr = trService.getCurrentTransaction()
-        expect(tr.name).toBe('new page load')
-        expect(tr.type).toBe(PAGE_LOAD)
-        spyOn(tr, 'detectFinish')
-        setTimeout(() => {
-          expect(tr.detectFinish).toHaveBeenCalled()
-          done()
-        })
-      })
+    apmBase.setInitialPageLoadName('new page load')
+    apmBase.observe(TRANSACTION_END, endedTr => {
+      expect(endedTr).toEqual(tr)
+      expect(document.readyState).toBe('complete')
+      expect(tr.detectFinish).toHaveBeenCalled()
+      expect(tr.name).toBe('new page load')
+      expect(tr.type).toBe(PAGE_LOAD)
+      done()
     })
   })
 
   it('should disable all auto instrumentations when instrument is false', () => {
-    const apmBase = new ApmBase(serviceFactory, !enabled)
     const trService = serviceFactory.getService('TransactionService')
     const ErrorLogging = serviceFactory.getService('ErrorLogging')
     const loggingInstane = ErrorLogging['__proto__']
@@ -87,7 +80,6 @@ describe('ApmBase', function() {
   })
 
   it('should selectively enable/disable instrumentations based on config', () => {
-    const apmBase = new ApmBase(serviceFactory, !enabled)
     const trService = serviceFactory.getService('TransactionService')
     const ErrorLogging = serviceFactory.getService('ErrorLogging')
     const loggingInstane = ErrorLogging['__proto__']
@@ -104,7 +96,6 @@ describe('ApmBase', function() {
   })
 
   it('should allow custom instrumentations via API when instrument is false', () => {
-    const apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({
       serviceName,
       serverUrl,
@@ -125,8 +116,7 @@ describe('ApmBase', function() {
     tr.end()
   })
 
-  it('should be noop when agent is not active', done => {
-    const apmBase = new ApmBase(serviceFactory, !enabled)
+  it('should be noop for auto instrumentaion when agent is not active', done => {
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(loggingService, 'info')
 
@@ -152,11 +142,25 @@ describe('ApmBase', function() {
     req.send()
   })
 
+  it('should be noop when API methods are used and agent is not active', () => {
+    const loggingService = serviceFactory.getService('LoggingService')
+    spyOn(loggingService, 'info')
+
+    apmBase.init({
+      active: false
+    })
+    expect(loggingService.info).toHaveBeenCalledWith('RUM agent is inactive')
+    const tr = apmBase.startTransaction('test')
+    const span = apmBase.startSpan('span1')
+
+    expect(tr).toBeUndefined()
+    expect(span).toBeUndefined()
+    expect(apmBase.getCurrentTransaction()).toBeUndefined()
+  })
+
   it('should provide the public api', function() {
-    var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ serviceName, serverUrl })
     apmBase.setInitialPageLoadName('test')
-    var trService = serviceFactory.getService('TransactionService')
     var configService = serviceFactory.getService('ConfigService')
 
     expect(configService.get('pageLoadTransactionName')).toBe('test')
@@ -178,7 +182,6 @@ describe('ApmBase', function() {
     )
 
     expect(apmBase.getCurrentTransaction()).toBe(tr)
-    expect(apmBase.getTransactionService()).toBe(trService)
 
     var filter = function() {}
     apmBase.addFilter(filter)
@@ -190,7 +193,6 @@ describe('ApmBase', function() {
   })
 
   it('should instrument xhr', function(done) {
-    var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ serviceName, serverUrl })
     var tr = apmBase.startTransaction('test-transaction', 'test-type', {
       managed: true
@@ -210,7 +212,6 @@ describe('ApmBase', function() {
   })
 
   it('should instrument xhr when no transaction was started', function(done) {
-    var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({
       disableInstrumentations: [PAGE_LOAD],
       serviceName,
@@ -231,11 +232,10 @@ describe('ApmBase', function() {
     req.send()
     tr = apmBase.getCurrentTransaction()
     expect(tr).toBeDefined()
-    expect(tr.name).toBe('Unknown')
+    expect(tr.name).toBe('GET /')
   })
 
   it('should patch xhr when not active', function(done) {
-    var apmBase = new ApmBase(serviceFactory, !enabled)
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(loggingService, 'info')
 
@@ -260,7 +260,6 @@ describe('ApmBase', function() {
   })
 
   it('should log errors when config is invalid', () => {
-    const apmBase = new ApmBase(serviceFactory, !enabled)
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(loggingService, 'info')
     const logErrorSpy = spyOn(loggingService, 'error')
@@ -293,7 +292,6 @@ describe('ApmBase', function() {
   })
 
   it('should instrument sync xhr', function(done) {
-    var apmBase = new ApmBase(serviceFactory, !enabled)
     apmBase.init({ serviceName, serverUrl })
     var tr = apmBase.startTransaction('test-transaction', 'test-type', {
       managed: true
@@ -367,7 +365,6 @@ describe('ApmBase', function() {
   })
 
   it('should wait for remote config before sending the page load', done => {
-    const apmBase = new ApmBase(serviceFactory, !enabled)
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(apmBase, 'fetchCentralConfig').and.callThrough()
     spyOn(apmBase, '_sendPageLoadMetrics').and.callFake(() => {

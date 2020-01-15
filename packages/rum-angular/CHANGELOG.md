@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@0.3.0...@elastic/apm-rum-angular@0.4.0) (2020-01-15)
+
+
+### Features
+
+* **rum-angular:** expose centralized error handler for angular ([#559](https://github.com/elastic/apm-agent-rum-js/issues/559)) ([de10ba1](https://github.com/elastic/apm-agent-rum-js/commit/de10ba121901aa9b181713f8d761a5cb165d6fa6))
+
+
+
+
+
 # [0.3.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@0.2.1...@elastic/apm-rum-angular@0.3.0) (2019-11-19)
 
 **Note:** Version bump only for package @elastic/apm-rum-angular

@@ -1,19 +1,42 @@
 [[supported-technologies]]
 == Supported Technologies
 
-The Elastic APM RUM JavaScript agent gives you detailed performance metrics of your web page by automatically instrumenting the following:
+[float]
+[[page-load-metrics]]
+=== Page load metrics
 
-* Page load metrics
-* Load time of Static Assets
-* API requests (XMLHttpRequest and Fetch)
+The RUM agent tries to capture the overall user experience on how the page is loaded/rendered as part of the page load Transaction.
+It includes all of the dependent resources, like JavaScript, stylesheets, images, etc., which are included as part of the page. In addition
+to capturing the resource timing information as Spans, the transaction also includes navigation spans that are associated with the rest
+of the captured information to make the waterfall more appealing.
 
-The agent uses the https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API[Navigation Timing API] and https://developer.mozilla.org/en-US/docs/Web/API/Resource_Timing_API[Resource Timing API] available in the browsers to instrument the page load performance and static assets load times.
+`Domain lookup`::
+Duration of the DNS query for the current page: `domainLookupEnd` - `domainLookupStart`.
 
-The agent automatically captures all the outgoing http requests, by instrumenting both XHR and Fetch API requests from the web page to the backend servers.
+`Making a connection to the server`::
+Duration of the TCP connection to the server, including the TLS negotiation time for HTTPS pages: `connectEnd` - `connectStart`.
 
-The agent also adds support for <<distributed-tracing-guide, Distributed Tracing>> for all outgoing requests.
+`Requesting and receiving the document`::
+Overall response time of the server including the last byte: `responseEnd` - `requestStart`.
 
-For all transactions, the agent automatically captures <<breakdown-metrics-docs, breakdown metrics>>.
+`Parsing the document, executing sync. scripts`::
+HTML document parsing time, including synchronous Stylesheets and Script: `tagsdomInteractive` - `domLoading`.
+
+`Fire "DOMContentLoaded" event`::
+Triggered when the browser completes parsing the document. Helpful when there are multiple listeners, or logic
+is executed: `domContentLoadedEventEnd` - `domContentLoadedEventStart`.
+
+`Fire "load" event`::
+Trigged when the browser finishes loading its document and dependent resources: `loadEventEnd` - `loadEventStart`.
+
+
+To capture the overall user experience of the page including all of the above information plus additional resource requests that might be
+triggered during the execution of dependent resources, the `page-load` transaction duration might not always reflect the 
+https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event[Load] event of the browser and can extend beyond the event. 
+
+If you are interested in accurately measuring the duration of load event, the information can be extracted by using 
+`Fire load event` Span or from the Transaction marks available as `transaction.marks.agent.domComplete` in the Elasticsearch document.
+
 
 [float]
 [[platforms]]
@@ -30,15 +53,16 @@ image::images/compatibility.png[Elastic APM RUM Agent compatibility]
 [[frameworks]]
 === Frameworks
 
-The agent supports integrations with certain frameworks. See <<framework-integrations, Framework specific integrations>> for more information. 
+The agent supports <<framework-integrations,integrations with certain frameworks>>.
 
-If you are interested in instrumenting custom metrics like rendering time or mounting time of components on frameworks like React, Angular, vue etc., please use the <<custom-transactions, Custom Transactions API>>.
+To instrument custom metrics, like rendering time or mounting time of components on frameworks like React, Angular, Vue,
+etc., use the <<custom-transactions,custom transactions API>>.
 
 [float]
 [[spa]]
 === Single Page Applications
 
-In the context of Single Page Applications, all the history pushstate events will be captured as transactions. 
-
-However, most of these transactions can be enhanced by using framework specific integrations. For all unsupported frameworks/libraries, you can instrument the application 
-by creating <<custom-transactions, Custom Transactions>> and also add custom spans using <<apm-start-span, Span API>>.
+All history `pushState` events will be captured as transactions. 
+Most of these transactions can be enhanced by using framework specific integrations.
+For all unsupported frameworks/libraries, you can instrument the application 
+by creating <<custom-transactions,custom transactions>> and custom spans with the <<apm-start-span,span API>>.

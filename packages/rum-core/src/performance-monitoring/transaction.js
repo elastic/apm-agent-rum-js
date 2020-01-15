@@ -31,7 +31,6 @@ import {
   now,
   getTime,
   extend,
-  getPageMetadata,
   removeInvalidChars
 } from '../common/utils'
 import { REUSABILITY_THRESHOLD } from '../common/constants'
@@ -54,6 +53,7 @@ class Transaction extends SpanBase {
     this.breakdownTimings = []
 
     this.sampled = Math.random() <= this.options.transactionSampleRate
+    this.browserResponsivenessCounter = 0
   }
 
   addMarks(obj) {
@@ -130,10 +130,6 @@ class Transaction extends SpanBase {
       span.type = span.type + '.truncated'
       span.end(endTime)
     }
-
-    const metadata = getPageMetadata()
-    this.addContext(metadata)
-
     this.callOnEnd()
   }
 

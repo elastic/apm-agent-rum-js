@@ -26,30 +26,36 @@
 import { Promise } from 'es6-promise'
 import Transaction from './transaction'
 import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
-import { PAGE_LOAD, NAME_UNKNOWN } from '../common/constants'
 import { captureNavigation } from './capture-navigation'
+import {
+  PAGE_LOAD,
+  NAME_UNKNOWN,
+  TRANSACTION_START,
+  TRANSACTION_END,
+  BROWSER_RESPONSIVENESS_INTERVAL,
+  TEMPORARY_TYPE,
+  TRANSACTION_TYPE_ORDER
+} from '../common/constants'
+import { addTransactionContext } from '../common/context'
 import { __DEV__ } from '../env'
-import { TRANSACTION_START, TRANSACTION_END } from '../common/constants'
 
 class TransactionService {
   constructor(logger, config) {
     this._config = config
     this._logger = logger
     this.currentTransaction = undefined
+    this.respIntervalId = undefined
   }
 
-  ensureCurrentTransaction(options) {
-    if (!options) {
-      options = this.createOptions()
-    }
-    var tr = this.getCurrentTransaction()
+  ensureCurrentTransaction(name, type, options) {
+    let tr = this.getCurrentTransaction()
     if (tr) {
       return tr
     } else {
-      options.canReuse = true
-      options.managed = true
-      return this.createTransaction(undefined, undefined, options)
+      tr = new Transaction(name, type, options)
+      this.setCurrentTransaction(tr)
     }
+    return tr
   }
 
   getCurrentTransaction() {
@@ -62,32 +68,26 @@ class TransactionService {
     this.currentTransaction = value
   }
 
-  createTransaction(name, type, options) {
-    var tr = new Transaction(name, type, options)
-    this.setCurrentTransaction(tr)
-    if (options.checkBrowserResponsiveness) {
-      this.startCounter(tr)
-    }
-    return tr
-  }
-
-  startCounter(transaction) {
-    transaction.browserResponsivenessCounter = 0
-    var interval = this._config.get('browserResponsivenessInterval')
-    if (typeof interval === 'undefined') {
-      if (__DEV__) {
-        this._logger.debug('browserResponsivenessInterval config is undefined!')
-      }
-      return
+  ensureRespInterval(checkBrowserResponsiveness) {
+    const clearRespInterval = () => {
+      clearInterval(this.respIntervalId)
+      this.respIntervalId = undefined
     }
 
-    const id = setInterval(function() {
-      if (transaction.ended) {
-        window.clearInterval(id)
-      } else {
-        transaction.browserResponsivenessCounter++
+    if (checkBrowserResponsiveness) {
+      if (typeof this.respIntervalId === 'undefined') {
+        this.respIntervalId = setInterval(() => {
+          let tr = this.getCurrentTransaction()
+          if (tr) {
+            tr.browserResponsivenessCounter++
+          } else {
+            clearRespInterval()
+          }
+        }, BROWSER_RESPONSIVENESS_INTERVAL)
       }
-    }, interval)
+    } else if (typeof this.respIntervalId !== 'undefined') {
+      clearRespInterval()
+    }
   }
 
   createOptions(options) {
@@ -113,7 +113,7 @@ class TransactionService {
     let tr = this.getCurrentTransaction()
 
     if (!tr) {
-      tr = this.createTransaction(name, type, perfOptions)
+      tr = this.ensureCurrentTransaction(name, type, perfOptions)
     } else if (tr.canReuse() && perfOptions.canReuse) {
       /*
        * perfOptions could also have `canReuse:true` in which case we
@@ -129,11 +129,22 @@ class TransactionService {
         )
       }
       /**
-       * We want to keep the type in it's original value, therefore,
-       * passing undefined as type. For example, in the case of a page-load
-       * we want to keep the type but redefine the name to the first route.
+       * We only update based precedence defined in TRANSACTION_TYPE_ORDER.
+       * If either orders don't exist we also don't redefine the type.
        */
-      tr.redefine(name, undefined, perfOptions)
+
+      let redefineType
+      let currentTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(tr.type)
+      let redefineTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(type)
+      if (
+        currentTypeOrder !== -1 &&
+        redefineTypeOrder !== -1 &&
+        redefineTypeOrder < currentTypeOrder
+      ) {
+        redefineType = type
+      }
+
+      tr.redefine(name, redefineType, perfOptions)
     } else {
       if (__DEV__) {
         this._logger.debug(
@@ -142,12 +153,12 @@ class TransactionService {
         )
       }
       tr.end()
-      tr = this.createTransaction(name, type, perfOptions)
+      tr = this.ensureCurrentTransaction(name, type, perfOptions)
     }
 
     tr.captureTimings = true
 
-    if (type === PAGE_LOAD) {
+    if (tr.type === PAGE_LOAD) {
       tr.options.checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
@@ -163,6 +174,8 @@ class TransactionService {
         tr.name = perfOptions.pageLoadTransactionName
       }
     }
+
+    this.ensureRespInterval(tr.options.checkBrowserResponsiveness)
 
     return tr
   }
@@ -190,7 +203,8 @@ class TransactionService {
     return Promise.resolve().then(
       () => {
         const { name, type } = tr
-        if (this.shouldIgnoreTransaction(name)) {
+
+        if (this.shouldIgnoreTransaction(name) || type === TEMPORARY_TYPE) {
           if (__DEV__) {
             this._logger.debug(
               `transaction(${tr.id}, ${name}, ${type}) is ignored`
@@ -198,6 +212,7 @@ class TransactionService {
           }
           return
         }
+
         if (type === PAGE_LOAD) {
           /**
            * Setting the pageLoadTransactionName via configService.setConfig after
@@ -224,6 +239,9 @@ class TransactionService {
         if (breakdownMetrics) {
           tr.captureBreakdown()
         }
+        const configContext = this._config.get('context')
+        addTransactionContext(tr, configContext)
+
         this._config.events.send(TRANSACTION_END, [tr])
         if (__DEV__) {
           this._logger.debug(`end transaction(${tr.id}, ${tr.name})`, tr)
@@ -295,7 +313,14 @@ class TransactionService {
   }
 
   startSpan(name, type, options) {
-    const tr = this.ensureCurrentTransaction()
+    const tr = this.ensureCurrentTransaction(
+      undefined,
+      TEMPORARY_TYPE,
+      this.createOptions({
+        canReuse: true,
+        managed: true
+      })
+    )
 
     if (tr) {
       const span = tr.startSpan(name, type, options)
@@ -310,7 +335,15 @@ class TransactionService {
   }
 
   addTask(taskId) {
-    var tr = this.ensureCurrentTransaction()
+    const tr = this.ensureCurrentTransaction(
+      undefined,
+      TEMPORARY_TYPE,
+      this.createOptions({
+        canReuse: true,
+        managed: true
+      })
+    )
+
     if (tr) {
       var taskId = tr.addTask(taskId)
       if (__DEV__) {

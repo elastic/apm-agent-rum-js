@@ -23,7 +23,6 @@
  *
  */
 
-const { Server } = require('karma')
 const {
   getSauceConnectOptions,
   getBrowserList,
@@ -36,7 +35,7 @@ const baseLaunchers = getBrowserList().map(launcher => ({
   ...launcher
 }))
 const specPattern =
-  'test/{*.spec.+(js|ts),!(e2e|integration|node|bundle)/*.spec.+(js|ts)}'
+  'test/{*.spec.+(js|ts),!(e2e|integration|node|bundle|types)/*.spec.+(js|ts)}'
 const { tunnelIdentifier } = getSauceConnectOptions()
 
 /**
@@ -50,12 +49,20 @@ const baseConfig = {
   },
   plugins: [
     'karma-sauce-launcher',
-    'karma-failed-reporter',
     'karma-jasmine',
+    'karma-failed-reporter',
     'karma-spec-reporter',
     'karma-webpack',
     'karma-sourcemap-loader'
   ],
+  client: {
+    // clearContext: false, // make Jasmine Spec Runner output visible in browsers
+    jasmine: {
+      random: false,
+      failFast: true,
+      timeoutInterval: 30000
+    }
+  },
   webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV),
   webpackMiddleware: {
     logLevel: 'error'
@@ -158,7 +165,6 @@ function prepareConfig(config, packageName) {
     console.log('prepareConfig: Run in SauceLab mode')
     config.sauceLabs.build = buildId
     console.log('saucelabs.build:', buildId)
-    config.concurrency = 3
     if (isJenkins) {
       config.sauceLabs.tags = [testConfig.branch, process.env.STACK_VERSION]
     } else if (testConfig.branch === 'master') {
@@ -172,19 +178,8 @@ function prepareConfig(config, packageName) {
   return config
 }
 
-function singleRunKarma(configFile, done) {
-  new Server(
-    {
-      configFile,
-      singleRun: true
-    },
-    done
-  ).start()
-}
-
 module.exports = {
   prepareConfig,
   baseConfig,
-  baseLaunchers,
-  singleRunKarma
+  baseLaunchers
 }

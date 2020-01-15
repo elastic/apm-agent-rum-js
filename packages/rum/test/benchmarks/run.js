@@ -29,7 +29,8 @@ const { gatherRawMetrics, launchBrowser } = require('./profiler')
 const {
   analyzeMetrics,
   calculateResults,
-  getCommonFields
+  getCommonFields,
+  customApmBuild
 } = require('./analyzer')
 const { runs, port, scenarios } = require('./config')
 const startServer = require('./server')
@@ -38,7 +39,13 @@ const REPORTS_DIR = join(__dirname, '../../reports')
 
 !(async function run() {
   try {
-    const server = await startServer()
+    /**
+     * Generate custom apm build
+     */
+    const filename = 'apm-rum-with-name.umd.min.js'
+    await customApmBuild(filename)
+
+    const server = await startServer(filename)
     /**
      * object cache holding the metrics accumlated in each run and
      * helps in processing the overall results

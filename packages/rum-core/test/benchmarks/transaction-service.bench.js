@@ -57,7 +57,7 @@ suite('TransactionService', () => {
         /**
          * Ensures we have  currentTranaction in place when span creation is done
          */
-        transactionService.createTransaction('test-tr', 'custom')
+        transactionService.ensureCurrentTransaction('test-tr', 'custom')
       }
     }
   )

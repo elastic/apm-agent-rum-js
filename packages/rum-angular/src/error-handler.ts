@@ -23,27 +23,13 @@
  *
  */
 
-import { apmBase } from '@elastic/apm-rum'
-import { routeHooks } from './route-hooks'
+import { ErrorHandler } from '@angular/core'
 
-export const ApmVuePlugin = {
-  install: (Vue, options) => {
-    const { router, apm = apmBase, config } = options
-    /**
-     * Initialize the APM with the config
-     */
-    apm.init(config)
+export class ApmErrorHandler extends ErrorHandler {
+  static apm: any
 
-    /**
-     * Hook router if provided
-     */
-    if (router) {
-      routeHooks(router, apm)
-    }
-
-    /**
-     * Provide it via $apm to be accessed in all Vue Components
-     */
-    Vue.prototype.$apm = apm
+  handleError(error) {
+    ApmErrorHandler.apm.captureError(error.originalError || error)
+    super.handleError(error)
   }
 }

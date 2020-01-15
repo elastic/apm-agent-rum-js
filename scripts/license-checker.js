@@ -47,6 +47,7 @@ const LICENSE_WHITELIST = [
   '(MIT OR Apache-2.0)',
   '(WTFPL OR MIT)',
   '(MIT OR WTFPL)',
+  '(MIT OR GPL-3.0)',
   '(MIT AND Zlib)',
   '(MIT OR CC0-1.0)',
   '(BSD-2-Clause OR MIT OR Apache-2.0)',
@@ -57,6 +58,7 @@ const LICENSE_WHITELIST = [
   'Unlicense',
   'Artistic-2.0',
   'WTFPL',
+  'W3C',
   'W3C-20150513'
 ]
 

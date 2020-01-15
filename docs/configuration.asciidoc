@@ -87,11 +87,11 @@ A list of instrumentations which can be disabled. Valid options are `xmlhttprequ
 
 Environment where the service being monitored is deployed, e.g. "production", "development", "test", etc.
 
-Environments allow you to easily filter data on a global level in the APM UI.
+Environments allow you to easily filter data on a global level in the APM app.
 It's important to be consistent when naming environments across agents.
-See {kibana-ref}/filters.html#environment-selector[environment selector] in the Kibana UI for more information.
+See {apm-app-ref}/filters.html#environment-selector[environment selector] in the APM app for more information.
 
-NOTE: This feature is fully supported in the APM UI in Kibana versions >= 7.2.
+NOTE: This feature is fully supported in the APM app in Kibana versions >= 7.2.
 You must use the query bar to filter for a specific environment in versions prior to 7.2.
 
 [float]
@@ -272,4 +272,23 @@ NOTE: This feature requires APM Server v7.5 or later and that the APM Server is 
 More information is available in {apm-app-ref}/agent-configuration.html[APM Agent configuration].
 
 
+[float]
+[[ignore-transactions]]
+==== `ignoreTransactions`
 
+
+* *Type:* Array
+* *Default:* `[]`
+
+Array containing a list of transactions names that should be ignored when sending the payload to the APM server.
+It can be set to an array containing one or more Strings or RegExp objects. If an element in the array is a String, an exact match will be performed. 
+If an element in the array is a RegExp object, its test function will be called with the name of the transation.
+
+[source,js]
+----
+const options = {
+  ignoreTransactions: [/login*/, '/app']
+}
+----
+
+NOTE: Spans that are captured as part of the ignored transactions would also be ignored.

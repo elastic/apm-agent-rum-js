@@ -65,18 +65,23 @@ const MAX_SPAN_DURATION = 5 * 60 * 1000
  */
 const PAGE_LOAD = 'page-load'
 const ROUTE_CHANGE = 'route-change'
-const NAME_UNKNOWN = 'Unknown'
 const TYPE_CUSTOM = 'custom'
+const HTTP_REQUEST_TYPE = 'http-request'
+const TEMPORARY_TYPE = 'temporary'
+const NAME_UNKNOWN = 'Unknown'
+
+const TRANSACTION_TYPE_ORDER = [
+  PAGE_LOAD,
+  ROUTE_CHANGE,
+  HTTP_REQUEST_TYPE,
+  TYPE_CUSTOM,
+  TEMPORARY_TYPE
+]
 
 /**
  * Check only for long tasks that are more than 60ms
  */
 const USER_TIMING_THRESHOLD = 60
-
-/**
- * Others
- */
-const KEYWORD_LIMIT = 1024
 
 /**
  * Events - to be consumed by the users
@@ -106,8 +111,16 @@ const AFTER_EVENT = ':after'
 /**
  * Local Config Key used storing the remote config in the localStorage
  */
-
 const LOCAL_CONFIG_KEY = 'elastic_apm_config'
+
+/**
+ * Default configs used on top of extensible configs from ConfigService
+ */
+const KEYWORD_LIMIT = 1024
+const SERVER_URL_PREFIX = '/intake/v2/rum/events'
+const BROWSER_RESPONSIVENESS_INTERVAL = 500
+const BROWSER_RESPONSIVENESS_BUFFER = 3
+const SIMILAR_SPAN_TO_TRANSACTION_RATIO = 0.05
 
 export {
   SCHEDULE,
@@ -123,7 +136,6 @@ export {
   NAME_UNKNOWN,
   TYPE_CUSTOM,
   USER_TIMING_THRESHOLD,
-  KEYWORD_LIMIT,
   TRANSACTION_START,
   TRANSACTION_END,
   CONFIG_CHANGE,
@@ -133,5 +145,13 @@ export {
   ERROR,
   BEFORE_EVENT,
   AFTER_EVENT,
-  LOCAL_CONFIG_KEY
+  LOCAL_CONFIG_KEY,
+  HTTP_REQUEST_TYPE,
+  KEYWORD_LIMIT,
+  SERVER_URL_PREFIX,
+  BROWSER_RESPONSIVENESS_INTERVAL,
+  BROWSER_RESPONSIVENESS_BUFFER,
+  SIMILAR_SPAN_TO_TRANSACTION_RATIO,
+  TEMPORARY_TYPE,
+  TRANSACTION_TYPE_ORDER
 }

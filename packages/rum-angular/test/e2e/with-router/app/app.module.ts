@@ -23,7 +23,7 @@
  *
  */
 
-import { NgModule, Inject } from '@angular/core'
+import { NgModule, Inject, ErrorHandler } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 import { HttpClientModule } from '@angular/common/http'
 import { Router } from '@angular/router'
@@ -34,7 +34,7 @@ import { HomeComponent } from './home.component'
 import { ContactListComponent } from './contact-list.component'
 import { ContactDetailComponent } from './contact-detail.component'
 import { PageNotFoundComponent } from './not-found.component'
-import { ApmService } from '../../../../src'
+import { ApmService, ApmErrorHandler } from '../../../../src'
 import { initializeApmService } from '../../../index'
 
 @NgModule({
@@ -51,6 +51,10 @@ import { initializeApmService } from '../../../index'
       provide: ApmService,
       useClass: ApmService,
       deps: [Router]
+    },
+    {
+      provide: ErrorHandler,
+      useClass: ApmErrorHandler
     }
   ],
   bootstrap: [AppComponent]

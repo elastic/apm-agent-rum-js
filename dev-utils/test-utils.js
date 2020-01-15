@@ -26,10 +26,10 @@
 const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
+const { Server } = require('karma')
 const { default: Launcher } = require('@wdio/cli')
 const sauceConnectLauncher = require('sauce-connect-launcher')
 const JasmineRunner = require('jasmine')
-const { singleRunKarma } = require('./karma')
 
 function walkSync(dir, filter, filelist) {
   var files = fs.readdirSync(dir)
@@ -179,13 +179,10 @@ function runSauceConnect(config, callback) {
 }
 
 function runKarma(configFile) {
-  singleRunKarma(configFile, exitCode => {
-    if (exitCode) {
-      return process.exit(exitCode)
-    }
-    console.log('Karma finished.')
-    return process.exit(0)
-  })
+  const server = new Server({ configFile, singleRun: true }, exitCode =>
+    process.exit(exitCode)
+  )
+  server.start()
 }
 
 function runE2eTests(configFilePath, runSelenium) {
@@ -195,7 +192,6 @@ function runE2eTests(configFilePath, runSelenium) {
       function(code) {
         process.stdin.pause()
         process.nextTick(() => process.exit(code))
-        // process.exit(code)
       },
       function(error) {
         console.error('Launcher failed to start the test', error)

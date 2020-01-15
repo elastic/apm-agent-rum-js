@@ -43,7 +43,7 @@ class ApmBase {
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
-      configService.setVersion('4.6.0')
+      configService.setVersion('4.7.0')
       this.config(config)
       const loggingService = this.serviceFactory.getService('LoggingService')
       /**
@@ -79,6 +79,7 @@ class ApmBase {
           sendPageLoad()
         }
       } else {
+        this._disable = true
         loggingService.info('RUM agent is inactive')
       }
     }
@@ -123,15 +124,11 @@ class ApmBase {
   }
 
   _sendPageLoadMetrics() {
-    const transactionService = this.serviceFactory.getService(
-      'TransactionService'
-    )
-
     /**
      * Name of the transaction is set in transaction service to
      * avoid duplicating the logic at multiple places
      */
-    const tr = transactionService.startTransaction(undefined, PAGE_LOAD, {
+    const tr = this.startTransaction(undefined, PAGE_LOAD, {
       managed: true,
       canReuse: true
     })
@@ -260,15 +257,6 @@ class ApmBase {
         'TransactionService'
       )
       return transactionService.getCurrentTransaction()
-    }
-  }
-
-  getTransactionService() {
-    if (this.isEnabled()) {
-      var transactionService = this.serviceFactory.getService(
-        'TransactionService'
-      )
-      return transactionService
     }
   }
 
