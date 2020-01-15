@@ -23,11 +23,13 @@
  *
  */
 
-import { apm } from '@elastic/apm-rum'
-import { ApmService } from './apm-service'
-import { ApmErrorHandler } from './error-handler'
+import { ErrorHandler } from '@angular/core'
 
-ApmService.apm = apm
-ApmErrorHandler.apm = apm
+export class ApmErrorHandler extends ErrorHandler {
+  static apm: any
 
-export { ApmService, ApmErrorHandler }
+  handleError(error) {
+    ApmErrorHandler.apm.captureError(error.originalError || error)
+    super.handleError(error)
+  }
+}
