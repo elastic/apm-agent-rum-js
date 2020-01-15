@@ -265,8 +265,8 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 
 [float]
 ===== BREAKING CHANGE
-* remove setTags in favor of addTags API ([#28](https://github.com/elastic/apm-agent-js-core/issues/28))
-* introduce subtype and action in Spans {commit}#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7[#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7]
+* remove setTags in favor of addTags API  {pull}28[#28]
+* introduce subtype and action in Spans {commit}5fd4af7[5fd4af7] {pull}9[#9]
 
 [float]
 ===== Features
@@ -296,7 +296,7 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 
 [float]
 ===== Features
-* introduce subtype and action in Spans {commit}#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7[#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7]
+* introduce subtype and action in Spans {commit}5fd4af7[5fd4af7] {pull}9[#9]
 
 [[release-notes-2.1.1]]
 ==== 2.1.1 (2018-12-05)
