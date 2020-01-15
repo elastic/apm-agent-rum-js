@@ -49,13 +49,14 @@ const baseConfig = {
   },
   plugins: [
     'karma-sauce-launcher',
-    'karma-failed-reporter',
     'karma-jasmine',
+    'karma-failed-reporter',
     'karma-spec-reporter',
     'karma-webpack',
     'karma-sourcemap-loader'
   ],
   client: {
+    // clearContext: false, // make Jasmine Spec Runner output visible in browsers
     jasmine: {
       random: false,
       failFast: true,
