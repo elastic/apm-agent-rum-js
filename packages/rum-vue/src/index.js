@@ -42,7 +42,44 @@ export const ApmVuePlugin = {
     }
 
     /**
-     * Provide it via $apm to be accessed in all Vue Components
+     * If the user already installed a global error handler
+     * we should call them after capturing it internally
+     */
+    const previousErrorHandler = Vue.config.errorHandler
+
+    /**
+     * Global error handler for capturing errors during
+     * component renders
+     */
+    Vue.config.errorHandler = function(error, vm, info) {
+      if (vm && vm.$options) {
+        const options = vm.$options
+        const component = options.name || options._componentTag
+
+        error.component = component || 'anonymous'
+        error.file = options.__file || ''
+      }
+
+      /**
+       * Lifecycle hook the error was thrown if available
+       */
+      if (info) {
+        error.lifecycleHook = info
+      }
+      apm.captureError(error)
+
+      if (typeof previousErrorHandler === 'function') {
+        previousErrorHandler.call(Vue, error, vm, info)
+      }
+      /**
+       * Logs the error to browser console similar
+       * to Vue logError
+       */
+      console.error(error)
+    }
+
+    /**
+     * Provide the APM instance via $apm to be accessed in all Vue Components
      */
     Vue.prototype.$apm = apm
   }
