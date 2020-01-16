@@ -13,7 +13,7 @@
     "release": "lerna publish && npm run github-release",
     "release-package": "node scripts/publish-package",
     "github-release": "node scripts/github-release",
-    "build-docs": "sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
+    "build-docs": "PREVIEW=1 sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
     "lint": "run-p --silent lint:*",
     "lint:js": "eslint . --ext .js,.jsx,.ts",
     "lint:license": "node scripts/license-checker",
