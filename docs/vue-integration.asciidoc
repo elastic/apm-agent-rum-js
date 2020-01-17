@@ -49,9 +49,9 @@ Vue.use(ApmVuePlugin, {
 [float]
 ==== Options
 
-* config(required) - RUM <<configuration, agent configuration options>> as described
-* router(optional) - Instance of Vue Router, if provided will start capturing both page load and SPA navigation events as transactions with path of the route as its name.
-* errors(optional) - If enabled, will install a global Vue error handler to capture render errors inside the components. (Defaults to `true`)
+* `config` (required) - RUM agent <<configuration,configuration options>>.
+* `router` (optional) - Instance of Vue Router. If provided, will start capturing both page load and SPA navigation events as transactions with path of the route as its name.
+* `errors` (optional) - If enabled, will install a global Vue error handler to capture render errors inside the components. Defaults to `true`.
 
 [float]
 ==== Accessing agent instance inside components
