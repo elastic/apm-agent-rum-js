@@ -23,12 +23,11 @@
  *
  */
 
-import '../polyfill'
 import Vue from 'vue'
 import { mount } from '@vue/test-utils'
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
-import { setUpErrorHandler } from '../../src/error-handler'
+import { getErrorHandler } from '../../src/error-handler'
 
 describe('Error handler', () => {
   it('should capture errors via global error handler', done => {
@@ -40,19 +39,19 @@ describe('Error handler', () => {
     spyOn(window.console, 'error')
 
     const original = Vue.config.errorHandler
-    Vue.config.errorHandler = setUpErrorHandler(Vue, apm)
+    Vue.config.errorHandler = getErrorHandler(Vue, apm)
 
     const ErrorComponent = {
       name: 'Error',
       template: '<div>error</div>',
       created: () => {
-        throw new Error('Component Error')
+        throw error
       }
     }
 
     spyOn(apm, 'captureError').and.callFake(err => {
       expect(err).toEqual(error)
-      expect(err.component).toEqual(ErrorComponent.name)
+      expect(err.component).toEqual('Error')
       expect(err.file).toEqual('')
       expect(err.lifecycleHook).toEqual('created hook')
       done()

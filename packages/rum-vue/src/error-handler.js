@@ -23,7 +23,7 @@
  *
  */
 
-export function setUpErrorHandler(Vue, apm) {
+export function getErrorHandler(Vue, apm) {
   /**
    * If the user already installed a global error handler
    * we should call them after capturing it internally
@@ -33,9 +33,8 @@ export function setUpErrorHandler(Vue, apm) {
   return (error, vm, info) => {
     if (vm && vm.$options) {
       const options = vm.$options
-      const component = options.name || options._componentTag
 
-      error.component = component || 'anonymous'
+      error.component = options.name || options._componentTag || 'anonymous'
       error.file = options.__file || ''
     }
 

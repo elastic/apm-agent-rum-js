@@ -25,11 +25,11 @@
 
 import { apmBase } from '@elastic/apm-rum'
 import { routeHooks } from './route-hooks'
-import { setUpErrorHandler } from './error-handler'
+import { getErrorHandler } from './error-handler'
 
 export const ApmVuePlugin = {
   install: (Vue, options) => {
-    const { router, apm = apmBase, config, errors = true } = options
+    const { router, apm = apmBase, config, captureErrors = true } = options
     /**
      * Initialize the APM with the config
      */
@@ -42,12 +42,12 @@ export const ApmVuePlugin = {
       routeHooks(router, apm)
     }
 
-    if (errors) {
+    if (captureErrors) {
       /**
        * Global error handler for capturing errors during
        * component renders
        */
-      Vue.config.errorHandler = setUpErrorHandler(Vue, apm)
+      Vue.config.errorHandler = getErrorHandler(Vue, apm)
     }
     /**
      * Provide the APM instance via $apm to be accessed in all Vue Components
