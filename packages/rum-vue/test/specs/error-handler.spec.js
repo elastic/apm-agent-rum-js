@@ -34,7 +34,7 @@ describe('Error handler', () => {
     const apm = new ApmBase(createServiceFactory(), false)
     const error = new Error('Component Error')
     /**
-     * To prevent the logging erorrs to the console
+     * To prevent the logging errors to the console
      */
     spyOn(window.console, 'error')
 

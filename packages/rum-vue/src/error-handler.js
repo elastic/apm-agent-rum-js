@@ -33,8 +33,14 @@ export function getErrorHandler(Vue, apm) {
   return (error, vm, info) => {
     if (vm && vm.$options) {
       const options = vm.$options
+      let component
+      if (vm.$root === vm) {
+        component = 'Root'
+      } else {
+        component = options.name || options._componentTag || 'Anonymous'
+      }
 
-      error.component = options.name || options._componentTag || 'anonymous'
+      error.component = component
       error.file = options.__file || ''
     }
 
