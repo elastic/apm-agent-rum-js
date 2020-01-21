@@ -23,35 +23,43 @@
  *
  */
 
-import { apmBase } from '@elastic/apm-rum'
-import { routeHooks } from './route-hooks'
-import { getErrorHandler } from './error-handler'
+export function getErrorHandler(Vue, apm) {
+  /**
+   * If the user already installed a global error handler
+   * we should call them after capturing it internally
+   */
+  const previousErrorHandler = Vue.config.errorHandler
 
-export const ApmVuePlugin = {
-  install: (Vue, options) => {
-    const { router, apm = apmBase, config, captureErrors = true } = options
-    /**
-     * Initialize the APM with the config
-     */
-    apm.init(config)
+  return (error, vm, info) => {
+    if (vm && vm.$options) {
+      const options = vm.$options
+      let component
+      if (vm.$root === vm) {
+        component = 'Root'
+      } else {
+        component = options.name || options._componentTag || 'Anonymous'
+      }
 
-    /**
-     * Hook router if provided
-     */
-    if (router) {
-      routeHooks(router, apm)
+      error.component = component
+      error.file = options.__file || ''
     }
 
-    if (captureErrors) {
-      /**
-       * Global error handler for capturing errors during
-       * component renders
-       */
-      Vue.config.errorHandler = getErrorHandler(Vue, apm)
+    /**
+     * Lifecycle hook the error was thrown if available
+     */
+    if (info) {
+      error.lifecycleHook = info
+    }
+
+    apm.captureError(error)
+
+    if (typeof previousErrorHandler === 'function') {
+      previousErrorHandler.call(this, error, vm, info)
     }
     /**
-     * Provide the APM instance via $apm to be accessed in all Vue Components
+     * Logs the error to browser console similar
+     * to original Vue logError
      */
-    Vue.prototype.$apm = apm
+    console.error(error)
   }
 }

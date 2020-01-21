@@ -14,6 +14,21 @@ npm install --save @elastic/apm-rum-vue
 ----
 
 [float]
+==== Using APM Plugin
+[source,js]
+----
+Vue.use(ApmVuePlugin, options)
+----
+
+===== Options
+
+* `config` (required) - RUM agent <<configuration,configuration options>>.
+* `router` (optional) - Instance of Vue Router. If provided, will start capturing both page load and SPA navigation events as transactions with path of the route as its name.
+* `captureErrors` (optional) - If enabled, will install a global Vue error handler to capture render errors inside the components. Defaults to `true`.
+  The plugin captures the component name, lifecycle hook and file name (if it's available) as part of the error context.
+
+
+[float]
 ==== Instrumenting your Vue application
 
 The package exposes `ApmVuePlugin` which is a Vue Plugin and can be installed in your application using `Vue.use` method. 
@@ -72,8 +87,6 @@ export default {
     this.span && this.span.end()
   }
 }
-</script>
-
 </script>
 ----
 

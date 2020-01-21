@@ -23,35 +23,44 @@
  *
  */
 
-import { apmBase } from '@elastic/apm-rum'
-import { routeHooks } from './route-hooks'
-import { getErrorHandler } from './error-handler'
+import Vue from 'vue'
+import { mount } from '@vue/test-utils'
+import { ApmBase } from '@elastic/apm-rum'
+import { createServiceFactory } from '@elastic/apm-rum-core'
+import { getErrorHandler } from '../../src/error-handler'
 
-export const ApmVuePlugin = {
-  install: (Vue, options) => {
-    const { router, apm = apmBase, config, captureErrors = true } = options
+describe('Error handler', () => {
+  it('should capture errors via global error handler', done => {
+    const apm = new ApmBase(createServiceFactory(), false)
+    const error = new Error('Component Error')
     /**
-     * Initialize the APM with the config
+     * To prevent the logging errors to the console
      */
-    apm.init(config)
+    spyOn(window.console, 'error')
 
-    /**
-     * Hook router if provided
-     */
-    if (router) {
-      routeHooks(router, apm)
+    const original = Vue.config.errorHandler
+    Vue.config.errorHandler = getErrorHandler(Vue, apm)
+
+    const ErrorComponent = {
+      name: 'Error',
+      template: '<div>error</div>',
+      created: () => {
+        throw error
+      }
     }
 
-    if (captureErrors) {
-      /**
-       * Global error handler for capturing errors during
-       * component renders
-       */
-      Vue.config.errorHandler = getErrorHandler(Vue, apm)
-    }
-    /**
-     * Provide the APM instance via $apm to be accessed in all Vue Components
-     */
-    Vue.prototype.$apm = apm
-  }
-}
+    spyOn(apm, 'captureError').and.callFake(err => {
+      expect(err).toEqual(error)
+      expect(err.component).toEqual('Error')
+      expect(err.file).toEqual('')
+      expect(err.lifecycleHook).toEqual('created hook')
+      done()
+    })
+
+    const wrapper = mount(ErrorComponent)
+
+    Vue.config.errorHandler = original
+
+    wrapper.destroy()
+  })
+})
