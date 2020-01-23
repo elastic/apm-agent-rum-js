@@ -114,6 +114,13 @@ const AFTER_EVENT = ':after'
 const LOCAL_CONFIG_KEY = 'elastic_apm_config'
 
 /**
+ * List of entry types that could be observed by the PerformaneObserver Interface
+ */
+const LONG_TASK = 'longtask'
+const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint'
+const ENTRY_TYPES = [LONG_TASK, LARGEST_CONTENTFUL_PAINT]
+
+/**
  * Default configs used on top of extensible configs from ConfigService
  */
 const KEYWORD_LIMIT = 1024
@@ -147,6 +154,9 @@ export {
   AFTER_EVENT,
   LOCAL_CONFIG_KEY,
   HTTP_REQUEST_TYPE,
+  LONG_TASK,
+  LARGEST_CONTENTFUL_PAINT,
+  ENTRY_TYPES,
   KEYWORD_LIMIT,
   SERVER_URL_PREFIX,
   BROWSER_RESPONSIVENESS_INTERVAL,

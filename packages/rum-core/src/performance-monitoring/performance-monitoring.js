@@ -36,6 +36,8 @@ import { globalState } from '../common/patching/patch-utils'
 import {
   SCHEDULE,
   INVOKE,
+  TRANSACTION_START,
+  BEFORE_EVENT,
   TRANSACTION_END,
   AFTER_EVENT,
   FETCH,
@@ -44,13 +46,15 @@ import {
   HTTP_REQUEST_TYPE,
   BROWSER_RESPONSIVENESS_INTERVAL,
   BROWSER_RESPONSIVENESS_BUFFER,
-  SIMILAR_SPAN_TO_TRANSACTION_RATIO
+  SIMILAR_SPAN_TO_TRANSACTION_RATIO,
+  ENTRY_TYPES
 } from '../common/constants'
 import {
   truncateModel,
   SPAN_MODEL,
   TRANSACTION_MODEL
 } from '../common/truncate'
+import { PerfEntryRecorder, onPerformanceEntry } from './perf-entry-recorder'
 import { __DEV__ } from '../env'
 
 class PerformanceMonitoring {
@@ -62,12 +66,19 @@ class PerformanceMonitoring {
   }
 
   init(flags = {}) {
+    const recorder = new PerfEntryRecorder(list =>
+      onPerformanceEntry(list, this._transactionService)
+    )
+
+    this._configService.events.observe(TRANSACTION_START + BEFORE_EVENT, () => {
+      recorder.start(ENTRY_TYPES)
+    })
     /**
      * We need to run this event listener after all of user-registered listener,
      * since this event listener adds the transaction to the queue to be send to APM Server.
      */
-
     this._configService.events.observe(TRANSACTION_END + AFTER_EVENT, tr => {
+      recorder.stop()
       const payload = this.createTransactionPayload(tr)
       if (payload) {
         this._apmServer.addTransaction(payload)
