@@ -46,27 +46,26 @@ function createLongTaskSpans(longtasks) {
   return longTaskSpans
 }
 
-export function onPerformanceEntry(entryList, transactionService) {
+export function onPerformanceEntry(entryList, transaction) {
   const longtaskEntries = entryList.getEntriesByType(LONG_TASK)
   const lcpEntries = entryList.getEntriesByType(LARGEST_CONTENTFUL_PAINT)
-
   const lastLcpEntry = lcpEntries[lcpEntries.length - 1]
-  const tr = transactionService.getCurrentTransaction()
 
-  if (!tr) {
-    return
-  }
+  console.log(lastLcpEntry)
 
   if (lastLcpEntry) {
-    tr.addMarks({
+    transaction.addMarks({
       agent: {
+        /**
+         * `renderTime` will not be available for Image element and if the element
+         * is loaded cross-origin without the `Timing-Allow-Origin` header.
+         */
         largestContentfulPaint: lastLcpEntry.renderTime || lastLcpEntry.loadTime
       }
     })
   }
 
-  const longTaskSpans = createLongTaskSpans(longtaskEntries)
-  tr.spans.push(...longTaskSpans)
+  transaction.spans.push(...createLongTaskSpans(longtaskEntries))
 }
 
 export class PerfEntryRecorder {
@@ -83,7 +82,7 @@ export class PerfEntryRecorder {
   start(entryTypes) {
     /**
      * Safari throws an error when PerformanceObserver is
-     * observed for unknown entry typess
+     * observed for unknown entry types
      */
     try {
       this.po.observe({ entryTypes })

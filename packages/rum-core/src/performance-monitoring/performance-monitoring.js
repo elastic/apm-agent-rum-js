@@ -66,9 +66,12 @@ class PerformanceMonitoring {
   }
 
   init(flags = {}) {
-    const recorder = new PerfEntryRecorder(list =>
-      onPerformanceEntry(list, this._transactionService)
-    )
+    const recorder = new PerfEntryRecorder(list => {
+      const transaction = this._transactionService.getCurrentTransaction()
+      if (transaction) {
+        onPerformanceEntry(list, transaction)
+      }
+    })
 
     this._configService.events.observe(TRANSACTION_START + BEFORE_EVENT, () => {
       recorder.start(ENTRY_TYPES)
