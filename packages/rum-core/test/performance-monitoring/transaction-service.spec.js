@@ -112,6 +112,29 @@ describe('TransactionService', function() {
     expect(trans.name).toBe('transaction')
   })
 
+  fit('should fire onstart hook only once for a transaction', () => {
+    const onStartSpy = jasmine.createSpy()
+    transactionService = new TransactionService(logger, {
+      config: {},
+      events: {
+        send: onStartSpy
+      }
+    })
+    const options = {
+      managed: true,
+      canReuse: true
+    }
+    transactionService.startTransaction('/', 'custom', options)
+    transactionService.startTransaction('/home', '', options)
+
+    expect(onStartSpy).toHaveBeenCalledTimes(1)
+
+    transactionService.startTransaction('/a', 'custom')
+    transactionService.startTransaction('/b', 'custom')
+
+    expect(onStartSpy).toHaveBeenCalledTimes(3)
+  })
+
   it('should capture page load on first transaction', function(done) {
     // todo: can't test hard navigation metrics since karma runs tests inside an iframe
     config.setConfig({
