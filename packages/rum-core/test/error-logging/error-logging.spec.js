@@ -53,9 +53,7 @@ describe('ErrorLogging', function() {
     }
     apmServer
       .sendErrors([errorObject])
-      .catch(reason => {
-        fail('Failed to send errors to the server, reason: ' + reason)
-      })
+      .catch(reason => fail(reason))
       .then(() => done())
   })
 
@@ -66,7 +64,6 @@ describe('ErrorLogging', function() {
     try {
       throw new Error('unittest error')
     } catch (error) {
-      // error['_elastic_extra_context'] = {test: 'hamid'}
       error.test = 'hamid'
       error.aDate = new Date('2017-01-12T00:00:00.000Z')
       var obj = { test: 'test' }
@@ -76,23 +73,21 @@ describe('ErrorLogging', function() {
       error.null = null
       errorLogging
         .logErrorEvent({ error }, true)
-        .then(
-          () => {
-            expect(apmServer.sendErrors).toHaveBeenCalled()
-            var errors = apmServer.sendErrors.calls.argsFor(0)[0]
-            expect(errors.length).toBe(1)
-            var errorData = errors[0]
-            expect(errorData.context.test).toBe('hamid')
-            expect(errorData.context.aDate).toBe('2017-01-12T00:00:00.000Z') // toISOString()
-            expect(errorData.context.anObject).toBeUndefined()
-            expect(errorData.context.aFunction).toBeUndefined()
-            expect(errorData.context.null).toBeUndefined()
-          },
-          reason => {
-            fail(reason)
-          }
-        )
-        .then(() => done())
+        .then(() => {
+          expect(apmServer.sendErrors).toHaveBeenCalled()
+          var errors = apmServer.sendErrors.calls.argsFor(0)[0]
+          expect(errors.length).toBe(1)
+          var errorData = errors[0]
+          expect(errorData.context.custom.test).toBe('hamid')
+          expect(errorData.context.custom.aDate).toBe(
+            '2017-01-12T00:00:00.000Z'
+          ) // toISOString()
+          expect(errorData.context.custom.anObject).toBeUndefined()
+          expect(errorData.context.custom.aFunction).toBeUndefined()
+          expect(errorData.context.custom.null).toBeUndefined()
+          done()
+        })
+        .catch(reason => fail(reason))
     }
   })
 
@@ -210,9 +205,7 @@ describe('ErrorLogging', function() {
           // the number of frames is different in different platforms
           expect(errorData.exception.stacktrace.length).toBeGreaterThan(0)
         },
-        reason => {
-          fail('Failed to send errors to the server, reason: ' + reason)
-        }
+        reason => fail(reason)
       )
       .then(() => done())
   })
@@ -305,9 +298,7 @@ describe('ErrorLogging', function() {
       function() {
         done()
       },
-      reason => {
-        fail('failed: ' + reason)
-      }
+      reason => fail(reason)
     )
   })
 
@@ -425,5 +416,30 @@ describe('ErrorLogging', function() {
       reason: [{ a: '1' }]
     })
     expect(getErrors()[7]).toBeUndefined()
+  })
+
+  it('should ignore keys and add other error fields to custom context', done => {
+    const errorLikeObject = {
+      message: 'Custom Error',
+      stack: 'ReferenceError: At example.js:23',
+      foo: 'bar',
+      bar: 'baz'
+    }
+    const error = errorLogging.createErrorDataModel({ error: errorLikeObject })
+
+    expect(error.context).toEqual({
+      page: jasmine.any(Object),
+      custom: {
+        foo: 'bar',
+        bar: 'baz'
+      }
+    })
+
+    apmServer
+      .sendErrors([error])
+      .catch(reason => {
+        fail(reason)
+      })
+      .then(() => done())
   })
 })

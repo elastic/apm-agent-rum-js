@@ -32,6 +32,36 @@ import {
 } from '../common/utils'
 import { truncateModel, ERROR_MODEL } from '../common/truncate'
 
+/**
+ * List of keys to be ignored from getting added to custom error properties
+ */
+const IGNORE_KEYS = ['stack', 'message']
+
+function getErrorProperties(error) {
+  const properties = {}
+  Object.keys(error).forEach(function(key) {
+    if (IGNORE_KEYS.indexOf(key) >= 0) {
+      return
+    }
+    let val = error[key]
+    /**
+     * null is typeof object and will break the switch below
+     * ignore undefined values
+     */
+    if (val == null) return
+    switch (typeof val) {
+      case 'function':
+        return
+      case 'object':
+        // ignore all objects except Dates
+        if (typeof val.toISOString !== 'function') return
+        val = val.toISOString()
+    }
+    properties[key] = val
+  })
+  return properties
+}
+
 class ErrorLogging {
   constructor(apmServer, configService, transactionService) {
     this._apmServer = apmServer
@@ -60,7 +90,9 @@ class ErrorLogging {
     if (error && typeof error === 'object') {
       errorMessage = errorMessage || error.message
       errorType = error.name
-      errorContext = this._getErrorProperties(error)
+      errorContext = {
+        custom: getErrorProperties(error)
+      }
     }
 
     if (!errorType) {
@@ -163,25 +195,6 @@ class ErrorLogging {
       errorEvent.error = messageOrError
     }
     return this.logErrorEvent(errorEvent)
-  }
-
-  _getErrorProperties(error) {
-    const properties = {}
-    Object.keys(error).forEach(function(key) {
-      if (key === 'stack') return
-      let val = error[key]
-      if (val === null) return // null is typeof object and well break the switch below
-      switch (typeof val) {
-        case 'function':
-          return
-        case 'object':
-          // ignore all objects except Dates
-          if (typeof val.toISOString !== 'function') return
-          val = val.toISOString()
-      }
-      properties[key] = val
-    })
-    return properties
   }
 }
 
