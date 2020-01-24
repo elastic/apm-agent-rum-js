@@ -46,8 +46,7 @@ import {
   HTTP_REQUEST_TYPE,
   BROWSER_RESPONSIVENESS_INTERVAL,
   BROWSER_RESPONSIVENESS_BUFFER,
-  SIMILAR_SPAN_TO_TRANSACTION_RATIO,
-  ENTRY_TYPES
+  SIMILAR_SPAN_TO_TRANSACTION_RATIO
 } from '../common/constants'
 import {
   truncateModel,
@@ -73,20 +72,28 @@ class PerformanceMonitoring {
       }
     })
 
-    this._configService.events.observe(TRANSACTION_START + BEFORE_EVENT, () => {
-      recorder.start(ENTRY_TYPES)
-    })
+    /**
+     * Start observing for events as soon as the Transaction starts
+     * to capture all available timings as part of transaction lifetime
+     */
+    this._configService.events.observe(
+      TRANSACTION_START + BEFORE_EVENT,
+      transaction => recorder.start(transaction.type)
+    )
     /**
      * We need to run this event listener after all of user-registered listener,
      * since this event listener adds the transaction to the queue to be send to APM Server.
      */
-    this._configService.events.observe(TRANSACTION_END + AFTER_EVENT, tr => {
-      recorder.stop()
-      const payload = this.createTransactionPayload(tr)
-      if (payload) {
-        this._apmServer.addTransaction(payload)
+    this._configService.events.observe(
+      TRANSACTION_END + AFTER_EVENT,
+      transaction => {
+        recorder.stop()
+        const payload = this.createTransactionPayload(transaction)
+        if (payload) {
+          this._apmServer.addTransaction(payload)
+        }
       }
-    })
+    )
 
     if (flags[HISTORY]) {
       patchEventHandler.observe(HISTORY, this.getHistorySub())

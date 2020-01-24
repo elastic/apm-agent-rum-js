@@ -23,10 +23,19 @@
  *
  */
 
-import { LONG_TASK, LARGEST_CONTENTFUL_PAINT } from '../common/constants'
+import {
+  LONG_TASK,
+  LARGEST_CONTENTFUL_PAINT,
+  PAGE_LOAD
+} from '../common/constants'
 import { noop } from '../common/utils'
 import Span from './span'
 
+/**
+ * Create Spans for the long task entries
+ *
+ * TODO: Make use of the long task attribution data
+ */
 function createLongTaskSpans(longtasks) {
   if (longtasks.length === 0) {
     return
@@ -36,7 +45,6 @@ function createLongTaskSpans(longtasks) {
   for (let i = 0; i < longtasks.length; i++) {
     const { name, startTime, duration } = longtasks[i]
     const end = startTime + duration
-
     const kind = LONG_TASK
     const span = new Span(`Longtask(${name})`, kind, { startTime })
     span.end(end)
@@ -46,28 +54,42 @@ function createLongTaskSpans(longtasks) {
   return longTaskSpans
 }
 
-export function onPerformanceEntry(entryList, transaction) {
-  const longtaskEntries = entryList.getEntriesByType(LONG_TASK)
-  const lcpEntries = entryList.getEntriesByType(LARGEST_CONTENTFUL_PAINT)
-  const lastLcpEntry = lcpEntries[lcpEntries.length - 1]
-
-  console.log(lastLcpEntry)
-
-  if (lastLcpEntry) {
-    transaction.addMarks({
-      agent: {
-        /**
-         * `renderTime` will not be available for Image element and if the element
-         * is loaded cross-origin without the `Timing-Allow-Origin` header.
-         */
-        largestContentfulPaint: lastLcpEntry.renderTime || lastLcpEntry.loadTime
-      }
-    })
-  }
+export function onPerformanceEntry(list, transaction) {
+  const longtaskEntries = list.getEntriesByType(LONG_TASK)
 
   transaction.spans.push(...createLongTaskSpans(longtaskEntries))
+  /**
+   * Paint timings like FCP and LCP are available only for page-load navigation
+   */
+  if (transaction.type !== PAGE_LOAD) {
+    return
+  }
+
+  const lcpEntries = list.getEntriesByType(LARGEST_CONTENTFUL_PAINT)
+  /**
+   * There can be multiple LCP present on a single page load,
+   * We need to always use the last one which takes all the lazy loaded
+   * elements in to account
+   */
+  const lastLcpEntry = lcpEntries[lcpEntries.length - 1]
+  if (!lastLcpEntry) {
+    return
+  }
+  /**
+   * `renderTime` will not be available for Image element and for the element
+   * that is loaded cross-origin without the `Timing-Allow-Origin` header.
+   */
+  transaction.addMarks({
+    agent: {
+      largestContentfulPaint: lastLcpEntry.renderTime || lastLcpEntry.loadTime
+    }
+  })
 }
 
+/**
+ * Records all performance entry events available via Performance Observer
+ * and fallbacks to Performance Timeline if not supported
+ */
 export class PerfEntryRecorder {
   constructor(callback) {
     this.po = {
@@ -79,13 +101,20 @@ export class PerfEntryRecorder {
     }
   }
 
-  start(entryTypes) {
+  start(type) {
     /**
      * Safari throws an error when PerformanceObserver is
      * observed for unknown entry types
      */
     try {
-      this.po.observe({ entryTypes })
+      /**
+       * Except longtasks other entries support buffered
+       * performance entries
+       */
+      if (type === PAGE_LOAD) {
+        this.po.observe({ type: LARGEST_CONTENTFUL_PAINT, buffered: true })
+      }
+      this.po.observe({ type: LONG_TASK })
     } catch (_) {}
   }
 

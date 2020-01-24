@@ -115,10 +115,15 @@ const LOCAL_CONFIG_KEY = 'elastic_apm_config'
 
 /**
  * List of entry types that could be observed by the PerformaneObserver Interface
+ * or can be captured via Performance Timeline API
  */
 const LONG_TASK = 'longtask'
+const PAINT = 'paint'
+const MEASURE = 'measure'
+const NAVIGATION = 'navigation'
+const RESOURCE = 'resource'
+const FIRST_CONTENTFUL_PAINT = 'first-contentful-paint'
 const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint'
-const ENTRY_TYPES = [LONG_TASK, LARGEST_CONTENTFUL_PAINT]
 
 /**
  * Default configs used on top of extensible configs from ConfigService
@@ -155,8 +160,12 @@ export {
   LOCAL_CONFIG_KEY,
   HTTP_REQUEST_TYPE,
   LONG_TASK,
+  PAINT,
+  MEASURE,
+  NAVIGATION,
+  RESOURCE,
+  FIRST_CONTENTFUL_PAINT,
   LARGEST_CONTENTFUL_PAINT,
-  ENTRY_TYPES,
   KEYWORD_LIMIT,
   SERVER_URL_PREFIX,
   BROWSER_RESPONSIVENESS_INTERVAL,
