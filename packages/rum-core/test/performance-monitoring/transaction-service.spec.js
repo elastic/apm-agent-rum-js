@@ -112,7 +112,7 @@ describe('TransactionService', function() {
     expect(trans.name).toBe('transaction')
   })
 
-  fit('should fire onstart hook only once for a transaction', () => {
+  it('should fire onstart hook only once for a transaction', () => {
     const onStartSpy = jasmine.createSpy()
     transactionService = new TransactionService(logger, {
       config: {},
