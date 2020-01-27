@@ -23,20 +23,29 @@
  *
  */
 
-const path = require('path')
-const {
-  getWebpackConfig,
-  BUNDLE_TYPES,
-  PACKAGE_TYPES
-} = require('../../../../dev-utils/build')
-
-module.exports = {
-  entry: {
-    app: path.join(__dirname, 'app.js')
+export default [
+  {
+    renderTime: 298.51500000222586,
+    loadTime: 295.4050000116695,
+    size: 3000,
+    id: '',
+    url: 'http://example.com/logo.svg',
+    element: null, // points to a DOM element
+    name: '',
+    entryType: 'largest-contentful-paint',
+    startTime: 298.51500000222586,
+    duration: 0
   },
-  output: {
-    path: path.resolve(__dirname),
-    filename: 'app.e2e-bundle.js'
-  },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD, PACKAGE_TYPES.VUE)
-}
+  {
+    renderTime: 1040.0399999925867,
+    loadTime: 0,
+    size: 5250,
+    id: '',
+    url: '',
+    element: null,
+    name: '',
+    entryType: 'largest-contentful-paint',
+    startTime: 1040.0399999925867,
+    duration: 0
+  }
+]

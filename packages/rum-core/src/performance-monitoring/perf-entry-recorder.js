@@ -89,6 +89,14 @@ export function onPerformanceEntry(list, transaction) {
 /**
  * Records all performance entry events available via Performance Observer
  * and fallbacks to Performance Timeline if not supported
+ *
+ * Entry types such as `resource`, `paint` and `measure` are recorded via
+ * Performance Timeline instead of the Observer since the buffering for
+ * certian events are not supported and we would end up in using both
+ * in certian browsers which adds performance cost.
+ *
+ * So we stick to PerformanceObserver only for new entry types like `longtask` and
+ * `largest-contentful-paint`
  */
 export class PerfEntryRecorder {
   constructor(callback) {

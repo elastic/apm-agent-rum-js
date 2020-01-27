@@ -23,20 +23,41 @@
  *
  */
 
-const path = require('path')
-const {
-  getWebpackConfig,
-  BUNDLE_TYPES,
-  PACKAGE_TYPES
-} = require('../../../../dev-utils/build')
-
-module.exports = {
-  entry: {
-    app: path.join(__dirname, 'app.js')
+export default [
+  {
+    name: 'unknown',
+    entryType: 'longtask',
+    startTime: 745.4100000031758,
+    duration: 54.56999997841194,
+    attribution: [
+      {
+        name: 'unknown',
+        entryType: 'taskattribution',
+        startTime: 0,
+        duration: 0,
+        containerType: 'iframe',
+        containerSrc: '',
+        containerId: '',
+        containerName: ''
+      }
+    ]
   },
-  output: {
-    path: path.resolve(__dirname),
-    filename: 'app.e2e-bundle.js'
-  },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD, PACKAGE_TYPES.VUE)
-}
+  {
+    name: 'self',
+    entryType: 'longtask',
+    startTime: 865.7799999928102,
+    duration: 53.874999983236194,
+    attribution: [
+      {
+        name: 'unknown',
+        entryType: 'taskattribution',
+        startTime: 0,
+        duration: 0,
+        containerType: 'iframe',
+        containerSrc: '',
+        containerId: '',
+        containerName: ''
+      }
+    ]
+  }
+]
