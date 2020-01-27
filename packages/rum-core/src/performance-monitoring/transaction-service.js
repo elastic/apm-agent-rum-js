@@ -183,18 +183,33 @@ class TransactionService {
   startTransaction(name, type, options) {
     const perfOptions = this.createOptions(options)
     let tr
+    /**
+     * Flag that decides whether we have to fire the `onstart`
+     * hook for a given transaction
+     */
+    let fireOnstartHook = true
     if (perfOptions.managed) {
+      const current = this.currentTransaction
       tr = this.startManagedTransaction(name, type, perfOptions)
+      /**
+       * If the current transaction remains the same since the
+       * transaction could be reused, we should not fire the hook
+       */
+      if (current === tr) {
+        fireOnstartHook = false
+      }
     } else {
       tr = new Transaction(name, type, perfOptions)
     }
 
     tr.onEnd = () => this.handleTransactionEnd(tr)
 
-    if (__DEV__) {
-      this._logger.debug(`startTransaction(${tr.id}, ${tr.name}, ${tr.type})`)
+    if (fireOnstartHook) {
+      if (__DEV__) {
+        this._logger.debug(`startTransaction(${tr.id}, ${tr.name}, ${tr.type})`)
+      }
+      this._config.events.send(TRANSACTION_START, [tr])
     }
-    this._config.events.send(TRANSACTION_START, [tr])
 
     return tr
   }
