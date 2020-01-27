@@ -38,27 +38,35 @@ import { truncateModel, ERROR_MODEL } from '../common/truncate'
 const IGNORE_KEYS = ['stack', 'message']
 
 function getErrorProperties(error) {
+  /**
+   * Flag which is used to eliminate the empty object
+   * check on context.custom
+   */
+  let noPropertyFound = true
   const properties = {}
   Object.keys(error).forEach(function(key) {
     if (IGNORE_KEYS.indexOf(key) >= 0) {
       return
     }
-    let val = error[key]
     /**
-     * null is typeof object and will break the switch below
-     * ignore undefined values
+     * ignore null, undefined, function values
      */
-    if (val == null) return
-    switch (typeof val) {
-      case 'function':
-        return
-      case 'object':
-        // ignore all objects except Dates
-        if (typeof val.toISOString !== 'function') return
-        val = val.toISOString()
+    let val = error[key]
+    if (val == null || typeof val === 'function') {
+      return
+    }
+
+    if (typeof val === 'object') {
+      if (typeof val.toISOString !== 'function') return
+      val = val.toISOString()
     }
     properties[key] = val
+    noPropertyFound = false
   })
+
+  if (noPropertyFound) {
+    return
+  }
   return properties
 }
 
@@ -90,8 +98,9 @@ class ErrorLogging {
     if (error && typeof error === 'object') {
       errorMessage = errorMessage || error.message
       errorType = error.name
-      errorContext = {
-        custom: getErrorProperties(error)
+      const customProperties = getErrorProperties(error)
+      if (customProperties) {
+        errorContext.custom = customProperties
       }
     }
 
