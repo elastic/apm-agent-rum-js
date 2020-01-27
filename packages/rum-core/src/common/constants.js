@@ -100,6 +100,7 @@ const CONFIG_CHANGE = 'config:change'
 const XMLHTTPREQUEST = 'xmlhttprequest'
 const FETCH = 'fetch'
 const HISTORY = 'history'
+const EVENT_TARGET = 'eventtarget'
 const ERROR = 'error'
 
 /**
@@ -142,6 +143,7 @@ export {
   XMLHTTPREQUEST,
   FETCH,
   HISTORY,
+  EVENT_TARGET,
   ERROR,
   BEFORE_EVENT,
   AFTER_EVENT,

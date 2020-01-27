@@ -23,35 +23,52 @@
  *
  */
 
-import { patchXMLHttpRequest } from './xhr-patch'
-import { patchFetch } from './fetch-patch'
-import { patchHistory } from './history-patch'
-import { patchEventTarget } from './event-target-patch'
-import EventHandler from '../event-handler'
+import patchEventHandler from './patch'
+import { EVENT_TARGET } from '../../src/common/constants'
 
-import { HISTORY, FETCH, XMLHTTPREQUEST, EVENT_TARGET } from '../constants'
+describe('EventTargetPatch', function() {
+  let events = []
+  let cancelFn
 
-const patchEventHandler = new EventHandler()
-
-let alreadyPatched = false
-function patchAll() {
-  if (!alreadyPatched) {
-    alreadyPatched = true
-    patchXMLHttpRequest(function(event, task) {
-      patchEventHandler.send(XMLHTTPREQUEST, [event, task])
+  beforeAll(function() {
+    cancelFn = patchEventHandler.observe(EVENT_TARGET, function(event, task) {
+      events.push({
+        event,
+        task
+      })
     })
-    patchFetch(function(event, task) {
-      patchEventHandler.send(FETCH, [event, task])
-    })
-    patchHistory(function(event, task) {
-      patchEventHandler.send(HISTORY, [event, task])
-    })
+  })
 
-    patchEventTarget(function(event, task) {
-      patchEventHandler.send(EVENT_TARGET, [event, task])
+  afterAll(function() {
+    cancelFn()
+  })
+
+  beforeEach(function() {
+    events = []
+  })
+
+  if (window.EventTarget) {
+    it('should patch addEventListener', () => {
+      let count = 0
+      let body = document.body
+      const listener = e => {
+        expect(e.type).toBe('click')
+        count++
+      }
+
+      body.addEventListener('click', listener)
+      body.click()
+      body.click()
+      expect(count).toBe(2)
+      body.removeEventListener('click', listener)
+      body.click()
+      expect(events.map(e => e.event)).toEqual([
+        'schedule',
+        'invoke',
+        'schedule',
+        'invoke'
+      ])
+      expect(count).toBe(2)
     })
   }
-  return patchEventHandler
-}
-
-export { patchAll, patchEventHandler }
+})
