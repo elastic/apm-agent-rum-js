@@ -173,10 +173,10 @@ describe('TransactionService', function() {
   it('should not capture timings as spans for unsampled transactions', done => {
     const unMock = mockGetEntriesByType()
 
-    config.events.observe(TRANSACTION_END, () => {
-      expect(tr.sampled).toBe(false)
-      expect(tr.captureTimings).toBe(false)
-      expect(tr.spans.length).toBe(0)
+    config.events.observe(TRANSACTION_END, transaction => {
+      expect(transaction.sampled).toBe(false)
+      expect(transaction.captureTimings).toBe(false)
+      expect(transaction.spans.length).toBe(0)
       unMock()
       done()
     })

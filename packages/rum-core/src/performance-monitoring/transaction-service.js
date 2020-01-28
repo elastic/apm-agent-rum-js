@@ -174,8 +174,8 @@ class TransactionService {
     }
 
     /**
-     * For unsampled transactions, avoid capturing various timing informations
-     * as spans as they are dropped anyways before sending to the server
+     * For unsampled transactions, avoid capturing various timing information
+     * as spans since they are dropped before sending to the server
      */
     if (tr.sampled) {
       tr.captureTimings = true
