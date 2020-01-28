@@ -156,8 +156,6 @@ class TransactionService {
       tr = this.ensureCurrentTransaction(name, type, perfOptions)
     }
 
-    tr.captureTimings = true
-
     if (tr.type === PAGE_LOAD) {
       tr.options.checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
@@ -173,6 +171,14 @@ class TransactionService {
       if (tr.name === NAME_UNKNOWN && perfOptions.pageLoadTransactionName) {
         tr.name = perfOptions.pageLoadTransactionName
       }
+    }
+
+    /**
+     * For unsampled transactions, avoid capturing various timing information
+     * as spans since they are dropped before sending to the server
+     */
+    if (tr.sampled) {
+      tr.captureTimings = true
     }
 
     this.ensureRespInterval(tr.options.checkBrowserResponsiveness)
