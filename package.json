@@ -143,6 +143,7 @@
     "@elastic/apm-rum-angular": "file:packages/rum-angular",
     "@elastic/apm-rum-core": "file:packages/rum-core",
     "@elastic/apm-rum-react": "file:packages/rum-react",
-    "@elastic/apm-rum-vue": "file:packages/rum-vue"
+    "@elastic/apm-rum-vue": "file:packages/rum-vue",
+    "playwright": "^0.9.24"
   }
 }

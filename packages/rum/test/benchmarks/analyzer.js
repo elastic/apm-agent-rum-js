@@ -99,11 +99,11 @@ function getApmBundleSize() {
   }
 }
 
-function getCommonFields({ version, url, scenario }) {
+function getCommonFields({ browser, url, scenario }) {
   const { minified, gzip } = getApmBundleSize()
   return {
     scenario,
-    'parameters.browser': version,
+    'parameters.browser': browser,
     'parameters.url': url,
     'parameters.runs': runs,
     'parameters.images': scenario === 'heavy' ? noOfImages : 0,
@@ -130,43 +130,47 @@ function getUnit(metricName) {
 }
 
 async function analyzeMetrics(metric, resultMap) {
-  const { cpu, payload, navigation, measure, url, scenario, memory } = metric
+  try {
+    const { cpu, payload, navigation, measure, url, scenario, memory } = metric
 
-  const loadTime =
-    getFromEntries(navigation, url, 'loadEventEnd') -
-    getFromEntries(navigation, url, 'fetchStart')
-  const initializationTime = getFromEntries(measure, 'init', 'duration')
-  const parseAndExecTime = getFromEntries(
-    measure,
-    'parse-and-execute',
-    'duration'
-  )
+    const loadTime =
+      getFromEntries(navigation, url, 'loadEventEnd') -
+      getFromEntries(navigation, url, 'fetchStart')
+    const initializationTime = getFromEntries(measure, 'init', 'duration')
+    const parseAndExecTime = getFromEntries(
+      measure,
+      'parse-and-execute',
+      'duration'
+    )
 
-  /**
-   * Analysis of each run
-   */
-  const analysis = {
-    'page-load-time': loadTime,
-    'rum-init-time': initializationTime,
-    'parse-and-execute-time': parseAndExecTime,
-    'total-cpu-time': cpu.cpuTime,
-    'rum-cpu-time': cpu.cpuTimeFiltered,
-    'payload-size': payload.size,
-    transactions: payload.transactions,
-    spans: payload.spans,
-    memory
-  }
-
-  /**
-   * Accumulate result of each run in the corresponding scenario
-   */
-  Object.keys(analysis).forEach(key => {
-    const metricObj = resultMap.get(scenario)
-    if (!metricObj[key]) {
-      metricObj[key] = []
+    /**
+     * Analysis of each run
+     */
+    const analysis = {
+      'page-load-time': loadTime,
+      'rum-init-time': initializationTime,
+      'parse-and-execute-time': parseAndExecTime,
+      'total-cpu-time': cpu.cpuTime,
+      'rum-cpu-time': cpu.cpuTimeFiltered,
+      'payload-size': payload.size,
+      transactions: payload.transactions,
+      spans: payload.spans,
+      memory
     }
-    metricObj[key].push(analysis[key])
-  })
+
+    /**
+     * Accumulate result of each run in the corresponding scenario
+     */
+    Object.keys(analysis).forEach(key => {
+      const metricObj = resultMap.get(scenario)
+      if (!metricObj[key]) {
+        metricObj[key] = []
+      }
+      metricObj[key].push(analysis[key])
+    })
+  } catch (e) {
+    throw e
+  }
 }
 
 function calculateResults(resultMap) {
@@ -175,6 +179,10 @@ function calculateResults(resultMap) {
     let result = {}
     Object.keys(metricObj).forEach(metricName => {
       const value = metricObj[metricName]
+      console.log('value', value)
+      if (value == null) {
+        return
+      }
       /**
        * Add consumed memory in bytes per each function to the result
        */
