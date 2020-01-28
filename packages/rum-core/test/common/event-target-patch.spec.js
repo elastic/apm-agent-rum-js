@@ -47,28 +47,96 @@ describe('EventTargetPatch', function() {
     events = []
   })
 
+  it('should work different argument types', () => {
+    let element = document.createElement('div')
+    element.addEventListener('click', undefined)
+    var spy = jasmine.createSpy('spy')
+    element.addEventListener('click', spy)
+    element.click()
+    expect(spy).toHaveBeenCalled()
+  })
+
+  it('should not affect other event types', () => {
+    const eventType = 'apm-test-event'
+    var event = new Event(eventType)
+    let count = 0
+    let element = document.createElement('div')
+    const listener = e => {
+      expect(e.type).toBe(eventType)
+      count++
+    }
+    element.addEventListener(eventType, listener)
+    element.dispatchEvent(event)
+    expect(count).toBe(1)
+    expect(events.length).toBe(0)
+    element.removeEventListener(eventType, listener)
+    element.dispatchEvent(event)
+    expect(count).toBe(1)
+  })
+
   if (window.EventTarget) {
     it('should patch addEventListener', () => {
       let count = 0
-      let body = document.body
+      let element = document.createElement('div')
       const listener = e => {
         expect(e.type).toBe('click')
         count++
       }
 
-      body.addEventListener('click', listener)
-      body.click()
-      body.click()
+      element.addEventListener('click', listener)
+      element.addEventListener('click', listener, { capture: true })
+      element.click()
       expect(count).toBe(2)
-      body.removeEventListener('click', listener)
-      body.click()
+      element.removeEventListener('click', listener)
+      element.click()
+      expect(count).toBe(3)
+      element.removeEventListener('click', listener, true)
+      element.click()
       expect(events.map(e => e.event)).toEqual([
+        'schedule',
+        'invoke',
         'schedule',
         'invoke',
         'schedule',
         'invoke'
       ])
-      expect(count).toBe(2)
+      expect(count).toBe(3)
+    })
+
+    it('should consider event listener uniqueness condition', () => {
+      let count = 0
+      let element = document.createElement('div')
+      const listener = e => {
+        expect(e.type).toBe('click')
+        count++
+      }
+
+      element.addEventListener('click', listener)
+      element.addEventListener('click', listener)
+      element.addEventListener('click', listener, { capture: false })
+
+      element.click()
+      expect(count).toBe(1)
+
+      element.addEventListener('click', listener, true)
+      element.addEventListener('click', listener, { capture: true })
+
+      element.click()
+      expect(count).toBe(3)
+
+      element.removeEventListener('click', listener)
+      element.removeEventListener('click', listener)
+      element.click()
+      expect(count).toBe(4)
+
+      element.removeEventListener('click', listener, true)
+      element.click()
+      expect(count).toBe(4)
+
+      element.removeEventListener('click', listener, true)
+      element.click()
+      expect(count).toBe(4)
+      expect(events.length).toBe(8)
     })
   }
 })

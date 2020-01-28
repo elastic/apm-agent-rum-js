@@ -30,11 +30,9 @@ import {
   REMOVE_EVENT_LISTENER_STR,
   EVENT_TARGET
 } from '../constants'
-
 import { apmSymbol } from './patch-utils'
 
 const eventTypes = ['click']
-
 const eventTypeSymbols = {}
 
 for (let i = 0; i < eventTypes.length; i++) {
@@ -51,6 +49,15 @@ export function patchEventTarget(callback) {
   const nativeAddEventListener = proto[ADD_EVENT_LISTENER_STR]
   const nativeRemoveEventListener = proto[REMOVE_EVENT_LISTENER_STR]
 
+  /**
+   * This function checks whether we have already patched an event listener
+   * according to the rules defined in:
+   * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
+   * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+   * In short, the uniqueness of an event listener depends on even type, capture argument
+   * and listener function instance. This ensures that no two event listeners that have the same value
+   * for these arguments are registered.
+   */
   function findTaskIndex(existingTasks, eventType, listenerFn, capture) {
     for (let i = 0; i < existingTasks.length; i++) {
       const task = existingTasks[i]
@@ -65,14 +72,15 @@ export function patchEventTarget(callback) {
     return -1
   }
 
+  /**
+   * isCapture unifies the multiple ways 'useCapture'
+   * argument can be passed to addEventlistener
+   * For more: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+   */
   function isCapture(options) {
     let capture
-    if (options === undefined) {
-      capture = false
-    } else if (options === true) {
-      capture = true
-    } else if (options === false) {
-      capture = false
+    if (typeof options === 'boolean') {
+      capture = options
     } else {
       capture = options ? !!options.capture : false
     }
@@ -129,6 +137,27 @@ export function patchEventTarget(callback) {
     return wrappingFn
   }
 
+  function getWrappingFn(target, eventType, listenerFn, options) {
+    const eventSymbol = eventTypeSymbols[eventType]
+    let existingTasks = target[eventSymbol]
+
+    if (existingTasks) {
+      let capture = isCapture(options)
+      let taskIndex = findTaskIndex(
+        existingTasks,
+        eventType,
+        listenerFn,
+        capture
+      )
+      if (taskIndex !== -1) {
+        let task = existingTasks[taskIndex]
+        existingTasks.splice(taskIndex, 1)
+        return task.wrappingFn
+      }
+    }
+    return listenerFn
+  }
+
   proto[ADD_EVENT_LISTENER_STR] = function(
     eventType,
     listenerFn,
@@ -162,24 +191,15 @@ export function patchEventTarget(callback) {
     }
     const target = this
 
-    const eventSymbol = eventTypeSymbols[eventType]
+    let wrappingFn = getWrappingFn(
+      target,
+      eventType,
+      listenerFn,
+      optionsOrCapture
+    )
 
-    let existingTasks = target[eventSymbol]
-    let capture = isCapture(optionsOrCapture)
     let args = [...arguments]
-    if (existingTasks) {
-      let taskIndex = findTaskIndex(
-        existingTasks,
-        eventType,
-        listenerFn,
-        capture
-      )
-      if (taskIndex !== -1) {
-        let task = existingTasks[taskIndex]
-        args[1] = task.wrappingFn
-        existingTasks.splice(taskIndex, 1)
-      }
-    }
+    args[1] = wrappingFn
     return nativeRemoveEventListener.apply(target, args)
   }
 }
