@@ -170,6 +170,25 @@ describe('TransactionService', function() {
     tr2.detectFinish()
   })
 
+  it('should not capture timings as spans for unsampled transactions', done => {
+    const unMock = mockGetEntriesByType()
+
+    config.events.observe(TRANSACTION_END, transaction => {
+      expect(transaction.sampled).toBe(false)
+      expect(transaction.captureTimings).toBe(false)
+      expect(transaction.spans.length).toBe(0)
+      unMock()
+      done()
+    })
+
+    const tr = transactionService.startTransaction(
+      'unsampled-test',
+      PAGE_LOAD,
+      { transactionSampleRate: 0 }
+    )
+    tr.detectFinish()
+  })
+
   it('should reuse Transaction', function() {
     transactionService = new TransactionService(logger, config)
     const reusableTr = new Transaction('test-name', 'test-type', {
