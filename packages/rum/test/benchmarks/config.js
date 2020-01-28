@@ -25,10 +25,10 @@
 
 const port = 9000
 module.exports = {
-  scenarios: ['basic'],
-  runs: 1,
+  scenarios: ['basic', 'heavy'],
+  runs: 3,
   noOfImages: 30,
-  browserTypes: ['firefox', 'webkit'],
+  browserTypes: ['chromium', 'firefox', 'webkit'],
   port,
   chrome: {
     /**
