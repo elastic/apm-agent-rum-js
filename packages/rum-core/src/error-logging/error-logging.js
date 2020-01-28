@@ -42,7 +42,7 @@ function getErrorProperties(error) {
    * Flag which is used to eliminate the empty object
    * check on context.custom
    */
-  let noPropertyFound = true
+  let propertyFound = false
   const properties = {}
   Object.keys(error).forEach(function(key) {
     if (IGNORE_KEYS.indexOf(key) >= 0) {
@@ -61,13 +61,12 @@ function getErrorProperties(error) {
       val = val.toISOString()
     }
     properties[key] = val
-    noPropertyFound = false
+    propertyFound = true
   })
 
-  if (noPropertyFound) {
-    return
+  if (propertyFound) {
+    return properties
   }
-  return properties
 }
 
 class ErrorLogging {
