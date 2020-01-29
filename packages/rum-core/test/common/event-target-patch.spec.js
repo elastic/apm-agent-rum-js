@@ -47,18 +47,35 @@ describe('EventTargetPatch', function() {
     events = []
   })
 
+  function createEvent(eventType) {
+    let event
+    if (typeof Event === 'function') {
+      event = new Event(eventType)
+    } else {
+      /**
+       * For IE11 support
+       */
+      event = document.createEvent('Event')
+      event.initEvent(eventType, true, true)
+    }
+    return event
+  }
+
   it('should work different argument types', () => {
     let element = document.createElement('div')
-    element.addEventListener('click', undefined)
-    var spy = jasmine.createSpy('spy')
-    element.addEventListener('click', spy)
+    document.body.insertBefore(element, null)
+    let eventType = 'click'
+    element.addEventListener(eventType, undefined)
+    let spy = jasmine.createSpy('spy')
+    element.addEventListener(eventType, spy)
     element.click()
     expect(spy).toHaveBeenCalled()
   })
 
   it('should not affect other event types', () => {
     const eventType = 'apm-test-event'
-    var event = new Event(eventType)
+    let event = createEvent(eventType)
+
     let count = 0
     let element = document.createElement('div')
     const listener = e => {
@@ -75,7 +92,7 @@ describe('EventTargetPatch', function() {
   })
 
   if (window.EventTarget) {
-    it('should patch addEventListener', () => {
+    it('should patch EventTarget', () => {
       let count = 0
       let element = document.createElement('div')
       const listener = e => {
@@ -113,7 +130,12 @@ describe('EventTargetPatch', function() {
 
       element.addEventListener('click', listener)
       element.addEventListener('click', listener)
-      element.addEventListener('click', listener, { capture: false })
+      /**
+       * Form with options object is only supported on
+       * Chrome Mobile 49 and above therefore we can not
+       * pass an object here.
+       */
+      element.addEventListener('click', listener, false)
 
       element.click()
       expect(count).toBe(1)

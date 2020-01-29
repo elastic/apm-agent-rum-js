@@ -122,8 +122,7 @@ export function patchEventTarget(callback) {
 
     existingTasks.push(task)
 
-    function wrappingFn(event) {
-      task.event = event
+    function wrappingFn() {
       callback(SCHEDULE, task)
       let result
       try {
@@ -152,6 +151,9 @@ export function patchEventTarget(callback) {
       if (taskIndex !== -1) {
         let task = existingTasks[taskIndex]
         existingTasks.splice(taskIndex, 1)
+        if (existingTasks.length === 0) {
+          target[eventSymbol] = undefined
+        }
         return task.wrappingFn
       }
     }
