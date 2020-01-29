@@ -34,7 +34,11 @@ import {
   MEASURE,
   FIRST_CONTENTFUL_PAINT
 } from '../common/constants'
-import { stripQueryStringFromUrl, PERF, isPTSupported } from '../common/utils'
+import {
+  stripQueryStringFromUrl,
+  PERF,
+  isPerfTimelineSupported
+} from '../common/utils'
 
 /**
  * Navigation Timing Spans
@@ -245,18 +249,19 @@ function getNavigationTimingMarks() {
 }
 
 /**
- * Paint Timing Metrics that is available during page load
- * `first-paint` and `first-contentful-paint`
- * https://www.w3.org/TR/paint-timing/
+ * Get the `first-contentful-paint` metric that is available during
+ * page-load using the Paint Timing Metrics API
+ * SPEC - https://www.w3.org/TR/paint-timing/
  */
 function getFirstContentfulPaint() {
   let fcp
-  if (isPTSupported()) {
+  if (isPerfTimelineSupported()) {
     const entries = PERF.getEntriesByType(PAINT)
     if (entries.length > 0) {
       const timing = PERF.timing
       /**
-       * To avoid capturing the unload event handler effect in paint timings
+       * To avoid capturing the unload event handler effect
+       * as part of the transaction duration
        */
       const unloadDiff = timing.fetchStart - timing.navigationStart
       const fcpEntry = entries.filter(
@@ -344,7 +349,7 @@ function captureNavigation(transaction) {
     transaction.addMarks(getPageLoadMarks())
   }
 
-  if (isPTSupported()) {
+  if (isPerfTimelineSupported()) {
     const trStart = transaction._start
     /**
      * Capture resource timing information as spans

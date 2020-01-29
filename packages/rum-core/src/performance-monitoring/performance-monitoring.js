@@ -78,7 +78,7 @@ class PerformanceMonitoring {
      */
     this._configService.events.observe(
       TRANSACTION_START + BEFORE_EVENT,
-      transaction => recorder.start(transaction.type)
+      transaction => recorder.start(transaction)
     )
     /**
      * We need to run this event listener after all of user-registered listener,
@@ -87,7 +87,7 @@ class PerformanceMonitoring {
     this._configService.events.observe(
       TRANSACTION_END + AFTER_EVENT,
       transaction => {
-        recorder.stop()
+        recorder.stop(transaction)
         const payload = this.createTransactionPayload(transaction)
         if (payload) {
           this._apmServer.addTransaction(payload)

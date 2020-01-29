@@ -63,9 +63,30 @@ describe('PerfEntryRecorder', () => {
     expect(customTransaction.marks).toBeUndefined()
   })
 
-  it('should start recording on all browsers without errors', () => {
+  it('should start recording based on managed vs custom transaction', () => {
     const recorder = new PerfEntryRecorder(() => {})
-    recorder.start()
-    recorder.stop()
+    const onStartSpy = jasmine.createSpy()
+    const onStopSpy = jasmine.createSpy()
+    recorder.po = {
+      observe: onStartSpy,
+      disconnect: onStopSpy
+    }
+
+    const pageLoadTransaction = new Transaction('/', PAGE_LOAD)
+    pageLoadTransaction.captureTimings = true
+    recorder.start(pageLoadTransaction)
+    recorder.stop(pageLoadTransaction)
+
+    expect(onStartSpy).toHaveBeenCalled()
+    expect(onStopSpy).toHaveBeenCalled()
+
+    onStartSpy.calls.reset()
+    onStopSpy.calls.reset()
+    const customTransaction = new Transaction('/', TYPE_CUSTOM)
+    customTransaction.captureTimings = false
+    recorder.start(customTransaction)
+    recorder.stop(customTransaction)
+    expect(onStartSpy).not.toHaveBeenCalled()
+    expect(onStopSpy).not.toHaveBeenCalled()
   })
 })

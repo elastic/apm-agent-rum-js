@@ -32,7 +32,22 @@ import { noop } from '../common/utils'
 import Span from './span'
 
 /**
+ * Detects if the given transaction is managed by the agent
+ */
+function isManaged(transaction) {
+  return transaction.captureTimings
+}
+
+/**
+ * Checks whether the give transaction is a page load transaction
+ */
+function isPageLoadTransaction(transaction) {
+  return transaction.type === PAGE_LOAD
+}
+
+/**
  * Create Spans for the long task entries
+ * Spec - https://w3c.github.io/longtasks/
  *
  * TODO: Make use of the long task attribution data
  */
@@ -61,7 +76,7 @@ export function onPerformanceEntry(list, transaction) {
   /**
    * Paint timings like FCP and LCP are available only for page-load navigation
    */
-  if (transaction.type !== PAGE_LOAD) {
+  if (!isPageLoadTransaction(transaction)) {
     return
   }
 
@@ -109,24 +124,43 @@ export class PerfEntryRecorder {
     }
   }
 
-  start(type) {
+  start(transaction) {
+    /**
+     * Only observe for managed transactions
+     */
+    if (!isManaged(transaction)) {
+      return
+    }
     /**
      * Safari throws an error when PerformanceObserver is
-     * observed for unknown entry types
+     * observed for unknown entry types as longtasks and lcp is
+     * not supported at the moment
      */
     try {
       /**
-       * Except longtasks other entries support buffered
-       * performance entries
+       * Start observing for different entry types depending on the transaction type
+       * - Except longtasks other entries support buffered flag for performance entries
+       * - `buffered`: true means we would be able to retrive all the events that happened
+       * before calling the observe method
+       * - We are using type instead of entryTypes in the options since
+       *   browsers would throw error when using entryTypes options along with
+       *   buffered flag (https://w3c.github.io/performance-timeline/#observe-method)
        */
-      if (type === PAGE_LOAD) {
+      if (isPageLoadTransaction(transaction)) {
+        /**
+         * Largest Contentful Paint is a draft spec and its not W3C standard yet
+         * Spec - https://wicg.github.io/largest-contentful-paint/
+         */
         this.po.observe({ type: LARGEST_CONTENTFUL_PAINT, buffered: true })
       }
       this.po.observe({ type: LONG_TASK })
     } catch (_) {}
   }
 
-  stop() {
+  stop(transaction) {
+    if (!isManaged(transaction)) {
+      return
+    }
     this.po.disconnect()
   }
 }

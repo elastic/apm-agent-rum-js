@@ -29,7 +29,7 @@ import {
   getPageMetadata,
   getServerTimingInfo,
   PERF,
-  isPTSupported
+  isPerfTimelineSupported
 } from './utils'
 
 const LEFT_SQUARE_BRACKET = 91 // [
@@ -166,7 +166,7 @@ export function addSpanContext(span, data) {
 export function addTransactionContext(transaction, configContext) {
   const pageContext = getPageMetadata()
   let responseContext = {}
-  if (transaction.type === PAGE_LOAD && isPTSupported()) {
+  if (transaction.type === PAGE_LOAD && isPerfTimelineSupported()) {
     let entries = PERF.getEntriesByType(NAVIGATION)
     if (entries && entries.length > 0) {
       responseContext = {

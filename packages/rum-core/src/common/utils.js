@@ -349,9 +349,10 @@ function scheduleMicroTask(callback) {
 }
 
 /**
- * Check if performancce Timeline is supported in browsers
+ * Check if performance Timeline is supported in browsers
+ * Performane Timeline imples `getEntriesByType`
  */
-function isPTSupported() {
+function isPerfTimelineSupported() {
   return typeof PERF.getEntriesByType === 'function'
 }
 
@@ -389,5 +390,5 @@ export {
   find,
   removeInvalidChars,
   PERF,
-  isPTSupported
+  isPerfTimelineSupported
 }
