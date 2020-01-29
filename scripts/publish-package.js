@@ -51,7 +51,7 @@ Command.prototype.runPreparations = async function() {
     const message = `
     Error: Please provide a valid package name
 
-    Valid pacakges: ${packages.map(pkg => pkg.name).join(', ')}
+    Valid packages: ${packages.map(pkg => pkg.name).join(', ')}
     `
     console.error(message)
     process.exit(1)
