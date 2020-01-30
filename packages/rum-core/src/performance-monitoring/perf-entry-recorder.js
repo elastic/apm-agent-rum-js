@@ -48,8 +48,6 @@ function isPageLoadTransaction(transaction) {
 /**
  * Create Spans for the long task entries
  * Spec - https://w3c.github.io/longtasks/
- *
- * TODO: Make use of the long task attribution data
  */
 function createLongTaskSpans(longtasks) {
   if (longtasks.length === 0) {
@@ -58,10 +56,55 @@ function createLongTaskSpans(longtasks) {
 
   const longTaskSpans = []
   for (let i = 0; i < longtasks.length; i++) {
-    const { name, startTime, duration } = longtasks[i]
+    /**
+     * name of the long task can be any one of the type listed here
+     * depeding on the origin of the longtask
+     * https://w3c.github.io/longtasks/#sec-PerformanceLongTaskTiming
+     */
+    const { name, startTime, duration, attribution } = longtasks[i]
     const end = startTime + duration
     const kind = LONG_TASK
     const span = new Span(`Longtask(${name})`, kind, { startTime })
+
+    /**
+     * use attribution data to figure out the culprits of the longtask
+     * https://w3c.github.io/longtasks/#sec-TaskAttributionTiming
+     *
+     * Based on the same-origin policy, we can figure out the culprit from
+     * the attribution data
+     */
+    if (attribution.length > 0) {
+      const { name, containerType, containerName, containerId } = attribution[0]
+
+      /**
+       * name - identifies the type of work responsible for the long task
+       * such as `unknown`, `script`, `layout`
+       *
+       * containerType - type of the culprit browsing context container such as
+       * 'iframe', 'embed', 'object' or 'window'
+       *
+       * Based on the container type, the name, id and src would be populated in
+       * the respective fields when available or empty string (ex: If iframe
+       * type caused the longtask, id and name of the Iframe would be populated)
+       *
+       * `containerSrc` is not used as it could be large url/blob and it would
+       * increase the payload size, showing id/name would be enough to asosicate the origin
+       */
+      const customContext = {
+        attribution: name,
+        type: containerType
+      }
+      if (containerName) {
+        customContext.name = containerName
+      }
+      if (containerId) {
+        customContext.id = containerId
+      }
+      span.addContext({
+        custom: customContext
+      })
+    }
+
     span.end(end)
 
     longTaskSpans.push(span)

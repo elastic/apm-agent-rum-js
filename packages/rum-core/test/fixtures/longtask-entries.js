@@ -23,9 +23,13 @@
  *
  */
 
+/**
+ * Entries are copied from the demo link available as part of
+ * longtask repo - https://w3c.github.io/longtasks/demo.html
+ */
 export default [
   {
-    name: 'unknown',
+    name: 'self',
     entryType: 'longtask',
     startTime: 745.4100000031758,
     duration: 54.56999997841194,
@@ -35,7 +39,7 @@ export default [
         entryType: 'taskattribution',
         startTime: 0,
         duration: 0,
-        containerType: 'iframe',
+        containerType: 'window',
         containerSrc: '',
         containerId: '',
         containerName: ''
@@ -43,10 +47,10 @@ export default [
     ]
   },
   {
-    name: 'self',
+    name: 'same-origin-descendant',
     entryType: 'longtask',
-    startTime: 865.7799999928102,
-    duration: 53.874999983236194,
+    startTime: 1023.40999995591,
+    duration: 187.19000002602115,
     attribution: [
       {
         name: 'unknown',
@@ -54,6 +58,24 @@ export default [
         startTime: 0,
         duration: 0,
         containerType: 'iframe',
+        containerSrc: 'demo-child.html',
+        containerId: '',
+        containerName: 'childA'
+      }
+    ]
+  },
+  {
+    name: 'same-origin-ancestor',
+    entryType: 'longtask',
+    startTime: 1923.40999995591,
+    duration: 158.16999995149672,
+    attribution: [
+      {
+        name: 'unknown',
+        entryType: 'taskattribution',
+        startTime: 0,
+        duration: 0,
+        containerType: 'window',
         containerSrc: '',
         containerId: '',
         containerName: ''

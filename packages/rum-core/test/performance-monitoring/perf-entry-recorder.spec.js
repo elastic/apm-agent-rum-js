@@ -35,18 +35,56 @@ describe('PerfEntryRecorder', () => {
     getEntriesByType: mockObserverEntryTypes
   }
 
+  const getLtSpans = tr => tr.spans.filter(span => span.type === LONG_TASK)
+
   it('should create long tasks spans for all transaction types', () => {
     const pageLoadTransaction = new Transaction('/', PAGE_LOAD)
     onPerformanceEntry(mockEntryList, pageLoadTransaction)
 
-    const getLtSpans = tr => tr.spans.filter(span => span.type === LONG_TASK)
-
-    expect(getLtSpans(pageLoadTransaction).length).toEqual(2)
+    expect(getLtSpans(pageLoadTransaction).length).toEqual(3)
 
     const customTransaction = new Transaction('/', TYPE_CUSTOM)
     onPerformanceEntry(mockEntryList, customTransaction)
 
-    expect(getLtSpans(customTransaction).length).toEqual(2)
+    expect(getLtSpans(customTransaction).length).toEqual(3)
+  })
+
+  it('should create long tasks attribution data in span context', () => {
+    const tr = new Transaction('/', PAGE_LOAD)
+    onPerformanceEntry(mockEntryList, tr)
+    const ltSpans = getLtSpans(tr)
+
+    expect(ltSpans.length).toBe(3)
+    expect(ltSpans).toEqual([
+      jasmine.objectContaining({
+        name: 'Longtask(self)',
+        context: {
+          custom: {
+            attribution: 'unknown',
+            type: 'window'
+          }
+        }
+      }),
+      jasmine.objectContaining({
+        name: 'Longtask(same-origin-descendant)',
+        context: {
+          custom: {
+            attribution: 'unknown',
+            type: 'iframe',
+            name: 'childA'
+          }
+        }
+      }),
+      jasmine.objectContaining({
+        name: 'Longtask(same-origin-ancestor)',
+        context: {
+          custom: {
+            attribution: 'unknown',
+            type: 'window'
+          }
+        }
+      })
+    ])
   })
 
   it('should mark largest contentful paint only for page-load transaction', () => {
