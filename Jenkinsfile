@@ -362,8 +362,10 @@ def runScript(Map args = [:]){
         sleep randomNumber(min: 5, max: 10)
         if(params.saucelab_test){
           env.MODE = 'saucelabs'
-          withSaucelabsEnv(){
-            sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
+          retry(3) {
+            withSaucelabsEnv(){
+              sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
+            }
           }
         } else {
           env.MODE = 'none'
@@ -376,14 +378,12 @@ def runScript(Map args = [:]){
 
 def withSaucelabsEnv(Closure body){
   def jsonValue = getVaultSecret(secret: "${SECRET}")
-  wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [
-    [var: 'SAUCE_USERNAME', password: jsonValue.data.SAUCE_USERNAME],
-    [var: 'SAUCE_ACCESS_KEY', password: jsonValue.data.SAUCE_ACCESS_KEY],
-  ]]) {
-    withEnv([
-      "SAUCE_USERNAME=${jsonValue.data.SAUCE_USERNAME}",
-      "SAUCE_ACCESS_KEY=${jsonValue.data.SAUCE_ACCESS_KEY}"]) {
-        body()
+  withEnvMask(vars: [
+    [var: 'SAUCE_USERNAME', password: "${jsonValue.data.SAUCE_USERNAME}"],
+    [var: 'SAUCE_ACCESS_KEY', password: "${jsonValue.data.SAUCE_ACCESS_KEY}"],
+  ]){
+    timeout(activity: true, time: 1) { //SauceLab uncatch exceptions
+      body()
     }
   }
 }
