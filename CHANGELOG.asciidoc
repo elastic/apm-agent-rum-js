@@ -29,6 +29,21 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-4.x]]
 === RUM JS Agent version 4.x
 
+[[release-notes-4.7.1]]
+==== 4.7.1 (2020-01-30)
+
+[float]
+===== Features
+* Vue: Capture errors in vue app automatically: {issue}555[#555]
+
+
+[float]
+===== Bug fixes
+* Add error properties to custom context by default {issue}582[#582]
+* Avoid capturing timings if the transaction is unsampled {issue}579[#579]
+* Avoid firing transaction-start event on reused transactions {issue}583[#583]
+
+
 [[release-notes-4.7.0]]
 ==== 4.7.0 (2020-01-15)
 

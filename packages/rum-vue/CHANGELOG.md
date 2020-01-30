@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@0.2.0...@elastic/apm-rum-vue@0.3.0) (2020-01-30)
+
+
+### Features
+
+* **rum-vue:** capture errors in vue app automatically ([#575](https://github.com/elastic/apm-agent-rum-js/issues/575)) ([1a2e214](https://github.com/elastic/apm-agent-rum-js/commit/1a2e2148ca91ff7073b898963d73631233eb3b99))
+
+
+
+
+
 # [0.2.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@0.1.0...@elastic/apm-rum-vue@0.2.0) (2020-01-15)
 
 
