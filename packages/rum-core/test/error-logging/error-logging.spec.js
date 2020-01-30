@@ -23,7 +23,7 @@
  *
  */
 
-import { createServiceFactory } from '../'
+import { createServiceFactory, createCustomEvent } from '../'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig('rum-core')
@@ -309,27 +309,6 @@ describe('ErrorLogging', function() {
   })
 
   it('should capture unhandled rejection events', done => {
-    /**
-     * Polyfilling the CustomEvent since they are available as objects
-     * in IE 9-11
-     * https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent#Polyfill
-     */
-    function createCustomEevent(event, params) {
-      params = params || { bubbles: false, cancelable: false, detail: null }
-      if (typeof window.CustomEvent === 'function') {
-        return new CustomEvent(event, params)
-      }
-
-      const evt = document.createEvent('CustomEvent')
-      evt.initCustomEvent(
-        event,
-        params.bubbles,
-        params.cancelable,
-        params.detail
-      )
-      return evt
-    }
-
     configService.setConfig({
       flushInterval: 1
     })
@@ -344,7 +323,7 @@ describe('ErrorLogging', function() {
      * all browsers
      */
     const reason = new Error(testErrorMessage)
-    const event = createCustomEevent('unhandledrejection')
+    const event = createCustomEvent('unhandledrejection')
     event.reason = reason
     window.dispatchEvent(event)
   })
