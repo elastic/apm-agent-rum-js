@@ -95,8 +95,8 @@ pipeline {
                     values (
                       '8.0.0-SNAPSHOT',
                       '7.0.0',
-                      '6.6.0',
-                      '6.5.0'
+                      '6.6.0'
+//                      '6.5.0'
                     )
                 }
                 //TODO move scope to an axis when we have the SauceLab account
