@@ -10,6 +10,7 @@ services:
       - "cluster.routing.allocation.disk.threshold_enabled=false"
       - "discovery.type=single-node"
       - "path.data=/usr/share/elasticsearch/data/${STACK_VERSION}"
+      - "indices.id_field_data.enabled=true"
     ulimits:
       memlock:
         soft: -1
