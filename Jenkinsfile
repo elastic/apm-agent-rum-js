@@ -87,12 +87,60 @@ pipeline {
         Execute unit tests.
         */
         stage('Test') {
-          steps {
-            withGithubNotify(context: 'Test', tab: 'tests') {
-              deleteDir()
-              unstash 'source'
-              dir("${BASE_DIR}"){
-                runParallelTest()
+          matrix {
+            agent { label 'linux && immutable' }
+            axes {
+                axis {
+                    name 'STACK_VERSION'
+                    values (
+                      '8.0.0-SNAPSHOT',
+                      '7.0.0',
+                      '6.6.0',
+                      '6.5.0'
+                    )
+                }
+                //TODO move scope to an axis when we have the SauceLab account
+            }
+            stages {
+              stage('Scope @elastic/apm-rum-core') {
+                environment {
+                  SCOPE="@elastic/apm-rum-core"
+                }
+                steps {
+                  runTest()
+                }
+              }
+              stage('Scope @elastic/apm-rum') {
+                environment {
+                  SCOPE="@elastic/apm-rum"
+                }
+                steps {
+                  runTest()
+                }
+              }
+              stage('Scope @elastic/apm-rum-react') {
+                environment {
+                  SCOPE="@elastic/apm-rum-react"
+                }
+                steps {
+                  runTest()
+                }
+              }
+              stage('Scope @elastic/apm-rum-angular') {
+                environment {
+                  SCOPE="@elastic/apm-rum-angular"
+                }
+                steps {
+                  runTest()
+                }
+              }
+              stage('Scope @elastic/apm-rum-vue') {
+                environment {
+                  SCOPE="@elastic/apm-rum-vue"
+                }
+                steps {
+                  runTest()
+                }
               }
             }
           }
@@ -219,6 +267,7 @@ pipeline {
 /**
 Parallel task generator for the integration tests.
 */
+//TODO delete
 class RumParallelTaskGenerator extends DefaultParallelTaskGenerator {
 
   public RumParallelTaskGenerator(Map params){
@@ -247,6 +296,7 @@ class RumParallelTaskGenerator extends DefaultParallelTaskGenerator {
   }
 }
 
+//TODO delete
 def runParallelTest(){
   rumTasksGen = new RumParallelTaskGenerator(
     xFile: '.ci/.jenkins_stack_versions.yaml',
@@ -268,6 +318,16 @@ def runParallelTest(){
         v()
       }
     }
+  }
+}
+
+def runTest(){
+  withGithubNotify(context: "Test ${SCOPE} - ${STACK_VERSION}", tab: 'tests') {
+    runScript(
+      label: "${SCOPE}",
+      stack: "${STACK_VERSION}",
+      scope: "${SCOPE}",
+      goal: 'test')
   }
 }
 
