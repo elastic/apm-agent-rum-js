@@ -105,6 +105,7 @@ pipeline {
               stage('Scope @elastic/apm-rum-core') {
                 environment {
                   SCOPE="@elastic/apm-rum-core"
+                  SECRET="${env.SAUCELABS_SECRET}@elastic/apm-rum-core"
                 }
                 steps {
                   runTest()
@@ -113,6 +114,7 @@ pipeline {
               stage('Scope @elastic/apm-rum') {
                 environment {
                   SCOPE="@elastic/apm-rum"
+                  SECRET="${env.SAUCELABS_SECRET}@elastic/apm-rum"
                 }
                 steps {
                   runTest()
@@ -121,6 +123,7 @@ pipeline {
               stage('Scope @elastic/apm-rum-react') {
                 environment {
                   SCOPE="@elastic/apm-rum-react"
+                  SECRET="${env.SAUCELABS_SECRET}@elastic/apm-rum-core"
                 }
                 steps {
                   runTest()
@@ -129,6 +132,7 @@ pipeline {
               stage('Scope @elastic/apm-rum-angular') {
                 environment {
                   SCOPE="@elastic/apm-rum-angular"
+                  SECRET="${env.SAUCELABS_SECRET}@elastic/apm-rum"
                 }
                 steps {
                   runTest()
@@ -137,6 +141,7 @@ pipeline {
               stage('Scope @elastic/apm-rum-vue') {
                 environment {
                   SCOPE="@elastic/apm-rum-vue"
+                  SECRET="${env.SAUCELABS_SECRET}@elastic/apm-rum-core"
                 }
                 steps {
                   runTest()
@@ -370,7 +375,7 @@ def runScript(Map args = [:]){
 }
 
 def withSaucelabsEnv(Closure body){
-  def jsonValue = getVaultSecret(secret: "${SAUCELABS_SECRET}${SCOPE}")
+  def jsonValue = getVaultSecret(secret: "${SECRET}")
   wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [
     [var: 'SAUCE_USERNAME', password: jsonValue.data.SAUCE_USERNAME],
     [var: 'SAUCE_ACCESS_KEY', password: jsonValue.data.SAUCE_ACCESS_KEY],
