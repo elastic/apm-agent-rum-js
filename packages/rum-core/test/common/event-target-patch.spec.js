@@ -25,6 +25,7 @@
 
 import patchEventHandler from './patch'
 import { EVENT_TARGET } from '../../src/common/constants'
+import { createCustomEvent } from '../'
 
 describe('EventTargetPatch', function() {
   let events = []
@@ -47,20 +48,6 @@ describe('EventTargetPatch', function() {
     events = []
   })
 
-  function createEvent(eventType) {
-    let event
-    if (typeof Event === 'function') {
-      event = new Event(eventType)
-    } else {
-      /**
-       * For IE11 support
-       */
-      event = document.createEvent('Event')
-      event.initEvent(eventType, true, true)
-    }
-    return event
-  }
-
   it('should work different argument types', () => {
     let element = document.createElement('div')
     document.body.insertBefore(element, null)
@@ -74,7 +61,7 @@ describe('EventTargetPatch', function() {
 
   it('should not affect other event types', () => {
     const eventType = 'apm-test-event'
-    let event = createEvent(eventType)
+    let event = createCustomEvent(eventType)
 
     let count = 0
     let element = document.createElement('div')
@@ -131,9 +118,10 @@ describe('EventTargetPatch', function() {
       element.addEventListener('click', listener)
       element.addEventListener('click', listener)
       /**
-       * Form with options object is only supported on
+       * Providing object as the third argument is only support on
        * Chrome Mobile 49 and above therefore we can not
-       * pass an object here.
+       * pass an object if we want capture to be false
+       * since an object will be evaluated as a truthy value.
        */
       element.addEventListener('click', listener, false)
 
