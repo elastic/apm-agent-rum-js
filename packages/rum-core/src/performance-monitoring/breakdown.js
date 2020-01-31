@@ -23,7 +23,7 @@
  *
  */
 
-import { getDuration } from '../common/utils'
+import { getDuration, PERF } from '../common/utils'
 import { PAGE_LOAD } from '../common/constants'
 
 /**
@@ -148,10 +148,7 @@ function getSpanBreakdown(
  * Capture breakdown metrics for the transaction based on the
  * transaction type
  */
-export function captureBreakdown(
-  transaction,
-  timings = window.performance.timing
-) {
+export function captureBreakdown(transaction, timings = PERF.timing) {
   const breakdowns = []
   const trDuration = transaction.duration()
   const { name, type, sampled } = transaction
