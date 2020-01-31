@@ -36,8 +36,6 @@ import { globalState } from '../common/patching/patch-utils'
 import {
   SCHEDULE,
   INVOKE,
-  TRANSACTION_START,
-  BEFORE_EVENT,
   TRANSACTION_END,
   AFTER_EVENT,
   FETCH,
@@ -53,7 +51,6 @@ import {
   SPAN_MODEL,
   TRANSACTION_MODEL
 } from '../common/truncate'
-import { PerfEntryRecorder, onPerformanceEntry } from './perf-entry-recorder'
 import { __DEV__ } from '../env'
 
 class PerformanceMonitoring {
@@ -65,35 +62,16 @@ class PerformanceMonitoring {
   }
 
   init(flags = {}) {
-    const recorder = new PerfEntryRecorder(list => {
-      const transaction = this._transactionService.getCurrentTransaction()
-      if (transaction) {
-        onPerformanceEntry(list, transaction)
-      }
-    })
-
-    /**
-     * Start observing for events as soon as the Transaction starts
-     * to capture all available timings as part of transaction lifetime
-     */
-    this._configService.events.observe(
-      TRANSACTION_START + BEFORE_EVENT,
-      transaction => recorder.start(transaction)
-    )
     /**
      * We need to run this event listener after all of user-registered listener,
      * since this event listener adds the transaction to the queue to be send to APM Server.
      */
-    this._configService.events.observe(
-      TRANSACTION_END + AFTER_EVENT,
-      transaction => {
-        recorder.stop(transaction)
-        const payload = this.createTransactionPayload(transaction)
-        if (payload) {
-          this._apmServer.addTransaction(payload)
-        }
+    this._configService.events.observe(TRANSACTION_END + AFTER_EVENT, tr => {
+      const payload = this.createTransactionPayload(tr)
+      if (payload) {
+        this._apmServer.addTransaction(payload)
       }
-    )
+    })
 
     if (flags[HISTORY]) {
       patchEventHandler.observe(HISTORY, this.getHistorySub())

@@ -23,38 +23,17 @@
  *
  */
 
-import {
-  LONG_TASK,
-  LARGEST_CONTENTFUL_PAINT,
-  PAGE_LOAD
-} from '../common/constants'
+import { LONG_TASK, LARGEST_CONTENTFUL_PAINT } from '../common/constants'
 import { noop } from '../common/utils'
 import Span from './span'
-
-/**
- * Detects if the given transaction is managed by the agent
- */
-function isManaged(transaction) {
-  return transaction.captureTimings
-}
-
-/**
- * Checks whether the give transaction is a page load transaction
- */
-function isPageLoadTransaction(transaction) {
-  return transaction.type === PAGE_LOAD
-}
 
 /**
  * Create Spans for the long task entries
  * Spec - https://w3c.github.io/longtasks/
  */
 function createLongTaskSpans(longtasks) {
-  if (longtasks.length === 0) {
-    return
-  }
+  const spans = []
 
-  const longTaskSpans = []
   for (let i = 0; i < longtasks.length; i++) {
     /**
      * name of the long task can be any one of the type listed here
@@ -104,25 +83,38 @@ function createLongTaskSpans(longtasks) {
         custom: customContext
       })
     }
-
     span.end(end)
-
-    longTaskSpans.push(span)
+    spans.push(span)
   }
-  return longTaskSpans
+  return spans
 }
 
-export function onPerformanceEntry(list, transaction) {
+/**
+ * Captures all the observed entries as Spans and Marks depending on the
+ * observed entry types and returns in the format
+ * {
+ *   spans: [],
+ *   marks: {}
+ * }
+ */
+export function captureObserverEntries(list, { capturePaint }) {
   const longtaskEntries = list.getEntriesByType(LONG_TASK)
+  const longTaskSpans = createLongTaskSpans(longtaskEntries)
 
-  transaction.spans.push(...createLongTaskSpans(longtaskEntries))
+  const result = {
+    spans: longTaskSpans,
+    marks: {}
+  }
   /**
    * Paint timings like FCP and LCP are available only for page-load navigation
    */
-  if (!isPageLoadTransaction(transaction)) {
-    return
+  if (!capturePaint) {
+    return result
   }
-
+  /**
+   * Largest Contentful Paint is a draft spec and its not W3C standard yet
+   * Spec - https://wicg.github.io/largest-contentful-paint/
+   */
   const lcpEntries = list.getEntriesByType(LARGEST_CONTENTFUL_PAINT)
   /**
    * There can be multiple LCP present on a single page load,
@@ -131,17 +123,16 @@ export function onPerformanceEntry(list, transaction) {
    */
   const lastLcpEntry = lcpEntries[lcpEntries.length - 1]
   if (!lastLcpEntry) {
-    return
+    return result
   }
   /**
    * `renderTime` will not be available for Image element and for the element
    * that is loaded cross-origin without the `Timing-Allow-Origin` header.
    */
-  transaction.addMarks({
-    agent: {
-      largestContentfulPaint: lastLcpEntry.renderTime || lastLcpEntry.loadTime
-    }
-  })
+  const lcp = lastLcpEntry.renderTime || lastLcpEntry.loadTime
+
+  result.marks.largestContentfulPaint = lcp
+  return result
 }
 
 /**
@@ -167,13 +158,7 @@ export class PerfEntryRecorder {
     }
   }
 
-  start(transaction) {
-    /**
-     * Only observe for managed transactions
-     */
-    if (!isManaged(transaction)) {
-      return
-    }
+  start(type) {
     /**
      * Safari throws an error when PerformanceObserver is
      * observed for unknown entry types as longtasks and lcp is
@@ -189,21 +174,15 @@ export class PerfEntryRecorder {
        *   browsers would throw error when using entryTypes options along with
        *   buffered flag (https://w3c.github.io/performance-timeline/#observe-method)
        */
-      if (isPageLoadTransaction(transaction)) {
-        /**
-         * Largest Contentful Paint is a draft spec and its not W3C standard yet
-         * Spec - https://wicg.github.io/largest-contentful-paint/
-         */
-        this.po.observe({ type: LARGEST_CONTENTFUL_PAINT, buffered: true })
+      let buffered = true
+      if (type === LONG_TASK) {
+        buffered = false
       }
-      this.po.observe({ type: LONG_TASK })
+      this.po.observe({ type, buffered })
     } catch (_) {}
   }
 
-  stop(transaction) {
-    if (!isManaged(transaction)) {
-      return
-    }
+  stop() {
     this.po.disconnect()
   }
 }

@@ -22,12 +22,11 @@
  * THE SOFTWARE.
  *
  */
-import Transaction from '../../src/performance-monitoring/transaction'
-import { PAGE_LOAD, TYPE_CUSTOM, LONG_TASK } from '../../src/common/constants'
 import {
-  onPerformanceEntry,
+  captureObserverEntries,
   PerfEntryRecorder
 } from '../../src/performance-monitoring/perf-entry-recorder'
+import { LARGEST_CONTENTFUL_PAINT, LONG_TASK } from '../../src/common/constants'
 import { mockObserverEntryTypes } from '../utils/globals-mock'
 
 describe('PerfEntryRecorder', () => {
@@ -35,27 +34,34 @@ describe('PerfEntryRecorder', () => {
     getEntriesByType: mockObserverEntryTypes
   }
 
-  const getLtSpans = tr => tr.spans.filter(span => span.type === LONG_TASK)
+  it('should create long tasks spans', () => {
+    const { spans } = captureObserverEntries(mockEntryList, {
+      capturePaint: false
+    })
+    expect(spans.length).toEqual(3)
+  })
 
-  it('should create long tasks spans for all transaction types', () => {
-    const pageLoadTransaction = new Transaction('/', PAGE_LOAD)
-    onPerformanceEntry(mockEntryList, pageLoadTransaction)
+  it('should return largest contentful paint if capturePaint is true', () => {
+    const { marks: paintFalse } = captureObserverEntries(mockEntryList, {
+      capturePaint: false
+    })
+    expect(paintFalse).toEqual({})
 
-    expect(getLtSpans(pageLoadTransaction).length).toEqual(3)
+    const { marks: paintTrue } = captureObserverEntries(mockEntryList, {
+      capturePaint: true
+    })
 
-    const customTransaction = new Transaction('/', TYPE_CUSTOM)
-    onPerformanceEntry(mockEntryList, customTransaction)
-
-    expect(getLtSpans(customTransaction).length).toEqual(3)
+    expect(paintTrue).toEqual({
+      largestContentfulPaint: 1040.0399999925867
+    })
   })
 
   it('should create long tasks attribution data in span context', () => {
-    const tr = new Transaction('/', PAGE_LOAD)
-    onPerformanceEntry(mockEntryList, tr)
-    const ltSpans = getLtSpans(tr)
-
-    expect(ltSpans.length).toBe(3)
-    expect(ltSpans).toEqual([
+    const { spans } = captureObserverEntries(mockEntryList, {
+      capturePaint: false
+    })
+    expect(spans.length).toBe(3)
+    expect(spans).toEqual([
       jasmine.objectContaining({
         name: 'Longtask(self)',
         context: {
@@ -87,44 +93,24 @@ describe('PerfEntryRecorder', () => {
     ])
   })
 
-  it('should mark largest contentful paint only for page-load transaction', () => {
-    const pageLoadTransaction = new Transaction('/', PAGE_LOAD)
-    onPerformanceEntry(mockEntryList, pageLoadTransaction)
-
-    expect(pageLoadTransaction.marks.agent.largestContentfulPaint).toEqual(
-      1040.0399999925867
-    )
-
-    const customTransaction = new Transaction('/', TYPE_CUSTOM)
-    onPerformanceEntry(mockEntryList, customTransaction)
-
-    expect(customTransaction.marks).toBeUndefined()
-  })
-
-  it('should start recording based on managed vs custom transaction', () => {
+  it('should pass buffered flag based on observed type', () => {
     const recorder = new PerfEntryRecorder(() => {})
     const onStartSpy = jasmine.createSpy()
-    const onStopSpy = jasmine.createSpy()
     recorder.po = {
-      observe: onStartSpy,
-      disconnect: onStopSpy
+      observe: onStartSpy
     }
+    recorder.start(LONG_TASK)
 
-    const pageLoadTransaction = new Transaction('/', PAGE_LOAD)
-    pageLoadTransaction.captureTimings = true
-    recorder.start(pageLoadTransaction)
-    recorder.stop(pageLoadTransaction)
-
-    expect(onStartSpy).toHaveBeenCalled()
-    expect(onStopSpy).toHaveBeenCalled()
-
+    expect(onStartSpy).toHaveBeenCalledWith({
+      type: LONG_TASK,
+      buffered: false
+    })
     onStartSpy.calls.reset()
-    onStopSpy.calls.reset()
-    const customTransaction = new Transaction('/', TYPE_CUSTOM)
-    customTransaction.captureTimings = false
-    recorder.start(customTransaction)
-    recorder.stop(customTransaction)
-    expect(onStartSpy).not.toHaveBeenCalled()
-    expect(onStopSpy).not.toHaveBeenCalled()
+
+    recorder.start(LARGEST_CONTENTFUL_PAINT)
+    expect(onStartSpy).toHaveBeenCalledWith({
+      type: LARGEST_CONTENTFUL_PAINT,
+      buffered: true
+    })
   })
 })
