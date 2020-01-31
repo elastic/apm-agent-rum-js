@@ -29,7 +29,11 @@ import Span from '../../src/performance-monitoring/span'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
 import { mockGetEntriesByType } from '../utils/globals-mock'
-import { TRANSACTION_END, PAGE_LOAD } from '../../src/common/constants'
+import {
+  TRANSACTION_END,
+  PAGE_LOAD,
+  ROUTE_CHANGE
+} from '../../src/common/constants'
 
 describe('TransactionService', function() {
   var transactionService
@@ -690,5 +694,79 @@ describe('TransactionService', function() {
 
     tr = transactionService.getCurrentTransaction()
     expect(tr.type).toBe('page-load')
+  })
+
+  describe('performance entry recorder', () => {
+    const logger = new LoggingService()
+    const config = new Config()
+    const trService = new TransactionService(logger, config)
+    const startSpy = jasmine.createSpy()
+    const stopSpy = jasmine.createSpy()
+
+    trService.recorder = {
+      start: startSpy,
+      stop: stopSpy
+    }
+    const resetSpies = () => {
+      startSpy.calls.reset()
+      stopSpy.calls.reset()
+    }
+
+    afterEach(() => resetSpies())
+
+    it('should start/stop performance recorder for managed transaction', async () => {
+      const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
+        managed: true
+      })
+      expect(startSpy).toHaveBeenCalledTimes(2)
+      expect(startSpy.calls.allArgs()).toEqual([
+        ['largest-contentful-paint'],
+        ['longtask']
+      ])
+      await pageLoadTr.end()
+      expect(stopSpy).toHaveBeenCalled()
+      resetSpies()
+
+      const routeChangeTr = trService.startTransaction('test', ROUTE_CHANGE, {
+        managed: true
+      })
+      expect(startSpy).toHaveBeenCalled()
+      expect(startSpy.calls.allArgs()).toEqual([['longtask']])
+      await routeChangeTr.end()
+      expect(stopSpy).toHaveBeenCalled()
+    })
+
+    it('should start recorder only once during redefining', async () => {
+      const managed1 = trService.startTransaction('test', 'test', {
+        managed: true,
+        canReuse: true
+      })
+      expect(startSpy).toHaveBeenCalledWith('longtask')
+      const managed2 = trService.startTransaction('test', 'custom', {
+        managed: true,
+        canReuse: true
+      })
+      expect(startSpy).toHaveBeenCalledTimes(1)
+      await managed1.end()
+      await managed2.end()
+
+      expect(stopSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should stop recorder before starting a non-reusable transaction', async () => {
+      const managedReusable = trService.startTransaction('test', 'test', {
+        managed: true,
+        canReuse: true
+      })
+      expect(startSpy).toHaveBeenCalledWith('longtask')
+      const managedNonReusable = trService.startTransaction('test', 'custom', {
+        managed: true
+      })
+      expect(startSpy.calls.allArgs()).toEqual([['longtask'], ['longtask']])
+      expect(stopSpy).toHaveBeenCalled()
+      await managedReusable.end()
+      await managedNonReusable.end()
+      expect(stopSpy).toHaveBeenCalledTimes(2)
+    })
   })
 })

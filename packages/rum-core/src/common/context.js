@@ -24,8 +24,13 @@
  */
 
 import Url from './url'
-import { PAGE_LOAD } from './constants'
-import { getPageMetadata, getServerTimingInfo } from './utils'
+import { PAGE_LOAD, NAVIGATION } from './constants'
+import {
+  getPageMetadata,
+  getServerTimingInfo,
+  PERF,
+  isPerfTimelineSupported
+} from './utils'
 
 const LEFT_SQUARE_BRACKET = 91 // [
 const RIGHT_SQUARE_BRACKET = 93 // ]
@@ -161,11 +166,8 @@ export function addSpanContext(span, data) {
 export function addTransactionContext(transaction, configContext) {
   const pageContext = getPageMetadata()
   let responseContext = {}
-  if (
-    transaction.type === PAGE_LOAD &&
-    typeof performance.getEntriesByType === 'function'
-  ) {
-    let entries = performance.getEntriesByType('navigation')
+  if (transaction.type === PAGE_LOAD && isPerfTimelineSupported()) {
+    let entries = PERF.getEntriesByType(NAVIGATION)
     if (entries && entries.length > 0) {
       responseContext = {
         response: getResponseContext(entries[0])
