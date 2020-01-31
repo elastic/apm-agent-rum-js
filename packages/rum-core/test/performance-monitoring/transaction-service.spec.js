@@ -752,5 +752,21 @@ describe('TransactionService', function() {
 
       expect(stopSpy).toHaveBeenCalledTimes(1)
     })
+
+    it('should stop recorder before starting a non-reusable transaction', async () => {
+      const managedReusable = trService.startTransaction('test', 'test', {
+        managed: true,
+        canReuse: true
+      })
+      expect(startSpy).toHaveBeenCalledWith('longtask')
+      const managedNonReusable = trService.startTransaction('test', 'custom', {
+        managed: true
+      })
+      expect(startSpy.calls.allArgs()).toEqual([['longtask'], ['longtask']])
+      expect(stopSpy).toHaveBeenCalled()
+      await managedReusable.end()
+      await managedNonReusable.end()
+      expect(stopSpy).toHaveBeenCalledTimes(2)
+    })
   })
 })
