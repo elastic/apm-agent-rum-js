@@ -20,7 +20,8 @@ pipeline {
     JOB_GCS_BUCKET = credentials('gcs-bucket')
     PIPELINE_LOG_LEVEL='INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
-    SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs'
+    SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
+    SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
     DOCKER_ELASTIC_SECRET = 'secret/apm-team/ci/docker-registry/prod'
     GITHUB_CHECK_ITS_NAME = 'Integration Tests'
     ITS_PIPELINE = 'apm-integration-tests-selector-mbp/master'
@@ -94,9 +95,9 @@ pipeline {
                     name 'STACK_VERSION'
                     values (
                       '8.0.0-SNAPSHOT',
-                      '7.0.0',
-                      '6.6.0'
-//                      '6.5.0'
+                      '7.6.0',
+                      '7.5.0',
+                      '6.8.0'
                     )
                 }
                 //TODO move scope to an axis when we have the SauceLab account
@@ -105,7 +106,7 @@ pipeline {
               stage('Scope @elastic/apm-rum-core') {
                 environment {
                   SCOPE="@elastic/apm-rum-core"
-                  SECRET="${env.SAUCELABS_SECRET}@elastic/apm-rum-core"
+                  SAUCELABS_SECRET="${env.SAUCELABS_SECRET_CORE}"
                 }
                 steps {
                   runTest()
@@ -114,7 +115,6 @@ pipeline {
               stage('Scope @elastic/apm-rum') {
                 environment {
                   SCOPE="@elastic/apm-rum"
-                  SECRET="${env.SAUCELABS_SECRET}@elastic/apm-rum"
                 }
                 steps {
                   runTest()
@@ -123,7 +123,7 @@ pipeline {
               stage('Scope @elastic/apm-rum-react') {
                 environment {
                   SCOPE="@elastic/apm-rum-react"
-                  SECRET="${env.SAUCELABS_SECRET}@elastic/apm-rum-core"
+                  SAUCELABS_SECRET="${env.SAUCELABS_SECRET_CORE}"
                 }
                 steps {
                   runTest()
@@ -132,7 +132,6 @@ pipeline {
               stage('Scope @elastic/apm-rum-angular') {
                 environment {
                   SCOPE="@elastic/apm-rum-angular"
-                  SECRET="${env.SAUCELABS_SECRET}@elastic/apm-rum"
                 }
                 steps {
                   runTest()
@@ -141,7 +140,7 @@ pipeline {
               stage('Scope @elastic/apm-rum-vue') {
                 environment {
                   SCOPE="@elastic/apm-rum-vue"
-                  SECRET="${env.SAUCELABS_SECRET}@elastic/apm-rum-core"
+                  SAUCELABS_SECRET="${env.SAUCELABS_SECRET_CORE}"
                 }
                 steps {
                   runTest()
@@ -377,7 +376,7 @@ def runScript(Map args = [:]){
 }
 
 def withSaucelabsEnv(Closure body){
-  def jsonValue = getVaultSecret(secret: "${SECRET}")
+  def jsonValue = getVaultSecret(secret: "${SAUCELABS_SECRET}")
   withEnvMask(vars: [
     [var: 'SAUCE_USERNAME', password: "${jsonValue.data.SAUCE_USERNAME}"],
     [var: 'SAUCE_ACCESS_KEY', password: "${jsonValue.data.SAUCE_ACCESS_KEY}"],
