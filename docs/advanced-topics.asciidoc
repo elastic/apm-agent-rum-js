@@ -20,12 +20,12 @@ part of the transaction. Since long tasks currently does not have the full infor
 which part of code cause slowness, it would be hard to interpret these spans.
 Below you can find some tips to help with interpreting long task spans:
 
-+ Name of the long task span (eg: `self`, `same-origin`) would imply the
+* The name of the long task span, e.g.: `self`, `same-origin`, etc., implies the
   origin of the task. It could be the current browsing context or inside iframes.
 
-+ Context of the span is enriched with useful information like `attribution`
-  (the type of work such as script, layout, etc), `type`, `id` and `name` which
-  determines the culprit container(such as window, iframe, embed or object)
+* Context of the span is enriched with useful information like `attribution`
+  (the type of work, such as script, layout, etc), `type`, `id` and `name`, which
+  determines the culprit container (such as window, iframe, embed or object)
   responsible for the long task.
 
 With the help of the transaction timeline and the span timings, one could dig
