@@ -303,4 +303,4 @@ NOTE: Spans that are captured as part of the ignored transactions would also be 
 
 Instructs the agent to start monitoring for browser tasks that block the UI
 thread and might delay other user inputs by affecting the overall page
-responsiveness. Learn more about <<longtasks, Longtask spans>> and how to interpret them.
+responsiveness. Learn more about <<longtasks, long task spans>> and how to interpret them.

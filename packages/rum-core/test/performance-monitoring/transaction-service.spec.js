@@ -124,7 +124,8 @@ describe('TransactionService', function() {
       config: {},
       events: {
         send: onStartSpy
-      }
+      },
+      get: () => {}
     })
     const options = {
       managed: true,
