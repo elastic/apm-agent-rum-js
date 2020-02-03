@@ -195,7 +195,7 @@ class TransactionService {
     /**
      * Start observing for long tasks for all managed transactions
      */
-    if (!isRedefined) {
+    if (!isRedefined && this._config.get('monitorLongtasks')) {
       this.recorder.start(LONG_TASK)
     }
     /**
