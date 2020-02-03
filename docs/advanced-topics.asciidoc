@@ -28,10 +28,11 @@ Below you can find some tips to help with interpreting long task spans:
   determines the culprit container (such as window, iframe, embed or object)
   responsible for the long task.
 
-With the help of the transaction timeline and the span timings, one could dig
-deeper by marking the slow application code using https://developer.mozilla.org/en-US/docs/Web/API/Performance/mark[User Timing
-API] which would be again captured as spans by the agent and combining them along
-with long tasks would reveal the true source code location.
+With the help of the transaction timeline and span timings,
+one could dig deeper by marking slow application code with the
+https://developer.mozilla.org/en-US/docs/Web/API/Performance/mark[User Timing API].
+When these spans are then captured by the agent again, you could combine them
+with long tasks to reveal the true source code location.
 
 [[typescript]]
 === Using with TypeScript
