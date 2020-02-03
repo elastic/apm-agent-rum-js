@@ -28,7 +28,7 @@ const puppeteer = require('puppeteer')
 async function runIntegrationTest(pageUrl) {
   const browser = await puppeteer.launch({
     headless: true,
-    ignoreHTTPSErrors: process.env.ELASTIC_APM_VERIFY_SERVER_CERT == 'true',
+    ignoreHTTPSErrors: process.env.ELASTIC_APM_VERIFY_SERVER_CERT == 'false',
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   })
   const result = {}
