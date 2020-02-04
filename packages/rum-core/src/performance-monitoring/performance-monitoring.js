@@ -41,7 +41,9 @@ import {
   FETCH,
   HISTORY,
   XMLHTTPREQUEST,
+  EVENT_TARGET,
   HTTP_REQUEST_TYPE,
+  USER_INTERACTION,
   BROWSER_RESPONSIVENESS_INTERVAL,
   BROWSER_RESPONSIVENESS_BUFFER,
   SIMILAR_SPAN_TO_TRANSACTION_RATIO
@@ -83,6 +85,42 @@ class PerformanceMonitoring {
 
     if (flags[FETCH]) {
       patchEventHandler.observe(FETCH, this.getFetchSub())
+    }
+
+    if (flags[EVENT_TARGET]) {
+      patchEventHandler.observe(EVENT_TARGET, this.getEventTargetSub())
+    }
+  }
+
+  getEventTargetSub() {
+    const transactionService = this._transactionService
+    return (event, task) => {
+      if (
+        event === SCHEDULE &&
+        task.source === EVENT_TARGET &&
+        task.eventType === 'click'
+      ) {
+        let target = task.target
+        let name = target.getAttribute('name')
+        let classes = target.getAttribute('class')
+
+        let additionalInfo = ''
+        if (name) {
+          additionalInfo = `["${name}"]`
+        } else if (classes) {
+          classes = classes.split(' ').join('.')
+          additionalInfo = `.${classes}`
+        }
+        let tagName = target.tagName.toLowerCase()
+        transactionService.startTransaction(
+          `Click >> ${tagName}${additionalInfo}`,
+          USER_INTERACTION,
+          {
+            managed: true,
+            canReuse: true
+          }
+        )
+      }
     }
   }
 

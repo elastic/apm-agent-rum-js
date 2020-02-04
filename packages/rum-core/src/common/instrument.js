@@ -23,7 +23,14 @@
  *
  */
 
-import { XMLHTTPREQUEST, FETCH, HISTORY, PAGE_LOAD, ERROR } from './constants'
+import {
+  XMLHTTPREQUEST,
+  FETCH,
+  HISTORY,
+  PAGE_LOAD,
+  ERROR,
+  EVENT_TARGET
+} from './constants'
 
 export function getInstrumentationFlags(instrument, disabledInstrumentations) {
   /**
@@ -34,7 +41,8 @@ export function getInstrumentationFlags(instrument, disabledInstrumentations) {
     [FETCH]: false,
     [HISTORY]: false,
     [PAGE_LOAD]: false,
-    [ERROR]: false
+    [ERROR]: false,
+    [EVENT_TARGET]: false
   }
 
   if (!instrument) {

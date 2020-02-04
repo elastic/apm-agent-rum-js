@@ -35,6 +35,7 @@ import {
   FETCH,
   XMLHTTPREQUEST,
   HISTORY,
+  EVENT_TARGET,
   PAGE_LOAD,
   ROUTE_CHANGE,
   TRANSACTION_END
@@ -796,4 +797,35 @@ describe('PerformanceMonitoring', function() {
 
     tr.end()
   })
+
+  if (window.EventTarget) {
+    it('should create click transactions', () => {
+      let transactionService = performanceMonitoring._transactionService
+      let etsub = performanceMonitoring.getEventTargetSub()
+      patchEventHandler.observe(EVENT_TARGET, (event, task) => {
+        etsub(event, task)
+      })
+      let element = document.createElement('button')
+      element.setAttribute('class', 'cool-button purchase-style')
+
+      const listener = e => {
+        expect(e.type).toBe('click')
+      }
+
+      element.addEventListener('click', listener)
+      element.click()
+
+      let tr = transactionService.getCurrentTransaction()
+      expect(tr).toBeDefined()
+      expect(tr.name).toBe('Click >> button.cool-button.purchase-style')
+      expect(tr.type).toBe('user-interaction')
+
+      element.setAttribute('name', 'purchase')
+      element.click()
+      let newTr = transactionService.getCurrentTransaction()
+
+      expect(newTr).toBe(tr)
+      expect(newTr.name).toBe('Click >> button["purchase"]')
+    })
+  }
 })

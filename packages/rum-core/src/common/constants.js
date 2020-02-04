@@ -66,6 +66,7 @@ const MAX_SPAN_DURATION = 5 * 60 * 1000
 const PAGE_LOAD = 'page-load'
 const ROUTE_CHANGE = 'route-change'
 const TYPE_CUSTOM = 'custom'
+const USER_INTERACTION = 'user-interaction'
 const HTTP_REQUEST_TYPE = 'http-request'
 const TEMPORARY_TYPE = 'temporary'
 const NAME_UNKNOWN = 'Unknown'
@@ -73,6 +74,7 @@ const NAME_UNKNOWN = 'Unknown'
 const TRANSACTION_TYPE_ORDER = [
   PAGE_LOAD,
   ROUTE_CHANGE,
+  USER_INTERACTION,
   HTTP_REQUEST_TYPE,
   TYPE_CUSTOM,
   TEMPORARY_TYPE
@@ -174,5 +176,6 @@ export {
   BROWSER_RESPONSIVENESS_BUFFER,
   SIMILAR_SPAN_TO_TRANSACTION_RATIO,
   TEMPORARY_TYPE,
+  USER_INTERACTION,
   TRANSACTION_TYPE_ORDER
 }
