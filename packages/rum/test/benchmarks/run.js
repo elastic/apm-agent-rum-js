@@ -25,6 +25,7 @@
 
 const { join } = require('path')
 const { writeFileSync } = require('fs')
+const { promisify } = require('util')
 const { gatherRawMetrics, launchBrowser } = require('./profiler')
 const {
   analyzeMetrics,
@@ -46,6 +47,7 @@ const REPORTS_DIR = join(__dirname, '../../reports')
     await customApmBuild(filename)
 
     const server = await startServer(filename)
+    const close = promisify(server.close.bind(server))
     /**
      * object cache holding the metrics accumlated in each run and
      * helps in processing the overall results
@@ -60,18 +62,19 @@ const REPORTS_DIR = join(__dirname, '../../reports')
          */
         const key = `${scenario}.${type}`
         resultMap.set(key, getCommonFields({ browser: type, url, scenario }))
-        let browser
         for (let i = 0; i < runs; i++) {
-          browser = await launchBrowser(type)
+          const browser = await launchBrowser(type)
           const metrics = await gatherRawMetrics(browser, url)
           Object.assign(metrics, { scenario: key, url })
           await analyzeMetrics(metrics, resultMap)
+          await browser.close()
         }
-        await browser.close()
       }
     }
-
-    server.close()
+    /**
+     * close the server
+     */
+    await close()
 
     const results = calculateResults(resultMap)
 
@@ -90,7 +93,6 @@ const REPORTS_DIR = join(__dirname, '../../reports')
     )
 
     console.log('RUM benchmark results written to disk', filePath)
-    process.exit()
   } catch (e) {
     console.error('Error running RUM benchmark script', e)
   }
