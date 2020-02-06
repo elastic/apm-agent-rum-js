@@ -23,11 +23,43 @@
  *
  */
 
-import { apm } from '@elastic/apm-rum'
-import { ApmService } from './apm-service'
-import { ApmErrorHandler } from './error-handler'
+export function getErrorHandler(Vue, apm) {
+  /**
+   * If the user already installed a global error handler
+   * we should call them after capturing it internally
+   */
+  const previousErrorHandler = Vue.config.errorHandler
 
-ApmService.apm = apm
-ApmErrorHandler.apm = apm
+  return (error, vm, info) => {
+    if (vm && vm.$options) {
+      const options = vm.$options
+      let component
+      if (vm.$root === vm) {
+        component = 'Root'
+      } else {
+        component = options.name || options._componentTag || 'Anonymous'
+      }
 
-export { ApmService, ApmErrorHandler }
+      error.component = component
+      error.file = options.__file || ''
+    }
+
+    /**
+     * Lifecycle hook the error was thrown if available
+     */
+    if (info) {
+      error.lifecycleHook = info
+    }
+
+    apm.captureError(error)
+
+    if (typeof previousErrorHandler === 'function') {
+      previousErrorHandler.call(this, error, vm, info)
+    }
+    /**
+     * Logs the error to browser console similar
+     * to original Vue logError
+     */
+    console.error(error)
+  }
+}

@@ -27,19 +27,39 @@ import resourceEntries from '../fixtures/resource-entries'
 import paintEntries from '../fixtures/paint-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import { TIMING_LEVEL2_ENTRIES } from '../fixtures/navigation-entries'
+import longtaskEntries from '../fixtures/longtask-entries'
+import largestContentfulPaintEntries from '../fixtures/lcp-entries'
+import {
+  LONG_TASK,
+  LARGEST_CONTENTFUL_PAINT,
+  MEASURE,
+  PAINT,
+  NAVIGATION,
+  RESOURCE
+} from '../../src/common/constants'
+
+export function mockObserverEntryTypes(type) {
+  if (type === LONG_TASK) {
+    return longtaskEntries
+  } else if (type === LARGEST_CONTENTFUL_PAINT) {
+    return largestContentfulPaintEntries
+  }
+
+  return []
+}
 
 export function mockGetEntriesByType() {
   const _getEntriesByType = window.performance.getEntriesByType
 
   window.performance.getEntriesByType = function(type) {
-    expect(['resource', 'paint', 'measure', 'navigation']).toContain(type)
-    if (type === 'resource') {
+    expect([RESOURCE, PAINT, MEASURE, NAVIGATION]).toContain(type)
+    if (type === RESOURCE) {
       return resourceEntries
-    } else if (type === 'paint') {
+    } else if (type === PAINT) {
       return paintEntries
-    } else if (type === 'measure') {
+    } else if (type === MEASURE) {
       return userTimingEntries
-    } else if (type === 'navigation') {
+    } else if (type === NAVIGATION) {
       return TIMING_LEVEL2_ENTRIES
     } else {
       return []

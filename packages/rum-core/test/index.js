@@ -45,3 +45,21 @@ export function scheduleTaskCycles(callback, cycles = 0) {
     callback()
   }
 }
+
+/**
+ * Polyfilling the CustomEvent since they are available as objects
+ * in IE 9-11
+ * https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent#Polyfill
+ */
+export function createCustomEvent(
+  event,
+  params = { bubbles: false, cancelable: false, detail: null }
+) {
+  if (typeof window.CustomEvent === 'function') {
+    return new CustomEvent(event, params)
+  }
+
+  const evt = document.createEvent('CustomEvent')
+  evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail)
+  return evt
+}

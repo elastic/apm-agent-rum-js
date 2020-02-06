@@ -34,28 +34,41 @@ const baseLaunchers = getBrowserList().map(launcher => ({
   base: 'SauceLabs',
   ...launcher
 }))
+/**
+ * Polyfills file that are required for the browser tests
+ *
+ * Including here eliminates polyfills required in each test suite
+ */
+const polyfills = 'test/polyfills.+(js|ts)'
+
 const specPattern =
-  'test/{*.spec.+(js|ts),!(e2e|integration|node|bundle)/*.spec.+(js|ts)}'
+  'test/{*.spec.+(js|ts),!(e2e|integration|node|bundle|types)/*.spec.+(js|ts)}'
 const { tunnelIdentifier } = getSauceConnectOptions()
 
 /**
  * Common base config for all the mono repo packages
  */
 const baseConfig = {
-  files: [require.resolve('regenerator-runtime/runtime'), specPattern],
+  files: [
+    polyfills,
+    require.resolve('regenerator-runtime/runtime'),
+    specPattern
+  ],
   frameworks: ['jasmine'],
   preprocessors: {
-    [specPattern]: ['webpack', 'sourcemap']
+    [specPattern]: ['webpack', 'sourcemap'],
+    [polyfills]: ['webpack']
   },
   plugins: [
     'karma-sauce-launcher',
-    'karma-failed-reporter',
     'karma-jasmine',
+    'karma-failed-reporter',
     'karma-spec-reporter',
     'karma-webpack',
     'karma-sourcemap-loader'
   ],
   client: {
+    // clearContext: false, // make Jasmine Spec Runner output visible in browsers
     jasmine: {
       random: false,
       failFast: true,

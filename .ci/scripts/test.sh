@@ -2,9 +2,11 @@
 set -xueo pipefail
 
 USER_ID="$(id -u):$(id -g)" \
-docker-compose -f ./dev-utils/docker-compose.yml up \
+docker-compose -f ./dev-utils/docker-compose.yml \
+  --log-level INFO \
+  up \
+  --quiet-pull \
   --no-ansi \
-  --log-level ERROR \
   --abort-on-container-exit \
   --exit-code-from node-puppeteer \
   --abort-on-container-exit \

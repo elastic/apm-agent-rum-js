@@ -26,7 +26,11 @@
 const { Promise } = require('es6-promise')
 const { join } = require('path')
 const glob = require('glob')
-const { getSauceConnectOptions, getBrowserList } = require('./test-config')
+const {
+  getSauceConnectOptions,
+  getBrowserList,
+  getTestEnvironmentVariables
+} = require('./test-config')
 
 const logLevels = {
   ALL: { value: Number.MIN_VALUE },
@@ -155,7 +159,7 @@ function getWebdriveBaseConfig(
     ...capability
   }))
 
-  return {
+  const baseConfig = {
     runner: 'local',
     specs: glob.sync(join(path, specs)),
     maxInstancesPerCapability: 3,
@@ -203,6 +207,30 @@ function getWebdriveBaseConfig(
       }
     }
   }
+
+  const { sauceLabs } = getTestEnvironmentVariables()
+
+  if (!sauceLabs) {
+    Object.assign(baseConfig, {
+      automationProtocol: 'devtools',
+      capabilities: [
+        {
+          browserName: 'chrome',
+          'goog:chromeOptions': {
+            headless: true
+          }
+        },
+        {
+          browserName: 'firefox',
+          'moz:firefoxOptions': {
+            headless: true
+          }
+        }
+      ]
+    })
+  }
+
+  return baseConfig
 }
 
 function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {

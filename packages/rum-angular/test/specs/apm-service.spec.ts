@@ -23,19 +23,16 @@
  *
  */
 
-import '../polyfills'
-import 'zone.js/dist/zone-testing'
 import { ApmService } from '../../src/apm-service'
 import { TestBed, ComponentFixture } from '@angular/core/testing'
-import { RouterTestingModule } from '@angular/router/testing'
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing'
-import { NgModule } from '@angular/core'
-import { Component } from '@angular/core'
-import { Location } from '@angular/common'
+import { NgModule, Component } from '@angular/core'
 import { Routes, Router } from '@angular/router'
+import { RouterTestingModule } from '@angular/router/testing'
+import { Location } from '@angular/common'
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
 
@@ -98,17 +95,17 @@ describe('ApmService', () => {
   let compiled: HTMLElement
   let apm
 
-  TestBed.initTestEnvironment(
-    BrowserDynamicTestingModule,
-    platformBrowserDynamicTesting()
-  )
-
   function setUpApm() {
     apm = new ApmBase(createServiceFactory(), false)
     ApmService.apm = apm
   }
 
   function setUpAppModule() {
+    TestBed.resetTestEnvironment()
+    TestBed.initTestEnvironment(
+      BrowserDynamicTestingModule,
+      platformBrowserDynamicTesting()
+    )
     TestBed.configureTestingModule({
       imports: [RouterTestingModule.withRoutes(routes)],
       declarations: [HomeComponent, AppComponent, SlugComponent],

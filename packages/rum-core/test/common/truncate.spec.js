@@ -23,7 +23,11 @@
  *
  */
 
-import { truncate, truncateModel } from '../../src/common/truncate'
+import {
+  truncate,
+  truncateModel,
+  RESPONSE_MODEL
+} from '../../src/common/truncate'
 
 /**
  * Dummy models to make the testing easier
@@ -39,13 +43,6 @@ const getMetadataModel = limit => ({
   }
 })
 
-const RESPONSE_MODEL = {
-  '*': true,
-  headers: {
-    '*': true
-  }
-}
-
 const getContextModel = limit => ({
   user: {
     id: [limit],
@@ -57,6 +54,12 @@ const getContextModel = limit => ({
   },
   http: {
     response: RESPONSE_MODEL
+  },
+  destination: {
+    address: [limit],
+    service: {
+      '*': [limit, true]
+    }
   },
   response: RESPONSE_MODEL
 })
@@ -258,6 +261,15 @@ describe('Truncate', () => {
               fg: ''
             }
           }
+        },
+        destination: {
+          address: generateStr('i', keywordLen),
+          port: 8080,
+          service: {
+            name: generateStr('j', keywordLen),
+            resource: '',
+            type: generateStr('l', keywordLen)
+          }
         }
       }
     }
@@ -290,6 +302,15 @@ describe('Truncate', () => {
           response: {
             cb: 2134,
             headers: {}
+          }
+        },
+        destination: {
+          address: generateStr('i', stringLimit),
+          port: 8080,
+          service: {
+            name: generateStr('j', stringLimit),
+            resource: 'N/A',
+            type: generateStr('l', stringLimit)
           }
         }
       }

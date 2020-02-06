@@ -62,3 +62,29 @@ export class AppModule {
 
 Once the service is initialized, both page load and SPA navigation events will be captured
 as transactions with the `path` of the route as its name and `page-load` or `route-change` as type.
+
+[float]
+==== Capturing errors in Angular applications
+
+By default, when an error is thrown inside the Angular application, the default error handler prints
+the error messages to the console without rethrowing them as browser events.
+
+`ApmErrorHandler` provides a centralized error handling which captures and reports the errors
+to be shown in the `APM UI` and also logs them to the browser console.
+
+
+[source,js]
+----
+import { ErrorHandler } from '@angular/core'
+import { ApmErrorHandler } from '@elastic/apm-rum-angular'
+
+@NgModule({
+  providers: [
+    {
+      provide: ErrorHandler,
+      useClass: ApmErrorHandler
+    }
+  ]
+})
+class AppModule {}
+----

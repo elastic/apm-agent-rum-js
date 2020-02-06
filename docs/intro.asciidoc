@@ -13,7 +13,7 @@ This enables you to analyze performance throughout your microservice architectur
 
 The RUM Agent automatically instruments the following:
 
-* Page load metrics
+* <<page-load-metrics,Page load metrics>> 
 * Load time of Static Assets
 * API requests (XMLHttpRequest and Fetch)
 
@@ -25,6 +25,7 @@ The agent automatically captures all outgoing http requests,
 by instrumenting both XHR and Fetch API requests from the webpage to backend servers.
 
 For all transactions, the agent automatically captures <<breakdown-metrics-docs, breakdown metrics>>.
+
 
 [float]
 [[additional-components]]

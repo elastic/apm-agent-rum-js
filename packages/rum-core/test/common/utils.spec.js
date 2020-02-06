@@ -70,19 +70,6 @@ describe('lib/utils', function() {
     html.removeChild(script)
   })
 
-  it('should getNavigationTimingMarks', function() {
-    var marks = utils.getNavigationTimingMarks()
-    expect(marks.fetchStart).toBeGreaterThanOrEqual(0)
-    expect(marks.domInteractive).toBeGreaterThanOrEqual(0)
-    expect(marks.domComplete).toBeGreaterThanOrEqual(0)
-    expect(marks.loadEventEnd).toBeGreaterThanOrEqual(0)
-  })
-
-  it('should getPaintTimingMarks', function() {
-    var marks = utils.getPaintTimingMarks()
-    expect(marks).toEqual({})
-  })
-
   it('should generate random ids', function() {
     var result = utils.bytesToHex(utils.rng())
     expect(result.length).toBe(32)

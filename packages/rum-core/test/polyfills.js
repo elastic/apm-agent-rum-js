@@ -23,11 +23,12 @@
  *
  */
 
-import { apm } from '@elastic/apm-rum'
-import { ApmService } from './apm-service'
-import { ApmErrorHandler } from './error-handler'
+import 'es6-promise/auto'
+import 'core-js/features/array/map'
 
-ApmService.apm = apm
-ApmErrorHandler.apm = apm
-
-export { ApmService, ApmErrorHandler }
+Object.setPrototypeOf =
+  Object.setPrototypeOf ||
+  function(obj, proto) {
+    obj.__proto__ = proto
+    return obj
+  }

@@ -27,6 +27,7 @@ import rng from 'uuid/lib/rng-browser'
 import { Promise } from 'es6-promise'
 
 const slice = [].slice
+const PERF = window.performance
 
 function isCORSSupported() {
   var xhr = new window.XMLHttpRequest()
@@ -126,8 +127,8 @@ function isPlatformSupported() {
     typeof Array.prototype.forEach === 'function' &&
     typeof JSON.stringify === 'function' &&
     typeof Function.bind === 'function' &&
-    window.performance &&
-    typeof window.performance.now === 'function' &&
+    PERF &&
+    typeof PERF.now === 'function' &&
     isCORSSupported()
   )
 }
@@ -148,64 +149,6 @@ function setLabel(key, value, obj) {
   }
   obj[skey] = value
   return obj
-}
-
-const navigationTimingKeys = [
-  'fetchStart',
-  'domainLookupStart',
-  'domainLookupEnd',
-  'connectStart',
-  'connectEnd',
-  'secureConnectionStart',
-  'requestStart',
-  'responseStart',
-  'responseEnd',
-  'domLoading',
-  'domInteractive',
-  'domContentLoadedEventStart',
-  'domContentLoadedEventEnd',
-  'domComplete',
-  'loadEventStart',
-  'loadEventEnd'
-]
-
-function getNavigationTimingMarks() {
-  var timing = window.performance.timing
-  var fetchStart = timing.fetchStart
-  var marks = {}
-  navigationTimingKeys.forEach(function(timingKey) {
-    var m = timing[timingKey]
-    if (m && m >= fetchStart) {
-      marks[timingKey] = m - fetchStart
-    }
-  })
-  return marks
-}
-
-/**
- * Paint Timing Metrics that is available during page load
- * https://www.w3.org/TR/paint-timing/
- */
-function getPaintTimingMarks() {
-  var paints = {}
-  var perf = window.performance
-  if (typeof perf.getEntriesByType === 'function') {
-    var entries = perf.getEntriesByType('paint')
-    if (entries.length > 0) {
-      var timings = perf.timing
-      /**
-       * To avoid capturing the unload event handler effect in paint timings
-       */
-      var unloadDiff = timings.fetchStart - timings.navigationStart
-      for (var i = 0; i < entries.length; i++) {
-        var data = entries[i]
-        var calcPaintTime =
-          unloadDiff >= 0 ? data.startTime - unloadDiff : data.startTime
-        paints[data.name] = calcPaintTime
-      }
-    }
-  }
-  return paints
 }
 
 /**
@@ -244,7 +187,7 @@ function getServerTimingInfo(serverTimingEntries = []) {
 }
 
 function getTimeOrigin() {
-  return window.performance.timing.fetchStart
+  return PERF.timing.fetchStart
 }
 
 function getPageMetadata() {
@@ -382,25 +325,8 @@ function getEarliestSpan(spans) {
   return earliestSpan
 }
 
-function getPageLoadMarks() {
-  const marks = getNavigationTimingMarks()
-  const paintMarks = getPaintTimingMarks()
-  const agent = {
-    timeToFirstByte: marks.responseStart,
-    domInteractive: marks.domInteractive,
-    domComplete: marks.domComplete
-  }
-  if (paintMarks['first-contentful-paint']) {
-    agent.firstContentfulPaint = paintMarks['first-contentful-paint']
-  }
-  return {
-    navigationTiming: marks,
-    agent
-  }
-}
-
 function now() {
-  return window.performance.now()
+  return PERF.now()
 }
 
 function getTime(time) {
@@ -422,6 +348,14 @@ function scheduleMicroTask(callback) {
   Promise.resolve().then(callback)
 }
 
+/**
+ * Check if performance Timeline is supported in browsers
+ * Performane Timeline imples `getEntriesByType`
+ */
+function isPerfTimelineSupported() {
+  return typeof PERF.getEntriesByType === 'function'
+}
+
 export {
   extend,
   merge,
@@ -435,8 +369,6 @@ export {
   isPlatformSupported,
   isDtHeaderValid,
   parseDtHeaderValue,
-  getNavigationTimingMarks,
-  getPaintTimingMarks,
   getServerTimingInfo,
   getDtHeaderValue,
   getPageMetadata,
@@ -446,7 +378,6 @@ export {
   generateRandomId,
   getEarliestSpan,
   getLatestNonXHRSpan,
-  getPageLoadMarks,
   getDuration,
   now,
   getTime,
@@ -457,5 +388,7 @@ export {
   setLabel,
   stripQueryStringFromUrl,
   find,
-  removeInvalidChars
+  removeInvalidChars,
+  PERF,
+  isPerfTimelineSupported
 }

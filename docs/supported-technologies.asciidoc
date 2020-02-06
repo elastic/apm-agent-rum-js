@@ -2,6 +2,43 @@
 == Supported Technologies
 
 [float]
+[[page-load-metrics]]
+=== Page load metrics
+
+The RUM agent tries to capture the overall user experience on how the page is loaded/rendered as part of the page load Transaction.
+It includes all of the dependent resources, like JavaScript, stylesheets, images, etc., which are included as part of the page. In addition
+to capturing the resource timing information as Spans, the transaction also includes navigation spans that are associated with the rest
+of the captured information to make the waterfall more appealing.
+
+`Domain lookup`::
+Duration of the DNS query for the current page: `domainLookupEnd` - `domainLookupStart`.
+
+`Making a connection to the server`::
+Duration of the TCP connection to the server, including the TLS negotiation time for HTTPS pages: `connectEnd` - `connectStart`.
+
+`Requesting and receiving the document`::
+Overall response time of the server including the last byte: `responseEnd` - `requestStart`.
+
+`Parsing the document, executing sync. scripts`::
+HTML document parsing time, including synchronous Stylesheets and Script: `tagsdomInteractive` - `domLoading`.
+
+`Fire "DOMContentLoaded" event`::
+Triggered when the browser completes parsing the document. Helpful when there are multiple listeners, or logic
+is executed: `domContentLoadedEventEnd` - `domContentLoadedEventStart`.
+
+`Fire "load" event`::
+Trigged when the browser finishes loading its document and dependent resources: `loadEventEnd` - `loadEventStart`.
+
+
+To capture the overall user experience of the page including all of the above information plus additional resource requests that might be
+triggered during the execution of dependent resources, the `page-load` transaction duration might not always reflect the 
+https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event[Load] event of the browser and can extend beyond the event. 
+
+If you are interested in accurately measuring the duration of load event, the information can be extracted by using 
+`Fire load event` Span or from the Transaction marks available as `transaction.marks.agent.domComplete` in the Elasticsearch document.
+
+
+[float]
 [[platforms]]
 === Platforms
 

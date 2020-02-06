@@ -25,6 +25,10 @@
 
 import { Promise } from 'es6-promise'
 import Transaction from './transaction'
+import {
+  PerfEntryRecorder,
+  captureObserverEntries
+} from './perf-entry-recorder'
 import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
 import { captureNavigation } from './capture-navigation'
 import {
@@ -34,7 +38,9 @@ import {
   TRANSACTION_END,
   BROWSER_RESPONSIVENESS_INTERVAL,
   TEMPORARY_TYPE,
-  TRANSACTION_TYPE_ORDER
+  TRANSACTION_TYPE_ORDER,
+  LARGEST_CONTENTFUL_PAINT,
+  LONG_TASK
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__ } from '../env'
@@ -45,6 +51,18 @@ class TransactionService {
     this._logger = logger
     this.currentTransaction = undefined
     this.respIntervalId = undefined
+    this.recorder = new PerfEntryRecorder(list => {
+      const tr = this.getCurrentTransaction()
+      if (tr && tr.captureTimings) {
+        let capturePaint = false
+        if (tr.type === PAGE_LOAD) {
+          capturePaint = true
+        }
+        const { spans, marks } = captureObserverEntries(list, { capturePaint })
+        tr.spans.push(...spans)
+        tr.addMarks({ agent: marks })
+      }
+    })
   }
 
   ensureCurrentTransaction(name, type, options) {
@@ -111,7 +129,7 @@ class TransactionService {
 
   startManagedTransaction(name, type, perfOptions) {
     let tr = this.getCurrentTransaction()
-
+    let isRedefined = false
     if (!tr) {
       tr = this.ensureCurrentTransaction(name, type, perfOptions)
     } else if (tr.canReuse() && perfOptions.canReuse) {
@@ -132,7 +150,6 @@ class TransactionService {
        * We only update based precedence defined in TRANSACTION_TYPE_ORDER.
        * If either orders don't exist we also don't redefine the type.
        */
-
       let redefineType
       let currentTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(tr.type)
       let redefineTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(type)
@@ -143,8 +160,8 @@ class TransactionService {
       ) {
         redefineType = type
       }
-
       tr.redefine(name, redefineType, perfOptions)
+      isRedefined = true
     } else {
       if (__DEV__) {
         this._logger.debug(
@@ -156,9 +173,10 @@ class TransactionService {
       tr = this.ensureCurrentTransaction(name, type, perfOptions)
     }
 
-    tr.captureTimings = true
-
     if (tr.type === PAGE_LOAD) {
+      if (!isRedefined) {
+        this.recorder.start(LARGEST_CONTENTFUL_PAINT)
+      }
       tr.options.checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
@@ -174,6 +192,19 @@ class TransactionService {
         tr.name = perfOptions.pageLoadTransactionName
       }
     }
+    /**
+     * Start observing for long tasks for all managed transactions
+     */
+    if (!isRedefined) {
+      this.recorder.start(LONG_TASK)
+    }
+    /**
+     * For unsampled transactions, avoid capturing various timing information
+     * as spans since they are dropped before sending to the server
+     */
+    if (tr.sampled) {
+      tr.captureTimings = true
+    }
 
     this.ensureRespInterval(tr.options.checkBrowserResponsiveness)
 
@@ -183,23 +214,45 @@ class TransactionService {
   startTransaction(name, type, options) {
     const perfOptions = this.createOptions(options)
     let tr
+    /**
+     * Flag that decides whether we have to fire the `onstart`
+     * hook for a given transaction
+     */
+    let fireOnstartHook = true
     if (perfOptions.managed) {
+      const current = this.currentTransaction
       tr = this.startManagedTransaction(name, type, perfOptions)
+      /**
+       * If the current transaction remains the same since the
+       * transaction could be reused, we should not fire the hook
+       */
+      if (current === tr) {
+        fireOnstartHook = false
+      }
     } else {
       tr = new Transaction(name, type, perfOptions)
     }
 
     tr.onEnd = () => this.handleTransactionEnd(tr)
 
-    if (__DEV__) {
-      this._logger.debug(`startTransaction(${tr.id}, ${tr.name}, ${tr.type})`)
+    if (fireOnstartHook) {
+      if (__DEV__) {
+        this._logger.debug(`startTransaction(${tr.id}, ${tr.name}, ${tr.type})`)
+      }
+      this._config.events.send(TRANSACTION_START, [tr])
     }
-    this._config.events.send(TRANSACTION_START, [tr])
 
     return tr
   }
 
   handleTransactionEnd(tr) {
+    /**
+     * Stop the observer once the transaction ends as we would like to
+     * get notified only when transaction is happening instead of observing
+     * all the time
+     */
+    this.recorder.stop()
+
     return Promise.resolve().then(
       () => {
         const { name, type } = tr
