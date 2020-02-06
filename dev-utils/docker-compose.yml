@@ -141,7 +141,7 @@ services:
       - WORKSPACE=${WORKSPACE}
       - BASE_DIR=${BASE_DIR}
     command: >
-      /bin/bash -c "set -x
+      /bin/bash -c 'set -x
         echo "USER=$(id)"
         echo "GOAL=${GOAL}"
         echo "MODE=${MODE}"
@@ -156,7 +156,7 @@ services:
         npm install
         npm install puppeteer --unsafe-perm=true --allow-root
         set -eo pipefail
-        npm run ${GOAL}"
+        npm run ${GOAL}'
     mem_limit: 2000m
 #    cpus: 0.5
     depends_on:
