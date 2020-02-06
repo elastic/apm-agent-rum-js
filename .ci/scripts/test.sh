@@ -8,6 +8,5 @@ docker-compose \
   up \
   --quiet-pull \
   --exit-code-from node-puppeteer \
-  --abort-on-container-exit \
   --remove-orphans \
   node-puppeteer

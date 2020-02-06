@@ -142,12 +142,17 @@ services:
       - BASE_DIR=${BASE_DIR}
     command: >
       /bin/bash -c "set -x
-        id
-        node --version
-        npm --version
-        npx --version
+        echo "USER=$(id)"
+        echo "GOAL=${GOAL}"
+        echo "MODE=${MODE}"
+        echo "SCOPE=${SCOPE}"
+        echo "STACK_VERSION=${STACK_VERSION}"
+        echo "NODE_VERSION=${NODE_VERSION}"
+        echo "YARN_VERSION=${YARN_VERSION}"
+        echo "NODE=$(node --version)"
+        echo "NPM=$(npm --version)"
+        echo "NPX=$(npx --version)"
         cd /app
-        export
         npm install
         npm install puppeteer --unsafe-perm=true --allow-root
         set -eo pipefail
