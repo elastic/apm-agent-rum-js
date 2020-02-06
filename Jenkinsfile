@@ -278,7 +278,6 @@ def runScript(Map args = [:]){
   deleteDir()
   unstash 'source'
   unstash 'cache'
-  sh(label: "Update Python dependencies", script: "pip install -r .ci/scripts/requirements.txt")
   dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "docker.elastic.co")
   dir("${BASE_DIR}"){
     withEnv([
