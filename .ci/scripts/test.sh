@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -xueo pipefail
 
-echo 0 > test_exit_code
+pip install docker-compose>=1.25.4
 
 USER_ID="$(id -u):$(id -g)" \
 docker-compose \
@@ -11,6 +11,5 @@ docker-compose \
   --quiet-pull \
   --exit-code-from node-puppeteer \
   --remove-orphans \
-  "node-puppeteer || (echo 1 > test_exit_code && exit 1)"
+  node-puppeteer
 echo "Exit code from docker-compose $?"
-exit $(cat test_exit_code)
