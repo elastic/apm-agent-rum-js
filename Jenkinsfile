@@ -2,15 +2,6 @@
 
 @Library('apm@current') _
 
-import co.elastic.matrix.*
-import groovy.transform.Field
-
-/**
-This is the parallel tasks generator,
-it is need as field to store the results of the tests.
-*/
-@Field def rumTasksGen
-
 pipeline {
   agent { label 'linux && immutable' }
   environment {
@@ -264,63 +255,6 @@ pipeline {
   post {
     cleanup {
       notifyBuildResult()
-    }
-  }
-}
-
-/**
-Parallel task generator for the integration tests.
-*/
-//TODO delete
-class RumParallelTaskGenerator extends DefaultParallelTaskGenerator {
-
-  public RumParallelTaskGenerator(Map params){
-    super(params)
-  }
-
-  /**
-  build a clousure that launch and agent and execute the corresponding test script,
-  then store the results.
-  */
-  public Closure generateStep(x, y){
-    return {
-      steps.node('linux && immutable'){
-        def label = "${this.tag}:${x}#${y}"
-        try {
-          steps.runScript(label: label, stack: x, scope: y)
-          saveResult(x, y, 1)
-        } catch(e){
-          saveResult(x, y, 0)
-          steps.error("${label} tests failed : ${e.toString()}\n")
-        } finally {
-          steps.wrappingUp()
-        }
-      }
-    }
-  }
-}
-
-//TODO delete
-def runParallelTest(){
-  rumTasksGen = new RumParallelTaskGenerator(
-    xFile: '.ci/.jenkins_stack_versions.yaml',
-    xKey: 'STACK_VERSION',
-    yFile: '.ci/.jenkins_scope.yaml',
-    yKey: 'SCOPE',
-    excludedVersions: ['empty'],
-    tag: "Rum",
-    name: "Rum",
-    steps: this
-  )
-  def mapPatallelTasks = rumTasksGen.generateParallelTests()
-
-  if(params.parallel_test){
-    parallel(mapPatallelTasks)
-  } else {
-    mapPatallelTasks.each{ k, v ->
-      stage(k){
-        v()
-      }
     }
   }
 }

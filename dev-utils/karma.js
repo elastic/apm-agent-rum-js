@@ -104,8 +104,8 @@ function prepareConfig(config, packageName) {
       ' (' +
       process.env.TRAVIS_BUILD_ID +
       ')'
-    config.plugins.push('karma-firefox-launcher')
-    config.browsers.push('Firefox')
+    config.plugins.push('karma-chrome-launcher')
+    config.browsers = ['ChromeHeadlessNoSandbox']
   } else if (isJenkins) {
     console.log('prepareConfig: Run in Jenkins')
     buildId =
@@ -115,18 +115,23 @@ function prepareConfig(config, packageName) {
       ' (' +
       process.env.BRANCH_NAME +
       ') Elastic Stack ' +
-      process.env.STACK_VERSION
+      process.env.STACK_VERSION +
+      ' Scope ' +
+      process.env.SCOPE
 
     config.plugins.push('karma-chrome-launcher')
-    config.browsers = ['ChromeHeadlessNoSandbox']
-    config.customLaunchers = {
-      ChromeHeadlessNoSandbox: {
-        base: 'ChromeHeadless',
-        flags: [
-          '--no-sandbox', // required to run without privileges in docker
-          '--user-data-dir=/tmp/chrome-test-profile',
-          '--disable-web-security'
-        ]
+
+    if (!isSauce) {
+      config.browsers = ['ChromeHeadlessNoSandbox']
+      config.customLaunchers = {
+        ChromeHeadlessNoSandbox: {
+          base: 'ChromeHeadless',
+          flags: [
+            '--no-sandbox', // required to run without privileges in docker
+            '--user-data-dir=/tmp/chrome-test-profile',
+            '--disable-web-security'
+          ]
+        }
       }
     }
     config.plugins.push('karma-junit-reporter')
@@ -169,7 +174,7 @@ function prepareConfig(config, packageName) {
     } else if (testConfig.branch === 'master') {
       config.sauceLabs.tags = [testConfig.branch]
     }
-    config.reporters = ['dots', 'saucelabs']
+    config.reporters.push('dots', 'saucelabs')
     config.browsers = Object.keys(config.customLaunchers)
     config.transports = ['polling']
   }
