@@ -101,6 +101,8 @@ class Config {
       transactionSampleRate: 1.0,
       centralConfig: false,
 
+      monitorLongtasks: false,
+
       context: {}
     }
 
