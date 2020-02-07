@@ -43,6 +43,11 @@ function gatherRawMetrics(browser, url) {
     const context = await browser.newContext()
     const page = await context.newPage()
 
+    /**
+     * CDP session is only available on chromium based browsers which follows
+     * the devtools protocol
+     * https://chromedevtools.github.io/devtools-protocol/
+     */
     let client = null
     try {
       client = await browser.pageTarget(page).createCDPSession()
@@ -103,7 +108,6 @@ function gatherRawMetrics(browser, url) {
          * Resolve the promise once we measure the size
          * of the payload to APM Server
          */
-        // await context.close()
         resolve(metrics)
       }
     })
