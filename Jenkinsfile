@@ -19,7 +19,7 @@ pipeline {
     OPBEANS_REPO = 'opbeans-frontend'
   }
   options {
-    timeout(time: 3, unit: 'HOURS')
+    //timeout(time: 3, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
