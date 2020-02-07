@@ -315,9 +315,9 @@ def withSaucelabsEnv(Closure body){
     [var: 'SAUCE_USERNAME', password: "${jsonValue.data.SAUCE_USERNAME}"],
     [var: 'SAUCE_ACCESS_KEY', password: "${jsonValue.data.SAUCE_ACCESS_KEY}"],
   ]){
-    timeout(activity: true, time: 2) { //SauceLab uncatch exceptions
+    //timeout(activity: true, time: 2) { //SauceLab uncatch exceptions
       body()
-    }
+    //}
   }
 }
 
