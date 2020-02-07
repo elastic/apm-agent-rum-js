@@ -102,24 +102,29 @@ class PerformanceMonitoring {
       ) {
         let target = task.target
         let name = target.getAttribute('name')
-        let classes = target.getAttribute('class')
 
         let additionalInfo = ''
         if (name) {
           additionalInfo = `["${name}"]`
-        } else if (classes) {
-          classes = classes.split(' ').join('.')
-          additionalInfo = `.${classes}`
         }
+
         let tagName = target.tagName.toLowerCase()
-        transactionService.startTransaction(
+        let tr = transactionService.startTransaction(
           `Click >> ${tagName}${additionalInfo}`,
           USER_INTERACTION,
           {
             managed: true,
-            canReuse: true
+            canReuse: true,
+            reuseThreshold: 100
           }
         )
+
+        if (tr) {
+          let classes = target.getAttribute('class')
+          if (classes) {
+            tr.addContext({ custom: { classes } })
+          }
+        }
       }
     }
   }
@@ -251,6 +256,15 @@ class PerformanceMonitoring {
       if (__DEV__) {
         this._logginService.debug(
           `transaction(${tr.id}, ${tr.name}) was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
+        )
+      }
+      return false
+    }
+
+    if (tr.options.managed && tr.spans.length === 0) {
+      if (__DEV__) {
+        this._logginService.debug(
+          `transaction(${tr.id}, ${tr.name}) was discarded! Transaction does not have any spans`
         )
       }
       return false
