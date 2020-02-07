@@ -32,7 +32,9 @@ import { mockGetEntriesByType } from '../utils/globals-mock'
 import {
   TRANSACTION_END,
   PAGE_LOAD,
-  ROUTE_CHANGE
+  ROUTE_CHANGE,
+  LONG_TASK,
+  LARGEST_CONTENTFUL_PAINT
 } from '../../src/common/constants'
 
 describe('TransactionService', function() {
@@ -122,7 +124,8 @@ describe('TransactionService', function() {
       config: {},
       events: {
         send: onStartSpy
-      }
+      },
+      get: () => {}
     })
     const options = {
       managed: true,
@@ -712,6 +715,7 @@ describe('TransactionService', function() {
       stopSpy.calls.reset()
     }
 
+    beforeAll(() => config.setConfig({ monitorLongtasks: true }))
     afterEach(() => resetSpies())
 
     it('should start/stop performance recorder for managed transaction', async () => {
@@ -720,8 +724,8 @@ describe('TransactionService', function() {
       })
       expect(startSpy).toHaveBeenCalledTimes(2)
       expect(startSpy.calls.allArgs()).toEqual([
-        ['largest-contentful-paint'],
-        ['longtask']
+        [LARGEST_CONTENTFUL_PAINT],
+        [LONG_TASK]
       ])
       await pageLoadTr.end()
       expect(stopSpy).toHaveBeenCalled()
@@ -731,7 +735,7 @@ describe('TransactionService', function() {
         managed: true
       })
       expect(startSpy).toHaveBeenCalled()
-      expect(startSpy.calls.allArgs()).toEqual([['longtask']])
+      expect(startSpy.calls.allArgs()).toEqual([[LONG_TASK]])
       await routeChangeTr.end()
       expect(stopSpy).toHaveBeenCalled()
     })
@@ -741,7 +745,7 @@ describe('TransactionService', function() {
         managed: true,
         canReuse: true
       })
-      expect(startSpy).toHaveBeenCalledWith('longtask')
+      expect(startSpy).toHaveBeenCalledWith(LONG_TASK)
       const managed2 = trService.startTransaction('test', 'custom', {
         managed: true,
         canReuse: true
@@ -758,15 +762,36 @@ describe('TransactionService', function() {
         managed: true,
         canReuse: true
       })
-      expect(startSpy).toHaveBeenCalledWith('longtask')
+      expect(startSpy).toHaveBeenCalledWith(LONG_TASK)
       const managedNonReusable = trService.startTransaction('test', 'custom', {
         managed: true
       })
-      expect(startSpy.calls.allArgs()).toEqual([['longtask'], ['longtask']])
+      expect(startSpy.calls.allArgs()).toEqual([[LONG_TASK], [LONG_TASK]])
       expect(stopSpy).toHaveBeenCalled()
       await managedReusable.end()
       await managedNonReusable.end()
       expect(stopSpy).toHaveBeenCalledTimes(2)
+    })
+
+    it('should not record longtasks when monitorLongtasks is false', async () => {
+      config.setConfig({
+        monitorLongtasks: false
+      })
+      const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
+        managed: true
+      })
+      expect(startSpy).toHaveBeenCalledTimes(1)
+      expect(startSpy).toHaveBeenCalledWith(LARGEST_CONTENTFUL_PAINT)
+      await pageLoadTr.end()
+      expect(stopSpy).toHaveBeenCalled()
+      resetSpies()
+
+      const routeChangeTr = trService.startTransaction('test', ROUTE_CHANGE, {
+        managed: true
+      })
+      expect(startSpy).not.toHaveBeenCalled()
+      await routeChangeTr.end()
+      expect(stopSpy).toHaveBeenCalled()
     })
   })
 })
