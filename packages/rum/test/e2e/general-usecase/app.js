@@ -111,6 +111,11 @@ generateError.tmp = 'tmp'
 
 testFetch(mockBackendUrl)
 
+let testAction = document.getElementsByName('test-action')[0]
+testAction.addEventListener('click', function() {
+  testXHR(mockBackendUrl)
+})
+
 if (location.hash === '#test-state') {
   const path = location.pathname
   history.pushState(

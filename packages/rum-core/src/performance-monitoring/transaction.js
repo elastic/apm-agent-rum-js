@@ -68,7 +68,8 @@ class Transaction extends SpanBase {
     this.addMarks({ custom })
   }
 
-  canReuse(threshold = REUSABILITY_THRESHOLD) {
+  canReuse() {
+    let threshold = this.options.reuseThreshold || REUSABILITY_THRESHOLD
     return (
       !!this.options.canReuse && !this.ended && now() - this._start < threshold
     ) // To avoid a stale transaction capture everything
