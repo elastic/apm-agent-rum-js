@@ -100,16 +100,22 @@ class PerformanceMonitoring {
         task.source === EVENT_TARGET &&
         task.eventType === 'click'
       ) {
-        let target = task.target
-        let name = target.getAttribute('name')
+        const target = task.target
+        const name = target.getAttribute('name')
 
         let additionalInfo = ''
         if (name) {
           additionalInfo = `["${name}"]`
         }
 
-        let tagName = target.tagName.toLowerCase()
-        let tr = transactionService.startTransaction(
+        const tagName = target.tagName.toLowerCase()
+
+        /**
+         * We reduce the reusability threshold to make sure
+         * we only capture async activities (e.g. network)
+         * related to this interaction.
+         */
+        const tr = transactionService.startTransaction(
           `Click >> ${tagName}${additionalInfo}`,
           USER_INTERACTION,
           {
