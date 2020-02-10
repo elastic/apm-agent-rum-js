@@ -99,11 +99,11 @@ function getApmBundleSize() {
   }
 }
 
-function getCommonFields({ version, url, scenario }) {
+function getCommonFields({ browser, url, scenario }) {
   const { minified, gzip } = getApmBundleSize()
   return {
     scenario,
-    'parameters.browser': version,
+    browser,
     'parameters.url': url,
     'parameters.runs': runs,
     'parameters.images': scenario === 'heavy' ? noOfImages : 0,
@@ -192,6 +192,13 @@ function calculateResults(resultMap) {
          */
         result[metricName] = value
       } else {
+        /**
+         * Skip if the value inside the array is null
+         * which means the metric type is not captured inside the browser
+         */
+        if (value[0] == null) {
+          return
+        }
         const unit = getUnit(metricName)
         const mean = stats.mean(value)
         const p90 = stats.percentile(value, 90)

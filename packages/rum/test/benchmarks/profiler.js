@@ -23,7 +23,7 @@
  *
  */
 
-const puppeteer = require('puppeteer')
+const playwright = require('playwright')
 const { chrome } = require('./config')
 const {
   filterCpuMetrics,
@@ -31,8 +31,8 @@ const {
   getMemoryAllocationPerFunction
 } = require('./analyzer')
 
-async function launchBrowser() {
-  return await puppeteer.launch(chrome.launchOptions)
+async function launchBrowser(type) {
+  return await playwright[type].launch(chrome.launchOptions)
 }
 
 function gatherRawMetrics(browser, url) {
@@ -40,26 +40,39 @@ function gatherRawMetrics(browser, url) {
     /**
      * Create a separate browsing context for each run
      */
-    const context = await browser.createIncognitoBrowserContext()
+    const context = await browser.newContext()
     const page = await context.newPage()
-    const client = await page.target().createCDPSession()
+
+    /**
+     * CDP session is only available on chromium based browsers which follows
+     * the devtools protocol
+     * https://chromedevtools.github.io/devtools-protocol/
+     */
+    let client = null
+    try {
+      client = await browser.pageTarget(page).createCDPSession()
+    } catch (_) {}
+
     /**
      * Disable cache for each run
      */
     await page.setCacheEnabled(false)
-    /**
-     * Enable events from Chrome devtools protocol
-     */
-    await client.send('Page.enable')
-    await client.send('Profiler.enable')
-    await client.send('HeapProfiler.enable')
-    /**
-     * Tune the CPU sampler to get control the
-     * number of samples generated
-     */
-    await client.send('Profiler.setSamplingInterval', {
-      interval: chrome.cpuSamplingInterval
-    })
+
+    if (client) {
+      /**
+       * Enable events from Chrome devtools protocol
+       */
+      await client.send('Page.enable')
+      await client.send('Profiler.enable')
+      await client.send('HeapProfiler.enable')
+      /**
+       * Tune the CPU sampler to get control the
+       * number of samples generated
+       */
+      await client.send('Profiler.setSamplingInterval', {
+        interval: chrome.cpuSamplingInterval
+      })
+    }
 
     /**
      * Result metrics that will be filled at various
@@ -74,11 +87,15 @@ function gatherRawMetrics(browser, url) {
          * Stop the profiler once we post the transaction to
          * the apm server
          */
-        const result = await client.send('Profiler.stop')
-        const sample = await client.send('HeapProfiler.stopSampling')
+        let filteredCpuMetrics = {}
+        let memoryMetrics = []
+        if (client) {
+          const result = await client.send('Profiler.stop')
+          const sample = await client.send('HeapProfiler.stopSampling')
 
-        const memoryMetrics = getMemoryAllocationPerFunction(sample)
-        const filteredCpuMetrics = filterCpuMetrics(result.profile, url)
+          memoryMetrics = getMemoryAllocationPerFunction(sample)
+          filteredCpuMetrics = filterCpuMetrics(result.profile, url)
+        }
         const response = request.postData()
         const payload = capturePayloadInfo(response)
 
@@ -95,13 +112,21 @@ function gatherRawMetrics(browser, url) {
       }
     })
 
-    client.on('Page.loadEventFired', async function() {
+    page.on('load', async function() {
       const timings = await page.evaluate(() => {
         // Serializing the outputs otherwise it will be undefined
+        let entries = performance.getEntriesByType('navigation')
+        /**
+         * Webkit does not support navigation entry types
+         */
+        if (entries.length === 0) {
+          const { loadEventEnd, fetchStart } = performance.timing
+          let entry = { loadEventEnd, fetchStart, name: window.location.href }
+          entries = [entry]
+        }
+
         return {
-          navigation: JSON.stringify(
-            performance.getEntriesByType('navigation')
-          ),
+          navigation: JSON.stringify(entries),
           resource: JSON.stringify(performance.getEntriesByType('resource')),
           measure: JSON.stringify(performance.getEntriesByType('measure'))
         }
@@ -109,17 +134,19 @@ function gatherRawMetrics(browser, url) {
 
       Object.assign(metrics, timings)
     })
-    /**
-     * Perform a garbage collection to do a clean check everytime
-     */
-    await client.send('HeapProfiler.collectGarbage')
-    /**
-     * Start the CPU and Memory profiler before navigating to the URL
-     */
-    await client.send('Profiler.start')
-    await client.send('HeapProfiler.startSampling', {
-      interval: chrome.memorySamplingInterval
-    })
+    if (client) {
+      /**
+       * Perform a garbage collection to do a clean check everytime
+       */
+      await client.send('HeapProfiler.collectGarbage')
+      /**
+       * Start the CPU and Memory profiler before navigating to the URL
+       */
+      await client.send('Profiler.start')
+      await client.send('HeapProfiler.startSampling', {
+        interval: chrome.memorySamplingInterval
+      })
+    }
 
     await page.goto(url)
   })

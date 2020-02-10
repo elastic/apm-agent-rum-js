@@ -65,13 +65,17 @@ module.exports = function(config) {
       formatOutput(results) {
         const summary = results.map(
           ({ suite, name, mean, count, cycle, browser, hz }) => {
+            /**
+             * Ignore version and os in browser
+             */
+            const browserName = browser.toLowerCase().split(' ')[0]
             return {
               suite,
               name,
               mean,
               count,
               cycle,
-              browser,
+              browser: browserName,
               hz,
               unit: 'ops/sec'
             }
