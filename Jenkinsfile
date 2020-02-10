@@ -313,8 +313,12 @@ def withSaucelabsEnv(Closure body){
     [var: 'SAUCE_USERNAME', password: "${jsonValue.data.SAUCE_USERNAME}"],
     [var: 'SAUCE_ACCESS_KEY', password: "${jsonValue.data.SAUCE_ACCESS_KEY}"],
   ]){
-    timeout(time: 700, unit: 'SECONDS') { //SauceLab uncatch exceptions
-      body()
+    try { //https://issues.jenkins-ci.org/browse/JENKINS-61034
+      timeout(activity: true, time: 300, unit: 'SECONDS') { //SauceLab uncatch exceptions
+        body()
+      }
+    } catch(err){
+      error("The test failed")
     }
   }
 }
