@@ -291,14 +291,12 @@ def runScript(Map args = [:]){
         sh(label: 'Pull and build docker infra', script: '.ci/scripts/pull_and_build.sh')
       }
       // Another retry in case there are any environmental issues
-      retry(2) {
+      retry(3) {
         sleep randomNumber(min: 5, max: 10)
         if(params.saucelab_test){
           env.MODE = 'saucelabs'
-          retry(3) {
-            withSaucelabsEnv(){
-              sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
-            }
+          withSaucelabsEnv(){
+            sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
           }
         } else {
           env.MODE = 'none'
