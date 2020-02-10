@@ -345,6 +345,14 @@ function getBrowserInfo() {
   }
 }
 
+function getBrowserFeatures() {
+  return browser.executeAsync(function(done) {
+    done({
+      EventTarget: !!window.EventTarget
+    })
+  })
+}
+
 function isChromeLatest() {
   const { name, version } = getBrowserInfo()
   const isChrome = name.indexOf('chrome') !== -1
@@ -360,5 +368,6 @@ module.exports = {
   isChromeLatest,
   getWebdriveBaseConfig,
   getBrowserInfo,
-  waitForApmServerCalls
+  waitForApmServerCalls,
+  getBrowserFeatures
 }

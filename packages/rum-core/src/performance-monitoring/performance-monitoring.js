@@ -41,7 +41,9 @@ import {
   FETCH,
   HISTORY,
   XMLHTTPREQUEST,
+  EVENT_TARGET,
   HTTP_REQUEST_TYPE,
+  USER_INTERACTION,
   BROWSER_RESPONSIVENESS_INTERVAL,
   BROWSER_RESPONSIVENESS_BUFFER,
   SIMILAR_SPAN_TO_TRANSACTION_RATIO
@@ -83,6 +85,53 @@ class PerformanceMonitoring {
 
     if (flags[FETCH]) {
       patchEventHandler.observe(FETCH, this.getFetchSub())
+    }
+
+    if (flags[EVENT_TARGET]) {
+      patchEventHandler.observe(EVENT_TARGET, this.getEventTargetSub())
+    }
+  }
+
+  getEventTargetSub() {
+    const transactionService = this._transactionService
+    return (event, task) => {
+      if (
+        event === SCHEDULE &&
+        task.source === EVENT_TARGET &&
+        task.eventType === 'click'
+      ) {
+        const target = task.target
+        const name = target.getAttribute('name')
+
+        let additionalInfo = ''
+        if (name) {
+          additionalInfo = `["${name}"]`
+        }
+
+        const tagName = target.tagName.toLowerCase()
+
+        /**
+         * We reduce the reusability threshold to make sure
+         * we only capture async activities (e.g. network)
+         * related to this interaction.
+         */
+        const tr = transactionService.startTransaction(
+          `Click >> ${tagName}${additionalInfo}`,
+          USER_INTERACTION,
+          {
+            managed: true,
+            canReuse: true,
+            reuseThreshold: 100
+          }
+        )
+
+        if (tr) {
+          let classes = target.getAttribute('class')
+          if (classes) {
+            tr.addContext({ custom: { classes } })
+          }
+        }
+      }
     }
   }
 
@@ -213,6 +262,15 @@ class PerformanceMonitoring {
       if (__DEV__) {
         this._logginService.debug(
           `transaction(${tr.id}, ${tr.name}) was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
+        )
+      }
+      return false
+    }
+
+    if (tr.options.managed && tr.spans.length === 0) {
+      if (__DEV__) {
+        this._logginService.debug(
+          `transaction(${tr.id}, ${tr.name}) was discarded! Transaction does not have any spans`
         )
       }
       return false
