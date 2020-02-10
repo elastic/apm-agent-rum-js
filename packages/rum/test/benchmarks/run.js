@@ -25,6 +25,7 @@
 
 const { join } = require('path')
 const { writeFileSync } = require('fs')
+const { promisify } = require('util')
 const { gatherRawMetrics, launchBrowser } = require('./profiler')
 const {
   analyzeMetrics,
@@ -32,7 +33,7 @@ const {
   getCommonFields,
   customApmBuild
 } = require('./analyzer')
-const { runs, port, scenarios } = require('./config')
+const { runs, port, scenarios, browserTypes } = require('./config')
 const startServer = require('./server')
 
 const REPORTS_DIR = join(__dirname, '../../reports')
@@ -46,6 +47,7 @@ const REPORTS_DIR = join(__dirname, '../../reports')
     await customApmBuild(filename)
 
     const server = await startServer(filename)
+    const close = promisify(server.close.bind(server))
     /**
      * object cache holding the metrics accumlated in each run and
      * helps in processing the overall results
@@ -53,24 +55,26 @@ const REPORTS_DIR = join(__dirname, '../../reports')
     const resultMap = new Map()
 
     for (let scenario of scenarios) {
-      const browser = await launchBrowser()
-      const url = `http://localhost:${port}/${scenario}`
-      const version = await browser.version()
-
-      /**
-       * Add common set of metrics for all scenarios
-       */
-      resultMap.set(scenario, getCommonFields({ version, url, scenario }))
-
-      for (let i = 0; i < runs; i++) {
-        const metrics = await gatherRawMetrics(browser, url)
-        Object.assign(metrics, { scenario, url })
-        await analyzeMetrics(metrics, resultMap)
+      for (let type of browserTypes) {
+        const url = `http://localhost:${port}/${scenario}`
+        /**
+         * Add common set of metrics for all scenarios
+         */
+        const key = `${scenario}.${type}`
+        resultMap.set(key, getCommonFields({ browser: type, url, scenario }))
+        for (let i = 0; i < runs; i++) {
+          const browser = await launchBrowser(type)
+          const metrics = await gatherRawMetrics(browser, url)
+          Object.assign(metrics, { scenario: key, url })
+          await analyzeMetrics(metrics, resultMap)
+          await browser.close()
+        }
       }
-      await browser.close()
     }
-
-    server.close()
+    /**
+     * close the server
+     */
+    await close()
 
     const results = calculateResults(resultMap)
 
