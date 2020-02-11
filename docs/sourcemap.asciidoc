@@ -127,7 +127,7 @@ curl http://localhost:8200/assets/v1/sourcemaps -X POST \
 [[secret-token]]
 === Using a secret token
 
-You can {apm-server-ref-v}/secure-communication-agents.html#secret-token[configure a secret token on APM Server] to restrict uploading sourcemaps.
+You can {apm-server-ref-v}/secure-communication-agents.html[configure a secret token on APM Server] to restrict uploading sourcemaps.
 
 Here's how to add the secret token to a curl command:
 
