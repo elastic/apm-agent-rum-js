@@ -75,8 +75,16 @@ NOTE: Both active and instrument needs to be true for instrumentation to be runn
 * *Type:* Array
 * *Default:* `[]`
 
-A list of instrumentations which can be disabled. Valid options are `xmlhttprequest`, `fetch`,
-`history`, `error` and `page-load`. When disabled, no transactions/spans will be created for that type.
+A list of instrumentations which can be disabled. When disabled, no transactions/spans will be created for that type.
+Valid options:
+
+* `page-load`
+* `history`
+* `user-interaction`
+* `xmlhttprequest`
+* `fetch`
+* `error`
+
 
 [float]
 [[environment]]
