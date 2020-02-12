@@ -423,6 +423,25 @@ describe('ApmServer', function() {
     expect(result).toEqual([expected])
   })
 
+  it('should pass correct payload to filters', () => {
+    configService.setConfig({
+      serviceName: 'serviceName'
+    })
+    let type = ''
+    configService.addFilter(function(payload) {
+      expect(payload[type]).toBeDefined()
+      return payload
+    })
+
+    type = 'errors'
+    let result = apmServer.sendErrors([{ test: 'test' }])
+    expect(result).toBeDefined()
+
+    type = 'transactions'
+    result = apmServer.sendTransactions([{ test: 'test' }])
+    expect(result).toBeDefined()
+  })
+
   if (isVersionInRange(testConfig.stackVersion, '7.3.0')) {
     it('should fetch remote config', async () => {
       spyOn(configService, 'setLocalConfig')
