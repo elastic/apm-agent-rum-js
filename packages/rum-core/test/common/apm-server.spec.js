@@ -427,19 +427,22 @@ describe('ApmServer', function() {
     configService.setConfig({
       serviceName: 'serviceName'
     })
+    /**
+     * We don't want to send these payloads to the apm server
+     * since they are only tests and not valid payloads.
+     */
+    spyOn(apmServer, '_postJson')
     let type = ''
     configService.addFilter(function(payload) {
-      expect(payload[type]).toBeDefined()
+      expect(payload[type]).toEqual([{ test: type }])
       return payload
     })
 
     type = 'errors'
-    let result = apmServer.sendErrors([{ test: 'test' }])
-    expect(result).toBeDefined()
+    apmServer.sendErrors([{ test: 'errors' }])
 
     type = 'transactions'
-    result = apmServer.sendTransactions([{ test: 'test' }])
-    expect(result).toBeDefined()
+    apmServer.sendTransactions([{ test: 'transactions' }])
   })
 
   if (isVersionInRange(testConfig.stackVersion, '7.3.0')) {
