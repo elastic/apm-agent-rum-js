@@ -43,9 +43,9 @@ If you are interested in accurately measuring the duration of load event, the in
 === User Interactions
 
 The RUM agent automatically instruments click event listeners that are
-registered by your application. The click events are captured as `user-interaction`
+registered by the application. The click events are captured as `user-interaction`
 transactions. However, to avoid sending too many `user-interaction` transactions
-to the server, the agent discards transactions without any spans.  Furthermore, 
+to the server, the agent discards transactions with no spans (e.g. no network activity). Furthermore, 
 if the click interaction results in route change, then a `route-change`
 transaction would be captured instead.
 
