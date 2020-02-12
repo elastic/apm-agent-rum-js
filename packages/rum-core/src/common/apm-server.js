@@ -70,7 +70,8 @@ class ApmServer {
           name: 'javascript'
         },
         environment: cfg.get('environment')
-      }
+      },
+      labels: cfg.get('context.tags')
     }
     return truncateModel(METADATA_MODEL, metadata)
   }
