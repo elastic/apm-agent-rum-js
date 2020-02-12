@@ -423,6 +423,28 @@ describe('ApmServer', function() {
     expect(result).toEqual([expected])
   })
 
+  it('should pass correct payload to filters', () => {
+    configService.setConfig({
+      serviceName: 'serviceName'
+    })
+    /**
+     * We don't want to send these payloads to the apm server
+     * since they are only tests and not valid payloads.
+     */
+    spyOn(apmServer, '_postJson')
+    let type = ''
+    configService.addFilter(function(payload) {
+      expect(payload[type]).toEqual([{ test: type }])
+      return payload
+    })
+
+    type = 'errors'
+    apmServer.sendErrors([{ test: 'errors' }])
+
+    type = 'transactions'
+    apmServer.sendTransactions([{ test: 'transactions' }])
+  })
+
   if (isVersionInRange(testConfig.stackVersion, '7.3.0')) {
     it('should fetch remote config', async () => {
       spyOn(configService, 'setLocalConfig')
