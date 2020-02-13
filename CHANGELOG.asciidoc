@@ -29,6 +29,22 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-4.x]]
 === RUM JS Agent version 4.x
 
+
+[[release-notes-4.8.0]]
+==== 4.8.0 (2020-02-13)
+
+[float]
+===== Features
+* Click events are captured as user-interaction transactions: {issue}496[#496]
+* Global labels are added to metadata on the payload: {issue}584[#584]
+* Longtask and Largest Contentful Paint are available through configuration {issue}376[#376]
+
+
+[float]
+===== Bug fixes
+* Pass correct properties for payload to filter functions {issue}616[#616]
+
+
 [[release-notes-4.7.1]]
 ==== 4.7.1 (2020-01-30)
 
