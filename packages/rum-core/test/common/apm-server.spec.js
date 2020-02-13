@@ -372,7 +372,7 @@ describe('ApmServer', function() {
     expect(apmServer._postJson).not.toHaveBeenCalled()
   })
 
-  it('should set metadata from config along with defaults', () => {
+  it('should set metadata from config along with defaults', async () => {
     configService.setConfig({
       serviceName: 'test',
       serviceVersion: '0.0.1',
@@ -380,19 +380,31 @@ describe('ApmServer', function() {
     })
 
     configService.setVersion('4.0.1')
+    configService.addLabels({ test: 'testlabel' })
 
     /** To catch agent version mismatch during release */
-    const { service } = apmServer.createMetaData()
-    expect(service).toEqual({
-      name: 'test',
-      version: '0.0.1',
-      environment: 'staging',
-      agent: {
-        name: 'js-base',
-        version: '4.0.1'
+    const meta = apmServer.createMetaData()
+    expect(meta).toEqual({
+      service: {
+        name: 'test',
+        version: '0.0.1',
+        environment: 'staging',
+        agent: {
+          name: 'js-base',
+          version: '4.0.1'
+        },
+        language: { name: 'javascript' }
       },
-      language: { name: 'javascript' }
+      labels: { test: 'testlabel' }
     })
+
+    const tr = new Transaction('test-meta-tr', 'test-type', {
+      startTime: 10
+    })
+    tr.startSpan('test-meta-span', 'test-type')
+    tr.end(100)
+    const payload = performanceMonitoring.convertTransactionsToServerModel([tr])
+    await apmServer.sendTransactions(payload)
   })
 
   it('should ndjson transactions', function() {
