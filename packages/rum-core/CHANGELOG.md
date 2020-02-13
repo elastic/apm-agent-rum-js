@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.9.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.8.1...@elastic/apm-rum-core@4.9.0) (2020-02-13)
+
+
+### Bug Fixes
+
+* pass correct properties to payload filters ([#616](https://github.com/elastic/apm-agent-rum-js/issues/616)) ([44d6740](https://github.com/elastic/apm-agent-rum-js/commit/44d674064dd1b7b992c7bf22fe82fb9cc48582da))
+
+
+### Features
+
+* add labels config to metadata payload ([#617](https://github.com/elastic/apm-agent-rum-js/issues/617)) ([2d8e46d](https://github.com/elastic/apm-agent-rum-js/commit/2d8e46da1919e15563568945f2e2a0a6adcabe0c))
+* capture click user-interaction transactions ([#604](https://github.com/elastic/apm-agent-rum-js/issues/604)) ([30530c1](https://github.com/elastic/apm-agent-rum-js/commit/30530c11c4b4ae46ad5fe140f1a15c1f3d240199))
+* **rum-core:** add config option to monitor longtasks ([#600](https://github.com/elastic/apm-agent-rum-js/issues/600)) ([34b4fb3](https://github.com/elastic/apm-agent-rum-js/commit/34b4fb300d47833acfaccbd6b07d155d299b2b6e))
+* **rum-core:** add EventTarget patch ([#588](https://github.com/elastic/apm-agent-rum-js/issues/588)) ([755bab4](https://github.com/elastic/apm-agent-rum-js/commit/755bab4124c0c7928071434901ddf642b43387a2))
+* **rum-core:** capture long tasks and lcp using performance observer ([#581](https://github.com/elastic/apm-agent-rum-js/issues/581)) ([a52ca9d](https://github.com/elastic/apm-agent-rum-js/commit/a52ca9d43abc83a15de6ac3bd7ab54559d36143b))
+
+
+
+
+
 ## [4.8.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.8.0...@elastic/apm-rum-core@4.8.1) (2020-01-30)
 
 

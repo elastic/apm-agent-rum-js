@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.8.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.7.1...@elastic/apm-rum@4.8.0) (2020-02-13)
+
+
+### Features
+
+* capture click user-interaction transactions ([#604](https://github.com/elastic/apm-agent-rum-js/issues/604)) ([30530c1](https://github.com/elastic/apm-agent-rum-js/commit/30530c11c4b4ae46ad5fe140f1a15c1f3d240199))
+
+
+
+
+
 ## [4.7.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.7.0...@elastic/apm-rum@4.7.1) (2020-01-30)
 
 **Note:** Version bump only for package @elastic/apm-rum
