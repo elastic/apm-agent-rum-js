@@ -398,8 +398,12 @@ describe('ApmServer', function() {
       labels: { test: 'testlabel' }
     })
 
-    const trs = generateTransaction(1)
-    const payload = performanceMonitoring.convertTransactionsToServerModel(trs)
+    const tr = new Transaction('test-meta-tr', 'test-type', {
+      startTime: 10
+    })
+    tr.startSpan('test-meta-span', 'test-type')
+    tr.end(100)
+    const payload = performanceMonitoring.convertTransactionsToServerModel([tr])
     await apmServer.sendTransactions(payload)
   })
 
