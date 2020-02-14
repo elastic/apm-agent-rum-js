@@ -29,6 +29,13 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-4.x]]
 === RUM JS Agent version 4.x
 
+[[release-notes-4.8.1]]
+==== 4.8.1 (2020-02-14)
+
+[float]
+===== Bug fixes
+* Click events are only captured for instances of Element {issue}625[#625]
+
 
 [[release-notes-4.8.0]]
 ==== 4.8.0 (2020-02-13)
