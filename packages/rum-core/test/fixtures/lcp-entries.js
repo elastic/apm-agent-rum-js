@@ -23,38 +23,29 @@
  *
  */
 
-var sourceMap = require('source-map')
-
-var bundleMap = require('./app.bundle.js.map.json')
-var errorPayload = require('./sample-error-request.json')
-
-var minfiedBundleMap = require('./app.bundle.min.js.map.json')
-var minifiedErrorPayload = require('./sample-error-request-min.json')
-
-function testMap(map, stacktrace) {
-  return new Promise(resolve => {
-    sourceMap.SourceMapConsumer.with(map, null, consumer => {
-      var result = stacktrace.map(stack => {
-        var mapped = consumer.originalPositionFor({
-          line: stack.lineno,
-          column: stack.colno
-        })
-        return { original: stack, mapped }
-      })
-      resolve(result)
-    })
-  })
-}
-
-var printStack = bundleName => result => {
-  console.log(`\n --------- ${bundleName} \n`)
-  console.log(JSON.stringify(result, null, 2))
-}
-
-testMap(bundleMap, errorPayload.errors[0].exception.stacktrace).then(
-  printStack('bundle')
-)
-testMap(
-  minfiedBundleMap,
-  minifiedErrorPayload.errors[0].exception.stacktrace
-).then(printStack('minified'))
+export default [
+  {
+    renderTime: 298.51500000222586,
+    loadTime: 295.4050000116695,
+    size: 3000,
+    id: '',
+    url: 'http://example.com/logo.svg',
+    element: null, // points to a DOM element
+    name: '',
+    entryType: 'largest-contentful-paint',
+    startTime: 298.51500000222586,
+    duration: 0
+  },
+  {
+    renderTime: 1040.0399999925867,
+    loadTime: 0,
+    size: 5250,
+    id: '',
+    url: '',
+    element: null,
+    name: '',
+    entryType: 'largest-contentful-paint',
+    startTime: 1040.0399999925867,
+    duration: 0
+  }
+]

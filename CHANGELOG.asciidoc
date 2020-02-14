@@ -29,6 +29,37 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-4.x]]
 === RUM JS Agent version 4.x
 
+
+[[release-notes-4.8.0]]
+==== 4.8.0 (2020-02-13)
+
+[float]
+===== Features
+* Click events are captured as user-interaction transactions: {issue}496[#496]
+* Global labels are added to metadata on the payload: {issue}584[#584]
+* Longtask and Largest Contentful Paint are available through configuration {issue}376[#376]
+
+
+[float]
+===== Bug fixes
+* Pass correct properties for payload to filter functions {issue}616[#616]
+
+
+[[release-notes-4.7.1]]
+==== 4.7.1 (2020-01-30)
+
+[float]
+===== Features
+* Vue: Capture errors in vue app automatically: {issue}555[#555]
+
+
+[float]
+===== Bug fixes
+* Add error properties to custom context by default {issue}582[#582]
+* Avoid capturing timings if the transaction is unsampled {issue}579[#579]
+* Avoid firing transaction-start event on reused transactions {issue}583[#583]
+
+
 [[release-notes-4.7.0]]
 ==== 4.7.0 (2020-01-15)
 
@@ -265,8 +296,8 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 
 [float]
 ===== BREAKING CHANGE
-* remove setTags in favor of addTags API ([#28](https://github.com/elastic/apm-agent-js-core/issues/28))
-* introduce subtype and action in Spans {commit}#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7[#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7]
+* remove setTags in favor of addTags API  {pull}28[#28]
+* introduce subtype and action in Spans {commit}5fd4af7[5fd4af7] {pull}9[#9]
 
 [float]
 ===== Features
@@ -296,7 +327,7 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 
 [float]
 ===== Features
-* introduce subtype and action in Spans {commit}#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7[#9](https://github.com/elastic/apm-agent-js-core/issues/9)) ([5fd4af7]
+* introduce subtype and action in Spans {commit}5fd4af7[5fd4af7] {pull}9[#9]
 
 [[release-notes-2.1.1]]
 ==== 2.1.1 (2018-12-05)

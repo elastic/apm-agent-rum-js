@@ -23,7 +23,6 @@
  *
  */
 
-import '../polyfill'
 import { createLocalVue, mount } from '@vue/test-utils'
 import VueRouter from 'vue-router'
 import { ApmBase } from '@elastic/apm-rum'

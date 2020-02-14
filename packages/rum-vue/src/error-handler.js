@@ -23,18 +23,43 @@
  *
  */
 
-const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
-const {
-  getWebpackConfig,
-  PACKAGE_TYPES,
-  BUNDLE_TYPES
-} = require('../../dev-utils/build')
+export function getErrorHandler(Vue, apm) {
+  /**
+   * If the user already installed a global error handler
+   * we should call them after capturing it internally
+   */
+  const previousErrorHandler = Vue.config.errorHandler
 
-module.exports = function(config) {
-  config.set(baseConfig)
-  config.set({
-    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.ANGULAR)
-  })
-  const preparedConfig = prepareConfig(config, 'rum-angular')
-  config.set(preparedConfig)
+  return (error, vm, info) => {
+    if (vm && vm.$options) {
+      const options = vm.$options
+      let component
+      if (vm.$root === vm) {
+        component = 'Root'
+      } else {
+        component = options.name || options._componentTag || 'Anonymous'
+      }
+
+      error.component = component
+      error.file = options.__file || ''
+    }
+
+    /**
+     * Lifecycle hook the error was thrown if available
+     */
+    if (info) {
+      error.lifecycleHook = info
+    }
+
+    apm.captureError(error)
+
+    if (typeof previousErrorHandler === 'function') {
+      previousErrorHandler.call(this, error, vm, info)
+    }
+    /**
+     * Logs the error to browser console similar
+     * to original Vue logError
+     */
+    console.error(error)
+  }
 }

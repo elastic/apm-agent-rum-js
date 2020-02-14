@@ -23,33 +23,44 @@
  *
  */
 
-const createApmBase = require('../')
-const { renderTestElement } = require('../utils')
-const elasticApm = createApmBase({
-  debug: true,
-  serverUrl: 'http://localhost:8200',
-  serviceName: 'apm-agent-js-base-test-e2e-general-usecase',
-  serviceVersion: '0.0.1'
+import Vue from 'vue'
+import { mount } from '@vue/test-utils'
+import { ApmBase } from '@elastic/apm-rum'
+import { createServiceFactory } from '@elastic/apm-rum-core'
+import { getErrorHandler } from '../../src/error-handler'
+
+describe('Error handler', () => {
+  it('should capture errors via global error handler', done => {
+    const apm = new ApmBase(createServiceFactory(), false)
+    const error = new Error('Component Error')
+    /**
+     * To prevent the logging errors to the console
+     */
+    spyOn(window.console, 'error')
+
+    const original = Vue.config.errorHandler
+    Vue.config.errorHandler = getErrorHandler(Vue, apm)
+
+    const ErrorComponent = {
+      name: 'Error',
+      template: '<div>error</div>',
+      created: () => {
+        throw error
+      }
+    }
+
+    spyOn(apm, 'captureError').and.callFake(err => {
+      expect(err).toEqual(error)
+      expect(err.component).toEqual('Error')
+      expect(err.file).toEqual('')
+      expect(err.lifecycleHook).toEqual('created hook')
+      done()
+    })
+
+    const wrapper = mount(ErrorComponent)
+
+    Vue.config.errorHandler = original
+
+    wrapper.destroy()
+  })
 })
-
-elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
-
-elasticApm.setUserContext({
-  usertest: 'usertest',
-  id: 'userId',
-  username: 'username',
-  email: 'email'
-})
-elasticApm.setCustomContext({ testContext: 'testContext' })
-
-function generateError() {
-  throw new Error('timeout test error')
-}
-
-setTimeout(function() {
-  generateError()
-}, 100)
-
-generateError.tmp = 'tmp'
-
-renderTestElement()

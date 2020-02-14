@@ -35,6 +35,7 @@ import {
   FETCH,
   XMLHTTPREQUEST,
   HISTORY,
+  EVENT_TARGET,
   PAGE_LOAD,
   ROUTE_CHANGE,
   TRANSACTION_END
@@ -796,4 +797,83 @@ describe('PerformanceMonitoring', function() {
 
     tr.end()
   })
+
+  it('should filter out managed transactions without any spans', () => {
+    spyOn(logger, 'debug').and.callThrough()
+    const transaction = new Transaction('test', 'custom', { id: 1 })
+    transaction.end()
+    transaction._end = transaction._end + 100
+    expect(performanceMonitoring.filterTransaction(transaction)).toBe(true)
+    transaction.options.managed = true
+    expect(performanceMonitoring.filterTransaction(transaction)).toBe(false)
+    expect(logger.debug).toHaveBeenCalledWith(
+      'transaction(1, test) was discarded! Transaction does not have any spans'
+    )
+  })
+
+  if (window.EventTarget) {
+    it('should create click transactions', () => {
+      let transactionService = performanceMonitoring._transactionService
+      let etsub = performanceMonitoring.getEventTargetSub()
+      patchEventHandler.observe(EVENT_TARGET, (event, task) => {
+        etsub(event, task)
+      })
+      let element = document.createElement('button')
+      element.setAttribute('class', 'cool-button purchase-style')
+
+      const listener = e => {
+        expect(e.type).toBe('click')
+      }
+
+      element.addEventListener('click', listener)
+      element.click()
+
+      let tr = transactionService.getCurrentTransaction()
+      expect(tr).toBeDefined()
+      expect(tr.name).toBe('Click >> button')
+      expect(tr.context.custom).toEqual({
+        classes: 'cool-button purchase-style'
+      })
+      expect(tr.type).toBe('user-interaction')
+
+      element.setAttribute('name', 'purchase')
+      element.click()
+      let newTr = transactionService.getCurrentTransaction()
+
+      expect(newTr).toBe(tr)
+      expect(newTr.name).toBe('Click >> button["purchase"]')
+    })
+
+    it('should respect the transaction type priority order', function() {
+      const historySubFn = performanceMonitoring.getHistorySub()
+      const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)
+      let etsub = performanceMonitoring.getEventTargetSub()
+      const cancelEventTargetSub = patchEventHandler.observe(
+        EVENT_TARGET,
+        (event, task) => {
+          etsub(event, task)
+        }
+      )
+      const transactionService = performanceMonitoring._transactionService
+
+      let element = document.createElement('button')
+      element.setAttribute('name', 'purchase')
+
+      const listener = () => {
+        let tr = transactionService.getCurrentTransaction()
+        expect(tr.type).toBe('user-interaction')
+        history.pushState(undefined, undefined, 'test')
+      }
+
+      element.addEventListener('click', listener)
+      element.click()
+
+      let tr = transactionService.getCurrentTransaction()
+      expect(tr.name).toBe('Click >> button["purchase"]')
+      expect(tr.type).toBe('route-change')
+
+      cancelHistorySub()
+      cancelEventTargetSub()
+    })
+  }
 })

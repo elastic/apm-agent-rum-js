@@ -372,7 +372,7 @@ describe('ApmServer', function() {
     expect(apmServer._postJson).not.toHaveBeenCalled()
   })
 
-  it('should set metadata from config along with defaults', () => {
+  it('should set metadata from config along with defaults', async () => {
     configService.setConfig({
       serviceName: 'test',
       serviceVersion: '0.0.1',
@@ -380,19 +380,31 @@ describe('ApmServer', function() {
     })
 
     configService.setVersion('4.0.1')
+    configService.addLabels({ test: 'testlabel' })
 
     /** To catch agent version mismatch during release */
-    const { service } = apmServer.createMetaData()
-    expect(service).toEqual({
-      name: 'test',
-      version: '0.0.1',
-      environment: 'staging',
-      agent: {
-        name: 'js-base',
-        version: '4.0.1'
+    const meta = apmServer.createMetaData()
+    expect(meta).toEqual({
+      service: {
+        name: 'test',
+        version: '0.0.1',
+        environment: 'staging',
+        agent: {
+          name: 'js-base',
+          version: '4.0.1'
+        },
+        language: { name: 'javascript' }
       },
-      language: { name: 'javascript' }
+      labels: { test: 'testlabel' }
     })
+
+    const tr = new Transaction('test-meta-tr', 'test-type', {
+      startTime: 10
+    })
+    tr.startSpan('test-meta-span', 'test-type')
+    tr.end(100)
+    const payload = performanceMonitoring.convertTransactionsToServerModel([tr])
+    await apmServer.sendTransactions(payload)
   })
 
   it('should ndjson transactions', function() {
@@ -421,6 +433,28 @@ describe('ApmServer', function() {
       '{"metricset":{"transaction":{"name":"transaction #0","type":"transaction"},"span":{"type":"type"},"samples":{"span.self_time.count":{"value":1},"span.self_time.sum.us":{"value":10}}}}\n'
     ].join('')
     expect(result).toEqual([expected])
+  })
+
+  it('should pass correct payload to filters', () => {
+    configService.setConfig({
+      serviceName: 'serviceName'
+    })
+    /**
+     * We don't want to send these payloads to the apm server
+     * since they are only tests and not valid payloads.
+     */
+    spyOn(apmServer, '_postJson')
+    let type = ''
+    configService.addFilter(function(payload) {
+      expect(payload[type]).toEqual([{ test: type }])
+      return payload
+    })
+
+    type = 'errors'
+    apmServer.sendErrors([{ test: 'errors' }])
+
+    type = 'transactions'
+    apmServer.sendTransactions([{ test: 'transactions' }])
   })
 
   if (isVersionInRange(testConfig.stackVersion, '7.3.0')) {

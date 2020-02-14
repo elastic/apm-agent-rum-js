@@ -24,7 +24,8 @@
  */
 const {
   allowSomeBrowserErrors,
-  waitForApmServerCalls
+  waitForApmServerCalls,
+  getBrowserFeatures
 } = require('../../../../../dev-utils/webdriver')
 
 describe('general-usercase', function() {
@@ -103,5 +104,35 @@ describe('general-usercase', function() {
      * The actual spans are tested as part of the previous test.
      */
     expect(transactionPayload.spans.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('should capture click user interaction', function() {
+    let features = getBrowserFeatures()
+    if (features.EventTarget) {
+      browser.url('/test/e2e/general-usecase/index.html')
+      browser.waitUntil(
+        () => {
+          return $('#test-element').getText() === 'Passed'
+        },
+        5000,
+        'expected element #test-element'
+      )
+      /**
+       * Wait for the page load transaction first.
+       */
+      let serverCalls = waitForApmServerCalls(0, 1)
+
+      const actionButton = $('#test-action')
+      actionButton.click()
+
+      /**
+       * The number of transactions is counted from the start.
+       */
+      serverCalls = waitForApmServerCalls(0, 2)
+      let clickTransaction = serverCalls.sendTransactions[1].args[0][0]
+      expect(clickTransaction.type).toBe('user-interaction')
+      expect(clickTransaction.name).toBe('Click >> button["test-action"]')
+      expect(clickTransaction.spans.length).toBeGreaterThanOrEqual(1)
+    }
   })
 })

@@ -28,9 +28,17 @@ import {
   RESOURCE_INITIATOR_TYPES,
   MAX_SPAN_DURATION,
   USER_TIMING_THRESHOLD,
-  PAGE_LOAD
+  PAGE_LOAD,
+  PAINT,
+  RESOURCE,
+  MEASURE,
+  FIRST_CONTENTFUL_PAINT
 } from '../common/constants'
-import { stripQueryStringFromUrl, getPageLoadMarks } from '../common/utils'
+import {
+  stripQueryStringFromUrl,
+  PERF,
+  isPerfTimelineSupported
+} from '../common/utils'
 
 /**
  * Navigation Timing Spans
@@ -208,6 +216,81 @@ function getApiSpanNames({ spans }) {
   return apiCalls
 }
 
+const navigationTimingKeys = [
+  'fetchStart',
+  'domainLookupStart',
+  'domainLookupEnd',
+  'connectStart',
+  'connectEnd',
+  'secureConnectionStart',
+  'requestStart',
+  'responseStart',
+  'responseEnd',
+  'domLoading',
+  'domInteractive',
+  'domContentLoadedEventStart',
+  'domContentLoadedEventEnd',
+  'domComplete',
+  'loadEventStart',
+  'loadEventEnd'
+]
+
+function getNavigationTimingMarks() {
+  const timing = PERF.timing
+  const fetchStart = timing.fetchStart
+  const marks = {}
+  navigationTimingKeys.forEach(function(timingKey) {
+    const m = timing[timingKey]
+    if (m && m >= fetchStart) {
+      marks[timingKey] = m - fetchStart
+    }
+  })
+  return marks
+}
+
+/**
+ * Get the `first-contentful-paint` metric that is available during
+ * page-load using the Paint Timing Metrics API
+ * SPEC - https://www.w3.org/TR/paint-timing/
+ */
+function getFirstContentfulPaint() {
+  let fcp
+  if (isPerfTimelineSupported()) {
+    const entries = PERF.getEntriesByType(PAINT)
+    if (entries.length > 0) {
+      const timing = PERF.timing
+      /**
+       * To avoid capturing the unload event handler effect
+       * as part of the transaction duration
+       */
+      const unloadDiff = timing.fetchStart - timing.navigationStart
+      const fcpEntry = entries.filter(
+        entry => entry.name === FIRST_CONTENTFUL_PAINT
+      )
+      const { startTime } = fcpEntry[0]
+      fcp = unloadDiff >= 0 ? startTime - unloadDiff : startTime
+    }
+  }
+  return fcp
+}
+
+function getPageLoadMarks() {
+  const marks = getNavigationTimingMarks()
+  const agent = {
+    timeToFirstByte: marks.responseStart,
+    domInteractive: marks.domInteractive,
+    domComplete: marks.domComplete
+  }
+  const fcp = getFirstContentfulPaint()
+  if (fcp) {
+    agent.firstContentfulPaint = fcp
+  }
+  return {
+    navigationTiming: marks,
+    agent
+  }
+}
+
 function captureNavigation(transaction) {
   /**
    * Do not capture timing related information when the
@@ -218,7 +301,6 @@ function captureNavigation(transaction) {
     return
   }
 
-  const perf = window.performance
   /**
    * Both start and end threshold decides if a span must be
    * captured as part of the transaction
@@ -246,7 +328,7 @@ function captureNavigation(transaction) {
     const trStart = 0
     transaction._start = trStart
 
-    const timings = perf.timing
+    const timings = PERF.timing
     createNavigationTimingSpans(
       timings,
       timings.fetchStart,
@@ -267,12 +349,12 @@ function captureNavigation(transaction) {
     transaction.addMarks(getPageLoadMarks())
   }
 
-  if (typeof perf.getEntriesByType === 'function') {
+  if (isPerfTimelineSupported()) {
     const trStart = transaction._start
     /**
      * Capture resource timing information as spans
      */
-    const resourceEntries = perf.getEntriesByType('resource')
+    const resourceEntries = PERF.getEntriesByType(RESOURCE)
     const apiCalls = getApiSpanNames(transaction)
 
     createResourceTimingSpans(
@@ -285,7 +367,7 @@ function captureNavigation(transaction) {
     /**
      * Capture user timing measures as spans
      */
-    const userEntries = perf.getEntriesByType('measure')
+    const userEntries = PERF.getEntriesByType(MEASURE)
     createUserTimingSpans(userEntries, trStart, trEnd).forEach(span =>
       transaction.spans.push(span)
     )

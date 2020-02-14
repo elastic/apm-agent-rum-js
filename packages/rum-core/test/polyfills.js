@@ -23,18 +23,12 @@
  *
  */
 
-const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
-const {
-  getWebpackConfig,
-  PACKAGE_TYPES,
-  BUNDLE_TYPES
-} = require('../../dev-utils/build')
+import 'es6-promise/auto'
+import 'core-js/features/array/map'
 
-module.exports = function(config) {
-  config.set(baseConfig)
-  config.set({
-    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.ANGULAR)
-  })
-  const preparedConfig = prepareConfig(config, 'rum-angular')
-  config.set(preparedConfig)
-}
+Object.setPrototypeOf =
+  Object.setPrototypeOf ||
+  function(obj, proto) {
+    obj.__proto__ = proto
+    return obj
+  }

@@ -66,6 +66,7 @@ const MAX_SPAN_DURATION = 5 * 60 * 1000
 const PAGE_LOAD = 'page-load'
 const ROUTE_CHANGE = 'route-change'
 const TYPE_CUSTOM = 'custom'
+const USER_INTERACTION = 'user-interaction'
 const HTTP_REQUEST_TYPE = 'http-request'
 const TEMPORARY_TYPE = 'temporary'
 const NAME_UNKNOWN = 'Unknown'
@@ -73,6 +74,7 @@ const NAME_UNKNOWN = 'Unknown'
 const TRANSACTION_TYPE_ORDER = [
   PAGE_LOAD,
   ROUTE_CHANGE,
+  USER_INTERACTION,
   HTTP_REQUEST_TYPE,
   TYPE_CUSTOM,
   TEMPORARY_TYPE
@@ -100,6 +102,7 @@ const CONFIG_CHANGE = 'config:change'
 const XMLHTTPREQUEST = 'xmlhttprequest'
 const FETCH = 'fetch'
 const HISTORY = 'history'
+const EVENT_TARGET = 'eventtarget'
 const ERROR = 'error'
 
 /**
@@ -112,6 +115,18 @@ const AFTER_EVENT = ':after'
  * Local Config Key used storing the remote config in the localStorage
  */
 const LOCAL_CONFIG_KEY = 'elastic_apm_config'
+
+/**
+ * List of entry types that could be observed by the PerformaneObserver Interface
+ * or can be captured via Performance Timeline API
+ */
+const LONG_TASK = 'longtask'
+const PAINT = 'paint'
+const MEASURE = 'measure'
+const NAVIGATION = 'navigation'
+const RESOURCE = 'resource'
+const FIRST_CONTENTFUL_PAINT = 'first-contentful-paint'
+const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint'
 
 /**
  * Default configs used on top of extensible configs from ConfigService
@@ -142,16 +157,25 @@ export {
   XMLHTTPREQUEST,
   FETCH,
   HISTORY,
+  EVENT_TARGET,
   ERROR,
   BEFORE_EVENT,
   AFTER_EVENT,
   LOCAL_CONFIG_KEY,
   HTTP_REQUEST_TYPE,
+  LONG_TASK,
+  PAINT,
+  MEASURE,
+  NAVIGATION,
+  RESOURCE,
+  FIRST_CONTENTFUL_PAINT,
+  LARGEST_CONTENTFUL_PAINT,
   KEYWORD_LIMIT,
   SERVER_URL_PREFIX,
   BROWSER_RESPONSIVENESS_INTERVAL,
   BROWSER_RESPONSIVENESS_BUFFER,
   SIMILAR_SPAN_TO_TRANSACTION_RATIO,
   TEMPORARY_TYPE,
+  USER_INTERACTION,
   TRANSACTION_TYPE_ORDER
 }
