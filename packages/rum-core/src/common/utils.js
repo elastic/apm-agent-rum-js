@@ -30,7 +30,7 @@ const slice = [].slice
 const PERF = window.performance
 
 /**
- * Use the globally available promise if its present and
+ * Use the globally available promise if it exists and
  * fallback to using the polyfilled Promise
  *
  * It is a function instead of a constant because if the user relies on other
@@ -45,7 +45,7 @@ let local = (() => {
   } else if (typeof self !== 'undefined') {
     return self
   }
-  return null
+  return {}
 })()
 
 function getPromise() {
