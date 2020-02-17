@@ -39,14 +39,14 @@ function startBackendAgentServer(port = 8003) {
     if (req.method === 'OPTIONS') {
       res.header(
         'Access-Control-Allow-Headers',
-        'Origin, elastic-apm-traceparent, Content-Type, Accept'
+        'Origin, traceparent, Content-Type, Accept'
       )
     }
     next()
   })
 
   function dTRespond(req, res) {
-    const header = req.headers['elastic-apm-traceparent']
+    const header = req.headers['traceparent']
     let payload = { noHeader: true }
     if (header) {
       const splited = header.split('-')
@@ -56,7 +56,7 @@ function startBackendAgentServer(port = 8003) {
         parentId: splited[2],
         flags: splited[3]
       }
-      console.log('elastic-apm-traceparent:', header)
+      console.log('traceparent:', header)
     }
 
     res.setHeader('Content-Type', 'application/json')
