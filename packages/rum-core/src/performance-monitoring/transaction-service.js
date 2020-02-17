@@ -23,13 +23,17 @@
  *
  */
 
-import { Promise } from 'es6-promise'
 import Transaction from './transaction'
 import {
   PerfEntryRecorder,
   captureObserverEntries
 } from './perf-entry-recorder'
-import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
+import {
+  extend,
+  getEarliestSpan,
+  getLatestNonXHRSpan,
+  getPromise
+} from '../common/utils'
 import { captureNavigation } from './capture-navigation'
 import {
   PAGE_LOAD,
@@ -253,6 +257,7 @@ class TransactionService {
      */
     this.recorder.stop()
 
+    const Promise = getPromise()
     return Promise.resolve().then(
       () => {
         const { name, type } = tr

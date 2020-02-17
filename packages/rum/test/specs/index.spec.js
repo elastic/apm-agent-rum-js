@@ -23,7 +23,7 @@
  *
  */
 
-import { Promise } from 'es6-promise'
+import Promise from 'promise-polyfill'
 import { apmBase } from '../../src/'
 import { isPlatformSupported } from '@elastic/apm-rum-core'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'

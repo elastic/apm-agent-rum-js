@@ -24,10 +24,36 @@
  */
 
 import rng from 'uuid/lib/rng-browser'
-import { Promise } from 'es6-promise'
+import PromisePolyfill from 'promise-polyfill'
 
 const slice = [].slice
 const PERF = window.performance
+
+/**
+ * Use the globally available promise if its present and
+ * fallback to using the polyfilled Promise
+ *
+ * It is a function instead of a constant because if the user relies on other
+ * Promise polyfills and it can be loaded either before or after the agent bundle,
+ * we would want to use that Promise instead of our polyfill to be consistent as
+ * libraries vary in their implementation details like using `setTimeout`,
+ * `setImmediate` or `MutationObservers`
+ */
+let local = (() => {
+  if (typeof window !== 'undefined') {
+    return window
+  } else if (typeof self !== 'undefined') {
+    return self
+  }
+  return null
+})()
+
+function getPromise() {
+  if (!('Promise' in local)) {
+    return PromisePolyfill
+  }
+  return local.Promise
+}
 
 function isCORSSupported() {
   var xhr = new window.XMLHttpRequest()
@@ -345,6 +371,7 @@ function scheduleMacroTask(callback) {
 }
 
 function scheduleMicroTask(callback) {
+  const Promise = getPromise()
   Promise.resolve().then(callback)
 }
 
@@ -379,8 +406,9 @@ export {
   getEarliestSpan,
   getLatestNonXHRSpan,
   getDuration,
-  now,
   getTime,
+  getPromise,
+  now,
   rng,
   checkSameOrigin,
   scheduleMacroTask,

@@ -23,10 +23,9 @@
  *
  */
 
-import { Promise } from 'es6-promise'
 import { globalState } from './patch-utils'
 import { SCHEDULE, INVOKE, FETCH } from '../constants'
-import { scheduleMicroTask } from '../utils'
+import { scheduleMicroTask, getPromise } from '../utils'
 
 export function patchFetch(callback) {
   if (!window.fetch || !window.Request) {
@@ -70,6 +69,7 @@ export function patchFetch(callback) {
         aborted: false
       }
     }
+    const Promise = getPromise()
 
     return new Promise(function(resolve, reject) {
       globalState.fetchInProgress = true
