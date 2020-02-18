@@ -200,7 +200,7 @@ class PerformanceMonitoring {
         this.injectDtHeader(span, target)
       } else if (__DEV__) {
         this._logginService.debug(
-          `Could not inject distributed tracing header to the request ('${requestUrl.origin}') from the current origin ('${currentUrl.origin}')`
+          `Could not inject distributed tracing header to the request origin ('${requestUrl.origin}') from the current origin ('${currentUrl.origin}')`
         )
       }
       span.sync = data.sync
