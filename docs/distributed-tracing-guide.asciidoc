@@ -29,12 +29,14 @@ var apm = initApm({
 This effectively tells the agent to add the distributed tracing HTTP header (`elastic-apm-traceparent`) 
 to requests made to `https://api.example.com`.
 
+Note that distributed tracing headers are only appended to API calls.
+To view the full trace from a backend service, see <<dynamic-html-doc>>.
 To read more about cross-origin requests and why this process is necessary,
 please see the MDN page on https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing].
 
 [float]
 [[server-configuration]]
-=== Server configuration
+==== Server configuration
 
 The RUM agent is only one of the components in a distributed trace, so
 you must properly configure other components in order to use distributed tracing.
