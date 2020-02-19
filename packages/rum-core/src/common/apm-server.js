@@ -29,7 +29,7 @@ import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
 import { SERVER_URL_PREFIX } from './constants'
-import { getPromise } from './utils'
+import { Promise } from './polyfills'
 import { __DEV__ } from '../env'
 
 class ApmServer {
@@ -114,7 +114,6 @@ class ApmServer {
     url,
     { timeout, payload, headers } = { timeout: 10000 }
   ) {
-    const Promise = getPromise()
     return new Promise(function(resolve, reject) {
       var xhr = new window.XMLHttpRequest()
       xhr[XHR_IGNORE] = true
@@ -159,7 +158,7 @@ class ApmServer {
     const serverUrl = this._configService.get('serverUrl')
     var configEndpoint = `${serverUrl}/config/v1/rum/agents`
     if (!serviceName) {
-      return getPromise().reject(
+      return Promise.reject(
         'serviceName is required for fetching central config.'
       )
     }
@@ -190,7 +189,7 @@ class ApmServer {
       })
       .catch(reason => {
         const error = this._constructError(reason)
-        return getPromise().reject(error)
+        return Promise.reject(error)
       })
   }
 
