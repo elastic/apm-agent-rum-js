@@ -119,7 +119,7 @@ class TransactionService {
           pageLoadSampled: config.pageLoadSampled,
           pageLoadSpanId: config.pageLoadSpanId,
           pageLoadTransactionName: config.pageLoadTransactionName,
-          checkBrowserResponsiveness: config.checkBrowserResponsiveness
+          checkBrowserResponsiveness: true
         },
         perfOptions
       )
