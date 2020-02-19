@@ -24,7 +24,7 @@
  */
 
 import rng from 'uuid/lib/rng-browser'
-import { Promise } from 'es6-promise'
+import { Promise } from './polyfills'
 
 const slice = [].slice
 const PERF = window.performance
@@ -379,8 +379,8 @@ export {
   getEarliestSpan,
   getLatestNonXHRSpan,
   getDuration,
-  now,
   getTime,
+  now,
   rng,
   checkSameOrigin,
   scheduleMacroTask,

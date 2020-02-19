@@ -23,7 +23,7 @@
  *
  */
 
-const { Promise } = require('es6-promise')
+const Promise = require('promise-polyfill')
 const { join } = require('path')
 const glob = require('glob')
 const {

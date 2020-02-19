@@ -25,7 +25,7 @@
 
 import { Router, NavigationStart } from '@angular/router'
 import { Injectable } from '@angular/core'
-import { scheduleMicroTask } from '@elastic/apm-rum-core'
+import { scheduleMacroTask } from '@elastic/apm-rum-core'
 
 @Injectable({
   providedIn: 'root'
@@ -101,11 +101,20 @@ export class ApmService {
         }
         /**
          * Schedule the transaction finish logic on the next
-         * micro task since most of the angular components wait for
+         * micro task queue ssince most of the angular components wait for
          * Observables resolution on ngInit to fetch the neccessary
          * data for mounting
+         *
+         * TODO: There are subtle differences in how micro task is schedluled while
+         * usisng promise polyfill libraries and browsers, Native promises run
+         * to completion on the same tick and due to that
+         * if we use scheduleMicroTask here, we wont be able to capture spans
+         * that are captured inside components on route-change
+         *
+         * Change it to microTask once we find a better solution
+         * https://github.com/elastic/apm-agent-rum-js/issues/636
          */
-        scheduleMicroTask(() => transaction.detectFinish())
+        scheduleMacroTask(() => transaction.detectFinish())
       }
     })
   }
