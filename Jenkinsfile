@@ -162,15 +162,12 @@ pipeline {
           agent none
           when {
             beforeAgent true
-            allOf {
-              anyOf {
-                environment name: 'GIT_BUILD_CAUSE', value: 'pr'
-                expression { return !params.Run_As_Master_Branch }
-              }
+            anyOf {
+              changeRequest()
+              expression { return !params.Run_As_Master_Branch }
             }
           }
           steps {
-            log(level: 'INFO', text: 'Launching Async ITs')
             build(job: env.ITS_PIPELINE, propagate: false, wait: false,
                   parameters: [string(name: 'AGENT_INTEGRATION_TEST', value: 'RUM'),
                                string(name: 'BUILD_OPTS', value: "--rum-agent-branch ${env.GIT_BASE_COMMIT}"),
