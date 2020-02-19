@@ -69,8 +69,8 @@ describe('PerformanceMonitoring', function() {
     span1.end()
     tr.spans.push(span1)
     tr.end()
-    var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
-    var promise = apmServer.sendTransactions(payload)
+    const payload = performanceMonitoring.createTransactionDataModel(tr)
+    var promise = apmServer.sendTransactions([payload])
     expect(promise).toBeDefined()
     promise
       .catch(reason => {
@@ -312,8 +312,8 @@ describe('PerformanceMonitoring', function() {
 
     configService.events.observe(TRANSACTION_END, function(tr) {
       expect(tr.captureTimings).toBe(true)
-      var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
-      var promise = apmServer.sendTransactions(payload)
+      const payload = performanceMonitoring.createTransactionDataModel(tr)
+      var promise = apmServer.sendTransactions([payload])
       expect(promise).toBeDefined()
       promise
         .then(
@@ -715,11 +715,9 @@ describe('PerformanceMonitoring', function() {
     setTimeout(() => {
       performanceMonitoring.processAPICalls('invoke', task)
       expect(tr.ended).toBe(true)
-      const payload = performanceMonitoring.convertTransactionsToServerModel([
-        tr
-      ])
+      const payload = performanceMonitoring.createTransactionDataModel(tr)
 
-      apmServer.sendTransactions(payload).then(done, reason => {
+      apmServer.sendTransactions([payload]).then(done, reason => {
         done.fail(
           `Failed sending http-request transaction to the server, reason: ${reason}`
         )
@@ -782,13 +780,11 @@ describe('PerformanceMonitoring', function() {
       expect(span1.context.destination).toBeDefined()
       expect(span2.context.destination).toBeDefined()
 
-      const payload = performanceMonitoring.convertTransactionsToServerModel([
-        tr
-      ])
-      expect(payload[0].spans[0].context.destination).toBeDefined()
-      expect(payload[0].spans[1].context.destination).toBeDefined()
+      const payload = performanceMonitoring.createTransactionDataModel(tr)
+      expect(payload.spans[0].context.destination).toBeDefined()
+      expect(payload.spans[1].context.destination).toBeDefined()
 
-      apmServer.sendTransactions(payload).then(done, reason => {
+      apmServer.sendTransactions([payload]).then(done, reason => {
         done.fail(
           `Failed sending span destination context details, reason: ${reason}`
         )
