@@ -403,14 +403,16 @@ describe('ApmServer', function() {
     })
     tr.startSpan('test-meta-span', 'test-type')
     tr.end(100)
-    const payload = performanceMonitoring.convertTransactionsToServerModel([tr])
-    await apmServer.sendTransactions(payload)
+    const payload = performanceMonitoring.createTransactionDataModel(tr)
+    await apmServer.sendTransactions([payload])
   })
 
   it('should ndjson transactions', function() {
     var trs = generateTransaction(3)
-    trs = performanceMonitoring.convertTransactionsToServerModel(trs)
-    var result = apmServer.ndjsonTransactions(trs)
+    const payload = trs.map(tr =>
+      performanceMonitoring.createTransactionDataModel(tr)
+    )
+    var result = apmServer.ndjsonTransactions(payload)
     /* eslint-disable max-len */
     var expected = [
       '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
@@ -421,8 +423,10 @@ describe('ApmServer', function() {
   })
 
   it('should ndjson metricsets along with transactions', function() {
-    const tr = generateTransaction(1, true)
-    const payload = performanceMonitoring.convertTransactionsToServerModel(tr)
+    const trs = generateTransaction(1, true)
+    const payload = trs.map(tr =>
+      performanceMonitoring.createTransactionDataModel(tr)
+    )
     const result = apmServer.ndjsonTransactions(payload)
     /* eslint-disable max-len */
     const expected = [
