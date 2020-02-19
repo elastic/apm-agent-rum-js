@@ -379,10 +379,6 @@ class PerformanceMonitoring {
     }
   }
 
-  convertTransactionsToServerModel(transactions) {
-    return transactions.map(tr => this.createTransactionDataModel(tr))
-  }
-
   groupSmallContinuouslySimilarSpans(transaction, threshold) {
     var transDuration = transaction.duration()
     var spans = []
