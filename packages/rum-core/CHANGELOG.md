@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.9.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.9.0...@elastic/apm-rum-core@4.9.1) (2020-02-14)
+
+
+### Bug Fixes
+
+* **rum-core:** Only capture events on Elements ([#625](https://github.com/elastic/apm-agent-rum-js/issues/625)) ([133a3f4](https://github.com/elastic/apm-agent-rum-js/commit/133a3f4cc4b44074a80e147d47de53b896f2967e))
+
+
+
+
+
 # [4.9.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.8.1...@elastic/apm-rum-core@4.9.0) (2020-02-13)
 
 
