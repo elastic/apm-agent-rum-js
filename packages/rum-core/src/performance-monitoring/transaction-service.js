@@ -23,7 +23,7 @@
  *
  */
 
-import { Promise } from 'es6-promise'
+import { Promise } from '../common/polyfills'
 import Transaction from './transaction'
 import {
   PerfEntryRecorder,

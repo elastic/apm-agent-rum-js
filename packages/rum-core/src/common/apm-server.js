@@ -23,13 +23,13 @@
  *
  */
 
-import { Promise } from 'es6-promise'
 import Queue from './queue'
 import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
 import { SERVER_URL_PREFIX } from './constants'
+import { Promise } from './polyfills'
 import { __DEV__ } from '../env'
 
 class ApmServer {

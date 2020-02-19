@@ -23,12 +23,18 @@
  *
  */
 
-import 'promise-polyfill/src/polyfill'
-import 'core-js/features/array/map'
+import PromisePollyfill from 'promise-polyfill'
 
-Object.setPrototypeOf =
-  Object.setPrototypeOf ||
-  function(obj, proto) {
-    obj.__proto__ = proto
-    return obj
-  }
+/**
+ * Use the globally available promise if it exists and
+ * fallback to using the polyfilled Promise
+ */
+let local = {}
+if (typeof window !== 'undefined') {
+  local = window
+} else if (typeof self !== 'undefined') {
+  local = self
+}
+const Promise = 'Promise' in local ? local.Promise : PromisePollyfill
+
+export { Promise }

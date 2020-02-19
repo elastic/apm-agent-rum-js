@@ -23,7 +23,7 @@
  *
  */
 
-import { Promise } from 'es6-promise'
+import { Promise } from '../polyfills'
 import { globalState } from './patch-utils'
 import { SCHEDULE, INVOKE, FETCH } from '../constants'
 import { scheduleMicroTask } from '../utils'
