@@ -44,10 +44,7 @@ import {
   EVENT_TARGET,
   HTTP_REQUEST_TYPE,
   USER_INTERACTION,
-  BROWSER_RESPONSIVENESS_INTERVAL,
-  BROWSER_RESPONSIVENESS_BUFFER,
-  SIMILAR_SPAN_TO_TRANSACTION_RATIO,
-  TRANSACTION_DURATION_THRESHOLD
+  PAGE_LOAD
 } from '../common/constants'
 import {
   truncateModel,
@@ -56,9 +53,13 @@ import {
 } from '../common/truncate'
 import { __DEV__ } from '../env'
 
-function isManagedTransaction(transaction) {
-  return !!transaction.options.managed
-}
+/**
+ * Parameters used for Managed Transactions
+ */
+const BROWSER_RESPONSIVENESS_INTERVAL = 500
+const BROWSER_RESPONSIVENESS_BUFFER = 3
+const SIMILAR_SPAN_TO_TRANSACTION_RATIO = 0.05
+const TRANSACTION_DURATION_THRESHOLD = 60000
 
 export function groupSmallContinuouslySimilarSpans(
   originalSpans,
@@ -106,7 +107,7 @@ export function groupSmallContinuouslySimilarSpans(
   return spans
 }
 
-export function prepareTransaction(transaction) {
+export function adjustTransactionSpans(transaction) {
   /**
    * In case of unsampled transaction, send only the transaction to apm server
    *  without any spans to reduce the payload size
@@ -125,8 +126,7 @@ export function prepareTransaction(transaction) {
   /**
    * Similar spans would be grouped automatically for all managed transactions
    */
-  const managed = isManagedTransaction(transaction)
-  if (managed) {
+  if (transaction.isManaged()) {
     var duration = transaction.duration()
     const similarSpans = groupSmallContinuouslySimilarSpans(
       filterdSpans,
@@ -353,7 +353,7 @@ export default class PerformanceMonitoring {
       return false
     }
 
-    if (isManagedTransaction(tr)) {
+    if (tr.isManaged()) {
       if (duration > TRANSACTION_DURATION_THRESHOLD) {
         if (__DEV__) {
           this._logginService.debug(
@@ -372,7 +372,10 @@ export default class PerformanceMonitoring {
         return false
       }
 
-      if (tr.options.checkBrowserResponsiveness) {
+      /**
+       * TODO: Refactor the type check with better logic
+       */
+      if (tr.type !== PAGE_LOAD) {
         const wasBrowserResponsive = checkBrowserResponsiveness(
           tr,
           BROWSER_RESPONSIVENESS_INTERVAL,
@@ -436,8 +439,8 @@ export default class PerformanceMonitoring {
   }
 
   createTransactionPayload(transaction) {
-    const preparedTr = prepareTransaction(transaction)
-    const filtered = this.filterTransaction(preparedTr)
+    const adjustedTransaction = adjustTransactionSpans(transaction)
+    const filtered = this.filterTransaction(adjustedTransaction)
     if (filtered) {
       return this.createTransactionDataModel(transaction)
     }

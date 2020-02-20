@@ -31,9 +31,7 @@ suite('TransactionService', () => {
 
   benchmark('page-load transaction overhead', () => {
     const tr = transactionService.startTransaction('/index', 'page-load', {
-      managed: true,
-      // To avoid timeouts interfering with benchmark results
-      checkBrowserResponsiveness: false
+      managed: true
     })
     setImmediate(() => tr.end())
   })

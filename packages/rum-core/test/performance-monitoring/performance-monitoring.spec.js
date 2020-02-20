@@ -29,7 +29,7 @@ import Span from '../../src/performance-monitoring/span'
 import {
   groupSmallContinuouslySimilarSpans,
   checkBrowserResponsiveness,
-  prepareTransaction
+  adjustTransactionSpans
 } from '../../src/performance-monitoring/performance-monitoring'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { getDtHeaderValue } from '../../src/common/utils'
@@ -122,7 +122,6 @@ describe('PerformanceMonitoring', function() {
       id: 212,
       transactionSampleRate: 1,
       managed: true,
-      checkBrowserResponsiveness: true,
       startTime: 1
     })
     var span = tr.startSpan('test span', 'test span type')
@@ -812,8 +811,8 @@ describe('PerformanceMonitoring', function() {
       span.end(20)
       tr.end(30)
       expect(tr.spans.length).toBe(1)
-      const preparedTransaction = prepareTransaction(tr)
-      expect(preparedTransaction.spans.length).toBe(0)
+      const adjustedTransaction = adjustTransactionSpans(tr)
+      expect(adjustedTransaction.spans.length).toBe(0)
     })
   })
 })
