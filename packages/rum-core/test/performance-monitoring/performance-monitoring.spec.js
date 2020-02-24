@@ -27,6 +27,7 @@ import { createServiceFactory } from '../'
 import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import { waitFor } from '../../../../dev-utils/jasmine'
 import { getDtHeaderValue } from '../../src/common/utils'
 import { globalState } from '../../src/common/patching/patch-utils'
 import { patchEventHandler as originalPatchHandler } from '../../src/common/patching'
@@ -260,28 +261,29 @@ describe('PerformanceMonitoring', function() {
     )
   })
 
-  xit('should initialize', function(done) {
+  it('should initialize and add transaction to the queue', async () => {
     performanceMonitoring.init()
-    spyOn(apmServer, 'addTransaction').and.callThrough()
+    spyOn(apmServer, 'addTransaction')
 
-    var tr = performanceMonitoring._transactionService.startTransaction(
+    const tr = performanceMonitoring._transactionService.startTransaction(
       'transaction',
-      'transaction'
+      'transaction',
+      { startTime: 0 }
     )
-    var span = tr.startSpan('test span', 'test span type')
-    span.end()
-    span = tr.startSpan('test span 2', 'test span type')
-    span.end()
-    tr.detectFinish()
-    setTimeout(() => {
-      expect(apmServer.addTransaction).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          name: 'transaction',
-          type: 'transaction'
-        })
-      )
-      done()
-    }, 10)
+    let span = tr.startSpan('test span', 'test span type', { startTime: 0 })
+    span.end(100)
+    span = tr.startSpan('test span 2', 'test span type', { startTime: 20 })
+    span.end(300)
+    tr.end(400)
+
+    await waitFor(() => apmServer.addTransaction.calls.any())
+
+    expect(apmServer.addTransaction).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        name: 'transaction',
+        type: 'transaction'
+      })
+    )
   })
 
   it('should create correct payload', function() {
