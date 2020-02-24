@@ -36,7 +36,6 @@ import {
 } from '../common/constants'
 import {
   stripQueryStringFromUrl,
-  PERF,
   isPerfTimelineSupported
 } from '../common/utils'
 
@@ -236,7 +235,7 @@ const navigationTimingKeys = [
 ]
 
 function getNavigationTimingMarks() {
-  const timing = PERF.timing
+  const timing = window.performance.timing
   const fetchStart = timing.fetchStart
   const marks = {}
   navigationTimingKeys.forEach(function(timingKey) {
@@ -256,9 +255,9 @@ function getNavigationTimingMarks() {
 function getFirstContentfulPaint() {
   let fcp
   if (isPerfTimelineSupported()) {
-    const entries = PERF.getEntriesByType(PAINT)
+    const entries = window.performance.getEntriesByType(PAINT)
     if (entries.length > 0) {
-      const timing = PERF.timing
+      const timing = window.performance.timing
       /**
        * To avoid capturing the unload event handler effect
        * as part of the transaction duration
@@ -328,7 +327,7 @@ function captureNavigation(transaction) {
     const trStart = 0
     transaction._start = trStart
 
-    const timings = PERF.timing
+    const timings = window.performance.timing
     createNavigationTimingSpans(
       timings,
       timings.fetchStart,
@@ -354,7 +353,7 @@ function captureNavigation(transaction) {
     /**
      * Capture resource timing information as spans
      */
-    const resourceEntries = PERF.getEntriesByType(RESOURCE)
+    const resourceEntries = window.performance.getEntriesByType(RESOURCE)
     const apiCalls = getApiSpanNames(transaction)
 
     createResourceTimingSpans(
@@ -367,7 +366,7 @@ function captureNavigation(transaction) {
     /**
      * Capture user timing measures as spans
      */
-    const userEntries = PERF.getEntriesByType(MEASURE)
+    const userEntries = window.performance.getEntriesByType(MEASURE)
     createUserTimingSpans(userEntries, trStart, trEnd).forEach(span =>
       transaction.spans.push(span)
     )
