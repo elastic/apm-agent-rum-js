@@ -108,34 +108,34 @@ export function groupSmallContinuouslySimilarSpans(
 }
 
 export function adjustTransactionSpans(transaction) {
-  /**
-   * In case of unsampled transaction, send only the transaction to apm server
-   *  without any spans to reduce the payload size
-   */
-  if (!transaction.sampled) {
-    transaction.resetSpans()
-  }
-
-  const filterdSpans = transaction.spans.filter(span => {
-    return (
-      span.duration() > 0 &&
-      span._start >= transaction._start &&
-      span._end <= transaction._end
-    )
-  })
-  /**
-   * Similar spans would be grouped automatically for all managed transactions
-   */
-  if (transaction.isManaged()) {
-    var duration = transaction.duration()
-    const similarSpans = groupSmallContinuouslySimilarSpans(
-      filterdSpans,
-      duration,
-      SIMILAR_SPAN_TO_TRANSACTION_RATIO
-    )
-    transaction.spans = similarSpans
+  if (transaction.sampled) {
+    const filterdSpans = transaction.spans.filter(span => {
+      return (
+        span.duration() > 0 &&
+        span._start >= transaction._start &&
+        span._end <= transaction._end
+      )
+    })
+    /**
+     * Similar spans would be grouped automatically for all managed transactions
+     */
+    if (transaction.isManaged()) {
+      var duration = transaction.duration()
+      const similarSpans = groupSmallContinuouslySimilarSpans(
+        filterdSpans,
+        duration,
+        SIMILAR_SPAN_TO_TRANSACTION_RATIO
+      )
+      transaction.spans = similarSpans
+    } else {
+      transaction.spans = filterdSpans
+    }
   } else {
-    transaction.spans = filterdSpans
+    /**
+     * In case of unsampled transaction, send only the transaction to apm server
+     *  without any spans to reduce the payload size
+     */
+    transaction.resetSpans()
   }
 
   return transaction
@@ -363,7 +363,7 @@ export default class PerformanceMonitoring {
         return false
       }
 
-      if (tr.spans.length === 0) {
+      if (tr.sampled && tr.spans.length === 0) {
         if (__DEV__) {
           this._logginService.debug(
             `transaction(${tr.id}, ${tr.name}) was discarded! Transaction does not have any spans`

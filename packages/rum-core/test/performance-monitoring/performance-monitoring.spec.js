@@ -647,17 +647,31 @@ describe('PerformanceMonitoring', function() {
     tr.end()
   })
 
-  it('should filter out managed transactions without any spans', () => {
+  it('should filter only sampled transaction without spans', () => {
     spyOn(logger, 'debug').and.callThrough()
-    const transaction = new Transaction('test', 'custom', { id: 1 })
-    transaction.end()
-    transaction._end = transaction._end + 100
-    expect(performanceMonitoring.filterTransaction(transaction)).toBe(true)
-    transaction.options.managed = true
-    expect(performanceMonitoring.filterTransaction(transaction)).toBe(false)
+    const sampledTr = new Transaction('test', 'custom', {
+      startTime: 0,
+      transactionSampleRate: 1,
+      managed: true,
+      id: 1
+    })
+    sampledTr.end(100)
+    expect(performanceMonitoring.filterTransaction(sampledTr)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
       'transaction(1, test) was discarded! Transaction does not have any spans'
     )
+
+    logger.debug.calls.reset()
+
+    const unsampledTr = new Transaction('test', 'custom', {
+      startTime: 0,
+      transactionSampleRate: 0,
+      managed: true,
+      id: 2
+    })
+    unsampledTr.end(100)
+    expect(performanceMonitoring.filterTransaction(unsampledTr)).toBe(true)
+    expect(logger.debug).not.toHaveBeenCalled()
   })
 
   if (window.EventTarget) {
