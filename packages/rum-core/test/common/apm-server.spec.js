@@ -23,12 +23,11 @@
  *
  */
 
+import compareVersions from 'compare-versions'
 import ApmServer from '../../src/common/apm-server'
 import Transaction from '../../src/performance-monitoring/transaction'
-import {
-  getGlobalConfig,
-  isVersionInRange
-} from '../../../../dev-utils/test-config'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import { describeIf } from '../../../../dev-utils/jasmine'
 import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
 import { createServiceFactory } from '../'
 
@@ -461,51 +460,56 @@ describe('ApmServer', function() {
     apmServer.sendTransactions([{ test: 'transactions' }])
   })
 
-  if (isVersionInRange(testConfig.stackVersion, '7.3.0')) {
-    it('should fetch remote config', async () => {
-      spyOn(configService, 'setLocalConfig')
-      spyOn(configService, 'getLocalConfig')
+  describeIf(
+    '7.5+',
+    () => {
+      it('should fetch remote config', async () => {
+        spyOn(configService, 'setLocalConfig')
+        spyOn(configService, 'getLocalConfig')
 
-      var config = await apmServer.fetchConfig('nonexistent-service')
-      expect(configService.getLocalConfig).toHaveBeenCalled()
-      expect(configService.setLocalConfig).toHaveBeenCalled()
+        var config = await apmServer.fetchConfig('nonexistent-service')
+        expect(configService.getLocalConfig).toHaveBeenCalled()
+        expect(configService.setLocalConfig).toHaveBeenCalled()
 
-      expect(config).toEqual({ etag: jasmine.any(String) })
+        expect(config).toEqual({ etag: jasmine.any(String) })
 
-      config = await apmServer.fetchConfig(
-        'nonexistent-service',
-        'nonexistent-env'
-      )
-      expect(config).toEqual({ etag: jasmine.any(String) })
+        config = await apmServer.fetchConfig(
+          'nonexistent-service',
+          'nonexistent-env'
+        )
+        expect(config).toEqual({ etag: jasmine.any(String) })
 
-      try {
-        config = await apmServer.fetchConfig()
-      } catch (e) {
-        expect(e).toBe('serviceName is required for fetching central config.')
-      }
-    })
-
-    it('should use local config if available', async () => {
-      configService.setLocalConfig({
-        transaction_sample_rate: '0.5',
-        etag: 'test'
+        try {
+          config = await apmServer.fetchConfig()
+        } catch (e) {
+          expect(e).toBe('serviceName is required for fetching central config.')
+        }
       })
 
-      apmServer._makeHttpRequest = () => {
-        return Promise.resolve({
-          status: 304
+      it('should use local config if available', async () => {
+        configService.setLocalConfig({
+          transaction_sample_rate: '0.5',
+          etag: 'test'
         })
-      }
 
-      let config = await apmServer.fetchConfig(
-        'nonexistent-service',
-        'nonexistent-env'
-      )
-      expect(config).toEqual({
-        transaction_sample_rate: '0.5',
-        etag: 'test'
+        apmServer._makeHttpRequest = () => {
+          return Promise.resolve({
+            status: 304
+          })
+        }
+
+        let config = await apmServer.fetchConfig(
+          'nonexistent-service',
+          'nonexistent-env'
+        )
+        expect(config).toEqual({
+          transaction_sample_rate: '0.5',
+          etag: 'test'
+        })
+        sessionStorage.removeItem(LOCAL_CONFIG_KEY)
       })
-      sessionStorage.removeItem(LOCAL_CONFIG_KEY)
-    })
-  }
+    },
+    !testConfig.stackVersion ||
+      compareVersions(testConfig.stackVersion, '7.5.0') >= 0
+  )
 })
