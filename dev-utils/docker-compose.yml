@@ -1,4 +1,4 @@
-version: "2.4"
+version: "2.1"
 services:
   elasticsearch:
     container_name: elasticsearch
@@ -125,7 +125,7 @@ services:
   node-puppeteer:
     build: ../.ci/docker/node-puppeteer
     container_name: node-puppeteer
-    image: docker.elastic.co/observability-ci/node-puppeteer:12
+    image: docker.elastic.co/observability-ci/node-puppeteer:8
     environment:
       - HOME=/app
       - SCOPE=${SCOPE}
@@ -166,11 +166,9 @@ services:
     user: ${USER_ID}
 
   node-benchmark:
-    build:
-      context: ../.ci/docker/node-puppeteer
-      shm_size: '1gb'
+    build: ../.ci/docker/node-puppeteer
     container_name: node-puppeteer
-    image: docker.elastic.co/observability-ci/node-puppeteer:12
+    image: docker.elastic.co/observability-ci/node-puppeteer:8
     environment:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}
@@ -198,8 +196,6 @@ services:
         aliases:
           - node-benchmark
     user: ${USER_ID}
-    cap_add:
-      - SYS_ADMIN
 
 networks:
   apm:
