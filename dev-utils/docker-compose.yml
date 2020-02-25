@@ -125,7 +125,7 @@ services:
   node-puppeteer:
     build: ../.ci/docker/node-puppeteer
     container_name: node-puppeteer
-    image: docker.elastic.co/observability-ci/node-puppeteer:8
+    image: docker.elastic.co/observability-ci/node-puppeteer:10
     environment:
       - HOME=/app
       - SCOPE=${SCOPE}
@@ -168,7 +168,7 @@ services:
   node-benchmark:
     build: ../.ci/docker/node-puppeteer
     container_name: node-puppeteer
-    image: docker.elastic.co/observability-ci/node-puppeteer:8
+    image: docker.elastic.co/observability-ci/node-puppeteer:10
     environment:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}
