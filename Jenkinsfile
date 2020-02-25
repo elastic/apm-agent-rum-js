@@ -90,7 +90,7 @@ pipeline {
               deleteDir()
               unstash 'source'
               dir("${BASE_DIR}"){
-                runParallelTest()
+                //runParallelTest()
               }
             }
           }
