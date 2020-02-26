@@ -27,6 +27,7 @@ import rng from 'uuid/lib/rng-browser'
 import { Promise } from './polyfills'
 
 const slice = [].slice
+const PERF = typeof window !== 'undefined' ? performance : {}
 
 function isCORSSupported() {
   var xhr = new window.XMLHttpRequest()
@@ -126,8 +127,8 @@ function isPlatformSupported() {
     typeof Array.prototype.forEach === 'function' &&
     typeof JSON.stringify === 'function' &&
     typeof Function.bind === 'function' &&
-    window.performance &&
-    typeof window.performance.now === 'function' &&
+    PERF &&
+    typeof PERF.now === 'function' &&
     isCORSSupported()
   )
 }
@@ -186,7 +187,7 @@ function getServerTimingInfo(serverTimingEntries = []) {
 }
 
 function getTimeOrigin() {
-  return window.performance.timing.fetchStart
+  return PERF.timing.fetchStart
 }
 
 function getPageMetadata() {
@@ -325,7 +326,7 @@ function getEarliestSpan(spans) {
 }
 
 function now() {
-  return window.performance.now()
+  return PERF.now()
 }
 
 function getTime(time) {
@@ -352,7 +353,7 @@ function scheduleMicroTask(callback) {
  * Performane Timeline imples `getEntriesByType`
  */
 function isPerfTimelineSupported() {
-  return typeof window.performance.getEntriesByType === 'function'
+  return typeof PERF.getEntriesByType === 'function'
 }
 
 export {
@@ -388,5 +389,6 @@ export {
   stripQueryStringFromUrl,
   find,
   removeInvalidChars,
+  PERF,
   isPerfTimelineSupported
 }

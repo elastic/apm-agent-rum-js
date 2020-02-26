@@ -28,6 +28,7 @@ import { PAGE_LOAD, NAVIGATION } from './constants'
 import {
   getPageMetadata,
   getServerTimingInfo,
+  PERF,
   isPerfTimelineSupported
 } from './utils'
 
@@ -166,7 +167,7 @@ export function addTransactionContext(transaction, configContext) {
   const pageContext = getPageMetadata()
   let responseContext = {}
   if (transaction.type === PAGE_LOAD && isPerfTimelineSupported()) {
-    let entries = window.performance.getEntriesByType(NAVIGATION)
+    let entries = PERF.getEntriesByType(NAVIGATION)
     if (entries && entries.length > 0) {
       responseContext = {
         response: getResponseContext(entries[0])
