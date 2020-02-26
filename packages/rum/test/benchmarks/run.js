@@ -95,5 +95,6 @@ const REPORTS_DIR = join(__dirname, '../../reports')
     console.log('RUM benchmark results written to disk', filePath)
   } catch (e) {
     console.error('Error running RUM benchmark script', e)
+    process.exit(1)
   }
 })()
