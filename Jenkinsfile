@@ -59,6 +59,17 @@ pipeline {
             deleteDir()
             gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
             stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+            // Look for changes related to the benchmark, if so then set the env variable.
+            script {
+              dir("${BASE_DIR}"){
+                def regexps =[
+                  '^packages/.*/test/benchmarks/.*',
+                  '^scripts/benchmarks.js',
+                  '^packages/rum-core/karma.bench.conf.js'
+                ]
+                env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: regexps)
+              }
+            }
           }
         }
         /**
@@ -129,6 +140,7 @@ pipeline {
                 branch 'master'
                 tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
                 expression { return params.Run_As_Master_Branch }
+                expression { return env.BENCHMARK_UPDATED != "false" }
               }
               expression { return params.bench_ci }
             }
@@ -148,7 +160,10 @@ pipeline {
             always {
               archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
               catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
-                sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+                log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
+                whenTrue(env.CHANGE_ID == null){
+                  sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+                }
               }
               catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                 deleteDir()
