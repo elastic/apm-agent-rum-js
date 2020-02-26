@@ -165,6 +165,10 @@ class Transaction extends SpanBase {
     // Remove span from _activeSpans
     delete this._activeSpans[span.id]
   }
+
+  isManaged() {
+    return !!this.options.managed
+  }
 }
 
 export default Transaction

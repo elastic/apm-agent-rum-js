@@ -26,6 +26,11 @@
 import { createServiceFactory } from '../'
 import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
+import {
+  groupSmallContinuouslySimilarSpans,
+  checkBrowserResponsiveness,
+  adjustTransactionSpans
+} from '../../src/performance-monitoring/performance-monitoring'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { waitFor } from '../../../../dev-utils/jasmine'
 import { getDtHeaderValue } from '../../src/common/utils'
@@ -80,139 +85,18 @@ describe('PerformanceMonitoring', function() {
       .then(() => done())
   })
 
-  it('should group small continuously similar spans up until the last one', function() {
-    var tr = new Transaction('transaction', 'transaction')
-    var span1 = tr.startSpan('name', 'type')
-    span1.end()
-    var span2 = tr.startSpan('name', 'type')
-    span2.end()
-    var span3 = tr.startSpan('another-name', 'type')
-    span3.end()
-    var span4 = tr.startSpan('name', 'type')
-    span4.end()
-    var span5 = tr.startSpan('name', 'type')
-    span5.end()
-
-    tr.end()
-
-    tr._start = 10
-    tr._end = 1000
-
-    span1._start = 20
-    span1._end = 30
-
-    span2._start = 31
-    span2._end = 35
-
-    span3._start = 35
-    span3._end = 45
-
-    span4._start = 50
-    span4._end = 60
-
-    span5._start = 61
-    span5._end = 70
-
-    tr.spans.sort(function(spanA, spanB) {
-      return spanA._start - spanB._start
-    })
-    var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(
-      tr,
-      0.05
-    )
-
-    expect(grouped.length).toBe(3)
-    expect(grouped[0].name).toBe('2x name')
-    expect(grouped[1].name).toBe('another-name')
-    expect(grouped[2].name).toBe('2x name')
-  })
-
-  it('should group small continuously similar spans', function() {
-    var tr = new Transaction('transaction', 'transaction')
-    var span1 = tr.startSpan('name', 'type')
-    span1.end()
-    var span2 = tr.startSpan('name', 'type')
-    span2.end()
-    var span3 = tr.startSpan('name', 'type')
-    span3.end()
-    var span4 = tr.startSpan('name', 'type')
-    span4.end()
-    var span5 = tr.startSpan('another-name', 'type')
-    span5.end()
-
-    tr.end()
-
-    tr._start = 10
-    tr._end = 1000
-
-    span1._start = 20
-    span1._end = 30
-
-    span2._start = 31
-    span2._end = 35
-
-    span3._start = 35
-    span3._end = 45
-
-    span4._start = 50
-    span4._end = 60
-
-    span5._start = 60
-    span5._end = 70
-
-    tr.spans.sort(function(spanA, spanB) {
-      return spanA._start - spanB._start
-    })
-
-    var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(
-      tr,
-      0.05
-    )
-
-    expect(grouped.length).toBe(2)
-    expect(grouped[0].name).toBe('4x name')
-    expect(grouped[1].name).toBe('another-name')
-  })
-
-  it('should calculate browser responsiveness', function() {
-    const tr = new Transaction('transaction', 'transaction', {
-      startTime: 1
-    })
-    tr.end(400)
-
-    tr.browserResponsivenessCounter = 0
-    var resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
-    expect(resp).toBe(true)
-
-    tr._end = 1001
-    tr.browserResponsivenessCounter = 2
-    resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
-    expect(resp).toBe(true)
-
-    tr._end = 1601
-    tr.browserResponsivenessCounter = 2
-    resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
-    expect(resp).toBe(true)
-
-    tr._end = 3001
-    tr.browserResponsivenessCounter = 3
-    resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
-    expect(resp).toBe(false)
-  })
-
   it('should filter transactions based on duration and spans', () => {
-    configService.setConfig({
-      transactionDurationThreshold: 200
-    })
     spyOn(logger, 'debug').and.callThrough()
-    const transaction1 = new Transaction('test', 'custom', { id: 1 })
-    transaction1.end()
-    transaction1._start = 0
-    transaction1._end = 201
-    expect(transaction1.duration()).toBe(201)
+    const transaction1 = new Transaction('test', 'custom', {
+      id: 1,
+      startTime: 0,
+      managed: true
+    })
+    transaction1.end(60001)
+    expect(transaction1.duration()).toBe(60001)
     expect(performanceMonitoring.filterTransaction(transaction1)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
-      'transaction(1, test) was discarded! Transaction duration (201) is greater than the transactionDurationThreshold configuration (200)'
+      'transaction(1, test) was discarded! Transaction duration (60001) is greater than managed transaction threshold (60000)'
     )
     logger.debug.calls.reset()
 
@@ -233,16 +117,12 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should filter transactions based on browser responsiveness', function() {
-    configService.setConfig({
-      checkBrowserResponsiveness: true
-    })
     spyOn(logger, 'debug').and.callThrough()
     expect(logger.debug).not.toHaveBeenCalled()
     var tr = new Transaction('transaction', 'transaction', {
       id: 212,
       transactionSampleRate: 1,
       managed: true,
-      checkBrowserResponsiveness: true,
       startTime: 1
     })
     var span = tr.startSpan('test span', 'test span type')
@@ -357,42 +237,15 @@ describe('PerformanceMonitoring', function() {
     expect(result).toBe(true)
   })
 
-  it('should not filter unsampled transactions with spans', function() {
-    const tr = new Transaction('unsampled', 'test', {
-      transactionSampleRate: 0
+  it('should filter managed transactions with duration above threshold', function() {
+    var tr = new Transaction('/test/outlier', 'page-load-slow', {
+      startTime: 0,
+      managed: true
     })
-    tr.end()
-    if (tr._end && tr._end === tr._start) {
-      tr._end += 100
-    }
-    expect(tr.duration()).toBeGreaterThan(0)
-
-    const tr2 = new Transaction('unsampled', 'test', {
-      transactionSampleRate: 0
-    })
-    tr2.startSpan('span1', 'type1').end()
-    tr2.end()
-    if (tr2._end && tr2._end === tr2._start) {
-      tr2._end += 100
-    }
-    expect(tr2.spans.length).toBe(1)
-    expect(performanceMonitoring.filterTransaction(tr2)).toBe(true)
-    expect(tr2.spans.length).toBe(0)
-  })
-
-  it('should filter the transactions with duration above threshold', function() {
-    var threshold = configService.get('transactionDurationThreshold')
-    var tr = new Transaction(
-      '/test/outlier',
-      'page-load-slow',
-      configService.config
-    )
     var span1 = new Span('span 1', 'test-span')
     span1.end()
     tr.spans.push(span1)
-    tr.end()
-    tr._end += 60001
-    expect(tr.duration()).toBeGreaterThanOrEqual(threshold)
+    tr.end(60001)
     var payload = performanceMonitoring.createTransactionPayload(tr)
     expect(payload).toBeUndefined()
     var promise = apmServer.sendTransactions(payload)
@@ -796,17 +649,31 @@ describe('PerformanceMonitoring', function() {
     tr.end()
   })
 
-  it('should filter out managed transactions without any spans', () => {
+  it('should filter only sampled transaction without spans', () => {
     spyOn(logger, 'debug').and.callThrough()
-    const transaction = new Transaction('test', 'custom', { id: 1 })
-    transaction.end()
-    transaction._end = transaction._end + 100
-    expect(performanceMonitoring.filterTransaction(transaction)).toBe(true)
-    transaction.options.managed = true
-    expect(performanceMonitoring.filterTransaction(transaction)).toBe(false)
+    const sampledTr = new Transaction('test', 'custom', {
+      startTime: 0,
+      transactionSampleRate: 1,
+      managed: true,
+      id: 1
+    })
+    sampledTr.end(100)
+    expect(performanceMonitoring.filterTransaction(sampledTr)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
       'transaction(1, test) was discarded! Transaction does not have any spans'
     )
+
+    logger.debug.calls.reset()
+
+    const unsampledTr = new Transaction('test', 'custom', {
+      startTime: 0,
+      transactionSampleRate: 0,
+      managed: true,
+      id: 2
+    })
+    unsampledTr.end(100)
+    expect(performanceMonitoring.filterTransaction(unsampledTr)).toBe(true)
+    expect(logger.debug).not.toHaveBeenCalled()
   })
 
   if (window.EventTarget) {
@@ -874,4 +741,94 @@ describe('PerformanceMonitoring', function() {
       cancelEventTargetSub()
     })
   }
+
+  describe('PerformanceMonitoring Utils', () => {
+    it('should group small continuously similar spans up until the last one', function() {
+      var tr = new Transaction('transaction', 'transaction', { startTime: 10 })
+      var span1 = tr.startSpan('name', 'type', { startTime: 10 })
+      span1.end(30)
+      var span2 = tr.startSpan('name', 'type', { startTime: 31 })
+      span2.end(35)
+      var span3 = tr.startSpan('another-name', 'type', { startTime: 35 })
+      span3.end(45)
+      var span4 = tr.startSpan('name', 'type', { startTime: 50 })
+      span4.end(60)
+      var span5 = tr.startSpan('name', 'type', { startTime: 61 })
+      span5.end(70)
+      tr.end(1000)
+
+      var grouped = groupSmallContinuouslySimilarSpans(
+        tr.spans,
+        tr.duration(),
+        0.05
+      )
+      expect(grouped.length).toBe(3)
+      expect(grouped[0].name).toBe('2x name')
+      expect(grouped[1].name).toBe('another-name')
+      expect(grouped[2].name).toBe('2x name')
+    })
+
+    it('should group small continuously similar spans', function() {
+      var tr = new Transaction('transaction', 'transaction', { startTime: 10 })
+      var span1 = tr.startSpan('name', 'type', { startTime: 20 })
+      span1.end(30)
+      var span2 = tr.startSpan('name', 'type', { startTime: 31 })
+      span2.end(35)
+      var span3 = tr.startSpan('name', 'type', { startTime: 35 })
+      span3.end(45)
+      var span4 = tr.startSpan('name', 'type', { startTime: 50 })
+      span4.end(60)
+      var span5 = tr.startSpan('another-name', 'type', { startTime: 60 })
+      span5.end(70)
+      tr.end(1000)
+
+      var grouped = groupSmallContinuouslySimilarSpans(
+        tr.spans,
+        tr.duration(),
+        0.05
+      )
+      expect(grouped.length).toBe(2)
+      expect(grouped[0].name).toBe('4x name')
+      expect(grouped[1].name).toBe('another-name')
+    })
+
+    it('should calculate browser responsiveness', function() {
+      const tr = new Transaction('transaction', 'transaction', {
+        startTime: 1
+      })
+      tr.end(400)
+
+      tr.browserResponsivenessCounter = 0
+      var resp = checkBrowserResponsiveness(tr, 500, 2)
+      expect(resp).toBe(true)
+
+      tr._end = 1001
+      tr.browserResponsivenessCounter = 2
+      resp = checkBrowserResponsiveness(tr, 500, 2)
+      expect(resp).toBe(true)
+
+      tr._end = 1601
+      tr.browserResponsivenessCounter = 2
+      resp = checkBrowserResponsiveness(tr, 500, 2)
+      expect(resp).toBe(true)
+
+      tr._end = 3001
+      tr.browserResponsivenessCounter = 3
+      resp = checkBrowserResponsiveness(tr, 500, 2)
+      expect(resp).toBe(false)
+    })
+
+    it('should reset spans for unsampled transactions', function() {
+      const tr = new Transaction('unsampled', 'test', {
+        transactionSampleRate: 0,
+        startTime: 0
+      })
+      const span = tr.startSpan('span1', 'type1', { startTime: 10 })
+      span.end(20)
+      tr.end(30)
+      expect(tr.spans.length).toBe(1)
+      const adjustedTransaction = adjustTransactionSpans(tr)
+      expect(adjustedTransaction.spans.length).toBe(0)
+    })
+  })
 })
