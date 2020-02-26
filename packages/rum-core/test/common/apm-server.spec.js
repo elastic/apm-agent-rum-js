@@ -119,38 +119,22 @@ describe('ApmServer', function() {
     )
   })
 
-  xit('should queue items', function() {
-    spyOn(loggingService, 'warn').and.callThrough()
+  it('should queue items before sending', function() {
     configService.setConfig({
-      serviceName: 'serviceName',
-      throttlingRequestLimit: 1
+      serviceName: 'serviceName'
     })
-    spyOn(apmServer, '_postJson').and.callThrough()
-    spyOn(apmServer, '_makeHttpRequest').and.callThrough()
-    apmServer.init()
-    spyOn(apmServer, '_throttledMakeRequest').and.callThrough()
 
-    var trs = generateTransaction(19)
+    spyOn(apmServer, '_postJson')
+    apmServer.init()
+
+    let trs = generateTransaction(19)
     trs.forEach(apmServer.addTransaction.bind(apmServer))
     expect(apmServer.transactionQueue.items.length).toBe(19)
     expect(apmServer._postJson).not.toHaveBeenCalled()
-    trs = generateTransaction(1)
-    trs.forEach(apmServer.addTransaction.bind(apmServer))
 
+    apmServer.transactionQueue.flush()
     expect(apmServer._postJson).toHaveBeenCalled()
-    expect(apmServer._makeHttpRequest).toHaveBeenCalled()
     expect(apmServer.transactionQueue.items.length).toBe(0)
-
-    apmServer._makeHttpRequest.calls.reset()
-    loggingService.warn.calls.reset()
-    trs = generateTransaction(20)
-    trs.forEach(apmServer.addTransaction.bind(apmServer))
-    expect(apmServer._throttledMakeRequest).toHaveBeenCalled()
-    expect(loggingService.warn).toHaveBeenCalledWith(
-      // eslint-disable-next-line
-      'ElasticAPM: Dropped request to http://localhost:8200/v1/client-side/transactions due to throttling!'
-    )
-    expect(apmServer._makeHttpRequest).not.toHaveBeenCalled()
   })
 
   it('should init queue if not initialized before', function(done) {
