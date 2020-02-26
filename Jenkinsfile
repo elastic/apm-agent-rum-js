@@ -160,12 +160,9 @@ pipeline {
             always {
               archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
               catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
-                script {
-                  if (env.CHANGE_ID?.trim()) {
-                    log(level: 'INFO', text: 'This is a PR, therefore the Benchmark did run but its output was not published to the ES cluster!')
-                  } else {
-                    sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
-                  }
+                log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
+                whenTrue(env.CHANGE_ID == null){
+                  sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
                 }
               }
               catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
