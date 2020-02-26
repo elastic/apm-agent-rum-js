@@ -14,5 +14,5 @@ jobs:
     - uses: preactjs/compressed-size-action@v1
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        build-script: "npx lerna run build:module"
+        build-script: "bundlesize"
         pattern: "{packages/rum/dist/bundles/*.js}"
