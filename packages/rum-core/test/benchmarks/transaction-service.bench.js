@@ -28,11 +28,6 @@ import { createServiceFactory } from '../../src/index'
 suite('TransactionService', () => {
   const serviceFactory = createServiceFactory()
   const transactionService = serviceFactory.getService('TransactionService')
-  const configService = serviceFactory.getService('ConfigService')
-  // To avoid timeouts interfering with benchmark results
-  configService.setConfig({
-    checkBrowserResponsiveness: false
-  })
 
   benchmark('page-load transaction overhead', () => {
     const tr = transactionService.startTransaction('/index', 'page-load', {

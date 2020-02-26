@@ -44,9 +44,7 @@ import {
   EVENT_TARGET,
   HTTP_REQUEST_TYPE,
   USER_INTERACTION,
-  BROWSER_RESPONSIVENESS_INTERVAL,
-  BROWSER_RESPONSIVENESS_BUFFER,
-  SIMILAR_SPAN_TO_TRANSACTION_RATIO
+  PAGE_LOAD
 } from '../common/constants'
 import {
   truncateModel,
@@ -55,7 +53,103 @@ import {
 } from '../common/truncate'
 import { __DEV__ } from '../env'
 
-class PerformanceMonitoring {
+/**
+ * Parameters used for Managed Transactions
+ */
+const BROWSER_RESPONSIVENESS_INTERVAL = 500
+const BROWSER_RESPONSIVENESS_BUFFER = 3
+const SIMILAR_SPAN_TO_TRANSACTION_RATIO = 0.05
+const TRANSACTION_DURATION_THRESHOLD = 60000
+
+export function groupSmallContinuouslySimilarSpans(
+  originalSpans,
+  transDuration,
+  threshold
+) {
+  /**
+   * sort the original spans
+   */
+  originalSpans.sort((spanA, spanB) => spanA._start - spanB._start)
+
+  var spans = []
+  let lastCount = 1
+  originalSpans.forEach(function(span, index) {
+    if (spans.length === 0) {
+      spans.push(span)
+    } else {
+      var lastSpan = spans[spans.length - 1]
+
+      var isContinuouslySimilar =
+        lastSpan.type === span.type &&
+        lastSpan.subType === span.subType &&
+        lastSpan.action === span.action &&
+        lastSpan.name === span.name &&
+        span.duration() / transDuration < threshold &&
+        (span._start - lastSpan._end) / transDuration < threshold
+
+      var isLastSpan = originalSpans.length === index + 1
+
+      if (isContinuouslySimilar) {
+        lastCount++
+        lastSpan._end = span._end
+      }
+
+      if (lastCount > 1 && (!isContinuouslySimilar || isLastSpan)) {
+        lastSpan.name = lastCount + 'x ' + lastSpan.name
+        lastCount = 1
+      }
+
+      if (!isContinuouslySimilar) {
+        spans.push(span)
+      }
+    }
+  })
+  return spans
+}
+
+export function adjustTransactionSpans(transaction) {
+  if (transaction.sampled) {
+    const filterdSpans = transaction.spans.filter(span => {
+      return (
+        span.duration() > 0 &&
+        span._start >= transaction._start &&
+        span._end <= transaction._end
+      )
+    })
+    /**
+     * Similar spans would be grouped automatically for all managed transactions
+     */
+    if (transaction.isManaged()) {
+      var duration = transaction.duration()
+      const similarSpans = groupSmallContinuouslySimilarSpans(
+        filterdSpans,
+        duration,
+        SIMILAR_SPAN_TO_TRANSACTION_RATIO
+      )
+      transaction.spans = similarSpans
+    } else {
+      transaction.spans = filterdSpans
+    }
+  } else {
+    /**
+     * In case of unsampled transaction, send only the transaction to apm server
+     *  without any spans to reduce the payload size
+     */
+    transaction.resetSpans()
+  }
+
+  return transaction
+}
+
+export function checkBrowserResponsiveness(transaction, interval, buffer) {
+  const counter = transaction.browserResponsivenessCounter
+  const duration = transaction.duration()
+  const expectedCount = Math.floor(duration / interval)
+
+  return counter + buffer >= expectedCount
+}
+
+export default class PerformanceMonitoring {
   constructor(apmServer, configService, loggingService, transactionService) {
     this._apmServer = apmServer
     this._configService = configService
@@ -244,9 +338,6 @@ class PerformanceMonitoring {
   }
 
   filterTransaction(tr) {
-    const transactionDurationThreshold = this._configService.get(
-      'transactionDurationThreshold'
-    )
     const duration = tr.duration()
 
     if (!duration) {
@@ -262,74 +353,50 @@ class PerformanceMonitoring {
       return false
     }
 
-    if (duration > transactionDurationThreshold) {
-      if (__DEV__) {
-        this._logginService.debug(
-          `transaction(${tr.id}, ${tr.name}) was discarded! Transaction duration (${duration}) is greater than the transactionDurationThreshold configuration (${transactionDurationThreshold})`
-        )
-      }
-      return false
-    }
-
-    if (tr.options.managed && tr.spans.length === 0) {
-      if (__DEV__) {
-        this._logginService.debug(
-          `transaction(${tr.id}, ${tr.name}) was discarded! Transaction does not have any spans`
-        )
-      }
-      return false
-    }
-
-    /**
-     * In case of unsampled transaction, send only the transaction to apm server
-     *  without any spans to reduce the payload size
-     */
-    if (!tr.sampled) {
-      tr.resetSpans()
-    }
-
-    if (tr.options.checkBrowserResponsiveness) {
-      const wasBrowserResponsive = this.checkBrowserResponsiveness(
-        tr,
-        BROWSER_RESPONSIVENESS_INTERVAL,
-        BROWSER_RESPONSIVENESS_BUFFER
-      )
-
-      if (!wasBrowserResponsive) {
+    if (tr.isManaged()) {
+      if (duration > TRANSACTION_DURATION_THRESHOLD) {
         if (__DEV__) {
           this._logginService.debug(
-            `transaction(${tr.id}, ${tr.name}) was discarded! Browser was not responsive enough during the transaction.`,
-            ' duration:',
-            duration,
-            ' browserResponsivenessCounter:',
-            tr.browserResponsivenessCounter
+            `transaction(${tr.id}, ${tr.name}) was discarded! Transaction duration (${duration}) is greater than managed transaction threshold (${TRANSACTION_DURATION_THRESHOLD})`
           )
         }
         return false
       }
+
+      if (tr.sampled && tr.spans.length === 0) {
+        if (__DEV__) {
+          this._logginService.debug(
+            `transaction(${tr.id}, ${tr.name}) was discarded! Transaction does not have any spans`
+          )
+        }
+        return false
+      }
+
+      /**
+       * TODO: Refactor the type check with better logic
+       */
+      if (tr.type !== PAGE_LOAD) {
+        const wasBrowserResponsive = checkBrowserResponsiveness(
+          tr,
+          BROWSER_RESPONSIVENESS_INTERVAL,
+          BROWSER_RESPONSIVENESS_BUFFER
+        )
+
+        if (!wasBrowserResponsive) {
+          if (__DEV__) {
+            this._logginService.debug(
+              `transaction(${tr.id}, ${tr.name}) was discarded! Browser was not responsive enough during the transaction.`,
+              ' duration:',
+              duration,
+              ' browserResponsivenessCounter:',
+              tr.browserResponsivenessCounter
+            )
+          }
+          return false
+        }
+      }
     }
     return true
-  }
-
-  prepareTransaction(transaction) {
-    transaction.spans.sort(function(spanA, spanB) {
-      return spanA._start - spanB._start
-    })
-
-    if (this._configService.get('groupSimilarSpans')) {
-      transaction.spans = this.groupSmallContinuouslySimilarSpans(
-        transaction,
-        SIMILAR_SPAN_TO_TRANSACTION_RATIO
-      )
-    }
-
-    transaction.spans = transaction.spans.filter(function(span) {
-      return (
-        span.duration() > 0 &&
-        span._start >= transaction._start &&
-        span._end <= transaction._end
-      )
-    })
   }
 
   createTransactionDataModel(transaction) {
@@ -372,58 +439,10 @@ class PerformanceMonitoring {
   }
 
   createTransactionPayload(transaction) {
-    this.prepareTransaction(transaction)
-    const filtered = this.filterTransaction(transaction)
+    const adjustedTransaction = adjustTransactionSpans(transaction)
+    const filtered = this.filterTransaction(adjustedTransaction)
     if (filtered) {
       return this.createTransactionDataModel(transaction)
     }
   }
-
-  groupSmallContinuouslySimilarSpans(transaction, threshold) {
-    var transDuration = transaction.duration()
-    var spans = []
-    var lastCount = 1
-    transaction.spans.forEach(function(span, index) {
-      if (spans.length === 0) {
-        spans.push(span)
-      } else {
-        var lastSpan = spans[spans.length - 1]
-
-        var isContinuouslySimilar =
-          lastSpan.type === span.type &&
-          lastSpan.subType === span.subType &&
-          lastSpan.action === span.action &&
-          lastSpan.name === span.name &&
-          span.duration() / transDuration < threshold &&
-          (span._start - lastSpan._end) / transDuration < threshold
-
-        var isLastSpan = transaction.spans.length === index + 1
-
-        if (isContinuouslySimilar) {
-          lastCount++
-          lastSpan._end = span._end
-        }
-
-        if (lastCount > 1 && (!isContinuouslySimilar || isLastSpan)) {
-          lastSpan.name = lastCount + 'x ' + lastSpan.name
-          lastCount = 1
-        }
-
-        if (!isContinuouslySimilar) {
-          spans.push(span)
-        }
-      }
-    })
-    return spans
-  }
-
-  checkBrowserResponsiveness(transaction, interval, buffer) {
-    const counter = transaction.browserResponsivenessCounter
-    const duration = transaction.duration()
-    const expectedCount = Math.floor(duration / interval)
-
-    return counter + buffer >= expectedCount
-  }
 }
-
-export default PerformanceMonitoring
