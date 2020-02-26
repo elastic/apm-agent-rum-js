@@ -25,7 +25,10 @@
 
 const { join } = require('path')
 const webpack = require('webpack')
-const TerserPlugin = require('terser-webpack-plugin')
+const {
+  getWebpackConfig,
+  BUNDLE_TYPES
+} = require('../../../../dev-utils/build')
 const rimraf = require('rimraf')
 
 const PROJECT_ROOT = join(__dirname, '../../../../')
@@ -37,9 +40,12 @@ function runWebpack(config, callback) {
     if (err) {
       callback(err)
     }
-    const { errors } = stats.toJson('errors-only')
-    if (errors.length > 0) {
-      callback(errors)
+    const { errors, warnings } = stats.toJson('errors-warnings')
+
+    if (stats.hasErrors()) {
+      callback(...errors)
+    } else if (stats.hasWarnings()) {
+      callback(...warnings)
     } else {
       callback(null)
     }
@@ -54,11 +60,7 @@ function getConfig(entry) {
       filename: 'bundle.js',
       libraryTarget: 'umd'
     },
-    mode: 'none',
-    optimization: {
-      minimize: true,
-      minimizer: [new TerserPlugin()]
-    }
+    ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD)
   }
 }
 
@@ -72,7 +74,7 @@ describe('Browser bundle test', () => {
     it('not produce any errors when run without babel', done => {
       const config = getConfig(mainEntry)
       return runWebpack(config, error => {
-        expect(error).toBe(null)
+        expect(error).toEqual(null)
         done()
       })
     })
@@ -83,7 +85,7 @@ describe('Browser bundle test', () => {
     it('not produce any errors when run without babel', done => {
       const config = getConfig(moduleEntry)
       return runWebpack(config, error => {
-        expect(error).toBe(null)
+        expect(error).toEqual(null)
         done()
       })
     })
