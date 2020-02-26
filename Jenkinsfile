@@ -63,9 +63,9 @@ pipeline {
             script {
               dir("${BASE_DIR}"){
                 def regexps =[
-                  "^packages/rum/test/benchmarks/",
-                  "^scripts/benchmarks.js$",
-                  "^packages/rum-core/karma.bench.conf.js$"
+                  '^packages/rum/test/benchmarks/',
+                  '^scripts/benchmarks.js',
+                  '^packages/rum-core/karma.bench.conf.js'
                 ]
                 env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: regexps)
               }
