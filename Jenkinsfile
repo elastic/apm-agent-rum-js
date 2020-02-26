@@ -63,7 +63,7 @@ pipeline {
             script {
               dir("${BASE_DIR}"){
                 def regexps =[
-                  '^packages/rum/test/benchmarks/',
+                  '^packages/.*/test/benchmarks/.*',
                   '^scripts/benchmarks.js',
                   '^packages/rum-core/karma.bench.conf.js'
                 ]
