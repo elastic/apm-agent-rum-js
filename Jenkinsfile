@@ -161,7 +161,7 @@ pipeline {
               archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
               catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
                 script {
-                  if (env.GIT_BUILD_CAUSE?.equals('pr')) {
+                  if (env.CHANGE_ID?.trim()) {
                     log(level: 'INFO', text: 'This is a PR, therefore the Benchmark did run but its output was not published to the ES cluster!')
                   } else {
                     sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
