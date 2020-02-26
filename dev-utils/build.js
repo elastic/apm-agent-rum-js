@@ -157,7 +157,7 @@ function getCommonWebpackConfig(bundleType, packageType) {
   const mode = isEnvProduction ? 'production' : 'development'
 
   return {
-    devtool: isEnvProduction ? false : 'inline-source-map',
+    devtool: isEnvProduction ? 'source-map' : 'inline-cheap-module-source-map',
     mode,
     stats: {
       colors: true,
