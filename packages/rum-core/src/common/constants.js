@@ -129,6 +129,11 @@ const FIRST_CONTENTFUL_PAINT = 'first-contentful-paint'
 const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint'
 
 /**
+ * Managed transaction configs
+ */
+const BROWSER_RESPONSIVENESS_INTERVAL = 500
+
+/**
  * Default configs used on top of extensible configs from ConfigService
  */
 const KEYWORD_LIMIT = 1024
@@ -171,5 +176,6 @@ export {
   SERVER_URL_PREFIX,
   TEMPORARY_TYPE,
   USER_INTERACTION,
-  TRANSACTION_TYPE_ORDER
+  TRANSACTION_TYPE_ORDER,
+  BROWSER_RESPONSIVENESS_INTERVAL
 }
