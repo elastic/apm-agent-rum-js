@@ -76,7 +76,7 @@
     "babel-plugin-transform-typescript-metadata": "^0.2.2",
     "benchmark": "^2.1.4",
     "bundlesize": "^0.18.0",
-    "codecov": "^3.6.1",
+    "codecov": "^3.6.5",
     "compare-versions": "^3.6.0",
     "core-js": "^3.5.0",
     "cpuprofile-filter": "^1.1.0",
