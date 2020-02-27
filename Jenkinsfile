@@ -367,7 +367,8 @@ def runAllScopes(){
 }
 
 def runTest(){
-  withGithubNotify(context: "Test ${SCOPE} - ${STACK_VERSION} - ${env.MODE}", tab: 'tests') {
+  def mode = env.MODE == 'none' ? 'Puppeteer' : env.MODE
+  withGithubNotify(context: "Test ${SCOPE} - ${STACK_VERSION} - ${mode}", tab: 'tests') {
     runScript(
       label: "${SCOPE}",
       stack: "${STACK_VERSION}",
