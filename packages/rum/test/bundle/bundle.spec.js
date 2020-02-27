@@ -64,6 +64,9 @@ function getConfig(entry) {
   }
 }
 
+// Since bundling happens inside tests, it needs more time on the CI
+const TEST_TIMEOUT = 15000
+
 describe('Browser bundle test', () => {
   afterEach(() => {
     rimraf.sync(BUNDLE_DIST_DIR)
@@ -71,23 +74,31 @@ describe('Browser bundle test', () => {
 
   describe('main version', () => {
     const mainEntry = require.resolve('@elastic/apm-rum/dist/lib/index.js')
-    it('not produce any errors when run without babel', done => {
-      const config = getConfig(mainEntry)
-      return runWebpack(config, error => {
-        expect(error).toEqual(null)
-        done()
-      })
-    })
+    it(
+      'not produce any errors when run without babel',
+      done => {
+        const config = getConfig(mainEntry)
+        return runWebpack(config, error => {
+          expect(error).toEqual(null)
+          done()
+        })
+      },
+      TEST_TIMEOUT
+    )
   })
 
   describe('module version', () => {
     const moduleEntry = require.resolve('@elastic/apm-rum/dist/es/index.js')
-    it('not produce any errors when run without babel', done => {
-      const config = getConfig(moduleEntry)
-      return runWebpack(config, error => {
-        expect(error).toEqual(null)
-        done()
-      })
-    })
+    it(
+      'not produce any errors when run without babel',
+      done => {
+        const config = getConfig(moduleEntry)
+        return runWebpack(config, error => {
+          expect(error).toEqual(null)
+          done()
+        })
+      },
+      TEST_TIMEOUT
+    )
   })
 })
