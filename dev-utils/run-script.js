@@ -169,11 +169,9 @@ function exitHandler(exitCode) {
     }
   })
   cleanUps = []
-  process.exit(exitCode)
 }
 
 process.on('exit', exitHandler)
-process.on('uncaughtException', exitHandler)
 process.on('SIGINT', exitHandler)
 
 const scripts = {
