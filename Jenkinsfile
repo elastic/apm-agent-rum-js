@@ -134,6 +134,17 @@ pipeline {
           environment {
             REPORT_FILE = 'apm-agent-benchmark-results.json'
           }
+          when {
+            beforeAgent true
+            allOf {
+              anyOf {
+                branch 'master'
+                tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
+                expression { return params.Run_As_Master_Branch }
+              }
+              expression { return params.bench_ci }
+            }
+          }
           steps {
             withGithubNotify(context: 'Benchmarks') {
               deleteDir()
@@ -148,6 +159,9 @@ pipeline {
           post {
             always {
               archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
+              catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
+                sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+              }
               catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                 deleteDir()
               }
