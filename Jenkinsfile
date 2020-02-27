@@ -140,6 +140,7 @@ pipeline {
           environment {
             SAUCELABS_SECRET="${env.SAUCELABS_SECRET}"
             STACK_VERSION="8.0.0-SNAPSHOT"
+            MODE = "saucelabs"
           }
           when {
             allOf {
