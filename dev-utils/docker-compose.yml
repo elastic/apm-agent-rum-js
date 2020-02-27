@@ -186,6 +186,7 @@ services:
         npm install
         npm install puppeteer --unsafe-perm=true --allow-root
         npm install playwright --unsafe-perm=true --allow-root
+        export CHROME_BIN=/app/node_modules/playwright-core/lib/chromium
         set -eo pipefail
         npx lerna run build:module
         node ./scripts/benchmarks.js ${REPORT_FILE}"
