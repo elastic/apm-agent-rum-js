@@ -89,7 +89,7 @@ pipeline {
         */
         stage('Test') {
           matrix {
-            agent { label 'linux && immutable' }
+            //agent { label 'linux && immutable' }
             axes {
                 axis {
                     name 'STACK_VERSION'
