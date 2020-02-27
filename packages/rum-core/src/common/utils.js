@@ -27,7 +27,7 @@ import rng from 'uuid/lib/rng-browser'
 import { Promise } from './polyfills'
 
 const slice = [].slice
-const PERF = window.performance
+const PERF = typeof window !== 'undefined' ? performance : {}
 
 function isCORSSupported() {
   var xhr = new window.XMLHttpRequest()
