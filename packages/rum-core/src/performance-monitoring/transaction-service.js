@@ -118,8 +118,7 @@ class TransactionService {
           pageLoadTraceId: config.pageLoadTraceId,
           pageLoadSampled: config.pageLoadSampled,
           pageLoadSpanId: config.pageLoadSpanId,
-          pageLoadTransactionName: config.pageLoadTransactionName,
-          checkBrowserResponsiveness: config.checkBrowserResponsiveness
+          pageLoadTransactionName: config.pageLoadTransactionName
         },
         perfOptions
       )
@@ -173,11 +172,12 @@ class TransactionService {
       tr = this.ensureCurrentTransaction(name, type, perfOptions)
     }
 
+    let checkBrowserResponsiveness = true
     if (tr.type === PAGE_LOAD) {
       if (!isRedefined) {
         this.recorder.start(LARGEST_CONTENTFUL_PAINT)
       }
-      tr.options.checkBrowserResponsiveness = false
+      checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
@@ -206,7 +206,7 @@ class TransactionService {
       tr.captureTimings = true
     }
 
-    this.ensureRespInterval(tr.options.checkBrowserResponsiveness)
+    this.ensureRespInterval(checkBrowserResponsiveness)
 
     return tr
   }

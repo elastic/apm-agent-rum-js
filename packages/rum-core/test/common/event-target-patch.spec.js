@@ -26,6 +26,7 @@
 import patchEventHandler from './patch'
 import { EVENT_TARGET } from '../../src/common/constants'
 import { createCustomEvent } from '../'
+import { describeIf } from '../../../../dev-utils/jasmine'
 
 describe('EventTargetPatch', function() {
   let events = []
@@ -78,95 +79,99 @@ describe('EventTargetPatch', function() {
     expect(count).toBe(1)
   })
 
-  if (window.EventTarget) {
-    it('should patch EventTarget', () => {
-      let count = 0
-      let element = document.createElement('div')
-      const listener = e => {
-        expect(e.type).toBe('click')
-        count++
-      }
+  describeIf(
+    'EventTarget supported',
+    () => {
+      it('should patch EventTarget', () => {
+        let count = 0
+        let element = document.createElement('div')
+        const listener = e => {
+          expect(e.type).toBe('click')
+          count++
+        }
 
-      element.addEventListener('click', listener)
-      element.addEventListener('click', listener, { capture: true })
-      element.click()
-      expect(count).toBe(2)
-      element.removeEventListener('click', listener)
-      element.click()
-      expect(count).toBe(3)
-      element.removeEventListener('click', listener, true)
-      element.click()
-      expect(events.map(e => e.event)).toEqual([
-        'schedule',
-        'invoke',
-        'schedule',
-        'invoke',
-        'schedule',
-        'invoke'
-      ])
-      expect(count).toBe(3)
-    })
+        element.addEventListener('click', listener)
+        element.addEventListener('click', listener, { capture: true })
+        element.click()
+        expect(count).toBe(2)
+        element.removeEventListener('click', listener)
+        element.click()
+        expect(count).toBe(3)
+        element.removeEventListener('click', listener, true)
+        element.click()
+        expect(events.map(e => e.event)).toEqual([
+          'schedule',
+          'invoke',
+          'schedule',
+          'invoke',
+          'schedule',
+          'invoke'
+        ])
+        expect(count).toBe(3)
+      })
 
-    it('should consider event listener uniqueness condition', () => {
-      let count = 0
-      let element = document.createElement('div')
-      const listener = e => {
-        expect(e.type).toBe('click')
-        count++
-      }
+      it('should consider event listener uniqueness condition', () => {
+        let count = 0
+        let element = document.createElement('div')
+        const listener = e => {
+          expect(e.type).toBe('click')
+          count++
+        }
 
-      element.addEventListener('click', listener)
-      element.addEventListener('click', listener)
-      /**
-       * Providing object as the third argument is only support on
-       * Chrome Mobile 49 and above therefore we can not
-       * pass an object if we want capture to be false
-       * since an object will be evaluated as a truthy value.
-       */
-      element.addEventListener('click', listener, false)
+        element.addEventListener('click', listener)
+        element.addEventListener('click', listener)
+        /**
+         * Providing object as the third argument is only support on
+         * Chrome Mobile 49 and above therefore we can not
+         * pass an object if we want capture to be false
+         * since an object will be evaluated as a truthy value.
+         */
+        element.addEventListener('click', listener, false)
 
-      element.click()
-      expect(count).toBe(1)
+        element.click()
+        expect(count).toBe(1)
 
-      element.addEventListener('click', listener, true)
-      element.addEventListener('click', listener, { capture: true })
+        element.addEventListener('click', listener, true)
+        element.addEventListener('click', listener, { capture: true })
 
-      element.click()
-      expect(count).toBe(3)
+        element.click()
+        expect(count).toBe(3)
 
-      element.removeEventListener('click', listener)
-      element.removeEventListener('click', listener)
-      element.click()
-      expect(count).toBe(4)
+        element.removeEventListener('click', listener)
+        element.removeEventListener('click', listener)
+        element.click()
+        expect(count).toBe(4)
 
-      element.removeEventListener('click', listener, true)
-      element.click()
-      expect(count).toBe(4)
+        element.removeEventListener('click', listener, true)
+        element.click()
+        expect(count).toBe(4)
 
-      element.removeEventListener('click', listener, true)
-      element.click()
-      expect(count).toBe(4)
-      expect(events.length).toBe(8)
-    })
+        element.removeEventListener('click', listener, true)
+        element.click()
+        expect(count).toBe(4)
+        expect(events.length).toBe(8)
+      })
 
-    it('should not instrument non-Element targets', () => {
-      let count = 0
-      const eventType = 'click'
-      const listener = e => {
-        expect(e.type).toBe(eventType)
-        count++
-      }
+      it('should not instrument non-Element targets', () => {
+        let count = 0
+        const eventType = 'click'
+        const listener = e => {
+          expect(e.type).toBe(eventType)
+          count++
+        }
 
-      let event = createCustomEvent(eventType)
-      window.addEventListener(eventType, listener)
-      window.dispatchEvent(event)
-      expect(count).toBe(1)
-      expect(events.length).toBe(0)
+        let event = createCustomEvent(eventType)
+        window.addEventListener(eventType, listener)
+        window.dispatchEvent(event)
+        expect(count).toBe(1)
+        expect(events.length).toBe(0)
 
-      window.addEventListener.apply(undefined, [eventType, listener, true])
-      window.dispatchEvent(event)
-      expect(count).toBe(3)
-      expect(events.length).toBe(0)
-    })
-  }
+        window.addEventListener.apply(undefined, [eventType, listener, true])
+        window.dispatchEvent(event)
+        expect(count).toBe(3)
+        expect(events.length).toBe(0)
+      })
+    },
+    !!window.EventTarget
+  )
 })

@@ -59,6 +59,17 @@ pipeline {
             deleteDir()
             gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
             stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+            // Look for changes related to the benchmark, if so then set the env variable.
+            script {
+              dir("${BASE_DIR}"){
+                def regexps =[
+                  '^packages/.*/test/benchmarks/.*',
+                  '^scripts/benchmarks.js',
+                  '^packages/rum-core/karma.bench.conf.js'
+                ]
+                env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: regexps)
+              }
+            }
           }
         }
         /**
