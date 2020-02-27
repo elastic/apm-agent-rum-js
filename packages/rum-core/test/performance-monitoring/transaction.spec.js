@@ -44,22 +44,6 @@ describe('transaction.Transaction', function() {
     done()
   })
 
-  xit('should not start any spans after transaction has been added to queue', function() {
-    var transaction = new Transaction('/', 'transaction', {})
-    transaction.end()
-    var firstSpan = transaction.startSpan('first-span-name', 'first-span')
-    firstSpan.end()
-    setTimeout(function() {
-      // todo: transaction has already been added to the queue, shouldn't accept more spans
-
-      var lastSpan = transaction.startSpan('last-span-name', 'last-span')
-      fail(
-        'done transaction should not accept more spans, now we simply ignore the newly stared span.'
-      )
-      lastSpan.end()
-    })
-  })
-
   it('should not generate stacktrace if the option is not passed', function(done) {
     var tr = new Transaction('/', 'transaction')
     tr.onEnd = function() {
