@@ -84,67 +84,28 @@ pipeline {
             }
           }
         }
-        /**
-        Execute unit tests.
-        */
-        stage('Test') {
-          matrix {
-            //agent { label 'linux && immutable' }
-            axes {
-                axis {
-                    name 'STACK_VERSION'
-                    values (
-                      '8.0.0-SNAPSHOT',
-                      '7.6.0-SNAPSHOT',
-                      '7.5.0',
-                      '6.8.0'
-                    )
-                }
-                //TODO move scope to an axis when we have the SauceLab account
+        // '7.5.0',
+        // '6.8.0'
+        stage('parallel'){
+          parallel {
+            stage('Stack 8.0.0-SNAPSHOT') {
+              agent { label 'linux && immutable' }
+              environment {
+                SAUCELABS_SECRET="${env.SAUCELABS_SECRET_CORE}"
+                STACK_VERSION="8.0.0-SNAPSHOT"
+              }
+              steps {
+                runAllScopes()
+              }
             }
-            stages {
-              stage('Scope @elastic/apm-rum-core') {
-                environment {
-                  SCOPE="@elastic/apm-rum-core"
-                  SAUCELABS_SECRET="${env.SAUCELABS_SECRET_CORE}"
-                }
-                steps {
-                  runTest()
-                }
+            stage('Stack ') {
+              agent { label 'linux && immutable' }
+              environment {
+                SAUCELABS_SECRET="${env.SAUCELABS_SECRET}"
+                STACK_VERSION="7.7.0-SNAPSHOT"
               }
-              stage('Scope @elastic/apm-rum') {
-                environment {
-                  SCOPE="@elastic/apm-rum"
-                }
-                steps {
-                  runTest()
-                }
-              }
-              stage('Scope @elastic/apm-rum-react') {
-                environment {
-                  SCOPE="@elastic/apm-rum-react"
-                  SAUCELABS_SECRET="${env.SAUCELABS_SECRET_CORE}"
-                }
-                steps {
-                  runTest()
-                }
-              }
-              stage('Scope @elastic/apm-rum-angular') {
-                environment {
-                  SCOPE="@elastic/apm-rum-angular"
-                }
-                steps {
-                  runTest()
-                }
-              }
-              stage('Scope @elastic/apm-rum-vue') {
-                environment {
-                  SCOPE="@elastic/apm-rum-vue"
-                  SAUCELABS_SECRET="${env.SAUCELABS_SECRET_CORE}"
-                }
-                steps {
-                  runTest()
-                }
+              steps {
+                runAllScopes()
               }
             }
           }
@@ -270,16 +231,6 @@ pipeline {
   }
 }
 
-def runTest(){
-  withGithubNotify(context: "Test ${SCOPE} - ${STACK_VERSION}", tab: 'tests') {
-    runScript(
-      label: "${SCOPE}",
-      stack: "${STACK_VERSION}",
-      scope: "${SCOPE}",
-      goal: 'test')
-  }
-}
-
 def runScript(Map args = [:]){
   def stack = args.stack
   def scope = args.scope
@@ -307,11 +258,11 @@ def runScript(Map args = [:]){
         if(params.saucelab_test){
           env.MODE = 'saucelabs'
           withSaucelabsEnv(){
-            sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
+            sh(label: "Start Elastic Stack ${stack} - ${scope}", script: '.ci/scripts/test.sh')
           }
         } else {
           env.MODE = 'none'
-          sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
+          sh(label: "Start Elastic Stack ${stack} - ${scope}", script: '.ci/scripts/test.sh')
         }
       }
     }
@@ -359,4 +310,25 @@ def wrappingUp(){
     keepLongStdio: true,
     testResults: "${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
   archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs,${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
+}
+
+def runAllScopes(){
+  def scopes = [
+    'SCOPE=@elastic/apm-rum-core',
+    'SCOPE=@elastic/apm-rum',
+    'SCOPE=@elastic/apm-rum-react',
+    'SCOPE=@elastic/apm-rum-angular',
+    'SCOPE=@elastic/apm-rum-vue'
+  ]
+  scopes.each{ s ->
+    withEnv([s]){
+      withGithubNotify(context: "Test ${SCOPE} - ${STACK_VERSION}", tab: 'tests') {
+        runScript(
+          label: "${SCOPE}",
+          stack: "${STACK_VERSION}",
+          scope: "${SCOPE}",
+          goal: 'test')
+      }
+    }
+  }
 }
