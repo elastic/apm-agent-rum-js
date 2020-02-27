@@ -166,9 +166,9 @@ services:
     user: ${USER_ID}
 
   node-benchmark:
-    build: ../.ci/docker/node-puppeteer
-    container_name: node-puppeteer
-    image: docker.elastic.co/observability-ci/node-puppeteer:12
+    build: ../.ci/docker/node-playwright
+    container_name: node-playwright
+    image: docker.elastic.co/observability-ci/node-playwright:12
     environment:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}
