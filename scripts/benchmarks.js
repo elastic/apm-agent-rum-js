@@ -126,7 +126,11 @@ function runBenchmarks() {
       let resultObj = {}
       for (let result of results) {
         const metricKey = result.name || result.scenario
-        resultObj[metricKey] = result
+        const browser = result.browser
+        if (!resultObj[metricKey]) {
+          resultObj[metricKey] = {}
+        }
+        resultObj[metricKey][browser] = result
       }
 
       const output = Object.assign({}, baseOutput, {

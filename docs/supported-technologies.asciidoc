@@ -39,15 +39,26 @@ If you are interested in accurately measuring the duration of load event, the in
 
 
 [float]
-[[platforms]]
-=== Platforms
+[[user-interactions]]
+=== User Interactions
 
-The following platforms are supported:
+The RUM agent automatically instruments click event listeners that are
+registered by the application. The click events are captured as `user-interaction`
+transactions. However, to avoid sending too many `user-interaction` transactions
+to the server, the agent discards transactions with no spans (e.g. no network activity). Furthermore, 
+if the click interaction results in route change, then a `route-change`
+transaction would be captured instead.
 
-// Update this image by modifying this URL:
-// https://badges.herokuapp.com/browsers?android=5.1&firefox=52&googlechrome=49,74&iexplore=11&iphone=12&microsoftedge=17&safari=9
-// Additional information: https://github.com/exogen/badge-matrix
-image::images/compatibility.png[Elastic APM RUM Agent compatibility]
+
+[float]
+[[spa]]
+=== Single Page Applications
+
+All history `pushState` events will be captured as transactions. 
+Most of these transactions can be enhanced by using framework specific integrations.
+For all unsupported frameworks/libraries, you can instrument the application 
+by creating <<custom-transactions,custom transactions>> and custom spans with the <<apm-start-span,span API>>.
+
 
 [float]
 [[frameworks]]
@@ -58,11 +69,14 @@ The agent supports <<framework-integrations,integrations with certain frameworks
 To instrument custom metrics, like rendering time or mounting time of components on frameworks like React, Angular, Vue,
 etc., use the <<custom-transactions,custom transactions API>>.
 
-[float]
-[[spa]]
-=== Single Page Applications
 
-All history `pushState` events will be captured as transactions. 
-Most of these transactions can be enhanced by using framework specific integrations.
-For all unsupported frameworks/libraries, you can instrument the application 
-by creating <<custom-transactions,custom transactions>> and custom spans with the <<apm-start-span,span API>>.
+[float]
+[[platforms]]
+=== Platforms
+
+The following platforms are supported:
+
+// Update this image by modifying this URL:
+// https://badges.herokuapp.com/browsers?android=5.1&firefox=52&googlechrome=49,74&iexplore=11&iphone=12&microsoftedge=17&safari=9
+// Additional information: https://github.com/exogen/badge-matrix
+image::images/compatibility.png[Elastic APM RUM Agent compatibility]

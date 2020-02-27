@@ -23,37 +23,18 @@
  *
  */
 
-import { createServiceFactory } from '../../src/index'
+import PromisePollyfill from 'promise-polyfill'
 
-suite('TransactionService', () => {
-  const serviceFactory = createServiceFactory()
-  const transactionService = serviceFactory.getService('TransactionService')
+/**
+ * Use the globally available promise if it exists and
+ * fallback to using the polyfilled Promise
+ */
+let local = {}
+if (typeof window !== 'undefined') {
+  local = window
+} else if (typeof self !== 'undefined') {
+  local = self
+}
+const Promise = 'Promise' in local ? local.Promise : PromisePollyfill
 
-  benchmark('page-load transaction overhead', () => {
-    const tr = transactionService.startTransaction('/index', 'page-load', {
-      managed: true
-    })
-    setImmediate(() => tr.end())
-  })
-
-  benchmark('custom transaction overhead', () => {
-    const tr = transactionService.startTransaction('custom', 'custom')
-    setImmediate(() => tr.end())
-  })
-
-  benchmark(
-    'span creation overhead',
-    () => {
-      const span = transactionService.startSpan('test-span', 'custom')
-      setImmediate(() => span.end())
-    },
-    {
-      onSetup() {
-        /**
-         * Ensures we have  currentTranaction in place when span creation is done
-         */
-        transactionService.ensureCurrentTransaction('test-tr', 'custom')
-      }
-    }
-  )
-})
+export { Promise }

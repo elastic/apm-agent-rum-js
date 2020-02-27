@@ -29,7 +29,8 @@ import {
   XMLHTTPREQUEST,
   FETCH,
   HISTORY,
-  ERROR
+  ERROR,
+  EVENT_TARGET
 } from '../../src/common/constants'
 
 describe('Instrumentation', function() {
@@ -41,7 +42,8 @@ describe('Instrumentation', function() {
       [XMLHTTPREQUEST]: false,
       [FETCH]: false,
       [HISTORY]: false,
-      [ERROR]: false
+      [ERROR]: false,
+      [EVENT_TARGET]: false
     })
   })
 
@@ -53,7 +55,8 @@ describe('Instrumentation', function() {
       [XMLHTTPREQUEST]: false,
       [FETCH]: true,
       [HISTORY]: false,
-      [ERROR]: true
+      [ERROR]: true,
+      [EVENT_TARGET]: true
     })
   })
 })

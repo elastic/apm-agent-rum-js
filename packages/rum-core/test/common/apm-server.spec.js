@@ -23,12 +23,11 @@
  *
  */
 
+import compareVersions from 'compare-versions'
 import ApmServer from '../../src/common/apm-server'
 import Transaction from '../../src/performance-monitoring/transaction'
-import {
-  getGlobalConfig,
-  isVersionInRange
-} from '../../../../dev-utils/test-config'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import { describeIf } from '../../../../dev-utils/jasmine'
 import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
 import { createServiceFactory } from '../'
 
@@ -372,7 +371,7 @@ describe('ApmServer', function() {
     expect(apmServer._postJson).not.toHaveBeenCalled()
   })
 
-  it('should set metadata from config along with defaults', () => {
+  it('should set metadata from config along with defaults', async () => {
     configService.setConfig({
       serviceName: 'test',
       serviceVersion: '0.0.1',
@@ -380,25 +379,39 @@ describe('ApmServer', function() {
     })
 
     configService.setVersion('4.0.1')
+    configService.addLabels({ test: 'testlabel' })
 
     /** To catch agent version mismatch during release */
-    const { service } = apmServer.createMetaData()
-    expect(service).toEqual({
-      name: 'test',
-      version: '0.0.1',
-      environment: 'staging',
-      agent: {
-        name: 'js-base',
-        version: '4.0.1'
+    const meta = apmServer.createMetaData()
+    expect(meta).toEqual({
+      service: {
+        name: 'test',
+        version: '0.0.1',
+        environment: 'staging',
+        agent: {
+          name: 'js-base',
+          version: '4.0.1'
+        },
+        language: { name: 'javascript' }
       },
-      language: { name: 'javascript' }
+      labels: { test: 'testlabel' }
     })
+
+    const tr = new Transaction('test-meta-tr', 'test-type', {
+      startTime: 10
+    })
+    tr.startSpan('test-meta-span', 'test-type')
+    tr.end(100)
+    const payload = performanceMonitoring.createTransactionDataModel(tr)
+    await apmServer.sendTransactions([payload])
   })
 
   it('should ndjson transactions', function() {
     var trs = generateTransaction(3)
-    trs = performanceMonitoring.convertTransactionsToServerModel(trs)
-    var result = apmServer.ndjsonTransactions(trs)
+    const payload = trs.map(tr =>
+      performanceMonitoring.createTransactionDataModel(tr)
+    )
+    var result = apmServer.ndjsonTransactions(payload)
     /* eslint-disable max-len */
     var expected = [
       '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}\n',
@@ -409,8 +422,10 @@ describe('ApmServer', function() {
   })
 
   it('should ndjson metricsets along with transactions', function() {
-    const tr = generateTransaction(1, true)
-    const payload = performanceMonitoring.convertTransactionsToServerModel(tr)
+    const trs = generateTransaction(1, true)
+    const payload = trs.map(tr =>
+      performanceMonitoring.createTransactionDataModel(tr)
+    )
     const result = apmServer.ndjsonTransactions(payload)
     /* eslint-disable max-len */
     const expected = [
@@ -423,51 +438,78 @@ describe('ApmServer', function() {
     expect(result).toEqual([expected])
   })
 
-  if (isVersionInRange(testConfig.stackVersion, '7.3.0')) {
-    it('should fetch remote config', async () => {
-      spyOn(configService, 'setLocalConfig')
-      spyOn(configService, 'getLocalConfig')
-
-      var config = await apmServer.fetchConfig('nonexistent-service')
-      expect(configService.getLocalConfig).toHaveBeenCalled()
-      expect(configService.setLocalConfig).toHaveBeenCalled()
-
-      expect(config).toEqual({ etag: jasmine.any(String) })
-
-      config = await apmServer.fetchConfig(
-        'nonexistent-service',
-        'nonexistent-env'
-      )
-      expect(config).toEqual({ etag: jasmine.any(String) })
-
-      try {
-        config = await apmServer.fetchConfig()
-      } catch (e) {
-        expect(e).toBe('serviceName is required for fetching central config.')
-      }
+  it('should pass correct payload to filters', () => {
+    configService.setConfig({
+      serviceName: 'serviceName'
+    })
+    /**
+     * We don't want to send these payloads to the apm server
+     * since they are only tests and not valid payloads.
+     */
+    spyOn(apmServer, '_postJson')
+    let type = ''
+    configService.addFilter(function(payload) {
+      expect(payload[type]).toEqual([{ test: type }])
+      return payload
     })
 
-    it('should use local config if available', async () => {
-      configService.setLocalConfig({
-        transaction_sample_rate: '0.5',
-        etag: 'test'
+    type = 'errors'
+    apmServer.sendErrors([{ test: 'errors' }])
+
+    type = 'transactions'
+    apmServer.sendTransactions([{ test: 'transactions' }])
+  })
+
+  describeIf(
+    '7.5+',
+    () => {
+      it('should fetch remote config', async () => {
+        spyOn(configService, 'setLocalConfig')
+        spyOn(configService, 'getLocalConfig')
+
+        var config = await apmServer.fetchConfig('nonexistent-service')
+        expect(configService.getLocalConfig).toHaveBeenCalled()
+        expect(configService.setLocalConfig).toHaveBeenCalled()
+
+        expect(config).toEqual({ etag: jasmine.any(String) })
+
+        config = await apmServer.fetchConfig(
+          'nonexistent-service',
+          'nonexistent-env'
+        )
+        expect(config).toEqual({ etag: jasmine.any(String) })
+
+        try {
+          config = await apmServer.fetchConfig()
+        } catch (e) {
+          expect(e).toBe('serviceName is required for fetching central config.')
+        }
       })
 
-      apmServer._makeHttpRequest = () => {
-        return Promise.resolve({
-          status: 304
+      it('should use local config if available', async () => {
+        configService.setLocalConfig({
+          transaction_sample_rate: '0.5',
+          etag: 'test'
         })
-      }
 
-      let config = await apmServer.fetchConfig(
-        'nonexistent-service',
-        'nonexistent-env'
-      )
-      expect(config).toEqual({
-        transaction_sample_rate: '0.5',
-        etag: 'test'
+        apmServer._makeHttpRequest = () => {
+          return Promise.resolve({
+            status: 304
+          })
+        }
+
+        let config = await apmServer.fetchConfig(
+          'nonexistent-service',
+          'nonexistent-env'
+        )
+        expect(config).toEqual({
+          transaction_sample_rate: '0.5',
+          etag: 'test'
+        })
+        sessionStorage.removeItem(LOCAL_CONFIG_KEY)
       })
-      sessionStorage.removeItem(LOCAL_CONFIG_KEY)
-    })
-  }
+    },
+    !testConfig.stackVersion ||
+      compareVersions(testConfig.stackVersion, '7.5.0') >= 0
+  )
 })

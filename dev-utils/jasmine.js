@@ -23,37 +23,46 @@
  *
  */
 
-import { createServiceFactory } from '../../src/index'
-
-suite('TransactionService', () => {
-  const serviceFactory = createServiceFactory()
-  const transactionService = serviceFactory.getService('TransactionService')
-
-  benchmark('page-load transaction overhead', () => {
-    const tr = transactionService.startTransaction('/index', 'page-load', {
-      managed: true
-    })
-    setImmediate(() => tr.end())
-  })
-
-  benchmark('custom transaction overhead', () => {
-    const tr = transactionService.startTransaction('custom', 'custom')
-    setImmediate(() => tr.end())
-  })
-
-  benchmark(
-    'span creation overhead',
-    () => {
-      const span = transactionService.startSpan('test-span', 'custom')
-      setImmediate(() => span.end())
-    },
-    {
-      onSetup() {
-        /**
-         * Ensures we have  currentTranaction in place when span creation is done
-         */
-        transactionService.ensureCurrentTransaction('test-tr', 'custom')
+/**
+ *  waitfor a specific number of cycles
+ * @param {*} conditionFn
+ * @param {*} count
+ * @param {*} message
+ */
+export function waitFor(
+  conditionFn,
+  count = 1,
+  message = 'Waiting for condition exceeded allowed cycles.'
+) {
+  const checkCondition = (resolve, reject) => {
+    if (count >= 0) {
+      count--
+      if (conditionFn(count)) {
+        resolve()
+      } else {
+        setTimeout(() => checkCondition(resolve, reject))
       }
+    } else {
+      reject(message)
     }
-  )
-})
+  }
+
+  return new Promise(checkCondition)
+}
+
+/**
+ * Conditional describe
+ * @param {*} description
+ * @param {*} specDefinitions
+ * @param {*} condition
+ */
+export function describeIf(description, specDefinitions, condition) {
+  let describeFn = describe
+  if (arguments.length > 2) {
+    if (!condition) {
+      describeFn = xdescribe
+    }
+  }
+
+  return describeFn.apply(this, [description, specDefinitions])
+}

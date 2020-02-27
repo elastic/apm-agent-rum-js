@@ -23,13 +23,13 @@
  *
  */
 
-import { Promise } from 'es6-promise'
 import Queue from './queue'
 import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
 import { SERVER_URL_PREFIX } from './constants'
+import { Promise } from './polyfills'
 import { __DEV__ } from '../env'
 
 class ApmServer {
@@ -70,7 +70,8 @@ class ApmServer {
           name: 'javascript'
         },
         environment: cfg.get('environment')
-      }
+      },
+      labels: cfg.get('context.tags')
     }
     return truncateModel(METADATA_MODEL, metadata)
   }
@@ -283,13 +284,12 @@ class ApmServer {
     })
   }
 
-  _send(data = [], type = 'transaction') {
+  _send(data = [], type = 'transactions') {
     if (data.length === 0) {
       return
     }
-    const { service } = this.createMetaData()
-    const payload = { service, data }
 
+    const payload = { [type]: data }
     const filteredPayload = this._configService.applyFilters(payload)
     if (!filteredPayload) {
       this._loggingService.warn('Dropped payload due to filtering!')
@@ -298,18 +298,18 @@ class ApmServer {
 
     let ndjson
     if (type === 'errors') {
-      ndjson = this.ndjsonErrors(filteredPayload.data)
-    } else if (type === 'transaction') {
-      ndjson = this.ndjsonTransactions(filteredPayload.data)
+      ndjson = this.ndjsonErrors(filteredPayload[type])
+    } else if (type === 'transactions') {
+      ndjson = this.ndjsonTransactions(filteredPayload[type])
     } else {
       if (__DEV__) {
         this._loggingService.debug('Dropped payload due to unknown data type')
       }
       return
     }
-    ndjson.unshift(
-      NDJSON.stringify({ metadata: { service: filteredPayload.service } })
-    )
+
+    const metadata = this.createMetaData()
+    ndjson.unshift(NDJSON.stringify({ metadata }))
     const ndjsonPayload = ndjson.join('')
     const endPoint = this._configService.get('serverUrl') + SERVER_URL_PREFIX
     return this._postJson(endPoint, ndjsonPayload)

@@ -23,7 +23,7 @@
  *
  */
 
-import 'es6-promise/auto'
+import 'promise-polyfill/src/polyfill'
 import 'core-js/features/array/map'
 
 Object.setPrototypeOf =

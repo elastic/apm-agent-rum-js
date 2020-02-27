@@ -17,6 +17,7 @@ pipeline {
     GITHUB_CHECK_ITS_NAME = 'Integration Tests'
     ITS_PIPELINE = 'apm-integration-tests-selector-mbp/master'
     OPBEANS_REPO = 'opbeans-frontend'
+    PATH = "${env.PATH}:${env.WORKSPACE}/bin"
   }
   options {
     //timeout(time: 3, unit: 'HOURS')
@@ -40,9 +41,6 @@ pipeline {
   stages {
     stage('Initializing'){
       options { skipDefaultCheckout() }
-      environment {
-        PATH = "${env.PATH}:${env.WORKSPACE}/bin"
-      }
       stages {
         /**
         Checkout the code and stash it, to use it on other stages.
@@ -53,6 +51,17 @@ pipeline {
             deleteDir()
             gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
             stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+            // Look for changes related to the benchmark, if so then set the env variable.
+            script {
+              dir("${BASE_DIR}"){
+                def regexps =[
+                  '^packages/.*/test/benchmarks/.*',
+                  '^scripts/benchmarks.js',
+                  '^packages/rum-core/karma.bench.conf.js'
+                ]
+                env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: regexps)
+              }
+            }
           }
         }
         /**
@@ -140,23 +149,23 @@ pipeline {
             }
           }
         }
-        /**
-        Execute code coverange only once.
-        */
-        stage('Coverage') {
-          steps {
-            withGithubNotify(context: 'Coverage') {
-              // No scope is required as the coverage should run for all of them
-              runScript(label: 'coverage', stack: '7.0.0', scope: '', goal: 'coverage')
-              codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
+        stage('Integration Tests') {
+          agent none
+          when {
+            beforeAgent true
+            anyOf {
+              changeRequest()
+              expression { return !params.Run_As_Master_Branch }
             }
           }
-          post {
-            always {
-              coverageReport("${BASE_DIR}/packages/**")
-              publishCoverage(adapters: [coberturaAdapter("${BASE_DIR}/packages/**/coverage-*-report.xml")],
-                              sourceFileResolver: sourceFiles('STORE_ALL_BUILD'))
-            }
+          steps {
+            build(job: env.ITS_PIPELINE, propagate: false, wait: false,
+                  parameters: [string(name: 'AGENT_INTEGRATION_TEST', value: 'RUM'),
+                               string(name: 'BUILD_OPTS', value: "--rum-agent-branch ${env.GIT_BASE_COMMIT}"),
+                               string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_ITS_NAME),
+                               string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+                               string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
+            githubNotify(context: "${env.GITHUB_CHECK_ITS_NAME}", description: "${env.GITHUB_CHECK_ITS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.ITS_PIPELINE.replaceAll('/','+')}")
           }
         }
         /**
@@ -171,9 +180,10 @@ pipeline {
             beforeAgent true
             allOf {
               anyOf {
-                branch 'master'
-                tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
+                //branch 'master'
+                //tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
                 expression { return params.Run_As_Master_Branch }
+                expression { return env.BENCHMARK_UPDATED != "false" }
               }
               expression { return params.bench_ci }
             }
@@ -193,7 +203,10 @@ pipeline {
             always {
               archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
               catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
-                sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+                log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
+                whenTrue(env.CHANGE_ID == null){
+                  sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+                }
               }
               catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                 deleteDir()
@@ -201,26 +214,24 @@ pipeline {
             }
           }
         }
-        stage('Integration Tests') {
-          agent none
-          when {
-            beforeAgent true
-            allOf {
-              anyOf {
-                environment name: 'GIT_BUILD_CAUSE', value: 'pr'
-                expression { return !params.Run_As_Master_Branch }
-              }
+        /**
+        Execute code coverage only once.
+        */
+        stage('Coverage') {
+          options { skipDefaultCheckout() }
+          steps {
+            withGithubNotify(context: 'Coverage') {
+              // No scope is required as the coverage should run for all of them
+              runScript(label: 'coverage', stack: '7.0.0', scope: '', goal: 'coverage')
+              codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
             }
           }
-          steps {
-            log(level: 'INFO', text: 'Launching Async ITs')
-            build(job: env.ITS_PIPELINE, propagate: false, wait: false,
-                  parameters: [string(name: 'AGENT_INTEGRATION_TEST', value: 'RUM'),
-                               string(name: 'BUILD_OPTS', value: "--rum-agent-branch ${env.GIT_BASE_COMMIT}"),
-                               string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_ITS_NAME),
-                               string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-                               string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
-            githubNotify(context: "${env.GITHUB_CHECK_ITS_NAME}", description: "${env.GITHUB_CHECK_ITS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.ITS_PIPELINE.replaceAll('/','+')}")
+          post {
+            always {
+              coverageReport("${BASE_DIR}/packages/**")
+              publishCoverage(adapters: [coberturaAdapter("${BASE_DIR}/packages/**/coverage-*-report.xml")],
+                              sourceFileResolver: sourceFiles('STORE_ALL_BUILD'))
+            }
           }
         }
         stage('Release') {

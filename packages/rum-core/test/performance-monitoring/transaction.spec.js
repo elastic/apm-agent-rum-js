@@ -144,5 +144,13 @@ describe('transaction.Transaction', function() {
 
     transaction._start = transaction._start - 10000
     expect(transaction.canReuse()).toBe(false)
+
+    transaction = new Transaction('transaction', 'transaction', {
+      canReuse: true,
+      reuseThreshold: 100
+    })
+    expect(transaction.canReuse()).toBe(true)
+    transaction._start = transaction._start - 101
+    expect(transaction.canReuse()).toBe(false)
   })
 })
