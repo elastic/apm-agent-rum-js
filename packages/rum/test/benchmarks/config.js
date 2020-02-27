@@ -28,7 +28,7 @@ module.exports = {
   scenarios: ['basic', 'heavy'],
   runs: 3,
   noOfImages: 30,
-  browserTypes: ['chromium', 'firefox', 'webkit'],
+  browserTypes: ['chromium'],
   port,
   chrome: {
     /**
