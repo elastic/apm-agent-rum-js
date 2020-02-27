@@ -135,7 +135,7 @@ pipeline {
             runAllScopes()
           }
         }
-        stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
+        stage('Stack 8.0.0-SNAPSHOT SauceLabs PR') {
           agent { label 'linux && immutable' }
           environment {
             SAUCELABS_SECRET="${env.SAUCELABS_SECRET}"
