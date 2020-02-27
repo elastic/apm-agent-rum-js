@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y curl && \
     apt-get install -y nodejs \
     --no-install-recommends
 
+RUN apt-get install -y git --no-install-recommends
+
 # These dependencies are the ones we have found in:
 # https://github.com/arjun27/playwright-github-actions/blob/master/Dockerfile
 RUN apt-get install -y libwoff1 \
