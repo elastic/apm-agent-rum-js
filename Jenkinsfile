@@ -141,7 +141,6 @@ pipeline {
                 branch 'master'
                 tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
                 expression { return params.Run_As_Master_Branch }
-                expression { return env.BENCHMARK_UPDATED != "false" }
               }
               expression { return params.bench_ci }
             }
@@ -161,10 +160,7 @@ pipeline {
             always {
               archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
               catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
-                log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
-                whenTrue(env.CHANGE_ID == null){
-                  sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
-                }
+                sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
               }
               catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                 deleteDir()
