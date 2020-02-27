@@ -18,6 +18,7 @@ pipeline {
     ITS_PIPELINE = 'apm-integration-tests-selector-mbp/master'
     OPBEANS_REPO = 'opbeans-frontend'
     PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+    MODE = "none"
   }
   options {
     //timeout(time: 3, unit: 'HOURS')
@@ -84,30 +85,70 @@ pipeline {
             }
           }
         }
-        // '7.5.0',
-        // '6.8.0'
-        stage('parallel'){
-          parallel {
-            stage('Stack 8.0.0-SNAPSHOT') {
-              agent { label 'linux && immutable' }
-              environment {
-                SAUCELABS_SECRET="${env.SAUCELABS_SECRET_CORE}"
-                STACK_VERSION="8.0.0-SNAPSHOT"
-              }
-              steps {
-                runAllScopes()
+        stage('Test Pupperteer') {
+          matrix {
+            agent { label 'linux && immutable' }
+            axes {
+                axis {
+                  name 'STACK_VERSION'
+                  values (
+                    '8.0.0-SNAPSHOT',
+                    '7.6.1',
+                    '6.8.0',
+                    '6.5.0'
+                  )
+                }
+                axis {
+                  name 'SCOPE'
+                  values (
+                    '@elastic/apm-rum',
+                    '@elastic/apm-rum-core',
+                    '@elastic/apm-rum-react',
+                    '@elastic/apm-rum-angular',
+                    '@elastic/apm-rum-vue',
+                  )
+                }
+            }
+            stages {
+              stage('Scope Test') {
+                steps {
+                  runTest()
+                }
               }
             }
-            stage('Stack ') {
-              agent { label 'linux && immutable' }
-              environment {
-                SAUCELABS_SECRET="${env.SAUCELABS_SECRET}"
-                STACK_VERSION="7.7.0-SNAPSHOT"
-              }
-              steps {
-                runAllScopes()
-              }
+          }
+        }
+        stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
+          agent { label 'linux && immutable' }
+          environment {
+            SAUCELABS_SECRET = "${env.SAUCELABS_SECRET_CORE}"
+            STACK_VERSION = "8.0.0-SNAPSHOT"
+            MODE = "saucelabs"
+          }
+          when {
+            allOf {
+              branch 'master'
+              expression { return params.saucelab_test }
             }
+          }
+          steps {
+            runAllScopes()
+          }
+        }
+        stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
+          agent { label 'linux && immutable' }
+          environment {
+            SAUCELABS_SECRET="${env.SAUCELABS_SECRET}"
+            STACK_VERSION="8.0.0-SNAPSHOT"
+          }
+          when {
+            allOf {
+              changeRequest()
+              expression { return params.saucelab_test }
+            }
+          }
+          steps {
+            runAllScopes()
           }
         }
         stage('Integration Tests') {
@@ -255,14 +296,12 @@ def runScript(Map args = [:]){
       // Another retry in case there are any environmental issues
       retry(3) {
         sleep randomNumber(min: 5, max: 10)
-        if(params.saucelab_test){
-          env.MODE = 'saucelabs'
+        if(env.MODE == 'saucelabs'){
           withSaucelabsEnv(){
-            sh(label: "Start Elastic Stack ${stack} - ${scope}", script: '.ci/scripts/test.sh')
+            sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
           }
         } else {
-          env.MODE = 'none'
-          sh(label: "Start Elastic Stack ${stack} - ${scope}", script: '.ci/scripts/test.sh')
+          sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
         }
       }
     }
@@ -322,13 +361,18 @@ def runAllScopes(){
   ]
   scopes.each{ s ->
     withEnv([s]){
-      withGithubNotify(context: "Test ${SCOPE} - ${STACK_VERSION}", tab: 'tests') {
-        runScript(
-          label: "${SCOPE}",
-          stack: "${STACK_VERSION}",
-          scope: "${SCOPE}",
-          goal: 'test')
-      }
+      runTest()
     }
+  }
+}
+
+def runTest(){
+  withGithubNotify(context: "Test ${SCOPE} - ${STACK_VERSION} - ${env.MODE}", tab: 'tests') {
+    runScript(
+      label: "${SCOPE}",
+      stack: "${STACK_VERSION}",
+      scope: "${SCOPE}",
+      goal: 'test'
+    )
   }
 }
