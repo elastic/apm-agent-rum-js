@@ -93,7 +93,7 @@ pipeline {
                   name 'STACK_VERSION'
                   values (
                     '8.0.0-SNAPSHOT',
-                    '7.6.1',
+                    '7.6.0',
                     '6.8.0',
                     '6.5.0'
                   )
