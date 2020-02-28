@@ -44,7 +44,8 @@ import {
   EVENT_TARGET,
   HTTP_REQUEST_TYPE,
   USER_INTERACTION,
-  PAGE_LOAD
+  PAGE_LOAD,
+  BROWSER_RESPONSIVENESS_INTERVAL
 } from '../common/constants'
 import {
   truncateModel,
@@ -56,7 +57,6 @@ import { __DEV__ } from '../env'
 /**
  * Parameters used for Managed Transactions
  */
-const BROWSER_RESPONSIVENESS_INTERVAL = 500
 const BROWSER_RESPONSIVENESS_BUFFER = 3
 const SIMILAR_SPAN_TO_TRANSACTION_RATIO = 0.05
 const TRANSACTION_DURATION_THRESHOLD = 60000
