@@ -24,23 +24,16 @@
  */
 
 class Queue {
-  constructor(onFlush, opts) {
-    if (!opts) opts = {}
+  constructor(onFlush, opts = {}) {
     this.onFlush = onFlush
     this.items = []
     this.queueLimit = opts.queueLimit || -1
     this.flushInterval = opts.flushInterval || 0
     this.timeoutId = undefined
   }
-  _setTimer() {
-    this.timeoutId = setTimeout(() => {
-      this.flush()
-    }, this.flushInterval)
-  }
 
-  flush() {
-    this.onFlush(this.items)
-    this._clear()
+  _setTimer() {
+    this.timeoutId = setTimeout(() => this.flush(), this.flushInterval)
   }
 
   _clear() {
@@ -49,6 +42,11 @@ class Queue {
       this.timeoutId = undefined
     }
     this.items = []
+  }
+
+  flush() {
+    this.onFlush(this.items)
+    this._clear()
   }
 
   add(item) {

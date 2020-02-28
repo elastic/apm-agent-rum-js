@@ -28,7 +28,7 @@ import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
-describe('ErrorLogging', function() {
+xdescribe('ErrorLogging', function() {
   var testErrorMessage = 'errorevent_test_error_message'
   var configService
   var apmServer

@@ -52,7 +52,7 @@ import resourceEntries from '../fixtures/resource-entries'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
-describe('PerformanceMonitoring', function() {
+xdescribe('PerformanceMonitoring', function() {
   var serviceFactory
   var apmServer
   var performanceMonitoring
