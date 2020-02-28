@@ -117,7 +117,7 @@ pipeline {
           }
           steps {
             build(job: env.ITS_PIPELINE, propagate: false, wait: false,
-                  parameters: [string(name: 'AGENT_INTEGRATION_TEST', value: 'RUM'),
+                  parameters: [string(name: 'INTEGRATION_TEST', value: 'RUM'),
                                string(name: 'BUILD_OPTS', value: "--rum-agent-branch ${env.GIT_BASE_COMMIT}"),
                                string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_ITS_NAME),
                                string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
