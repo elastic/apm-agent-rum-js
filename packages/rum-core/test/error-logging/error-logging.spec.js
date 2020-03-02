@@ -24,11 +24,12 @@
  */
 
 import { createServiceFactory, createCustomEvent } from '../'
+import { ERRORS } from '../../src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
-xdescribe('ErrorLogging', function() {
+describe('ErrorLogging', function() {
   var testErrorMessage = 'errorevent_test_error_message'
   var configService
   var apmServer
@@ -44,6 +45,8 @@ xdescribe('ErrorLogging', function() {
     transactionService = serviceFactory.getService('TransactionService')
   })
 
+  const getErrors = () => apmServer.queue.items
+
   it('should send error', function(done) {
     var errorObject
     try {
@@ -52,14 +55,18 @@ xdescribe('ErrorLogging', function() {
       errorObject = errorLogging.createErrorDataModel({ error })
     }
     apmServer
-      .sendErrors([errorObject])
+      .sendEvents([
+        {
+          data: errorObject,
+          type: ERRORS
+        }
+      ])
       .then(done)
       .catch(reason => fail(reason))
   })
 
-  it('should process errors', function(done) {
-    spyOn(apmServer, 'sendErrors').and.callThrough()
-
+  it('should process errors', done => {
+    apmServer.init()
     // in IE 10, Errors are given a stack once they're thrown.
     try {
       throw new Error('unittest error')
@@ -71,51 +78,47 @@ xdescribe('ErrorLogging', function() {
       error.anObject = obj
       error.aFunction = function noop() {}
       error.null = null
-      errorLogging
-        .logErrorEvent({ error }, true)
-        .then(() => {
-          expect(apmServer.sendErrors).toHaveBeenCalled()
-          var errors = apmServer.sendErrors.calls.argsFor(0)[0]
-          expect(errors.length).toBe(1)
-          var errorData = errors[0]
-          expect(errorData.context.custom.test).toBe('hamid')
-          expect(errorData.context.custom.aDate).toBe(
-            '2017-01-12T00:00:00.000Z'
-          ) // toISOString()
-          expect(errorData.context.custom.anObject).toBeUndefined()
-          expect(errorData.context.custom.aFunction).toBeUndefined()
-          expect(errorData.context.custom.null).toBeUndefined()
-          done()
-        })
+      errorLogging.logErrorEvent({ error })
+      const errors = getErrors()
+      expect(errors.length).toBe(1)
+      const errorData = errors[0].data
+      expect(errorData.context.custom.test).toBe('hamid')
+      expect(errorData.context.custom.aDate).toBe('2017-01-12T00:00:00.000Z') // toISOString()
+      expect(errorData.context.custom.anObject).toBeUndefined()
+      expect(errorData.context.custom.aFunction).toBeUndefined()
+      expect(errorData.context.custom.null).toBeUndefined()
+
+      apmServer
+        .sendEvents(errors)
+        .then(done)
         .catch(reason => fail(reason))
     }
   })
 
   it('should include transaction details on error', done => {
-    spyOn(apmServer, 'sendErrors').and.callThrough()
+    apmServer.init()
     const transaction = transactionService.startTransaction('test', 'dummy', {
       managed: true
     })
     try {
       throw new Error('Test Error')
     } catch (error) {
-      errorLogging
-        .logErrorEvent({ error }, true)
-        .then(() => {
-          expect(apmServer.sendErrors).toHaveBeenCalled()
-          var errors = apmServer.sendErrors.calls.argsFor(0)[0]
-          expect(errors.length).toBe(1)
-          var errorData = errors[0]
-          expect(errorData.transaction_id).toEqual(transaction.id)
-          expect(errorData.trace_id).toEqual(transaction.traceId)
-          expect(errorData.parent_id).toEqual(transaction.id)
-          expect(errorData.transaction).toEqual({
-            type: transaction.type,
-            sampled: transaction.sampled
-          })
-          transaction.end()
-          done()
-        })
+      errorLogging.logErrorEvent({ error })
+      const errors = getErrors()
+      expect(errors.length).toBe(1)
+      const errorData = errors[0].data
+      expect(errorData.transaction_id).toEqual(transaction.id)
+      expect(errorData.trace_id).toEqual(transaction.traceId)
+      expect(errorData.parent_id).toEqual(transaction.id)
+      expect(errorData.transaction).toEqual({
+        type: transaction.type,
+        sampled: transaction.sampled
+      })
+      transaction.end()
+
+      apmServer
+        .sendEvents(errors)
+        .then(done)
         .catch(reason => fail(reason))
     }
   })
@@ -184,29 +187,26 @@ xdescribe('ErrorLogging', function() {
   })
 
   it('should support ErrorEvent', function(done) {
-    spyOn(apmServer, 'sendErrors').and.callThrough()
-
+    apmServer.init()
     var errorEvent = createErrorEvent(testErrorMessage)
+    errorLogging.logErrorEvent(errorEvent)
+    const errors = getErrors()
+    expect(errors.length).toBe(1)
+    const errorData = errors[0].data
 
-    errorLogging
-      .logErrorEvent(errorEvent, true)
-      .then(() => {
-        expect(apmServer.sendErrors).toHaveBeenCalled()
-        var errors = apmServer.sendErrors.calls.argsFor(0)[0]
-        expect(errors.length).toBe(1)
-        var errorData = errors[0]
-        // the message is different in IE 10 since error type is not available
-        expect(errorData.exception.message).toContain(testErrorMessage)
-        // the number of frames is different in different platforms
-        expect(errorData.exception.stacktrace.length).toBeGreaterThan(0)
-        done()
-      })
+    // the message is different in IE 10 since error type is not available
+    expect(errorData.exception.message).toContain(testErrorMessage)
+    // the number of frames is different in different platforms
+    expect(errorData.exception.stacktrace.length).toBeGreaterThan(0)
+
+    apmServer
+      .sendEvents(errors)
+      .then(done)
       .catch(reason => fail(reason))
   })
 
   it('should use message over error.message for error event', done => {
-    spyOn(apmServer, 'sendErrors').and.callThrough()
-
+    apmServer.init()
     const errorEvent = createErrorEvent(testErrorMessage)
 
     /**
@@ -216,31 +216,28 @@ xdescribe('ErrorLogging', function() {
       errorEvent.error.message = 'Constructor Error'
     }
 
-    errorLogging
-      .logErrorEvent(errorEvent, true)
-      .then(() => {
-        expect(apmServer.sendErrors).toHaveBeenCalled()
-        const errors = apmServer.sendErrors.calls.argsFor(0)[0]
-        expect(errors[0].exception.message).toContain(testErrorMessage)
-        done()
-      })
+    errorLogging.logErrorEvent(errorEvent)
+    const errors = getErrors()
+    expect(errors.length).toBe(1)
+    const errorData = errors[0].data
+    expect(errorData.exception.message).toContain(testErrorMessage)
+
+    apmServer
+      .sendEvents(errors)
+      .then(done)
       .catch(reason => fail(reason))
   })
 
   it('should install global listener for error and accept ErrorEvents', function(done) {
-    var count = 0
-    var numberOfErrors = 4
+    apmServer.init()
+    const numberOfErrors = 4
     const original = window.addEventListener
-    spyOn(apmServer, 'sendErrors').and.callFake(function(errors) {
+    spyOn(apmServer, 'sendEvents').and.callFake(function(errors) {
       expect(errors.length).toBe(numberOfErrors)
-      var error = errors[0]
-      expect(error.exception.message).toContain(testErrorMessage)
-
-      count = count + errors.length
-      if (count === numberOfErrors) {
-        window.addEventListener = original
-        done()
-      }
+      var errorData = errors[0].data
+      expect(errorData.exception.message).toContain(testErrorMessage)
+      window.addEventListener = original
+      done()
     })
 
     const addedListenerTypes = []
@@ -292,10 +289,11 @@ xdescribe('ErrorLogging', function() {
   })
 
   it('should add error to queue', function() {
+    apmServer.init()
     configService.setConfig({
       serviceName: 'serviceName'
     })
-    spyOn(apmServer, 'sendErrors')
+    spyOn(apmServer, 'sendEvents')
     try {
       throw new Error('unittest error')
     } catch (error) {
@@ -303,19 +301,21 @@ xdescribe('ErrorLogging', function() {
       errorLogging.logErrorEvent({ error })
       errorLogging.logError(error)
       errorLogging.logError('test error')
-      expect(apmServer.sendErrors).not.toHaveBeenCalled()
-      expect(apmServer.errorQueue.items.length).toBe(4)
+      expect(apmServer.sendEvents).not.toHaveBeenCalled()
+      expect(apmServer.queue.items.length).toBe(4)
     }
   })
 
   it('should capture unhandled rejection events', done => {
+    apmServer.init()
     configService.setConfig({
       flushInterval: 1
     })
     errorLogging.registerListeners()
 
-    spyOn(apmServer, 'sendErrors').and.callFake(errors => {
-      expect(errors[0].exception.message).toMatch(reason.message)
+    spyOn(apmServer, 'sendEvents').and.callFake(events => {
+      const errorData = events[0].data
+      expect(errorData.exception.message).toMatch(reason.message)
       done()
     })
     /**
@@ -329,22 +329,22 @@ xdescribe('ErrorLogging', function() {
   })
 
   it('should handle different type of reasons for promise rejections', done => {
-    const getErrors = () => apmServer.errorQueue.items
+    apmServer.init()
 
     errorLogging.logPromiseEvent({})
     expect(getErrors().length).toBe(1)
-    expect(getErrors()[0].exception.message).toMatch(/no reason specified/)
+    expect(getErrors()[0].data.exception.message).toMatch(/no reason specified/)
 
     const error = new Error(testErrorMessage)
     errorLogging.logPromiseEvent({
       reason: error
     })
-    expect(getErrors()[1].exception.message).toMatch(error.message)
+    expect(getErrors()[1].data.exception.message).toMatch(error.message)
 
     errorLogging.logPromiseEvent({
       reason: testErrorMessage
     })
-    expect(getErrors()[2].exception.message).toMatch(testErrorMessage)
+    expect(getErrors()[2].data.exception.message).toMatch(testErrorMessage)
 
     const errorObj = {
       message: testErrorMessage,
@@ -353,8 +353,8 @@ xdescribe('ErrorLogging', function() {
     errorLogging.logPromiseEvent({
       reason: errorObj
     })
-    expect(getErrors()[3].exception.message).toMatch(testErrorMessage)
-    expect(getErrors()[3].exception.stacktrace.length).toBeGreaterThan(0)
+    expect(getErrors()[3].data.exception.message).toMatch(testErrorMessage)
+    expect(getErrors()[3].data.exception.stacktrace.length).toBeGreaterThan(0)
 
     const errorLikeObj = {
       message: testErrorMessage,
@@ -363,20 +363,20 @@ xdescribe('ErrorLogging', function() {
     errorLogging.logPromiseEvent({
       reason: errorLikeObj
     })
-    expect(getErrors()[4].exception.message).toMatch(testErrorMessage)
-    expect(getErrors()[4].exception.stacktrace.length).toBe(0)
+    expect(getErrors()[4].data.exception.message).toMatch(testErrorMessage)
+    expect(getErrors()[4].data.exception.stacktrace.length).toBe(0)
 
     errorLogging.logPromiseEvent({
       reason: 200
     })
-    expect(getErrors()[5].exception.message).toBe(
+    expect(getErrors()[5].data.exception.message).toBe(
       'Unhandled promise rejection: 200'
     )
 
     errorLogging.logPromiseEvent({
       reason: true
     })
-    expect(getErrors()[6].exception.message).toBe(
+    expect(getErrors()[6].data.exception.message).toBe(
       'Unhandled promise rejection: true'
     )
 
@@ -388,10 +388,10 @@ xdescribe('ErrorLogging', function() {
     const errors = getErrors()
 
     // Clear the error queue
-    apmServer.errorQueue._clear()
+    apmServer.queue._clear()
 
     apmServer
-      .sendErrors(errors)
+      .sendEvents(errors)
       .then(done)
       .catch(reason => {
         fail(reason)
@@ -431,7 +431,12 @@ xdescribe('ErrorLogging', function() {
     })
 
     apmServer
-      .sendErrors([error])
+      .sendEvents([
+        {
+          data: error,
+          type: ERRORS
+        }
+      ])
       .then(done)
       .catch(reason => fail(reason))
   })

@@ -77,17 +77,7 @@ class ApmServerMock {
     }
     spyOn(
       _apmServer,
-      'sendErrors',
-      useMocks
-        ? function() {
-            return Promise.resolve()
-          }
-        : undefined
-    )
-
-    spyOn(
-      _apmServer,
-      'sendTransactions',
+      'sendEvents',
       useMocks
         ? function() {
             return Promise.resolve()
@@ -97,8 +87,8 @@ class ApmServerMock {
 
     this.addError = _apmServer.addError.bind(_apmServer)
     this.addTransaction = _apmServer.addTransaction.bind(_apmServer)
+    this.init = _apmServer.init.bind(_apmServer)
   }
-  init() {}
 }
 
 export default ApmServerMock

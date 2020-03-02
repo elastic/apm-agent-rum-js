@@ -28,7 +28,7 @@ import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
-import { SERVER_URL_PREFIX } from './constants'
+import { SERVER_URL_PREFIX, ERRORS, TRANSACTIONS } from './constants'
 import { Promise } from './polyfills'
 import { __DEV__ } from '../env'
 
@@ -36,11 +36,6 @@ import { __DEV__ } from '../env'
  * Throttling interval deafultss to 60 seconds
  */
 const THROTTLE_INTERVAL = 60000
-/**
- * Event types sent to APM Server on the queue
- */
-const ERRORS = 'errors'
-const TRANSACTIONS = 'transactions'
 
 class ApmServer {
   constructor(configService, loggingService) {
@@ -258,15 +253,20 @@ class ApmServer {
     if (events.length === 0) {
       return
     }
-
     const transactions = []
     const errors = []
     for (const event of events) {
+      if (!event.data) {
+        continue
+      }
       if (event.type === TRANSACTIONS) {
         transactions.push(event.data)
       } else if (event.type === ERRORS) {
         errors.push(event.data)
       }
+    }
+    if (transactions.length === 0 && errors.length === 0) {
+      return
     }
 
     const payload = {
@@ -279,12 +279,14 @@ class ApmServer {
       return
     }
 
-    const ndjson = []
-    ndjson.push(this.ndjsonErrors(filteredPayload[ERRORS]))
-    ndjson.push(this.ndjsonTransactions(filteredPayload[TRANSACTIONS]))
-
+    let ndjson = []
     const metadata = this.createMetaData()
-    ndjson.unshift(NDJSON.stringify({ metadata }))
+    ndjson.push(NDJSON.stringify({ metadata }))
+
+    ndjson = ndjson.concat(
+      this.ndjsonErrors(filteredPayload[ERRORS]),
+      this.ndjsonTransactions(filteredPayload[TRANSACTIONS])
+    )
     const ndjsonPayload = ndjson.join('')
     const endPoint = this._configService.get('serverUrl') + SERVER_URL_PREFIX
     return this._postJson(endPoint, ndjsonPayload)

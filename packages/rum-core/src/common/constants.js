@@ -134,6 +134,12 @@ const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint'
 const BROWSER_RESPONSIVENESS_INTERVAL = 500
 
 /**
+ * Event types sent to APM Server on the queue
+ */
+const ERRORS = 'errors'
+const TRANSACTIONS = 'transactions'
+
+/**
  * Default configs used on top of extensible configs from ConfigService
  */
 const KEYWORD_LIMIT = 1024
@@ -177,5 +183,7 @@ export {
   TEMPORARY_TYPE,
   USER_INTERACTION,
   TRANSACTION_TYPE_ORDER,
-  BROWSER_RESPONSIVENESS_INTERVAL
+  BROWSER_RESPONSIVENESS_INTERVAL,
+  ERRORS,
+  TRANSACTIONS
 }

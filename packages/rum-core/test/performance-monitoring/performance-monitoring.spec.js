@@ -44,7 +44,8 @@ import {
   EVENT_TARGET,
   PAGE_LOAD,
   ROUTE_CHANGE,
-  TRANSACTION_END
+  TRANSACTION_END,
+  TRANSACTIONS
 } from '../../src/common/constants'
 import patchEventHandler from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
@@ -52,7 +53,7 @@ import resourceEntries from '../fixtures/resource-entries'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
-xdescribe('PerformanceMonitoring', function() {
+describe('PerformanceMonitoring', function() {
   var serviceFactory
   var apmServer
   var performanceMonitoring
@@ -76,7 +77,12 @@ xdescribe('PerformanceMonitoring', function() {
     tr.spans.push(span1)
     tr.end()
     const payload = performanceMonitoring.createTransactionDataModel(tr)
-    var promise = apmServer.sendTransactions([payload])
+    var promise = apmServer.sendEvents([
+      {
+        data: payload,
+        type: TRANSACTIONS
+      }
+    ])
     expect(promise).toBeDefined()
     promise
       .catch(reason => {
@@ -195,7 +201,12 @@ xdescribe('PerformanceMonitoring', function() {
     configService.events.observe(TRANSACTION_END, function(tr) {
       expect(tr.captureTimings).toBe(true)
       const payload = performanceMonitoring.createTransactionDataModel(tr)
-      var promise = apmServer.sendTransactions([payload])
+      var promise = apmServer.sendEvents([
+        {
+          data: payload,
+          type: TRANSACTIONS
+        }
+      ])
       expect(promise).toBeDefined()
       promise
         .then(
@@ -248,7 +259,12 @@ xdescribe('PerformanceMonitoring', function() {
     tr.end(60001)
     var payload = performanceMonitoring.createTransactionPayload(tr)
     expect(payload).toBeUndefined()
-    var promise = apmServer.sendTransactions(payload)
+    var promise = apmServer.sendEvents([
+      {
+        data: payload,
+        type: TRANSACTIONS
+      }
+    ])
     expect(promise).toBeUndefined()
   })
 
@@ -571,12 +587,18 @@ xdescribe('PerformanceMonitoring', function() {
       performanceMonitoring.processAPICalls('invoke', task)
       expect(tr.ended).toBe(true)
       const payload = performanceMonitoring.createTransactionDataModel(tr)
-
-      apmServer.sendTransactions([payload]).then(done, reason => {
-        done.fail(
-          `Failed sending http-request transaction to the server, reason: ${reason}`
-        )
-      })
+      apmServer
+        .sendEvents([
+          {
+            data: payload,
+            type: TRANSACTIONS
+          }
+        ])
+        .then(done, reason => {
+          done.fail(
+            `Failed sending http-request transaction to the server, reason: ${reason}`
+          )
+        })
     }, 100)
   })
 
@@ -639,11 +661,18 @@ xdescribe('PerformanceMonitoring', function() {
       expect(payload.spans[0].context.destination).toBeDefined()
       expect(payload.spans[1].context.destination).toBeDefined()
 
-      apmServer.sendTransactions([payload]).then(done, reason => {
-        done.fail(
-          `Failed sending span destination context details, reason: ${reason}`
-        )
-      })
+      apmServer
+        .sendEvents([
+          {
+            data: payload,
+            type: TRANSACTIONS
+          }
+        ])
+        .then(done, reason => {
+          done.fail(
+            `Failed sending span destination context details, reason: ${reason}`
+          )
+        })
     })
 
     tr.end()

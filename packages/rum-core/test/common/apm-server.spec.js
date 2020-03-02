@@ -28,10 +28,14 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { describeIf } from '../../../../dev-utils/jasmine'
 import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
+import {
+  LOCAL_CONFIG_KEY,
+  ERRORS,
+  TRANSACTIONS
+} from '../../src/common/constants'
 import { createServiceFactory } from '../'
 
 const { agentConfig, testConfig } = getGlobalConfig('rum-core')
-import { LOCAL_CONFIG_KEY } from '../../src/common/constants'
 
 function generateTransaction(count, breakdown = false) {
   var result = []
@@ -107,7 +111,7 @@ describe('ApmServer', function() {
     var result = apmServer.sendEvents([
       {
         data: { test: 'test' },
-        type: 'transactions'
+        type: TRANSACTIONS
       }
     ])
     expect(result).toBeDefined()
@@ -260,7 +264,7 @@ describe('ApmServer', function() {
     const result = apmServer.sendEvents([
       {
         data: { test: 'test' },
-        type: 'transactions'
+        type: TRANSACTIONS
       }
     ])
     expect(result).toBeUndefined()
@@ -301,12 +305,12 @@ describe('ApmServer', function() {
     await apmServer.sendEvents([
       {
         data: payload,
-        type: 'transactions'
+        type: TRANSACTIONS
       }
     ])
   })
 
-  it('should mix events on ndjson payload', () => {
+  it('should ndjson all events', async () => {
     const clock = jasmine.clock()
     clock.install()
     apmServer.init()
@@ -327,7 +331,17 @@ describe('ApmServer', function() {
     expect(apmServer._postJson).toHaveBeenCalled()
     const payload = apmServer._postJson.calls.argsFor(0)[1]
 
-    expect(payload).toBeDefined()
+    const expected = [
+      '{"metadata":{"service":{"name":"test","agent":{"name":"js-base","version":"N/A"},"language":{"name":"javascript"}}}}',
+      '{"error":{"name":"Error","message":"error #0"}}',
+      '{"error":{"name":"Error","message":"error #1"}}',
+      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}',
+      '{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}',
+      '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}',
+      '{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","sync":false,"start":10,"duration":10}}'
+    ]
+
+    expect(payload.split('\n').filter(a => a)).toEqual(expected)
     clock.uninstall()
   })
 
@@ -378,7 +392,7 @@ describe('ApmServer', function() {
       return payload
     })
 
-    type = 'errors'
+    type = ERRORS
     apmServer.sendEvents([
       {
         data: { test: type },
@@ -386,7 +400,7 @@ describe('ApmServer', function() {
       }
     ])
 
-    type = 'transactions'
+    type = TRANSACTIONS
     apmServer.sendEvents([
       {
         data: { test: type },

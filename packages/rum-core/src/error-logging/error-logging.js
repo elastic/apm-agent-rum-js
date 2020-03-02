@@ -161,7 +161,7 @@ class ErrorLogging {
       return
     }
 
-    return this._apmServer.addError(errorObject)
+    this._apmServer.addError(errorObject)
   }
 
   registerListeners() {
