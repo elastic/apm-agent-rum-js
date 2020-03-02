@@ -140,18 +140,7 @@ services:
       - GOAL=${GOAL}
       - WORKSPACE=${WORKSPACE}
       - BASE_DIR=${BASE_DIR}
-    command: >
-      /bin/bash -c "set -x
-        id
-        node --version
-        npm --version
-        npx --version
-        cd /app
-        export
-        npm install
-        npm install puppeteer --unsafe-perm=true --allow-root
-        set -eo pipefail
-        npm run ${GOAL}"
+    command: /run-test.sh
     mem_limit: 2000m
 #    cpus: 0.5
     depends_on:
