@@ -118,7 +118,7 @@ function prepareConfig(config, packageName) {
       process.env.TRAVIS_BUILD_ID +
       ')'
     config.plugins.push('karma-chrome-launcher')
-    config.browsers = ['ChromeHeadlessNoSandbox']
+    config.browsers = ['ChromeHeadless']
   } else if (isJenkins) {
     console.log('prepareConfig: Run in Jenkins')
     buildId =
