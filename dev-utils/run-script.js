@@ -164,7 +164,7 @@ function runSauceTests(packagePath, serve = 'true', ...scripts) {
   })
 }
 
-function exitHandler(callExit, exitCode) {
+function exitHandler(exitCode) {
   if (cleanUps.length > 0) {
     console.log('Running cleanups:', cleanUps.length)
     cleanUps.forEach(f => {
@@ -176,16 +176,10 @@ function exitHandler(callExit, exitCode) {
     })
     cleanUps = []
   }
-  if (callExit) {
-    if (exitCode !== 0) {
-      console.log('Exiting with code:', exitCode)
-    }
-    process.exit(exitCode)
-  }
 }
 
-process.on('exit', exitHandler.bind(null, false))
-process.on('SIGINT', exitHandler.bind(null, true))
+process.on('exit', exitHandler)
+process.on('SIGINT', exitHandler)
 
 const scripts = {
   launchSauceConnect,
