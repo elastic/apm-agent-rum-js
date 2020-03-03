@@ -233,94 +233,71 @@ function getWebdriveBaseConfig(
   return baseConfig
 }
 
-function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
-  const { name, version } = getBrowserInfo()
-  console.log(
-    `Waiting for minimum ${errorCount} Errors and ${transactionCount} Transactions in`,
-    name,
-    version
-  )
-  const serverCalls = browser.executeAsync(
-    function(errorCount, transactionCount, done) {
-      var apmServerMock = window.elasticApm.serviceFactory.getService(
-        'ApmServer'
-      )
+function isPageLoaded() {
+  return browser.execute(() => {
+    return document.readyState === 'complete'
+  })
+}
 
-      function checkCalls() {
-        var serverCalls = apmServerMock.calls
+function waitForApmServerCalls(eventsCount = 0) {
+  const { name = '', version = '' } = getBrowserInfo()
+  console.log(`Waiting for ${eventsCount} events in`, name, version)
+  const serverCalls = browser.executeAsync(function(eventsCount, done) {
+    var apmServerMock = window.elasticApm.serviceFactory.getService('ApmServer')
 
-        var validCalls = true
-
-        if (errorCount) {
-          validCalls =
-            validCalls &&
-            serverCalls.sendErrors &&
-            serverCalls.sendErrors.length >= errorCount
-        }
-        if (transactionCount) {
-          validCalls =
-            validCalls &&
-            serverCalls.sendTransactions &&
-            serverCalls.sendTransactions.length >= transactionCount
-        }
-
-        if (validCalls) {
-          console.log('calls', serverCalls)
-          var promises = []
-
-          if (serverCalls.sendErrors) {
-            promises = promises.concat(
-              serverCalls.sendErrors.map(function(s) {
-                return s.returnValue
-              })
-            )
-          }
-          if (serverCalls.sendTransactions) {
-            promises = promises.concat(
-              serverCalls.sendTransactions.map(function(s) {
-                return s.returnValue
-              })
-            )
-          }
-
-          Promise.all(promises)
-            .then(function() {
-              function mapCall(c) {
-                return { args: c.args, mocked: c.mocked }
-              }
-              try {
-                var calls = {
-                  sendErrors: serverCalls.sendErrors
-                    ? serverCalls.sendErrors.map(mapCall)
-                    : undefined,
-                  sendTransactions: serverCalls.sendTransactions
-                    ? serverCalls.sendTransactions.map(mapCall)
-                    : undefined
-                }
-                done(calls)
-              } catch (e) {
-                throw e
-              }
-            })
-            .catch(function(reason) {
-              console.log('reason', reason)
-              try {
-                done({ error: reason.message || JSON.stringify(reason) })
-              } catch (e) {
-                done({
-                  error: 'Failed serializing rejection reason: ' + e.message
-                })
-              }
-            })
-        }
+    function checkCalls() {
+      var serverCalls = apmServerMock.calls
+      var validCall = false
+      if (eventsCount >= 0) {
+        /**
+         * sendEvents arguments must match the eventsCount to complete the script
+         */
+        validCall =
+          serverCalls.sendEvents &&
+          serverCalls.sendEvents.length > 0 &&
+          serverCalls.sendEvents[0].args[0].length >= eventsCount
       }
 
-      checkCalls()
-      apmServerMock.subscription.subscribe(checkCalls)
-    },
-    errorCount,
-    transactionCount
-  )
+      if (validCall) {
+        const promises = serverCalls.sendEvents.map(s => s.returnValue)
+        Promise.all(promises)
+          .then(() => {
+            const transactions = []
+            const errors = []
+            for (const arg of serverCalls.sendEvents[0].args) {
+              arg.forEach(event => {
+                const { type, data } = event
+                if (type === 'transactions') {
+                  transactions.push(data)
+                } else if (type === 'errors') {
+                  errors.push(data)
+                }
+              })
+            }
+            const calls = {
+              sendEvents: {
+                transactions,
+                errors
+              }
+            }
+            done(calls)
+          })
+          .catch(reason => {
+            console.log('reason', reason)
+            try {
+              done({ error: reason.message || JSON.stringify(reason) })
+            } catch (e) {
+              done({
+                error: 'Failed serializing rejection reason: ' + e.message
+              })
+            }
+          })
+      }
+    }
+
+    checkCalls()
+    apmServerMock.events.observe('sendEvents', checkCalls)
+  }, eventsCount)
 
   if (!serverCalls) {
     throw new Error('serverCalls is undefined!')
@@ -369,5 +346,6 @@ module.exports = {
   getWebdriveBaseConfig,
   getBrowserInfo,
   waitForApmServerCalls,
-  getBrowserFeatures
+  getBrowserFeatures,
+  isPageLoaded
 }
