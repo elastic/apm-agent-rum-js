@@ -29,6 +29,22 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-4.x]]
 === RUM JS Agent version 4.x
 
+
+[[release-notes-4.9.0]]
+==== 4.9.0 (2020-03-03)
+
+
+[float]
+===== Features
+* Change promise polyfill library to reduce bundle size and improve native promise use: {issue}621[#621]
+* Log when distributed tracing is not injected to make debugging easier: {issue}630[#630]
+
+
+[float]
+===== Bug fixes
+* Added a check for window before using it to avoid server-side rendering bug: {issue}646[#646]
+
+
 [[release-notes-4.8.1]]
 ==== 4.8.1 (2020-02-14)
 
