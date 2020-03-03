@@ -104,7 +104,6 @@
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage": "^2.0.1",
     "karma-failed-reporter": "^0.0.3",
-    "karma-firefox-launcher": "^1.2.0",
     "karma-jasmine": "^2.0.1",
     "karma-junit-reporter": "^2.0.1",
     "karma-sauce-launcher": "^2.0.2",
