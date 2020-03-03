@@ -33,7 +33,7 @@ import { ApmRoute } from '../../../src'
 import createApmBase from '..'
 
 const apm = createApmBase({
-  debug: true,
+  logLevel: 'debug',
   serviceName: 'apm-agent-rum-switch-e2e-react',
   serviceVersion: '0.0.1',
   pageLoadTransactionName: '/notfound'

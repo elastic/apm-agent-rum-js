@@ -35,7 +35,7 @@ import { ApmRoute } from '../../../src'
 import createApmBase from '..'
 
 const apm = createApmBase({
-  debug: true,
+  logLevel: 'debug',
   serviceName: 'apm-agent-rum-general-e2e-react',
   serviceVersion: '0.0.1'
 })

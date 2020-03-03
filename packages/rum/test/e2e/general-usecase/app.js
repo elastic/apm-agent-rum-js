@@ -32,7 +32,7 @@ const { mockBackendUrl } = getGlobalConfig().testConfig
 const active = Math.random() < 1
 const elasticApm = createApmBase({
   active,
-  debug: true,
+  logLevel: 'debug',
   serviceName: 'apm-agent-rum-test-e2e-general-usecase',
   serviceVersion: '0.0.1',
   distributedTracingOrigins: [mockBackendUrl],
