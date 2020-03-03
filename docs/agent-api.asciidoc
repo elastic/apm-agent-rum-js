@@ -86,7 +86,8 @@ deprecated[4.1.x,Tags have been replaced with labels], Please use <<apm-add-labe
 apm.addLabels({ [name]: value })
 ----
 
-Set labels on transactions and errors.
+Set labels on transactions and errors. 
+Starting with APM Server 7.6+, the labels are added to spans as well.
 
 Labels are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via <<apm-set-custom-context,`apm.setCustomContext()`>>). You can set multiple labels.
 

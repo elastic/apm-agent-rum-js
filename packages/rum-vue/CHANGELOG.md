@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@0.3.2...@elastic/apm-rum-vue@0.4.0) (2020-03-03)
+
+
+### Features
+
+* **rum-core:** use global promise when available and fallback ([#629](https://github.com/elastic/apm-agent-rum-js/issues/629)) ([65f08e0](https://github.com/elastic/apm-agent-rum-js/commit/65f08e06d2819a5ba76f476d9a4bc1dfd7fe788b))
+
+
+
+
+
 ## [0.3.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@0.3.1...@elastic/apm-rum-vue@0.3.2) (2020-02-14)
 
 **Note:** Version bump only for package @elastic/apm-rum-vue

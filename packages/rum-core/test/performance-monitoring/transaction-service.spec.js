@@ -248,47 +248,6 @@ describe('TransactionService', function() {
     })
   })
 
-  xit('should not add duplicate resource spans', function() {
-    transactionService = new TransactionService(logger, config)
-
-    var tr = transactionService.startTransaction('transaction', 'transaction', {
-      managed: true
-    })
-    tr.captureTimings = true
-    var queryString = '?' + Date.now()
-    var testUrl = '/base/test/performance/transactionService.spec.js'
-
-    if (window.performance.getEntriesByType) {
-      if (window.fetch) {
-        window.fetch(testUrl + queryString).then(function() {
-          var entries = window.performance
-            .getEntriesByType('resource')
-            .filter(function(entry) {
-              return entry.name.indexOf(testUrl + queryString) > -1
-            })
-          expect(entries.length).toBe(1)
-
-          tr.donePromise.then(function() {
-            var filtered = tr.spans.filter(function(span) {
-              return span.name.indexOf(testUrl) > -1
-            })
-            expect(filtered.length).toBe(1)
-            console.log(filtered[0])
-            fail()
-          })
-
-          var xhrTask = {
-            source: 'XMLHttpRequest.send',
-            XHR: { url: testUrl, method: 'GET' }
-          }
-          var spanName = xhrTask.XHR.method + ' ' + testUrl
-          var span = transactionService.startSpan(spanName, 'external.http')
-          span.end()
-        })
-      }
-    }
-  })
-
   it('should capture resources from navigation timing', function(done) {
     const unMock = mockGetEntriesByType()
 

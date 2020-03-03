@@ -2,15 +2,6 @@
 
 @Library('apm@current') _
 
-import co.elastic.matrix.*
-import groovy.transform.Field
-
-/**
-This is the parallel tasks generator,
-it is need as field to store the results of the tests.
-*/
-@Field def rumTasksGen
-
 pipeline {
   agent { label 'linux && immutable' }
   environment {
@@ -20,14 +11,17 @@ pipeline {
     JOB_GCS_BUCKET = credentials('gcs-bucket')
     PIPELINE_LOG_LEVEL='INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
-    SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs'
+    SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
+    SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
     DOCKER_ELASTIC_SECRET = 'secret/apm-team/ci/docker-registry/prod'
     GITHUB_CHECK_ITS_NAME = 'Integration Tests'
     ITS_PIPELINE = 'apm-integration-tests-selector-mbp/master'
     OPBEANS_REPO = 'opbeans-frontend'
+    PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+    MODE = "none"
   }
   options {
-    timeout(time: 3, unit: 'HOURS')
+    //timeout(time: 3, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -41,16 +35,13 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'Run_As_Master_Branch', defaultValue: false, description: 'Allow to run any steps on a PR, some steps normally only run on master branch.')
-    booleanParam(name: 'saucelab_test', defaultValue: "false", description: "Enable run a Sauce lab test")
+    booleanParam(name: 'saucelab_test', defaultValue: "true", description: "Enable run a Sauce lab test")
     booleanParam(name: 'parallel_test', defaultValue: "true", description: "Enable run tests in parallel")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
   }
   stages {
     stage('Initializing'){
       options { skipDefaultCheckout() }
-      environment {
-        PATH = "${env.PATH}:${env.WORKSPACE}/bin"
-      }
       stages {
         /**
         Checkout the code and stash it, to use it on other stages.
@@ -61,6 +52,17 @@ pipeline {
             deleteDir()
             gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
             stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+            // Look for changes related to the benchmark, if so then set the env variable.
+            script {
+              dir("${BASE_DIR}"){
+                def regexps =[
+                  '^packages/.*/test/benchmarks/.*',
+                  '^scripts/benchmarks.js',
+                  '^packages/rum-core/karma.bench.conf.js'
+                ]
+                env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: regexps)
+              }
+            }
           }
         }
         /**
@@ -83,37 +85,105 @@ pipeline {
             }
           }
         }
-        /**
-        Execute unit tests.
-        */
-        stage('Test') {
-          steps {
-            withGithubNotify(context: 'Test', tab: 'tests') {
-              deleteDir()
-              unstash 'source'
-              dir("${BASE_DIR}"){
-                runParallelTest()
+        stage('Test Pupperteer') {
+          matrix {
+            agent { label 'linux && immutable' }
+            axes {
+                axis {
+                  name 'STACK_VERSION'
+                  values (
+                    '8.0.0-SNAPSHOT',
+                    '7.6.0',
+                    '6.8.0',
+                    '6.5.0'
+                  )
+                }
+                axis {
+                  name 'SCOPE'
+                  values (
+                    '@elastic/apm-rum',
+                    '@elastic/apm-rum-core',
+                    '@elastic/apm-rum-react',
+                    '@elastic/apm-rum-angular',
+                    '@elastic/apm-rum-vue',
+                  )
+                }
+            }
+            stages {
+              stage('Scope Test') {
+                steps {
+                  runTest()
+                }
+              }
+            }
+            post {
+              cleanup {
+                wrappingUp()
               }
             }
           }
         }
-        /**
-        Execute code coverange only once.
-        */
-        stage('Coverage') {
-          steps {
-            withGithubNotify(context: 'Coverage') {
-              // No scope is required as the coverage should run for all of them
-              runScript(label: 'coverage', stack: '7.0.0', scope: '', goal: 'coverage')
-              codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
+        stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
+          agent { label 'linux && immutable' }
+          environment {
+            SAUCELABS_SECRET = "${env.SAUCELABS_SECRET_CORE}"
+            STACK_VERSION = "8.0.0-SNAPSHOT"
+            MODE = "saucelabs"
+          }
+          when {
+            allOf {
+              branch 'master'
+              expression { return params.saucelab_test }
             }
           }
+          steps {
+            runAllScopes()
+          }
           post {
-            always {
-              coverageReport("${BASE_DIR}/packages/**")
-              publishCoverage(adapters: [coberturaAdapter("${BASE_DIR}/packages/**/coverage-*-report.xml")],
-                              sourceFileResolver: sourceFiles('STORE_ALL_BUILD'))
+            cleanup {
+              wrappingUp()
             }
+          }
+        }
+        stage('Stack 8.0.0-SNAPSHOT SauceLabs PR') {
+          agent { label 'linux && immutable' }
+          environment {
+            SAUCELABS_SECRET="${env.SAUCELABS_SECRET}"
+            STACK_VERSION="8.0.0-SNAPSHOT"
+            MODE = "saucelabs"
+          }
+          when {
+            allOf {
+              changeRequest()
+              expression { return params.saucelab_test }
+            }
+          }
+          steps {
+            runAllScopes()
+          }
+          post {
+            cleanup {
+              wrappingUp()
+            }
+          }
+        }
+        stage('Integration Tests') {
+          agent none
+          when {
+            beforeAgent true
+            anyOf {
+              changeRequest()
+              expression { return !params.Run_As_Master_Branch }
+            }
+          }
+          steps {
+            build(job: env.ITS_PIPELINE, propagate: false, wait: false,
+                  parameters: [string(name: 'INTEGRATION_TEST', value: 'RUM'),
+                               string(name: 'BUILD_OPTS', value: "--rum-agent-branch ${env.GIT_BASE_COMMIT}"),
+                               string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_ITS_NAME),
+                               string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+                               string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
+            githubNotify(context: "${env.GITHUB_CHECK_ITS_NAME}", description: "${env.GITHUB_CHECK_ITS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.ITS_PIPELINE.replaceAll('/','+')}")
           }
         }
         /**
@@ -128,9 +198,10 @@ pipeline {
             beforeAgent true
             allOf {
               anyOf {
-                branch 'master'
-                tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
+                //branch 'master'
+                //tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
                 expression { return params.Run_As_Master_Branch }
+                expression { return env.BENCHMARK_UPDATED != "false" }
               }
               expression { return params.bench_ci }
             }
@@ -150,7 +221,10 @@ pipeline {
             always {
               archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
               catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
-                sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+                log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
+                whenTrue(env.CHANGE_ID == null){
+                  sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+                }
               }
               catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                 deleteDir()
@@ -158,26 +232,24 @@ pipeline {
             }
           }
         }
-        stage('Integration Tests') {
-          agent none
-          when {
-            beforeAgent true
-            allOf {
-              anyOf {
-                environment name: 'GIT_BUILD_CAUSE', value: 'pr'
-                expression { return !params.Run_As_Master_Branch }
-              }
+        /**
+        Execute code coverage only once.
+        */
+        stage('Coverage') {
+          options { skipDefaultCheckout() }
+          steps {
+            withGithubNotify(context: 'Coverage') {
+              // No scope is required as the coverage should run for all of them
+              runScript(label: 'coverage', stack: '7.0.0', scope: '', goal: 'coverage')
+              codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
             }
           }
-          steps {
-            log(level: 'INFO', text: 'Launching Async ITs')
-            build(job: env.ITS_PIPELINE, propagate: false, wait: false,
-                  parameters: [string(name: 'AGENT_INTEGRATION_TEST', value: 'RUM'),
-                               string(name: 'BUILD_OPTS', value: "--rum-agent-branch ${env.GIT_BASE_COMMIT}"),
-                               string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_ITS_NAME),
-                               string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-                               string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
-            githubNotify(context: "${env.GITHUB_CHECK_ITS_NAME}", description: "${env.GITHUB_CHECK_ITS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.ITS_PIPELINE.replaceAll('/','+')}")
+          post {
+            always {
+              coverageReport("${BASE_DIR}/packages/**")
+              publishCoverage(adapters: [coberturaAdapter("${BASE_DIR}/packages/**/coverage-*-report.xml")],
+                              sourceFileResolver: sourceFiles('STORE_ALL_BUILD'))
+            }
           }
         }
         stage('Release') {
@@ -216,66 +288,11 @@ pipeline {
   }
 }
 
-/**
-Parallel task generator for the integration tests.
-*/
-class RumParallelTaskGenerator extends DefaultParallelTaskGenerator {
-
-  public RumParallelTaskGenerator(Map params){
-    super(params)
-  }
-
-  /**
-  build a clousure that launch and agent and execute the corresponding test script,
-  then store the results.
-  */
-  public Closure generateStep(x, y){
-    return {
-      steps.node('linux && immutable'){
-        def label = "${this.tag}:${x}#${y}"
-        try {
-          steps.runScript(label: label, stack: x, scope: y)
-          saveResult(x, y, 1)
-        } catch(e){
-          saveResult(x, y, 0)
-          steps.error("${label} tests failed : ${e.toString()}\n")
-        } finally {
-          steps.wrappingUp()
-        }
-      }
-    }
-  }
-}
-
-def runParallelTest(){
-  rumTasksGen = new RumParallelTaskGenerator(
-    xFile: '.ci/.jenkins_stack_versions.yaml',
-    xKey: 'STACK_VERSION',
-    yFile: '.ci/.jenkins_scope.yaml',
-    yKey: 'SCOPE',
-    excludedVersions: ['empty'],
-    tag: "Rum",
-    name: "Rum",
-    steps: this
-  )
-  def mapPatallelTasks = rumTasksGen.generateParallelTests()
-
-  if(params.parallel_test){
-    parallel(mapPatallelTasks)
-  } else {
-    mapPatallelTasks.each{ k, v ->
-      stage(k){
-        v()
-      }
-    }
-  }
-}
-
-def runScript(Map params = [:]){
-  def stack = params.stack
-  def scope = params.scope
-  def label = params.label
-  def goal = params.get('goal', 'test')
+def runScript(Map args = [:]){
+  def stack = args.stack
+  def scope = args.scope
+  def label = args.label
+  def goal = args.get('goal', 'test')
 
   deleteDir()
   unstash 'source'
@@ -293,16 +310,14 @@ def runScript(Map params = [:]){
         sh(label: 'Pull and build docker infra', script: '.ci/scripts/pull_and_build.sh')
       }
       // Another retry in case there are any environmental issues
-      retry(2) {
+      retry(3) {
         sleep randomNumber(min: 5, max: 10)
-        if(params.saucelab_test){
-          env.MODE = 'saucelabs'
+        if(env.MODE == 'saucelabs'){
           withSaucelabsEnv(){
-            sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
+            sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
           }
         } else {
-          env.MODE = 'none'
-          sh(label: "Start Elastic Stack ${stack}", script: '.ci/scripts/test.sh')
+          sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
         }
       }
     }
@@ -310,15 +325,17 @@ def runScript(Map params = [:]){
 }
 
 def withSaucelabsEnv(Closure body){
-  def jsonValue = getVaultSecret(secret: "${SAUCELABS_SECRET}${SCOPE}")
-  wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [
-    [var: 'SAUCE_USERNAME', password: jsonValue.data.SAUCE_USERNAME],
-    [var: 'SAUCE_ACCESS_KEY', password: jsonValue.data.SAUCE_ACCESS_KEY],
-  ]]) {
-    withEnv([
-      "SAUCE_USERNAME=${jsonValue.data.SAUCE_USERNAME}",
-      "SAUCE_ACCESS_KEY=${jsonValue.data.SAUCE_ACCESS_KEY}"]) {
+  def jsonValue = getVaultSecret(secret: "${SAUCELABS_SECRET}")
+  withEnvMask(vars: [
+    [var: 'SAUCE_USERNAME', password: "${jsonValue.data.SAUCE_USERNAME}"],
+    [var: 'SAUCE_ACCESS_KEY', password: "${jsonValue.data.SAUCE_ACCESS_KEY}"],
+  ]){
+    try { //https://issues.jenkins-ci.org/browse/JENKINS-61034
+      timeout(activity: true, time: 300, unit: 'SECONDS') { //SauceLab uncatch exceptions
         body()
+      }
+    } catch(err){
+      error("The test failed")
     }
   }
 }
@@ -348,4 +365,31 @@ def wrappingUp(){
     keepLongStdio: true,
     testResults: "${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
   archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs,${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
+}
+
+def runAllScopes(){
+  def scopes = [
+    'SCOPE=@elastic/apm-rum-core',
+    'SCOPE=@elastic/apm-rum',
+    'SCOPE=@elastic/apm-rum-react',
+    'SCOPE=@elastic/apm-rum-angular',
+    'SCOPE=@elastic/apm-rum-vue'
+  ]
+  scopes.each{ s ->
+    withEnv([s]){
+      runTest()
+    }
+  }
+}
+
+def runTest(){
+  def mode = env.MODE == 'none' ? 'Puppeteer' : env.MODE
+  withGithubNotify(context: "Test ${SCOPE} - ${STACK_VERSION} - ${mode}", tab: 'tests') {
+    runScript(
+      label: "${SCOPE}",
+      stack: "${STACK_VERSION}",
+      scope: "${SCOPE}",
+      goal: 'test'
+    )
+  }
 }

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.9.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.8.1...@elastic/apm-rum@4.9.0) (2020-03-03)
+
+
+### Bug Fixes
+
+* **rum-core:** export browser responsiveness interval correctly ([#658](https://github.com/elastic/apm-agent-rum-js/issues/658)) ([2ecf060](https://github.com/elastic/apm-agent-rum-js/commit/2ecf060a35dd1b64110149edc5bbdd4a4613caa9))
+
+
+### Features
+
+* **rum-core:** use global promise when available and fallback ([#629](https://github.com/elastic/apm-agent-rum-js/issues/629)) ([65f08e0](https://github.com/elastic/apm-agent-rum-js/commit/65f08e06d2819a5ba76f476d9a4bc1dfd7fe788b))
+
+
+
+
+
 ## [4.8.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.8.0...@elastic/apm-rum@4.8.1) (2020-02-14)
 
 **Note:** Version bump only for package @elastic/apm-rum
