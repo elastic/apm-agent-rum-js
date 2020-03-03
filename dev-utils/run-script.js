@@ -42,6 +42,16 @@ const { generateNotice } = require('./dep-info')
 const PROJECT_DIR = join(__dirname, '../')
 const { sauceLabs } = getTestEnvironmentVariables()
 
+let cleanUps = []
+
+function startServersWithCleanups() {
+  let servers = startTestServers.apply(this, arguments)
+  cleanUps.push(() => {
+    servers.map(s => s.close())
+  })
+  return servers
+}
+
 function runUnitTests(packagePath, startSauceConnect = 'false') {
   const karmaConfigFile = join(PROJECT_DIR, packagePath, 'karma.conf.js')
   if (startSauceConnect === 'true') {
@@ -114,13 +124,9 @@ function runSauceTests(packagePath, serve = 'true', ...scripts) {
    * we launch the sauce connect tunnel before starting all the saucelab tests
    */
 
-  let servers = []
   if (serve === 'true') {
-    servers = startTestServers(join(PROJECT_DIR, packagePath))
+    startServersWithCleanups(join(PROJECT_DIR, packagePath))
   }
-  cleanUps.push(() => {
-    servers.map(s => s.close())
-  })
 
   launchSauceConnect(async sauceConnectProcess => {
     if (!sauceLabs) {
@@ -158,17 +164,18 @@ function runSauceTests(packagePath, serve = 'true', ...scripts) {
   })
 }
 
-let cleanUps = []
 function exitHandler(exitCode) {
-  console.log('Running cleanups.')
-  cleanUps.forEach(f => {
-    try {
-      f(exitCode)
-    } catch (e) {
-      console.error(e)
-    }
-  })
-  cleanUps = []
+  if (cleanUps.length > 0) {
+    console.log('Running cleanups:', cleanUps.length)
+    cleanUps.forEach(f => {
+      try {
+        f(exitCode)
+      } catch (e) {
+        console.error(e)
+      }
+    })
+    cleanUps = []
+  }
 }
 
 process.on('exit', exitHandler)
@@ -184,7 +191,7 @@ const scripts = {
   runNodeTests,
   runBundleTests,
   buildE2eBundles,
-  startTestServers
+  startTestServers: startServersWithCleanups
 }
 
 function runScript() {
