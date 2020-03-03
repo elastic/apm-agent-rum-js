@@ -116,6 +116,11 @@ pipeline {
                 }
               }
             }
+            post {
+              cleanup {
+                wrappingUp()
+              }
+            }
           }
         }
         stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
@@ -134,6 +139,11 @@ pipeline {
           steps {
             runAllScopes()
           }
+          post {
+            cleanup {
+              wrappingUp()
+            }
+          }
         }
         stage('Stack 8.0.0-SNAPSHOT SauceLabs PR') {
           agent { label 'linux && immutable' }
@@ -150,6 +160,11 @@ pipeline {
           }
           steps {
             runAllScopes()
+          }
+          post {
+            cleanup {
+              wrappingUp()
+            }
           }
         }
         stage('Integration Tests') {
