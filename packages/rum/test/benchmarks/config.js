@@ -28,7 +28,7 @@ module.exports = {
   scenarios: ['basic', 'heavy'],
   runs: 3,
   noOfImages: 30,
-  browserTypes: ['chromium', 'firefox', 'webkit'],
+  browserTypes: ['chromium'],
   port,
   chrome: {
     /**
@@ -42,6 +42,7 @@ module.exports = {
     memorySamplingInterval: 10,
     launchOptions: {
       headless: true,
+      dumpio: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     }
   }

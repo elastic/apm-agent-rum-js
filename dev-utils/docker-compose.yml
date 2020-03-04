@@ -125,7 +125,7 @@ services:
   node-puppeteer:
     build: ../.ci/docker/node-puppeteer
     container_name: node-puppeteer
-    image: docker.elastic.co/observability-ci/node-puppeteer:8
+    image: docker.elastic.co/observability-ci/node-puppeteer:12
     environment:
       - HOME=/app
       - SCOPE=${SCOPE}
@@ -156,8 +156,8 @@ services:
 
   node-benchmark:
     build: ../.ci/docker/node-puppeteer
-    container_name: node-puppeteer
-    image: docker.elastic.co/observability-ci/node-puppeteer:8
+    container_name: node-playwright
+    image: docker.elastic.co/observability-ci/node-playwright:12
     environment:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}
@@ -173,7 +173,7 @@ services:
         cd /app
         export
         npm install
-        npm install puppeteer --unsafe-perm=true --allow-root
+        npm install playwright --unsafe-perm=true --allow-root
         set -eo pipefail
         npx lerna run build:module
         node ./scripts/benchmarks.js ${REPORT_FILE}"
