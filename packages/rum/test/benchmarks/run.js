@@ -39,6 +39,7 @@ const startServer = require('./server')
 const REPORTS_DIR = join(__dirname, '../../reports')
 
 !(async function run() {
+  let exitCode = 0
   try {
     /**
      * Generate custom apm build
@@ -95,5 +96,8 @@ const REPORTS_DIR = join(__dirname, '../../reports')
     console.log('RUM benchmark results written to disk', filePath)
   } catch (e) {
     console.error('Error running RUM benchmark script', e)
+    exitCode = 1
+  } finally {
+    process.exit(exitCode)
   }
 })()
