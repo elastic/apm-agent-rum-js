@@ -68,12 +68,14 @@ the sampling rate of backend agents might be affected by the sampling rate of th
 
 
 [float]
-[[backend-agents-compatibility]]
-=== Backend agents compatibility
-Since version 5.0, the RUM agent supports the official W3C tracecontext `traceparent` header,
+[[backend-agent-compatibility]]
+=== Backend Agent compatibility
+
+Starting in version 5.0, the RUM Agent supports the official W3C tracecontext `traceparent` header,
 instead of the previously used `elastic-apm-traceparent` header.
-In this table you can find which versions of our backend agents also supports the official W3C 
-tracecontext header and therefore can be used with the RUM agent version >=5.0 for distributed tracing:
+Use the table below to determine which versions of our backend agents also support the official W3C
+tracecontext headers. Compatible agents use the official tracecontext spec to propagate traces and can
+therefor be used with the RUM Agent version >=5.0 for distributed tracing.
 
 [options="header"]
 |====
