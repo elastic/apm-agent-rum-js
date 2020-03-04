@@ -265,7 +265,7 @@ function getFirstContentfulPaint() {
       if (entry.name === FIRST_CONTENTFUL_PAINT) {
         return unloadDiff >= 0 ? entry.startTime - unloadDiff : entry.startTime
       }
-    })
+    }, null)
     return fcp
   }
   return null
