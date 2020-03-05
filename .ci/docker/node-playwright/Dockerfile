@@ -3,15 +3,15 @@
 FROM ubuntu:bionic
 
 # 1. Install node12
-RUN apt-get update && apt-get install -y curl && \
+RUN apt-get -qq update && apt-get -qq install -y curl && \
     curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
-    apt-get install -y nodejs
+    apt-get -qq install -y nodejs
 
 # 2. Install git (used to tag commit in benchmark runner)
-RUN apt-get install -y git --no-install-recommends
+RUN apt-get -qq install -y git --no-install-recommends
 
 # 3. Install WebKit dependencies
-RUN apt-get install -y libwoff1 \
+RUN apt-get -qq install -y libwoff1 \
                        libopus0 \
                        libwebp6 \
                        libwebpdemux2 \
@@ -26,28 +26,24 @@ RUN apt-get install -y libwoff1 \
                        libevent-2.1-6 \
                        libgles2 \
                        libvpx5
-
 # 4. Install Chromium dependencies
-RUN apt-get install -y libnss3 \
+RUN apt-get -qq install -y libnss3 \
                        libxss1 \
                        libasound2
 
 # 5. Install Chrome unstable to run karma benchmark tests inside puppeteer
-RUN apt-get update \
-    && apt-get install -y wget --no-install-recommends \
+RUN apt-get -qq install -y wget --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-    && apt-get update \
-    && apt-get install -y \
+    && apt-get -qq update  \
+    && apt-get -qq install -y \
         google-chrome-unstable \
         fonts-ipafont-gothic \
         fonts-wqy-zenhei \
         fonts-thai-tlwg \
         fonts-kacst \
-        --no-install-recommends \
-        && rm -rf /var/lib/apt/lists/*
+        --no-install-recommends
 
 # 6. Install Firefox dependencies
-RUN apt-get update \
-    && apt-get install -y libdbus-glib-1-2 \
+RUN apt-get -qq install -y libdbus-glib-1-2 \
                           xvfb
