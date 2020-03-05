@@ -85,7 +85,7 @@ Valid options:
 * `fetch`
 * `error`
 
-NOTE: To disable all http requests you should add both `fetch` and `xmlhttprequest`
+NOTE: To disable all `http-request` transactions, you should add both `fetch` and `xmlhttprequest`.
 to this config.
 
 NOTE: To disable `user-interaction` transactions, you should add `eventtarget` to this config.
