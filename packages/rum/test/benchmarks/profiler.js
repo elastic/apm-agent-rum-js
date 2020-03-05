@@ -72,7 +72,7 @@ function gatherRawMetrics(browser, url) {
        * number of samples generated
        */
       await client.send('Profiler.setSamplingInterval', {
-        interval: chrome.cpuSamplingInterval
+        interval: config.chromium.cpuSamplingInterval
       })
     }
 
@@ -146,7 +146,7 @@ function gatherRawMetrics(browser, url) {
        */
       await client.send('Profiler.start')
       await client.send('HeapProfiler.startSampling', {
-        interval: chrome.memorySamplingInterval
+        interval: config.chromium.memorySamplingInterval
       })
     }
 
