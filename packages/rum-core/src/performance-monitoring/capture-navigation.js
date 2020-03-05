@@ -268,7 +268,7 @@ function getFirstContentfulPaint() {
     }, null)
     return fcp
   }
-  return null
+  return undefined
 }
 
 function getPageLoadMarks() {
