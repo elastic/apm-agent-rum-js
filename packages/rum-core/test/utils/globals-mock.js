@@ -23,8 +23,8 @@
  *
  */
 
+import paintEntries, { paintWithMissingFcp } from '../fixtures/paint-entries'
 import resourceEntries from '../fixtures/resource-entries'
-import paintEntries from '../fixtures/paint-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import { TIMING_LEVEL2_ENTRIES } from '../fixtures/navigation-entries'
 import longtaskEntries from '../fixtures/longtask-entries'
@@ -46,6 +46,29 @@ export function mockObserverEntryTypes(type) {
   }
 
   return []
+}
+
+export function mockPaintEntryWithMissingFCP() {
+  const _getEntriesByType = window.performance.getEntriesByType
+
+  window.performance.getEntriesByType = function(type) {
+    expect([RESOURCE, PAINT, MEASURE, NAVIGATION]).toContain(type)
+    if (type === RESOURCE) {
+      return resourceEntries
+    } else if (type === PAINT) {
+      return paintWithMissingFcp
+    } else if (type === MEASURE) {
+      return userTimingEntries
+    } else if (type === NAVIGATION) {
+      return TIMING_LEVEL2_ENTRIES
+    } else {
+      return []
+    }
+  }
+
+  return function unMock() {
+    window.performance.getEntriesByType = _getEntriesByType
+  }
 }
 
 export function mockGetEntriesByType() {
