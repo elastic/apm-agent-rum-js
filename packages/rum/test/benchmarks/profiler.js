@@ -24,7 +24,7 @@
  */
 
 const playwright = require('playwright')
-const { chrome } = require('./config')
+const config = require('./config')
 const {
   filterCpuMetrics,
   capturePayloadInfo,
@@ -32,7 +32,9 @@ const {
 } = require('./analyzer')
 
 async function launchBrowser(type) {
-  return await playwright[type].launch(chrome.launchOptions)
+  const { launchOptions } =
+    type !== 'chromium' ? config.default : config.chromium
+  return await playwright[type].launch(launchOptions)
 }
 
 function gatherRawMetrics(browser, url) {
