@@ -1,13 +1,13 @@
-# Little bit customized version of microsoft/playwright:bionic
+# Little bit customized version of microsoft/playwright:bionic image
 
 FROM ubuntu:bionic
 
-# 1. Install node12 and git
+# 1. Install node12
 RUN apt-get update && apt-get install -y curl && \
     curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
     apt-get install -y nodejs
 
-# 2. Install git
+# 2. Install git (used to tag commit in benchmark runner)
 RUN apt-get install -y git --no-install-recommends
 
 # 3. Install WebKit dependencies
@@ -32,10 +32,7 @@ RUN apt-get install -y libnss3 \
                        libxss1 \
                        libasound2
 
-# 5. Install Firefox dependencies
-RUN apt-get install -y libdbus-glib-1-2
-
-# 6. Install Chrome unstable to run karma benchmark tests inside puppeteer
+# 5. Install Chrome unstable to run karma benchmark tests inside puppeteer
 RUN apt-get update \
     && apt-get install -y wget --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
@@ -50,5 +47,7 @@ RUN apt-get update \
         --no-install-recommends \
         && rm -rf /var/lib/apt/lists/*
 
-# 7. (Optional) Install XVFB if there's a need to run browsers in headful mode
-# RUN apt-get install -y xvfb
+# 6. Install Firefox dependencies
+RUN apt-get update \
+    && apt-get install -y libdbus-glib-1-2 \
+                          xvfb
