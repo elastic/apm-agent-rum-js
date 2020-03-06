@@ -304,15 +304,16 @@ describe('Capture hard navigation', function() {
 
     expect(tr.marks.agent.firstContentfulPaint).toBeGreaterThan(0)
     unMock()
-  }),
-    it('should handle missing first-contentful-paint on page load', function() {
-      const unMock = mockPaintEntryWithMissingFCP()
-      const tr = new Transaction('test', PAGE_LOAD)
-      tr.captureTimings = true
-      captureNavigation(tr)
-      tr.end()
+  })
 
-      expect(tr.marks.agent.firstContentfulPaint).toBeUndefined()
-      unMock()
-    })
+  it('should handle missing first-contentful-paint on page load', function() {
+    const unMock = mockPaintEntryWithMissingFCP()
+    const tr = new Transaction('test', PAGE_LOAD)
+    tr.captureTimings = true
+    captureNavigation(tr)
+    tr.end()
+
+    expect(tr.marks.agent.firstContentfulPaint).toBeUndefined()
+    unMock()
+  })
 })
