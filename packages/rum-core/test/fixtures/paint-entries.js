@@ -23,6 +23,15 @@
  *
  */
 
+export const paintWithMissingFcp = [
+  {
+    name: 'first-paint',
+    entryType: 'paint',
+    startTime: 127.5000000023283,
+    duration: 0
+  }
+]
+
 export default [
   {
     name: 'first-paint',

@@ -34,7 +34,10 @@ import resourceEntries from '../fixtures/resource-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import navTimingSpans from '../fixtures/navigation-timing-span-snapshot'
 import { TIMING_LEVEL1_ENTRY as timings } from '../fixtures/navigation-entries'
-import { mockGetEntriesByType } from '../utils/globals-mock'
+import {
+  mockGetEntriesByType,
+  mockPaintEntryWithMissingFCP
+} from '../utils/globals-mock'
 import { PAGE_LOAD, ROUTE_CHANGE } from '../../src/common/constants'
 
 const spanSnapshot = navTimingSpans.map(mapSpan)
@@ -291,4 +294,25 @@ describe('Capture hard navigation', function() {
     captureNavigation(tr)
     expect(tr.marks.custom.testMark).toEqual(start + markValue)
   })
+
+  it('should set firstContentfulPaint', function() {
+    const unMock = mockGetEntriesByType()
+    const tr = new Transaction('test', PAGE_LOAD)
+    tr.captureTimings = true
+    captureNavigation(tr)
+    tr.end()
+
+    expect(tr.marks.agent.firstContentfulPaint).toBeGreaterThan(0)
+    unMock()
+  }),
+    it('should handle missing first-contentful-paint on page load', function() {
+      const unMock = mockPaintEntryWithMissingFCP()
+      const tr = new Transaction('test', PAGE_LOAD)
+      tr.captureTimings = true
+      captureNavigation(tr)
+      tr.end()
+
+      expect(tr.marks.agent.firstContentfulPaint).toBeUndefined()
+      unMock()
+    })
 })
