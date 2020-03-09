@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.10.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.10.0...@elastic/apm-rum-core@4.10.1) (2020-03-09)
+
+
+### Bug Fixes
+
+* **rum-core:** Check if first-contentful-paint exists before setting the agent marks ([#681](https://github.com/elastic/apm-agent-rum-js/issues/681)) ([a2298f7](https://github.com/elastic/apm-agent-rum-js/commit/a2298f723a1d774e6d099c6fe811b8344deb8287)), closes [#680](https://github.com/elastic/apm-agent-rum-js/issues/680) [elastic/apm-agent-rum-js#680](https://github.com/elastic/apm-agent-rum-js/issues/680) [#680](https://github.com/elastic/apm-agent-rum-js/issues/680) [#680](https://github.com/elastic/apm-agent-rum-js/issues/680)
+* **rum-core:** replace >> in click transaction name with '-' ([#690](https://github.com/elastic/apm-agent-rum-js/issues/690)) ([ca43a71](https://github.com/elastic/apm-agent-rum-js/commit/ca43a7104a4820b3d880282d32c0509e4190a9d0))
+
+
+
+
+
 # [4.10.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.9.1...@elastic/apm-rum-core@4.10.0) (2020-03-03)
 
 

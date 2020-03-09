@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.9.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.9.0...@elastic/apm-rum@4.9.1) (2020-03-09)
+
+
+### Bug Fixes
+
+* **rum-core:** replace >> in click transaction name with '-' ([#690](https://github.com/elastic/apm-agent-rum-js/issues/690)) ([ca43a71](https://github.com/elastic/apm-agent-rum-js/commit/ca43a7104a4820b3d880282d32c0509e4190a9d0))
+
+
+
+
+
 # [4.9.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.8.1...@elastic/apm-rum@4.9.0) (2020-03-03)
 
 
