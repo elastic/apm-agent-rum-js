@@ -131,7 +131,7 @@ describe('general-usercase', function() {
       serverCalls = waitForApmServerCalls(0, 2)
       let clickTransaction = serverCalls.sendTransactions[1].args[0][0]
       expect(clickTransaction.type).toBe('user-interaction')
-      expect(clickTransaction.name).toBe('Click >> button["test-action"]')
+      expect(clickTransaction.name).toBe('Click - button["test-action"]')
       expect(clickTransaction.spans.length).toBeGreaterThanOrEqual(1)
     }
   })

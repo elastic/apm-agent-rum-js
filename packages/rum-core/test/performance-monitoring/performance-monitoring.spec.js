@@ -695,7 +695,7 @@ describe('PerformanceMonitoring', function() {
 
       let tr = transactionService.getCurrentTransaction()
       expect(tr).toBeDefined()
-      expect(tr.name).toBe('Click >> button')
+      expect(tr.name).toBe('Click - button')
       expect(tr.context.custom).toEqual({
         classes: 'cool-button purchase-style'
       })
@@ -706,7 +706,7 @@ describe('PerformanceMonitoring', function() {
       let newTr = transactionService.getCurrentTransaction()
 
       expect(newTr).toBe(tr)
-      expect(newTr.name).toBe('Click >> button["purchase"]')
+      expect(newTr.name).toBe('Click - button["purchase"]')
     })
 
     it('should respect the transaction type priority order', function() {
@@ -734,7 +734,7 @@ describe('PerformanceMonitoring', function() {
       element.click()
 
       let tr = transactionService.getCurrentTransaction()
-      expect(tr.name).toBe('Click >> button["purchase"]')
+      expect(tr.name).toBe('Click - button["purchase"]')
       expect(tr.type).toBe('route-change')
 
       cancelHistorySub()
