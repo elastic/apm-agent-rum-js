@@ -71,7 +71,7 @@ Vue.use(ApmVuePlugin, {
   config: {
     serviceName: 'rum-e2e-vue',
     serverUrl: getServerUrl(),
-    debug: true
+    logLevel: 'debug'
   }
 })
 

@@ -73,7 +73,6 @@ class Config {
       active: true,
       instrument: true,
       disableInstrumentations: [],
-      debug: false,
       logLevel: 'warn',
       breakdownMetrics: false,
       ignoreTransactions: [],
