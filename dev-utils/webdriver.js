@@ -257,19 +257,23 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
         /**
          * If there is more than one event we consider that as valid call
          */
-        const validCall =
+        var validCall =
           serverCalls.sendEvents &&
           serverCalls.sendEvents.length > 0 &&
           serverCalls.sendEvents[0].args[0].length > 0
 
         if (validCall) {
-          const promises = serverCalls.sendEvents.map(s => s.returnValue)
+          var promises = serverCalls.sendEvents.map(function(s) {
+            return s.returnValue
+          })
           Promise.all(promises)
-            .then(() => {
-              const transactions = []
-              const errors = []
-              for (const arg of serverCalls.sendEvents[0].args) {
-                arg.forEach(event => {
+            .then(function() {
+              var transactions = []
+              var errors = []
+              var args = serverCalls.sendEvents[0].args
+              for (var i = 0; i < args.length; i++) {
+                var arg = args[i]
+                arg.forEach(function(event) {
                   if (event['transactions']) {
                     transactions.push(event['transactions'])
                   } else if (event['errors']) {
@@ -281,7 +285,7 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
                 errors.length >= errorCount &&
                 transactions.length >= transactionCount
               ) {
-                const calls = {
+                var calls = {
                   sendEvents: {
                     transactions,
                     errors
@@ -290,7 +294,7 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
                 done(calls)
               }
             })
-            .catch(reason => {
+            .catch(function(reason) {
               console.log('reason', reason)
               try {
                 done({ error: reason.message || JSON.stringify(reason) })
