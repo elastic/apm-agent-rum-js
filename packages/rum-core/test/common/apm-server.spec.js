@@ -221,7 +221,7 @@ describe('ApmServer', function() {
     configService.setConfig({
       serviceName: 'serviceName',
       flushInterval: 100,
-      eventsPerMin: 5
+      eventsLimit: 5
     })
     apmServer.init()
 

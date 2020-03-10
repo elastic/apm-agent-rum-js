@@ -57,7 +57,7 @@ class ApmServer {
   _initQueue() {
     const queueLimit = this._configService.get('queueLimit')
     const flushInterval = this._configService.get('flushInterval')
-    const limit = this._configService.get('eventsPerMin')
+    const limit = this._configService.get('eventsLimit')
 
     const onFlush = events => {
       const promise = this.sendEvents(events)

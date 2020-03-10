@@ -76,7 +76,7 @@ class Config {
       logLevel: 'warn',
       breakdownMetrics: false,
       ignoreTransactions: [],
-      eventsPerMin: 80,
+      eventsLimit: 80,
       queueLimit: -1,
       flushInterval: 500,
       distributedTracing: true,
