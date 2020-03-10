@@ -661,6 +661,7 @@ describe('TransactionService', function() {
   describe('performance entry recorder', () => {
     const logger = new LoggingService()
     const config = new Config()
+    config.init()
     const trService = new TransactionService(logger, config)
     const startSpy = jasmine.createSpy()
     const stopSpy = jasmine.createSpy()
@@ -674,7 +675,6 @@ describe('TransactionService', function() {
       stopSpy.calls.reset()
     }
 
-    beforeAll(() => config.setConfig({ monitorLongtasks: true }))
     afterEach(() => resetSpies())
 
     it('should start/stop performance recorder for managed transaction', async () => {

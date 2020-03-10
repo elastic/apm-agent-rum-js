@@ -311,7 +311,7 @@ NOTE: Spans that are captured as part of the ignored transactions would also be 
 ==== `monitorLongtasks`
 
 * *Type:* Boolean
-* *Default:* `false`
+* *Default:* `true`
 
 Instructs the agent to start monitoring for browser tasks that block the UI
 thread and might delay other user inputs by affecting the overall page
