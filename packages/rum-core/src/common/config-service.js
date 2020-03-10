@@ -87,7 +87,7 @@ class Config {
 
       distributedTracing: true,
       distributedTracingOrigins: [],
-      distributedTracingHeaderName: 'elastic-apm-traceparent',
+      distributedTracingHeaderName: 'traceparent',
 
       pageLoadTraceId: '',
       pageLoadSpanId: '',
