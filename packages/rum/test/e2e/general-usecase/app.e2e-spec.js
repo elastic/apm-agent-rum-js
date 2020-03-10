@@ -39,7 +39,7 @@ describe('general-usercase', function() {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(2)
+    const { sendEvents } = waitForApmServerCalls(1, 1)
     const { transactions, errors } = sendEvents
 
     expect(errors.length).toBe(1)
@@ -97,7 +97,7 @@ describe('general-usercase', function() {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(1)
+    const { sendEvents } = waitForApmServerCalls(0, 1)
     const { transactions } = sendEvents
     expect(transactions.length).toBe(1)
     const transactionPayload = transactions[0]
@@ -121,7 +121,7 @@ describe('general-usercase', function() {
       )
       const actionButton = $('#test-action')
       actionButton.click()
-      const { sendEvents } = waitForApmServerCalls(2)
+      const { sendEvents } = waitForApmServerCalls(0, 2)
       const { transactions } = sendEvents
       expect(transactions.length).toEqual(2)
       const clickTransaction = transactions[1]

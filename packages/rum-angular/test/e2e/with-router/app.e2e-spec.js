@@ -48,7 +48,7 @@ describe('Angular router integration', function() {
       'expected contact list to be rendered'
     )
 
-    const { sendEvents } = waitForApmServerCalls(2)
+    const { sendEvents } = waitForApmServerCalls(0, 2)
     const { transactions } = sendEvents
     expect(transactions.length).toBe(2)
 

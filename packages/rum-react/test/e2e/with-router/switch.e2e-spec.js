@@ -42,7 +42,7 @@ describe('Using Switch component of react router', function() {
       'expected functional component to be rendered'
     )
 
-    const { sendEvents } = waitForApmServerCalls(2)
+    const { sendEvents } = waitForApmServerCalls(0, 2)
     const { transactions } = sendEvents
     expect(transactions.length).toBe(2)
 

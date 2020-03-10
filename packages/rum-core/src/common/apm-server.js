@@ -33,7 +33,7 @@ import { Promise } from './polyfills'
 import { __DEV__ } from '../env'
 
 /**
- * Throttling interval deafultss to 60 seconds
+ * Throttling interval deafults to 60 seconds
  */
 const THROTTLE_INTERVAL = 60000
 
@@ -211,17 +211,11 @@ class ApmServer {
   }
 
   addError(error) {
-    this.throttleEvents({
-      data: error,
-      type: ERRORS
-    })
+    this.throttleEvents({ [ERRORS]: error })
   }
 
   addTransaction(transaction) {
-    this.throttleEvents({
-      data: transaction,
-      type: TRANSACTIONS
-    })
+    this.throttleEvents({ [TRANSACTIONS]: transaction })
   }
 
   ndjsonErrors(errors) {
@@ -256,13 +250,11 @@ class ApmServer {
     const transactions = []
     const errors = []
     for (const event of events) {
-      if (!event.data) {
-        continue
+      if (event[TRANSACTIONS]) {
+        transactions.push(event[TRANSACTIONS])
       }
-      if (event.type === TRANSACTIONS) {
-        transactions.push(event.data)
-      } else if (event.type === ERRORS) {
-        errors.push(event.data)
+      if (event[ERRORS]) {
+        errors.push(event[ERRORS])
       }
     }
     if (transactions.length === 0 && errors.length === 0) {

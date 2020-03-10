@@ -69,6 +69,7 @@ function generateErrors(count) {
   }
   return result
 }
+
 describe('ApmServer', function() {
   var serviceFactory
   var apmServer
@@ -110,8 +111,7 @@ describe('ApmServer', function() {
     })
     var result = apmServer.sendEvents([
       {
-        data: { test: 'test' },
-        type: TRANSACTIONS
+        [TRANSACTIONS]: { test: 'test' }
       }
     ])
     expect(result).toBeDefined()
@@ -263,8 +263,7 @@ describe('ApmServer', function() {
 
     const result = apmServer.sendEvents([
       {
-        data: { test: 'test' },
-        type: TRANSACTIONS
+        [TRANSACTIONS]: { test: 'test' }
       }
     ])
     expect(result).toBeUndefined()
@@ -304,8 +303,7 @@ describe('ApmServer', function() {
     const payload = performanceMonitoring.createTransactionDataModel(tr)
     await apmServer.sendEvents([
       {
-        data: payload,
-        type: TRANSACTIONS
+        [TRANSACTIONS]: payload
       }
     ])
   })
@@ -395,16 +393,14 @@ describe('ApmServer', function() {
     type = ERRORS
     apmServer.sendEvents([
       {
-        data: { test: type },
-        type
+        [ERRORS]: { test: type }
       }
     ])
 
     type = TRANSACTIONS
     apmServer.sendEvents([
       {
-        data: { test: type },
-        type
+        [TRANSACTIONS]: { test: type }
       }
     ])
   })

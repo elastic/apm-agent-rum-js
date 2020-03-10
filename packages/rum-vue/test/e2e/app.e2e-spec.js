@@ -42,7 +42,7 @@ describe('Vue router integration', function() {
       'expected data.json to be loaded'
     )
 
-    const { sendEvents } = waitForApmServerCalls(1)
+    const { sendEvents } = waitForApmServerCalls(0, 2)
     const { transactions } = sendEvents
     expect(transactions.length).toBe(2)
 

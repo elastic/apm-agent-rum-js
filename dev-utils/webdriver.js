@@ -239,65 +239,76 @@ function isPageLoaded() {
   })
 }
 
-function waitForApmServerCalls(eventsCount = 0) {
+function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
   const { name = '', version = '' } = getBrowserInfo()
-  console.log(`Waiting for ${eventsCount} events in`, name, version)
-  const serverCalls = browser.executeAsync(function(eventsCount, done) {
-    var apmServerMock = window.elasticApm.serviceFactory.getService('ApmServer')
+  console.log(
+    `Waiting for minimum ${errorCount} Errors and ${transactionCount} Transactions in`,
+    name,
+    version
+  )
+  const serverCalls = browser.executeAsync(
+    function(errorCount, transactionCount, done) {
+      var apmServerMock = window.elasticApm.serviceFactory.getService(
+        'ApmServer'
+      )
 
-    function checkCalls() {
-      var serverCalls = apmServerMock.calls
-      var validCall = false
-      if (eventsCount >= 0) {
+      function checkCalls() {
+        var serverCalls = apmServerMock.calls
         /**
-         * sendEvents arguments must match the eventsCount to complete the script
+         * If there is more than one event we consider that as valid call
          */
-        validCall =
+        const validCall =
           serverCalls.sendEvents &&
           serverCalls.sendEvents.length > 0 &&
-          serverCalls.sendEvents[0].args[0].length >= eventsCount
-      }
+          serverCalls.sendEvents[0].args[0].length > 0
 
-      if (validCall) {
-        const promises = serverCalls.sendEvents.map(s => s.returnValue)
-        Promise.all(promises)
-          .then(() => {
-            const transactions = []
-            const errors = []
-            for (const arg of serverCalls.sendEvents[0].args) {
-              arg.forEach(event => {
-                const { type, data } = event
-                if (type === 'transactions') {
-                  transactions.push(data)
-                } else if (type === 'errors') {
-                  errors.push(data)
-                }
-              })
-            }
-            const calls = {
-              sendEvents: {
-                transactions,
-                errors
+        if (validCall) {
+          const promises = serverCalls.sendEvents.map(s => s.returnValue)
+          Promise.all(promises)
+            .then(() => {
+              const transactions = []
+              const errors = []
+              for (const arg of serverCalls.sendEvents[0].args) {
+                arg.forEach(event => {
+                  if (event['transactions']) {
+                    transactions.push(event['transactions'])
+                  } else if (event['errors']) {
+                    errors.push(event['errors'])
+                  }
+                })
               }
-            }
-            done(calls)
-          })
-          .catch(reason => {
-            console.log('reason', reason)
-            try {
-              done({ error: reason.message || JSON.stringify(reason) })
-            } catch (e) {
-              done({
-                error: 'Failed serializing rejection reason: ' + e.message
-              })
-            }
-          })
+              if (
+                errors.length >= errorCount &&
+                transactions.length >= transactionCount
+              ) {
+                const calls = {
+                  sendEvents: {
+                    transactions,
+                    errors
+                  }
+                }
+                done(calls)
+              }
+            })
+            .catch(reason => {
+              console.log('reason', reason)
+              try {
+                done({ error: reason.message || JSON.stringify(reason) })
+              } catch (e) {
+                done({
+                  error: 'Failed serializing rejection reason: ' + e.message
+                })
+              }
+            })
+        }
       }
-    }
 
-    checkCalls()
-    apmServerMock.events.observe('sendEvents', checkCalls)
-  }, eventsCount)
+      checkCalls()
+      apmServerMock.events.observe('sendEvents', checkCalls)
+    },
+    errorCount,
+    transactionCount
+  )
 
   if (!serverCalls) {
     throw new Error('serverCalls is undefined!')

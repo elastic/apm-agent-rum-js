@@ -89,6 +89,7 @@ describe('index', function() {
       throw new Error('ApmBase test error')
     } catch (error) {
       apmBase.captureError(error)
+      expect(apmServer.sendEvents).not.toHaveBeenCalled()
 
       if (isPlatformSupported()) {
         expect(apmServer.queue.items.length).toBe(1)

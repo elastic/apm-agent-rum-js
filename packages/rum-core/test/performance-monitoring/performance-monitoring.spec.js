@@ -79,8 +79,7 @@ describe('PerformanceMonitoring', function() {
     const payload = performanceMonitoring.createTransactionDataModel(tr)
     var promise = apmServer.sendEvents([
       {
-        data: payload,
-        type: TRANSACTIONS
+        [TRANSACTIONS]: payload
       }
     ])
     expect(promise).toBeDefined()
@@ -203,8 +202,7 @@ describe('PerformanceMonitoring', function() {
       const payload = performanceMonitoring.createTransactionDataModel(tr)
       var promise = apmServer.sendEvents([
         {
-          data: payload,
-          type: TRANSACTIONS
+          [TRANSACTIONS]: payload
         }
       ])
       expect(promise).toBeDefined()
@@ -261,8 +259,7 @@ describe('PerformanceMonitoring', function() {
     expect(payload).toBeUndefined()
     var promise = apmServer.sendEvents([
       {
-        data: payload,
-        type: TRANSACTIONS
+        [TRANSACTIONS]: payload
       }
     ])
     expect(promise).toBeUndefined()
@@ -590,8 +587,7 @@ describe('PerformanceMonitoring', function() {
       apmServer
         .sendEvents([
           {
-            data: payload,
-            type: TRANSACTIONS
+            [TRANSACTIONS]: payload
           }
         ])
         .then(done, reason => {
@@ -664,8 +660,7 @@ describe('PerformanceMonitoring', function() {
       apmServer
         .sendEvents([
           {
-            data: payload,
-            type: TRANSACTIONS
+            [TRANSACTIONS]: payload
           }
         ])
         .then(done, reason => {

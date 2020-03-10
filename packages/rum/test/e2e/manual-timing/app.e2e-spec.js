@@ -39,7 +39,7 @@ describe('manual-timing', function() {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(1)
+    const { sendEvents } = waitForApmServerCalls(1, 1)
     const { transactions, errors } = sendEvents
 
     expect(errors.length).toBe(1)

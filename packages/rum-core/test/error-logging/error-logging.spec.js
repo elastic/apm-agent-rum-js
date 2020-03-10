@@ -55,12 +55,7 @@ describe('ErrorLogging', function() {
       errorObject = errorLogging.createErrorDataModel({ error })
     }
     apmServer
-      .sendEvents([
-        {
-          data: errorObject,
-          type: ERRORS
-        }
-      ])
+      .sendEvents([{ [ERRORS]: errorObject }])
       .then(done)
       .catch(reason => fail(reason))
   })
@@ -81,7 +76,7 @@ describe('ErrorLogging', function() {
       errorLogging.logErrorEvent({ error })
       const errors = getErrors()
       expect(errors.length).toBe(1)
-      const errorData = errors[0].data
+      const errorData = errors[0][ERRORS]
       expect(errorData.context.custom.test).toBe('hamid')
       expect(errorData.context.custom.aDate).toBe('2017-01-12T00:00:00.000Z') // toISOString()
       expect(errorData.context.custom.anObject).toBeUndefined()
@@ -106,7 +101,7 @@ describe('ErrorLogging', function() {
       errorLogging.logErrorEvent({ error })
       const errors = getErrors()
       expect(errors.length).toBe(1)
-      const errorData = errors[0].data
+      const errorData = errors[0][ERRORS]
       expect(errorData.transaction_id).toEqual(transaction.id)
       expect(errorData.trace_id).toEqual(transaction.traceId)
       expect(errorData.parent_id).toEqual(transaction.id)
@@ -192,7 +187,7 @@ describe('ErrorLogging', function() {
     errorLogging.logErrorEvent(errorEvent)
     const errors = getErrors()
     expect(errors.length).toBe(1)
-    const errorData = errors[0].data
+    const errorData = errors[0][ERRORS]
 
     // the message is different in IE 10 since error type is not available
     expect(errorData.exception.message).toContain(testErrorMessage)
@@ -219,7 +214,7 @@ describe('ErrorLogging', function() {
     errorLogging.logErrorEvent(errorEvent)
     const errors = getErrors()
     expect(errors.length).toBe(1)
-    const errorData = errors[0].data
+    const errorData = errors[0][ERRORS]
     expect(errorData.exception.message).toContain(testErrorMessage)
 
     apmServer
@@ -234,7 +229,7 @@ describe('ErrorLogging', function() {
     const original = window.addEventListener
     spyOn(apmServer, 'sendEvents').and.callFake(function(errors) {
       expect(errors.length).toBe(numberOfErrors)
-      var errorData = errors[0].data
+      var errorData = errors[0][ERRORS]
       expect(errorData.exception.message).toContain(testErrorMessage)
       window.addEventListener = original
       done()
@@ -314,7 +309,7 @@ describe('ErrorLogging', function() {
     errorLogging.registerListeners()
 
     spyOn(apmServer, 'sendEvents').and.callFake(events => {
-      const errorData = events[0].data
+      const errorData = events[0][ERRORS]
       expect(errorData.exception.message).toMatch(reason.message)
       done()
     })
@@ -333,18 +328,20 @@ describe('ErrorLogging', function() {
 
     errorLogging.logPromiseEvent({})
     expect(getErrors().length).toBe(1)
-    expect(getErrors()[0].data.exception.message).toMatch(/no reason specified/)
+    expect(getErrors()[0][ERRORS].exception.message).toMatch(
+      /no reason specified/
+    )
 
     const error = new Error(testErrorMessage)
     errorLogging.logPromiseEvent({
       reason: error
     })
-    expect(getErrors()[1].data.exception.message).toMatch(error.message)
+    expect(getErrors()[1][ERRORS].exception.message).toMatch(error.message)
 
     errorLogging.logPromiseEvent({
       reason: testErrorMessage
     })
-    expect(getErrors()[2].data.exception.message).toMatch(testErrorMessage)
+    expect(getErrors()[2][ERRORS].exception.message).toMatch(testErrorMessage)
 
     const errorObj = {
       message: testErrorMessage,
@@ -353,8 +350,10 @@ describe('ErrorLogging', function() {
     errorLogging.logPromiseEvent({
       reason: errorObj
     })
-    expect(getErrors()[3].data.exception.message).toMatch(testErrorMessage)
-    expect(getErrors()[3].data.exception.stacktrace.length).toBeGreaterThan(0)
+    expect(getErrors()[3][ERRORS].exception.message).toMatch(testErrorMessage)
+    expect(getErrors()[3][ERRORS].exception.stacktrace.length).toBeGreaterThan(
+      0
+    )
 
     const errorLikeObj = {
       message: testErrorMessage,
@@ -363,20 +362,20 @@ describe('ErrorLogging', function() {
     errorLogging.logPromiseEvent({
       reason: errorLikeObj
     })
-    expect(getErrors()[4].data.exception.message).toMatch(testErrorMessage)
-    expect(getErrors()[4].data.exception.stacktrace.length).toBe(0)
+    expect(getErrors()[4][ERRORS].exception.message).toMatch(testErrorMessage)
+    expect(getErrors()[4][ERRORS].exception.stacktrace.length).toBe(0)
 
     errorLogging.logPromiseEvent({
       reason: 200
     })
-    expect(getErrors()[5].data.exception.message).toBe(
+    expect(getErrors()[5][ERRORS].exception.message).toBe(
       'Unhandled promise rejection: 200'
     )
 
     errorLogging.logPromiseEvent({
       reason: true
     })
-    expect(getErrors()[6].data.exception.message).toBe(
+    expect(getErrors()[6][ERRORS].exception.message).toBe(
       'Unhandled promise rejection: true'
     )
 
@@ -433,8 +432,7 @@ describe('ErrorLogging', function() {
     apmServer
       .sendEvents([
         {
-          data: error,
-          type: ERRORS
+          [ERRORS]: error
         }
       ])
       .then(done)
