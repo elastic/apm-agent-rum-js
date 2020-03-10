@@ -47,7 +47,7 @@ function createRelease(token) {
    * To match the package version with tags
    */
   const tagVersion = `${name}@${version}`
-  const changelogUrl = `https://github.com/elastic/apm-agent-rum-js/blob/master/CHANGELOG.md`
+  const changelogUrl = `https://www.elastic.co/guide/en/apm/agent/rum-js/current/release-notes.html`
   const postBody = {
     tag_name: tagVersion,
     name: tagVersion,

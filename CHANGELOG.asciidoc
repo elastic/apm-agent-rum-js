@@ -30,6 +30,16 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 === RUM JS Agent version 4.x
 
 
+[[release-notes-4.9.1]]
+==== 4.9.1 (2020-03-09)
+
+
+[float]
+===== Bug fixes
+* Replace '>>' in click transaction name with '-' to avoid display issues in kibana: {issue}689[#689]
+* Check if first-contentful-paint exists before setting the agent marks: {issue}680[#680]
+
+
 [[release-notes-4.9.0]]
 ==== 4.9.0 (2020-03-03)
 

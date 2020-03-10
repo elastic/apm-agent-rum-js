@@ -24,7 +24,7 @@
  */
 
 const playwright = require('playwright')
-const { chrome } = require('./config')
+const config = require('./config')
 const {
   filterCpuMetrics,
   capturePayloadInfo,
@@ -32,7 +32,9 @@ const {
 } = require('./analyzer')
 
 async function launchBrowser(type) {
-  return await playwright[type].launch(chrome.launchOptions)
+  const { launchOptions } =
+    type !== 'chromium' ? config.default : config.chromium
+  return await playwright[type].launch(launchOptions)
 }
 
 function gatherRawMetrics(browser, url) {
@@ -70,7 +72,7 @@ function gatherRawMetrics(browser, url) {
        * number of samples generated
        */
       await client.send('Profiler.setSamplingInterval', {
-        interval: chrome.cpuSamplingInterval
+        interval: config.chromium.cpuSamplingInterval
       })
     }
 
@@ -144,7 +146,7 @@ function gatherRawMetrics(browser, url) {
        */
       await client.send('Profiler.start')
       await client.send('HeapProfiler.startSampling', {
-        interval: chrome.memorySamplingInterval
+        interval: config.chromium.memorySamplingInterval
       })
     }
 

@@ -254,24 +254,21 @@ function getNavigationTimingMarks() {
  * SPEC - https://www.w3.org/TR/paint-timing/
  */
 function getFirstContentfulPaint() {
-  let fcp
   if (isPerfTimelineSupported()) {
-    const entries = PERF.getEntriesByType(PAINT)
-    if (entries.length > 0) {
-      const timing = PERF.timing
-      /**
-       * To avoid capturing the unload event handler effect
-       * as part of the transaction duration
-       */
-      const unloadDiff = timing.fetchStart - timing.navigationStart
-      const fcpEntry = entries.filter(
-        entry => entry.name === FIRST_CONTENTFUL_PAINT
-      )
-      const { startTime } = fcpEntry[0]
-      fcp = unloadDiff >= 0 ? startTime - unloadDiff : startTime
-    }
+    const timing = PERF.timing
+    /**
+     * To avoid capturing the unload event handler effect
+     * as part of the transaction duration
+     */
+    const unloadDiff = timing.fetchStart - timing.navigationStart
+    const fcp = PERF.getEntriesByType(PAINT).reduce((_fcp, entry) => {
+      if (entry.name === FIRST_CONTENTFUL_PAINT) {
+        return unloadDiff >= 0 ? entry.startTime - unloadDiff : entry.startTime
+      }
+    }, null)
+    return fcp
   }
-  return fcp
+  return undefined
 }
 
 function getPageLoadMarks() {

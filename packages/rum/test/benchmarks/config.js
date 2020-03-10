@@ -30,7 +30,13 @@ module.exports = {
   noOfImages: 30,
   browserTypes: ['chromium', 'firefox', 'webkit'],
   port,
-  chrome: {
+  default: {
+    launchOptions: {
+      headless: true,
+      dumpio: true
+    }
+  },
+  chromium: {
     /**
      * By default the CPU samples are taken at 1000 microseconds, To get
      * more samples in each run within page-load event, we have to tune it so that

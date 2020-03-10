@@ -80,11 +80,15 @@ Valid options:
 
 * `page-load`
 * `history`
-* `user-interaction`
+* `eventtarget`
 * `xmlhttprequest`
 * `fetch`
 * `error`
 
+NOTE: To disable all `http-request` transactions, you should add both `fetch` and `xmlhttprequest`.
+to this config.
+
+NOTE: To disable `user-interaction` transactions, you should add `eventtarget` to this config.
 
 [float]
 [[environment]]

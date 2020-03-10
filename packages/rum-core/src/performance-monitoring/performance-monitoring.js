@@ -210,7 +210,7 @@ export default class PerformanceMonitoring {
          * related to this interaction.
          */
         const tr = transactionService.startTransaction(
-          `Click >> ${tagName}${additionalInfo}`,
+          `Click - ${tagName}${additionalInfo}`,
           USER_INTERACTION,
           {
             managed: true,
