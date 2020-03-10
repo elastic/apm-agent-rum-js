@@ -33,29 +33,29 @@ describe('ConfigService', function() {
     configService.init()
   })
   it('should merge configs with already set configs', function() {
-    expect(configService.get('debug')).toBe(false)
+    expect(configService.get('instrument')).toBe(true)
     expect(configService.get('serviceName')).toBe('')
 
     configService.setConfig({
       serviceName: 'serviceName'
     })
 
-    expect(configService.get('debug')).toBe(false)
+    expect(configService.get('instrument')).toBe(true)
     expect(configService.get('serviceName')).toBe('serviceName')
 
     configService.setConfig({
-      debug: true
+      instrument: false
     })
 
-    expect(configService.get('debug')).toBe(true)
+    expect(configService.get('instrument')).toBe(false)
     expect(configService.get('serviceName')).toBe('serviceName')
 
     configService.setConfig({
-      debug: false,
+      instrument: false,
       serviceName: null
     })
 
-    expect(configService.get('debug')).toBe(false)
+    expect(configService.get('instrument')).toBe(false)
     expect(configService.get('serviceName')).toBe(null)
   })
 

@@ -63,7 +63,7 @@ export class AppModule {
   constructor(@Inject(ApmService) service: ApmService) {
     initializeApmService(service, {
       serviceName: 'e2e-angular-integration',
-      debug: true
+      logLevel: 'debug'
     })
   }
 }

@@ -39,22 +39,13 @@ describe('ServiceFactory', function() {
   })
 
   it('should set correct log level', function() {
-    expect(configService.get('debug')).toBe(false)
     expect(configService.get('logLevel')).toBe('warn')
     expect(loggingService.level).toBe('warn')
 
-    configService.setConfig({ debug: true })
-    expect(configService.get('debug')).toBe(true)
-    expect(loggingService.level).toBe('debug')
-
-    configService.setConfig({ debug: false })
-    expect(configService.get('debug')).toBe(false)
-    expect(loggingService.level).toBe('warn')
-
-    configService.setConfig({ logLevel: 'trace', debug: true })
+    configService.setConfig({ logLevel: 'trace' })
     expect(loggingService.level).toBe('trace')
 
-    configService.setConfig({ logLevel: 'warn', debug: false })
-    expect(loggingService.level).toBe('warn')
+    configService.setConfig({ logLevel: 'debug' })
+    expect(loggingService.level).toBe('debug')
   })
 })
