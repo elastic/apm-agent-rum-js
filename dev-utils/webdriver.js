@@ -287,8 +287,10 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
               ) {
                 var calls = {
                   sendEvents: {
-                    transactions,
-                    errors
+                    // eslint-disable-next-line object-shorthand
+                    transactions: transactions,
+                    // eslint-disable-next-line object-shorthand
+                    errors: errors
                   }
                 }
                 done(calls)

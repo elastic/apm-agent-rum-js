@@ -29,6 +29,7 @@ import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
 import { SERVER_URL_PREFIX, ERRORS, TRANSACTIONS } from './constants'
+import { noop } from './utils'
 import { Promise } from './polyfills'
 import { __DEV__ } from '../env'
 
@@ -42,7 +43,7 @@ class ApmServer {
     this._configService = configService
     this._loggingService = loggingService
     this.queue = undefined
-    this.throttleEvents = undefined
+    this.throttleEvents = noop
     this.initialized = false
   }
 

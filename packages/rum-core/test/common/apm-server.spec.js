@@ -141,6 +141,28 @@ describe('ApmServer', function() {
     expect(apmServer.queue.items.length).toBe(0)
   })
 
+  it('should not add any items to queue when not initialized', function() {
+    const clock = jasmine.clock()
+    clock.install()
+    configService.setConfig({ flushInterval: 200 })
+
+    spyOn(apmServer, 'sendEvents')
+    expect(apmServer.queue).toBeUndefined()
+
+    apmServer.addError({})
+    apmServer.addTransaction({})
+    expect(apmServer.queue).toBeUndefined()
+
+    apmServer.init()
+    apmServer.addTransaction({})
+    apmServer.addError({})
+
+    expect(apmServer.queue.items.length).toBe(2)
+    clock.tick(201)
+    expect(apmServer.sendEvents).toHaveBeenCalled()
+    clock.uninstall()
+  })
+
   it('should capture errors logs from apm-server', done => {
     apmServer.init()
     spyOn(loggingService, 'warn').and.callFake((failedMsg, error) => {
@@ -330,7 +352,7 @@ describe('ApmServer', function() {
     const payload = apmServer._postJson.calls.argsFor(0)[1]
 
     const expected = [
-      '{"metadata":{"service":{"name":"test","agent":{"name":"js-base","version":"N/A"},"language":{"name":"javascript"}}}}',
+      '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}',
       '{"error":{"name":"Error","message":"error #0"}}',
       '{"error":{"name":"Error","message":"error #1"}}',
       '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}',
