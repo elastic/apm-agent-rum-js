@@ -222,6 +222,8 @@ describe('lib/utils', function() {
     utils.setLabel(undefined, 'value', labels)
     utils.setLabel('test', 'test', labels)
     utils.setLabel('no', 1, labels)
+    utils.setLabel('bool_false', false, labels)
+    utils.setLabel('bool_true', true, labels)
     utils.setLabel('test.test', 'passed', labels)
     utils.setLabel('date', date, labels)
     utils.setLabel()
@@ -229,7 +231,9 @@ describe('lib/utils', function() {
     utils.setLabel('obj', {}, labels)
     expect(labels).toEqual({
       test: 'test',
-      no: '1',
+      no: 1,
+      bool_false: false,
+      bool_true: true,
       test_test: 'passed',
       date: String(date),
       removed: undefined,

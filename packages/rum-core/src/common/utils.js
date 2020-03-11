@@ -143,8 +143,13 @@ function isPlatformSupported() {
  */
 function setLabel(key, value, obj) {
   if (!obj || !key) return
-  var skey = removeInvalidChars(key)
-  if (value) {
+  const skey = removeInvalidChars(key)
+  let valueType = typeof value
+  if (
+    valueType !== 'undefined' &&
+    valueType !== 'boolean' &&
+    valueType !== 'number'
+  ) {
     value = String(value)
   }
   obj[skey] = value
