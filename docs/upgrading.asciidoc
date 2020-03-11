@@ -51,35 +51,40 @@ This guide outlines the changes and the steps required to upgrade.
 
 [float]
 [[v5-breaking-changes]]
-=== 5.x Breaking changes
+=== 5.0 Breaking changes
 
-Agent name changed to `rum-js`::
+*Agent name changed to `rum-js`*
+
 The Agent name has been changed to `rum-js`.
-Because of this change, you may need to upgrade your APM Server version,
-and therefor your Elasticsearch and Kibana version.
+Because of this change, you may need to upgrade your APM Server instance,
+and therefor your Elasticsearch and Kibana instance.
 
-Official W3C tracecontext support::
+*Official W3C tracecontext support*
+
 The RUM Agent supports the official W3C tracecontext `traceparent` header,
 instead of the previously used `elastic-apm-traceparent` header.
 If you're using Elastic backend agents,
 you must upgrade them to a version that also supports the official W3C tracecontext headers.
 
-// https://github.com/elastic/apm-agent-rum-js/pull/664
-// WIP! I still need to clean this up
-Consolidated configurations::
+*Consolidated configurations*
+
 A single queue is now used to process all events (transactions, errors, etc.).
-This change consolidates two configuration options:
-+
-* `throttleInterval` - details to come
-* `throttleLimit` - details to come
-+
-Adding:
-+
-* Introduces `eventsPerMin` which is set to 80 by default including errors and transactions for throttling instead of `throttleLimit` and `throttleInterval` for errors and transactions.
+This change allows the consolidation of four configuration options into one:
+
+Removed options:
+
+* `errorThrottleLimit`
+* `errorThrottleInterval`
+* `transactionThrottleLimit`
+* `transactionThrottleInterval`
+
+Added option:
+
+* <<event-limit>> -- Configure the number of events sent sent to APM Server per minute. Defaults to `80`.
 
 [float]
 [[v5-upgrade-steps]]
-=== 5.x Upgrade steps
+=== Upgrade steps
 
 [float]
 [[v5-upgrade-server]]
@@ -87,7 +92,8 @@ Adding:
 
 Version `5.x` of the RUM Agent requires APM Server version >= `7.0`.
 The {apm-server-ref-v}/upgrading-to-70.html[APM Server `7.0` upgrade guide] can help with the upgrade process.
-Note that APM Server version >= `7.0` requires Elasticsearch and Kibana versions >= `7.0` as well.
+
+NOTE: APM Server version >= `7.0` requires Elasticsearch and Kibana versions >= `7.0` as well.
 
 [float]
 [[v5-upgrade-agents]]
@@ -108,9 +114,18 @@ You must upgrade your backend agents to the minimum versions listed below for al
 |====
 
 [float]
-[[v5-upgrade-rum-agent]]
-==== Upgrade the RUM Agent
+[[v5-update-rum-agent]]
+==== Upgrade the RUM agent
 
-// Update your configuration
+Update or download the latest version of the RUM Agent using your
+<<install-the-agent,preferred installation method>>.
 
-// Upgrade the Agent
+If your old configuration used one of the removed config options (listed below),
+update your configuration to use the new <<event-limit>> config option instead.
+
+Removed configurations:
+
+* `errorThrottleLimit`
+* `errorThrottleInterval`
+* `transactionThrottleLimit`
+* `transactionThrottleInterval`

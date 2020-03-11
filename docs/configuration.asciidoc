@@ -212,48 +212,19 @@ var options = {
 ----
 
 [float]
-[[error-throttling]]
-=== Error throttling
+[[event-throttling]]
+=== Event throttling
 
-To throttle the number of errors send to the APM Server, you can use the following options:
+Throttle the number of events sent to APM Server.
 
 [float]
-[[error-throttle-limit]]
-==== `errorThrottleLimit`
+[[event-limit]]
+==== `eventLimit`
+
+By default, the agent can only send up to `80` events every `60000` milliseconds (one minute).
 
 * *Type:* Number
-* *Default:* `20`
-
-[float]
-[[error-throttle-interval]]
-==== `errorThrottleInterval`
-
-* *Type:* Number
-* *Default:* `30000`
-
-By default the agent can only send (up to) `20` errors every `30000` milliseconds.
-
-
-[float]
-[[transaction-throttling]]
-=== Transaction throttling
-
-[float]
-[[transaction-throttle-limit]]
-==== `transactionThrottleLimit`
-
-* *Type:* Number
-* *Default:* `20`
-
-[float]
-[[transaction-throttle-interval]]
-==== `transactionThrottleInterval`
-
-* *Type:* Number
-* *Default:* `30000`
-
-By default the agent can only send (up to) `20` transactions every `30000` milliseconds.
-
+* *Default:* `80`
 
 [float]
 [[transaction-sample-rate]]
