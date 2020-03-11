@@ -201,7 +201,7 @@ Distributed tracing is enabled by default, however you can use this configuratio
 * *Default:* `[]`
 
 This option is an array of strings and determines which origins should be monitored as part of distributed tracing.
-More specificly this option is consulted when the agent is about to add distributed tracing http header (`elastic-apm-traceparent`) to a request.
+More specificly this option is consulted when the agent is about to add distributed tracing http header (`traceparent`) to a request.
 Please note that each item in the array should be a valid url and at least include the origin part (other parts of the url are ignored).
 
 [source,js]

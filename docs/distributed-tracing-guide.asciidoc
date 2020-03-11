@@ -26,7 +26,7 @@ var apm = initApm({
 })
 ----
 
-This effectively tells the agent to add the distributed tracing HTTP header (`elastic-apm-traceparent`) 
+This effectively tells the agent to add the distributed tracing HTTP header (`traceparent`) 
 to requests made to `https://api.example.com`.
 
 Note that distributed tracing headers are only appended to API calls.
@@ -46,7 +46,7 @@ Specifically, `https://api.example.com` will receive an `OPTIONS` request with t
 
 [source,header]
 ----
-Access-Control-Request-Headers: elastic-apm-traceparent
+Access-Control-Request-Headers: traceparent
 Access-Control-Request-Method: [request-method]
 Origin: [request-origin]
 ----
@@ -55,16 +55,39 @@ And should respond to it with these headers:
 
 [source,header]
 ----
-Access-Control-Allow-Headers: elastic-apm-traceparent
+Access-Control-Allow-Headers: traceparent
 Access-Control-Allow-Methods: [allowed-methods]
 Access-Control-Allow-Origin: [request-origin]
 ----
 
-NOTE: `Access-Control-Request-Headers` might include more headers than just `elastic-apm-traceparent`.
+NOTE: `Access-Control-Request-Headers` might include more headers than just `traceparent`.
 The response should include all headers if the server wishes to let the browser send the original request.
 
 NOTE: To make sure all components in a distributed trace are included,
 the sampling rate of backend agents might be affected by the sampling rate of the RUM agent.
+
+
+[float]
+[[backend-agent-compatibility]]
+=== Backend Agent compatibility
+
+Starting in version 5.0, the RUM Agent supports the official W3C tracecontext `traceparent` header,
+instead of the previously used `elastic-apm-traceparent` header.
+Use the table below to determine which versions of our backend agents also support the official W3C
+tracecontext headers. Compatible agents use the official tracecontext spec to propagate traces and can
+therefor be used with the RUM Agent version >=5.0 for distributed tracing.
+
+[options="header"]
+|====
+|Agent |Agent Version
+|**Go Agent**|>= `1.6`
+|**Java Agent**|>= `1.14`
+|**.NET Agent**|>= `1.3`
+|**Node.js Agent**|>= `3.4`
+|**Python Agent**|>= `5.4`
+|**Ruby Agent**|>= `3.5`
+|====
+
 
 [float]
 [[dynamic-html-doc]]
