@@ -142,8 +142,8 @@ To understand the different types, see <<breakdown-metrics-docs>>
 * *Type:* Number
 * *Default:* `500`
 
-The agent maintains two in-memory queues to record transactions and errors when they are added.
-This option sets the flush interval in *milliseconds* for these queues.
+The agent maintains a single queue to record transaction and error events when they are added.
+This option sets the flush interval in *milliseconds* for the queue.
 
 NOTE: After each flush of the queue, the next flush isn't scheduled until an item is added to the queue.
 
