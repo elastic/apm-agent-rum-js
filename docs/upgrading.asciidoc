@@ -66,7 +66,16 @@ instead of the previously used `elastic-apm-traceparent` header.
 If you're using Elastic backend agents,
 you must upgrade them to a version that also supports the official W3C tracecontext headers.
 
-*Consolidated configurations*
+*`addTags` replaced with `addLabels*
+
+`addTags`, which was deprecated in version `4.1`, has been removed and replaced with `addLabels`,
+which supports strings, booleans, and numbers:
+
+* `apm.addTags()` removed in favor of <<apm-add-labels>>.
+* `span.addTags()` removed in favor of <<span-add-labels>>.
+* `transaction.addTags()` removed in favor of <<transaction-add-labels>>.
+
+*Single queue processing*
 
 A single queue is now used to process all events (transactions, errors, etc.).
 This change allows the consolidation of four configuration options into one:
