@@ -45,7 +45,8 @@ describe('ErrorLogging', function() {
     transactionService = serviceFactory.getService('TransactionService')
   })
 
-  const getErrors = () => apmServer.queue.items
+  const getEvents = () => apmServer.queue.items
+  const clearQueue = () => apmServer.queue._clear()
 
   it('should send error', function(done) {
     var errorObject
@@ -74,17 +75,18 @@ describe('ErrorLogging', function() {
       error.aFunction = function noop() {}
       error.null = null
       errorLogging.logErrorEvent({ error })
-      const errors = getErrors()
-      expect(errors.length).toBe(1)
-      const errorData = errors[0][ERRORS]
+      const events = getEvents()
+      expect(events.length).toBe(1)
+      const errorData = events[0][ERRORS]
       expect(errorData.context.custom.test).toBe('hamid')
       expect(errorData.context.custom.aDate).toBe('2017-01-12T00:00:00.000Z') // toISOString()
       expect(errorData.context.custom.anObject).toBeUndefined()
       expect(errorData.context.custom.aFunction).toBeUndefined()
       expect(errorData.context.custom.null).toBeUndefined()
 
+      clearQueue()
       apmServer
-        .sendEvents(errors)
+        .sendEvents(events)
         .then(done)
         .catch(reason => fail(reason))
     }
@@ -99,9 +101,9 @@ describe('ErrorLogging', function() {
       throw new Error('Test Error')
     } catch (error) {
       errorLogging.logErrorEvent({ error })
-      const errors = getErrors()
-      expect(errors.length).toBe(1)
-      const errorData = errors[0][ERRORS]
+      const events = getEvents()
+      expect(events.length).toBe(1)
+      const errorData = events[0][ERRORS]
       expect(errorData.transaction_id).toEqual(transaction.id)
       expect(errorData.trace_id).toEqual(transaction.traceId)
       expect(errorData.parent_id).toEqual(transaction.id)
@@ -111,8 +113,9 @@ describe('ErrorLogging', function() {
       })
       transaction.end()
 
+      clearQueue()
       apmServer
-        .sendEvents(errors)
+        .sendEvents(events)
         .then(done)
         .catch(reason => fail(reason))
     }
@@ -185,17 +188,18 @@ describe('ErrorLogging', function() {
     apmServer.init()
     var errorEvent = createErrorEvent(testErrorMessage)
     errorLogging.logErrorEvent(errorEvent)
-    const errors = getErrors()
-    expect(errors.length).toBe(1)
-    const errorData = errors[0][ERRORS]
+    const events = getEvents()
+    expect(events.length).toBe(1)
+    const errorData = events[0][ERRORS]
 
     // the message is different in IE 10 since error type is not available
     expect(errorData.exception.message).toContain(testErrorMessage)
     // the number of frames is different in different platforms
     expect(errorData.exception.stacktrace.length).toBeGreaterThan(0)
 
+    clearQueue()
     apmServer
-      .sendEvents(errors)
+      .sendEvents(events)
       .then(done)
       .catch(reason => fail(reason))
   })
@@ -212,13 +216,14 @@ describe('ErrorLogging', function() {
     }
 
     errorLogging.logErrorEvent(errorEvent)
-    const errors = getErrors()
-    expect(errors.length).toBe(1)
-    const errorData = errors[0][ERRORS]
+    const events = getEvents()
+    expect(events.length).toBe(1)
+    const errorData = events[0][ERRORS]
     expect(errorData.exception.message).toContain(testErrorMessage)
 
+    clearQueue()
     apmServer
-      .sendEvents(errors)
+      .sendEvents(events)
       .then(done)
       .catch(reason => fail(reason))
   })
@@ -327,8 +332,8 @@ describe('ErrorLogging', function() {
     apmServer.init()
 
     errorLogging.logPromiseEvent({})
-    expect(getErrors().length).toBe(1)
-    expect(getErrors()[0][ERRORS].exception.message).toMatch(
+    expect(getEvents().length).toBe(1)
+    expect(getEvents()[0][ERRORS].exception.message).toMatch(
       /no reason specified/
     )
 
@@ -336,12 +341,12 @@ describe('ErrorLogging', function() {
     errorLogging.logPromiseEvent({
       reason: error
     })
-    expect(getErrors()[1][ERRORS].exception.message).toMatch(error.message)
+    expect(getEvents()[1][ERRORS].exception.message).toMatch(error.message)
 
     errorLogging.logPromiseEvent({
       reason: testErrorMessage
     })
-    expect(getErrors()[2][ERRORS].exception.message).toMatch(testErrorMessage)
+    expect(getEvents()[2][ERRORS].exception.message).toMatch(testErrorMessage)
 
     const errorObj = {
       message: testErrorMessage,
@@ -350,8 +355,8 @@ describe('ErrorLogging', function() {
     errorLogging.logPromiseEvent({
       reason: errorObj
     })
-    expect(getErrors()[3][ERRORS].exception.message).toMatch(testErrorMessage)
-    expect(getErrors()[3][ERRORS].exception.stacktrace.length).toBeGreaterThan(
+    expect(getEvents()[3][ERRORS].exception.message).toMatch(testErrorMessage)
+    expect(getEvents()[3][ERRORS].exception.stacktrace.length).toBeGreaterThan(
       0
     )
 
@@ -362,35 +367,33 @@ describe('ErrorLogging', function() {
     errorLogging.logPromiseEvent({
       reason: errorLikeObj
     })
-    expect(getErrors()[4][ERRORS].exception.message).toMatch(testErrorMessage)
-    expect(getErrors()[4][ERRORS].exception.stacktrace.length).toBe(0)
+    expect(getEvents()[4][ERRORS].exception.message).toMatch(testErrorMessage)
+    expect(getEvents()[4][ERRORS].exception.stacktrace.length).toBe(0)
 
     errorLogging.logPromiseEvent({
       reason: 200
     })
-    expect(getErrors()[5][ERRORS].exception.message).toBe(
+    expect(getEvents()[5][ERRORS].exception.message).toBe(
       'Unhandled promise rejection: 200'
     )
 
     errorLogging.logPromiseEvent({
       reason: true
     })
-    expect(getErrors()[6][ERRORS].exception.message).toBe(
+    expect(getEvents()[6][ERRORS].exception.message).toBe(
       'Unhandled promise rejection: true'
     )
 
     errorLogging.logPromiseEvent({
       reason: [{ a: '1' }]
     })
-    expect(getErrors()[7]).toBeUndefined()
+    expect(getEvents()[7]).toBeUndefined()
 
-    const errors = getErrors()
+    const events = getEvents()
 
-    // Clear the error queue
-    apmServer.queue._clear()
-
+    clearQueue()
     apmServer
-      .sendEvents(errors)
+      .sendEvents(events)
       .then(done)
       .catch(reason => {
         fail(reason)

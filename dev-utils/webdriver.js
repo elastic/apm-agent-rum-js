@@ -258,9 +258,7 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
          * If there is more than one event we consider that as valid call
          */
         var validCall =
-          serverCalls.sendEvents &&
-          serverCalls.sendEvents.length > 0 &&
-          serverCalls.sendEvents[0].args[0].length > 0
+          serverCalls.sendEvents && serverCalls.sendEvents.length > 0
 
         if (validCall) {
           var promises = serverCalls.sendEvents.map(function(s) {
@@ -270,16 +268,19 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
             .then(function() {
               var transactions = []
               var errors = []
-              var args = serverCalls.sendEvents[0].args
-              for (var i = 0; i < args.length; i++) {
-                var arg = args[i]
-                arg.forEach(function(event) {
-                  if (event['transactions']) {
-                    transactions.push(event['transactions'])
-                  } else if (event['errors']) {
-                    errors.push(event['errors'])
-                  }
-                })
+              var spyCalls = serverCalls.sendEvents
+              for (var i = 0; i < spyCalls.length; i++) {
+                var args = spyCalls[i].args
+                for (var j = 0; j < args.length; j++) {
+                  var arg = args[j]
+                  arg.forEach(function(event) {
+                    if (event['transactions']) {
+                      transactions.push(event['transactions'])
+                    } else if (event['errors']) {
+                      errors.push(event['errors'])
+                    }
+                  })
+                }
               }
               if (
                 errors.length >= errorCount &&
@@ -297,7 +298,7 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
               }
             })
             .catch(function(reason) {
-              console.log('reason', reason)
+              console.log('reason', JSON.stringify(reason))
               try {
                 done({ error: reason.message || JSON.stringify(reason) })
               } catch (e) {
