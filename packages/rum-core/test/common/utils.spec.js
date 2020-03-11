@@ -228,6 +228,7 @@ describe('lib/utils', function() {
     utils.setLabel('date', date, labels)
     utils.setLabel()
     utils.setLabel('removed', undefined, labels)
+    utils.setLabel('removed_null', null, labels)
     utils.setLabel('obj', {}, labels)
     expect(labels).toEqual({
       test: 'test',
@@ -237,6 +238,7 @@ describe('lib/utils', function() {
       test_test: 'passed',
       date: String(date),
       removed: undefined,
+      removed_null: null,
       obj: '[object Object]'
     })
   })

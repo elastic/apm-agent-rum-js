@@ -134,18 +134,16 @@ function isPlatformSupported() {
 }
 
 /**
- * Convert values of the Tag/Label to be string to be compatible
- * with the apm server prior to <6.7 version
- *
- * TODO: Remove string conversion in the next major release since
- * support for boolean and number in the APM server has landed in 6.7
- * https://github.com/elastic/apm-server/pull/1712/
+ * Support for boolean and number in the APM server landed in 6.7
+ * therefore, we keep these values unchange but convert any other
+ * type to string.
  */
 function setLabel(key, value, obj) {
   if (!obj || !key) return
   const skey = removeInvalidChars(key)
   let valueType = typeof value
   if (
+    value !== null &&
     valueType !== 'undefined' &&
     valueType !== 'boolean' &&
     valueType !== 'number'
