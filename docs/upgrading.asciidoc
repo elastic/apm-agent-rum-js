@@ -89,7 +89,7 @@ Removed options:
 
 Added option:
 
-* <<event-limit>> -- Configure the number of events sent to APM Server per minute. Defaults to `80`.
+* <<events-limit>> -- Configure the number of events sent to APM Server per minute. Defaults to `80`.
 
 [float]
 [[v5-upgrade-steps]]
@@ -136,11 +136,14 @@ Update or download the latest version of the RUM Agent using your
 <<install-the-agent,preferred installation method>>.
 
 If your old configuration used one of the removed config options (listed below),
-update your configuration to use the new <<event-limit>> config option instead.
+update your configuration to use the new config options instead.
 
 Removed configurations:
 
-* `errorThrottleLimit`
-* `errorThrottleInterval`
-* `transactionThrottleLimit`
-* `transactionThrottleInterval`
+* `errorThrottleLimit` removed in favor of <<events-limit>>.
+* `errorThrottleInterval` removed in favor of <<events-limit>>.
+* `transactionThrottleLimit` removed in favor of <<events-limit>>.
+* `transactionThrottleInterval` removed in favor of <<events-limit>>.
+* `apm.addTags()` removed in favor of <<apm-add-labels>>.
+* `span.addTags()` removed in favor of <<span-add-labels>>.
+* `transaction.addTags()` removed in favor of <<transaction-add-labels>>.

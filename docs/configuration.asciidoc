@@ -218,8 +218,8 @@ var options = {
 Throttle the number of events sent to APM Server.
 
 [float]
-[[event-limit]]
-==== `eventLimit`
+[[events-limit]]
+==== `eventsLimit`
 
 By default, the agent can only send up to `80` events every `60000` milliseconds (one minute).
 
