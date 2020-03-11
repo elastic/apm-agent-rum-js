@@ -56,8 +56,8 @@ This guide outlines the changes and the steps required to upgrade.
 *Agent name changed to `rum-js`*
 
 The Agent name has been changed to `rum-js`.
-Because of this change, you may need to upgrade your APM Server instance,
-and therefor your Elasticsearch and Kibana instance.
+Because older versions of the APM app in Kibana don't recognize this new name,
+you may need to upgrade your Elastic stack version.
 
 *Official W3C tracecontext support*
 
@@ -102,6 +102,9 @@ NOTE: APM Server version >= `7.0` requires Elasticsearch and Kibana versions >= 
 All Elastic APM agents have been upgraded to support the changes in the RUM Agent.
 You must upgrade your backend agents to the minimum versions listed below for all features to work:
 
+// This content is reused elsewhere in the documentation. Take care when updating.
+// tag::backend-compat-chart[]
+
 [options="header"]
 |====
 |Agent name |Agent Version
@@ -112,6 +115,9 @@ You must upgrade your backend agents to the minimum versions listed below for al
 |**Python Agent**|>= `5.4`
 |**Ruby Agent**|>= `3.5`
 |====
+
+// End shared content
+// end::backend-compat-chart[]
 
 [float]
 [[v5-update-rum-agent]]
