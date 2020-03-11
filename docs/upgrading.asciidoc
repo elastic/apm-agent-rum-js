@@ -80,7 +80,7 @@ Removed options:
 
 Added option:
 
-* <<event-limit>> -- Configure the number of events sent sent to APM Server per minute. Defaults to `80`.
+* <<event-limit>> -- Configure the number of events sent to APM Server per minute. Defaults to `80`.
 
 [float]
 [[v5-upgrade-steps]]
