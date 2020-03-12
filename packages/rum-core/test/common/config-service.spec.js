@@ -223,7 +223,7 @@ describe('ConfigService', function() {
     const contextLabels = configService.get('context.tags')
     expect(contextLabels).toEqual({
       test: 'test',
-      no: '1',
+      no: 1,
       test_test: 'test',
       obj: '[object Object]',
       date: String(date)
