@@ -39,16 +39,17 @@ describe('general-usercase', function() {
       'expected element #test-element'
     )
 
-    const serverCalls = waitForApmServerCalls(1, 1)
+    const { sendEvents } = waitForApmServerCalls(1, 1)
+    const { transactions, errors } = sendEvents
 
-    expect(serverCalls.sendErrors.length).toBe(1)
-    var errorPayload = serverCalls.sendErrors[0].args[0][0]
+    expect(errors.length).toBe(1)
+    var errorPayload = errors[0]
     expect(
       errorPayload.exception.message.indexOf('timeout test error') >= 0
     ).toBeTruthy()
 
-    expect(serverCalls.sendTransactions.length).toBe(1)
-    var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
+    expect(transactions.length).toBe(1)
+    var transactionPayload = transactions[0]
     expect(transactionPayload.marks.agent.domComplete).toBeDefined()
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('general-usecase-initial-page-load')
@@ -96,9 +97,10 @@ describe('general-usercase', function() {
       'expected element #test-element'
     )
 
-    const serverCalls = waitForApmServerCalls(0, 1)
-    expect(serverCalls.sendTransactions.length).toBe(1)
-    const transactionPayload = serverCalls.sendTransactions[0].args[0][0]
+    const { sendEvents } = waitForApmServerCalls(0, 1)
+    const { transactions } = sendEvents
+    expect(transactions.length).toBe(1)
+    const transactionPayload = transactions[0]
     expect(transactionPayload.name).toBe('Push state title')
     /**
      * The actual spans are tested as part of the previous test.
@@ -117,19 +119,12 @@ describe('general-usercase', function() {
         5000,
         'expected element #test-element'
       )
-      /**
-       * Wait for the page load transaction first.
-       */
-      let serverCalls = waitForApmServerCalls(0, 1)
-
       const actionButton = $('#test-action')
       actionButton.click()
-
-      /**
-       * The number of transactions is counted from the start.
-       */
-      serverCalls = waitForApmServerCalls(0, 2)
-      let clickTransaction = serverCalls.sendTransactions[1].args[0][0]
+      const { sendEvents } = waitForApmServerCalls(0, 2)
+      const { transactions } = sendEvents
+      expect(transactions.length).toEqual(2)
+      const clickTransaction = transactions[1]
       expect(clickTransaction.type).toBe('user-interaction')
       expect(clickTransaction.name).toBe('Click - button["test-action"]')
       expect(clickTransaction.spans.length).toBeGreaterThanOrEqual(1)

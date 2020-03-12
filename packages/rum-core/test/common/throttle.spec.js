@@ -111,39 +111,4 @@ describe('throttle', function() {
       done()
     }, 10)
   })
-
-  it('should accept countFn', function() {
-    var counter = 0
-    var throttled = 0
-    var fn = throttle(
-      function() {
-        counter++
-        return 'fn_result'
-      },
-      function() {
-        throttled++
-      },
-      {
-        limit: 3,
-        countFn(i) {
-          return i
-        }
-      }
-    )
-
-    var result = fn(2)
-    expect(result).toBe('fn_result')
-    expect(counter).toBe(1)
-    expect(throttled).toBe(0)
-
-    result = fn(1)
-    expect(result).toBe('fn_result')
-    expect(counter).toBe(2)
-    expect(throttled).toBe(0)
-
-    result = fn()
-    expect(result).toBe(undefined)
-    expect(counter).toBe(2)
-    expect(throttled).toBe(1)
-  })
 })

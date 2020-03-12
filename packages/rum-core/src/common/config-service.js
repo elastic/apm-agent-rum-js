@@ -76,28 +76,19 @@ class Config {
       logLevel: 'warn',
       breakdownMetrics: false,
       ignoreTransactions: [],
-      errorThrottleLimit: 20,
-      errorThrottleInterval: 30000,
-      transactionThrottleLimit: 20,
-      transactionThrottleInterval: 30000,
-
+      eventsLimit: 80,
       queueLimit: -1,
       flushInterval: 500,
-
       distributedTracing: true,
       distributedTracingOrigins: [],
       distributedTracingHeaderName: 'traceparent',
-
       pageLoadTraceId: '',
       pageLoadSpanId: '',
       pageLoadSampled: false,
       pageLoadTransactionName: '',
-
       transactionSampleRate: 1.0,
       centralConfig: false,
-
       monitorLongtasks: true,
-
       context: {}
     }
 

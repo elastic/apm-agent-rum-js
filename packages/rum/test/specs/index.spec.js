@@ -68,8 +68,7 @@ describe('index', function() {
       }
     }
 
-    spyOn(apmServer, 'sendErrors').and.callThrough()
-    spyOn(apmServer, '_postJson').and.callThrough()
+    spyOn(apmServer, 'sendEvents').and.callThrough()
 
     apmBase.init({
       serverUrl,
@@ -90,12 +89,13 @@ describe('index', function() {
       throw new Error('ApmBase test error')
     } catch (error) {
       apmBase.captureError(error)
-      expect(apmServer.sendErrors).not.toHaveBeenCalled()
+      expect(apmServer.sendEvents).not.toHaveBeenCalled()
+
       if (isPlatformSupported()) {
-        expect(apmServer.errorQueue.items.length).toBe(1)
+        expect(apmServer.queue.items.length).toBe(1)
         setTimeout(() => {
-          expect(apmServer.sendErrors).toHaveBeenCalled()
-          var callData = apmServer.sendErrors.calls.mostRecent()
+          expect(apmServer.sendEvents).toHaveBeenCalled()
+          var callData = apmServer.sendEvents.calls.mostRecent()
           callData.returnValue.then(
             () => {
               // Wait before ending the test to make sure the result are processed by the agent.

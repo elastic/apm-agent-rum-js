@@ -152,7 +152,7 @@ class ErrorLogging {
     return truncateModel(ERROR_MODEL, errorObject)
   }
 
-  logErrorEvent(errorEvent, sendImmediately) {
+  logErrorEvent(errorEvent) {
     if (typeof errorEvent === 'undefined') {
       return
     }
@@ -160,11 +160,8 @@ class ErrorLogging {
     if (typeof errorObject.exception.message === 'undefined') {
       return
     }
-    if (sendImmediately) {
-      return this._apmServer.sendErrors([errorObject])
-    } else {
-      return this._apmServer.addError(errorObject)
-    }
+
+    this._apmServer.addError(errorObject)
   }
 
   registerListeners() {

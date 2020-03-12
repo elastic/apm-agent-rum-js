@@ -23,11 +23,11 @@
  *
  */
 
-import Subscription from './subscription'
+import EventHandler from '../../src/common/event-handler'
 
 class ApmServerMock {
   constructor(apmServer, useMocks) {
-    var subscription = (this.subscription = new Subscription())
+    var events = (this.events = new EventHandler())
     var _apmServer = (this._apmServer = apmServer)
     var calls = (this.calls = {})
 
@@ -37,7 +37,7 @@ class ApmServerMock {
       } else {
         calls[methodName] = [call]
       }
-      subscription.applyAll(this, [call])
+      events.sendOnly(methodName, [call])
     }
     // eslint-disable-next-line
     function applyMock(methodName, captureFn, mockFn) {
@@ -75,30 +75,17 @@ class ApmServerMock {
         }
       })
     }
-    spyOn(
-      _apmServer,
-      'sendErrors',
-      useMocks
-        ? function() {
-            return Promise.resolve()
-          }
-        : undefined
-    )
 
     spyOn(
       _apmServer,
-      'sendTransactions',
-      useMocks
-        ? function() {
-            return Promise.resolve()
-          }
-        : undefined
+      'sendEvents',
+      useMocks ? () => Promise.resolve() : undefined
     )
 
     this.addError = _apmServer.addError.bind(_apmServer)
     this.addTransaction = _apmServer.addTransaction.bind(_apmServer)
+    this.init = _apmServer.init.bind(_apmServer)
   }
-  init() {}
 }
 
 export default ApmServerMock

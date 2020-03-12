@@ -53,9 +53,11 @@ async function runIntegrationTest(pageUrl) {
       let transactionData = false
       if (data) {
         const payloads = data.split('\n').map(p => p && JSON.parse(p))
-        if (payloads[1].hasOwnProperty('transaction')) {
-          transactionData = true
-        }
+        payloads.forEach(payload => {
+          if (payload.hasOwnProperty('transaction')) {
+            transactionData = true
+          }
+        })
       }
       return (
         transactionData &&

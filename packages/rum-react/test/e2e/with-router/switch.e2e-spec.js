@@ -42,14 +42,15 @@ describe('Using Switch component of react router', function() {
       'expected functional component to be rendered'
     )
 
-    const serverCalls = waitForApmServerCalls(0, 2)
-    expect(serverCalls.sendTransactions.length).toBe(2)
+    const { sendEvents } = waitForApmServerCalls(0, 2)
+    const { transactions } = sendEvents
+    expect(transactions.length).toBe(2)
 
-    const pageLoadTransaction = serverCalls.sendTransactions[0].args[0][0]
+    const pageLoadTransaction = transactions[0]
     expect(pageLoadTransaction.type).toBe('page-load')
     expect(pageLoadTransaction.name).toBe('/notfound')
 
-    const routeTransaction = serverCalls.sendTransactions[1].args[0][0]
+    const routeTransaction = transactions[1]
     expect(routeTransaction.name).toBe('/func')
     expect(routeTransaction.type).toBe('route-change')
     /**

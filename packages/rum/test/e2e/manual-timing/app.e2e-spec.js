@@ -39,16 +39,17 @@ describe('manual-timing', function() {
       'expected element #test-element'
     )
 
-    const serverCalls = waitForApmServerCalls(1, 1)
+    const { sendEvents } = waitForApmServerCalls(1, 1)
+    const { transactions, errors } = sendEvents
 
-    expect(serverCalls.sendErrors.length).toBe(1)
-    var errorPayload = serverCalls.sendErrors[0].args[0][0]
+    expect(errors.length).toBe(1)
+    const errorPayload = errors[0]
     expect(
       errorPayload.exception.message.indexOf('timeout test error') >= 0
     ).toBeTruthy()
 
-    expect(serverCalls.sendTransactions.length).toBe(1)
-    var transactionPayload = serverCalls.sendTransactions[0].args[0][0]
+    expect(transactions.length).toBe(1)
+    const transactionPayload = transactions[0]
     expect(transactionPayload.name).toBe('transaction-name')
     expect(transactionPayload.type).toBe('transaction-type')
 
