@@ -212,12 +212,6 @@ class ApmBase {
     configService.setCustomContext(customContext)
   }
 
-  addTags(tags) {
-    const loggingService = this.serviceFactory.getService('LoggingService')
-    loggingService.warn('addTags deprecated, please use addLabels')
-    this.addLabels(tags)
-  }
-
   addLabels(labels) {
     var configService = this.serviceFactory.getService('ConfigService')
     configService.addLabels(labels)
