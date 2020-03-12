@@ -32,8 +32,8 @@
     "karma:dev": "karma start --auto-watch --restartOnFileChange",
     "karma:coverage": "karma start --coverage --singleRun",
     "test:unit": "npm run script runUnitTests packages/rum-react",
-    "test:e2e:supported": "npm run script runE2eTests packages/rum-react/wdio.conf.js",
-    "test:sauce": "npm run script runSauceTests packages/rum-react true build:e2e test:unit test:e2e:supported",
+    "test:e2e": "npm run script runE2eTests packages/rum-react/wdio.conf.js",
+    "test:sauce": "npm run script runSauceTests packages/rum-react true build:e2e test:unit test:e2e",
     "test": "npm run test:sauce",
     "script": "node ../../dev-utils/run-script.js"
   },

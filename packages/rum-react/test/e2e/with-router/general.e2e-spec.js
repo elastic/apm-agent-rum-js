@@ -41,11 +41,11 @@ describe('General usecase with react-router', function() {
       'expected element #test-element'
     )
 
-    const serverCalls = waitForApmServerCalls(0, 1)
+    const { sendEvents } = waitForApmServerCalls(0, 1)
+    const { transactions } = sendEvents
 
-    expect(serverCalls.sendTransactions.length).toBe(1)
-
-    const transaction = serverCalls.sendTransactions[0].args[0][0]
+    expect(transactions.length).toBe(1)
+    const transaction = transactions[0]
     expect(transaction.type).toBe('page-load')
     expect(transaction.name).toBe('/home')
     expect(transaction.spans.length).toBeGreaterThan(1)
@@ -79,14 +79,14 @@ describe('General usecase with react-router', function() {
       'expected manual component to be rendered'
     )
 
-    const serverCalls = waitForApmServerCalls(0, 2)
-    expect(serverCalls.sendTransactions.length).toBe(2)
+    const { sendEvents } = waitForApmServerCalls(0, 2)
+    const { transactions } = sendEvents
 
-    const pageLoadTransaction = serverCalls.sendTransactions[0].args[0][0]
+    const pageLoadTransaction = transactions[0]
     expect(pageLoadTransaction.type).toBe('page-load')
     expect(pageLoadTransaction.name).toBe('/home')
 
-    const routeTransaction = serverCalls.sendTransactions[1].args[0][0]
+    const routeTransaction = transactions[1]
     expect(routeTransaction.name).toBe('ManualComponent')
     expect(routeTransaction.type).toBe('route-change')
 

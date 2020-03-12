@@ -233,8 +233,14 @@ function getWebdriveBaseConfig(
   return baseConfig
 }
 
+function isPageLoaded() {
+  return browser.execute(() => {
+    return document.readyState === 'complete'
+  })
+}
+
 function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
-  const { name, version } = getBrowserInfo()
+  const { name = '', version = '' } = getBrowserInfo()
   console.log(
     `Waiting for minimum ${errorCount} Errors and ${transactionCount} Transactions in`,
     name,
@@ -248,62 +254,51 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
 
       function checkCalls() {
         var serverCalls = apmServerMock.calls
+        /**
+         * If there is more than one event we consider that as valid call
+         */
+        var validCall =
+          serverCalls.sendEvents && serverCalls.sendEvents.length > 0
 
-        var validCalls = true
-
-        if (errorCount) {
-          validCalls =
-            validCalls &&
-            serverCalls.sendErrors &&
-            serverCalls.sendErrors.length >= errorCount
-        }
-        if (transactionCount) {
-          validCalls =
-            validCalls &&
-            serverCalls.sendTransactions &&
-            serverCalls.sendTransactions.length >= transactionCount
-        }
-
-        if (validCalls) {
-          console.log('calls', serverCalls)
-          var promises = []
-
-          if (serverCalls.sendErrors) {
-            promises = promises.concat(
-              serverCalls.sendErrors.map(function(s) {
-                return s.returnValue
-              })
-            )
-          }
-          if (serverCalls.sendTransactions) {
-            promises = promises.concat(
-              serverCalls.sendTransactions.map(function(s) {
-                return s.returnValue
-              })
-            )
-          }
-
+        if (validCall) {
+          var promises = serverCalls.sendEvents.map(function(s) {
+            return s.returnValue
+          })
           Promise.all(promises)
             .then(function() {
-              function mapCall(c) {
-                return { args: c.args, mocked: c.mocked }
+              var transactions = []
+              var errors = []
+              var spyCalls = serverCalls.sendEvents
+              for (var i = 0; i < spyCalls.length; i++) {
+                var args = spyCalls[i].args
+                for (var j = 0; j < args.length; j++) {
+                  var arg = args[j]
+                  arg.forEach(function(event) {
+                    if (event['transactions']) {
+                      transactions.push(event['transactions'])
+                    } else if (event['errors']) {
+                      errors.push(event['errors'])
+                    }
+                  })
+                }
               }
-              try {
+              if (
+                errors.length >= errorCount &&
+                transactions.length >= transactionCount
+              ) {
                 var calls = {
-                  sendErrors: serverCalls.sendErrors
-                    ? serverCalls.sendErrors.map(mapCall)
-                    : undefined,
-                  sendTransactions: serverCalls.sendTransactions
-                    ? serverCalls.sendTransactions.map(mapCall)
-                    : undefined
+                  sendEvents: {
+                    // eslint-disable-next-line object-shorthand
+                    transactions: transactions,
+                    // eslint-disable-next-line object-shorthand
+                    errors: errors
+                  }
                 }
                 done(calls)
-              } catch (e) {
-                throw e
               }
             })
             .catch(function(reason) {
-              console.log('reason', reason)
+              console.log('reason', JSON.stringify(reason))
               try {
                 done({ error: reason.message || JSON.stringify(reason) })
               } catch (e) {
@@ -316,7 +311,7 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
       }
 
       checkCalls()
-      apmServerMock.subscription.subscribe(checkCalls)
+      apmServerMock.events.observe('sendEvents', checkCalls)
     },
     errorCount,
     transactionCount
@@ -369,5 +364,6 @@ module.exports = {
   getWebdriveBaseConfig,
   getBrowserInfo,
   waitForApmServerCalls,
-  getBrowserFeatures
+  getBrowserFeatures,
+  isPageLoaded
 }

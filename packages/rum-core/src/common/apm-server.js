@@ -28,21 +28,22 @@ import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
-import { SERVER_URL_PREFIX } from './constants'
+import { SERVER_URL_PREFIX, ERRORS, TRANSACTIONS } from './constants'
+import { noop } from './utils'
 import { Promise } from './polyfills'
 import { __DEV__ } from '../env'
+
+/**
+ * Throttling interval deafults to 60 seconds
+ */
+const THROTTLE_INTERVAL = 60000
 
 class ApmServer {
   constructor(configService, loggingService) {
     this._configService = configService
     this._loggingService = loggingService
-
-    this.errorQueue = undefined
-    this.transactionQueue = undefined
-
-    this.throttleAddError = undefined
-    this.throttleAddTransaction = undefined
-
+    this.queue = undefined
+    this.throttleEvents = noop
     this.initialized = false
   }
 
@@ -51,29 +52,32 @@ class ApmServer {
       return
     }
     this.initialized = true
-
-    this.initErrorQueue()
-    this.initTransactionQueue()
+    this._initQueue()
   }
 
-  createMetaData() {
-    const cfg = this._configService
-    const metadata = {
-      service: {
-        name: cfg.get('serviceName'),
-        version: cfg.get('serviceVersion'),
-        agent: {
-          name: 'rum-js',
-          version: cfg.version
-        },
-        language: {
-          name: 'javascript'
-        },
-        environment: cfg.get('environment')
-      },
-      labels: cfg.get('context.tags')
+  _initQueue() {
+    const queueLimit = this._configService.get('queueLimit')
+    const flushInterval = this._configService.get('flushInterval')
+    const limit = this._configService.get('eventsLimit')
+
+    const onFlush = events => {
+      const promise = this.sendEvents(events)
+      if (promise) {
+        promise.catch(reason => {
+          this._loggingService.warn(
+            'Failed sending events!',
+            this._constructError(reason)
+          )
+        })
+      }
     }
-    return truncateModel(METADATA_MODEL, metadata)
+    this.queue = new Queue(onFlush, { queueLimit, flushInterval })
+
+    this.throttleEvents = throttle(
+      this.queue.add.bind(this.queue),
+      () => this._loggingService.warn('Dropped events due to throttling!'),
+      { limit, interval: THROTTLE_INTERVAL }
+    )
   }
 
   _postJson(endPoint, payload) {
@@ -148,12 +152,6 @@ class ApmServer {
     })
   }
 
-  _createQueue(onFlush) {
-    var queueLimit = this._configService.get('queueLimit')
-    var flushInterval = this._configService.get('flushInterval')
-    return new Queue(onFlush, { queueLimit, flushInterval })
-  }
-
   fetchConfig(serviceName, environment) {
     const serverUrl = this._configService.get('serverUrl')
     var configEndpoint = `${serverUrl}/config/v1/rum/agents`
@@ -193,70 +191,32 @@ class ApmServer {
       })
   }
 
-  initErrorQueue() {
-    if (this.errorQueue) {
-      this.errorQueue.flush()
+  createMetaData() {
+    const cfg = this._configService
+    const metadata = {
+      service: {
+        name: cfg.get('serviceName'),
+        version: cfg.get('serviceVersion'),
+        agent: {
+          name: 'rum-js',
+          version: cfg.version
+        },
+        language: {
+          name: 'javascript'
+        },
+        environment: cfg.get('environment')
+      },
+      labels: cfg.get('context.tags')
     }
-    this.errorQueue = this._createQueue(errors => {
-      var p = this.sendErrors(errors)
-      if (p) {
-        p.catch(reason => {
-          this._loggingService.warn(
-            'Failed sending errors!',
-            this._constructError(reason)
-          )
-        })
-      }
-    })
-
-    var limit = this._configService.get('errorThrottleLimit')
-    var interval = this._configService.get('errorThrottleInterval')
-
-    this.throttleAddError = throttle(
-      this.errorQueue.add.bind(this.errorQueue),
-      () => this._loggingService.warn('Dropped error due to throttling!'),
-      { limit, interval }
-    )
-  }
-
-  initTransactionQueue() {
-    if (this.transactionQueue) {
-      this.transactionQueue.flush()
-    }
-    this.transactionQueue = this._createQueue(transactions => {
-      var p = this.sendTransactions(transactions)
-      if (p) {
-        p.catch(reason => {
-          this._loggingService.warn(
-            'Failed sending transactions!',
-            this._constructError(reason)
-          )
-        })
-      }
-    })
-
-    var limit = this._configService.get('transactionThrottleLimit')
-    var interval = this._configService.get('transactionThrottleInterval')
-
-    this.throttleAddTransaction = throttle(
-      this.transactionQueue.add.bind(this.transactionQueue),
-      () => this._loggingService.warn('Dropped transaction due to throttling!'),
-      { limit, interval }
-    )
+    return truncateModel(METADATA_MODEL, metadata)
   }
 
   addError(error) {
-    if (!this.errorQueue) {
-      this.initErrorQueue()
-    }
-    this.throttleAddError(error)
+    this.throttleEvents({ [ERRORS]: error })
   }
 
   addTransaction(transaction) {
-    if (!this.transactionQueue) {
-      this.initTransactionQueue()
-    }
-    this.throttleAddTransaction(transaction)
+    this.throttleEvents({ [TRANSACTIONS]: transaction })
   }
 
   ndjsonErrors(errors) {
@@ -284,43 +244,45 @@ class ApmServer {
     })
   }
 
-  _send(data = [], type = 'transactions') {
-    if (data.length === 0) {
+  sendEvents(events) {
+    if (events.length === 0) {
+      return
+    }
+    const transactions = []
+    const errors = []
+    for (const event of events) {
+      if (event[TRANSACTIONS]) {
+        transactions.push(event[TRANSACTIONS])
+      }
+      if (event[ERRORS]) {
+        errors.push(event[ERRORS])
+      }
+    }
+    if (transactions.length === 0 && errors.length === 0) {
       return
     }
 
-    const payload = { [type]: data }
+    const payload = {
+      [TRANSACTIONS]: transactions,
+      [ERRORS]: errors
+    }
     const filteredPayload = this._configService.applyFilters(payload)
     if (!filteredPayload) {
       this._loggingService.warn('Dropped payload due to filtering!')
       return
     }
 
-    let ndjson
-    if (type === 'errors') {
-      ndjson = this.ndjsonErrors(filteredPayload[type])
-    } else if (type === 'transactions') {
-      ndjson = this.ndjsonTransactions(filteredPayload[type])
-    } else {
-      if (__DEV__) {
-        this._loggingService.debug('Dropped payload due to unknown data type')
-      }
-      return
-    }
-
+    let ndjson = []
     const metadata = this.createMetaData()
-    ndjson.unshift(NDJSON.stringify({ metadata }))
+    ndjson.push(NDJSON.stringify({ metadata }))
+
+    ndjson = ndjson.concat(
+      this.ndjsonErrors(filteredPayload[ERRORS]),
+      this.ndjsonTransactions(filteredPayload[TRANSACTIONS])
+    )
     const ndjsonPayload = ndjson.join('')
     const endPoint = this._configService.get('serverUrl') + SERVER_URL_PREFIX
     return this._postJson(endPoint, ndjsonPayload)
-  }
-
-  sendTransactions(transactions) {
-    return this._send(transactions)
-  }
-
-  sendErrors(errors) {
-    return this._send(errors, 'errors')
   }
 }
 

@@ -24,15 +24,18 @@
  */
 
 import compareVersions from 'compare-versions'
-import ApmServer from '../../src/common/apm-server'
 import Transaction from '../../src/performance-monitoring/transaction'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { describeIf } from '../../../../dev-utils/jasmine'
 import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
+import {
+  LOCAL_CONFIG_KEY,
+  ERRORS,
+  TRANSACTIONS
+} from '../../src/common/constants'
 import { createServiceFactory } from '../'
 
 const { agentConfig, testConfig } = getGlobalConfig('rum-core')
-import { LOCAL_CONFIG_KEY } from '../../src/common/constants'
 
 function generateTransaction(count, breakdown = false) {
   var result = []
@@ -66,6 +69,7 @@ function generateErrors(count) {
   }
   return result
 }
+
 describe('ApmServer', function() {
   var serviceFactory
   var apmServer
@@ -93,26 +97,27 @@ describe('ApmServer', function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
-  it('should not send transctions when the list is empty', function() {
+  it('should not send events when there are no events', function() {
     spyOn(apmServer, '_postJson')
-    var result = apmServer.sendTransactions([])
+    var result = apmServer.sendEvents([])
     expect(result).toBeUndefined()
     expect(apmServer._postJson).not.toHaveBeenCalled()
   })
 
-  it('should report http errors', function(done) {
-    var apmServer = new ApmServer(configService, loggingService)
+  it('should report http errors when server is down', function(done) {
     configService.setConfig({
       serverUrl: 'http://localhost:54321',
       serviceName: 'test-service'
     })
-    var result = apmServer.sendTransactions([{ test: 'test' }])
+    var result = apmServer.sendEvents([
+      {
+        [TRANSACTIONS]: { test: 'test' }
+      }
+    ])
     expect(result).toBeDefined()
     result.then(
-      function() {
-        fail('Request should have failed!')
-      },
-      function(reason) {
+      () => fail('Request should have failed!'),
+      reason => {
         expect(reason).toBeDefined()
         done()
       }
@@ -123,62 +128,45 @@ describe('ApmServer', function() {
     configService.setConfig({
       serviceName: 'serviceName'
     })
-
-    spyOn(apmServer, '_postJson')
     apmServer.init()
+    spyOn(apmServer, '_postJson')
 
-    let trs = generateTransaction(19)
+    const trs = generateTransaction(19)
     trs.forEach(apmServer.addTransaction.bind(apmServer))
-    expect(apmServer.transactionQueue.items.length).toBe(19)
+    expect(apmServer.queue.items.length).toBe(19)
     expect(apmServer._postJson).not.toHaveBeenCalled()
 
-    apmServer.transactionQueue.flush()
+    apmServer.queue.flush()
     expect(apmServer._postJson).toHaveBeenCalled()
-    expect(apmServer.transactionQueue.items.length).toBe(0)
+    expect(apmServer.queue.items.length).toBe(0)
   })
 
-  it('should init queue if not initialized before', function(done) {
+  it('should not add any items to queue when not initialized', function() {
+    const clock = jasmine.clock()
+    clock.install()
     configService.setConfig({ flushInterval: 200 })
-    spyOn(apmServer, 'sendErrors')
-    spyOn(apmServer, 'sendTransactions')
 
-    expect(apmServer.errorQueue).toBeUndefined()
+    spyOn(apmServer, 'sendEvents')
+    expect(apmServer.queue).toBeUndefined()
+
     apmServer.addError({})
-    expect(apmServer.errorQueue).toBeDefined()
-
-    expect(apmServer.transactionQueue).toBeUndefined()
     apmServer.addTransaction({})
-    expect(apmServer.transactionQueue).toBeDefined()
-
-    expect(apmServer.sendErrors).not.toHaveBeenCalled()
-    expect(apmServer.sendTransactions).not.toHaveBeenCalled()
+    expect(apmServer.queue).toBeUndefined()
 
     apmServer.init()
-
-    expect(apmServer.sendErrors).toHaveBeenCalled()
-    expect(apmServer.sendTransactions).toHaveBeenCalled()
-
-    apmServer.sendErrors.calls.reset()
-    apmServer.sendTransactions.calls.reset()
-
     apmServer.addTransaction({})
     apmServer.addError({})
 
-    apmServer.init()
-
-    expect(apmServer.sendErrors).not.toHaveBeenCalled()
-    expect(apmServer.sendTransactions).not.toHaveBeenCalled()
-
-    setTimeout(() => {
-      expect(apmServer.sendErrors).toHaveBeenCalled()
-      expect(apmServer.sendTransactions).toHaveBeenCalled()
-      done()
-    }, 300)
+    expect(apmServer.queue.items.length).toBe(2)
+    clock.tick(201)
+    expect(apmServer.sendEvents).toHaveBeenCalled()
+    clock.uninstall()
   })
 
   it('should capture errors logs from apm-server', done => {
+    apmServer.init()
     spyOn(loggingService, 'warn').and.callFake((failedMsg, error) => {
-      expect(failedMsg).toEqual('Failed sending transactions!')
+      expect(failedMsg).toEqual('Failed sending events!')
       /**
        * APM server error varies by stack, So we check for
        * explicit characters instead of whole message
@@ -189,7 +177,6 @@ describe('ApmServer', function() {
       expect(error.message).toContain('missing properties: "trace_id"')
       done()
     })
-    const apmServer = new ApmServer(configService, loggingService)
 
     apmServer.addTransaction({
       id: '21312',
@@ -197,7 +184,7 @@ describe('ApmServer', function() {
       duration: 100,
       type: 'app'
     })
-    apmServer.transactionQueue.flush()
+    apmServer.queue.flush()
   })
 
   it('should log parse error when response is invalid', done => {
@@ -205,7 +192,6 @@ describe('ApmServer', function() {
       expect(message).toEqual('Error parsing response from APM server')
       done()
     })
-    const apmServer = new ApmServer(configService, loggingService)
 
     const error = apmServer._constructError({
       url: 'http://localhost:54321',
@@ -216,20 +202,18 @@ describe('ApmServer', function() {
     expect(error.message).toEqual('http://localhost:54321 HTTP status: 0')
   })
 
-  it('should report http errors for queued errors', function(done) {
+  it('should report http errors for queued events', function(done) {
+    apmServer.init()
     spyOn(loggingService, 'warn')
-    var apmServer = new ApmServer(configService, loggingService)
-    var _sendErrors = apmServer.sendErrors
-    apmServer.sendErrors = function() {
-      var result = _sendErrors.apply(apmServer, arguments)
+    var _sendEvents = apmServer.sendEvents
+    apmServer.sendEvents = function() {
+      var result = _sendEvents.apply(apmServer, arguments)
       result.then(
-        function() {
-          fail('Request should have failed!')
-        },
-        function() {
+        () => fail('Request should have failed!'),
+        () => {
           setTimeout(() => {
             expect(loggingService.warn).toHaveBeenCalledWith(
-              'Failed sending errors!',
+              'Failed sending events!',
               jasmine.objectContaining({})
             )
             done()
@@ -243,114 +227,67 @@ describe('ApmServer', function() {
       serviceName: 'test-service'
     })
     apmServer.addError({ test: 'test' })
-
-    expect(loggingService.warn).not.toHaveBeenCalled()
-    apmServer.errorQueue.flush()
-  })
-
-  it('should report http errors for queued transactions', function(done) {
-    spyOn(loggingService, 'warn')
-    var apmServer = new ApmServer(configService, loggingService)
-    var _sendTransactions = apmServer.sendTransactions
-    apmServer.sendTransactions = function() {
-      var result = _sendTransactions.apply(apmServer, arguments)
-      result.then(
-        function() {
-          fail('Request should have failed!')
-        },
-        function() {
-          setTimeout(() => {
-            expect(loggingService.warn).toHaveBeenCalledWith(
-              'Failed sending transactions!',
-              jasmine.objectContaining({})
-            )
-            done()
-          })
-        }
-      )
-      return result
-    }
-    configService.setConfig({
-      serverUrl: 'http://localhost:54321',
-      serviceName: 'test-service'
-    })
     apmServer.addTransaction({ test: 'test' })
 
+    expect(apmServer.queue.items.length).toEqual(2)
     expect(loggingService.warn).not.toHaveBeenCalled()
-    apmServer.transactionQueue.flush()
+    apmServer.queue.flush()
   })
 
-  it('should throttle adding to the error queue', function(done) {
+  it('should throttle adding events to the queue every minute', () => {
+    const clock = jasmine.clock()
+    clock.install()
+    spyOn(apmServer, 'sendEvents')
+    spyOn(loggingService, 'warn')
+
     configService.setConfig({
       serviceName: 'serviceName',
       flushInterval: 100,
-      errorThrottleLimit: 5,
-      errorThrottleInterval: 200
+      eventsLimit: 5
     })
-    spyOn(apmServer, 'sendErrors')
-    spyOn(loggingService, 'warn')
+    apmServer.init()
 
-    var errors = generateErrors(6)
+    const errors = generateErrors(3)
     errors.forEach(apmServer.addError.bind(apmServer))
-    expect(apmServer.errorQueue.items.length).toBe(5)
-    expect(apmServer.sendErrors).not.toHaveBeenCalled()
-    expect(loggingService.warn).toHaveBeenCalledWith(
-      'Dropped error due to throttling!'
-    )
-
-    setTimeout(() => {
-      expect(apmServer.errorQueue.items.length).toBe(0)
-      expect(apmServer.sendErrors).toHaveBeenCalledWith(
-        jasmine.objectContaining(errors.slice(0, 4))
-      )
-      errors.forEach(apmServer.addError.bind(apmServer))
-      expect(apmServer.errorQueue.items.length).toBe(5)
-      apmServer.errorQueue._clear()
-      done()
-    }, 300)
-  })
-
-  it('should throttle adding to the transaction queue', function(done) {
-    configService.setConfig({
-      serviceName: 'serviceName',
-      flushInterval: 100,
-      transactionThrottleLimit: 5,
-      transactionThrottleInterval: 200
-    })
-    spyOn(apmServer, 'sendTransactions')
-    spyOn(loggingService, 'warn')
-
-    var transactions = generateTransaction(6)
+    const transactions = generateTransaction(3)
     transactions.forEach(apmServer.addTransaction.bind(apmServer))
-    expect(apmServer.transactionQueue.items.length).toBe(5)
-    expect(apmServer.sendTransactions).not.toHaveBeenCalled()
-    expect(loggingService.warn).toHaveBeenCalledWith(
-      'Dropped transaction due to throttling!'
-    )
 
-    setTimeout(() => {
-      expect(apmServer.transactionQueue.items.length).toBe(0)
-      expect(apmServer.sendTransactions).toHaveBeenCalledWith(
-        jasmine.objectContaining(transactions.slice(0, 4))
-      )
-      transactions.forEach(apmServer.addTransaction.bind(apmServer))
-      expect(apmServer.transactionQueue.items.length).toBe(5)
-      apmServer.transactionQueue._clear()
-      done()
-    }, 300)
+    expect(apmServer.queue.items.length).toBe(5)
+    expect(apmServer.sendEvents).not.toHaveBeenCalled()
+    expect(loggingService.warn).toHaveBeenCalledWith(
+      'Dropped events due to throttling!'
+    )
+    // Kickoff queue flush interval
+    clock.tick(120)
+    expect(apmServer.queue.items.length).toBe(0)
+    expect(apmServer.sendEvents).toHaveBeenCalled()
+
+    // add more events to the queue
+    errors.forEach(apmServer.addError.bind(apmServer))
+    expect(apmServer.queue.items.length).toBe(0)
+
+    // tick throttle limit of 1 minute
+    clock.tick(60001)
+
+    errors.forEach(apmServer.addError.bind(apmServer))
+    expect(apmServer.queue.items.length).toBe(3)
+
+    clock.uninstall()
   })
 
-  it('should ignore undefined payload', function() {
+  it('should ignore undefined filtered payload', function() {
     spyOn(loggingService, 'warn')
     configService.setConfig({
       serviceName: 'serviceName'
     })
     configService.addFilter(function() {})
     spyOn(apmServer, '_postJson')
-    var result = apmServer.sendErrors([{ test: 'test' }])
-    expect(result).toBeUndefined()
-    expect(apmServer._postJson).not.toHaveBeenCalled()
-    result = apmServer.sendTransactions([{ test: 'test' }])
+
+    const result = apmServer.sendEvents([
+      {
+        [TRANSACTIONS]: { test: 'test' }
+      }
+    ])
     expect(result).toBeUndefined()
     expect(apmServer._postJson).not.toHaveBeenCalled()
   })
@@ -361,7 +298,6 @@ describe('ApmServer', function() {
       serviceVersion: '0.0.1',
       environment: 'staging'
     })
-
     configService.setVersion('4.0.1')
     configService.addLabels({ test: 'testlabel' })
 
@@ -387,7 +323,46 @@ describe('ApmServer', function() {
     tr.startSpan('test-meta-span', 'test-type')
     tr.end(100)
     const payload = performanceMonitoring.createTransactionDataModel(tr)
-    await apmServer.sendTransactions([payload])
+    await apmServer.sendEvents([
+      {
+        [TRANSACTIONS]: payload
+      }
+    ])
+  })
+
+  it('should ndjson all events', async () => {
+    const clock = jasmine.clock()
+    clock.install()
+    apmServer.init()
+    spyOn(apmServer, '_postJson')
+    const trs = generateTransaction(2).map(tr =>
+      performanceMonitoring.createTransactionDataModel(tr)
+    )
+    const errors = generateErrors(2).map(err => ({
+      name: err.name,
+      message: err.message
+    }))
+
+    trs.forEach(apmServer.addTransaction.bind(apmServer))
+    errors.forEach(apmServer.addError.bind(apmServer))
+
+    clock.tick(600)
+
+    expect(apmServer._postJson).toHaveBeenCalled()
+    const payload = apmServer._postJson.calls.argsFor(0)[1]
+
+    const expected = [
+      '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}',
+      '{"error":{"name":"Error","message":"error #0"}}',
+      '{"error":{"name":"Error","message":"error #1"}}',
+      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}',
+      '{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","sync":false,"start":10,"duration":10}}',
+      '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}',
+      '{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","sync":false,"start":10,"duration":10}}'
+    ]
+
+    expect(payload.split('\n').filter(a => a)).toEqual(expected)
+    clock.uninstall()
   })
 
   it('should ndjson transactions', function() {
@@ -437,11 +412,19 @@ describe('ApmServer', function() {
       return payload
     })
 
-    type = 'errors'
-    apmServer.sendErrors([{ test: 'errors' }])
+    type = ERRORS
+    apmServer.sendEvents([
+      {
+        [ERRORS]: { test: type }
+      }
+    ])
 
-    type = 'transactions'
-    apmServer.sendTransactions([{ test: 'transactions' }])
+    type = TRANSACTIONS
+    apmServer.sendEvents([
+      {
+        [TRANSACTIONS]: { test: type }
+      }
+    ])
   })
 
   describeIf(
