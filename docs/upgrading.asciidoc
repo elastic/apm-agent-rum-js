@@ -8,6 +8,11 @@ Before upgrading the agent, be sure to review the:
 * <<release-notes,Agent release notes>>
 * {apm-overview-ref-v}/agent-server-compatibility.html[Agent and Server compatibility chart]
 
+The following upgrade guides are also available:
+
+* <<upgrade-to-v5>> - Follow this guide to upgrade from version `4.x` to version `5.x` of the
+Elastic APM RUM JS Agent.
+
 [float]
 [[end-of-life-dates]]
 === End of life dates
@@ -37,3 +42,108 @@ The table below is a simplified description of this policy.
 |2.0.x |2020-05-14 |2.1.0
 |1.0.x |2020-02-23 |3.0.0
 |====
+
+[[upgrade-to-v5]]
+=== Upgrade to version 5.x
+
+Upgrading from version `4.x` to `5.x` of the RUM Agent introduces some breaking changes.
+This guide outlines the changes and the steps required to upgrade.
+
+[float]
+[[v5-breaking-changes]]
+=== 5.0 Breaking changes
+
+*Agent name changed to `rum-js`*
+
+The Agent name has been changed to `rum-js`.
+Because older versions of the APM app in Kibana don't recognize this new name,
+you may need to upgrade your Elastic stack version.
+
+*Official W3C tracecontext support*
+
+The RUM Agent supports the official W3C tracecontext `traceparent` header,
+instead of the previously used `elastic-apm-traceparent` header.
+If you're using Elastic backend agents,
+you must upgrade them to a version that also supports the official W3C tracecontext headers.
+
+*`addTags` replaced with `addLabels*
+
+`addTags`, which was deprecated in version `4.1`, has been removed and replaced with `addLabels`,
+which supports strings, booleans, and numbers:
+
+* `apm.addTags()` removed in favor of <<apm-add-labels>>.
+* `span.addTags()` removed in favor of <<span-add-labels>>.
+* `transaction.addTags()` removed in favor of <<transaction-add-labels>>.
+
+*Single queue processing*
+
+A single queue is now used to process all events (transactions, errors, etc.).
+This change allows the consolidation of four configuration options into one:
+
+Removed options:
+
+* `errorThrottleLimit`
+* `errorThrottleInterval`
+* `transactionThrottleLimit`
+* `transactionThrottleInterval`
+
+Added option:
+
+* <<events-limit>> -- Configure the number of events sent to APM Server per minute. Defaults to `80`.
+
+[float]
+[[v5-upgrade-steps]]
+=== Upgrade steps
+
+[float]
+[[v5-upgrade-server]]
+==== Upgrade APM Server
+
+Version `5.x` of the RUM Agent requires APM Server version >= `7.0`.
+The {apm-server-ref-v}/upgrading-to-70.html[APM Server `7.0` upgrade guide] can help with the upgrade process.
+
+NOTE: APM Server version >= `7.0` requires Elasticsearch and Kibana versions >= `7.0` as well.
+
+[float]
+[[v5-upgrade-agents]]
+==== Upgrade backend agents
+
+All Elastic APM agents have been upgraded to support the changes in the RUM Agent.
+You must upgrade your backend agents to the minimum versions listed below for all features to work:
+
+// This content is reused elsewhere in the documentation. Take care when updating.
+// tag::backend-compat-chart[]
+
+[options="header"]
+|====
+|Agent name |Agent Version
+|**Go Agent**|>= `1.6`
+|**Java Agent**|>= `1.14`
+|**.NET Agent**|>= `1.3`
+|**Node.js Agent**|>= `3.4`
+|**Python Agent**|>= `5.4`
+|**Ruby Agent**|>= `3.5`
+|====
+
+// End shared content
+// end::backend-compat-chart[]
+
+[float]
+[[v5-update-rum-agent]]
+==== Upgrade the RUM agent
+
+Update or download the latest version of the RUM Agent using your
+<<install-the-agent,preferred installation method>>.
+
+If your old configuration used one of the removed config options (listed below),
+update your configuration to use the new config options instead.
+
+Removed configurations:
+
+* `errorThrottleLimit` removed in favor of <<events-limit>>.
+* `errorThrottleInterval` removed in favor of <<events-limit>>.
+* `transactionThrottleLimit` removed in favor of <<events-limit>>.
+* `transactionThrottleInterval` removed in favor of <<events-limit>>.
+* `apm.addTags()` removed in favor of <<apm-add-labels>>.
+* `span.addTags()` removed in favor of <<span-add-labels>>.
+* `transaction.addTags()` removed in favor of <<transaction-add-labels>>.

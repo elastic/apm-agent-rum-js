@@ -142,8 +142,8 @@ To understand the different types, see <<breakdown-metrics-docs>>
 * *Type:* Number
 * *Default:* `500`
 
-The agent maintains two in-memory queues to record transactions and errors when they are added.
-This option sets the flush interval in *milliseconds* for these queues.
+The agent maintains a single queue to record transaction and error events when they are added.
+This option sets the flush interval in *milliseconds* for the queue.
 
 NOTE: After each flush of the queue, the next flush isn't scheduled until an item is added to the queue.
 
@@ -212,48 +212,19 @@ var options = {
 ----
 
 [float]
-[[error-throttling]]
-=== Error throttling
+[[event-throttling]]
+=== Event throttling
 
-To throttle the number of errors send to the APM Server, you can use the following options:
+Throttle the number of events sent to APM Server.
 
 [float]
-[[error-throttle-limit]]
-==== `errorThrottleLimit`
+[[events-limit]]
+==== `eventsLimit`
+
+By default, the agent can only send up to `80` events every `60000` milliseconds (one minute).
 
 * *Type:* Number
-* *Default:* `20`
-
-[float]
-[[error-throttle-interval]]
-==== `errorThrottleInterval`
-
-* *Type:* Number
-* *Default:* `30000`
-
-By default the agent can only send (up to) `20` errors every `30000` milliseconds.
-
-
-[float]
-[[transaction-throttling]]
-=== Transaction throttling
-
-[float]
-[[transaction-throttle-limit]]
-==== `transactionThrottleLimit`
-
-* *Type:* Number
-* *Default:* `20`
-
-[float]
-[[transaction-throttle-interval]]
-==== `transactionThrottleInterval`
-
-* *Type:* Number
-* *Default:* `30000`
-
-By default the agent can only send (up to) `20` transactions every `30000` milliseconds.
-
+* *Default:* `80`
 
 [float]
 [[transaction-sample-rate]]
