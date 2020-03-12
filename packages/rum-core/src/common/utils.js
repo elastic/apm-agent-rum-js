@@ -142,12 +142,7 @@ function setLabel(key, value, obj) {
   if (!obj || !key) return
   const skey = removeInvalidChars(key)
   let valueType = typeof value
-  if (
-    value !== null &&
-    valueType !== 'undefined' &&
-    valueType !== 'boolean' &&
-    valueType !== 'number'
-  ) {
+  if (value != undefined && valueType !== 'boolean' && valueType !== 'number') {
     value = String(value)
   }
   obj[skey] = value
