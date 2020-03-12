@@ -116,7 +116,8 @@ class ErrorLogging {
     const transactionContext = currentTransaction
       ? currentTransaction.context
       : {}
-    const configContext = this._configService.get('context')
+    // eslint-disable-next-line no-unused-vars
+    const { tags, ...configContext } = this._configService.get('context')
     const pageMetadata = getPageMetadata()
 
     const context = merge(
