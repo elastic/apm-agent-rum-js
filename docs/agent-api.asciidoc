@@ -72,12 +72,6 @@ TIP: Before using custom context, ensure you understand the different types of
 
 
 [float]
-[[apm-add-tags]]
-==== `apm.addTags()`
-
-deprecated[4.1.x,Tags have been replaced with labels], Please use <<apm-add-labels,`apm.addLabels()`>> instead
-
-[float]
 [[apm-add-labels]]
 ==== `apm.addLabels()`
 
@@ -98,7 +92,8 @@ Arguments:
 
 * `name` - Any string. All periods (.), asterisks (*), and double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
 
-* `value` - Any string. If a non-string data type is given, it's converted to a string before being sent to the APM Server.
+* `value` - Any string, boolean, or number. All other data types will be converted to a string
+before being sent to the APM Server.
 
 WARNING: Avoid defining too many user-specified labels.
 Defining too many unique fields in an index is a condition that can lead to a

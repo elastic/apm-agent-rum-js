@@ -39,13 +39,6 @@ the following are standardized across all Elastic APM agents:
 
 
 [float]
-[[span-add-tags]]
-==== `span.addTags()`
-
-deprecated[4.1.x,Tags have been replaced with labels], Please use <<span-add-labels,`span.addLabels()`>> instead
-
-
-[float]
 [[span-add-labels]]
 ==== `span.addLabels()`
 
@@ -61,8 +54,8 @@ Arguments:
 
 * `name` - Any string. All periods (.), asterisks (*), and double quotation marks (") will be replaced by underscores (_), as those characters have special meaning in Elasticsearch
 
-* `value` - Any string. If a non-string data type is given, it's converted to a string before being sent to the APM Server.
-
+* `value` - Any string, boolean, or number. All other data types will be converted to a string
+before being sent to the APM Server.
 
 [float]
 [[span-end]]
