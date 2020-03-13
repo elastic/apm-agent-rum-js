@@ -40,6 +40,9 @@ const METADATA_MODEL = {
       version: [KEYWORD_LIMIT, true]
     },
     environment: true
+  },
+  labels: {
+    '*': true
   }
 }
 
@@ -62,9 +65,6 @@ const CONTEXT_MODEL = {
     id: true,
     email: true,
     username: true
-  },
-  tags: {
-    '*': true
   },
   /** Spans */
   http: {

@@ -40,6 +40,9 @@ const getMetadataModel = limit => ({
       version: [limit]
     },
     environment: [limit]
+  },
+  labels: {
+    '*': [limit]
   }
 })
 
@@ -128,6 +131,10 @@ describe('Truncate', () => {
           version: '2.0.1'
         },
         environment: 'development'
+      },
+      labels: {
+        stringLabel: 'string-label',
+        booleanLabel: true
       }
     }
 
@@ -140,6 +147,10 @@ describe('Truncate', () => {
           version: '2.0'
         },
         environment: 'dev'
+      },
+      labels: {
+        stringLabel: 'str',
+        booleanLabel: true
       }
     })
   })

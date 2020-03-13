@@ -167,10 +167,10 @@ describe('Context', () => {
 
   it('should enrich transaction with context info based on type', () => {
     const transaction = new Transaction('test', 'custom')
-    let trContext = { tags: { tag1: 'tag1' } }
+    const trContext = { tags: { tag1: 'tag1' } }
     transaction.addContext(trContext)
     transaction.end()
-    let userContext = {
+    const userContext = {
       user: {
         email: 'test@example.com',
         id: '123'
