@@ -66,6 +66,9 @@ const CONTEXT_MODEL = {
     email: true,
     username: true
   },
+  tags: {
+    '*': true
+  },
   /** Spans */
   http: {
     response: RESPONSE_MODEL
