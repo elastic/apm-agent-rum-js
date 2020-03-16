@@ -40,6 +40,9 @@ const METADATA_MODEL = {
       version: [KEYWORD_LIMIT, true]
     },
     environment: true
+  },
+  labels: {
+    '*': true
   }
 }
 

@@ -167,12 +167,17 @@ describe('Context', () => {
 
   it('should enrich transaction with context info based on type', () => {
     const transaction = new Transaction('test', 'custom')
+    const trContext = { tags: { tag1: 'tag1' } }
+    transaction.addContext(trContext)
     transaction.end()
-    const configContext = {
+    const userContext = {
       user: {
         email: 'test@example.com',
         id: '123'
-      },
+      }
+    }
+    const configContext = {
+      ...userContext,
       tags: {
         message: 'test'
       }
@@ -183,7 +188,8 @@ describe('Context', () => {
         referer: jasmine.any(String),
         url: jasmine.any(String)
       },
-      ...configContext
+      ...userContext,
+      ...trContext
     })
 
     const unmock = mockGetEntriesByType()
@@ -203,7 +209,7 @@ describe('Context', () => {
           'server-timing': 'edge;dur=4, cdn-cache;desc=HIT'
         }
       },
-      ...configContext
+      ...userContext
     })
 
     unmock()
