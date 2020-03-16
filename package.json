@@ -15,6 +15,7 @@
     "github-release": "node scripts/github-release",
     "build-docs": "PREVIEW=1 sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
     "lint": "run-p --silent lint:*",
+    "lint:commit": "test/lint-commits.sh",
     "lint:js": "eslint . --ext .js,.jsx,.ts",
     "lint:license": "node scripts/license-checker",
     "test": "npm run build && lerna run test --scope=$SCOPE --no-prefix  --concurrency=1",
@@ -33,7 +34,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
   "author": "",
@@ -57,6 +59,9 @@
     "@babel/preset-react": "^7.7.4",
     "@babel/preset-typescript": "^7.7.4",
     "@babel/register": "^7.7.4",
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
+    "@commitlint/config-lerna-scopes": "^8.3.4",
     "@lerna/child-process": "^3.16.5",
     "@lerna/prompt": "^3.18.5",
     "@types/jasmine": "^3.5.0",
