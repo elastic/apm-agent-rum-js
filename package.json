@@ -15,7 +15,6 @@
     "github-release": "node scripts/github-release",
     "build-docs": "PREVIEW=1 sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
     "lint": "run-p --silent lint:*",
-    "lint:commit": "scripts/lint-commits.sh",
     "lint:js": "eslint . --ext .js,.jsx,.ts",
     "lint:license": "node scripts/license-checker",
     "test": "npm run build && lerna run test --scope=$SCOPE --no-prefix  --concurrency=1",
@@ -154,7 +153,8 @@
   },
   "commitlint": {
     "extends": [
-      "@commitlint/config-conventional"
+      "@commitlint/config-conventional",
+      "@commitlint/config-lerna-scopes"
     ]
   }
 }
