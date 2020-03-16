@@ -163,7 +163,11 @@ export function addSpanContext(span, data) {
   span.addContext(context)
 }
 
-export function addTransactionContext(transaction, configContext) {
+export function addTransactionContext(
+  transaction,
+  // eslint-disable-next-line no-unused-vars
+  { tags, ...configContext } = {}
+) {
   const pageContext = getPageMetadata()
   let responseContext = {}
   if (transaction.type === PAGE_LOAD && isPerfTimelineSupported()) {

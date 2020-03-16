@@ -401,6 +401,9 @@ describe('ErrorLogging', function() {
   })
 
   it('should ignore keys and add other error fields to custom context', done => {
+    configService.setConfig({
+      context: { tags: { tag1: 'tag1' }, other: 'other' }
+    })
     const errorLikeObject = {
       message: 'Custom Error',
       stack: 'ReferenceError: At example.js:23',
@@ -415,7 +418,8 @@ describe('ErrorLogging', function() {
       custom: {
         foo: 'bar',
         bar: 'baz'
-      }
+      },
+      other: 'other'
     })
 
     const error2 = errorLogging.createErrorDataModel({
@@ -429,7 +433,8 @@ describe('ErrorLogging', function() {
     })
 
     expect(error2.context).toEqual({
-      page: jasmine.any(Object)
+      page: jasmine.any(Object),
+      other: 'other'
     })
 
     apmServer
