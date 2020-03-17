@@ -33,8 +33,7 @@
   },
   "commitlint": {
     "extends": [
-      "@commitlint/config-conventional",
-      "@commitlint/config-lerna-scopes"
+      "@commitlint/config-conventional"
     ],
     "rules": {
       "scope-enum": [
@@ -45,7 +44,11 @@
           "dev",
           "jenkins",
           "karma",
-          "release"
+          "release",
+          "rum",
+          "rum-angular",
+          "rum-core",
+          "rum-vue"
         ]
       ]
     }
