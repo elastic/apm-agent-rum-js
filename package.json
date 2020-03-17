@@ -31,6 +31,11 @@
       "git add"
     ]
   },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
