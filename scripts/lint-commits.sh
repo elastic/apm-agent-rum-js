@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -xeo pipefail
+set -eo pipefail
 
 # Run if we're not on Jenkins
 if [[ -n "${JENKINS_URL}" ]]; then
