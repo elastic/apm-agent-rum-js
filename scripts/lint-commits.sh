@@ -11,6 +11,11 @@ if [[ -n "${JENKINS_URL}" ]]; then
   else
     # If on a branch, test all commits between this branch and master
     commitlint --from="origin/${CHANGE_TARGET}" --to="${GIT_BASE_COMMIT}"
+
+    # Lint PR title
+    if [[ -n ${CHANGE_TITLE} ]]; then
+      echo "${CHANGE_TITLE}" | commitlint
+    fi
   fi
 # Run if we're not on Travis
 elif [[ -z "$CI" ]]; then
