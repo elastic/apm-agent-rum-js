@@ -33,9 +33,27 @@
   },
   "commitlint": {
     "extends": [
-      "@commitlint/config-conventional",
-      "@commitlint/config-lerna-scopes"
-    ]
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "scope-enum": [
+        2,
+        "always",
+        [
+          "benchmarks",
+          "deps",
+          "dev",
+          "jenkins",
+          "karma",
+          "release",
+          "rum",
+          "rum-angular",
+          "rum-core",
+          "rum-react",
+          "rum-vue"
+        ]
+      ]
+    }
   },
   "husky": {
     "hooks": {
