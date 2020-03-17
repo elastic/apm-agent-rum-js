@@ -29,12 +29,19 @@ const {
 } = require('@commitlint/config-lerna-scopes')
 
 module.exports = {
-  extends: ['@commitlint/config-lerna-scopes'],
+  extends: ['@commitlint/config-conventional'],
   rules: {
     'scope-enum': async ctx => [
       2,
       'always',
-      [...(await getPackages(ctx)), 'benchmarks', 'dev', 'jenkins', 'release']
+      [
+        ...(await getPackages(ctx)),
+        'benchmarks',
+        'dev',
+        'deps',
+        'jenkins',
+        'release'
+      ]
     ]
   }
 }
