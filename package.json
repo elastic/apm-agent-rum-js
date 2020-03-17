@@ -41,6 +41,7 @@
         "always",
         [
           "benchmarks",
+          "deps",
           "dev",
           "jenkins",
           "karma",
@@ -48,6 +49,7 @@
           "rum",
           "rum-angular",
           "rum-core",
+          "rum-react",
           "rum-vue"
         ]
       ]
