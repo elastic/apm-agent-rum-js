@@ -100,6 +100,7 @@ var apm = initApm({
 Most Elastic APM back-end agents provide methods to extract this information.
 Please refer to the relevant Agent's API for more information:
 
+* {apm-dotnet-ref}/public-api.html[.NET Agent: `EnsureParentId()`]
 * {apm-java-ref}/public-api.html[Java Agent: `ensureParentId()`]
 * {apm-ruby-ref}/api.html[Ruby Agent: `EnsureParent()`]
 * {apm-go-ref}/api.html[Go Agent: `EnsureParent()`]
