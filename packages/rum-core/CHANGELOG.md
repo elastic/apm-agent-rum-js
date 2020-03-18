@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.10.1...@elastic/apm-rum-core@5.0.0) (2020-03-18)
+
+
+### Features
+
+* **rum-core:** monitor longtasks by default during active transaction ([#677](https://github.com/elastic/apm-agent-rum-js/issues/677)) ([7de5169](https://github.com/elastic/apm-agent-rum-js/commit/7de5169922dba2cc1e8b6b67c0f98a6b0dee7e71))
+* **rum-core:** set sync field only for synchronous spans ([#699](https://github.com/elastic/apm-agent-rum-js/issues/699)) ([3fd4bca](https://github.com/elastic/apm-agent-rum-js/commit/3fd4bca0e577e45d84fad8b79b55d29a2ac2d7ca))
+
+
+
+### BREAKING CHANGES
+
+* BREAKING CHANGE: tags are not added to individual events (#700) ([e968c54](https://github.com/elastic/apm-agent-rum-js/commit/e968c54fb55bece8176e4663bfcf842ccef3244f)), closes [#700](https://github.com/elastic/apm-agent-rum-js/issues/700)
+* BREAKING CHANGE: add support for boolean and number values in addLabels (#697) ([4533b67](https://github.com/elastic/apm-agent-rum-js/commit/4533b67b658943a1370eeaf90a64f866cd271269)), closes [#697](https://github.com/elastic/apm-agent-rum-js/issues/697)
+
+
+
+
+
 ## [4.10.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@4.10.0...@elastic/apm-rum-core@4.10.1) (2020-03-09)
 
 
