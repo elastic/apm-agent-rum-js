@@ -65,7 +65,6 @@ export function patchFetch(callback) {
       data: {
         target: request,
         method: request.method,
-        sync: false,
         url,
         aborted: false
       }

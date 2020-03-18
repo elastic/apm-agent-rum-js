@@ -297,7 +297,14 @@ export default class PerformanceMonitoring {
           `Could not inject distributed tracing header to the request origin ('${requestUrl.origin}') from the current origin ('${currentUrl.origin}')`
         )
       }
-      span.sync = data.sync
+      /**
+       * set sync flag only for synchronous API calls, setting the flag to
+       * false would result in UI showing `async` label on non-synchronous spans
+       * which creates unncessary noise for the user
+       */
+      if (data.sync) {
+        span.sync = data.sync
+      }
       data.span = span
       task.id = taskId
     } else if (event === INVOKE) {
