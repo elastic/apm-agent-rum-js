@@ -26,6 +26,32 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 ===== Bug fixes
 ////
 
+[[release-notes-5.x]]
+=== RUM JS Agent version 5.x
+
+[[release-notes-5.0.0]]
+==== 5.0.0 (2020-03-18)
+
+
+[float]
+===== Breaking changes
+* The agent now uses the official W3C traceparent header to propagate trace context: {issue}477[#477]
+* The agent name is changed from `js-base` to `rum-js`: {issue}379[#379]
+* Global labels are only added to metadata to improve payload size: {issue}618[#618]
+* Labels now accept Boolean and Number types: {issue}272[#272]
+* Simplify configuration by removing and/or merging config options: {issue}628[#628]
+* `addTags` method is removed in favour of `addLabels`: {issue}215[#215]
+
+
+Please see our <<upgrade-to-v5>> guide for more information.
+
+
+[float]
+===== Features
+* Monitor longtasks by default during active transaction: {issue}601[#601]
+* Set sync field only for synchronous spans: {issue}619[#619]
+
+
 [[release-notes-4.x]]
 === RUM JS Agent version 4.x
 
