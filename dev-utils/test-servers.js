@@ -27,7 +27,6 @@ const express = require('express')
 const serveIndex = require('serve-index')
 const proxy = require('express-http-proxy')
 const { join } = require('path')
-const useragent = require('useragent')
 const { runIntegrationTest } = require('./integration-test')
 const { DEFAULT_APM_SERVER_URL } = require('./test-config')
 
@@ -47,25 +46,17 @@ function startBackendAgentServer(port = 8003) {
   })
 
   function dTRespond(req, res) {
-    const traceHeader = req.headers['traceparent']
-    const browser = useragent.is(req.headers['user-agent'])
-    /**
-     * Unsupported browsers IE 10
-     */
-    let payload = { supported: true }
-    if (browser.ie && Number(browser.version) < 11) {
-      payload.supported = false
-    }
-    if (traceHeader) {
-      const splited = traceHeader.split('-')
+    const header = req.headers['traceparent']
+    let payload = { noHeader: true }
+    if (header) {
+      const splited = header.split('-')
       payload = {
         version: splited[0],
         traceId: splited[1],
         parentId: splited[2],
-        flags: splited[3],
-        ...payload
+        flags: splited[3]
       }
-      console.log('traceparent:', traceHeader)
+      console.log('traceparent:', header)
     }
 
     res.setHeader('Content-Type', 'application/json')
