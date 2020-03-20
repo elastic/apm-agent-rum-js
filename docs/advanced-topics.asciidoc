@@ -9,7 +9,7 @@
 [[longtasks]]
 === How to interpret long task spans in the UI
 
-Long tasks is a new performance metric that can be used for measuring the
+Foo Long tasks is a new performance metric that can be used for measuring the
 responsiveness of an application and helps developers to understand the bad user
 experience. It enables detecting tasks that monopolize the UI thread for
 extended periods (greater than 50 milliseconds) and block other
