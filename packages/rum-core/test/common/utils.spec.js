@@ -71,6 +71,10 @@ describe('lib/utils', function() {
   })
 
   it('should generate random ids', function() {
+    const destinationArr = utils.rng()
+    expect(destinationArr).toBeInstanceOf(Uint8Array)
+    expect(destinationArr.length).toEqual(16)
+
     var result = utils.bytesToHex(utils.rng())
     expect(result.length).toBe(32)
 
