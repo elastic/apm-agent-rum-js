@@ -84,7 +84,6 @@
     "@babel/register": "^7.7.4",
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
-    "@commitlint/config-lerna-scopes": "^8.3.4",
     "@lerna/child-process": "^3.16.5",
     "@lerna/prompt": "^3.18.5",
     "@types/jasmine": "^3.5.0",
