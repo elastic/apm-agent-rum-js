@@ -23,7 +23,6 @@
  *
  */
 
-import rng from 'uuid/lib/rng-browser'
 import { Promise } from './polyfills'
 
 const slice = [].slice
@@ -34,33 +33,48 @@ function isCORSSupported() {
   return 'withCredentials' in xhr
 }
 
+/**
+ * Original source is from uuid module to strip `-` in the UUID generation logic
+ * https://github.com/uuidjs/uuid/blob/8977966d0061cca33a01a88f5b4893d3304d4840/src/bytesToUuid.js
+ */
 var byteToHex = []
 for (var i = 0; i < 256; ++i) {
   byteToHex[i] = (i + 0x100).toString(16).substr(1)
 }
 
-function bytesToHex(buf, offset) {
-  var i = offset || 0
-  var bth = byteToHex
-  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
-  return [
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]],
-    bth[buf[i++]]
-  ].join('')
+function bytesToHex(buffer) {
+  const hexOctets = []
+  for (let i = 0; i < buffer.length; i++) {
+    hexOctets.push(byteToHex[buffer[i]])
+  }
+  return hexOctets.join('')
+}
+
+/**
+ * Random number generator using crypto.getRandomValues
+ * uses msCrypto for supporting IE 11
+ * https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues
+ */
+const destination = new Uint8Array(16)
+
+function rng() {
+  if (
+    typeof crypto != 'undefined' &&
+    typeof crypto.getRandomValues == 'function'
+  ) {
+    return crypto.getRandomValues(destination)
+  } else if (
+    typeof msCrypto != 'undefined' &&
+    typeof msCrypto.getRandomValues == 'function'
+  ) {
+    return msCrypto.getRandomValues(destination)
+  }
+  return destination
+}
+
+function generateRandomId(length) {
+  var id = bytesToHex(rng())
+  return id.substr(0, length)
 }
 
 function getDtHeaderValue(span) {
@@ -114,11 +128,6 @@ function checkSameOrigin(source, target) {
     })
   }
   return isSame
-}
-
-function generateRandomId(length) {
-  var id = bytesToHex(rng())
-  return id.substr(0, length)
 }
 
 function isPlatformSupported() {

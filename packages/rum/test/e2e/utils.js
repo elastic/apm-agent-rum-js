@@ -24,9 +24,25 @@
  */
 
 function checkDtInfo(payload) {
-  console.log('distributed tracing header value', payload)
-  if (typeof payload.traceId !== 'string') {
-    throw new Error('Wrong distributed tracing payload: ')
+  console.log('distributed tracing header value', JSON.stringify(payload))
+  /**
+   * In non supported browsers (like IE 10), `getRandomValues` on the crypto
+   * is unsupported, we test the traceparent header to be not present in this case
+   */
+  const getRandomValues =
+    (typeof crypto != 'undefined' &&
+      typeof crypto.getRandomValues == 'function') ||
+    (typeof msCrypto != 'undefined' &&
+      typeof msCrypto.getRandomValues == 'function')
+
+  if (!getRandomValues) {
+    if (payload.noHeader !== true) {
+      throw new Error(
+        'traceparent header should not be present for non-supported browsers'
+      )
+    }
+  } else if (typeof payload.traceId !== 'string') {
+    throw new Error('Wrong distributed tracing payload')
   }
 }
 
