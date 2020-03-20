@@ -30,7 +30,8 @@ function checkDtInfo(payload) {
    * is unsupported, we test the traceparent header to be not present in this case
    */
   const getRandomValues =
-    (typeof crypto != 'undefined' && crypto.getRandomValues) ||
+    (typeof crypto != 'undefined' &&
+      typeof crypto.getRandomValues == 'function') ||
     (typeof msCrypto != 'undefined' &&
       typeof msCrypto.getRandomValues == 'function')
 

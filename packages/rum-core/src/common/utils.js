@@ -58,7 +58,10 @@ function bytesToHex(buffer) {
 const destination = new Uint8Array(16)
 
 function rng() {
-  if (typeof crypto != 'undefined' && crypto.getRandomValues) {
+  if (
+    typeof crypto != 'undefined' &&
+    typeof crypto.getRandomValues == 'function'
+  ) {
     return crypto.getRandomValues(destination)
   } else if (
     typeof msCrypto != 'undefined' &&
