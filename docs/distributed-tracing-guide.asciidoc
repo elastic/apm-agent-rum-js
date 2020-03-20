@@ -77,6 +77,10 @@ Use the table below to determine which versions of our backend agents also suppo
 tracecontext headers. Compatible agents use the official tracecontext spec to propagate traces and can
 therefor be used with the RUM Agent version >=5.0 for distributed tracing.
 
+NOTE: Our backend agents will support both `traceparent` and `elastic-apm-traceparent` headers
+until their respective major version release. Therefore, you can safely upgrade your backend agents
+before upgrading the RUM agent.
+
 include::./upgrading.asciidoc[tag=backend-compat-chart]
 
 [float]
@@ -97,7 +101,8 @@ var apm = initApm({
 })
 ----
 
-Most Elastic APM back-end agents provide methods to extract this information.
+The `pageLoadSpanId` should be set to the parent ID of the backend transaction.
+Most Elastic APM backend agents provide methods to extract this information.
 Please refer to the relevant Agent's API for more information:
 
 * {apm-dotnet-ref}/public-api.html[.NET Agent: `EnsureParentId()`]
