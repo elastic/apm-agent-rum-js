@@ -17,7 +17,7 @@ if [[ -n "${JENKINS_URL}" ]]; then
       titleLength=$(echo -n "${CHANGE_TITLE}" | wc -c)
       titleResult=0
       if [ "${titleLength}" -ge 75 ] ; then
-        echo "PR title got a long comment. This will fail when squashing and merging the Pull Request"
+        echo "PR title has a long comment. This will fail when squashing and merging the Pull Request"
         titleResult=1
       fi
       echo "${CHANGE_TITLE}" | commitlint
