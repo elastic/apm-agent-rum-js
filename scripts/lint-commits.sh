@@ -14,7 +14,14 @@ if [[ -n "${JENKINS_URL}" ]]; then
 
     # Lint PR title
     if [[ -n ${CHANGE_TITLE} ]]; then
+      titleLength=$(echo -n "${CHANGE_TITLE}" | wc -c)
+      titleResult=0
+      if [ "${titleLength}" -ge 65 ] ; then
+        echo "PR title has a long comment. This will fail when squashing and merging the Pull Request"
+        titleResult=1
+      fi
       echo "${CHANGE_TITLE}" | commitlint
+      exit ${titleResult}
     fi
   fi
 # Run if we're not on Travis
