@@ -211,8 +211,8 @@ pipeline {
             beforeAgent true
             allOf {
               anyOf {
-                //branch 'master'
-                //tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
+                branch 'master'
+                tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
                 expression { return params.Run_As_Master_Branch }
                 expression { return env.BENCHMARK_UPDATED != "false" }
               }
