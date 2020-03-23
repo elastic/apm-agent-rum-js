@@ -54,14 +54,13 @@ pipeline {
             stash allowEmpty: true, name: 'source', useDefaultExcludes: false
             script {
               dir("${BASE_DIR}"){
-
                 // Look for changes related to the benchmark, if so then set the env variable.
-                def regexps =[
+                def patternList =[
                   '^packages/.*/test/benchmarks/.*',
                   '^scripts/benchmarks.js',
                   '^packages/rum-core/karma.bench.conf.js'
                 ]
-                env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: regexps)
+                env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: patternList)
 
                 // Skip all the stages except docs for PR's with asciidoc changes only
                 env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.asciidoc' ], comparator: 'regexp', shouldMatchAll: true)
