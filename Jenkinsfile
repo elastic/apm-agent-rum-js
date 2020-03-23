@@ -52,15 +52,18 @@ pipeline {
             deleteDir()
             gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
             stash allowEmpty: true, name: 'source', useDefaultExcludes: false
-            // Look for changes related to the benchmark, if so then set the env variable.
             script {
               dir("${BASE_DIR}"){
-                def regexps =[
+                // Look for changes related to the benchmark, if so then set the env variable.
+                def patternList =[
                   '^packages/.*/test/benchmarks/.*',
                   '^scripts/benchmarks.js',
                   '^packages/rum-core/karma.bench.conf.js'
                 ]
-                env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: regexps)
+                env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: patternList)
+
+                // Skip all the stages except docs for PR's with asciidoc changes only
+                env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.asciidoc' ], comparator: 'regexp', shouldMatchAll: true)
               }
             }
           }
@@ -69,6 +72,10 @@ pipeline {
         Lint the code.
         */
         stage('Lint') {
+          when {
+            beforeAgent true
+            expression { return env.ONLY_DOCS == "false" }
+          }
           steps {
             withGithubNotify(context: 'Lint') {
               deleteDir()
@@ -86,6 +93,10 @@ pipeline {
           }
         }
         stage('Test Pupperteer') {
+          when {
+            beforeAgent true
+            expression { return env.ONLY_DOCS == "false" }
+          }
           matrix {
             agent { label 'linux && immutable' }
             axes {
@@ -133,6 +144,7 @@ pipeline {
             allOf {
               branch 'master'
               expression { return params.saucelab_test }
+              expression { return env.ONLY_DOCS == "false" }
             }
           }
           steps {
@@ -155,6 +167,7 @@ pipeline {
             allOf {
               changeRequest()
               expression { return params.saucelab_test }
+              expression { return env.ONLY_DOCS == "false" }
             }
           }
           steps {
@@ -173,6 +186,7 @@ pipeline {
             anyOf {
               changeRequest()
               expression { return !params.Run_As_Master_Branch }
+              expression { return env.ONLY_DOCS == "false" }
             }
           }
           steps {
@@ -203,6 +217,7 @@ pipeline {
                 expression { return env.BENCHMARK_UPDATED != "false" }
               }
               expression { return params.bench_ci }
+              expression { return env.ONLY_DOCS == "false" }
             }
           }
           steps {
@@ -236,6 +251,10 @@ pipeline {
         */
         stage('Coverage') {
           options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression { return env.ONLY_DOCS == "false" }
+          }
           steps {
             withGithubNotify(context: 'Coverage') {
               // No scope is required as the coverage should run for all of them
