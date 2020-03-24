@@ -25,20 +25,19 @@
 
 import Transaction from '../../src/performance-monitoring/transaction'
 
-export function generateTestTransaction(noOfSpans) {
+export function generateTestTransaction(noOfSpans, sampled) {
   const tr = new Transaction(
     `transaction with ${noOfSpans} spans`,
-    'transaction1type'
+    'transaction1type',
+    { startTime: 0, transactionSampleRate: sampled ? 1 : 0 }
   )
+  let lastSpanEnd = 0
   for (let i = 0; i < noOfSpans; i++) {
-    const span = tr.startSpan(`span ${i}`, `span${i}type`)
-    span.end()
-    span._end = span.duration() === 0 ? span._start + 10 : span._end
+    const span = tr.startSpan(`span ${i}`, `span${i}type`, { startTime: 0 })
+    lastSpanEnd = 10 + i
+    span.end(lastSpanEnd)
   }
 
-  tr.detectFinish()
-  if (tr._end === tr._start) {
-    tr._end = tr._end + 100
-  }
+  tr.end(lastSpanEnd + 100)
   return tr
 }
