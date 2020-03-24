@@ -22,50 +22,31 @@
  * THE SOFTWARE.
  *
  */
-
-import { createServiceFactory } from '../../src/index'
+import { captureNavigation } from '../../src/performance-monitoring/capture-navigation'
+import Transaction from '../../src/performance-monitoring/transaction'
 import { PAGE_LOAD } from '../../src/common/constants'
 
-suite('TransactionService', () => {
-  const serviceFactory = createServiceFactory()
-  const transactionService = serviceFactory.getService('TransactionService')
+suite('CaptureNavigation', () => {
+  const options = {
+    managed: true,
+    startTime: 0,
+    transactionSampleRate: 1
+  }
 
-  benchmark('managed sampled transaction overhead', async () => {
-    const tr = transactionService.startTransaction('/index', PAGE_LOAD, {
-      managed: true,
-      startTime: 0,
-      transactionSampleRate: 1
-    })
-    await tr.end()
+  benchmark('page-load transaction', () => {
+    const pageLoadTr = new Transaction('/index', PAGE_LOAD, options)
+    pageLoadTr.captureTimings = true
+    pageLoadTr.end(5000)
+    captureNavigation(pageLoadTr)
   })
 
-  benchmark('managed unsampled overhead', async () => {
-    const tr = transactionService.startTransaction('/index', PAGE_LOAD, {
-      managed: true,
-      startTime: 0,
-      transactionSampleRate: 0
-    })
-    await tr.end()
+  benchmark('other transaction', () => {
+    /**
+     * Does not include navigation timing spans and agent marks
+     */
+    const nonPageLoadTr = new Transaction('/index', 'custom', options)
+    nonPageLoadTr.captureTimings = true
+    nonPageLoadTr.end(5000)
+    captureNavigation(nonPageLoadTr)
   })
-
-  benchmark('custom transaction overhead', async () => {
-    const tr = transactionService.startTransaction('custom', 'custom')
-    await tr.end()
-  })
-
-  benchmark(
-    'span creation overhead',
-    () => {
-      const span = transactionService.startSpan('test-span', 'custom')
-      span.end()
-    },
-    {
-      onSetup() {
-        /**
-         * Ensures we have  currentTranaction in place when span creation is done
-         */
-        transactionService.ensureCurrentTransaction('test-tr', 'custom')
-      }
-    }
-  )
 })
