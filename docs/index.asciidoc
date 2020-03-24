@@ -28,6 +28,8 @@ include::./opentracing.asciidoc[]
 
 include::./advanced-topics.asciidoc[]
 
+include::./performance-tuning.asciidoc[]
+
 include::./troubleshooting.asciidoc[]
 
 include::./upgrading.asciidoc[]
