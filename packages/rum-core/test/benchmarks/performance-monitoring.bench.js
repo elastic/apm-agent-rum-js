@@ -25,16 +25,19 @@
 
 import { generateTestTransaction } from './'
 import { createServiceFactory } from '../../src'
+import { TRANSACTIONS } from '../../src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
-function getSendTransactions(performanceMonitoring, apmServer) {
+function getSendEvents(performanceMonitoring, apmServer) {
   return function(transactions) {
-    const payload = transactions
-      .map(tr => performanceMonitoring.createTransactionPayload(tr))
-      .filter(tr => tr)
-    return apmServer.sendTransactions(payload)
+    const payload = transactions.map(tr => {
+      return {
+        [TRANSACTIONS]: performanceMonitoring.createTransactionPayload(tr)
+      }
+    })
+    return apmServer.sendEvents(payload)
   }
 }
 
@@ -52,46 +55,29 @@ suite('PerformanceMonitoring', () => {
   function ResolvedPromise() {
     return Promise.resolve()
   }
-  const tr = generateTestTransaction(10)
-  const sendTransactions = getSendTransactions(performanceMonitoring, apmServer)
+  const sampledTr = generateTestTransaction(10, true)
+  const unsampledTr = generateTestTransaction(10, false)
+  const sendEvents = getSendEvents(performanceMonitoring, apmServer)
 
-  benchmark('createTransactionPayload', function() {
-    performanceMonitoring.createTransactionPayload(tr)
+  benchmark('createTransactionPayload Sampled', function() {
+    performanceMonitoring.createTransactionPayload(sampledTr)
   })
 
-  benchmark('sendTransactions-no-json', function() {
+  benchmark('createTransactionPayload Unsampled', function() {
+    performanceMonitoring.createTransactionPayload(unsampledTr)
+  })
+
+  benchmark('sendEvents-no-json', function() {
     apmServer._postJson = ResolvedPromise
-    sendTransactions([tr])
+    sendEvents([sampledTr])
   })
 
   benchmark(
-    'sendTransactions',
+    'sendEvents',
     function() {
       apmServer._postJson = _postJson
-      sendTransactions([tr])
+      sendEvents([sampledTr])
     },
     { delay: 1 }
-  )
-})
-
-suite.skip('PerformanceMonitoring - Defered', function() {
-  var serviceFactory = createServiceFactory()
-  var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
-  var configService = serviceFactory.getService('ConfigService')
-  configService.setConfig({
-    serviceName: 'benchmark-send-transactions-defered'
-  })
-  const sendTransactions = getSendTransactions(performanceMonitoring, apmServer)
-
-  benchmark(
-    'sendTransactions - Defered',
-    function(deferred) {
-      var tr = generateTransaction()
-
-      sendTransactions([tr]).then(() => {
-        deferred.resolve()
-      })
-    },
-    { defer: true }
   )
 })
