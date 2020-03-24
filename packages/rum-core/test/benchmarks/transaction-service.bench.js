@@ -24,28 +24,40 @@
  */
 
 import { createServiceFactory } from '../../src/index'
+import { PAGE_LOAD } from '../../src/common/constants'
 
 suite('TransactionService', () => {
   const serviceFactory = createServiceFactory()
   const transactionService = serviceFactory.getService('TransactionService')
 
-  benchmark('page-load transaction overhead', () => {
-    const tr = transactionService.startTransaction('/index', 'page-load', {
-      managed: true
+  benchmark.skip('managed sampled transaction overhead', async () => {
+    const tr = transactionService.startTransaction('/index', PAGE_LOAD, {
+      managed: true,
+      startTime: 0,
+      transactionSampleRate: 1
     })
-    setImmediate(() => tr.end())
+    await tr.end()
   })
 
-  benchmark('custom transaction overhead', () => {
+  benchmark('managed unsampled overhead', async () => {
+    const tr = transactionService.startTransaction('/index', PAGE_LOAD, {
+      managed: true,
+      startTime: 0,
+      transactionSampleRate: 0
+    })
+    await tr.end()
+  })
+
+  benchmark('custom transaction overhead', async () => {
     const tr = transactionService.startTransaction('custom', 'custom')
-    setImmediate(() => tr.end())
+    await tr.end()
   })
 
   benchmark(
     'span creation overhead',
     () => {
       const span = transactionService.startSpan('test-span', 'custom')
-      setImmediate(() => span.end())
+      span.end()
     },
     {
       onSetup() {
