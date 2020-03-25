@@ -328,9 +328,9 @@ describe('Capture hard navigation', function() {
     tr.end(transactionEnd)
     captureNavigation(tr)
 
-    const filteredRTSpan = tr.spans.filter(
-      span => span.name === 'http://ajax-filter.test'
-    )
+    const filteredRTSpan = tr.spans.filter(({ name, type }) => {
+      return name.indexOf('http://ajax-filter.test') >= 0 && type === 'resource'
+    })
     expect(filteredRTSpan).toEqual([])
     expect(tr.spans.length, 23)
 
