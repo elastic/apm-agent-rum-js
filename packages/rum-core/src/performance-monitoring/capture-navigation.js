@@ -207,11 +207,9 @@ function getApiSpanNames({ spans }) {
 
   for (let i = 0; i < spans.length; i++) {
     const span = spans[i]
-
     if (span.type === 'external' && span.subType === 'http') {
-      continue
+      apiCalls.push(span.name.split(' ')[1])
     }
-    apiCalls.push(span.name.split(' ')[1])
   }
   return apiCalls
 }
