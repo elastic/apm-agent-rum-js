@@ -25,19 +25,22 @@
 
 import Transaction from '../../src/performance-monitoring/transaction'
 
+function getRandomInRange(min, max) {
+  return Math.random() * (max - min) + min
+}
+
 export function generateTestTransaction(noOfSpans, sampled) {
-  const tr = new Transaction(
-    `transaction with ${noOfSpans} spans`,
-    'transaction1type',
-    { startTime: 0, transactionSampleRate: sampled ? 1 : 0 }
-  )
-  let lastSpanEnd = 0
+  const tr = new Transaction(`transaction with ${noOfSpans} spans`, 'custom', {
+    startTime: 0,
+    transactionSampleRate: sampled ? 1 : 0
+  })
   for (let i = 0; i < noOfSpans; i++) {
-    const span = tr.startSpan(`span ${i}`, `span${i}type`, { startTime: 0 })
-    lastSpanEnd = 10 + i
-    span.end(lastSpanEnd)
+    const span = tr.startSpan(`name`, `type`, {
+      startTime: getRandomInRange(0, i)
+    })
+    span.end(getRandomInRange(i, i + 1))
   }
 
-  tr.end(lastSpanEnd + 100)
+  tr.end(noOfSpans + 10)
   return tr
 }

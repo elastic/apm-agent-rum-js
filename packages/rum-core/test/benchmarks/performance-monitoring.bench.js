@@ -26,6 +26,7 @@
 import { generateTestTransaction } from './'
 import { createServiceFactory } from '../../src'
 import { TRANSACTIONS } from '../../src/common/constants'
+import { groupSmallContinuouslySimilarSpans } from '../../src/performance-monitoring/performance-monitoring'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig('rum-core')
@@ -80,4 +81,12 @@ suite('PerformanceMonitoring', () => {
     },
     { delay: 1 }
   )
+
+  const testTransaction = generateTestTransaction(100)
+  const spans = testTransaction.spans
+  const duration = testTransaction.duration()
+
+  benchmark('groupSmallContinuouslySimilarSpans', () => {
+    groupSmallContinuouslySimilarSpans(spans, duration, 2)
+  })
 })
