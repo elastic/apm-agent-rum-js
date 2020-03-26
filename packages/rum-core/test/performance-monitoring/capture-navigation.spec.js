@@ -316,4 +316,24 @@ describe('Capture hard navigation', function() {
     expect(tr.marks.agent.firstContentfulPaint).toBeUndefined()
     unMock()
   })
+
+  it('should not add API calls as resource timing spans', function() {
+    const unMock = mockGetEntriesByType()
+    const tr = new Transaction('test', PAGE_LOAD, {
+      startTime: transactionStart
+    })
+    const apiSpan = tr.startSpan('GET http://ajax-filter.test', 'external.http')
+    apiSpan.end()
+    tr.captureTimings = true
+    tr.end(transactionEnd)
+    captureNavigation(tr)
+
+    const filteredRTSpan = tr.spans.filter(({ name, type }) => {
+      return name.indexOf('http://ajax-filter.test') >= 0 && type === 'resource'
+    })
+    expect(filteredRTSpan).toEqual([])
+    expect(tr.spans.length, 23)
+
+    unMock()
+  })
 })
