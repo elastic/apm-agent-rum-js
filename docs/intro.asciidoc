@@ -13,7 +13,7 @@ This enables you to analyze performance throughout your microservice architectur
 
 The RUM Agent automatically instruments the following:
 
-* <<page-load-metrics,Page load metrics>> 
+* <<page-load-metrics,Page load metrics>>
 * Load time of Static Assets
 * API requests (XMLHttpRequest and Fetch)
 
@@ -32,6 +32,7 @@ For all transactions, the agent automatically captures <<breakdown-metrics-docs,
 === Additional Components
 
 APM Agents work in conjunction with the {apm-server-ref-v}/index.html[APM Server], {ref}/index.html[Elasticsearch], and {kibana-ref}/index.html[Kibana].
-Please view the {apm-overview-ref-v}/index.html[APM Overview] for details on how these components work together.
+The {apm-overview-ref-v}/index.html[APM Overview] provides details on how these components work together,
+and provides a matrix outlining {apm-overview-ref-v}/agent-server-compatibility.html[Agent and Server compatibility].
 
 include::./set-up.asciidoc[]
