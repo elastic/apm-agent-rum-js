@@ -24,29 +24,29 @@
  */
 import { captureNavigation } from '../../src/performance-monitoring/capture-navigation'
 import Transaction from '../../src/performance-monitoring/transaction'
-import { PAGE_LOAD } from '../../src/common/constants'
+import { PAGE_LOAD, ROUTE_CHANGE } from '../../src/common/constants'
 
 suite('CaptureNavigation', () => {
   const options = {
-    managed: true,
     startTime: 0,
     transactionSampleRate: 1
   }
+  const endTime = 10000
 
-  benchmark('page-load transaction', () => {
+  benchmark('hard navigation', () => {
     const pageLoadTr = new Transaction('/index', PAGE_LOAD, options)
     pageLoadTr.captureTimings = true
-    pageLoadTr.end(5000)
+    pageLoadTr.end(endTime)
     captureNavigation(pageLoadTr)
   })
 
-  benchmark('other transaction', () => {
+  benchmark('soft navigation', () => {
     /**
      * Does not include navigation timing spans and agent marks
      */
-    const nonPageLoadTr = new Transaction('/index', 'custom', options)
+    const nonPageLoadTr = new Transaction('/index', ROUTE_CHANGE, options)
     nonPageLoadTr.captureTimings = true
-    nonPageLoadTr.end(5000)
+    nonPageLoadTr.end(endTime)
     captureNavigation(nonPageLoadTr)
   })
 })
