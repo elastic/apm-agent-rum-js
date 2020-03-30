@@ -183,9 +183,11 @@ pipeline {
           agent none
           when {
             beforeAgent true
-            anyOf {
-              changeRequest()
-              expression { return !params.Run_As_Master_Branch }
+            allOf {
+              anyOf {
+                changeRequest()
+                expression { return !params.Run_As_Master_Branch }
+              }
               expression { return env.ONLY_DOCS == "false" }
             }
           }
