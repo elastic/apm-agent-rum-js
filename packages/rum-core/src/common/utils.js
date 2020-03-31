@@ -26,7 +26,10 @@
 import { Promise } from './polyfills'
 
 const slice = [].slice
-const PERF = typeof window !== 'undefined' ? performance : {}
+const PERF =
+  typeof window !== 'undefined' && typeof performance !== 'undefined'
+    ? performance
+    : {}
 
 function isCORSSupported() {
   var xhr = new window.XMLHttpRequest()
