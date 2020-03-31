@@ -34,6 +34,7 @@ import {
   removeInvalidChars
 } from '../common/utils'
 import { REUSABILITY_THRESHOLD } from '../common/constants'
+import AfterFrame from '../common/after-frame'
 import { captureBreakdown } from './breakdown'
 
 class Transaction extends SpanBase {
@@ -54,6 +55,8 @@ class Transaction extends SpanBase {
 
     this.sampled = Math.random() <= this.options.transactionSampleRate
     this.browserResponsivenessCounter = 0
+
+    this.frame = new AfterFrame()
   }
 
   addMarks(obj) {
@@ -114,8 +117,31 @@ class Transaction extends SpanBase {
     return this._scheduledTasks.length === 0
   }
 
-  detectFinish() {
-    if (this.isFinished()) this.end()
+  detectFinish(times = 0) {
+    /**
+     * Cancel any previously scheduled frames
+     */
+    this.frame.cancel()
+    /**
+     * If the tasks are not finished when this function is called,
+     * we immediately return to the caller and let the task handler
+     * handle the closing of the transaction
+     */
+    if (!this.isFinished()) {
+      return
+    }
+
+    /**
+     * We are calculating the end time here to make sure we
+     * account for the timing differece between the scheduled frames and subtract
+     * that difference from the transaction duration
+     *
+     * If there is no browser rendering activity(Script, Style, Layout), we want
+     * to exclude those scheduled frames and use the time before the RAF was scheduled
+     */
+    const endTime = now()
+
+    this.frame.next(times, () => this.end(endTime))
   }
 
   end(endTime) {

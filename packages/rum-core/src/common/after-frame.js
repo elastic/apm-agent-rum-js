@@ -23,38 +23,26 @@
  *
  */
 
-export function routeHooks(router, apm) {
-  let transaction
+export default class AfterFrame {
+  constructor() {
+    this.current = null
+  }
 
-  router.beforeEach((to, from, next) => {
-    const matched = to.matched || []
-    let path = to.path
-    /**
-     * Get the last matched route record which acts as stack when
-     * route changes are pushed and popped out of the stack
-     *
-     * Also account for the slug pattern on the routes, to.path always
-     * resolves the current slug param, but we need need to
-     * use the slug pattern for the transaction name
-     */
-    if (matched.length > 0) {
-      path = matched[matched.length - 1].path || path
-    }
-    transaction = apm.startTransaction(path, 'route-change', {
-      managed: true,
-      canReuse: true
+  next(times, callback) {
+    this.current = requestAnimationFrame(() => {
+      console.log('RAF', performance.now())
+      if (times <= 0) {
+        callback()
+      } else {
+        times--
+        this.next(times, callback)
+      }
     })
-    next()
-  })
+  }
 
-  router.afterEach(() => {
-    transaction && transaction.detectFinish(3)
-  })
-  /**
-   * handle when the navigation is cancelled in `beforeEach` hook of components
-   * where `next(error)` is called
-   */
-  router.onError(() => {
-    transaction && transaction.end()
-  })
+  cancel() {
+    if (this.current) {
+      cancelAnimationFrame(this.current)
+    }
+  }
 }
