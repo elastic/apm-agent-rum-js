@@ -23,7 +23,10 @@
  *
  */
 
-import { generateTestTransaction } from './'
+import {
+  generateTestTransaction,
+  generateTransactionWithGroupedSpans
+} from './'
 import { createServiceFactory } from '../../src'
 import { TRANSACTIONS } from '../../src/common/constants'
 import { groupSmallContinuouslySimilarSpans } from '../../src/performance-monitoring/performance-monitoring'
@@ -82,7 +85,7 @@ suite('PerformanceMonitoring', () => {
     { delay: 1 }
   )
 
-  const testTransaction = generateTestTransaction(100)
+  const testTransaction = generateTransactionWithGroupedSpans(100)
   const spans = testTransaction.spans
   const duration = testTransaction.duration()
 
