@@ -23,27 +23,42 @@
  *
  */
 
-const RAF_TIMEOUT = 100
+import afterFrame from '../../src/common/after-frame'
 
-/**
- * Schedule a callback to be invoked after the browser paints a new frame.
- *
- * There are multiple ways to do this like double rAF, MessageChannel, But we
- * use the requestAnimationFrame + setTimeout
- *
- * Also, RAF does not fire if the current tab is not visible, so we schedule a
- * timeout in parallel to ensure the callback is invoked
- *
- * Based on the  code from preact!
- * https://github.com/preactjs/preact/blob/f6577c495306f1e93174d69bd79f9fb8a418da75/hooks/src/index.js#L285-L297
- */
-export default function afterFrame(callback) {
-  const handler = () => {
-    clearTimeout(timeout)
-    cancelAnimationFrame(raf)
-    setTimeout(callback)
-  }
-  const timeout = setTimeout(handler, RAF_TIMEOUT)
+describe('AfterFrame', () => {
+  it('should be called after micro tasks', done => {
+    let count = 0
+    afterFrame(() => {
+      expect(count).toBe(2)
+      done()
+    })
+    Promise.resolve().then(() => count++)
 
-  const raf = requestAnimationFrame(handler)
-}
+    new MutationObserver(() => count++).observe(document.body, {
+      attributes: true
+    })
+    // Trigger mutation observer callback
+    document.body.setAttribute('test', 'test')
+  })
+
+  it('should be called after tasks', done => {
+    let count = 0
+    afterFrame(() => {
+      expect(count).toBe(3)
+      done()
+    })
+
+    setTimeout(() => count++, 0)
+
+    setTimeout(() => {
+      setTimeout(() => count++)
+    })
+
+    /**
+     * Technique Used by react to enqueue task
+     */
+    const channel = new MessageChannel()
+    channel.port1.onmessage = () => count++
+    channel.port2.postMessage(undefined)
+  })
+})
