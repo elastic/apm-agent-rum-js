@@ -22,50 +22,24 @@
  * THE SOFTWARE.
  *
  */
-
-import { createServiceFactory } from '../../src/index'
+import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
+import Transaction from '../../src/performance-monitoring/transaction'
 import { PAGE_LOAD } from '../../src/common/constants'
+import { generateTestTransaction } from './'
+import { TIMING_LEVEL1_ENTRY } from '../fixtures/navigation-entries'
 
-suite('TransactionService', () => {
-  const serviceFactory = createServiceFactory()
-  const transactionService = serviceFactory.getService('TransactionService')
-
-  benchmark('managed sampled transaction overhead', async () => {
-    const tr = transactionService.startTransaction('/index', PAGE_LOAD, {
-      managed: true,
+suite('CaptureBreakdown', () => {
+  benchmark('page-load transaction', () => {
+    const pageLoadTr = new Transaction('/index', PAGE_LOAD, {
       startTime: 0,
       transactionSampleRate: 1
     })
-    await tr.end()
+    pageLoadTr.end(5000)
+    captureBreakdown(pageLoadTr, TIMING_LEVEL1_ENTRY)
   })
 
-  benchmark('managed unsampled overhead', async () => {
-    const tr = transactionService.startTransaction('/index', PAGE_LOAD, {
-      managed: true,
-      startTime: 0,
-      transactionSampleRate: 0
-    })
-    await tr.end()
+  benchmark('other transaction', () => {
+    const nonPageLoadTr = generateTestTransaction(10, true)
+    captureBreakdown(nonPageLoadTr)
   })
-
-  benchmark('custom transaction overhead', async () => {
-    const tr = transactionService.startTransaction('custom', 'custom')
-    await tr.end()
-  })
-
-  benchmark(
-    'span creation overhead',
-    () => {
-      const span = transactionService.startSpan('test-span', 'custom')
-      span.end()
-    },
-    {
-      onSetup() {
-        /**
-         * Ensures we have  currentTranaction in place when span creation is done
-         */
-        transactionService.ensureCurrentTransaction('test-tr', 'custom')
-      }
-    }
-  )
 })
