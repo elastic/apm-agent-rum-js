@@ -172,7 +172,7 @@ describe('ApmServer', function() {
        * explicit characters instead of whole message
        */
       expect(error.message).toContain(
-        'validating JSON document against schema: I[#] S[#] doesn\'t validate with "transaction#'
+        ': I[#] S[#] doesn\'t validate with "transaction#'
       )
       expect(error.message).toContain('missing properties: "trace_id"')
       done()
