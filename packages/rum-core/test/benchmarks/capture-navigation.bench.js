@@ -22,48 +22,31 @@
  * THE SOFTWARE.
  *
  */
-
+import { captureNavigation } from '../../src/performance-monitoring/capture-navigation'
 import Transaction from '../../src/performance-monitoring/transaction'
+import { PAGE_LOAD, ROUTE_CHANGE } from '../../src/common/constants'
 
-export function generateTestTransaction(noOfSpans, sampled) {
-  const tr = new Transaction(
-    `transaction with ${noOfSpans} spans`,
-    'transaction1type',
-    { startTime: 0, transactionSampleRate: sampled ? 1 : 0 }
-  )
-  let lastSpanEnd = 0
-  for (let i = 0; i < noOfSpans; i++) {
-    const span = tr.startSpan(`span ${i}`, `span${i}type`, { startTime: i })
-    lastSpanEnd = 10 + i
-    span.end(lastSpanEnd)
+suite('CaptureNavigation', () => {
+  const options = {
+    startTime: 0,
+    transactionSampleRate: 1
   }
+  const endTime = 10000
 
-  tr.end(lastSpanEnd + 100)
-  return tr
-}
+  benchmark('hard navigation', () => {
+    const pageLoadTr = new Transaction('/index', PAGE_LOAD, options)
+    pageLoadTr.captureTimings = true
+    pageLoadTr.end(endTime)
+    captureNavigation(pageLoadTr)
+  })
 
-export function generateTransactionWithGroupedSpans(noOfSpans) {
-  const tr = new Transaction('tr', 'custom', { startTime: 0 })
-  const mid = Math.floor(noOfSpans / 2)
-  /**
-   * Can be grouped only when name and type are same
-   * and the spans occur continuosly with some delta
-   */
-  let delta = 0,
-    lastSpanEnd = 0
-  for (let i = 0; i < noOfSpans; i++) {
-    let name = 'name'
-    let type = 'type'
-    if (i >= mid) {
-      name += i
-      type += i
-    }
-    const span = tr.startSpan(name, type, { startTime: i + delta })
-    lastSpanEnd = i + delta + 1
-    span.end(lastSpanEnd)
-    delta += 2
-  }
-
-  tr.end(lastSpanEnd + 10)
-  return tr
-}
+  benchmark('soft navigation', () => {
+    /**
+     * Does not include navigation timing spans and agent marks
+     */
+    const nonPageLoadTr = new Transaction('/index', ROUTE_CHANGE, options)
+    nonPageLoadTr.captureTimings = true
+    nonPageLoadTr.end(endTime)
+    captureNavigation(nonPageLoadTr)
+  })
+})

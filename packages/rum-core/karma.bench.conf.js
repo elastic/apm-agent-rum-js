@@ -26,6 +26,7 @@
 const { join } = require('path')
 const { mkdirSync, existsSync } = require('fs')
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma')
+const { getWebpackConfig, BUNDLE_TYPES } = require('../../dev-utils/build')
 
 const BENCHMARKS_DIR = join(__dirname, 'test', 'benchmarks')
 const REPORTS_DIR = join(__dirname, 'reports')
@@ -47,8 +48,8 @@ module.exports = function(config) {
 
   const specPattern = `${BENCHMARKS_DIR}/**/*.bench.js`
   config.set({
-    files: [specPattern],
-
+    files: [require.resolve('regenerator-runtime/runtime'), specPattern],
+    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_ESM_PROD),
     autoWatch: false,
     singleRun: true,
     concurrency: 1,
