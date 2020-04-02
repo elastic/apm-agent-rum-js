@@ -59,4 +59,31 @@ describe('Using Switch component of react router', function() {
     expect(routeTransaction.spans.length).toBe(1)
     expect(routeTransaction.spans[0].name).toBe('GET /test/e2e/data.json')
   })
+
+  it('should capture spans inside lazy rendered components', function() {
+    browser.waitUntil(
+      () => {
+        $('#lazy-func').click()
+        const componentContainer = $('#func-container')
+        return componentContainer.getText().indexOf('/lazy') !== -1
+      },
+      5000,
+      'expected functional component to be rendered'
+    )
+
+    const { sendEvents } = waitForApmServerCalls(0, 2)
+    const { transactions } = sendEvents
+    expect(transactions.length).toBe(2)
+
+    const pageLoadTransaction = transactions[0]
+    expect(pageLoadTransaction.type).toBe('page-load')
+    expect(pageLoadTransaction.name).toBe('/notfound')
+
+    const routeTransaction = transactions[1]
+    expect(routeTransaction.name).toBe('/lazy')
+    expect(routeTransaction.type).toBe('route-change')
+
+    expect(routeTransaction.spans.length).toBe(1)
+    expect(routeTransaction.spans[0].name).toBe('GET /test/e2e/data.json')
+  })
 })
