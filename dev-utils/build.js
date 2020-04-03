@@ -36,7 +36,8 @@ const BUNDLE_TYPES = {
   NODE_ESM_PROD: 'NODE_ESM_PROD',
   BROWSER_DEV: 'BROWSER_DEV',
   BROWSER_PROD: 'BROWSER_PROD',
-  BROWSER_ESM_PROD: 'BROWSER_ESM_PROD'
+  BROWSER_ESM_PROD: 'BROWSER_ESM_PROD',
+  BROWSER_ESM_ES2015: 'BROWSER_ESM_ES2015'
 }
 
 const {
@@ -44,7 +45,8 @@ const {
   NODE_ESM_PROD,
   BROWSER_DEV,
   BROWSER_PROD,
-  BROWSER_ESM_PROD
+  BROWSER_ESM_PROD,
+  BROWSER_ESM_ES2015
 } = BUNDLE_TYPES
 
 const PACKAGE_TYPES = {
@@ -55,19 +57,48 @@ const PACKAGE_TYPES = {
 }
 
 function getBabelPresetEnv(bundleType) {
-  const isBrowser = [BROWSER_DEV, BROWSER_PROD, BROWSER_ESM_PROD].includes(
-    bundleType
-  )
+  const isBrowser = [
+    BROWSER_DEV,
+    BROWSER_PROD,
+    BROWSER_ESM_PROD,
+    BROWSER_ESM_ES2015
+  ].includes(bundleType)
   /**
    * Decides transformation of ES6 module syntax to another module type.
    */
-  const shipESModule = [NODE_ESM_PROD, BROWSER_ESM_PROD].includes(bundleType)
+  const shipESModule = [
+    NODE_ESM_PROD,
+    BROWSER_ESM_PROD,
+    BROWSER_ESM_ES2015
+  ].includes(bundleType)
+
+  /**
+   * By default RUM agent support starts from IE 11 and we do not want every users to run
+   * babel on thier dependencies to support older browser versions. However,
+   * advanced users can always use webpack resolve.mainFields set to `source`
+   * and target their audience.
+   */
+  let targets = { ie: '11' }
+  /**
+   * Angular CLI uses the target `es2015` by default which is based on the
+   * Angular Packaging Format specification and uses it for differential
+   * loading (module/nomodule)
+   * Info - https://angular.io/guide/deployment#configuring-differential-loading
+   *
+   * Babel already supports browsers targetting ES Modules via `esmodules` flag
+   * https://babeljs.io/docs/en/babel-preset-env#targetsesmodules
+   */
+  if (isBrowser && bundleType === BROWSER_ESM_ES2015) {
+    targets = { esmodules: true }
+  } else if (!isBrowser) {
+    targets = { node: true }
+  }
 
   return [
     [
       '@babel/preset-env',
       {
-        targets: isBrowser ? { ie: '11' } : { node: true },
+        targets,
         modules: shipESModule ? false : 'auto',
         loose: true
       }
