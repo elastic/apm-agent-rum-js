@@ -44,10 +44,36 @@ describe('AfterFrame', () => {
   it('should be called after tasks', done => {
     let count = 0
     afterFrame(() => {
-      expect(count).toBeGreaterThanOrEqual(2)
+      expect(count).toBe(2)
       done()
     })
 
+    setTimeout(() => count++, 0)
+
+    /**
+     * Technique Used by react to enqueue task
+     */
+    const channel = new MessageChannel()
+    channel.port1.onmessage = () => count++
+    channel.port2.postMessage(undefined)
+  })
+
+  it('edge case test with double timeout', done => {
+    let count = 0
+    afterFrame(() => {
+      /**
+       * Varies based on how browser schedules the double setTimeout calls
+       * depending on how many tasks are scheduled on the Task Queue
+       * Task Scheduling is entirely up to the browser and it may render(layout
+       * & paint) updates between tasks so we might not be able to account for all edge cases
+       *
+       * Hence the check is >= 1 instead of 2 which ensures if the browser calls
+       * timers later the test should still pass as its an edge case for our
+       * afterFrame code and its okay to not measure changes in this scenario
+       */
+      expect(count).toBeGreaterThanOrEqual(1)
+      done()
+    })
     setTimeout(() => count++, 0)
 
     /**
@@ -59,12 +85,5 @@ describe('AfterFrame', () => {
     setTimeout(() => {
       setTimeout(() => count++)
     })
-
-    /**
-     * Technique Used by react to enqueue task
-     */
-    const channel = new MessageChannel()
-    channel.port1.onmessage = () => count++
-    channel.port2.postMessage(undefined)
   })
 })

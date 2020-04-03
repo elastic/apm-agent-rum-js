@@ -32,7 +32,7 @@ import FunctionalComponent from '../components/func-component'
 import { ApmRoute } from '../../../src'
 import createApmBase from '..'
 
-const LazyFuncComponent = lazy(() => import('../components/func-component'))
+const LazyFuncComponent = lazy(() => import('../components/lazy-component'))
 
 const apm = createApmBase({
   logLevel: 'debug',

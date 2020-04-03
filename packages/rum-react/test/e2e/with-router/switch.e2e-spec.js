@@ -64,7 +64,7 @@ describe('Using Switch component of react router', function() {
     browser.waitUntil(
       () => {
         $('#lazy-func').click()
-        const componentContainer = $('#func-container')
+        const componentContainer = $('#lazy-container')
         return componentContainer.getText().indexOf('/lazy') !== -1
       },
       5000,
@@ -83,7 +83,11 @@ describe('Using Switch component of react router', function() {
     expect(routeTransaction.name).toBe('/lazy')
     expect(routeTransaction.type).toBe('route-change')
 
-    expect(routeTransaction.spans.length).toBe(1)
-    expect(routeTransaction.spans[0].name).toBe('GET /test/e2e/data.json')
+    /**
+     * 2 Spans
+     * 1 lazy loaded component JS with 'resource' type
+     * 1 Fetch call with 'external' type
+     */
+    expect(routeTransaction.spans.length).toBe(2)
   })
 })
