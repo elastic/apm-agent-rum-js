@@ -26,9 +26,8 @@
 const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
 
 describe('Using Switch component of react router', function() {
-  beforeAll(() => browser.url('/test/e2e/with-router/switch.html'))
-
   it('should render the react app on route change', function() {
+    browser.url('/test/e2e/with-router/switch.html')
     browser.waitUntil(
       () => {
         /**
@@ -61,6 +60,7 @@ describe('Using Switch component of react router', function() {
   })
 
   it('should capture spans inside lazy rendered components', function() {
+    browser.url('/test/e2e/with-router/switch.html')
     browser.waitUntil(
       () => {
         $('#lazy-func').click()
