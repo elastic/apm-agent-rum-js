@@ -73,12 +73,15 @@ function getBabelPresetEnv(bundleType) {
   ].includes(bundleType)
 
   /**
-   * By default RUM agent targets IE 11 as we would like to support all of our
-   * users.
+   * By default RUM agent support starts from IE 11 and we do not want every users to run
+   * babel on thier dependencies to support older browser versions. However,
+   * advanced users can always use webpack resolve.mainFields set to `source`
+   * and target their audience.
    */
   let targets = { ie: '11' }
   /**
-   * Angular Packaging format uses the target `es2015` for differential
+   * Angular CLI uses the target `es2015` by default which is based on the
+   * Angular Packaging Format specification and uses it for differential
    * loading (module/nomodule)
    * Info - https://angular.io/guide/deployment#configuring-differential-loading
    *
