@@ -25,7 +25,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "run-p build:main build:module",
+    "build": "run-p build:main build:module build:es2015",
     "build:main": "BABEL_ENV=BROWSER_PROD npx babel -x '.ts' src -d dist/lib ",
     "build:module": "BABEL_ENV=BROWSER_ESM_PROD npx babel -x '.ts' src -d dist/es",
     "build:es2015": "BABEL_ENV=BROWSER_ESM_ES2015 npx babel -x '.ts' src -d dist/es2015",
