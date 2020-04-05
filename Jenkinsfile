@@ -62,8 +62,8 @@ pipeline {
                 ]
                 env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: patternList)
 
-                // Skip all the stages except docs for PR's with asciidoc changes only
-                env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.asciidoc' ], comparator: 'regexp', shouldMatchAll: true)
+                // Skip all the stages except docs for PR's with asciidoc/md changes only
+                env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true)
               }
             }
           }
