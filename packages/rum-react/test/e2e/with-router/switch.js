@@ -25,14 +25,12 @@
 
 import '@babel/polyfill'
 import 'whatwg-fetch'
-import React, { Suspense, lazy } from 'react'
+import React, { Suspense } from 'react'
 import { render } from 'react-dom'
 import { BrowserRouter, Link, Switch } from 'react-router-dom'
 import FunctionalComponent from '../components/func-component'
 import { ApmRoute } from '../../../src'
 import createApmBase from '..'
-
-const LazyFuncComponent = lazy(() => import('../components/lazy-component'))
 
 const apm = createApmBase({
   logLevel: 'debug',
@@ -51,15 +49,9 @@ function App() {
             Functional
           </Link>
         </li>
-        <li>
-          <Link id="lazy-func" to="/lazy">
-            Lazy
-          </Link>
-        </li>
       </ul>
       <Suspense fallback={<div>Loading...</div>}>
         <Switch>
-          <ApmRoute path="/lazy" component={LazyFuncComponent} />
           <ApmRoute path="/func" component={FunctionalComponent} />
           <ApmRoute component={NotFound} />
         </Switch>

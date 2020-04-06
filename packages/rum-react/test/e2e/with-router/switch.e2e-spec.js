@@ -27,7 +27,7 @@ const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
 
 describe('Using Switch component of react router', function() {
   it('should render the react app on route change', function() {
-    browser.url('/test/e2e/with-router/switch.html')
+    beforeAll(() => browser.url('/test/e2e/with-router/switch.html'))
     browser.waitUntil(
       () => {
         /**
@@ -57,37 +57,5 @@ describe('Using Switch component of react router', function() {
      */
     expect(routeTransaction.spans.length).toBe(1)
     expect(routeTransaction.spans[0].name).toBe('GET /test/e2e/data.json')
-  })
-
-  it('should capture spans inside lazy rendered components', function() {
-    browser.url('/test/e2e/with-router/switch.html')
-    browser.waitUntil(
-      () => {
-        $('#lazy-func').click()
-        const componentContainer = $('#lazy-container')
-        return componentContainer.getText().indexOf('/lazy') !== -1
-      },
-      5000,
-      'expected functional component to be rendered'
-    )
-
-    const { sendEvents } = waitForApmServerCalls(0, 2)
-    const { transactions } = sendEvents
-    expect(transactions.length).toBe(2)
-
-    const pageLoadTransaction = transactions[0]
-    expect(pageLoadTransaction.type).toBe('page-load')
-    expect(pageLoadTransaction.name).toBe('/notfound')
-
-    const routeTransaction = transactions[1]
-    expect(routeTransaction.name).toBe('/lazy')
-    expect(routeTransaction.type).toBe('route-change')
-
-    /**
-     * 2 Spans
-     * 1 lazy loaded component JS with 'resource' type
-     * 1 Fetch call with 'external' type
-     */
-    expect(routeTransaction.spans.length).toBe(2)
   })
 })
