@@ -36,6 +36,7 @@ import {
 import { patchAll, patchEventHandler } from './common/patching'
 import { PAGE_LOAD, ERROR } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
+import afterFrame from './common/after-frame'
 import { createTracer } from './opentracing'
 
 function createServiceFactory() {
@@ -57,5 +58,6 @@ export {
   getInstrumentationFlags,
   createTracer,
   scheduleMicroTask,
-  scheduleMacroTask
+  scheduleMacroTask,
+  afterFrame
 }

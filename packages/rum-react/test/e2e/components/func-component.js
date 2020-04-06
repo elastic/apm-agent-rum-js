@@ -23,7 +23,9 @@
  *
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense, lazy } from 'react'
+
+const LazyComponent = lazy(() => import('./lazy-component'))
 
 export default function FunctionalComponent(props) {
   const [count, setCount] = useState(0)
@@ -43,8 +45,10 @@ export default function FunctionalComponent(props) {
 
   return (
     <div id="func-container">
-      {props.match.path + '\n'}
-      {count}
+      {props.match.path + '\n'} {count}
+      <Suspense fallback={<div>Loading...</div>}>
+        <LazyComponent />
+      </Suspense>
     </div>
   )
 }

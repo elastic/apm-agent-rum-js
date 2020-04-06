@@ -23,40 +23,27 @@
  *
  */
 
-import { afterFrame } from '@elastic/apm-rum-core'
+const RAF_TIMEOUT = 100
 
-export function routeHooks(router, apm) {
-  let transaction
+/**
+ * Schedule a callback to be invoked after the browser paints a new frame.
+ *
+ * There are multiple ways to do this like double rAF, MessageChannel, But we
+ * use the requestAnimationFrame + setTimeout
+ *
+ * Also, RAF does not fire if the current tab is not visible, so we schedule a
+ * timeout in parallel to ensure the callback is invoked
+ *
+ * Based on the  code from preact!
+ * https://github.com/preactjs/preact/blob/f6577c495306f1e93174d69bd79f9fb8a418da75/hooks/src/index.js#L285-L297
+ */
+export default function afterFrame(callback) {
+  const handler = () => {
+    clearTimeout(timeout)
+    cancelAnimationFrame(raf)
+    setTimeout(callback)
+  }
+  const timeout = setTimeout(handler, RAF_TIMEOUT)
 
-  router.beforeEach((to, from, next) => {
-    const matched = to.matched || []
-    let path = to.path
-    /**
-     * Get the last matched route record which acts as stack when
-     * route changes are pushed and popped out of the stack
-     *
-     * Also account for the slug pattern on the routes, to.path always
-     * resolves the current slug param, but we need need to
-     * use the slug pattern for the transaction name
-     */
-    if (matched.length > 0) {
-      path = matched[matched.length - 1].path || path
-    }
-    transaction = apm.startTransaction(path, 'route-change', {
-      managed: true,
-      canReuse: true
-    })
-    next()
-  })
-
-  router.afterEach(() => {
-    afterFrame(() => transaction && transaction.detectFinish())
-  })
-  /**
-   * handle when the navigation is cancelled in `beforeEach` hook of components
-   * where `next(error)` is called
-   */
-  router.onError(() => {
-    transaction && transaction.end()
-  })
+  const raf = requestAnimationFrame(handler)
 }

@@ -25,7 +25,7 @@
 
 import '@babel/polyfill'
 import 'whatwg-fetch'
-import React from 'react'
+import React, { Suspense } from 'react'
 import { render } from 'react-dom'
 import { BrowserRouter, Link, Switch } from 'react-router-dom'
 import FunctionalComponent from '../components/func-component'
@@ -50,10 +50,12 @@ function App() {
           </Link>
         </li>
       </ul>
-      <Switch>
-        <ApmRoute path="/func" component={FunctionalComponent} />
-        <ApmRoute component={NotFound} />
-      </Switch>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Switch>
+          <ApmRoute path="/func" component={FunctionalComponent} />
+          <ApmRoute component={NotFound} />
+        </Switch>
+      </Suspense>
     </React.Fragment>
   )
 }
