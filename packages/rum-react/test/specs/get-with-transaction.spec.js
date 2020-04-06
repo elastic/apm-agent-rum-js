@@ -31,7 +31,7 @@ Enzyme.configure({ adapter: new Adapter() })
 
 import { getWithTransaction } from '../../src/get-with-transaction'
 import { ApmBase } from '@elastic/apm-rum'
-import { createServiceFactory } from '@elastic/apm-rum-core'
+import { createServiceFactory, afterFrame } from '@elastic/apm-rum-core'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 function TestComponent(apm) {
@@ -145,7 +145,7 @@ describe('withTransaction', function() {
     expect(wrapper.text()).toBe('Testing, new-props')
   })
 
-  it('should end transaction when component unmounts', () => {
+  it('should end transaction when component unmounts', done => {
     const transactionService = serviceFactory.getService('TransactionService')
     const detectFinishSpy = jasmine.createSpy('detectFinish')
     spyOn(transactionService, 'startTransaction').and.returnValue({
@@ -161,8 +161,11 @@ describe('withTransaction', function() {
         managed: true
       }
     )
-    expect(detectFinishSpy).toHaveBeenCalled()
-    wrapper.unmount()
-    expect(detectFinishSpy).toHaveBeenCalled()
+    afterFrame(() => {
+      expect(detectFinishSpy).toHaveBeenCalled()
+      wrapper.unmount()
+      expect(detectFinishSpy).toHaveBeenCalled()
+      done()
+    })
   })
 })

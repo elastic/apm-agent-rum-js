@@ -26,7 +26,7 @@
 import { createLocalVue, mount } from '@vue/test-utils'
 import VueRouter from 'vue-router'
 import { ApmBase } from '@elastic/apm-rum'
-import { createServiceFactory } from '@elastic/apm-rum-core'
+import { createServiceFactory, afterFrame } from '@elastic/apm-rum-core'
 import { ApmVuePlugin } from '../../src'
 
 describe('APM route hooks', () => {
@@ -87,7 +87,7 @@ describe('APM route hooks', () => {
         component: Home
       }
     ])
-    spyOn(apm, 'startTransaction')
+    spyOn(apm, 'startTransaction').and.callThrough()
     router.push('/')
 
     expect(apm.startTransaction).toHaveBeenCalledWith('/home', 'route-change', {
@@ -105,7 +105,7 @@ describe('APM route hooks', () => {
         component: Foo
       }
     ])
-    spyOn(apm, 'startTransaction')
+    spyOn(apm, 'startTransaction').and.callThrough()
     router.push('/foo/1')
 
     expect(apm.startTransaction).toHaveBeenCalledWith(
@@ -120,7 +120,7 @@ describe('APM route hooks', () => {
     wrapper.destroy()
   })
 
-  it('should use the slug id for nested child routes', () => {
+  it('should use the slug id for nested child routes', done => {
     const { router, wrapper } = mountApp([
       {
         path: '/parent',
@@ -133,7 +133,10 @@ describe('APM route hooks', () => {
         ]
       }
     ])
-    spyOn(apm, 'startTransaction')
+    const detectFinishSpy = jasmine.createSpy('detectFinishSpy')
+    spyOn(apm, 'startTransaction').and.returnValue({
+      detectFinish: detectFinishSpy
+    })
     router.push('/parent/foo/1')
 
     expect(apm.startTransaction).toHaveBeenCalledWith(
@@ -145,7 +148,11 @@ describe('APM route hooks', () => {
       }
     )
     expect(wrapper.find(Foo).exists()).toBe(true)
-    wrapper.destroy()
+    afterFrame(() => {
+      expect(detectFinishSpy).toHaveBeenCalled()
+      wrapper.destroy()
+      done()
+    })
   })
 
   it('should expose the $apm on the vue instance', () => {
@@ -212,6 +219,7 @@ describe('APM route hooks', () => {
 
   it('should end transaction on navigation error', done => {
     const endSpy = jasmine.createSpy('endSpy')
+    const detectFinishSpy = jasmine.createSpy('detectFinishSpy')
     const ErrorSpan = {
       template: `<div>Span</div>`,
       beforeRouteEnter() {
@@ -227,11 +235,13 @@ describe('APM route hooks', () => {
 
     router.onError(() => {
       expect(endSpy).toHaveBeenCalled()
+      wrapper.destroy()
       done()
     })
 
     spyOn(apm, 'startTransaction').and.returnValue({
-      end: endSpy
+      end: endSpy,
+      detectFinish: detectFinishSpy
     })
     router.push('/error')
 
@@ -244,7 +254,6 @@ describe('APM route hooks', () => {
       }
     )
     expect(wrapper.find(ErrorSpan).exists()).toBe(false)
-    wrapper.destroy()
   })
 
   describe('vue router hash mode', () => {
