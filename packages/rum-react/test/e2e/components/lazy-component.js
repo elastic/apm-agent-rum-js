@@ -23,32 +23,8 @@
  *
  */
 
-import React, { useEffect, useState, Suspense, lazy } from 'react'
+import React from 'react'
 
-const LazyComponent = lazy(() => import('./lazy-component'))
-
-export default function FunctionalComponent(props) {
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    async function dummyGet() {
-      try {
-        await fetch('/test/e2e/data.json')
-      } catch (_) {
-      } finally {
-        setCount(2)
-      }
-    }
-
-    dummyGet()
-  }, [])
-
-  return (
-    <div id="func-container">
-      {props.match.path + '\n'} {count}
-      <Suspense fallback={<div>Loading...</div>}>
-        <LazyComponent />
-      </Suspense>
-    </div>
-  )
+export default function lazyComponent() {
+  return <div>lazy component rendered</div>
 }
