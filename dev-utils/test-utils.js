@@ -105,67 +105,6 @@ function buildE2eBundles(basePath, callback) {
   })
 }
 
-function onExit(callback) {
-  function exitHandler(err) {
-    try {
-      callback(err)
-    } finally {
-      if (err) console.log(err)
-    }
-  }
-
-  process.on('exit', exitHandler)
-
-  process.on('SIGINT', exitHandler)
-
-  process.on('uncaughtException', exitHandler)
-}
-
-function startSelenium(callback, manualStop) {
-  callback = callback || function() {}
-  var selenium = require('selenium-standalone')
-  var drivers = {
-    chrome: {
-      version: '2.38',
-      arch: process.arch,
-      baseURL: 'https://chromedriver.storage.googleapis.com'
-    },
-    firefox: {
-      version: '0.19.1',
-      arch: process.arch
-    }
-  }
-  selenium.install(
-    {
-      logger: console.log,
-      drivers
-    },
-    function(installError) {
-      if (installError) {
-        console.log('Error while installing selenium:', installError)
-      }
-      selenium.start({ drivers }, function(startError, child) {
-        function killSelenium() {
-          child.kill()
-          console.log('Just killed selenium!')
-        }
-        if (startError) {
-          console.log('Error while starting selenium:', startError)
-          return process.exit(1)
-        } else {
-          console.log('Selenium started!')
-          if (manualStop) {
-            callback(killSelenium)
-          } else {
-            onExit(killSelenium)
-            callback()
-          }
-        }
-      })
-    }
-  )
-}
-
 function runSauceConnect(config, callback) {
   return sauceConnectLauncher(config, (err, sauceConnectProcess) => {
     if (err) {
@@ -185,26 +124,19 @@ function runKarma(configFile) {
   server.start()
 }
 
-function runE2eTests(configFilePath, runSelenium) {
+function runE2eTests(configFilePath) {
   const wdio = new Launcher(configFilePath, {})
-  function runWdio() {
-    wdio.run().then(
-      function(code) {
-        process.stdin.pause()
-        process.nextTick(() => process.exit(code))
-      },
-      function(error) {
-        console.error('Launcher failed to start the test', error)
-        process.stdin.pause()
-        process.nextTick(() => process.exit())
-      }
-    )
-  }
-  if (runSelenium) {
-    startSelenium(runWdio)
-  } else {
-    runWdio()
-  }
+  wdio.run().then(
+    function(code) {
+      process.stdin.pause()
+      process.nextTick(() => process.exit(code))
+    },
+    function(error) {
+      console.error('Launcher failed to start the test', error)
+      process.stdin.pause()
+      process.nextTick(() => process.exit())
+    }
+  )
 }
 
 function runJasmine(specDir, cb) {
@@ -236,6 +168,5 @@ module.exports = {
   runKarma,
   runJasmine,
   runSauceConnect,
-  startSelenium,
   dirWalkSync: walkSync
 }

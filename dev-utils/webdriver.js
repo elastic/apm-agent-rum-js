@@ -213,6 +213,7 @@ function getWebdriveBaseConfig(
   if (!sauceLabs) {
     Object.assign(baseConfig, {
       automationProtocol: 'devtools',
+      services: [],
       capabilities: [
         {
           browserName: 'chrome',
