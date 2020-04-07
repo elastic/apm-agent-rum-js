@@ -122,6 +122,7 @@
     "express-http-proxy": "^1.6.0",
     "gh-release-assets": "^1.1.2",
     "glob": "^7.1.6",
+    "html-webpack-plugin": "^4.0.4",
     "husky": "^3.1.0",
     "jasmine": "^3.5.0",
     "karma": "^4.4.1",
