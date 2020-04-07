@@ -30,7 +30,6 @@ const {
   getWebpackConfig,
   BUNDLE_TYPES
 } = require('../../../../../dev-utils/build')
-const ApmServerMock = require('../../../../rum-core/test/utils/apm-server-mock')
 
 const { serverUrl, mockBackendUrl } = getGlobalConfig().testConfig
 
@@ -47,8 +46,7 @@ module.exports = {
       filename: path.resolve(__dirname, 'async-e2e.html'),
       templateParameters: {
         serverUrl,
-        mockBackendUrl,
-        ApmServerMock
+        mockBackendUrl
       },
       inject: false
     })

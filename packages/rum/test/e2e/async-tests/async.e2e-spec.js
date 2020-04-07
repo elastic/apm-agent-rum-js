@@ -23,13 +23,10 @@
  *
  */
 
-const {
-  waitForApmServerCalls,
-  getBrowserInfo
-} = require('../../../../../dev-utils/webdriver')
+const { getBrowserInfo } = require('../../../../../dev-utils/webdriver')
 
 describe('async-tests', function() {
-  fit('should run the usecase', function() {
+  it('should run the usecase', function() {
     browser.url('/test/e2e/async-tests/async-e2e.html')
     browser.waitUntil(
       () => {
@@ -39,14 +36,14 @@ describe('async-tests', function() {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 1)
-    const { transactions } = sendEvents
-
-    expect(transactions.length).toBe(1)
-    const transactionPayload = transactions[0]
+    /**
+     * Payload is set in the EJS template.
+     * Its not possible to inject the ApmServerMock for standalone
+     * tests as the application code is different from the APM Agent bundle code
+     */
+    const transactionPayload = browser.execute(() => window.TRANSACTION_PAYLOAD)
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('/async')
-
     /**
      * Check for all types of spans that would be captured by
      * loading script async
@@ -56,7 +53,7 @@ describe('async-tests', function() {
      * Safari does not support Resource & User Timing API
      */
     const { name } = getBrowserInfo()
-    if (name.indexOf('safari') !== -1) {
+    if (name.indexOf('safari') === -1) {
       spanTypes.push('resource', 'app')
     }
 

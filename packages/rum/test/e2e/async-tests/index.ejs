@@ -11,7 +11,6 @@
         if (typeof performance.measure === 'function') {
           performance.measure('loaded')
         }
-        console.log('<%= ApmServerMock %>')
         window.elasticApm.init({
           serviceName: 'async-test',
           serverUrl: '<%= serverUrl %>',
@@ -19,6 +18,14 @@
           distributedTracingOrigins: ['<%= mockBackendUrl %>'],
           pageLoadTransactionName: '/async'
         })
+
+        /**
+         * Make payload available globally so we can test
+         */
+        var apmServer = window.elasticApm.serviceFactory.getService('ApmServer')
+        apmServer.addTransaction = function(payload) {
+          window.TRANSACTION_PAYLOAD = payload
+        }
       }
       document.head.appendChild(script)
     </script>
