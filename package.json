@@ -23,7 +23,8 @@
     "serve": "node ./dev-utils/run-script.js startTestServers",
     "coverage": "lerna run build:module && lerna run karma:coverage",
     "bench:dev": "lerna run build:module && node ./scripts/benchmarks.js",
-    "clean": "npx lerna exec -- rm -rf dist/"
+    "clean": "npx lerna exec -- rm -rf dist/",
+    "release-ci": "lerna publish --otp=${TOTP_CODE} --yes && npm run github-release"
   },
   "lint-staged": {
     "*.{js,jsx,ts}": [
@@ -85,7 +86,6 @@
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
     "@lerna/child-process": "^3.16.5",
-    "@lerna/prompt": "^3.18.5",
     "@types/jasmine": "^3.5.0",
     "@typescript-eslint/eslint-plugin": "^2.11.0",
     "@typescript-eslint/parser": "^2.11.0",

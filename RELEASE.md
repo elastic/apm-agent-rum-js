@@ -1,5 +1,7 @@
 # Releasing
 
+## Manually
+
 Before releasing a new version of packages to the NPM and GitHub, Set all the environment variables necessary for the testing and release scripts. The required variables are
 - APM_SERVER_URL
 - GITHUB_TOKEN
@@ -35,3 +37,15 @@ Before releasing, be sure to update the following documentation:
 
 - Update `CHANGELOG.asciidoc` to add release notes for the new version. Headings should follow this format: `==== x.x.x (yyyy-MM-dd)`.
 - For Major and minor releases: Add a new row to the EOL table in `docs/upgrading.asciidoc`. The EOL date is the release date plus 18 months.
+
+## CI based
+
+The release process is also automated in the way any specific commit from the master branch can be potentially released, for such it's required the below steps:
+
+1. Login to apm-ci.elastic.co
+1. Go to the [master](https://apm-ci.elastic.co/job/apm-agent-rum/job/apm-agent-rum-mbp/job/master/) pipeline.
+1. Click on `Build with parameters` and choose the `release` checkbox.
+1. Wait for an email to confirm the release is ready to be approved, it might take roughly 30 minutes.
+1. Confirm if the list of changes are the ones that are expected.
+1. Approve or abort.
+1. Then you can go to the https://registry.npmjs.org and GitHub repo to validate that the bundles and release notes have been published.

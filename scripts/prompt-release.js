@@ -24,7 +24,6 @@
  */
 
 const log = require('npmlog')
-const PromptUtils = require('@lerna/prompt')
 const childProcess = require('@lerna/child-process')
 
 !(async () => {
@@ -39,21 +38,7 @@ const childProcess = require('@lerna/child-process')
       './packages/rum/src/apm-base.js'
     ])
 
-    /**
-     * Prompt for working directory clean
-     */
-    const answer = await PromptUtils.confirm(
-      'Are these changes ok (Check your working directory before continuing)'
-    )
-
-    if (!answer) {
-      log.error(
-        'release',
-        'Aborting the release process',
-        `Please run 'npm run release' again to start`
-      )
-      process.exit(1)
-    }
+    childProcess.execSync('git', ['add', './packages/rum/src/apm-base.js'])
   } catch (err) {
     log.error(err)
   }
