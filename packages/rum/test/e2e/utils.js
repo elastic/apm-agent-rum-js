@@ -69,11 +69,11 @@ function testXHR(backendUrl, callback = () => {}, validateDT = true) {
   req.send()
 }
 
-function testFetch(backendUrl, callback = () => {}, validateDT = true) {
+function testFetch(backendUrl, callback = () => {}) {
   if ('fetch' in window) {
     fetch(backendUrl + '/fetch', { method: 'POST' }).then(response => {
       response.json().then(function(payload) {
-        validateDT && checkDtInfo(payload)
+        checkDtInfo(payload)
         callback()
       })
     })

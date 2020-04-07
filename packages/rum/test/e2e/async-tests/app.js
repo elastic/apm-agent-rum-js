@@ -23,14 +23,14 @@
  *
  */
 
-import { testFetch, renderTestElement } from '../utils'
+import { testXHR, renderTestElement } from '../utils'
 import { getGlobalConfig } from '../../../../../dev-utils/test-config'
 
 const { mockBackendUrl } = getGlobalConfig().testConfig
 
 /**
- * Currently, Fetch call will not be captured as Spans by the agent
+ * Currently, XHR call will not be captured as Spans by the agent
  * since agent script is loaded asynchronously and we will not be able to patch
  * XHR and FETCH calls on time
  */
-testFetch(mockBackendUrl, renderTestElement, false)
+testXHR(mockBackendUrl, renderTestElement, false)
