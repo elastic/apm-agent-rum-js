@@ -3,12 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# 1.1.0 (2020-04-08)
+# [1.1.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.0.0...@elastic/apm-rum-react@1.1.0) (2020-04-08)
 
 
 ### Features
 
 * **rum-core:** end spa navigations after browser frame ([#730](https://github.com/elastic/apm-agent-rum-js/issues/730)) ([5397fa2](https://github.com/elastic/apm-agent-rum-js/commit/5397fa22eb88c080f7a6d07ef5b89dfefc572fb3))
+
+
+### Performance Improvements
+
+* **rum-core:** random number generator using crypto.getRandomValues ([#705](https://github.com/elastic/apm-agent-rum-js/issues/705)) ([ce0db92](https://github.com/elastic/apm-agent-rum-js/commit/ce0db92d1ba057def0c81595340de4e9e59c4872))
 
 
 

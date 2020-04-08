@@ -3,12 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# 5.1.0 (2020-04-08)
+# [5.1.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.0.0...@elastic/apm-rum-core@5.1.0) (2020-04-08)
+
+
+### Bug Fixes
+
+* **rum-core:** filter API calls from resource spans ([#724](https://github.com/elastic/apm-agent-rum-js/issues/724)) ([15dba46](https://github.com/elastic/apm-agent-rum-js/commit/15dba464f0e4db1268b1fecbe4f4bf83b0b38c54))
+* **rum-core:** handle error when `performance` is not available ([#708](https://github.com/elastic/apm-agent-rum-js/issues/708)) ([bb1740a](https://github.com/elastic/apm-agent-rum-js/commit/bb1740a20c65a5ce7649a122d1e27deeb97ed994))
 
 
 ### Features
 
 * **rum-core:** end spa navigations after browser frame ([#730](https://github.com/elastic/apm-agent-rum-js/issues/730)) ([5397fa2](https://github.com/elastic/apm-agent-rum-js/commit/5397fa22eb88c080f7a6d07ef5b89dfefc572fb3))
+
+
+### Performance Improvements
+
+* **rum-core:** random number generator using crypto.getRandomValues ([#705](https://github.com/elastic/apm-agent-rum-js/issues/705)) ([ce0db92](https://github.com/elastic/apm-agent-rum-js/commit/ce0db92d1ba057def0c81595340de4e9e59c4872))
 
 
 
