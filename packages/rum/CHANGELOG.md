@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.0.0...@elastic/apm-rum@5.0.1) (2020-04-08)
+
+
+### Performance Improvements
+
+* **rum-core:** random number generator using crypto.getRandomValues ([#705](https://github.com/elastic/apm-agent-rum-js/issues/705)) ([ce0db92](https://github.com/elastic/apm-agent-rum-js/commit/ce0db92d1ba057def0c81595340de4e9e59c4872))
+
+
+
+
+
 # [5.0.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@4.9.1...@elastic/apm-rum@5.0.0) (2020-03-18)
 
 **Note:** Version bump only for package @elastic/apm-rum
