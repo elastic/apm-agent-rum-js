@@ -5,29 +5,35 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
     <script>
-      var script = document.createElement('script')
-      script.src = '/dist/bundles/elastic-apm-rum.umd.js'
-      script.onload = function() {
-        if (typeof performance.measure === 'function') {
-          performance.measure('loaded')
-        }
-        window.elasticApm.init({
-          serviceName: 'async-test',
-          serverUrl: '<%= serverUrl %>',
-          logLevel: 'debug',
-          distributedTracingOrigins: ['<%= mockBackendUrl %>'],
-          pageLoadTransactionName: '/async'
-        })
+      /**
+       * Use the recomended async loading pattern from the Setup page
+       */
+      ;(function(d, s, c) {
+        var j = d.createElement(s),
+          t = d.getElementsByTagName(s)[0]
 
-        /**
-         * Make payload available globally so we can test
-         */
-        var apmServer = window.elasticApm.serviceFactory.getService('ApmServer')
-        apmServer.addTransaction = function(payload) {
-          window.TRANSACTION_PAYLOAD = payload
+        j.src = '/dist/bundles/elastic-apm-rum.umd.js'
+        j.onload = function() {
+          if (typeof performance.measure === 'function') {
+            performance.measure('loaded')
+          }
+          elasticApm.init(c)
+          /**
+           * Make payload available globally so we can test
+           */
+          var apmServer = elasticApm.serviceFactory.getService('ApmServer')
+          apmServer.addTransaction = function(payload) {
+            window.TRANSACTION_PAYLOAD = payload
+          }
         }
-      }
-      document.head.appendChild(script)
+        t.parentNode.insertBefore(j, t)
+      })(document, 'script', {
+        serviceName: 'async-test',
+        serverUrl: '<%= serverUrl %>',
+        logLevel: 'debug',
+        distributedTracingOrigins: ['<%= mockBackendUrl %>'],
+        pageLoadTransactionName: '/async'
+      })
     </script>
   </head>
 
