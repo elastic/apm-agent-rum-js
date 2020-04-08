@@ -74,7 +74,6 @@ const getMemoizedApmComponent = memoize((Component, apm, name, type) => {
     }
 
     render() {
-      console.log('##### renderrrr')
       return <Component transaction={this.transaction} {...this.props} />
     }
   }
