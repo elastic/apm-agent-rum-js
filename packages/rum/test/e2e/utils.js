@@ -54,13 +54,15 @@ function renderTestElement() {
   appEl.appendChild(testEl)
 }
 
-function testXHR(backendUrl, callback = () => {}) {
+function testXHR(backendUrl, callback = () => {}, validateDT = true) {
   const req = new window.XMLHttpRequest()
   req.onerror = err => console.log('[XHR Error]', err)
   req.open('POST', backendUrl + '/data', false)
   req.addEventListener('load', function() {
-    const payload = JSON.parse(req.responseText)
-    checkDtInfo(payload)
+    if (validateDT) {
+      const payload = JSON.parse(req.responseText)
+      checkDtInfo(payload)
+    }
     callback()
   })
 
