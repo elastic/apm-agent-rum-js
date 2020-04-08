@@ -50,7 +50,7 @@ describe('async-tests', function() {
      * Check for all types of spans that would be captured by
      * loading script async
      */
-    const spanTypes = ['hard-navigation']
+    const spanTypes = ['hard-navigation', 'external']
     /**
      * Safari does not support Resource & User Timing API
      */
