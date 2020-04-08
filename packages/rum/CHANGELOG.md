@@ -3,7 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [5.0.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.0.0...@elastic/apm-rum@5.0.1) (2020-04-08)
+## [5.1.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.0.0...@elastic/apm-rum@5.1.0) (2020-04-08)
+
+
+### Features
+  
+* **rum-core:** end spa navigations after browser frame ([#730](https://github.com/elastic/apm-agent-rum-js/issues/730)) ([5397fa2](https://github.com/elastic/apm-agent-rum-js/commit/5397fa22eb88c080f7a6d07ef5b89dfefc572fb3))
 
 
 ### Performance Improvements
