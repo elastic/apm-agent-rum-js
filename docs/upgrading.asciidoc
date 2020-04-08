@@ -133,7 +133,7 @@ You must upgrade your backend agents to the minimum versions listed below for al
 ==== Upgrade the RUM agent
 
 Update or download the latest version of the RUM Agent using your
-<<install-the-agent,preferred installation method>>.
+<<usage,preferred installation method>>.
 
 If your old configuration used one of the removed config options (listed below),
 update your configuration to use the new config options instead.
