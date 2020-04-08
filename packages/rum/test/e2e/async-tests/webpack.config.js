@@ -23,23 +23,32 @@
  *
  */
 
-const log = require('npmlog')
-const childProcess = require('@lerna/child-process')
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { getGlobalConfig } = require('../../../../../dev-utils/test-config')
+const {
+  getWebpackConfig,
+  BUNDLE_TYPES
+} = require('../../../../../dev-utils/build')
 
-!(async () => {
-  /**
-   * Test the agent version with updated package version
-   */
-  try {
-    childProcess.execSync('eslint', [
-      '--rule',
-      '{"rulesdir/version-checker": "error"}',
-      '--fix',
-      './packages/rum/src/apm-base.js'
-    ])
+const { serverUrl, mockBackendUrl } = getGlobalConfig().testConfig
 
-    childProcess.execSync('git', ['add', './packages/rum/src/apm-base.js'])
-  } catch (err) {
-    log.error(err)
-  }
-})()
+module.exports = {
+  entry: path.join(__dirname, 'app.js'),
+  output: {
+    path: path.resolve(__dirname),
+    filename: 'app.e2e-bundle.min.js'
+  },
+  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV),
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, 'index.ejs'),
+      filename: path.resolve(__dirname, 'async-e2e.html'),
+      templateParameters: {
+        serverUrl,
+        mockBackendUrl
+      },
+      inject: false
+    })
+  ]
+}

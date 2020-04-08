@@ -22,24 +22,24 @@
  * THE SOFTWARE.
  *
  */
+import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
+import Transaction from '../../src/performance-monitoring/transaction'
+import { PAGE_LOAD } from '../../src/common/constants'
+import { generateTestTransaction } from './'
+import { TIMING_LEVEL1_ENTRY } from '../fixtures/navigation-entries'
 
-const log = require('npmlog')
-const childProcess = require('@lerna/child-process')
+suite('CaptureBreakdown', () => {
+  benchmark('page-load transaction', () => {
+    const pageLoadTr = new Transaction('/index', PAGE_LOAD, {
+      startTime: 0,
+      transactionSampleRate: 1
+    })
+    pageLoadTr.end(5000)
+    captureBreakdown(pageLoadTr, TIMING_LEVEL1_ENTRY)
+  })
 
-!(async () => {
-  /**
-   * Test the agent version with updated package version
-   */
-  try {
-    childProcess.execSync('eslint', [
-      '--rule',
-      '{"rulesdir/version-checker": "error"}',
-      '--fix',
-      './packages/rum/src/apm-base.js'
-    ])
-
-    childProcess.execSync('git', ['add', './packages/rum/src/apm-base.js'])
-  } catch (err) {
-    log.error(err)
-  }
-})()
+  benchmark('other transaction', () => {
+    const nonPageLoadTr = generateTestTransaction(10, true)
+    captureBreakdown(nonPageLoadTr)
+  })
+})

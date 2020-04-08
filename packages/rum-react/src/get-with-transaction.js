@@ -25,6 +25,7 @@
 
 import React from 'react'
 import hoistStatics from 'hoist-non-react-statics'
+import { afterFrame } from '@elastic/apm-rum-core'
 
 /**
  * Check if the given component is class based component
@@ -101,7 +102,7 @@ function getWithTransaction(apm) {
            * which ensures if the transaction can be completed or not.
            */
           React.useEffect(() => {
-            transaction && transaction.detectFinish()
+            afterFrame(() => transaction && transaction.detectFinish())
             return () => {
               /**
                * Incase the transaction is never ended, we check if the transaction
@@ -136,9 +137,9 @@ function getWithTransaction(apm) {
             /**
              * React guarantees the parent CDM runs after the child components CDM
              */
-            if (this.transaction) {
-              this.transaction.detectFinish()
-            }
+            afterFrame(
+              () => this.transaction && this.transaction.detectFinish()
+            )
           }
 
           componentWillUnmount() {

@@ -17,6 +17,8 @@ pipeline {
     GITHUB_CHECK_ITS_NAME = 'Integration Tests'
     ITS_PIPELINE = 'apm-integration-tests-selector-mbp/master'
     OPBEANS_REPO = 'opbeans-frontend'
+    NPMRC_SECRET = 'secret/jenkins-ci/npmjs/elasticmachine'
+    TOTP_SECRET = 'totp/code/npmjs-elasticmachine'
     PATH = "${env.PATH}:${env.WORKSPACE}/bin"
     MODE = "none"
   }
@@ -38,6 +40,7 @@ pipeline {
     booleanParam(name: 'saucelab_test', defaultValue: "true", description: "Enable run a Sauce lab test")
     booleanParam(name: 'parallel_test', defaultValue: "true", description: "Enable run tests in parallel")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
+    booleanParam(name: 'release', defaultValue: false, description: 'Release.')
   }
   stages {
     stage('Initializing'){
@@ -52,15 +55,18 @@ pipeline {
             deleteDir()
             gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
             stash allowEmpty: true, name: 'source', useDefaultExcludes: false
-            // Look for changes related to the benchmark, if so then set the env variable.
             script {
               dir("${BASE_DIR}"){
-                def regexps =[
+                // Look for changes related to the benchmark, if so then set the env variable.
+                def patternList =[
                   '^packages/.*/test/benchmarks/.*',
                   '^scripts/benchmarks.js',
                   '^packages/rum-core/karma.bench.conf.js'
                 ]
-                env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: regexps)
+                env.BENCHMARK_UPDATED = isGitRegionMatch(patterns: patternList)
+
+                // Skip all the stages except docs for PR's with asciidoc/md changes only
+                env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true)
               }
             }
           }
@@ -69,6 +75,10 @@ pipeline {
         Lint the code.
         */
         stage('Lint') {
+          when {
+            beforeAgent true
+            expression { return env.ONLY_DOCS == "false" }
+          }
           steps {
             withGithubNotify(context: 'Lint') {
               deleteDir()
@@ -86,6 +96,10 @@ pipeline {
           }
         }
         stage('Test Pupperteer') {
+          when {
+            beforeAgent true
+            expression { return env.ONLY_DOCS == "false" }
+          }
           matrix {
             agent { label 'linux && immutable' }
             axes {
@@ -133,6 +147,7 @@ pipeline {
             allOf {
               branch 'master'
               expression { return params.saucelab_test }
+              expression { return env.ONLY_DOCS == "false" }
             }
           }
           steps {
@@ -155,6 +170,7 @@ pipeline {
             allOf {
               changeRequest()
               expression { return params.saucelab_test }
+              expression { return env.ONLY_DOCS == "false" }
             }
           }
           steps {
@@ -170,9 +186,12 @@ pipeline {
           agent none
           when {
             beforeAgent true
-            anyOf {
-              changeRequest()
-              expression { return !params.Run_As_Master_Branch }
+            allOf {
+              anyOf {
+                changeRequest()
+                expression { return !params.Run_As_Master_Branch }
+              }
+              expression { return env.ONLY_DOCS == "false" }
             }
           }
           steps {
@@ -197,12 +216,13 @@ pipeline {
             beforeAgent true
             allOf {
               anyOf {
-                //branch 'master'
-                //tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
+                branch 'master'
+                tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
                 expression { return params.Run_As_Master_Branch }
                 expression { return env.BENCHMARK_UPDATED != "false" }
               }
               expression { return params.bench_ci }
+              expression { return env.ONLY_DOCS == "false" }
             }
           }
           steps {
@@ -236,6 +256,10 @@ pipeline {
         */
         stage('Coverage') {
           options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression { return env.ONLY_DOCS == "false" }
+          }
           steps {
             withGithubNotify(context: 'Coverage') {
               // No scope is required as the coverage should run for all of them
@@ -252,28 +276,82 @@ pipeline {
           }
         }
         stage('Release') {
+          options {
+            skipDefaultCheckout()
+            timeout(time: 12, unit: 'HOURS')
+          }
+          environment {
+            HOME = "${env.WORKSPACE}"
+          }
+          when {
+            beforeAgent true
+            allOf {
+              branch 'master'
+              expression { return params.release }
+            }
+          }
+          stages {
+            stage('Notify') {
+              options { skipDefaultCheckout() }
+              steps {
+                deleteDir()
+                unstash 'source'
+                dir("${BASE_DIR}") {
+                  prepareRelease() {
+                    script {
+                      sh(label: 'Lerna version dry-run', script: 'npx lerna version --no-push --yes', returnStdout: true)
+                      def releaseVersions = sh(label: 'Gather versions from last commit', script: 'git log -1 --format="%b"', returnStdout: true)
+                      log(level: 'INFO', text: "Versions: ${releaseVersions}")
+                      emailext subject: "[${env.REPO}] Release ready to be pushed", to: "${NOTIFY_TO}",
+                               body: "Please go to ${env.BUILD_URL}input to approve or reject within 12 hours.\n Changes: ${releaseVersions}"
+                      input(message: 'Should we release a new version?', ok: 'Yes, we should.',
+                            parameters: [text(description: 'Look at the versions to be released. They cannot be edited here',
+                                              defaultValue: "${releaseVersions}", name: 'versions')])
+                    }
+                  }
+                }
+              }
+            }
+            stage('Release CI') {
+              options { skipDefaultCheckout() }
+              steps {
+                deleteDir()
+                unstash 'source'
+                dir("${BASE_DIR}") {
+                  prepareRelease() {
+                    sh 'npm run release-ci'
+                  }
+                }
+              }
+              post {
+                always {
+                  script {
+                    currentBuild.description = "${currentBuild.description?.trim() ? currentBuild.description : ''} released"
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Opbeans') {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
             tag pattern: '@elastic/apm-rum@\\d+\\.\\d+\\.\\d+$', comparator: 'REGEXP'
           }
-          stages {
-            stage('Opbeans') {
-              environment {
-                REPO_NAME = "${OPBEANS_REPO}"
-              }
-              steps {
-                deleteDir()
-                dir("${OPBEANS_REPO}"){
-                  git credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
-                      url: "git@github.com:elastic/${OPBEANS_REPO}.git"
-                  sh script: ".ci/bump-version.sh '${env.BRANCH_NAME}'", label: 'Bump version'
-                  // The opbeans pipeline will trigger a release for the master branch
-                  gitPush()
-                  // The opbeans pipeline will trigger a release for the release tag
-                  gitCreateTag(tag: "${env.BRANCH_NAME}")
-                }
-              }
+          environment {
+            REPO_NAME = "${OPBEANS_REPO}"
+          }
+          steps {
+            deleteDir()
+            dir("${OPBEANS_REPO}"){
+              git credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
+                  url: "git@github.com:elastic/${OPBEANS_REPO}.git"
+              sh script: ".ci/bump-version.sh '${env.BRANCH_NAME}'", label: 'Bump version'
+              // The opbeans pipeline will trigger a release for the master branch
+              gitPush()
+              // The opbeans pipeline will trigger a release for the release tag
+              gitCreateTag(tag: "${env.BRANCH_NAME}")
             }
           }
         }
@@ -364,6 +442,23 @@ def wrappingUp(){
     keepLongStdio: true,
     testResults: "${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
   archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs,${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
+}
+
+def prepareRelease(String nodeVersion='node:lts', Closure body){
+  withNpmrc(secret: "${env.NPMRC_SECRET}", path: "${env.WORKSPACE}/${env.BASE_DIR}") {
+    withCredentials([usernamePassword(credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken',
+                                      passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USER')]) {
+      docker.image(nodeVersion).inside(){
+        withEnv(["HOME=${env.WORKSPACE}/${env.BASE_DIR}"]) {
+          sh '.ci/scripts/prepare-git-context.sh'
+          sh 'npm ci'
+          withTotpVault(secret: "${env.TOTP_SECRET}", code_var_name: 'TOTP_CODE'){
+            body()
+          }
+        }
+      }
+    }
+  }
 }
 
 def runAllScopes(){

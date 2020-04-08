@@ -23,23 +23,14 @@
  *
  */
 
-const log = require('npmlog')
-const childProcess = require('@lerna/child-process')
+import { testXHR, renderTestElement } from '../utils'
+import { getGlobalConfig } from '../../../../../dev-utils/test-config'
 
-!(async () => {
-  /**
-   * Test the agent version with updated package version
-   */
-  try {
-    childProcess.execSync('eslint', [
-      '--rule',
-      '{"rulesdir/version-checker": "error"}',
-      '--fix',
-      './packages/rum/src/apm-base.js'
-    ])
+const { mockBackendUrl } = getGlobalConfig().testConfig
 
-    childProcess.execSync('git', ['add', './packages/rum/src/apm-base.js'])
-  } catch (err) {
-    log.error(err)
-  }
-})()
+/**
+ * Currently, XHR call will not be captured as Spans by the agent
+ * since agent script is loaded asynchronously and we will not be able to patch
+ * XHR and FETCH calls on time
+ */
+testXHR(mockBackendUrl, renderTestElement, false)

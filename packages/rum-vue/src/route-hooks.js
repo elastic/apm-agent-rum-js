@@ -23,7 +23,7 @@
  *
  */
 
-import { scheduleMicroTask } from '@elastic/apm-rum-core'
+import { afterFrame } from '@elastic/apm-rum-core'
 
 export function routeHooks(router, apm) {
   let transaction
@@ -50,9 +50,7 @@ export function routeHooks(router, apm) {
   })
 
   router.afterEach(() => {
-    if (transaction) {
-      scheduleMicroTask(() => transaction.detectFinish())
-    }
+    afterFrame(() => transaction && transaction.detectFinish())
   })
   /**
    * handle when the navigation is cancelled in `beforeEach` hook of components

@@ -23,23 +23,8 @@
  *
  */
 
-const log = require('npmlog')
-const childProcess = require('@lerna/child-process')
+import React from 'react'
 
-!(async () => {
-  /**
-   * Test the agent version with updated package version
-   */
-  try {
-    childProcess.execSync('eslint', [
-      '--rule',
-      '{"rulesdir/version-checker": "error"}',
-      '--fix',
-      './packages/rum/src/apm-base.js'
-    ])
-
-    childProcess.execSync('git', ['add', './packages/rum/src/apm-base.js'])
-  } catch (err) {
-    log.error(err)
-  }
-})()
+export default function lazyComponent() {
+  return <div>lazy component rendered</div>
+}

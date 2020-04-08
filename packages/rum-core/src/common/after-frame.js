@@ -23,23 +23,27 @@
  *
  */
 
-const log = require('npmlog')
-const childProcess = require('@lerna/child-process')
+const RAF_TIMEOUT = 100
 
-!(async () => {
-  /**
-   * Test the agent version with updated package version
-   */
-  try {
-    childProcess.execSync('eslint', [
-      '--rule',
-      '{"rulesdir/version-checker": "error"}',
-      '--fix',
-      './packages/rum/src/apm-base.js'
-    ])
-
-    childProcess.execSync('git', ['add', './packages/rum/src/apm-base.js'])
-  } catch (err) {
-    log.error(err)
+/**
+ * Schedule a callback to be invoked after the browser paints a new frame.
+ *
+ * There are multiple ways to do this like double rAF, MessageChannel, But we
+ * use the requestAnimationFrame + setTimeout
+ *
+ * Also, RAF does not fire if the current tab is not visible, so we schedule a
+ * timeout in parallel to ensure the callback is invoked
+ *
+ * Based on the  code from preact!
+ * https://github.com/preactjs/preact/blob/f6577c495306f1e93174d69bd79f9fb8a418da75/hooks/src/index.js#L285-L297
+ */
+export default function afterFrame(callback) {
+  const handler = () => {
+    clearTimeout(timeout)
+    cancelAnimationFrame(raf)
+    setTimeout(callback)
   }
-})()
+  const timeout = setTimeout(handler, RAF_TIMEOUT)
+
+  const raf = requestAnimationFrame(handler)
+}

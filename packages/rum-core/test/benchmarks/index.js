@@ -25,20 +25,45 @@
 
 import Transaction from '../../src/performance-monitoring/transaction'
 
-export function generateTestTransaction(noOfSpans) {
+export function generateTestTransaction(noOfSpans, sampled) {
   const tr = new Transaction(
     `transaction with ${noOfSpans} spans`,
-    'transaction1type'
+    'transaction1type',
+    { startTime: 0, transactionSampleRate: sampled ? 1 : 0 }
   )
+  let lastSpanEnd = 0
   for (let i = 0; i < noOfSpans; i++) {
-    const span = tr.startSpan(`span ${i}`, `span${i}type`)
-    span.end()
-    span._end = span.duration() === 0 ? span._start + 10 : span._end
+    const span = tr.startSpan(`span ${i}`, `span${i}type`, { startTime: i })
+    lastSpanEnd = 10 + i
+    span.end(lastSpanEnd)
   }
 
-  tr.detectFinish()
-  if (tr._end === tr._start) {
-    tr._end = tr._end + 100
+  tr.end(lastSpanEnd + 100)
+  return tr
+}
+
+export function generateTransactionWithGroupedSpans(noOfSpans) {
+  const tr = new Transaction('tr', 'custom', { startTime: 0 })
+  const mid = Math.floor(noOfSpans / 2)
+  /**
+   * Can be grouped only when name and type are same
+   * and the spans occur continuosly with some delta
+   */
+  let delta = 0,
+    lastSpanEnd = 0
+  for (let i = 0; i < noOfSpans; i++) {
+    let name = 'name'
+    let type = 'type'
+    if (i >= mid) {
+      name += i
+      type += i
+    }
+    const span = tr.startSpan(name, type, { startTime: i + delta })
+    lastSpanEnd = i + delta + 1
+    span.end(lastSpanEnd)
+    delta += 2
   }
+
+  tr.end(lastSpanEnd + 10)
   return tr
 }

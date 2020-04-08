@@ -54,9 +54,17 @@ describe('Using Switch component of react router', function() {
     expect(routeTransaction.name).toBe('/func')
     expect(routeTransaction.type).toBe('route-change')
     /**
-     * Should include the fetch call inside useEffect hook
+     * Include the fetch call inside useEffect hook
+     * and also lazy loaded component's bundle
      */
-    expect(routeTransaction.spans.length).toBe(1)
-    expect(routeTransaction.spans[0].name).toBe('GET /test/e2e/data.json')
+    const spanTypes = ['resource', 'external']
+    const foundSpans = routeTransaction.spans.filter(
+      span => spanTypes.indexOf(span.type) > -1
+    )
+    /**
+     * `resource` span type will not be captured if
+     * Resource Timing API is not supported.
+     */
+    expect(foundSpans.length).toBeGreaterThanOrEqual(1)
   })
 })

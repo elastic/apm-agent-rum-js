@@ -22,24 +22,31 @@
  * THE SOFTWARE.
  *
  */
+import { captureNavigation } from '../../src/performance-monitoring/capture-navigation'
+import Transaction from '../../src/performance-monitoring/transaction'
+import { PAGE_LOAD, ROUTE_CHANGE } from '../../src/common/constants'
 
-const log = require('npmlog')
-const childProcess = require('@lerna/child-process')
-
-!(async () => {
-  /**
-   * Test the agent version with updated package version
-   */
-  try {
-    childProcess.execSync('eslint', [
-      '--rule',
-      '{"rulesdir/version-checker": "error"}',
-      '--fix',
-      './packages/rum/src/apm-base.js'
-    ])
-
-    childProcess.execSync('git', ['add', './packages/rum/src/apm-base.js'])
-  } catch (err) {
-    log.error(err)
+suite('CaptureNavigation', () => {
+  const options = {
+    startTime: 0,
+    transactionSampleRate: 1
   }
-})()
+  const endTime = 10000
+
+  benchmark('hard navigation', () => {
+    const pageLoadTr = new Transaction('/index', PAGE_LOAD, options)
+    pageLoadTr.captureTimings = true
+    pageLoadTr.end(endTime)
+    captureNavigation(pageLoadTr)
+  })
+
+  benchmark('soft navigation', () => {
+    /**
+     * Does not include navigation timing spans and agent marks
+     */
+    const nonPageLoadTr = new Transaction('/index', ROUTE_CHANGE, options)
+    nonPageLoadTr.captureTimings = true
+    nonPageLoadTr.end(endTime)
+    captureNavigation(nonPageLoadTr)
+  })
+})
