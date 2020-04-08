@@ -41,7 +41,9 @@ describe('async-tests', function() {
      * Its not possible to inject the ApmServerMock for standalone
      * tests as the application code is different from the APM Agent bundle code
      */
-    const transactionPayload = browser.execute(() => window.TRANSACTION_PAYLOAD)
+    const transactionPayload = browser.execute(function() {
+      return window.TRANSACTION_PAYLOAD
+    })
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('/async')
     /**
