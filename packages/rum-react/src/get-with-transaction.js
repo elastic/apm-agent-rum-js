@@ -26,6 +26,7 @@
 import React from 'react'
 import hoistStatics from 'hoist-non-react-statics'
 import { afterFrame } from '@elastic/apm-rum-core'
+import memoize from 'lodash/memoize'
 
 /**
  * Check if the given component is class based component
@@ -39,6 +40,45 @@ function isReactClassComponent(Component) {
   const prototype = Component.prototype
   return !!(prototype && prototype.isReactComponent)
 }
+
+const getMemoizedApmComponent = memoize((Component, apm, name, type) => {
+  return class ApmComponent extends React.Component {
+    constructor(props) {
+      super(props)
+      /**
+       * We need to start the transaction in constructor because otherwise,
+       * we won't be able to capture what happens in componentDidMount of child
+       * components since the parent component is mounted after child
+       */
+      this.transaction = apm.startTransaction(name, type, {
+        managed: true,
+        canReuse: true
+      })
+    }
+
+    componentDidMount() {
+      /**
+       * React guarantees the parent CDM runs after the child components CDM
+       */
+      afterFrame(() => this.transaction && this.transaction.detectFinish())
+    }
+
+    componentWillUnmount() {
+      /**
+       * It is possible that the transaction has ended before this unmount event,
+       * in that case this is a noop.
+       */
+      if (this.transaction) {
+        this.transaction.detectFinish()
+      }
+    }
+
+    render() {
+      console.log('##### renderrrr')
+      return <Component transaction={this.transaction} {...this.props} />
+    }
+  }
+})
 
 /**
  * Usage:
@@ -123,43 +163,7 @@ function getWithTransaction(apm) {
           [Component]
         )
       } else {
-        ApmComponent = class ApmComponent extends React.Component {
-          constructor(props) {
-            super(props)
-            /**
-             * We need to start the transaction in constructor because otherwise,
-             * we won't be able to capture what happens in componentDidMount of child
-             * components since the parent component is mounted after child
-             */
-            this.transaction = apm.startTransaction(name, type, {
-              managed: true,
-              canReuse: true
-            })
-          }
-
-          componentDidMount() {
-            /**
-             * React guarantees the parent CDM runs after the child components CDM
-             */
-            afterFrame(
-              () => this.transaction && this.transaction.detectFinish()
-            )
-          }
-
-          componentWillUnmount() {
-            /**
-             * It is possible that the transaction has ended before this unmount event,
-             * in that case this is a noop.
-             */
-            if (this.transaction) {
-              this.transaction.detectFinish()
-            }
-          }
-
-          render() {
-            return <Component transaction={this.transaction} {...this.props} />
-          }
-        }
+        ApmComponent = getMemoizedApmComponent(Component, apm, name, type)
       }
 
       ApmComponent.displayName = `withTransaction(${Component.displayName ||
