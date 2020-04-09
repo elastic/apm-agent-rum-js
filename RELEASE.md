@@ -44,8 +44,14 @@ The release process is also automated in the way any specific commit from the ma
 
 1. Login to apm-ci.elastic.co
 1. Go to the [master](https://apm-ci.elastic.co/job/apm-agent-rum/job/apm-agent-rum-mbp/job/master/) pipeline.
-1. Click on `Build with parameters` and choose the `release` checkbox.
+1. Click on `Build with parameters` with the below checkboxes:
+  * `release` to be selected.
+  * `bench_ci` to be unselected.
+  * `saucelab_test` to be unselected.
+  * other checkboxes should be left as default.
+1. Click on `Build`.
 1. Wait for an email to confirm the release is ready to be approved, it might take roughly 30 minutes.
 1. Confirm if the list of changes are the ones that are expected.
-1. Approve or abort.
-1. Then you can go to the https://registry.npmjs.org and GitHub repo to validate that the bundles and release notes have been published.
+1. Click on the URL from the email.
+1. Click on approve or abort.
+1. Then you can go to the `https://www.npmjs.com/package/@elastic/apm-rum` and [GitHub releases](https://github.com/elastic/apm-agent-rum-js/releases) to validate that the bundles and release notes have been published.

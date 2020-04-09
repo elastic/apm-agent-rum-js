@@ -324,6 +324,9 @@ pipeline {
                 }
               }
               post {
+                success {
+                  emailext subject: "[${env.REPO}] Release published", to: "${env.NOTIFY_TO}", body: "Great news, the release has been done successfully."
+                }
                 always {
                   script {
                     currentBuild.description = "${currentBuild.description?.trim() ? currentBuild.description : ''} released"
