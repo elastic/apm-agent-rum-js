@@ -1,0 +1,12 @@
+{
+  "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "dist/rum-angular",
+  "lib": {
+    "entryFile": "src/public-api.ts",
+    "umdModuleIds": {
+      "@elastic/apm-rum": "@elastic/apm-rum",
+      "@elastic/apm-rum-core": "@elastic/apm-rum-core"
+    }
+  },
+  "whitelistedNonPeerDependencies": ["@elastic/apm-rum", "@elastic/apm-rum-core"]
+}
