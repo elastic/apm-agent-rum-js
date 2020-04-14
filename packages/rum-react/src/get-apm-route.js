@@ -33,15 +33,26 @@ function getApmRoute(apm) {
   return class ApmRoute extends React.Component {
     constructor(props) {
       super(props)
-      const { path, component } = props
+      this.state = {}
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+      const initial = prevState.apmComponent == null
+      const { path, component } = nextProps
+      const pathChanged = path != prevState.path
+
       /**
-       * Having the ApmComponent on state ensures that we capture the SPA
-       * navigation only when route changes/mount and not on re-renders
-       * Ex: updating query params from child components
+       * Should update the apmComponent state and re-render the component only on
+       * initial mount and on route change.
+       * Ex: Query param changes should not result in new apmComponent
        */
-      this.state = {
-        apmComponent: withTransaction(path, 'route-change')(component)
+      if (initial || pathChanged) {
+        return {
+          apmComponent: withTransaction(path, 'route-change')(component),
+          path
+        }
       }
+      return null
     }
 
     render() {
