@@ -23,17 +23,30 @@
  *
  */
 
-import React from 'react'
+import React, { Component } from 'react'
 import { Route } from 'react-router-dom'
 import { getWithTransaction } from './get-with-transaction'
 
 function getApmRoute(apm) {
   const withTransaction = getWithTransaction(apm)
 
-  return function ApmRoute(props) {
-    const { path, component } = props
-    const apmComponent = withTransaction(path, 'route-change')(component)
-    return <Route {...props} component={apmComponent} />
+  return class ApmRoute extends Component {
+    shouldComponentUpdate(nextProps) {
+      // Doesn't update the component when props.component and props.path are the same.
+      // It avoids the apmComponent to be recreated every time due to changes on query param for example.
+      if (
+        nextProps.component === this.props.component &&
+        nextProps.path === this.props.path
+      ) {
+        return false
+      }
+      return true
+    }
+    render() {
+      const { path, component, ...props } = this.props
+      const apmComponent = withTransaction(path, 'route-change')(component)
+      return <Route {...props} component={apmComponent} />
+    }
   }
 }
 
