@@ -63,11 +63,9 @@ describe('ApmRoute', function() {
     const ApmRoute = getApmRoute(apmBase)
 
     const rendered = mount(
-      <div>
-        <Router initialEntries={['/']}>
-          <ApmRoute path="/" component={Component} />
-        </Router>
-      </div>
+      <Router initialEntries={['/']}>
+        <ApmRoute path="/" component={Component} />
+      </Router>
     )
 
     var apmRoute = rendered.find(ApmRoute)
@@ -88,14 +86,9 @@ describe('ApmRoute', function() {
     spyOn(loggingService, 'warn')
 
     const rendered = mount(
-      <div>
-        <Router initialEntries={['/']}>
-          <ApmRoute
-            path="/"
-            render={() => <Component name={'render-test'} />}
-          />
-        </Router>
-      </div>
+      <Router initialEntries={['/']}>
+        <ApmRoute path="/" render={() => <Component name={'render-test'} />} />
+      </Router>
     )
 
     var apmRoute = rendered.find(ApmRoute)
@@ -110,5 +103,49 @@ describe('ApmRoute', function() {
     expect(loggingService.warn).toHaveBeenCalledWith(
       '/ is not instrumented since component property is not provided'
     )
+  })
+
+  it('should not trigger full rerender on query change', function() {
+    const ApmRoute = getApmRoute(apmBase)
+    const transactionService = serviceFactory.getService('TransactionService')
+    spyOn(transactionService, 'startTransaction')
+
+    const rendered = mount(
+      <Router initialEntries={['/home', '/new']}>
+        <>
+          <ApmRoute path="/home" component={Component} />
+          <ApmRoute path="/new" component={() => <h1>New</h1>} />
+        </>
+      </Router>
+    )
+
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      '/home',
+      'route-change',
+      {
+        canReuse: true,
+        managed: true
+      }
+    )
+    const HomeComponent = rendered.find(Component)
+
+    const history = HomeComponent.props().history
+    // Move to new route
+    history.push({ pathname: '/new' })
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      '/new',
+      'route-change',
+      {
+        canReuse: true,
+        managed: true
+      }
+    )
+
+    /**
+     * Update query on existing route
+     * do not trigger a new transaction
+     */
+    history.push({ pathname: '/new', search: '?test=foo' })
+    expect(transactionService.startTransaction).toHaveBeenCalledTimes(2)
   })
 })
