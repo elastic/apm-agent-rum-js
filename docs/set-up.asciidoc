@@ -6,15 +6,13 @@ you must first {apm-server-ref-v}/configuration-rum.html[enable the RUM endpoint
 
 Once the APM Server endpoint has been configured, you can:
 
-* <<usage>>
+* <<install-the-agent>>
 * <<configuring-cors>>
 
-[[usage]]
-=== Usage
+[[install-the-agent]]
+=== Install the Agent
 
-There are three ways to include the APM RUM Agent:
-
-APM RUM Agent can be added to your web page in one of two ways
+There are multiple was to add the APM RUM Agent to your web page:
 
 * <<using-script-tags>>: Add a `<script>` tag to the HTML page.
 * <<using-bundlers>>: Bundling the Agent package during the application's build process
@@ -58,17 +56,16 @@ resources on the page, however, it will stick block browsers `onload` event.
 </script>
 ----
 
-Even though this is the recommended pattern, there is a caveat
-attached to it as a result of downloading and initializing the
-agent asynchronously. The distributed tracing would not work for requests that
-happened before the agent is initialized as the agent would not be available to
-patch the requests on time.
+Even though this is the recommended pattern, there is a caveat to be aware of.
+Because the downloading and initializing of the agent happens asynchronously,
+distributed tracing will not work for requests that occur before the agent is initialized.
 
 NOTE: Please download the latest version of RUM agent from https://github.com/elastic/apm-agent-rum-js/releases/latest[GitHub] or
 https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG]
-and host the file in your Server/CDN before deploying to production with proper
-versioning scheme and set far future `max-age` and `immutable` in https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control[cache-control]
-header as the file never changes.
+and host the file in your Server/CDN before deploying to production.Remember to
+use a proper versioning scheme and set a far future `max-age` and `immutable`
+in the https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control[cache-control]
+header, as the file never changes.
 
 The debug messages are removed by default from the minified bundles. It is strongly recommended
 to use the unminfined version for debugging purposes.
@@ -146,7 +143,7 @@ plugins: [
 ]
 ----
 
-NOTE: Currently the optimized(minified + gzipped) agent bundle size is about 16KiB.
+NOTE: Currently the optimized (minified + gzipped) agent bundle size is about 16KiB.
 
 [[configuring-cors]]
 === Configure CORS
