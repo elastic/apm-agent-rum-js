@@ -30,10 +30,23 @@ import { getWithTransaction } from './get-with-transaction'
 function getApmRoute(apm) {
   const withTransaction = getWithTransaction(apm)
 
-  return function ApmRoute(props) {
-    const { path, component } = props
-    const apmComponent = withTransaction(path, 'route-change')(component)
-    return <Route {...props} component={apmComponent} />
+  return class ApmRoute extends React.Component {
+    constructor(props) {
+      super(props)
+      const { path, component } = props
+      /**
+       * Having the ApmComponent on state ensures that we capture the SPA
+       * navigation only when route changes/mount and not on re-renders
+       * Ex: updating query params from child components
+       */
+      this.state = {
+        apmComponent: withTransaction(path, 'route-change')(component)
+      }
+    }
+
+    render() {
+      return <Route {...this.props} component={this.state.apmComponent} />
+    }
   }
 }
 
