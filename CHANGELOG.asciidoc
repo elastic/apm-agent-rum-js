@@ -29,6 +29,19 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.1.1]]
+==== 5.1.1 (2020-04-15)
+
+[float]
+===== Features
+* Performance Observer is used to measure FirstContentfulPaint Metric: {issue}731[#731]
+
+[float]
+===== Bug fixes
+* Avoid full component re-rerender when query params are updated on current
+`ApmRoute` inside child components: {issue}748[#748]
+
+
 
 [[release-notes-5.1.0]]
 ==== 5.1.0 (2020-04-08)
