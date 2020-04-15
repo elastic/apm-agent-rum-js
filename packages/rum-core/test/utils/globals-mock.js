@@ -23,7 +23,7 @@
  *
  */
 
-import paintEntries, { paintWithMissingFcp } from '../fixtures/paint-entries'
+import { fcpEntries } from '../fixtures/paint-entries'
 import resourceEntries from '../fixtures/resource-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import { TIMING_LEVEL2_ENTRIES } from '../fixtures/navigation-entries'
@@ -33,9 +33,9 @@ import {
   LONG_TASK,
   LARGEST_CONTENTFUL_PAINT,
   MEASURE,
-  PAINT,
   NAVIGATION,
-  RESOURCE
+  RESOURCE,
+  FIRST_CONTENTFUL_PAINT
 } from '../../src/common/constants'
 
 export function mockObserverEntryTypes(type) {
@@ -44,42 +44,23 @@ export function mockObserverEntryTypes(type) {
   } else if (type === LARGEST_CONTENTFUL_PAINT) {
     return largestContentfulPaintEntries
   }
-
   return []
 }
 
-export function mockPaintEntryWithMissingFCP() {
-  const _getEntriesByType = window.performance.getEntriesByType
-
-  window.performance.getEntriesByType = function(type) {
-    expect([RESOURCE, PAINT, MEASURE, NAVIGATION]).toContain(type)
-    if (type === RESOURCE) {
-      return resourceEntries
-    } else if (type === PAINT) {
-      return paintWithMissingFcp
-    } else if (type === MEASURE) {
-      return userTimingEntries
-    } else if (type === NAVIGATION) {
-      return TIMING_LEVEL2_ENTRIES
-    } else {
-      return []
-    }
+export function mockObserverEntryNames(name) {
+  if (name === FIRST_CONTENTFUL_PAINT) {
+    return fcpEntries
   }
-
-  return function unMock() {
-    window.performance.getEntriesByType = _getEntriesByType
-  }
+  return []
 }
 
 export function mockGetEntriesByType() {
   const _getEntriesByType = window.performance.getEntriesByType
 
   window.performance.getEntriesByType = function(type) {
-    expect([RESOURCE, PAINT, MEASURE, NAVIGATION]).toContain(type)
+    expect([RESOURCE, MEASURE, NAVIGATION]).toContain(type)
     if (type === RESOURCE) {
       return resourceEntries
-    } else if (type === PAINT) {
-      return paintEntries
     } else if (type === MEASURE) {
       return userTimingEntries
     } else if (type === NAVIGATION) {

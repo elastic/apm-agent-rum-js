@@ -27,27 +27,44 @@ import {
   PerfEntryRecorder
 } from '../../src/performance-monitoring/perf-entry-recorder'
 import { LARGEST_CONTENTFUL_PAINT, LONG_TASK } from '../../src/common/constants'
-import { mockObserverEntryTypes } from '../utils/globals-mock'
+import {
+  mockObserverEntryTypes,
+  mockObserverEntryNames
+} from '../utils/globals-mock'
 
 describe('PerfEntryRecorder', () => {
-  const mockEntryList = {
-    getEntriesByType: mockObserverEntryTypes
+  const list = {
+    getEntriesByType: jasmine.createSpy(),
+    getEntriesByName: jasmine.createSpy()
   }
 
-  it('should create long tasks spans', () => {
-    const { spans } = captureObserverEntries(mockEntryList, {
+  beforeEach(() => {
+    list.getEntriesByType.and.returnValue([])
+    list.getEntriesByName.and.returnValue([])
+  })
+
+  it('should not create long tasks spans if entries are not present', () => {
+    const { spans } = captureObserverEntries(list, {
       capturePaint: false
     })
-    expect(spans.length).toEqual(3)
+    expect(spans).toEqual([])
+  })
+
+  it('should not mark LCP & FCP if entries are not preset ', () => {
+    const { marks } = captureObserverEntries(list, {
+      capturePaint: true
+    })
+    expect(marks).toEqual({})
   })
 
   it('should return largest contentful paint if capturePaint is true', () => {
-    const { marks: paintFalse } = captureObserverEntries(mockEntryList, {
+    list.getEntriesByType.and.callFake(mockObserverEntryTypes)
+    const { marks: paintFalse } = captureObserverEntries(list, {
       capturePaint: false
     })
     expect(paintFalse).toEqual({})
 
-    const { marks: paintTrue } = captureObserverEntries(mockEntryList, {
+    const { marks: paintTrue } = captureObserverEntries(list, {
       capturePaint: true
     })
 
@@ -56,8 +73,24 @@ describe('PerfEntryRecorder', () => {
     })
   })
 
+  it('should set firstContentfulPaint if capturePaint is true ', () => {
+    list.getEntriesByName.and.callFake(mockObserverEntryNames)
+    const { marks: paintFalse } = captureObserverEntries(list, {
+      capturePaint: false
+    })
+    expect(paintFalse).toEqual({})
+
+    const { marks: paintTrue } = captureObserverEntries(list, {
+      capturePaint: true
+    })
+    expect(paintTrue).toEqual({
+      firstContentfulPaint: jasmine.any(Number)
+    })
+  })
+
   it('should create long tasks attribution data in span context', () => {
-    const { spans } = captureObserverEntries(mockEntryList, {
+    list.getEntriesByType.and.callFake(mockObserverEntryTypes)
+    const { spans } = captureObserverEntries(list, {
       capturePaint: false
     })
     expect(spans.length).toBe(3)

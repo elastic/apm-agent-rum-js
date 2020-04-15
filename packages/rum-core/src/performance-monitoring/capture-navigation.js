@@ -29,10 +29,8 @@ import {
   MAX_SPAN_DURATION,
   USER_TIMING_THRESHOLD,
   PAGE_LOAD,
-  PAINT,
   RESOURCE,
-  MEASURE,
-  FIRST_CONTENTFUL_PAINT
+  MEASURE
 } from '../common/constants'
 import {
   stripQueryStringFromUrl,
@@ -246,39 +244,12 @@ function getNavigationTimingMarks() {
   return marks
 }
 
-/**
- * Get the `first-contentful-paint` metric that is available during
- * page-load using the Paint Timing Metrics API
- * SPEC - https://www.w3.org/TR/paint-timing/
- */
-function getFirstContentfulPaint() {
-  if (isPerfTimelineSupported()) {
-    const timing = PERF.timing
-    /**
-     * To avoid capturing the unload event handler effect
-     * as part of the transaction duration
-     */
-    const unloadDiff = timing.fetchStart - timing.navigationStart
-    const fcp = PERF.getEntriesByType(PAINT).reduce((_fcp, entry) => {
-      if (entry.name === FIRST_CONTENTFUL_PAINT) {
-        return unloadDiff >= 0 ? entry.startTime - unloadDiff : entry.startTime
-      }
-    }, null)
-    return fcp
-  }
-  return undefined
-}
-
 function getPageLoadMarks() {
   const marks = getNavigationTimingMarks()
   const agent = {
     timeToFirstByte: marks.responseStart,
     domInteractive: marks.domInteractive,
     domComplete: marks.domComplete
-  }
-  const fcp = getFirstContentfulPaint()
-  if (fcp) {
-    agent.firstContentfulPaint = fcp
   }
   return {
     navigationTiming: marks,
