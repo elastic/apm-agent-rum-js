@@ -23,8 +23,12 @@
  *
  */
 
-import { LONG_TASK, LARGEST_CONTENTFUL_PAINT } from '../common/constants'
-import { noop } from '../common/utils'
+import {
+  LONG_TASK,
+  LARGEST_CONTENTFUL_PAINT,
+  FIRST_CONTENTFUL_PAINT
+} from '../common/constants'
+import { noop, PERF } from '../common/utils'
 import Span from './span'
 
 /**
@@ -122,16 +126,34 @@ export function captureObserverEntries(list, { capturePaint }) {
    * elements in to account
    */
   const lastLcpEntry = lcpEntries[lcpEntries.length - 1]
-  if (!lastLcpEntry) {
-    return result
-  }
-  /**
-   * `renderTime` will not be available for Image element and for the element
-   * that is loaded cross-origin without the `Timing-Allow-Origin` header.
-   */
-  const lcp = lastLcpEntry.renderTime || lastLcpEntry.loadTime
 
-  result.marks.largestContentfulPaint = lcp
+  if (lastLcpEntry) {
+    /**
+     * `renderTime` will not be available for Image element and for the element
+     * that is loaded cross-origin without the `Timing-Allow-Origin` header.
+     */
+    const lcp = lastLcpEntry.renderTime || lastLcpEntry.loadTimes
+    result.marks.largestContentfulPaint = lcp
+  }
+
+  /**
+   * Paint Timing API
+   * First Contentful Paint is available only during Page load
+   * SPEC - https://www.w3.org/TR/paint-timing/
+   */
+  const timing = PERF.timing
+  /**
+   * To avoid capturing the unload event handler effect
+   * as part of the page-load transaction duration
+   */
+  const unloadDiff = timing.fetchStart - timing.navigationStart
+  const fcpEntry = list.getEntriesByName(FIRST_CONTENTFUL_PAINT)[0]
+  if (fcpEntry) {
+    const fcp =
+      unloadDiff >= 0 ? fcpEntry.startTime - unloadDiff : fcpEntry.startTime
+    result.marks.firstContentfulPaint = fcp
+  }
+
   return result
 }
 
