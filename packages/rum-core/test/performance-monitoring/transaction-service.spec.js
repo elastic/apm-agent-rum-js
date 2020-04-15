@@ -34,7 +34,8 @@ import {
   PAGE_LOAD,
   ROUTE_CHANGE,
   LONG_TASK,
-  LARGEST_CONTENTFUL_PAINT
+  LARGEST_CONTENTFUL_PAINT,
+  PAINT
 } from '../../src/common/constants'
 
 describe('TransactionService', function() {
@@ -260,7 +261,6 @@ describe('TransactionService', function() {
       expect(
         tr.spans.filter(({ type }) => type === 'app').length
       ).toBeGreaterThanOrEqual(1)
-      expect(tr.marks.agent.firstContentfulPaint).toBeDefined()
       expect(tr.marks.navigationTiming).toBeDefined()
       unMock()
       done()
@@ -681,9 +681,10 @@ describe('TransactionService', function() {
       const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
         managed: true
       })
-      expect(startSpy).toHaveBeenCalledTimes(2)
+      expect(startSpy).toHaveBeenCalledTimes(3)
       expect(startSpy.calls.allArgs()).toEqual([
         [LARGEST_CONTENTFUL_PAINT],
+        [PAINT],
         [LONG_TASK]
       ])
       await pageLoadTr.end()
@@ -739,8 +740,11 @@ describe('TransactionService', function() {
       const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
         managed: true
       })
-      expect(startSpy).toHaveBeenCalledTimes(1)
-      expect(startSpy).toHaveBeenCalledWith(LARGEST_CONTENTFUL_PAINT)
+      expect(startSpy).toHaveBeenCalledTimes(2)
+      expect(startSpy.calls.allArgs()).toEqual([
+        [LARGEST_CONTENTFUL_PAINT],
+        [PAINT]
+      ])
       await pageLoadTr.end()
       expect(stopSpy).toHaveBeenCalled()
       resetSpies()

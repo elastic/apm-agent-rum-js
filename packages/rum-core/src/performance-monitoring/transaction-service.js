@@ -40,7 +40,8 @@ import {
   TEMPORARY_TYPE,
   TRANSACTION_TYPE_ORDER,
   LARGEST_CONTENTFUL_PAINT,
-  LONG_TASK
+  LONG_TASK,
+  PAINT
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__ } from '../env'
@@ -176,6 +177,7 @@ class TransactionService {
     if (tr.type === PAGE_LOAD) {
       if (!isRedefined) {
         this.recorder.start(LARGEST_CONTENTFUL_PAINT)
+        this.recorder.start(PAINT)
       }
       checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
