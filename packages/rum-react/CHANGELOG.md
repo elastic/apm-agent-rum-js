@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.1.0...@elastic/apm-rum-react@1.1.1) (2020-04-15)
+
+
+### Bug Fixes
+
+* **rum-react:** avoid rerendering on query param changes ([#748](https://github.com/elastic/apm-agent-rum-js/issues/748)) ([6a4ab16](https://github.com/elastic/apm-agent-rum-js/commit/6a4ab16e283dbed89d05327a6ad068360857e2cb))
+
+
+
+
+
 # [1.1.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.0.0...@elastic/apm-rum-react@1.1.0) (2020-04-08)
 
 

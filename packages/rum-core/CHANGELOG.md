@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.2.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.1.0...@elastic/apm-rum-core@5.2.0) (2020-04-15)
+
+
+### Features
+
+* **rum-core:** use performance observer to capture FCP ([#749](https://github.com/elastic/apm-agent-rum-js/issues/749)) ([fc60eb3](https://github.com/elastic/apm-agent-rum-js/commit/fc60eb3744b45792dff7e1dbd4aefe72b023d372))
+
+
+
+
+
 # [5.1.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.0.0...@elastic/apm-rum-core@5.1.0) (2020-04-08)
 
 
