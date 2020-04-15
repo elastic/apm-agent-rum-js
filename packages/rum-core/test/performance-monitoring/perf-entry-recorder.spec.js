@@ -43,12 +43,18 @@ describe('PerfEntryRecorder', () => {
     list.getEntriesByName.and.returnValue([])
   })
 
-  it('should create long tasks spans', () => {
-    list.getEntriesByType.and.callFake(mockObserverEntryTypes)
+  it('should not create long tasks spans if entries are not present', () => {
     const { spans } = captureObserverEntries(list, {
       capturePaint: false
     })
-    expect(spans.length).toEqual(3)
+    expect(spans).toEqual([])
+  })
+
+  it('should not mark LCP & FCP if entries are not preset ', () => {
+    const { marks } = captureObserverEntries(list, {
+      capturePaint: true
+    })
+    expect(marks).toEqual({})
   })
 
   it('should return largest contentful paint if capturePaint is true', () => {
@@ -67,13 +73,6 @@ describe('PerfEntryRecorder', () => {
     })
   })
 
-  it('should not mark LCP when entries are not present', () => {
-    const { marks } = captureObserverEntries(list, {
-      capturePaint: true
-    })
-    expect(marks).toEqual({})
-  })
-
   it('should set firstContentfulPaint if capturePaint is true ', () => {
     list.getEntriesByName.and.callFake(mockObserverEntryNames)
     const { marks: paintFalse } = captureObserverEntries(list, {
@@ -87,15 +86,6 @@ describe('PerfEntryRecorder', () => {
     expect(paintTrue).toEqual({
       firstContentfulPaint: jasmine.any(Number)
     })
-
-    list.getEntriesByName.and.callFake(mockObserverEntryNames)
-  })
-
-  it('should not mark FCP if entry is not preset ', () => {
-    const { marks } = captureObserverEntries(list, {
-      capturePaint: true
-    })
-    expect(marks).toEqual({})
   })
 
   it('should create long tasks attribution data in span context', () => {
