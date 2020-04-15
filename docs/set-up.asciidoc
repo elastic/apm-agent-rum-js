@@ -12,21 +12,73 @@ Once the APM Server endpoint has been configured, you can:
 [[install-the-agent]]
 === Install the Agent
 
-There are three ways to use the APM RUM Agent:
+There are multiple was to add the APM RUM Agent to your web page:
 
-* <<using-package-managers>>: Install the Agent as a dependency to your application.
 * <<using-script-tags>>: Add a `<script>` tag to the HTML page.
-* <<using-production-build>>: Optimized bundles.
+* <<using-bundlers>>: Bundling the Agent package during the application's build process
 
 [float]
-[[using-package-managers]]
-=== Using Package Managers
+[[using-script-tags]]
+=== Using Script Tags
 
-Install the APM agent for JavaScript as a dependency to your application:
+==== Synchronous / Blocking Pattern
+
+Add a <script> tag to load the bundle and use the `elasticApm` global
+object to initialize the agent:
+
+[source,html]
+----
+<script src="https://<your-cdn-host>.com/path/to/elastic-apm-rum.umd.min-<version>.js" crossorigin></script>
+<script>
+  elasticApm.init({
+    serviceName: '<instrumeted-app>',
+    serverUrl: '<apm-server-url>',
+  })
+</script>
+----
+
+==== Asynchronous / Non-Blocking Pattern
+
+Loading the script asynchronously ensures the agent script will not block other
+resources on the page, however, it will stick block browsers `onload` event.
+
+[source,html]
+----
+<script>
+  ;(function(d, s, c) {
+    var j = d.createElement(s),
+      t = d.getElementsByTagName(s)[0]
+
+    j.src = 'https://<your-cdn-host>.com/path/to/elastic-apm-rum.umd.min-<version>.js'
+    j.onload = function() {elasticApm.init(c)}
+    t.parentNode.insertBefore(j, t)
+  })(document, 'script', {serviceName: '<instrumeted-app>', serverUrl: '<apm-server-url>'})
+</script>
+----
+
+Even though this is the recommended pattern, there is a caveat to be aware of.
+Because the downloading and initializing of the agent happens asynchronously,
+distributed tracing will not work for requests that occur before the agent is initialized.
+
+NOTE: Please download the latest version of RUM agent from https://github.com/elastic/apm-agent-rum-js/releases/latest[GitHub] or
+https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG]
+and host the file in your Server/CDN before deploying to production.Remember to
+use a proper versioning scheme and set a far future `max-age` and `immutable`
+in the https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control[cache-control]
+header, as the file never changes.
+
+The debug messages are removed by default from the minified bundles. It is strongly recommended
+to use the unminfined version for debugging purposes.
+
+[float]
+[[using-bundlers]]
+=== Using Bundlers
+
+Install the Real User Monitoring APM agent as a dependency to your application:
 
 [source,bash]
 ----
-npm install @elastic/apm-rum --save
+npm install @elastic/apm-rum --save 
 ----
 
 Configure the agent:
@@ -34,6 +86,7 @@ Configure the agent:
 [source,js]
 ----
 import { init as initApm } from '@elastic/apm-rum'
+
 const apm = initApm({
   
   // Set required service name (allowed characters: a-z, A-Z, 0-9, -, _, and space)
@@ -48,32 +101,12 @@ const apm = initApm({
 ----
 
 [float]
-[[using-script-tags]]
-=== Using Script Tags
+[[production-build]]
+==== Production Build
 
-Add a <script> tag to the HTML page and use the `elasticApm` global object to load and initialize the agent:
-
-NOTE: Please download the latest version of JavaScript agent from https://github.com/elastic/apm-agent-rum-js/releases/latest[GitHub] or
-https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG] and host the file in your Server/CDN before deploying to production.
-
-[source,html]
-----
-<script src="https://your-cdn-host.com/path/to/elastic-apm-rum.umd.min.js" crossorigin></script>
-<script>
-  elasticApm.init({
-    serviceName: '',
-    serverUrl: 'http://localhost:8200',
-  })
-</script>
-----
-
-NOTE: Currently the optimized(minified + gzipped) JavaScript bundle size is about 16KiB.
-
-[float]
-[[using-production-build]]
-=== Using Production Build
-
-By default, RUM agent logs all the debug messages to the browser console. These logs are very useful in development. However, they make the RUM agent bundle size larger so you should make sure to use the optimized production version when deploying your application.
+By default, RUM agent logs all the debug messages to the browser console. These
+logs are very useful in development. However, they make the RUM agent bundle
+size larger so you should make sure to use the optimized production version when deploying your application.
 
 You can find instructions for building optimized code below for different bundlers
 
@@ -109,6 +142,8 @@ plugins: [
   })
 ]
 ----
+
+NOTE: Currently the optimized (minified + gzipped) agent bundle size is about 16KiB.
 
 [[configuring-cors]]
 === Configure CORS
