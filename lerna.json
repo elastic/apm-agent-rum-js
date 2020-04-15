@@ -9,10 +9,14 @@
       "allowBranch": ["master", "4.x"],
       "conventionalCommits": true,
       "message": "chore(release): publish",
-      "gitRemote": "upstream"
+      "gitRemote": "upstream",
+      "loglevel": "verbose"
     },
     "run": {
       "stream": true
+    },
+    "publish": {
+      "loglevel": "verbose"
     }
   },
   "ignoreChanges": [

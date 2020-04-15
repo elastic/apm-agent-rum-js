@@ -38,3 +38,6 @@ git reset --hard "${GIT_BASE_COMMIT}"
 # Enable upstream with git+https.
 git remote add upstream "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/${ORG_NAME}/${REPO_NAME}.git"
 git fetch upstream
+
+# Pull the git history when repo was cloned with shallow/depth.
+git pull --unshallow
