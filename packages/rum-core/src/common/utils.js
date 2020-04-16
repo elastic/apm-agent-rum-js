@@ -203,7 +203,7 @@ function getTimeOrigin() {
 function getNetworkInformation(captureNetInfo) {
   const connection = window.navigator && window.navigator.connection
   if (!captureNetInfo || typeof connection !== 'object') {
-    return undefined
+    return null
   }
   /**
    * Ignoring `type` and `downlinkMax` as they are only
@@ -218,13 +218,15 @@ function getNetworkInformation(captureNetInfo) {
 }
 
 function getPageMetadata(captureNetInfo = true) {
-  return {
-    page: {
-      referer: document.referrer,
-      url: window.location.href,
-      netinfo: getNetworkInformation(captureNetInfo)
-    }
+  const context = {
+    referer: document.referrer,
+    url: window.location.href
   }
+  const networkInfo = getNetworkInformation(captureNetInfo)
+  if (networkInfo != null) {
+    context.netinfo = networkInfo
+  }
+  return { page: context }
 }
 
 function stripQueryStringFromUrl(url) {

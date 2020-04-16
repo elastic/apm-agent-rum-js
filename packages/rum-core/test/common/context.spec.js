@@ -166,6 +166,24 @@ describe('Context', () => {
   })
 
   it('should enrich transaction with context info based on type', () => {
+    /**
+     * Custom matcher to check if netinfo can either be undefined or
+     * match object with required fields set on browsers that supports
+     * connection information
+     */
+    jasmine.addMatchers({
+      toEqualOrUndefined: () => ({
+        compare: (actual, expected) => {
+          const result = {}
+          if (typeof actual === 'undefined') {
+            result.pass = true
+          } else {
+            result.pass = jasmine.matchersUtil.equals(actual, expected)
+          }
+          return result
+        }
+      })
+    })
     const transaction = new Transaction('test', 'custom')
     const trContext = { tags: { tag1: 'tag1' } }
     transaction.addContext(trContext)
@@ -182,23 +200,14 @@ describe('Context', () => {
         message: 'test'
       }
     }
-
     const pageContext = {
-      page: {
+      page: jasmine.objectContaining({
         referer: jasmine.any(String),
-        url: jasmine.any(String),
-        netinfo:
-          {
-            downlink: jasmine.any(Number),
-            effective_type: jasmine.any(String),
-            rtt: jasmine.any(Number),
-            save_data: jasmine.any(Boolean)
-          } || undefined
-      }
+        url: jasmine.any(String)
+      })
     }
 
     addTransactionContext(transaction, configContext)
-
     expect(transaction.context).toEqual({
       ...pageContext,
       ...userContext,
@@ -221,7 +230,12 @@ describe('Context', () => {
       },
       ...userContext
     })
-
+    expect(pageloadTr.context.page.netinfo).toEqualOrUndefined({
+      downlink: jasmine.any(Number),
+      effective_type: jasmine.any(String),
+      rtt: jasmine.any(Number),
+      save_data: jasmine.any(Boolean)
+    })
     unmock()
   })
 })
