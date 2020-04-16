@@ -182,12 +182,25 @@ describe('Context', () => {
         message: 'test'
       }
     }
-    addTransactionContext(transaction, configContext)
-    expect(transaction.context).toEqual({
+
+    const pageContext = {
       page: {
         referer: jasmine.any(String),
-        url: jasmine.any(String)
-      },
+        url: jasmine.any(String),
+        netinfo:
+          {
+            downlink: jasmine.any(Number),
+            effective_type: jasmine.any(String),
+            rtt: jasmine.any(Number),
+            save_data: jasmine.any(Boolean)
+          } || undefined
+      }
+    }
+
+    addTransactionContext(transaction, configContext)
+
+    expect(transaction.context).toEqual({
+      ...pageContext,
       ...userContext,
       ...trContext
     })
@@ -197,10 +210,7 @@ describe('Context', () => {
     pageloadTr.end()
     addTransactionContext(pageloadTr, configContext)
     expect(pageloadTr.context).toEqual({
-      page: {
-        referer: jasmine.any(String),
-        url: jasmine.any(String)
-      },
+      ...pageContext,
       response: {
         transfer_size: 26941,
         encoded_body_size: 105297,

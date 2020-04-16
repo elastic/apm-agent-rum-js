@@ -118,7 +118,7 @@ class ErrorLogging {
       : {}
     // eslint-disable-next-line no-unused-vars
     const { tags, ...configContext } = this._configService.get('context')
-    const pageMetadata = getPageMetadata()
+    const pageMetadata = getPageMetadata(false)
 
     const context = merge(
       {},

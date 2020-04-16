@@ -200,11 +200,29 @@ function getTimeOrigin() {
   return PERF.timing.fetchStart
 }
 
-function getPageMetadata() {
+function getNetworkInformation(captureNetInfo) {
+  const connection = window.navigator && window.navigator.connection
+  if (!captureNetInfo || typeof connection !== 'object') {
+    return undefined
+  }
+  /**
+   * Ignoring `type` and `downlinkMax` as they are only
+   * supported on Chrome OS
+   */
+  return {
+    downlink: connection.downlink,
+    effective_type: connection.effectiveType,
+    rtt: connection.rtt,
+    save_data: !!connection.saveData
+  }
+}
+
+function getPageMetadata(captureNetInfo = true) {
   return {
     page: {
       referer: document.referrer,
-      url: window.location.href
+      url: window.location.href,
+      netinfo: getNetworkInformation(captureNetInfo)
     }
   }
 }

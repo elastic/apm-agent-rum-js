@@ -171,7 +171,8 @@ describe('ErrorLogging', function() {
       jasmine.objectContaining({
         page: {
           referer: jasmine.any(String),
-          url: jasmine.any(String)
+          url: jasmine.any(String),
+          netinfo: undefined
         },
         managed: true,
         dummy: {
