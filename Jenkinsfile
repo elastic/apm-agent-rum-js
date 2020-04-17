@@ -34,6 +34,7 @@ pipeline {
   }
   stages {
     stage('Checkout') {
+      options { skipDefaultCheckout() }
       steps {
         pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
@@ -41,7 +42,25 @@ pipeline {
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
+    stage('Lint') {
+      options { skipDefaultCheckout() }
+      steps {
+        withGithubNotify(context: 'Lint') {
+          deleteDir()
+          unstash 'source'
+          script{
+            docker.image('node:8').inside(){
+              dir("${BASE_DIR}"){
+                sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
+              }
+              stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
+            }
+          }
+        }
+      }
+    }
     stage('Benchmarks') {
+      options { skipDefaultCheckout() }
       agent { label 'metal' }
       environment {
         REPORT_FILE = 'apm-agent-benchmark-results.json'
