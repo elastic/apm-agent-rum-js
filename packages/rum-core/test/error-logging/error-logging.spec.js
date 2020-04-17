@@ -26,6 +26,7 @@
 import { createServiceFactory, createCustomEvent } from '../'
 import { ERRORS } from '../../src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import { toEqualOrUndefined } from '../../../../dev-utils/jasmine'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
@@ -149,6 +150,7 @@ describe('ErrorLogging', function() {
   }
 
   it('should include context info on error', () => {
+    jasmine.addMatchers({ toEqualOrUndefined })
     const transaction = transactionService.startTransaction('test', 'dummy', {
       managed: true
     })
@@ -167,21 +169,24 @@ describe('ErrorLogging', function() {
       error: new Error(testErrorMessage)
     }
     const errorData = errorLogging.createErrorDataModel(errorEvent)
-    expect(errorData.context).toEqual(
-      jasmine.objectContaining({
-        page: {
-          referer: jasmine.any(String),
-          url: jasmine.any(String)
-        },
-        managed: true,
-        dummy: {
-          foo: 'bar',
-          bar: 20
-        },
-        user: { id: 12, username: 'test' }
-      })
-    )
-    transaction.end()
+    expect(errorData.context).toEqual({
+      page: jasmine.objectContaining({
+        referer: jasmine.any(String),
+        url: jasmine.any(String)
+      }),
+      managed: true,
+      dummy: {
+        foo: 'bar',
+        bar: 20
+      },
+      user: { id: 12, username: 'test' }
+    })
+    expect(errorData.context.page.netinfo).toEqualOrUndefined({
+      downlink: jasmine.any(Number),
+      effective_type: jasmine.any(String),
+      rtt: jasmine.any(Number),
+      save_data: jasmine.any(Boolean)
+    })
   })
 
   it('should support ErrorEvent', function(done) {

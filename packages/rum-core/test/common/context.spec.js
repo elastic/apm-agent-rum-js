@@ -28,6 +28,7 @@ import resourceEntries from '../fixtures/resource-entries'
 import Span from '../../src/performance-monitoring/span'
 import Transaction from '../../src/performance-monitoring/transaction'
 import { PAGE_LOAD } from '../../src/common/constants'
+import { toEqualOrUndefined } from '../../../../dev-utils/jasmine'
 import { mockGetEntriesByType } from '../utils/globals-mock'
 
 describe('Context', () => {
@@ -166,24 +167,7 @@ describe('Context', () => {
   })
 
   it('should enrich transaction with context info based on type', () => {
-    /**
-     * Custom matcher to check if netinfo can either be undefined or
-     * match object with required fields set on browsers that supports
-     * connection information
-     */
-    jasmine.addMatchers({
-      toEqualOrUndefined: () => ({
-        compare: (actual, expected) => {
-          const result = {}
-          if (typeof actual === 'undefined') {
-            result.pass = true
-          } else {
-            result.pass = jasmine.matchersUtil.equals(actual, expected)
-          }
-          return result
-        }
-      })
-    })
+    jasmine.addMatchers({ toEqualOrUndefined })
     const transaction = new Transaction('test', 'custom')
     const trContext = { tags: { tag1: 'tag1' } }
     transaction.addContext(trContext)

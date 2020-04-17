@@ -200,10 +200,11 @@ function getTimeOrigin() {
   return PERF.timing.fetchStart
 }
 
-function getNetworkInformation(captureNetInfo) {
-  const connection = window.navigator && window.navigator.connection
-  if (!captureNetInfo || typeof connection !== 'object') {
-    return null
+function getNetworkInformation() {
+  const connection = navigator && navigator.connection
+
+  if (!(connection && typeof connection === 'object')) {
+    return
   }
   /**
    * Ignoring `type` and `downlinkMax` as they are only
@@ -217,12 +218,12 @@ function getNetworkInformation(captureNetInfo) {
   }
 }
 
-function getPageMetadata(captureNetInfo = true) {
+function getPageMetadata() {
   const context = {
     referer: document.referrer,
     url: window.location.href
   }
-  const networkInfo = getNetworkInformation(captureNetInfo)
+  const networkInfo = getNetworkInformation()
   if (networkInfo != null) {
     context.netinfo = networkInfo
   }
