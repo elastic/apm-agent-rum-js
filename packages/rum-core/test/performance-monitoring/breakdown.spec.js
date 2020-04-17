@@ -127,7 +127,7 @@ describe('Breakdown metrics', () => {
 
   it('transaction with single span', () => {
     const tr = createTransaction('custom')
-    const span = tr.startSpan('foo', 'bar', { startTime: 20 })
+    const span = tr.startSpan('foo', 'bar.baz', { startTime: 20 })
     span.end(40)
     tr.end(40)
     const breakdown = getBreakdownObj(captureBreakdown(tr))
@@ -143,7 +143,7 @@ describe('Breakdown metrics', () => {
       'span.self_time.sum.us': { value: 20 }
     })
 
-    expect(breakdown.bar).toEqual({
+    expect(breakdown['bar.baz']).toEqual({
       'span.self_time.count': { value: 1 },
       'span.self_time.sum.us': { value: 20 }
     })

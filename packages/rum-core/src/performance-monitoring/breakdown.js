@@ -112,10 +112,10 @@ function groupSpans(transaction) {
     if (duration === 0 || duration == null) {
       continue
     }
-    const { type, subType } = span
+    const { type, subtype } = span
     let key = type
-    if (subType) {
-      key += '.' + subType
+    if (subtype) {
+      key += '.' + subtype
     }
     if (!spanMap[key]) {
       spanMap[key] = {

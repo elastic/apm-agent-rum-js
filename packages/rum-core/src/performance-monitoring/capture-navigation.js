@@ -205,7 +205,7 @@ function getApiSpanNames({ spans }) {
 
   for (let i = 0; i < spans.length; i++) {
     const span = spans[i]
-    if (span.type === 'external' && span.subType === 'http') {
+    if (span.type === 'external' && span.subtype === 'http') {
       apiCalls.push(span.name.split(' ')[1])
     }
   }
