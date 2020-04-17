@@ -88,7 +88,7 @@ pipeline {
                     cat ${REPORT_FILE} | sed "s#@timestamp\":.*#@timestamp\":${COMMIT_TIMESTAMP}}#g" > ${REPORT_FILE}.new.json
                   fi
                 '''
-                archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}.*", onlyIfSuccessful: false)
+                archiveArtifacts(allowEmptyArchive: true, artifacts: "*.json", onlyIfSuccessful: false)
               }
             }
           }
