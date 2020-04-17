@@ -76,6 +76,9 @@ pipeline {
               git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
               git fetch --all
               git checkout master
+              git reset --hard origin/master
+              git remote add upstream "https://@github.com/${ORG_NAME}/${REPO_NAME}.git"
+              git fetch upstream
               git pull --unshallow
               git log --pretty=format:"%H %ct000" --after="2020-03-09" --until="2020-04-05" --reverse > commits.txt
             '''
