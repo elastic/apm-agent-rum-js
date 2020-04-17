@@ -75,7 +75,7 @@ pipeline {
             sh '''
               git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
               git fetch --all
-              git co master
+              git checkout master
               git pull --unshallow
               git log --pretty=format:"%H %ct000" --after="2020-03-09" --until="2020-04-05" --reverse > commits.txt
             '''
