@@ -6,7 +6,7 @@ pipeline {
   agent { label 'linux && immutable' }
   environment {
     REPO = 'apm-agent-rum-js'
-    BASE_DIR = "src/github.com/elastic/${env.REPO}"
+    BASE_DIR = "${env.REPO}"
     NOTIFY_TO = credentials('notify-to')
     JOB_GCS_BUCKET = credentials('gcs-bucket')
     PIPELINE_LOG_LEVEL='INFO'
@@ -38,6 +38,7 @@ pipeline {
       steps {
         pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
+        sh "git clone https://github.com/elastic/apm-agent-rum-js.git ${BASE_DIR}"
         gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
@@ -72,16 +73,7 @@ pipeline {
         dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: 'docker.elastic.co')
         dir("${BASE_DIR}"){
           script {
-            sh '''
-              git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
-              git fetch --all
-              git checkout master
-              git reset --hard origin/master
-              git remote add upstream "https://@github.com/${ORG_NAME}/${REPO_NAME}.git"
-              git fetch upstream
-              git pull --unshallow
-              git log --pretty=format:"%H %ct000" --after="2020-03-09" --until="2020-04-05" --reverse > commits.txt
-            '''
+            sh 'git log --pretty=format:"%H %ct000" --after="2020-03-09" --until="2020-04-05" --reverse > commits.txt'
             def file = readFile(file: 'commits.txt')
             file?.split("\n").each { line ->
               content = line.split(' ')
