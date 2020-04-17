@@ -81,7 +81,7 @@ export function groupSmallContinuouslySimilarSpans(
 
       var isContinuouslySimilar =
         lastSpan.type === span.type &&
-        lastSpan.subType === span.subType &&
+        lastSpan.subtype === span.subtype &&
         lastSpan.action === span.action &&
         lastSpan.name === span.name &&
         span.duration() / transDuration < threshold &&
@@ -417,7 +417,7 @@ export default class PerformanceMonitoring {
         trace_id: transaction.traceId,
         name: span.name,
         type: span.type,
-        subType: span.subType,
+        subtype: span.subtype,
         action: span.action,
         sync: span.sync,
         start: span._start - transactionStart,

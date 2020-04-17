@@ -249,7 +249,7 @@ describe('Truncate', () => {
       name: generateStr('d', keywordLen),
       type: generateStr('e', keywordLen),
       sync: false,
-      subType: undefined,
+      subtype: undefined,
       action: undefined,
       start: 500,
       duration: 700.02,
