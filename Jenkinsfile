@@ -78,8 +78,9 @@ pipeline {
             file?.split("\n").each { line ->
               content = line.split(' ')
               withEnv(["REPORT_FILE=apm-agent-benchmark-results-${content[0]}.json",
-                       "COMMIT_TIMESTAMP=${content[1]}"]) {
-                sh 'git checkout ${COMMIT_TIMESTAMP}'
+                       "COMMIT_TIMESTAMP=${content[1]}",
+                       "COMMIT_SHA=${content[0]}"]) {
+                sh 'git checkout ${COMMIT_SHA}'
                 sh './.ci/scripts/benchmarks.sh || true'
                 sh '''
                   if [ -e "${REPORT_FILE}" ] ; then
