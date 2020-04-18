@@ -87,7 +87,7 @@ pipeline {
                 sh '''
                   if [ -e "${REPORT_FILE}" ] ; then
                     set +e
-                    cat ${REPORT_FILE} | sed "s#@timestamp\":.*#@timestamp\":${COMMIT_TIMESTAMP}}#g" > ${REPORT_FILE}.new.json
+                    cat ${REPORT_FILE} | sed "s#@timestamp\":.*#@timestamp\":${COMMIT_TIMESTAMP}#g" > ${COMMIT_TIMESTAMP}-${REPORT_FILE}.json
                   fi
                 '''
                 archiveArtifacts(allowEmptyArchive: true, artifacts: "*.json", onlyIfSuccessful: false)
