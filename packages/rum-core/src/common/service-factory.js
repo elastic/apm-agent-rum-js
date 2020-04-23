@@ -26,32 +26,30 @@
 import ApmServer from './apm-server'
 import ConfigService from './config-service'
 import LoggingService from './logging-service'
-import { CONFIG_CHANGE } from './constants'
+import {
+  CONFIG_CHANGE,
+  CONFIG_SERVICE,
+  LOGGING_SERVICE,
+  APM_SERVER
+} from './constants'
 
 class ServiceFactory {
   constructor() {
-    this._serviceCreators = {}
-    this._serviceInstances = {}
+    this._creators = {
+      [CONFIG_SERVICE]: () => new ConfigService(),
+      [LOGGING_SERVICE]: () =>
+        new LoggingService({
+          prefix: '[Elastic APM] '
+        }),
+      [APM_SERVER]: () => {
+        return new ApmServer(
+          this.getService(CONFIG_SERVICE),
+          this.getService(LOGGING_SERVICE)
+        )
+      }
+    }
+    this._instances = {}
     this.initialized = false
-  }
-
-  registerCoreServices() {
-    var serviceFactory = this
-
-    this.registerServiceCreator('ConfigService', function() {
-      return new ConfigService()
-    })
-    this.registerServiceCreator('LoggingService', function() {
-      return new LoggingService({
-        prefix: '[Elastic APM] '
-      })
-    })
-    this.registerServiceCreator('ApmServer', function() {
-      return new ApmServer(
-        serviceFactory.getService('ConfigService'),
-        serviceFactory.getService('LoggingService')
-      )
-    })
   }
 
   init() {
@@ -59,9 +57,9 @@ class ServiceFactory {
       return
     }
     this.initialized = true
-    var configService = this.getService('ConfigService')
+    const configService = this.getService(CONFIG_SERVICE)
     configService.init()
-    var loggingService = this.getService('LoggingService')
+    const loggingService = this.getService(LOGGING_SERVICE)
 
     function setLogLevel(loggingService, configService) {
       const logLevel = configService.get('logLevel')
@@ -73,27 +71,27 @@ class ServiceFactory {
       setLogLevel(loggingService, configService)
     })
 
-    var apmServer = this.getService('ApmServer')
+    const apmServer = this.getService(APM_SERVER)
     apmServer.init()
   }
 
   registerServiceCreator(name, creator) {
-    this._serviceCreators[name] = creator
+    this._creators[name] = creator
   }
 
   registerServiceInstance(name, instance) {
-    this._serviceInstances[name] = instance
+    this._instances[name] = instance
   }
 
   getService(name) {
-    if (!this._serviceInstances[name]) {
-      if (typeof this._serviceCreators[name] === 'function') {
-        this._serviceInstances[name] = this._serviceCreators[name](this)
+    if (!this._instances[name]) {
+      if (typeof this._creators[name] === 'function') {
+        this._instances[name] = this._creators[name](this)
       } else {
         throw new Error('Can not get service, No creator for: ' + name)
       }
     }
-    return this._serviceInstances[name]
+    return this._instances[name]
   }
 }
 

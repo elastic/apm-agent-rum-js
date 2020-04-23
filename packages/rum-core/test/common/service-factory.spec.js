@@ -30,7 +30,6 @@ describe('ServiceFactory', function() {
   var loggingService
   beforeEach(function() {
     var serviceFactory = new ServiceFactory()
-    serviceFactory.registerCoreServices()
     serviceFactory.init()
     configService = serviceFactory.getService('ConfigService')
 

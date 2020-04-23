@@ -34,14 +34,19 @@ import {
   scheduleMacroTask
 } from './common/utils'
 import { patchAll, patchEventHandler } from './common/patching'
-import { PAGE_LOAD, ERROR } from './common/constants'
+import {
+  PAGE_LOAD,
+  ERROR,
+  CONFIG_SERVICE,
+  LOGGING_SERVICE,
+  APM_SERVER
+} from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
 import afterFrame from './common/after-frame'
 import { createTracer } from './opentracing'
 
 function createServiceFactory() {
   const serviceFactory = new ServiceFactory()
-  serviceFactory.registerCoreServices()
   ErrorLogging.registerServices(serviceFactory)
   PerformanceMonitoring.registerServices(serviceFactory)
   return serviceFactory
@@ -53,11 +58,14 @@ export {
   patchAll,
   patchEventHandler,
   isPlatformSupported,
-  ERROR,
-  PAGE_LOAD,
   getInstrumentationFlags,
   createTracer,
   scheduleMicroTask,
   scheduleMacroTask,
-  afterFrame
+  afterFrame,
+  ERROR,
+  PAGE_LOAD,
+  CONFIG_SERVICE,
+  LOGGING_SERVICE,
+  APM_SERVER
 }
