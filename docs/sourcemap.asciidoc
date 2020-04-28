@@ -4,7 +4,7 @@
 Minifying JavaScript bundles is a common practice in production as it can improve the load time and network latency of your application.
 However, minified code by itself can be hard to debug.
 For this reason, Elastic APM supports source maps.
-A source map maps minified files back to the original source code,
+A source map is a file that maps minified files back to the original source code,
 allowing you to maintain the speed advantage of minified code,
 without losing the ability to quickly and easily debug your applications.
 
