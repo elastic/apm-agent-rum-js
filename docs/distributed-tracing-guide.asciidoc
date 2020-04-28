@@ -9,11 +9,11 @@ to queries made to your back-end services -- all in one view.
 [[enable-cors]]
 === Enable cross-origin requests
 
-Distributed tracing is enabled by default in the RUM agent, however, 
-it only includes requests made to the same origin. In order to include cross-origin 
+Distributed tracing is enabled by default in the RUM agent, however,
+it only includes requests made to the same origin. In order to include cross-origin
 requests, you must set the `distributedTracingOrigins` configuration option.
 
-For example, consider an application that is served from: `https://example.com`. 
+For example, consider an application that is served from: `https://example.com`.
 By default, all of the HTTP requests made to `https://example.com` will be included in the trace.
 To also include requests made to: `https://api.example.com`,
 you would need to add the following configuration:
@@ -26,7 +26,7 @@ var apm = initApm({
 })
 ----
 
-This effectively tells the agent to add the distributed tracing HTTP header (`traceparent`) 
+This effectively tells the agent to add the distributed tracing HTTP header (`traceparent`)
 to requests made to `https://api.example.com`.
 
 Note that distributed tracing headers are only appended to API calls.
@@ -40,7 +40,7 @@ please see the MDN page on https://developer.mozilla.org/en-US/docs/Web/HTTP/COR
 
 The RUM agent is only one of the components in a distributed trace, so
 you must properly configure other components in order to use distributed tracing.
-In the example above, you need to make sure `https://api.example.com` 
+In the example above, you need to make sure `https://api.example.com`
 can respond to requests that include the distributed tracing header.
 Specifically, `https://api.example.com` will receive an `OPTIONS` request with the following headers:
 
@@ -107,6 +107,9 @@ Please refer to the relevant Agent's API for more information:
 
 * {apm-dotnet-ref}/public-api.html[.NET Agent: `EnsureParentId()`]
 * {apm-java-ref}/public-api.html[Java Agent: `ensureParentId()`]
+* Python Agent:
+** {apm-py-ref}/flask-support.html[Flask integration]
+** {apm-py-ref}/django-support.html[Django integration]
 * {apm-ruby-ref}/api.html[Ruby Agent: `EnsureParent()`]
 * {apm-go-ref}/api.html[Go Agent: `EnsureParent()`]
-* {apm-node-ref}/transaction-api.html[Node.js Agent: `ensureParentId()`]
+* {apm-node-ref}/distributed-tracing.html[Node.js Agent distributed tracing guide]
