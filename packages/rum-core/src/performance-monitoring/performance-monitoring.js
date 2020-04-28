@@ -420,7 +420,7 @@ export default class PerformanceMonitoring {
         subtype: span.subtype,
         action: span.action,
         sync: span.sync,
-        start: span._start - transactionStart,
+        start: parseInt(span._start - transactionStart),
         duration: span.duration(),
         context: span.context
       }

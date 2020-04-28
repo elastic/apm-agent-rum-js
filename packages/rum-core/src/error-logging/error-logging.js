@@ -24,12 +24,8 @@
  */
 
 import { createStackTraces, filterInvalidFrames } from './stack-trace'
-import {
-  getPageMetadata,
-  generateRandomId,
-  merge,
-  extend
-} from '../common/utils'
+import { generateRandomId, merge, extend } from '../common/utils'
+import { getPageContext } from '../common/context'
 import { truncateModel, ERROR_MODEL } from '../common/truncate'
 
 /**
@@ -118,11 +114,11 @@ class ErrorLogging {
       : {}
     // eslint-disable-next-line no-unused-vars
     const { tags, ...configContext } = this._configService.get('context')
-    const pageMetadata = getPageMetadata()
+    const pageContext = getPageContext()
 
     const context = merge(
       {},
-      pageMetadata,
+      pageContext,
       transactionContext,
       configContext,
       errorContext

@@ -25,12 +25,7 @@
 
 import Url from './url'
 import { PAGE_LOAD, NAVIGATION } from './constants'
-import {
-  getPageMetadata,
-  getServerTimingInfo,
-  PERF,
-  isPerfTimelineSupported
-} from './utils'
+import { getServerTimingInfo, PERF, isPerfTimelineSupported } from './utils'
 
 const LEFT_SQUARE_BRACKET = 91 // [
 const RIGHT_SQUARE_BRACKET = 93 // ]
@@ -146,6 +141,15 @@ function getExternalContext(data) {
   return context
 }
 
+export function getPageContext() {
+  return {
+    page: {
+      referer: document.referrer,
+      url: window.location.href
+    }
+  }
+}
+
 export function addSpanContext(span, data) {
   if (!data) {
     return
@@ -168,7 +172,7 @@ export function addTransactionContext(
   // eslint-disable-next-line no-unused-vars
   { tags, ...configContext } = {}
 ) {
-  const pageContext = getPageMetadata()
+  const pageContext = getPageContext()
   let responseContext = {}
   if (transaction.type === PAGE_LOAD && isPerfTimelineSupported()) {
     let entries = PERF.getEntriesByType(NAVIGATION)

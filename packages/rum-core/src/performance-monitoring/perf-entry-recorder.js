@@ -133,7 +133,7 @@ export function captureObserverEntries(list, { capturePaint }) {
      * that is loaded cross-origin without the `Timing-Allow-Origin` header.
      */
     const lcp = lastLcpEntry.renderTime || lastLcpEntry.loadTimes
-    result.marks.largestContentfulPaint = lcp
+    result.marks.largestContentfulPaint = parseInt(lcp)
   }
 
   /**
@@ -151,7 +151,7 @@ export function captureObserverEntries(list, { capturePaint }) {
   if (fcpEntry) {
     const fcp =
       unloadDiff >= 0 ? fcpEntry.startTime - unloadDiff : fcpEntry.startTime
-    result.marks.firstContentfulPaint = fcp
+    result.marks.firstContentfulPaint = parseInt(fcp)
   }
 
   return result

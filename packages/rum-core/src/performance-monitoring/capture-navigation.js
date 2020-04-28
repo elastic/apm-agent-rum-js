@@ -212,13 +212,12 @@ function getApiSpanNames({ spans }) {
   return apiCalls
 }
 
-const navigationTimingKeys = [
+const NAVIGATION_TIMING_MARKS = [
   'fetchStart',
   'domainLookupStart',
   'domainLookupEnd',
   'connectStart',
   'connectEnd',
-  'secureConnectionStart',
   'requestStart',
   'responseStart',
   'responseEnd',
@@ -235,10 +234,10 @@ function getNavigationTimingMarks() {
   const timing = PERF.timing
   const fetchStart = timing.fetchStart
   const marks = {}
-  navigationTimingKeys.forEach(function(timingKey) {
+  NAVIGATION_TIMING_MARKS.forEach(function(timingKey) {
     const m = timing[timingKey]
     if (m && m >= fetchStart) {
-      marks[timingKey] = m - fetchStart
+      marks[timingKey] = parseInt(m - fetchStart)
     }
   })
   return marks
@@ -344,5 +343,6 @@ export {
   captureNavigation,
   createNavigationTimingSpans,
   createResourceTimingSpans,
-  createUserTimingSpans
+  createUserTimingSpans,
+  NAVIGATION_TIMING_MARKS
 }
