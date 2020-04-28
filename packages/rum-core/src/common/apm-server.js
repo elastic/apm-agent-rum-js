@@ -44,18 +44,9 @@ class ApmServer {
     this._loggingService = loggingService
     this.queue = undefined
     this.throttleEvents = noop
-    this.initialized = false
   }
 
   init() {
-    if (this.initialized) {
-      return
-    }
-    this.initialized = true
-    this._initQueue()
-  }
-
-  _initQueue() {
     const queueLimit = this._configService.get('queueLimit')
     const flushInterval = this._configService.get('flushInterval')
     const limit = this._configService.get('eventsLimit')

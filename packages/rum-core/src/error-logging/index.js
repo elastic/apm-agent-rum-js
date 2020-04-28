@@ -25,14 +25,17 @@
 
 import ErrorLogging from './error-logging'
 import { CONFIG_SERVICE, APM_SERVER } from '../common/constants'
-export default {
-  ErrorLogging,
-  registerServices: function registerServices(serviceFactory) {
-    serviceFactory.registerServiceCreator('ErrorLogging', function() {
-      const apmService = serviceFactory.getService(APM_SERVER)
-      const configService = serviceFactory.getService(CONFIG_SERVICE)
-      const transactionService = serviceFactory.getService('TransactionService')
-      return new ErrorLogging(apmService, configService, transactionService)
-    })
+import { serviceCreators } from '../common/service-factory'
+
+function registerServices() {
+  serviceCreators['ErrorLogging'] = serviceFactory => {
+    const deps = serviceFactory.getService([
+      APM_SERVER,
+      CONFIG_SERVICE,
+      'TransactionService'
+    ])
+    return new ErrorLogging(...deps)
   }
 }
+
+export { ErrorLogging, registerServices }

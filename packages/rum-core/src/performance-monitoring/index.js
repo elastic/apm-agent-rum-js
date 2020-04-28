@@ -31,26 +31,23 @@ import {
   LOGGING_SERVICE
 } from '../common/constants'
 
-export default {
-  PerformanceMonitoring,
-  registerServices: function registerServices(serviceFactory) {
-    serviceFactory.registerServiceCreator('TransactionService', function() {
-      const configService = serviceFactory.getService(CONFIG_SERVICE)
-      const loggingService = serviceFactory.getService(LOGGING_SERVICE)
-      return new TransactionService(loggingService, configService)
-    })
+import { serviceCreators } from '../common/service-factory'
 
-    serviceFactory.registerServiceCreator('PerformanceMonitoring', function() {
-      const configService = serviceFactory.getService(CONFIG_SERVICE)
-      const loggingService = serviceFactory.getService(LOGGING_SERVICE)
-      const apmService = serviceFactory.getService(APM_SERVER)
-      const transactionService = serviceFactory.getService('TransactionService')
-      return new PerformanceMonitoring(
-        apmService,
-        configService,
-        loggingService,
-        transactionService
-      )
-    })
+function registerServices() {
+  serviceCreators['TransactionService'] = serviceFactory => {
+    const deps = serviceFactory.getService([LOGGING_SERVICE, CONFIG_SERVICE])
+    return new TransactionService(...deps)
+  }
+
+  serviceCreators['PerformanceMonitoring'] = serviceFactory => {
+    const deps = serviceFactory.getService([
+      APM_SERVER,
+      CONFIG_SERVICE,
+      LOGGING_SERVICE,
+      'TransactionService'
+    ])
+    return new PerformanceMonitoring(...deps)
   }
 }
+
+export { PerformanceMonitoring, registerServices }

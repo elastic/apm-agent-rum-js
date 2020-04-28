@@ -23,13 +23,14 @@
  *
  */
 
-import ServiceFactory from '../../src/common/service-factory'
+import { ServiceFactory } from '../../src/common/service-factory'
 
 describe('ServiceFactory', function() {
-  var configService
-  var loggingService
+  let configService
+  let loggingService
+  let serviceFactory
   beforeEach(function() {
-    var serviceFactory = new ServiceFactory()
+    serviceFactory = new ServiceFactory()
     serviceFactory.init()
     configService = serviceFactory.getService('ConfigService')
 
@@ -46,5 +47,13 @@ describe('ServiceFactory', function() {
 
     configService.setConfig({ logLevel: 'debug' })
     expect(loggingService.level).toBe('debug')
+  })
+
+  it('should get multiple services', function() {
+    let services = serviceFactory.getService([
+      'ConfigService',
+      'LoggingService'
+    ])
+    expect(services).toEqual([configService, loggingService])
   })
 })

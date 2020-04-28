@@ -42,13 +42,15 @@ class ApmBase {
   init(config) {
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
-      const configService = this.serviceFactory.getService(CONFIG_SERVICE)
+      const [configService, loggingService] = this.serviceFactory.getService([
+        CONFIG_SERVICE,
+        LOGGING_SERVICE
+      ])
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
       configService.setVersion('5.1.1')
       this.config(config)
-      const loggingService = this.serviceFactory.getService(LOGGING_SERVICE)
       /**
        * Deactive agent when the active config flag is set to false
        */
@@ -95,9 +97,15 @@ class ApmBase {
    * it resolves to the fetched config.
    */
   fetchCentralConfig() {
-    const apmServer = this.serviceFactory.getService(APM_SERVER)
-    const loggingService = this.serviceFactory.getService(LOGGING_SERVICE)
-    const configService = this.serviceFactory.getService(CONFIG_SERVICE)
+    const [
+      apmServer,
+      loggingService,
+      configService
+    ] = this.serviceFactory.getService([
+      APM_SERVER,
+      LOGGING_SERVICE,
+      CONFIG_SERVICE
+    ])
 
     return apmServer
       .fetchConfig(

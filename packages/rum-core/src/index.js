@@ -25,9 +25,9 @@
 
 // export public core APIs.
 
-import ErrorLogging from './error-logging'
-import PerformanceMonitoring from './performance-monitoring'
-import ServiceFactory from './common/service-factory'
+import { registerServices as registerErrorServices } from './error-logging'
+import { registerServices as registerPerfServices } from './performance-monitoring'
+import { ServiceFactory } from './common/service-factory'
 import {
   isPlatformSupported,
   scheduleMicroTask,
@@ -45,10 +45,10 @@ import { getInstrumentationFlags } from './common/instrument'
 import afterFrame from './common/after-frame'
 import { createTracer } from './opentracing'
 
+registerPerfServices()
+registerErrorServices()
 function createServiceFactory() {
   const serviceFactory = new ServiceFactory()
-  ErrorLogging.registerServices(serviceFactory)
-  PerformanceMonitoring.registerServices(serviceFactory)
   return serviceFactory
 }
 

@@ -32,22 +32,23 @@ import {
   LOGGING_SERVICE,
   APM_SERVER
 } from './constants'
+import { __DEV__ } from '../env'
+
+const serviceCreators = {
+  [CONFIG_SERVICE]: () => new ConfigService(),
+  [LOGGING_SERVICE]: () =>
+    new LoggingService({
+      prefix: '[Elastic APM] '
+    }),
+  [APM_SERVER]: factory => {
+    return new ApmServer(
+      ...factory.getService([CONFIG_SERVICE, LOGGING_SERVICE])
+    )
+  }
+}
 
 class ServiceFactory {
   constructor() {
-    this._creators = {
-      [CONFIG_SERVICE]: () => new ConfigService(),
-      [LOGGING_SERVICE]: () =>
-        new LoggingService({
-          prefix: '[Elastic APM] '
-        }),
-      [APM_SERVER]: () => {
-        return new ApmServer(
-          this.getService(CONFIG_SERVICE),
-          this.getService(LOGGING_SERVICE)
-        )
-      }
-    }
     this._instances = {}
     this.initialized = false
   }
@@ -75,24 +76,25 @@ class ServiceFactory {
     apmServer.init()
   }
 
-  registerServiceCreator(name, creator) {
-    this._creators[name] = creator
-  }
-
   registerServiceInstance(name, instance) {
     this._instances[name] = instance
   }
 
   getService(name) {
-    if (!this._instances[name]) {
-      if (typeof this._creators[name] === 'function') {
-        this._instances[name] = this._creators[name](this)
-      } else {
-        throw new Error('Can not get service, No creator for: ' + name)
+    if (typeof name === 'string') {
+      if (!this._instances[name]) {
+        if (typeof serviceCreators[name] === 'function') {
+          this._instances[name] = serviceCreators[name](this)
+        } else if (__DEV__) {
+          console.log('Can not get service, No creator for: ' + name)
+        }
       }
+      return this._instances[name]
+    } else if (name.length) {
+      // Assume name is array of strings
+      return name.map(n => this.getService(n))
     }
-    return this._instances[name]
   }
 }
 
-export default ServiceFactory
+export { serviceCreators, ServiceFactory }
