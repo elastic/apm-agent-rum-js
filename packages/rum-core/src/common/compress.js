@@ -25,6 +25,12 @@
 
 import { NAVIGATION_TIMING_MARKS } from '../performance-monitoring/capture-navigation'
 
+/**
+ * Compression of all the below schema is based on the v3 RUM Specification
+ * Mapping of existing fields can  be found here
+ * https://github.com/elastic/apm-server/blob/master/model/modeldecoder/field/rum_v3_mapping.go
+ */
+
 const COMPRESSED_NAV_TIMING_MARKS = [
   'fs',
   'ls',

@@ -25,51 +25,16 @@
 
 import compareVersions from 'compare-versions'
 import Transaction from '../../src/performance-monitoring/transaction'
-import { getGlobalConfig } from '../../../../dev-utils/test-config'
-import { describeIf } from '../../../../dev-utils/jasmine'
-import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
 import {
   LOCAL_CONFIG_KEY,
   ERRORS,
   TRANSACTIONS
 } from '../../src/common/constants'
-import { createServiceFactory } from '../'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import { describeIf } from '../../../../dev-utils/jasmine'
+import { createServiceFactory, generateTransaction, generateErrors } from '../'
 
 const { agentConfig, testConfig } = getGlobalConfig('rum-core')
-
-function generateTransaction(count, breakdown = false) {
-  var result = []
-  for (var i = 0; i < count; i++) {
-    var tr = new Transaction('transaction #' + i, 'transaction', {
-      startTime: 10
-    })
-    tr.id = 'transaction-id-' + i
-    tr.traceId = 'trace-id-' + i
-    var span = tr.startSpan('name', 'type.subtype', {
-      sync: false,
-      startTime: 20
-    })
-    span.end(30)
-    span.id = 'span-id-' + i + '-1'
-    tr.end(1000)
-    if (breakdown) {
-      tr.sampled = true
-      tr.selfTime = tr.duration() - span.duration()
-      tr.breakdownTimings = captureBreakdown(tr)
-    }
-
-    result.push(tr)
-  }
-  return result
-}
-
-function generateErrors(count) {
-  var result = []
-  for (var i = 0; i < count; i++) {
-    result.push(new Error('error #' + i))
-  }
-  return result
-}
 
 describe('ApmServer', function() {
   var serviceFactory

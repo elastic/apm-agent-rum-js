@@ -39,7 +39,7 @@ import {
 import { __DEV__ } from '../env'
 
 /**
- * Throttling interval deafults to 60 seconds
+ * Throttling interval defaults to 60 seconds
  */
 const THROTTLE_INTERVAL = 60000
 
