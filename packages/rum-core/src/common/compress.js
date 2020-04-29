@@ -84,6 +84,9 @@ function compressHTTP(http) {
 }
 
 function compressContext(context) {
+  if (!context) {
+    return null
+  }
   const compressed = {}
   for (const key of Object.keys(context)) {
     const value = context[key]
@@ -128,6 +131,9 @@ function compressContext(context) {
 }
 
 function compressMarks(marks) {
+  if (!marks) {
+    return null
+  }
   const { navigationTiming, agent } = marks
   const compressed = { nt: {}, a: {} }
 
@@ -180,10 +186,8 @@ export function compressTransaction(transaction) {
       n: span.name,
       t: span.type,
       s: span.start,
-      d: span.duration
-    }
-    if (span.context) {
-      spanData.c = compressContext(span.context)
+      d: span.duration,
+      c: compressContext(span.context)
     }
     /**
      * Set parentId only for spans that are child of other spans
