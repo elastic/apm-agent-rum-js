@@ -189,8 +189,8 @@ describe('PerformanceMonitoring', function() {
     expect(payload.spans.length).toBe(1)
     expect(payload.spans[0].name).toBe('span1')
     expect(payload.spans[0].type).toBe('span1type')
-    expect(payload.spans[0].start).toBe(span._start - tr._start)
-    expect(payload.spans[0].duration).toBe(span._end - span._start)
+    expect(payload.spans[0].start).toBe(parseInt(span._start - tr._start))
+    expect(payload.spans[0].duration).toBe(parseInt(span._end - span._start))
   })
 
   it('should sendPageLoadMetrics', function(done) {
@@ -224,7 +224,10 @@ describe('PerformanceMonitoring', function() {
   })
 
   it('should filter out empty transactions', function() {
-    var tr = new Transaction('test', 'test', { transactionSampleRate: 1 })
+    var tr = new Transaction('test', 'test', {
+      transactionSampleRate: 1,
+      startTime: 0
+    })
     var result = performanceMonitoring.filterTransaction(tr)
     expect(tr.spans.length).toBe(0)
     expect(tr.duration()).toBe(null)
@@ -237,11 +240,8 @@ describe('PerformanceMonitoring', function() {
     result = performanceMonitoring.filterTransaction(tr)
     expect(result).toBe(false)
 
-    tr.end()
-    if (tr._end && tr._end === tr._start) {
-      tr._end += 100
-    }
-    expect(tr.duration()).toBeGreaterThan(0)
+    tr.end(100)
+    expect(tr.duration()).toBe(100)
     result = performanceMonitoring.filterTransaction(tr)
     expect(result).toBe(true)
   })

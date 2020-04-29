@@ -302,7 +302,7 @@ class ApmServer {
       this.ndjsonTransactions(filteredPayload[TRANSACTIONS], compress)
     )
     const ndjsonPayload = ndjson.join('')
-    const endPoint = cfg.get('serverUrl') + compress ? V3_PREFIX : V2_PREFIX
+    const endPoint = cfg.get('serverUrl') + (compress ? V3_PREFIX : V2_PREFIX)
     return this._postJson(endPoint, ndjsonPayload)
   }
 }
