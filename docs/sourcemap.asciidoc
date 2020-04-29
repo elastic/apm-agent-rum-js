@@ -1,147 +1,26 @@
 [[sourcemap]]
-== Source Maps
+== Source maps
 
-TIP: Additional information on the source map endpoint is available in the
-APM Server's {apm-server-ref-v}/sourcemaps.html[source map documentation].
-Don't forget, you must enable {apm-server-ref-v}/configuration-rum.html[RUM support] in the APM Server for this endpoint to work.
+Minifying JavaScript bundles is a common practice in production as it can improve the load time and network latency of your application.
+However, minified code by itself can be hard to debug.
+For this reason, Elastic APM supports source maps.
+A source map is a file that maps minified files back to the original source code,
+allowing you to maintain the speed advantage of minified code,
+without losing the ability to quickly and easily debug your applications.
 
-It's a common practice to minify JavaScript bundles.
-However, debugging minified files is inherently difficult. To resolve this issue,
-you can generate source maps for your bundles and upload them to the APM server.
+There are three steps required to enable, upload, and apply a source map to error stack traces.
+An overview is listed below, and a complete walk-through is available in the
+{apm-server-ref-v}/sourcemaps.html[generate and upload a source map] guide.
 
-Here's an example that shows how to generate source maps with webpack,
-and configure the JavaScript agent accordingly.
+1. Set the <<service-version,`serviceVersion`>> when initializing the RUM Agent.
+2. {apm-server-ref-v}/sourcemaps.html#sourcemap-rum-generate[Generate a source map]
+for your application with the `serviceVersion` from step one.
+3. {apm-server-ref-v}/sourcemaps.html#sourcemap-rum-upload[Enable and upload the source map file] to APM Server.
 
-First, you need to configure webpack to generate source maps and provide the service version to your app:
-
-[source,js]
-----
-const webpack = require('webpack')
-const serviceVersion = require("./package.json").version
-const TerserPlugin = require('terser-webpack-plugin');
-module.exports = {
-  entry: 'app.js',
-  output: {
-    filename: 'app.min.js',
-    path: './dist'
-  },
-  devtool: 'source-map',
-  plugins: [
-    new webpack.DefinePlugin({'serviceVersion': JSON.stringify(serviceVersion)}),
-    new TerserPlugin({
-      sourceMap: true
-    })
-  ]
-}
-----
-
-Or you can use current git commit hash:
-
-[source,js]
-----
-const webpack = require('webpack')
-const git = require('git-rev-sync')
-const serviceVersion = git.short()
-const TerserPlugin = require('terser-webpack-plugin');
-module.exports = {
-  entry: 'app.js',
-  output: {
-    filename: 'app.min.js',
-    path: './dist'
-  },
-  devtool: 'source-map',
-  plugins: [
-    new webpack.DefinePlugin({'serviceVersion': JSON.stringify(serviceVersion)}),
-    new TerserPlugin({
-      sourceMap: true
-    })
-  ]
-}
-----
-
-Then you can use the provided service version to set the "serviceVersion" configuration:
-
-[source,js]
-----
-import { init as initApm } from '@elastic/apm-rum'
-var apm = initApm({
-  // Set required service name
-  serviceName: 'service-name',
-  
-  // Set service version (required for source map feature)
-  serviceVersion: serviceVersion
-})
-----
-
-NOTE: Make sure to upload the generated source map file to APM server with the same "serviceVersion" 
-and "serviceName".
-
-Here is a Node.js example of uploading source map file to the APM server:
-
-[source,js]
-----
-console.log('Uploading sourcemaps!')
-var request = require('request')
-var filepath = './dist/app.min.js.map'
-var formData = {
-  sourcemap: fs.createReadStream(filepath),
-  service_version: require("./package.json").version, // Or use 'git-rev-sync' for git commit hash
-  bundle_filepath: 'http://localhost/app.min.js',
-  service_name: 'service-name'
-}
-request.post({url: 'http://localhost:8200/assets/v1/sourcemaps',formData: formData}, function (err, resp, body) {
-  if (err) {
-    console.log('Error while uploading sourcemaps!', err)
-  } else {
-    console.log('Sourcemaps uploaded!')
-  }
-})
-----
-
-You can also use `curl` command:
-
-[source,sh]
-----
-SERVICEVERSION=`node -e "console.log(require('./package.json').version);"` && \
-curl http://localhost:8200/assets/v1/sourcemaps -X POST \
-    -F sourcemap=@./dist/app.min.js.map \
-    -F service_version="$SERVICEVERSION" \
-    -F bundle_filepath="http://localhost/app.min.js" \
-    -F service_name="service-name"
-----
-
-Or use current git commit hash:
-
-[source,sh]
-----
-SERVICEVERSION=`git rev-parse --short HEAD` && \
-curl http://localhost:8200/assets/v1/sourcemaps -X POST \
-    -F sourcemap=@./dist/app.min.js.map \
-    -F service_version="$SERVICEVERSION" \
-    -F bundle_filepath="http://localhost/app.min.js" \
-    -F service_name="service-name"
-----
-
-
-[float]
+// Don't link to this section
 [[secret-token]]
-=== Using a secret token
+You can also configure a {apm-server-ref-v}/secret-token.html[secret token] or
+{apm-server-ref-v}/api-key.html[API key] to restrict the uploading of sourcemaps.
 
-You can {apm-server-ref-v}/secure-communication-agents.html[configure a secret token on APM Server] to restrict uploading sourcemaps.
-
-Here's how to add the secret token to a curl command:
-
-[source,sh]
-----
-SERVICEVERSION=`git rev-parse --short HEAD` && \
-curl http://localhost:8200/assets/v1/sourcemaps -X POST \
-    -F sourcemap=@./dist/app.min.js.map \
-    -F service_version="$SERVICEVERSION" \
-    -F bundle_filepath="http://localhost/app.min.js" \
-    -F service_name="service-name" \
-    -H "Authorization: Bearer <token>"
-----
-
-
-NOTE: Please note that the previously provided endpoint (`/v1/rum/sourcemaps`) 
-has been deprecated and will be removed starting with APM Server version 7.0+.
+TIP: Don't forget,
+you must enable {apm-server-ref-v}/configuration-rum.html[RUM support] in the APM Server for this endpoint to work.
