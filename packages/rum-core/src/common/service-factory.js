@@ -41,15 +41,17 @@ const serviceCreators = {
       prefix: '[Elastic APM] '
     }),
   [APM_SERVER]: factory => {
-    return new ApmServer(
-      ...factory.getService([CONFIG_SERVICE, LOGGING_SERVICE])
-    )
+    const [configService, loggingService] = factory.getService([
+      CONFIG_SERVICE,
+      LOGGING_SERVICE
+    ])
+    return new ApmServer(configService, loggingService)
   }
 }
 
 class ServiceFactory {
   constructor() {
-    this._instances = {}
+    this.instances = {}
     this.initialized = false
   }
 
@@ -76,22 +78,17 @@ class ServiceFactory {
     apmServer.init()
   }
 
-  registerServiceInstance(name, instance) {
-    this._instances[name] = instance
-  }
-
   getService(name) {
     if (typeof name === 'string') {
-      if (!this._instances[name]) {
+      if (!this.instances[name]) {
         if (typeof serviceCreators[name] === 'function') {
-          this._instances[name] = serviceCreators[name](this)
+          this.instances[name] = serviceCreators[name](this)
         } else if (__DEV__) {
           console.log('Can not get service, No creator for: ' + name)
         }
       }
-      return this._instances[name]
-    } else if (name.length) {
-      // Assume name is array of strings
+      return this.instances[name]
+    } else if (Array.isArray(name)) {
       return name.map(n => this.getService(n))
     }
   }

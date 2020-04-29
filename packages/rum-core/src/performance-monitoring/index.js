@@ -35,18 +35,31 @@ import { serviceCreators } from '../common/service-factory'
 
 function registerServices() {
   serviceCreators['TransactionService'] = serviceFactory => {
-    const deps = serviceFactory.getService([LOGGING_SERVICE, CONFIG_SERVICE])
-    return new TransactionService(...deps)
+    const [loggingService, configService] = serviceFactory.getService([
+      LOGGING_SERVICE,
+      CONFIG_SERVICE
+    ])
+    return new TransactionService(loggingService, configService)
   }
 
   serviceCreators['PerformanceMonitoring'] = serviceFactory => {
-    const deps = serviceFactory.getService([
+    const [
+      apmServer,
+      configService,
+      loggingService,
+      transactionService
+    ] = serviceFactory.getService([
       APM_SERVER,
       CONFIG_SERVICE,
       LOGGING_SERVICE,
       'TransactionService'
     ])
-    return new PerformanceMonitoring(...deps)
+    return new PerformanceMonitoring(
+      apmServer,
+      configService,
+      loggingService,
+      transactionService
+    )
   }
 }
 

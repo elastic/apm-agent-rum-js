@@ -34,7 +34,7 @@ export function getApmBase() {
   console.log('E2E Global Configs', JSON.stringify(globalConfig, null, 2))
   const apmServer = apmBase.serviceFactory.getService('ApmServer')
   const serverMock = new ApmServerMock(apmServer, globalConfig.useMocks)
-  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
+  apmBase.serviceFactory.instances['ApmServer'] = serverMock
   return apmBase
 }
 

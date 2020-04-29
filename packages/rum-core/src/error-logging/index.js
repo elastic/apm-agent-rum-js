@@ -29,12 +29,16 @@ import { serviceCreators } from '../common/service-factory'
 
 function registerServices() {
   serviceCreators['ErrorLogging'] = serviceFactory => {
-    const deps = serviceFactory.getService([
+    const [
+      apmServer,
+      configService,
+      transactionService
+    ] = serviceFactory.getService([
       APM_SERVER,
       CONFIG_SERVICE,
       'TransactionService'
     ])
-    return new ErrorLogging(...deps)
+    return new ErrorLogging(apmServer, configService, transactionService)
   }
 }
 
