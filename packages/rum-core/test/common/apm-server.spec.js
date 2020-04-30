@@ -334,10 +334,10 @@ describe('ApmServer', function() {
     clock.uninstall()
   })
 
-  it('should compress all events when compress flag is true', () => {
+  it('should compress all events when apiVersion is >2', () => {
     const clock = jasmine.clock()
     clock.install()
-    configService.setConfig({ compressPayload: true })
+    configService.setConfig({ apiVersion: 3 })
     apmServer.init()
     spyOn(apmServer, '_postJson')
     const trs = generateTransaction(1, true).map(tr =>
@@ -485,7 +485,7 @@ describe('ApmServer', function() {
     '7.8+',
     () => {
       it('should post compressed payload without errors', async () => {
-        configService.setConfig({ compressPayload: true })
+        configService.setConfig({ apiVersion: 3 })
         const transactions = generateTransaction(1, true).map(tr =>
           performanceMonitoring.createTransactionDataModel(tr)
         )

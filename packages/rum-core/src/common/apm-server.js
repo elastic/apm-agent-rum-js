@@ -43,9 +43,6 @@ import { __DEV__ } from '../env'
  */
 const THROTTLE_INTERVAL = 60000
 
-const V2_PREFIX = '/intake/v2/rum/events'
-const V3_PREFIX = '/intake/v3/rum/events'
-
 class ApmServer {
   constructor(configService, loggingService) {
     this._configService = configService
@@ -263,7 +260,9 @@ class ApmServer {
     }
     const transactions = []
     const errors = []
-    for (const event of events) {
+    for (let i = 0; i < events.length; i++) {
+      const event = events[i]
+
       if (event[TRANSACTIONS]) {
         transactions.push(event[TRANSACTIONS])
       }
@@ -286,7 +285,12 @@ class ApmServer {
       return
     }
 
-    const compress = cfg.get('compressPayload')
+    const apiVersion = cfg.get('apiVersion')
+    /**
+     * when API version is >2, we can enable compression of the payload
+     */
+    const compress = apiVersion > 2 ? true : false
+
     let ndjson = []
     const metadata = this.createMetaData()
     const metadataKey = compress ? 'm' : 'metadata'
@@ -302,7 +306,7 @@ class ApmServer {
       this.ndjsonTransactions(filteredPayload[TRANSACTIONS], compress)
     )
     const ndjsonPayload = ndjson.join('')
-    const endPoint = cfg.get('serverUrl') + (compress ? V3_PREFIX : V2_PREFIX)
+    const endPoint = cfg.get('serverUrl') + `/intake/v${apiVersion}/rum/events`
     return this._postJson(endPoint, ndjsonPayload)
   }
 }
