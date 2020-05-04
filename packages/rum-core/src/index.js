@@ -45,9 +45,9 @@ import { getInstrumentationFlags } from './common/instrument'
 import afterFrame from './common/after-frame'
 import { createTracer } from './opentracing'
 
-registerPerfServices()
-registerErrorServices()
 function createServiceFactory() {
+  registerPerfServices()
+  registerErrorServices()
   const serviceFactory = new ServiceFactory()
   return serviceFactory
 }
