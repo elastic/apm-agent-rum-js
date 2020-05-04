@@ -84,7 +84,7 @@ class ServiceFactory {
         if (typeof serviceCreators[name] === 'function') {
           this.instances[name] = serviceCreators[name](this)
         } else if (__DEV__) {
-          console.log('Can not get service, No creator for: ' + name)
+          console.log('Cannot get service, No creator for: ' + name)
         }
       }
       return this.instances[name]

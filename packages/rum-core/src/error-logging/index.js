@@ -42,4 +42,4 @@ function registerServices() {
   }
 }
 
-export { ErrorLogging, registerServices }
+export { registerServices }

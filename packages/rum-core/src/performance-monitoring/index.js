@@ -63,4 +63,4 @@ function registerServices() {
   }
 }
 
-export { PerformanceMonitoring, registerServices }
+export { registerServices }
