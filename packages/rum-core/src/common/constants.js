@@ -140,18 +140,23 @@ const ERRORS = 'errors'
 const TRANSACTIONS = 'transactions'
 
 /**
- * Default configs used on top of extensible configs from ConfigService
- */
-const KEYWORD_LIMIT = 1024
-const SERVER_URL_PREFIX = '/intake/v2/rum/events'
-
-/**
  * Services
  */
 
 const CONFIG_SERVICE = 'ConfigService'
 const LOGGING_SERVICE = 'LoggingService'
 const APM_SERVER = 'ApmServer'
+
+/**
+ * Truncated spans are associated with this type information
+ */
+const TRUNCATED_TYPE = '.truncated'
+
+/**
+ * Default configs used on top of extensible configs from ConfigService
+ */
+const KEYWORD_LIMIT = 1024
+const SERVER_URL_PREFIX = '/intake/v2/rum/events'
 
 export {
   SCHEDULE,
@@ -196,5 +201,6 @@ export {
   TRANSACTIONS,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  TRUNCATED_TYPE
 }

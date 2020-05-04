@@ -33,7 +33,7 @@ import {
   extend,
   removeInvalidChars
 } from '../common/utils'
-import { REUSABILITY_THRESHOLD } from '../common/constants'
+import { REUSABILITY_THRESHOLD, TRUNCATED_TYPE } from '../common/constants'
 import { captureBreakdown } from './breakdown'
 
 class Transaction extends SpanBase {
@@ -128,7 +128,7 @@ class Transaction extends SpanBase {
     // truncate active spans
     for (let sid in this._activeSpans) {
       const span = this._activeSpans[sid]
-      span.type = span.type + '.truncated'
+      span.type = span.type + TRUNCATED_TYPE
       span.end(endTime)
     }
     this.callOnEnd()
