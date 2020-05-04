@@ -320,7 +320,8 @@ describe('ApmServer', function() {
     const tr = new Transaction('test-meta-tr', 'test-type', {
       startTime: 10
     })
-    tr.startSpan('test-meta-span', 'test-type')
+    const sp = tr.startSpan('test-meta-span', 'test-type', { startTime: 0 })
+    sp.end(50)
     tr.end(100)
     const payload = performanceMonitoring.createTransactionDataModel(tr)
     await apmServer.sendEvents([
