@@ -116,7 +116,7 @@ function groupSpans(transaction) {
     /**
      * Ignore calculating truncated spans as separate types in breakdown
      */
-    let key = type.replace(`${TRUNCATED_TYPE}`, '')
+    let key = type.replace(TRUNCATED_TYPE, '')
     if (subtype) {
       key += '.' + subtype
     }
