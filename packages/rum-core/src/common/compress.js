@@ -23,31 +23,16 @@
  *
  */
 
-import { NAVIGATION_TIMING_MARKS } from '../performance-monitoring/capture-navigation'
+import {
+  NAVIGATION_TIMING_MARKS,
+  COMPRESSED_NAV_TIMING_MARKS
+} from '../performance-monitoring/capture-navigation'
 
 /**
  * Compression of all the below schema is based on the v3 RUM Specification
  * Mapping of existing fields can  be found here
  * https://github.com/elastic/apm-server/blob/master/model/modeldecoder/field/rum_v3_mapping.go
  */
-
-const COMPRESSED_NAV_TIMING_MARKS = [
-  'fs',
-  'ls',
-  'le',
-  'cs',
-  'ce',
-  'qs',
-  'rs',
-  're',
-  'dl',
-  'di',
-  'ds',
-  'de',
-  'dc',
-  'es',
-  'ee'
-]
 
 function compressStackFrames(frames) {
   return frames.map(frame => ({
@@ -69,23 +54,19 @@ function compressResponse(response) {
 
 function compressHTTP(http) {
   const compressed = {}
-  for (const key of Object.keys(http)) {
-    const value = http[key]
-    switch (key) {
-      case 'method':
-        compressed.mt = value
-        break
-      case 'status_code':
-        compressed.sc = value
-        break
-      case 'url':
-        compressed.url = value
-        break
-      case 'response':
-        compressed.r = compressResponse(value)
-        break
-    }
+  const { method, status_code, url, response } = http
+
+  compressed.url = url
+  if (method) {
+    compressed.mt = method
   }
+  if (status_code) {
+    compressed.sc = status_code
+  }
+  if (response) {
+    compressed.r = compressResponse(response)
+  }
+
   return compressed
 }
 
@@ -94,45 +75,43 @@ function compressContext(context) {
     return null
   }
   const compressed = {}
-  for (const key of Object.keys(context)) {
-    const value = context[key]
-    switch (key) {
-      case 'page':
-        compressed.p = {
-          rf: value.referer,
-          url: value.url
-        }
-        break
-      case 'http':
-        compressed.h = compressHTTP(value)
-        break
-      case 'response':
-        compressed.r = compressResponse(value)
-        break
-      case 'user':
-        compressed.u = {
-          id: value.id,
-          un: value.username,
-          em: value.email
-        }
-        break
-      case 'destination':
-        const { service } = value
-        compressed.dt = {
-          se: {
-            n: service.name,
-            t: service.type,
-            rc: service.resource
-          },
-          ad: value.address,
-          po: value.port
-        }
-        break
-      case 'custom':
-        compressed.cu = value
-        break
+  const { page, http, response, destination, user, custom } = context
+
+  if (page) {
+    compressed.p = {
+      rf: page.referer,
+      url: page.url
     }
   }
+  if (http) {
+    compressed.h = compressHTTP(http)
+  }
+  if (response) {
+    compressed.r = compressResponse(response)
+  }
+  if (destination) {
+    const { service } = destination
+    compressed.dt = {
+      se: {
+        n: service.name,
+        t: service.type,
+        rc: service.resource
+      },
+      ad: destination.address,
+      po: destination.port
+    }
+  }
+  if (user) {
+    compressed.u = {
+      id: user.id,
+      un: user.username,
+      em: user.email
+    }
+  }
+  if (custom) {
+    compressed.cu = custom
+  }
+
   return compressed
 }
 
@@ -141,7 +120,7 @@ function compressMarks(marks) {
     return null
   }
   const { navigationTiming, agent } = marks
-  const compressed = { nt: {}, a: {} }
+  const compressed = { nt: {} }
 
   COMPRESSED_NAV_TIMING_MARKS.forEach((mark, index) => {
     const mapping = NAVIGATION_TIMING_MARKS[index]
@@ -225,7 +204,7 @@ export function compressTransaction(transaction) {
     d: transaction.duration,
     c: compressContext(transaction.context),
     m: compressMarks(transaction.marks),
-    b: compressMetricsets(transaction.breakdown),
+    me: compressMetricsets(transaction.breakdown),
     y: spans,
     yc: {
       sd: spans.length

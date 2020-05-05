@@ -23,7 +23,7 @@
  *
  */
 
-import { createServiceFactory, generateTransaction, generateErrors } from '../'
+import { createServiceFactory, generateTransaction, generateErrors } from '..'
 import {
   compressTransaction,
   compressMetadata,
@@ -123,7 +123,7 @@ const V3_MAPPING = {
   start: 's',
   started: 'sd',
   status_code: 'sc',
-  subType: 'su',
+  subtype: 'su',
   sync: 'sy',
   tags: 'g',
   timeToFirstByte: 'fb',

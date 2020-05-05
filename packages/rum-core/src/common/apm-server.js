@@ -287,9 +287,9 @@ class ApmServer {
 
     const apiVersion = cfg.get('apiVersion')
     /**
-     * when API version is >2, we can enable compression of the payload
+     * Enable payload compression only when API version is > 2
      */
-    const compress = apiVersion > 2 ? true : false
+    const compress = apiVersion > 2
 
     let ndjson = []
     const metadata = this.createMetaData()
