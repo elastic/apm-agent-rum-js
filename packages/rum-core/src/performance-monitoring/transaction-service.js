@@ -41,7 +41,8 @@ import {
   TRANSACTION_TYPE_ORDER,
   LARGEST_CONTENTFUL_PAINT,
   LONG_TASK,
-  PAINT
+  PAINT,
+  TRUNCATED_TYPE
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__ } from '../env'
@@ -342,7 +343,7 @@ class TransactionService {
       const span = spans[i]
       if (span._end > transactionEnd) {
         span._end = transactionEnd
-        span.type += '.truncated'
+        span.type += TRUNCATED_TYPE
       }
       if (span._start > transactionEnd) {
         span._start = transactionEnd
