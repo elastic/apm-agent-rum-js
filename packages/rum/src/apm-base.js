@@ -26,7 +26,10 @@
 import {
   getInstrumentationFlags,
   PAGE_LOAD,
-  ERROR
+  ERROR,
+  CONFIG_SERVICE,
+  LOGGING_SERVICE,
+  APM_SERVER
 } from '@elastic/apm-rum-core'
 
 class ApmBase {
@@ -39,13 +42,15 @@ class ApmBase {
   init(config) {
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
-      const configService = this.serviceFactory.getService('ConfigService')
+      const [configService, loggingService] = this.serviceFactory.getService([
+        CONFIG_SERVICE,
+        LOGGING_SERVICE
+      ])
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
       configService.setVersion('5.1.1')
       this.config(config)
-      const loggingService = this.serviceFactory.getService('LoggingService')
       /**
        * Deactive agent when the active config flag is set to false
        */
@@ -92,9 +97,15 @@ class ApmBase {
    * it resolves to the fetched config.
    */
   fetchCentralConfig() {
-    const apmServer = this.serviceFactory.getService('ApmServer')
-    const loggingService = this.serviceFactory.getService('LoggingService')
-    const configService = this.serviceFactory.getService('ConfigService')
+    const [
+      apmServer,
+      loggingService,
+      configService
+    ] = this.serviceFactory.getService([
+      APM_SERVER,
+      LOGGING_SERVICE,
+      CONFIG_SERVICE
+    ])
 
     return apmServer
       .fetchConfig(
@@ -157,7 +168,7 @@ class ApmBase {
   }
 
   observe(name, fn) {
-    const configService = this.serviceFactory.getService('ConfigService')
+    const configService = this.serviceFactory.getService(CONFIG_SERVICE)
     configService.events.observe(name, fn)
   }
 
@@ -176,12 +187,12 @@ class ApmBase {
    * }
    */
   config(config) {
-    const configService = this.serviceFactory.getService('ConfigService')
+    const configService = this.serviceFactory.getService(CONFIG_SERVICE)
     const { missing, invalid } = configService.validate(config)
     if (missing.length === 0 && invalid.length === 0) {
       configService.setConfig(config)
     } else {
-      const loggingService = this.serviceFactory.getService('LoggingService')
+      const loggingService = this.serviceFactory.getService(LOGGING_SERVICE)
       const separator = ', '
       let message = "RUM agent isn't correctly configured. "
 
@@ -203,24 +214,24 @@ class ApmBase {
   }
 
   setUserContext(userContext) {
-    var configService = this.serviceFactory.getService('ConfigService')
+    var configService = this.serviceFactory.getService(CONFIG_SERVICE)
     configService.setUserContext(userContext)
   }
 
   setCustomContext(customContext) {
-    var configService = this.serviceFactory.getService('ConfigService')
+    var configService = this.serviceFactory.getService(CONFIG_SERVICE)
     configService.setCustomContext(customContext)
   }
 
   addLabels(labels) {
-    var configService = this.serviceFactory.getService('ConfigService')
+    var configService = this.serviceFactory.getService(CONFIG_SERVICE)
     configService.addLabels(labels)
   }
 
   // Should call this method before 'load' event on window is fired
   setInitialPageLoadName(name) {
     if (this.isEnabled()) {
-      var configService = this.serviceFactory.getService('ConfigService')
+      var configService = this.serviceFactory.getService(CONFIG_SERVICE)
       configService.setConfig({
         pageLoadTransactionName: name
       })
@@ -262,7 +273,7 @@ class ApmBase {
   }
 
   addFilter(fn) {
-    var configService = this.serviceFactory.getService('ConfigService')
+    var configService = this.serviceFactory.getService(CONFIG_SERVICE)
     configService.addFilter(fn)
   }
 }

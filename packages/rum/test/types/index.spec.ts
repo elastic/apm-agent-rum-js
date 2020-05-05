@@ -39,7 +39,7 @@ apmBase.addLabels({})
 
 // dummy service factory
 const serviceFactory = {
-  registerServiceInstance: () => undefined,
+  instances: {},
   getService(name: string) {
     return name
   }

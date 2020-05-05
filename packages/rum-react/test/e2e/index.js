@@ -36,7 +36,7 @@ export default function createApmBase(config) {
   const { serverUrl } = globalConfig.agentConfig
   config.serverUrl = serverUrl
   const serverMock = new ApmServerMock(apmServer, globalConfig.useMocks)
-  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
+  apmBase.serviceFactory.instances['ApmServer'] = serverMock
 
   return apmBase.init(config)
 }

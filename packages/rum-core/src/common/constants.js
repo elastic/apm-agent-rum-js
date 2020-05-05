@@ -145,6 +145,14 @@ const TRANSACTIONS = 'transactions'
 const KEYWORD_LIMIT = 1024
 const SERVER_URL_PREFIX = '/intake/v2/rum/events'
 
+/**
+ * Services
+ */
+
+const CONFIG_SERVICE = 'ConfigService'
+const LOGGING_SERVICE = 'LoggingService'
+const APM_SERVER = 'ApmServer'
+
 export {
   SCHEDULE,
   INVOKE,
@@ -185,5 +193,8 @@ export {
   TRANSACTION_TYPE_ORDER,
   BROWSER_RESPONSIVENESS_INTERVAL,
   ERRORS,
-  TRANSACTIONS
+  TRANSACTIONS,
+  CONFIG_SERVICE,
+  LOGGING_SERVICE,
+  APM_SERVER
 }
