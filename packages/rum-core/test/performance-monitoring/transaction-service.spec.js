@@ -35,7 +35,8 @@ import {
   ROUTE_CHANGE,
   LONG_TASK,
   LARGEST_CONTENTFUL_PAINT,
-  PAINT
+  PAINT,
+  TRUNCATED_TYPE
 } from '../../src/common/constants'
 
 describe('TransactionService', function() {
@@ -513,7 +514,7 @@ describe('TransactionService', function() {
     transactionService.adjustTransactionTime(transaction)
     expect(transaction.spans.length).toBe(1)
     expect(Object.keys(transaction._activeSpans).length).toBe(0)
-    expect(span.type).toContain('.truncated')
+    expect(span.type).toContain(TRUNCATED_TYPE)
   })
 
   it('should account for spans start > transaction start during breakdown', done => {

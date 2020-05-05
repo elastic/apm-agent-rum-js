@@ -306,9 +306,32 @@ describe('Breakdown metrics', () => {
       'span.self_time.count': { value: 1 },
       'span.self_time.sum.us': { value: 20 }
     })
-    expect(breakdown['ext.truncated']).toEqual({
+    expect(breakdown['ext.http']).toEqual({
       'span.self_time.count': { value: 1 },
       'span.self_time.sum.us': { value: 10 }
+    })
+  })
+
+  it('transaction with similar active and truncated span', () => {
+    const tr = createTransaction('custom')
+    const sp1 = tr.startSpan('foo', 'ext.http', { startTime: 10 })
+    const sp2 = tr.startSpan('foo', 'ext.http', { startTime: 15 })
+    sp2.end(20)
+    tr.end(30)
+    sp1.end(35)
+    const breakdown = getBreakdownObj(captureBreakdown(tr))
+    expect(breakdown.transaction).toEqual({
+      'transaction.duration.count': { value: 1 },
+      'transaction.duration.sum.us': { value: 30 },
+      'transaction.breakdown.count': { value: 1 }
+    })
+    expect(breakdown.app).toEqual({
+      'span.self_time.count': { value: 1 },
+      'span.self_time.sum.us': { value: 10 }
+    })
+    expect(breakdown['ext.http']).toEqual({
+      'span.self_time.count': { value: 2 },
+      'span.self_time.sum.us': { value: 25 }
     })
   })
 

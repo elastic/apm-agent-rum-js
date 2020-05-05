@@ -24,7 +24,7 @@
  */
 
 import { getDuration, PERF } from '../common/utils'
-import { PAGE_LOAD } from '../common/constants'
+import { PAGE_LOAD, TRUNCATED_TYPE } from '../common/constants'
 
 /**
  * Page load transaction breakdown timings
@@ -113,7 +113,10 @@ function groupSpans(transaction) {
       continue
     }
     const { type, subtype } = span
-    let key = type
+    /**
+     * Ignore calculating truncated spans as separate types in breakdown
+     */
+    let key = type.replace(TRUNCATED_TYPE, '')
     if (subtype) {
       key += '.' + subtype
     }
