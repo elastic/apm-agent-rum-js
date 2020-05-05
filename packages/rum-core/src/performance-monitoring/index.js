@@ -25,27 +25,42 @@
 
 import PerformanceMonitoring from './performance-monitoring'
 import TransactionService from './transaction-service'
+import {
+  APM_SERVER,
+  CONFIG_SERVICE,
+  LOGGING_SERVICE
+} from '../common/constants'
 
-export default {
-  PerformanceMonitoring,
-  registerServices: function registerServices(serviceFactory) {
-    serviceFactory.registerServiceCreator('TransactionService', function() {
-      var configService = serviceFactory.getService('ConfigService')
-      var loggingService = serviceFactory.getService('LoggingService')
-      return new TransactionService(loggingService, configService)
-    })
+import { serviceCreators } from '../common/service-factory'
 
-    serviceFactory.registerServiceCreator('PerformanceMonitoring', function() {
-      var configService = serviceFactory.getService('ConfigService')
-      var loggingService = serviceFactory.getService('LoggingService')
-      var apmService = serviceFactory.getService('ApmServer')
-      var transactionService = serviceFactory.getService('TransactionService')
-      return new PerformanceMonitoring(
-        apmService,
-        configService,
-        loggingService,
-        transactionService
-      )
-    })
+function registerServices() {
+  serviceCreators['TransactionService'] = serviceFactory => {
+    const [loggingService, configService] = serviceFactory.getService([
+      LOGGING_SERVICE,
+      CONFIG_SERVICE
+    ])
+    return new TransactionService(loggingService, configService)
+  }
+
+  serviceCreators['PerformanceMonitoring'] = serviceFactory => {
+    const [
+      apmServer,
+      configService,
+      loggingService,
+      transactionService
+    ] = serviceFactory.getService([
+      APM_SERVER,
+      CONFIG_SERVICE,
+      LOGGING_SERVICE,
+      'TransactionService'
+    ])
+    return new PerformanceMonitoring(
+      apmServer,
+      configService,
+      loggingService,
+      transactionService
+    )
   }
 }
+
+export { registerServices }

@@ -165,7 +165,7 @@ interface Labels {
  * once available
  */
 interface ServiceFactory {
-  registerServiceInstance(name: string, instance: any): void
+  instances: { [key: string]: any }
   getService: (name: string) => any
 }
 

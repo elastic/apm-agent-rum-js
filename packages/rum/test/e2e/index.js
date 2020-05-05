@@ -43,7 +43,7 @@ function createApmBase(config) {
     config.serverUrl = serverUrl
   }
   const serverMock = new ApmServerMock(apmServer, globalConfig.useMocks)
-  apmBase.serviceFactory.registerServiceInstance('ApmServer', serverMock)
+  apmBase.serviceFactory.instances['ApmServer'] = serverMock
 
   return apmBase.init(config)
 }
