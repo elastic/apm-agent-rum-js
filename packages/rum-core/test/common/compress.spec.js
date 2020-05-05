@@ -142,7 +142,7 @@ const V3_MAPPING = {
   version: 've'
 }
 
-const SEPARATOR = '.'
+const SEPARATOR = '-'
 
 function flatten(obj) {
   const result = {}
@@ -150,7 +150,6 @@ function flatten(obj) {
     const value = obj[key]
     if (value != null && typeof value === 'object') {
       const flatObj = flatten(value)
-
       for (let flatKey of Object.keys(flatObj)) {
         result[key + SEPARATOR + flatKey] = flatObj[flatKey]
       }
@@ -184,13 +183,38 @@ describe('Compress', function() {
   })
 
   function getMappedKeys(keys) {
+    /**
+     * Some keys needs special mapping as they are used it only for
+     * internal data structures
+     */
+    const special = {
+      spans: 'y',
+      breakdown: 'me'
+    }
     return keys.map(key => {
-      const mappedKey = V3_MAPPING[key]
+      const mappedKey = special[key] || V3_MAPPING[key]
       if (mappedKey != null) {
         return mappedKey
       }
       return key
     })
+  }
+
+  function isOptional(key) {
+    /**
+     * List of keys that are made optional in V3 SPEC
+     */
+    const OPTIONAL_KEYS = [
+      'transaction_id',
+      'parent_id',
+      'trace_id',
+      'sync',
+      // Optional keys inside breakdown - breakdown.*.samples.<key>
+      'transaction-name',
+      'transaction-type',
+      'span-subtype'
+    ]
+    return OPTIONAL_KEYS.some(optKey => key.indexOf(optKey) >= 0)
   }
 
   function testMappedObject(original, compressed) {
@@ -203,9 +227,10 @@ describe('Compress', function() {
       const compressedKey = mappedKeys.join(SEPARATOR)
       /**
        * Some fields are made optional in the v3 spec so we check
-       * the condition only when the values are present in new scheme
+       * the condition only when the keys are not optional and
+       * values exist in the new compressed model
        */
-      if (compressedFlat[compressedKey] != null) {
+      if (!isOptional(key) || compressedFlat[compressedKey] != null) {
         expect(originalFlat[key]).toEqual(compressedFlat[compressedKey])
       }
     }
