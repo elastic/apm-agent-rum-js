@@ -28,6 +28,7 @@ import resourceEntries from '../fixtures/resource-entries'
 import Span from '../../src/performance-monitoring/span'
 import Transaction from '../../src/performance-monitoring/transaction'
 import { PAGE_LOAD } from '../../src/common/constants'
+import { toEqualOrUndefined } from '../../../../dev-utils/jasmine'
 import { mockGetEntriesByType } from '../utils/globals-mock'
 
 describe('Context', () => {
@@ -166,6 +167,7 @@ describe('Context', () => {
   })
 
   it('should enrich transaction with context info based on type', () => {
+    jasmine.addMatchers({ toEqualOrUndefined })
     const transaction = new Transaction('test', 'custom')
     const trContext = { tags: { tag1: 'tag1' } }
     transaction.addContext(trContext)
@@ -182,12 +184,16 @@ describe('Context', () => {
         message: 'test'
       }
     }
-    addTransactionContext(transaction, configContext)
-    expect(transaction.context).toEqual({
-      page: {
+    const pageContext = {
+      page: jasmine.objectContaining({
         referer: jasmine.any(String),
         url: jasmine.any(String)
-      },
+      })
+    }
+
+    addTransactionContext(transaction, configContext)
+    expect(transaction.context).toEqual({
+      ...pageContext,
       ...userContext,
       ...trContext
     })
@@ -197,10 +203,7 @@ describe('Context', () => {
     pageloadTr.end()
     addTransactionContext(pageloadTr, configContext)
     expect(pageloadTr.context).toEqual({
-      page: {
-        referer: jasmine.any(String),
-        url: jasmine.any(String)
-      },
+      ...pageContext,
       response: {
         transfer_size: 26941,
         encoded_body_size: 105297,
@@ -211,7 +214,12 @@ describe('Context', () => {
       },
       ...userContext
     })
-
+    expect(pageloadTr.context.page.netinfo).toEqualOrUndefined({
+      downlink: jasmine.any(Number),
+      effective_type: jasmine.any(String),
+      rtt: jasmine.any(Number),
+      save_data: jasmine.any(Boolean)
+    })
     unmock()
   })
 })

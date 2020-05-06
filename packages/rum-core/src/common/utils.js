@@ -200,13 +200,34 @@ function getTimeOrigin() {
   return PERF.timing.fetchStart
 }
 
-function getPageMetadata() {
-  return {
-    page: {
-      referer: document.referrer,
-      url: window.location.href
-    }
+function getNetworkInformation() {
+  const connection = navigator && navigator.connection
+
+  if (!(connection && typeof connection === 'object')) {
+    return
   }
+  /**
+   * Ignoring `type` and `downlinkMax` as they are only
+   * supported on Chrome OS
+   */
+  return {
+    downlink: connection.downlink,
+    effective_type: connection.effectiveType,
+    rtt: connection.rtt,
+    save_data: !!connection.saveData
+  }
+}
+
+function getPageMetadata() {
+  const context = {
+    referer: document.referrer,
+    url: window.location.href
+  }
+  const networkInfo = getNetworkInformation()
+  if (networkInfo != null) {
+    context.netinfo = networkInfo
+  }
+  return { page: context }
 }
 
 function stripQueryStringFromUrl(url) {

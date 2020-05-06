@@ -66,3 +66,21 @@ export function describeIf(description, specDefinitions, condition) {
 
   return describeFn.apply(this, [description, specDefinitions])
 }
+
+/**
+ * Custom Jasmine matcher to check if given field in a object can either be
+ * undefined or match object deeply
+ */
+export function toEqualOrUndefined() {
+  return {
+    compare: (actual, expected) => {
+      const result = {}
+      if (typeof actual === 'undefined') {
+        result.pass = true
+      } else {
+        result.pass = jasmine.matchersUtil.equals(actual, expected)
+      }
+      return result
+    }
+  }
+}
