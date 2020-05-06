@@ -121,6 +121,19 @@ This option is useful when you want to report an issue with the agent to us.
 Possible levels are: `trace`, `debug`, `info`, `warn`, `error`.
 
 [float]
+[[api-version]]
+=== `apiVersion`
+
+* *Type:* number
+* *Default:* `2`
+
+Denotes the version of APM Server's intake API. Setting this value to any number
+above `2` will compress the events(transactions & errors) payload sent to the server.
+
+NOTE: This feature requires APM Server >= 7.8. Setting this flag to number > 2 with older
+APM server version would break the RUM payload from reaching the server.
+
+[float]
 [[breakdown-metrics]]
 === `breakdownMetrics`
 
