@@ -25,50 +25,16 @@
 
 import compareVersions from 'compare-versions'
 import Transaction from '../../src/performance-monitoring/transaction'
-import { getGlobalConfig } from '../../../../dev-utils/test-config'
-import { describeIf } from '../../../../dev-utils/jasmine'
-import { captureBreakdown } from '../../src/performance-monitoring/breakdown'
 import {
   LOCAL_CONFIG_KEY,
   ERRORS,
   TRANSACTIONS
 } from '../../src/common/constants'
-import { createServiceFactory } from '../'
+import { getGlobalConfig } from '../../../../dev-utils/test-config'
+import { describeIf } from '../../../../dev-utils/jasmine'
+import { createServiceFactory, generateTransaction, generateErrors } from '../'
 
 const { agentConfig, testConfig } = getGlobalConfig('rum-core')
-
-function generateTransaction(count, breakdown = false) {
-  var result = []
-  for (var i = 0; i < count; i++) {
-    var tr = new Transaction('transaction #' + i, 'transaction', {})
-    tr.id = 'transaction-id-' + i
-    tr.traceId = 'trace-id-' + i
-    var span1 = tr.startSpan('name', 'type.subtype', { sync: false })
-    span1.end()
-    span1.id = 'span-id-' + i + '-1'
-    tr.end()
-    tr._start = 10
-    tr._end = 1000
-    span1._start = 20
-    span1._end = 30
-    if (breakdown) {
-      tr.sampled = true
-      tr.selfTime = tr.duration() - span1.duration()
-      tr.breakdownTimings = captureBreakdown(tr)
-    }
-
-    result.push(tr)
-  }
-  return result
-}
-
-function generateErrors(count) {
-  var result = []
-  for (var i = 0; i < count; i++) {
-    result.push(new Error('error #' + i))
-  }
-  return result
-}
 
 describe('ApmServer', function() {
   var serviceFactory
@@ -77,6 +43,7 @@ describe('ApmServer', function() {
   var loggingService
   var originalTimeout
   var performanceMonitoring
+  var errorLogging
 
   beforeEach(function() {
     /**
@@ -91,6 +58,7 @@ describe('ApmServer', function() {
     loggingService = serviceFactory.getService('LoggingService')
     apmServer = serviceFactory.getService('ApmServer')
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    errorLogging = serviceFactory.getService('ErrorLogging')
   })
 
   afterEach(function() {
@@ -366,6 +334,38 @@ describe('ApmServer', function() {
     clock.uninstall()
   })
 
+  it('should compress all events when apiVersion is >2', () => {
+    const clock = jasmine.clock()
+    clock.install()
+    configService.setConfig({ apiVersion: 3 })
+    apmServer.init()
+    spyOn(apmServer, '_postJson')
+    const trs = generateTransaction(1, true).map(tr =>
+      performanceMonitoring.createTransactionDataModel(tr)
+    )
+    const errors = generateErrors(1).map((err, i) => {
+      let model = errorLogging.createErrorDataModel(err)
+      model.id = 'error-id-' + i
+      model.context = null
+      return model
+    })
+
+    trs.forEach(tr => apmServer.addTransaction(tr))
+    errors.forEach(err => apmServer.addError(err))
+    clock.tick(600)
+
+    expect(apmServer._postJson).toHaveBeenCalled()
+    const payload = apmServer._postJson.calls.argsFor(0)[1]
+
+    const expected = [
+      '{"m":{"se":{"n":"test","a":{"n":"rum-js","ve":"N/A"},"la":{"n":"javascript"}}}}',
+      '{"e":{"id":"error-id-0","cl":"(inline script)","ex":{"mg":"error #0","st":[]},"c":null}}',
+      '{"x":{"id":"transaction-id-0","tid":"trace-id-0","n":"transaction #0","t":"transaction","d":990,"c":null,"m":null,"me":[{"sa":{"xdc":{"v":1},"xds":{"v":990},"xbc":{"v":1}}},{"y":{"t":"app"},"sa":{"ysc":{"v":1},"yss":{"v":980}}},{"y":{"t":"type"},"sa":{"ysc":{"v":1},"yss":{"v":10}}}],"y":[{"id":"span-id-0-1","n":"name","t":"type","s":10,"d":10,"c":null,"su":"subtype"}],"yc":{"sd":1},"sm":true}}'
+    ]
+    expect(payload.split('\n').filter(a => a)).toEqual(expected)
+    clock.uninstall()
+  })
+
   it('should ndjson transactions', function() {
     var trs = generateTransaction(3)
     const payload = trs.map(tr =>
@@ -477,7 +477,32 @@ describe('ApmServer', function() {
         sessionStorage.removeItem(LOCAL_CONFIG_KEY)
       })
     },
-    !testConfig.stackVersion ||
+    testConfig.stackVersion &&
       compareVersions(testConfig.stackVersion, '7.5.0') >= 0
+  )
+
+  describeIf(
+    '7.8+',
+    () => {
+      it('should post compressed payload without errors', async () => {
+        configService.setConfig({ apiVersion: 3 })
+        const transactions = generateTransaction(1, true).map(tr =>
+          performanceMonitoring.createTransactionDataModel(tr)
+        )
+        const errors = generateErrors(1, true).map(err =>
+          errorLogging.createErrorDataModel(err)
+        )
+        await apmServer.sendEvents([
+          {
+            [TRANSACTIONS]: transactions[0]
+          },
+          {
+            [ERRORS]: errors[0]
+          }
+        ])
+      })
+    },
+    testConfig.stackVersion &&
+      compareVersions(testConfig.stackVersion, '7.8.0') >= 0
   )
 })

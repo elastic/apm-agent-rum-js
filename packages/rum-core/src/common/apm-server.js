@@ -28,13 +28,18 @@ import throttle from './throttle'
 import NDJSON from './ndjson'
 import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
-import { SERVER_URL_PREFIX, ERRORS, TRANSACTIONS } from './constants'
+import { ERRORS, TRANSACTIONS } from './constants'
 import { noop } from './utils'
 import { Promise } from './polyfills'
+import {
+  compressMetadata,
+  compressTransaction,
+  compressError
+} from './compress'
 import { __DEV__ } from '../env'
 
 /**
- * Throttling interval deafults to 60 seconds
+ * Throttling interval defaults to 60 seconds
  */
 const THROTTLE_INTERVAL = 60000
 
@@ -210,28 +215,42 @@ class ApmServer {
     this.throttleEvents({ [TRANSACTIONS]: transaction })
   }
 
-  ndjsonErrors(errors) {
-    return errors.map(error => NDJSON.stringify({ error }))
+  ndjsonErrors(errors, compress) {
+    const key = compress ? 'e' : 'error'
+    return errors.map(error =>
+      NDJSON.stringify({
+        [key]: compress ? compressError(error) : error
+      })
+    )
   }
 
   ndjsonMetricsets(metricsets) {
     return metricsets.map(metricset => NDJSON.stringify({ metricset })).join('')
   }
 
-  ndjsonTransactions(transactions) {
+  ndjsonTransactions(transactions, compress) {
+    const key = compress ? 'x' : 'transaction'
+
     return transactions.map(tr => {
-      let spans = ''
-      if (tr.spans) {
-        spans = tr.spans.map(span => NDJSON.stringify({ span })).join('')
-        delete tr.spans
-      }
-      let breakdowns = ''
-      if (tr.breakdown) {
-        breakdowns = this.ndjsonMetricsets(tr.breakdown)
-        delete tr.breakdown
+      let spans = '',
+        breakdowns = ''
+
+      if (!compress) {
+        if (tr.spans) {
+          spans = tr.spans.map(span => NDJSON.stringify({ span })).join('')
+          delete tr.spans
+        }
+        if (tr.breakdown) {
+          breakdowns = this.ndjsonMetricsets(tr.breakdown)
+          delete tr.breakdown
+        }
       }
 
-      return NDJSON.stringify({ transaction: tr }) + spans + breakdowns
+      return (
+        NDJSON.stringify({ [key]: compress ? compressTransaction(tr) : tr }) +
+        spans +
+        breakdowns
+      )
     })
   }
 
@@ -241,7 +260,9 @@ class ApmServer {
     }
     const transactions = []
     const errors = []
-    for (const event of events) {
+    for (let i = 0; i < events.length; i++) {
+      const event = events[i]
+
       if (event[TRANSACTIONS]) {
         transactions.push(event[TRANSACTIONS])
       }
@@ -253,26 +274,39 @@ class ApmServer {
       return
     }
 
+    const cfg = this._configService
     const payload = {
       [TRANSACTIONS]: transactions,
       [ERRORS]: errors
     }
-    const filteredPayload = this._configService.applyFilters(payload)
+    const filteredPayload = cfg.applyFilters(payload)
     if (!filteredPayload) {
       this._loggingService.warn('Dropped payload due to filtering!')
       return
     }
 
+    const apiVersion = cfg.get('apiVersion')
+    /**
+     * Enable payload compression only when API version is > 2
+     */
+    const compress = apiVersion > 2
+
     let ndjson = []
     const metadata = this.createMetaData()
-    ndjson.push(NDJSON.stringify({ metadata }))
+    const metadataKey = compress ? 'm' : 'metadata'
+
+    ndjson.push(
+      NDJSON.stringify({
+        [metadataKey]: compress ? compressMetadata(metadata) : metadata
+      })
+    )
 
     ndjson = ndjson.concat(
-      this.ndjsonErrors(filteredPayload[ERRORS]),
-      this.ndjsonTransactions(filteredPayload[TRANSACTIONS])
+      this.ndjsonErrors(filteredPayload[ERRORS], compress),
+      this.ndjsonTransactions(filteredPayload[TRANSACTIONS], compress)
     )
     const ndjsonPayload = ndjson.join('')
-    const endPoint = this._configService.get('serverUrl') + SERVER_URL_PREFIX
+    const endPoint = cfg.get('serverUrl') + `/intake/v${apiVersion}/rum/events`
     return this._postJson(endPoint, ndjsonPayload)
   }
 }

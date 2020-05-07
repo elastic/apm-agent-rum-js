@@ -69,7 +69,7 @@ describe('PerfEntryRecorder', () => {
     })
 
     expect(paintTrue).toEqual({
-      largestContentfulPaint: 1040.0399999925867
+      largestContentfulPaint: 1040
     })
   })
 

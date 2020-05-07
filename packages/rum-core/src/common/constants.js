@@ -142,7 +142,6 @@ const TRANSACTIONS = 'transactions'
 /**
  * Services
  */
-
 const CONFIG_SERVICE = 'ConfigService'
 const LOGGING_SERVICE = 'LoggingService'
 const APM_SERVER = 'ApmServer'
@@ -156,7 +155,6 @@ const TRUNCATED_TYPE = '.truncated'
  * Default configs used on top of extensible configs from ConfigService
  */
 const KEYWORD_LIMIT = 1024
-const SERVER_URL_PREFIX = '/intake/v2/rum/events'
 
 export {
   SCHEDULE,
@@ -192,7 +190,6 @@ export {
   FIRST_CONTENTFUL_PAINT,
   LARGEST_CONTENTFUL_PAINT,
   KEYWORD_LIMIT,
-  SERVER_URL_PREFIX,
   TEMPORARY_TYPE,
   USER_INTERACTION,
   TRANSACTION_TYPE_ORDER,

@@ -200,15 +200,6 @@ function getTimeOrigin() {
   return PERF.timing.fetchStart
 }
 
-function getPageMetadata() {
-  return {
-    page: {
-      referer: document.referrer,
-      url: window.location.href
-    }
-  }
-}
-
 function stripQueryStringFromUrl(url) {
   return url && url.split('?')[0]
 }
@@ -347,7 +338,7 @@ function getDuration(start, end) {
   if (isUndefined(end) || isUndefined(start)) {
     return null
   }
-  return parseFloat(end - start)
+  return parseInt(end - start)
 }
 
 function scheduleMacroTask(callback) {
@@ -381,7 +372,6 @@ export {
   parseDtHeaderValue,
   getServerTimingInfo,
   getDtHeaderValue,
-  getPageMetadata,
   getCurrentScript,
   getElasticScript,
   getTimeOrigin,
