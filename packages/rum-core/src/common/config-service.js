@@ -89,6 +89,7 @@ class Config {
       transactionSampleRate: 1.0,
       centralConfig: false,
       monitorLongtasks: true,
+      apiVersion: 2,
       context: {}
     }
 

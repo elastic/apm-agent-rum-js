@@ -212,13 +212,19 @@ function getApiSpanNames({ spans }) {
   return apiCalls
 }
 
-const navigationTimingKeys = [
+/**
+ * Navigation timing marks are reported only for page-load transactions
+ *
+ * Do not change the order of both NAVIGATION_TIMING_MARKS and
+ * COMPRESSED_NAV_TIMING_MARKS since compression of the fields are based on the
+ * order they are placed in the array
+ */
+const NAVIGATION_TIMING_MARKS = [
   'fetchStart',
   'domainLookupStart',
   'domainLookupEnd',
   'connectStart',
   'connectEnd',
-  'secureConnectionStart',
   'requestStart',
   'responseStart',
   'responseEnd',
@@ -231,14 +237,32 @@ const navigationTimingKeys = [
   'loadEventEnd'
 ]
 
+const COMPRESSED_NAV_TIMING_MARKS = [
+  'fs',
+  'ls',
+  'le',
+  'cs',
+  'ce',
+  'qs',
+  'rs',
+  're',
+  'dl',
+  'di',
+  'ds',
+  'de',
+  'dc',
+  'es',
+  'ee'
+]
+
 function getNavigationTimingMarks() {
   const timing = PERF.timing
   const fetchStart = timing.fetchStart
   const marks = {}
-  navigationTimingKeys.forEach(function(timingKey) {
+  NAVIGATION_TIMING_MARKS.forEach(function(timingKey) {
     const m = timing[timingKey]
     if (m && m >= fetchStart) {
-      marks[timingKey] = m - fetchStart
+      marks[timingKey] = parseInt(m - fetchStart)
     }
   })
   return marks
@@ -344,5 +368,7 @@ export {
   captureNavigation,
   createNavigationTimingSpans,
   createResourceTimingSpans,
-  createUserTimingSpans
+  createUserTimingSpans,
+  NAVIGATION_TIMING_MARKS,
+  COMPRESSED_NAV_TIMING_MARKS
 }

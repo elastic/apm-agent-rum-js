@@ -24,7 +24,8 @@
  */
 
 import { createServiceFactory as originalFactory } from '../src'
-
+import Transaction from '../src/performance-monitoring/transaction'
+import { captureBreakdown } from '../src/performance-monitoring/breakdown'
 import { scheduleMacroTask } from '../src/common/utils'
 
 export function createServiceFactory() {
@@ -62,4 +63,37 @@ export function createCustomEvent(
   const evt = document.createEvent('CustomEvent')
   evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail)
   return evt
+}
+
+export function generateTransaction(count, breakdown = false) {
+  const result = []
+  for (var i = 0; i < count; i++) {
+    var tr = new Transaction('transaction #' + i, 'transaction', {
+      startTime: 10
+    })
+    tr.id = 'transaction-id-' + i
+    tr.traceId = 'trace-id-' + i
+    var span = tr.startSpan('name', 'type.subtype', {
+      sync: false,
+      startTime: 20
+    })
+    span.end(30)
+    span.id = 'span-id-' + i + '-1'
+    tr.end(1000)
+    if (breakdown) {
+      tr.sampled = true
+      tr.selfTime = tr.duration() - span.duration()
+      tr.breakdownTimings = captureBreakdown(tr)
+    }
+    result.push(tr)
+  }
+  return result
+}
+
+export function generateErrors(count) {
+  const result = []
+  for (var i = 0; i < count; i++) {
+    result.push(new Error('error #' + i))
+  }
+  return result
 }
