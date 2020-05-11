@@ -12,7 +12,7 @@ Once the APM Server endpoint has been configured, you can:
 [[install-the-agent]]
 === Install the Agent
 
-There are multiple was to add the APM RUM Agent to your web page:
+There are multiple ways to add the APM RUM Agent to your web page:
 
 * <<using-script-tags>>: Add a `<script>` tag to the HTML page.
 * <<using-bundlers>>: Bundling the Agent package during the application's build process
@@ -40,7 +40,7 @@ object to initialize the agent:
 ==== Asynchronous / Non-Blocking Pattern
 
 Loading the script asynchronously ensures the agent script will not block other
-resources on the page, however, it will stick block browsers `onload` event.
+resources on the page, however, it will still block browsers `onload` event.
 
 [source,html]
 ----
