@@ -26,7 +26,8 @@
 import {
   LONG_TASK,
   LARGEST_CONTENTFUL_PAINT,
-  FIRST_CONTENTFUL_PAINT
+  FIRST_CONTENTFUL_PAINT,
+  FIRST_INPUT
 } from '../common/constants'
 import { noop, PERF } from '../common/utils'
 import { metrics } from '../common/metrics'
@@ -91,6 +92,42 @@ function createLongTaskSpans(longtasks) {
     spans.push(span)
   }
   return spans
+}
+
+export function isPerfEntryTypeSupported(type) {
+  return (
+    PerformanceObserver &&
+    PerformanceObserver.supportedEntryTypes &&
+    PerformanceObserver.supportedEntryTypes.indexOf(type) > -1
+  )
+}
+
+let wasHidden = document.visibilityState === 'hidden'
+
+window.addEventListener(
+  'visibilitychange',
+  () => {
+    if (document.visibilityState === 'hidden') {
+      wasHidden = true
+    }
+  },
+  { capture: true, once: true }
+)
+
+export function createFirstInputDelaySpan(list) {
+  const fidEntries = list.getEntriesByType(FIRST_INPUT)
+  let firstInput = fidEntries[0]
+
+  if (firstInput && !wasHidden) {
+    let { name, startTime, processingStart } = firstInput
+
+    let span = new Span('FirstInputDelay', FIRST_INPUT, { startTime })
+    span.addContext({
+      custom: { eventType: name }
+    })
+    span.end(processingStart)
+    return span
+  }
 }
 
 /**
@@ -213,6 +250,11 @@ export function captureObserverEntries(list, { capturePaint }) {
     })
     tbtSpan.end(start + duration)
     result.spans.push(tbtSpan)
+  }
+
+  const fidSpan = createFirstInputDelaySpan(list)
+  if (fidSpan) {
+    result.spans.push(fidSpan)
   }
 
   return result

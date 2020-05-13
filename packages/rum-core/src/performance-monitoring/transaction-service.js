@@ -27,7 +27,9 @@ import { Promise } from '../common/polyfills'
 import Transaction from './transaction'
 import {
   PerfEntryRecorder,
-  captureObserverEntries
+  isPerfEntryTypeSupported,
+  captureObserverEntries,
+  createFirstInputDelaySpan
 } from './perf-entry-recorder'
 import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
 import { captureNavigation } from './capture-navigation'
@@ -42,10 +44,12 @@ import {
   LARGEST_CONTENTFUL_PAINT,
   LONG_TASK,
   PAINT,
-  TRUNCATED_TYPE
+  TRUNCATED_TYPE,
+  FIRST_INPUT
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__ } from '../env'
+import { metrics } from './metrics-polyfill'
 
 class TransactionService {
   constructor(logger, config) {
@@ -179,6 +183,7 @@ class TransactionService {
       if (!isRedefined) {
         this.recorder.start(LARGEST_CONTENTFUL_PAINT)
         this.recorder.start(PAINT)
+        this.recorder.start(FIRST_INPUT)
       }
       checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
@@ -279,6 +284,20 @@ class TransactionService {
           )
           if (name === NAME_UNKNOWN && pageLoadTransactionName) {
             tr.name = pageLoadTransactionName
+          }
+
+          if (tr.captureTimings && !isPerfEntryTypeSupported() && metrics.fid) {
+            let { delay, event } = metrics.fid
+            let span = createFirstInputDelaySpan([
+              {
+                name: event.type,
+                startTime: event.timeStamp,
+                processingStart: event.timeStamp + delay
+              }
+            ])
+            if (span) {
+              tr.spans.push(span)
+            }
           }
         }
         captureNavigation(tr)

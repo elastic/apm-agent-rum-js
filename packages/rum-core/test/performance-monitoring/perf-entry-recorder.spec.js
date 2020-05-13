@@ -25,6 +25,7 @@
 import {
   captureObserverEntries,
   PerfEntryRecorder,
+  createFirstInputDelaySpan,
   calculateTotalBlockingTime
 } from '../../src/performance-monitoring/perf-entry-recorder'
 import { LARGEST_CONTENTFUL_PAINT, LONG_TASK } from '../../src/common/constants'
@@ -130,7 +131,7 @@ describe('PerfEntryRecorder', () => {
   })
 
   it('should pass buffered flag based on observed type', () => {
-    const recorder = new PerfEntryRecorder(() => {})
+    const recorder = new PerfEntryRecorder(() => { })
     const onStartSpy = jasmine.createSpy()
     recorder.po = {
       observe: onStartSpy
@@ -198,5 +199,30 @@ describe('PerfEntryRecorder', () => {
         duration: 0
       })
     })
+  })
+
+  it('should create first input delay span', () => {
+    list.getEntriesByType.and.returnValue([
+      {
+        name: 'mousedown',
+        entryType: 'first-input',
+        startTime: 5482.669999997597,
+        duration: 16,
+        processingStart: 5489.029999997001,
+        processingEnd: 5489.0550000127405,
+        cancelable: true
+      }
+    ])
+    let span = createFirstInputDelaySpan(list)
+    expect(span).toEqual(
+      jasmine.objectContaining({
+        name: 'FirstInputDelay',
+        type: 'first-input',
+        ended: true,
+        context: { custom: { eventType: 'mousedown' } },
+        _end: 5489.029999997001,
+        _start: 5482.669999997597
+      })
+    )
   })
 })
