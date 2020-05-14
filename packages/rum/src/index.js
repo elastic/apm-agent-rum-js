@@ -23,8 +23,8 @@
  *
  */
 
-import bootstrap from './bootstrap'
 import { createServiceFactory } from '@elastic/apm-rum-core'
+import { bootstrap } from '@elastic/apm-rum-core/src/bootstrap'
 import ApmBase from './apm-base'
 
 const enabled = bootstrap()

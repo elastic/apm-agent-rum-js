@@ -29,8 +29,9 @@ import {
   PerfEntryRecorder,
   isPerfEntryTypeSupported,
   captureObserverEntries,
-  createFirstInputDelaySpan
-} from './perf-entry-recorder'
+  createFirstInputDelaySpan,
+  metrics
+} from './metrics'
 import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
 import { captureNavigation } from './capture-navigation'
 import {
@@ -49,7 +50,6 @@ import {
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__ } from '../env'
-import { metrics } from './metrics-polyfill'
 
 class TransactionService {
   constructor(logger, config) {
@@ -286,7 +286,12 @@ class TransactionService {
             tr.name = pageLoadTransactionName
           }
 
-          if (tr.captureTimings && !isPerfEntryTypeSupported() && metrics.fid) {
+          if (
+            tr.captureTimings &&
+            !isPerfEntryTypeSupported() &&
+            metrics.fid &&
+            !metrics.wasHidden
+          ) {
             let { delay, event } = metrics.fid
             let span = createFirstInputDelaySpan([
               {

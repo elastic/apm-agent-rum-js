@@ -50,7 +50,7 @@ describe('index', function() {
     spyOn(console, 'log')
 
     delete require.cache[require.resolve('../../src/')]
-    delete require.cache[require.resolve('../../src/bootstrap')]
+    delete require.cache[require.resolve('@elastic/apm-rum-core/src/bootstrap')]
     require('../../src/')
 
     expect(console.log).toHaveBeenCalledWith(

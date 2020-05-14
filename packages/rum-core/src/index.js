@@ -39,26 +39,17 @@ import {
   ERROR,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
-  APM_SERVER,
-  FIRST_INPUT
+  APM_SERVER
 } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
 import afterFrame from './common/after-frame'
 import { createTracer } from './opentracing'
-import { polyfillFID } from './performance-monitoring/metrics-polyfill'
-import { isPerfEntryTypeSupported } from './performance-monitoring/perf-entry-recorder'
 
 function createServiceFactory() {
   registerPerfServices()
   registerErrorServices()
   const serviceFactory = new ServiceFactory()
   return serviceFactory
-}
-
-function bootstrap() {
-  if (!isPerfEntryTypeSupported(FIRST_INPUT)) {
-    polyfillFID()
-  }
 }
 
 export {
@@ -76,6 +67,5 @@ export {
   PAGE_LOAD,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
-  APM_SERVER,
-  bootstrap
+  APM_SERVER
 }
