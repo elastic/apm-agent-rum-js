@@ -24,13 +24,16 @@
  */
 import {
   captureObserverEntries,
-  PerfEntryRecorder
+  PerfEntryRecorder,
+  calculateTotalBlockingTime
 } from '../../src/performance-monitoring/perf-entry-recorder'
 import { LARGEST_CONTENTFUL_PAINT, LONG_TASK } from '../../src/common/constants'
+import { metrics } from '../../src/common/metrics'
 import {
   mockObserverEntryTypes,
   mockObserverEntryNames
 } from '../utils/globals-mock'
+import longtaskEntries from '../fixtures/longtask-entries'
 
 describe('PerfEntryRecorder', () => {
   const list = {
@@ -144,6 +147,56 @@ describe('PerfEntryRecorder', () => {
     expect(onStartSpy).toHaveBeenCalledWith({
       type: LARGEST_CONTENTFUL_PAINT,
       buffered: true
+    })
+  })
+
+  describe('Total Blocking Time', () => {
+    it('should create total blocking time as span', () => {
+      list.getEntriesByType.and.callFake(mockObserverEntryTypes)
+      const { spans } = captureObserverEntries(list, {
+        capturePaint: true
+      })
+      const tbtSpans = spans.filter(span => span.name === 'Total Blocking Time')
+      expect(tbtSpans[0]).toEqual(
+        jasmine.objectContaining({
+          name: 'Total Blocking Time',
+          type: LONG_TASK
+        })
+      )
+    })
+
+    it('should calculate total blocking time from long tasks', () => {
+      const tbt = calculateTotalBlockingTime(longtaskEntries)
+      expect(tbt).toEqual({
+        start: 745.4100000031758,
+        duration: 249.92999995592982
+      })
+    })
+
+    it('should calculate total blocking time based on FCP', () => {
+      metrics.fcp = 1000
+      const tbt = calculateTotalBlockingTime(longtaskEntries)
+      expect(tbt).toEqual({
+        start: 1023.40999995591,
+        duration: 245.35999997751787
+      })
+    })
+
+    it('should return tbt as 0 when entries are not self/same-origin', () => {
+      const tbt = calculateTotalBlockingTime([
+        {
+          name: 'unknown',
+          startTime: 10
+        },
+        {
+          name: 'cross-origin',
+          startTime: 20
+        }
+      ])
+      expect(tbt).toEqual({
+        start: Infinity,
+        duration: 0
+      })
     })
   })
 })
