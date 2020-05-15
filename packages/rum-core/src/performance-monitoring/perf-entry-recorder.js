@@ -126,6 +126,11 @@ export function calculateTotalBlockingTime(longtaskEntries) {
     totalBlockingTime.start = Math.min(totalBlockingTime.start, startTime)
 
     const blockingTime = duration - threshold
+    /**
+     * Theoretically blocking time would always be greater than 0 as Long tasks are
+     * tasks that exceeds 50ms, but this would be configurable in the future so
+     * the > 0 check acts as an extra guard
+     */
     if (blockingTime > 0) {
       totalBlockingTime.duration += blockingTime
     }
