@@ -29,6 +29,7 @@ import {
   FIRST_CONTENTFUL_PAINT
 } from '../common/constants'
 import { noop, PERF } from '../common/utils'
+import { metrics } from '../common/metrics'
 import Span from './span'
 
 /**
@@ -46,8 +47,7 @@ function createLongTaskSpans(longtasks) {
      */
     const { name, startTime, duration, attribution } = longtasks[i]
     const end = startTime + duration
-    const kind = LONG_TASK
-    const span = new Span(`Longtask(${name})`, kind, { startTime })
+    const span = new Span(`Longtask(${name})`, LONG_TASK, { startTime })
 
     /**
      * use attribution data to figure out the culprits of the longtask
@@ -94,6 +94,51 @@ function createLongTaskSpans(longtasks) {
 }
 
 /**
+ * Calculate Total Blocking Time (TBT) from long tasks
+ */
+export function calculateTotalBlockingTime(longtaskEntries) {
+  const threshold = 50
+  const totalBlockingTime = {
+    start: Infinity,
+    duration: 0
+  }
+  for (let i = 0; i < longtaskEntries.length; i++) {
+    const { name, startTime, duration } = longtaskEntries[i]
+    /**
+     * FCP is picked as the lower bound because there is little risk of user input happening
+     * before FCP and it will not harm user experience.
+     */
+    if (startTime < metrics.fcp) {
+      continue
+    }
+    /**
+     * Account for long task originated only from the current browsing context
+     * or from the same origin.
+     * https://w3c.github.io/longtasks/#performancelongtasktiming
+     */
+    if (name !== 'self' && name.indexOf('same-origin') === -1) {
+      continue
+    }
+    /**
+     * Calcualte the start time of the first long task so we can add it
+     * as span start
+     */
+    totalBlockingTime.start = Math.min(totalBlockingTime.start, startTime)
+
+    const blockingTime = duration - threshold
+    /**
+     * Theoretically blocking time would always be greater than 0 as Long tasks are
+     * tasks that exceeds 50ms, but this would be configurable in the future so
+     * the > 0 check acts as an extra guard
+     */
+    if (blockingTime > 0) {
+      totalBlockingTime.duration += blockingTime
+    }
+  }
+  return totalBlockingTime
+}
+
+/**
  * Captures all the observed entries as Spans and Marks depending on the
  * observed entry types and returns in the format
  * {
@@ -132,8 +177,9 @@ export function captureObserverEntries(list, { capturePaint }) {
      * `renderTime` will not be available for Image element and for the element
      * that is loaded cross-origin without the `Timing-Allow-Origin` header.
      */
-    const lcp = lastLcpEntry.renderTime || lastLcpEntry.loadTimes
-    result.marks.largestContentfulPaint = parseInt(lcp)
+    const lcp = parseInt(lastLcpEntry.renderTime || lastLcpEntry.loadTime)
+    metrics.lcp = lcp
+    result.marks.largestContentfulPaint = lcp
   }
 
   /**
@@ -149,9 +195,24 @@ export function captureObserverEntries(list, { capturePaint }) {
   const unloadDiff = timing.fetchStart - timing.navigationStart
   const fcpEntry = list.getEntriesByName(FIRST_CONTENTFUL_PAINT)[0]
   if (fcpEntry) {
-    const fcp =
+    const fcp = parseInt(
       unloadDiff >= 0 ? fcpEntry.startTime - unloadDiff : fcpEntry.startTime
-    result.marks.firstContentfulPaint = parseInt(fcp)
+    )
+    metrics.fcp = fcp
+    result.marks.firstContentfulPaint = fcp
+  }
+
+  /**
+   * Capture TBT as Span only for page load navigation
+   */
+  const { duration, start } = calculateTotalBlockingTime(longtaskEntries)
+
+  if (duration > 0) {
+    const tbtSpan = new Span('Total Blocking Time', LONG_TASK, {
+      startTime: start
+    })
+    tbtSpan.end(start + duration)
+    result.spans.push(tbtSpan)
   }
 
   return result
