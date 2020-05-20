@@ -78,6 +78,9 @@ pipeline {
             beforeAgent true
             expression { return env.ONLY_DOCS == "false" }
           }
+          environment {
+            HOME = "${env.WORKSPACE}"
+          }
           steps {
             deleteDir()
             unstash 'source'
