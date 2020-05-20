@@ -72,6 +72,27 @@ pipeline {
             }
           }
         }
+        stage('CDN') {
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression { return env.ONLY_DOCS == "false" }
+          }
+          steps {
+            deleteDir()
+            unstash 'source'
+            dir("${BASE_DIR}") {
+              sh(script: 'npm ci')
+              sh(label: 'Lerna version dry-run', script: 'npx lerna version --no-push --yes')
+              sh(label: 'Build packages', script: 'npm run build')
+            }
+          }
+          post {
+            always {
+              archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/packages/rum/dist/bundles/*.js")
+            }
+          }
+        }
         /**
         Lint the code.
         */
@@ -334,26 +355,6 @@ pipeline {
                   }
                 }
               }
-            }
-          }
-        }
-        stage('CDN') {
-          options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression { return env.ONLY_DOCS == "false" }
-          }
-          steps {
-            deleteDir()
-            unstash 'source'
-            dir("${BASE_DIR}") {
-              sh(script: 'npm ci')
-              sh(label: 'Lerna publish dry-run', script: 'lerna publish --skip-git --skip-npm')
-            }
-          }
-          post {
-            always {
-              archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/**/dist/bundles/")
             }
           }
         }
