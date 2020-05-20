@@ -8,7 +8,8 @@ pipeline {
     REPO = 'apm-agent-rum-js'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     NOTIFY_TO = credentials('notify-to')
-    JOB_GCS_BUCKET = credentials('gcs-bucket')
+    JOB_GCS_BUCKET = 'beats-ci-temp'  // TODO: to be changed with the final CDN bucket
+    JOB_GCS_CREDENTIALS = 'apm-ci-gcs-plugin'
     PIPELINE_LOG_LEVEL='INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
     SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
@@ -333,6 +334,26 @@ pipeline {
                   }
                 }
               }
+            }
+          }
+        }
+        stage('CDN') {
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression { return env.ONLY_DOCS == "false" }
+          }
+          steps {
+            deleteDir()
+            unstash 'source'
+            dir("${BASE_DIR}") {
+              sh(script: 'npm ci')
+              sh(label: 'Lerna publish dry-run', script: 'lerna publish --skip-git --skip-npm')
+            }
+          }
+          post {
+            always {
+              archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/**/dist/bundles/")
             }
           }
         }
