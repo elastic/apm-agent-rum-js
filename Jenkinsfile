@@ -84,9 +84,9 @@ pipeline {
           steps {
             deleteDir()
             unstash 'source'
-            dir("${BASE_DIR}") {
-              script {
-                docker.image('node:lts').inside(){
+            script {
+              docker.image('node:lts').inside(){
+                dir("${BASE_DIR}") {
                   sh(script: 'npm ci')
                   sh(label: 'Lerna version dry-run', script: 'npx lerna version --no-push --yes')
                   sh(label: 'Build packages', script: 'npm run build')
@@ -100,8 +100,8 @@ pipeline {
                   // TODO: error to stop the process
                 }
               }
-              error('force an error')
             }
+            error('force an error')
           }
           post {
             always {
