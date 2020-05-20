@@ -72,6 +72,30 @@ pipeline {
             }
           }
         }
+        /**
+        Lint the code.
+        */
+        stage('Lint') {
+          when {
+            beforeAgent true
+            expression { return env.ONLY_DOCS == "false" }
+          }
+          steps {
+            withGithubNotify(context: 'Lint') {
+              deleteDir()
+              unstash 'source'
+              script{
+                docker.image('node:8').inside(){
+                  dir("${BASE_DIR}"){
+                    sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
+                    bundlesize()
+                  }
+                  stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
+                }
+              }
+            }
+          }
+        }
         stage('CDN') {
           options { skipDefaultCheckout() }
           when {
@@ -84,6 +108,7 @@ pipeline {
           steps {
             deleteDir()
             unstash 'source'
+            unstash 'cache'
             script {
               docker.image('node:lts').inside(){
                 dir("${BASE_DIR}") {
@@ -106,30 +131,6 @@ pipeline {
           post {
             always {
               archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/packages/rum/dist/bundles/*.js")
-            }
-          }
-        }
-        /**
-        Lint the code.
-        */
-        stage('Lint') {
-          when {
-            beforeAgent true
-            expression { return env.ONLY_DOCS == "false" }
-          }
-          steps {
-            withGithubNotify(context: 'Lint') {
-              deleteDir()
-              unstash 'source'
-              script{
-                docker.image('node:8').inside(){
-                  dir("${BASE_DIR}"){
-                    sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
-                    bundlesize()
-                  }
-                  stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
-                }
-              }
             }
           }
         }
