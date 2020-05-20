@@ -82,17 +82,21 @@ pipeline {
             deleteDir()
             unstash 'source'
             dir("${BASE_DIR}") {
-              sh(script: 'npm ci')
-              sh(label: 'Lerna version dry-run', script: 'npx lerna version --no-push --yes')
-              sh(label: 'Build packages', script: 'npm run build')
-              googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/rum",
-                                  credentialsId: "${JOB_GCS_CREDENTIALS}",
-                                  pathPrefix: 'packages/rum/dist/bundles/',
-                                  pattern: 'packages/rum/dist/bundles/*.js',
-                                  sharedPublicly: false,
-                                  showInline: true)
-              // Add metadata
-              // TODO: error to stop the process
+              script {
+                docker.image('node:lts').inside(){
+                  sh(script: 'npm ci')
+                  sh(label: 'Lerna version dry-run', script: 'npx lerna version --no-push --yes')
+                  sh(label: 'Build packages', script: 'npm run build')
+                  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/rum",
+                                      credentialsId: "${JOB_GCS_CREDENTIALS}",
+                                      pathPrefix: 'packages/rum/dist/bundles/',
+                                      pattern: 'packages/rum/dist/bundles/*.js',
+                                      sharedPublicly: false,
+                                      showInline: true)
+                  // Add metadata
+                  // TODO: error to stop the process
+                }
+              }
               error('force an error')
             }
           }
