@@ -107,7 +107,7 @@ pipeline {
                   name 'STACK_VERSION'
                   values (
                     '8.0.0-SNAPSHOT',
-                    '7.6.0',
+                    '7.7.0',
                     '7.0.0'
                   )
                 }
