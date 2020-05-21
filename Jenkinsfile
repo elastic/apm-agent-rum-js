@@ -334,16 +334,16 @@ pipeline {
                 }
               }
             }
-          }
-          stage('Publish CDN') {
-            options { skipDefaultCheckout() }
-            steps {
-              script {
-                def version = sh(label: 'Get package version', script: 'jq --raw-output .version packages/rum/package.json', returnStdout: true)
-                publishToCDN(header: "Cache-Control:public,max-age=3600",
-                             source: 'packages/rum/dist/bundles/*.js',
-                             target: "gs://beats-ci-temp/rum/${version}", // TODO: change bucket
-                             secret: 'secret/observability-team/ci/service-account/test-google-storage-plugin') // TODO: change secret
+            stage('Publish CDN') {
+              options { skipDefaultCheckout() }
+              steps {
+                script {
+                  def version = sh(label: 'Get package version', script: 'jq --raw-output .version packages/rum/package.json', returnStdout: true)
+                  publishToCDN(header: "Cache-Control:public,max-age=3600",
+                              source: 'packages/rum/dist/bundles/*.js',
+                              target: "gs://beats-ci-temp/rum/${version}", // TODO: change bucket
+                              secret: 'secret/observability-team/ci/service-account/test-google-storage-plugin') // TODO: change secret
+                }
               }
             }
           }
