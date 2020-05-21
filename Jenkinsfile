@@ -8,8 +8,6 @@ pipeline {
     REPO = 'apm-agent-rum-js'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     NOTIFY_TO = credentials('notify-to')
-    JOB_GCS_BUCKET = 'beats-ci-temp'  // TODO: to be changed with the final CDN bucket
-    JOB_GCS_CREDENTIALS = 'apm-ci-gcs-plugin'
     PIPELINE_LOG_LEVEL='INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
     SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
@@ -113,18 +111,11 @@ pipeline {
               docker.image('node:lts').inside(){
                 dir("${BASE_DIR}") {
                   sh(script: 'npm ci')
-                  withGitRelease(credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken') {
-                    sh(label: 'Lerna version dry-run', script: 'npx lerna version --no-push --yes')
-                  }
                   sh(label: 'Build packages', script: 'npm run build')
-                  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/rum",
-                                      credentialsId: "${JOB_GCS_CREDENTIALS}",
-                                      pathPrefix: 'packages/rum/dist/bundles/',
-                                      pattern: 'packages/rum/dist/bundles/*.js',
-                                      sharedPublicly: false,
-                                      showInline: true)
-                  // Add metadata
-                  // TODO: error to stop the process
+                  publishToCDN(header: "Cache-Control:public,max-age=3600",
+                               source: 'packages/rum/dist/bundles/*.js',
+                               target: "gs://beats-ci-temp/rum/version",
+                               secret: 'secret/observability-team/ci/service-account/test-google-storage-plugin')
                 }
               }
             }
