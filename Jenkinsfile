@@ -94,39 +94,6 @@ pipeline {
             }
           }
         }
-        stage('CDN') {
-          options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression { return env.ONLY_DOCS == "false" }
-          }
-          environment {
-            HOME = "${env.WORKSPACE}"
-          }
-          steps {
-            deleteDir()
-            unstash 'source'
-            unstash 'cache'
-            script {
-              docker.image('node:lts').inside(){
-                dir("${BASE_DIR}") {
-                  sh(script: 'npm ci')
-                  sh(label: 'Build packages', script: 'npm run build')
-                  publishToCDN(header: "Cache-Control:public,max-age=3600",
-                               source: 'packages/rum/dist/bundles/*.js',
-                               target: "gs://beats-ci-temp/rum/version",
-                               secret: 'secret/observability-team/ci/service-account/test-google-storage-plugin')
-                }
-              }
-            }
-            error('force an error')
-          }
-          post {
-            always {
-              archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/packages/rum/dist/bundles/*.js")
-            }
-          }
-        }
         stage('Test Pupperteer') {
           when {
             beforeAgent true
@@ -363,7 +330,20 @@ pipeline {
                   script {
                     currentBuild.description = "${currentBuild.description?.trim() ? currentBuild.description : ''} released"
                   }
+                  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/packages/rum/dist/bundles/*.js")
                 }
+              }
+            }
+          }
+          stage('Publish CDN') {
+            options { skipDefaultCheckout() }
+            steps {
+              script {
+                def version = sh(label: 'Get package version', script: 'jq --raw-output .version packages/rum/package.json', returnStdout: true)
+                publishToCDN(header: "Cache-Control:public,max-age=3600",
+                             source: 'packages/rum/dist/bundles/*.js',
+                             target: "gs://beats-ci-temp/rum/${version}", // TODO: change bucket
+                             secret: 'secret/observability-team/ci/service-account/test-google-storage-plugin') // TODO: change secret
               }
             }
           }
