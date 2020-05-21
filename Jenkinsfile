@@ -112,12 +112,14 @@ pipeline {
                 dir("${BASE_DIR}") {
                   sh(script: 'npm ci')
                   sh(label: 'Build packages', script: 'npm run build')
-                  publishToCDN(header: "Cache-Control:public,max-age=3600",
+                }
+              }
+            }
+            dir("${BASE_DIR}") {
+              publishToCDN(header: "Cache-Control:public,max-age=3600",
                                source: 'packages/rum/dist/bundles/*.js',
                                target: "gs://beats-ci-temp/rum/version",
                                secret: 'secret/observability-team/ci/service-account/test-google-storage-plugin')
-                }
-              }
             }
             error('force an error')
           }
