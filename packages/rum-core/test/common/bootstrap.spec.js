@@ -23,35 +23,20 @@
  *
  */
 
-import {
-  createServiceFactory,
-  bootstrap,
-  isBrowser
-} from '@elastic/apm-rum-core'
-import ApmBase from './apm-base'
+import { bootstrap } from '../../src/common/bootstrap'
 
-/**
- * Use a single instance of ApmBase across all instance of the agent
- * including the instanes used in framework specific integrations
- */
-function getApmBase() {
-  if (isBrowser && window.elasticApm) {
-    return window.elasticApm
-  }
-  const enabled = bootstrap()
-  const serviceFactory = createServiceFactory()
-  const apmBase = new ApmBase(serviceFactory, !enabled)
+describe('bootstrap', function() {
+  it('should log warning on unsupported environments', () => {
+    // Pass unsupported check
+    const nowFn = window.performance.now
+    window.performance.now = undefined
 
-  if (isBrowser) {
-    window.elasticApm = apmBase
-  }
+    spyOn(console, 'log')
+    bootstrap()
 
-  return apmBase
-}
-
-const apmBase = getApmBase()
-
-const init = apmBase.init.bind(apmBase)
-
-export default init
-export { init, apmBase, ApmBase, apmBase as apm }
+    expect(console.log).toHaveBeenCalledWith(
+      '[Elastic APM] platform is not supported!'
+    )
+    window.performance.now = nowFn
+  })
+})

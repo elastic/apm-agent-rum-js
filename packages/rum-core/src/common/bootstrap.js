@@ -23,24 +23,17 @@
  *
  */
 
-import { isPlatformSupported } from './common/utils'
-import { patchAll } from './common/patching'
-import { bootstrapMetrics } from './performance-monitoring/metrics'
+import { isPlatformSupported, isBrowser } from './utils'
+import { patchAll } from './patching'
+import { bootstrapMetrics } from '../performance-monitoring/metrics'
 
-let alreadyBootstrap = false
 let enabled = false
-
 export function bootstrap() {
-  if (alreadyBootstrap) {
-    return enabled
-  }
-  alreadyBootstrap = true
-
   if (isPlatformSupported()) {
     patchAll()
     bootstrapMetrics()
     enabled = true
-  } else if (typeof window !== 'undefined') {
+  } else if (isBrowser) {
     /**
      * Print this error message only on the browser console
      * on unsupported browser versions
