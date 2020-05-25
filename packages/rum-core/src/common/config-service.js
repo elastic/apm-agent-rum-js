@@ -179,7 +179,7 @@ class Config {
       properties.serverUrl = properties.serverUrl.replace(/\/+$/, '')
     }
 
-    this.config = merge({}, this.config, properties)
+    merge(this.config, properties)
     this.events.send(CONFIG_CHANGE, [this.config])
   }
 
