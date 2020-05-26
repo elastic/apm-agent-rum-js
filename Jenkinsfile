@@ -376,8 +376,8 @@ pipeline {
 
 def uploadToCDN() {
   def source = 'packages/rum/dist/bundles/*.js'
-  def target = 'gs://beats-ci-temp/rum' // TODO: change bucket
-  def secret = 'secret/observability-team/ci/service-account/test-google-storage-plugin' // TODO: change secret
+  def target = 'gs://apm-rum-357700bc'
+  def secret = 'secret/gce/elastic-cdn/service-account/apm-rum-admin'
   def version = sh(label: 'Get package version', script: 'jq --raw-output .version packages/rum/package.json', returnStdout: true)
   def majorVersion = "${version.split('\\.')[0]}.x"
 
