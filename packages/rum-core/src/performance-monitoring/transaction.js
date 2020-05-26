@@ -84,7 +84,7 @@ class Transaction extends SpanBase {
     }
 
     if (options) {
-      this.options = extend(this.options, options)
+      extend(this.options, options)
     }
   }
 

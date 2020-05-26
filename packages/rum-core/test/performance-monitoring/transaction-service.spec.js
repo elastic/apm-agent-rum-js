@@ -621,14 +621,6 @@ describe('TransactionService', function() {
     let tr = transactionService.getCurrentTransaction()
     expect(tr.type).toBe('temporary')
 
-    transactionService.startTransaction('test 1', 'random-type', {
-      managed: true,
-      canReuse: true
-    })
-
-    tr = transactionService.getCurrentTransaction()
-    expect(tr.type).toBe('temporary')
-
     transactionService.startTransaction('test 1', 'route-change', {
       managed: true,
       canReuse: true
@@ -650,13 +642,24 @@ describe('TransactionService', function() {
       canReuse: true
     })
 
-    transactionService.startTransaction('test 1', 'random-type', {
+    tr = transactionService.getCurrentTransaction()
+    expect(tr.type).toBe('page-load')
+
+    transactionService.startTransaction('test 1', 'custom-type', {
       managed: true,
       canReuse: true
     })
 
     tr = transactionService.getCurrentTransaction()
-    expect(tr.type).toBe('page-load')
+    expect(tr.type).toBe('custom-type')
+
+    transactionService.startTransaction('test 1', 'page-load', {
+      managed: true,
+      canReuse: true
+    })
+
+    tr = transactionService.getCurrentTransaction()
+    expect(tr.type).toBe('custom-type')
   })
 
   describe('performance entry recorder', () => {
