@@ -308,6 +308,21 @@ describe('ApmBase', function() {
     expect(tr.spans[0].name).toBe('GET /')
   })
 
+  it('should allow setting labels before calling init', () => {
+    const labels = {
+      foo: '1',
+      bar: 2
+    }
+    apmBase.addLabels(labels)
+    apmBase.init({
+      serviceName,
+      serverUrl,
+      disableInstrumentations: [PAGE_LOAD]
+    })
+    const configService = serviceFactory.getService('ConfigService')
+    expect(configService.get('context.tags')).toEqual(labels)
+  })
+
   it('should fetch central config', done => {
     const apmServer = serviceFactory.getService('ApmServer')
     const configService = serviceFactory.getService('ConfigService')
