@@ -221,7 +221,6 @@ describe('Metrics', () => {
           name: 'First Input Delay',
           type: 'first-input',
           ended: true,
-          context: { custom: { eventType: 'mousedown' } },
           _end: 5489.029999997001,
           _start: 5482.669999997597
         })

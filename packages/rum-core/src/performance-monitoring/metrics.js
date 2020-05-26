@@ -101,12 +101,9 @@ export function createFirstInputDelaySpan(fidEntries) {
   let firstInput = fidEntries[0]
 
   if (firstInput && !metrics.wasHidden) {
-    const { name, startTime, processingStart } = firstInput
+    const { startTime, processingStart } = firstInput
 
     const span = new Span('First Input Delay', FIRST_INPUT, { startTime })
-    span.addContext({
-      custom: { eventType: name }
-    })
     span.end(processingStart)
     return span
   }
