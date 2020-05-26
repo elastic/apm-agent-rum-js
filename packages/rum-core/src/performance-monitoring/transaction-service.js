@@ -25,10 +25,7 @@
 
 import { Promise } from '../common/polyfills'
 import Transaction from './transaction'
-import {
-  PerfEntryRecorder,
-  captureObserverEntries
-} from './perf-entry-recorder'
+import { PerfEntryRecorder, captureObserverEntries } from './metrics'
 import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
 import { captureNavigation } from './capture-navigation'
 import {
@@ -42,7 +39,8 @@ import {
   LARGEST_CONTENTFUL_PAINT,
   LONG_TASK,
   PAINT,
-  TRUNCATED_TYPE
+  TRUNCATED_TYPE,
+  FIRST_INPUT
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__ } from '../env'
@@ -179,6 +177,7 @@ class TransactionService {
       if (!isRedefined) {
         this.recorder.start(LARGEST_CONTENTFUL_PAINT)
         this.recorder.start(PAINT)
+        this.recorder.start(FIRST_INPUT)
       }
       checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {

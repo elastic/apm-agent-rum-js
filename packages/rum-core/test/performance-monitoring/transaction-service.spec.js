@@ -36,7 +36,8 @@ import {
   LONG_TASK,
   LARGEST_CONTENTFUL_PAINT,
   PAINT,
-  TRUNCATED_TYPE
+  TRUNCATED_TYPE,
+  FIRST_INPUT
 } from '../../src/common/constants'
 
 describe('TransactionService', function() {
@@ -680,10 +681,11 @@ describe('TransactionService', function() {
       const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
         managed: true
       })
-      expect(startSpy).toHaveBeenCalledTimes(3)
+      expect(startSpy).toHaveBeenCalledTimes(4)
       expect(startSpy.calls.allArgs()).toEqual([
         [LARGEST_CONTENTFUL_PAINT],
         [PAINT],
+        [FIRST_INPUT],
         [LONG_TASK]
       ])
       await pageLoadTr.end()
@@ -739,10 +741,11 @@ describe('TransactionService', function() {
       const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
         managed: true
       })
-      expect(startSpy).toHaveBeenCalledTimes(2)
+      expect(startSpy).toHaveBeenCalledTimes(3)
       expect(startSpy.calls.allArgs()).toEqual([
         [LARGEST_CONTENTFUL_PAINT],
-        [PAINT]
+        [PAINT],
+        [FIRST_INPUT]
       ])
       await pageLoadTr.end()
       expect(stopSpy).toHaveBeenCalled()

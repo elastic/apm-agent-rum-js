@@ -23,12 +23,14 @@
  *
  */
 
-import { isPlatformSupported, patchAll } from '@elastic/apm-rum-core'
+import { isPlatformSupported } from './common/utils'
+import { patchAll } from './common/patching'
+import { bootstrapMetrics } from './performance-monitoring/metrics'
 
-var alreadyBootstrap = false
-var enabled = false
+let alreadyBootstrap = false
+let enabled = false
 
-export default function bootstrap() {
+export function bootstrap() {
   if (alreadyBootstrap) {
     return enabled
   }
@@ -36,6 +38,7 @@ export default function bootstrap() {
 
   if (isPlatformSupported()) {
     patchAll()
+    bootstrapMetrics()
     enabled = true
   } else if (typeof window !== 'undefined') {
     /**

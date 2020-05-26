@@ -26,11 +26,15 @@
 import {
   LONG_TASK,
   LARGEST_CONTENTFUL_PAINT,
-  FIRST_CONTENTFUL_PAINT
+  FIRST_CONTENTFUL_PAINT,
+  FIRST_INPUT
 } from '../common/constants'
 import { noop, PERF } from '../common/utils'
-import { metrics } from '../common/metrics'
 import Span from './span'
+
+export const metrics = {
+  fcp: 0
+}
 
 /**
  * Create Spans for the long task entries
@@ -91,6 +95,18 @@ function createLongTaskSpans(longtasks) {
     spans.push(span)
   }
   return spans
+}
+
+export function createFirstInputDelaySpan(fidEntries) {
+  let firstInput = fidEntries[0]
+
+  if (firstInput && !metrics.wasHidden) {
+    const { startTime, processingStart } = firstInput
+
+    const span = new Span('First Input Delay', FIRST_INPUT, { startTime })
+    span.end(processingStart)
+    return span
+  }
 }
 
 /**
@@ -215,6 +231,12 @@ export function captureObserverEntries(list, { capturePaint }) {
     result.spans.push(tbtSpan)
   }
 
+  const fidEntries = list.getEntriesByType(FIRST_INPUT)
+  const fidSpan = createFirstInputDelaySpan(fidEntries)
+  if (fidSpan) {
+    result.spans.push(fidSpan)
+  }
+
   return result
 }
 
@@ -268,4 +290,18 @@ export class PerfEntryRecorder {
   stop() {
     this.po.disconnect()
   }
+}
+
+export function bootstrapMetrics() {
+  metrics.wasHidden = document.visibilityState === 'hidden'
+
+  window.addEventListener(
+    'visibilitychange',
+    () => {
+      if (document.visibilityState === 'hidden') {
+        metrics.wasHidden = true
+      }
+    },
+    { capture: true, once: true }
+  )
 }

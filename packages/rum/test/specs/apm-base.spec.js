@@ -24,9 +24,12 @@
  */
 
 import ApmBase from '../../src/apm-base'
-import { createServiceFactory, PAGE_LOAD } from '@elastic/apm-rum-core'
+import {
+  createServiceFactory,
+  bootstrap,
+  PAGE_LOAD
+} from '@elastic/apm-rum-core'
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
-import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import Promise from 'promise-polyfill'
 import { scheduleTaskCycles } from '../../../rum-core/test'
