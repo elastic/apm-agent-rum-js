@@ -27,7 +27,6 @@ import {
   calculateTotalBlockingTime,
   createFirstInputDelaySpan,
   PerfEntryRecorder,
-  polyfillFID,
   metrics
 } from '../../src/performance-monitoring/metrics'
 import { LARGEST_CONTENTFUL_PAINT, LONG_TASK } from '../../src/common/constants'
@@ -37,7 +36,6 @@ import {
 } from '../utils/globals-mock'
 import longtaskEntries from '../fixtures/longtask-entries'
 
-polyfillFID()
 describe('Metrics', () => {
   describe('PerfEntryRecorder', () => {
     const list = {
@@ -207,7 +205,7 @@ describe('Metrics', () => {
     })
 
     it('should create first input delay span', () => {
-      list.getEntriesByType.and.returnValue([
+      let span = createFirstInputDelaySpan([
         {
           name: 'mousedown',
           entryType: 'first-input',
@@ -218,10 +216,9 @@ describe('Metrics', () => {
           cancelable: true
         }
       ])
-      let span = createFirstInputDelaySpan(list)
       expect(span).toEqual(
         jasmine.objectContaining({
-          name: 'FirstInputDelay',
+          name: 'First Input Delay',
           type: 'first-input',
           ended: true,
           context: { custom: { eventType: 'mousedown' } },
@@ -230,23 +227,5 @@ describe('Metrics', () => {
         })
       )
     })
-  })
-
-  it('should polyfill first input delay', done => {
-    document.body.click()
-    setTimeout(() => {
-      expect(metrics).toEqual(
-        jasmine.objectContaining({
-          fid: {
-            delay: jasmine.any(Number),
-            event: jasmine.objectContaining({
-              type: 'click',
-              timeStamp: jasmine.any(Number)
-            })
-          }
-        })
-      )
-      done()
-    }, 100)
   })
 })

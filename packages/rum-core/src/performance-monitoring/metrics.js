@@ -32,7 +32,9 @@ import {
 import { noop, PERF } from '../common/utils'
 import Span from './span'
 
-export const metrics = {}
+export const metrics = {
+  fcp: 0
+}
 
 /**
  * Create Spans for the long task entries
@@ -95,95 +97,13 @@ function createLongTaskSpans(longtasks) {
   return spans
 }
 
-export function isPerfEntryTypeSupported(type) {
-  return (
-    PerformanceObserver &&
-    PerformanceObserver.supportedEntryTypes &&
-    PerformanceObserver.supportedEntryTypes.indexOf(type) > -1
-  )
-}
-
-/**
- * First Input Delay, source: https://github.com/GoogleChromeLabs/first-input-delay/blob/master/src/first-input-delay.js
- */
-
-export function polyfillFID() {
-  const eventTypes = [
-    'click',
-    'mousedown',
-    'keydown',
-    'touchstart',
-    'pointerdown'
-  ]
-  const listenerOpts = { passive: true, capture: true }
-  const startTimeStamp = new Date()
-
-  const pointerup = 'pointerup'
-  const pointercancel = 'pointercancel'
-
-  function onPointerDown(delay, event) {
-    function onPointerUp() {
-      recordFirstInputDelay(delay, event)
-      removePointerEventListeners()
-    }
-
-    function onPointerCancel() {
-      removePointerEventListeners()
-    }
-
-    function removePointerEventListeners() {
-      removeEventListener(pointerup, onPointerUp, listenerOpts)
-      removeEventListener(pointercancel, onPointerCancel, listenerOpts)
-    }
-
-    addEventListener(pointerup, onPointerUp, listenerOpts)
-    addEventListener(pointercancel, onPointerCancel, listenerOpts)
-  }
-
-  function recordFirstInputDelay(delay, event) {
-    if (!metrics.fid) {
-      let firstInputTimeStamp = new Date()
-
-      eachEventType(removeEventListener)
-
-      if (delay >= 0 && delay < firstInputTimeStamp - startTimeStamp) {
-        metrics.fid = { delay, event }
-      }
-    }
-  }
-
-  function onInput(event) {
-    if (event.cancelable) {
-      let isEpochTime = event.timeStamp > 1e12
-      let now = isEpochTime ? new Date() : performance.now()
-
-      let delay = now - event.timeStamp
-
-      if (event.type == 'pointerdown') {
-        onPointerDown(delay, event)
-      } else {
-        recordFirstInputDelay(delay, event)
-      }
-    }
-  }
-
-  function eachEventType(callback) {
-    eventTypes.forEach(function(eventType) {
-      callback(eventType, onInput, listenerOpts)
-    })
-  }
-
-  eachEventType(addEventListener)
-}
-
-export function createFirstInputDelaySpan(list) {
-  const fidEntries = list.getEntriesByType(FIRST_INPUT)
+export function createFirstInputDelaySpan(fidEntries) {
   let firstInput = fidEntries[0]
 
   if (firstInput && !metrics.wasHidden) {
-    let { name, startTime, processingStart } = firstInput
+    const { name, startTime, processingStart } = firstInput
 
-    let span = new Span('FirstInputDelay', FIRST_INPUT, { startTime })
+    const span = new Span('First Input Delay', FIRST_INPUT, { startTime })
     span.addContext({
       custom: { eventType: name }
     })
@@ -314,7 +234,8 @@ export function captureObserverEntries(list, { capturePaint }) {
     result.spans.push(tbtSpan)
   }
 
-  const fidSpan = createFirstInputDelaySpan(list)
+  const fidEntries = list.getEntriesByType(FIRST_INPUT)
+  const fidSpan = createFirstInputDelaySpan(fidEntries)
   if (fidSpan) {
     result.spans.push(fidSpan)
   }
@@ -386,8 +307,4 @@ export function bootstrapMetrics() {
     },
     { capture: true, once: true }
   )
-
-  if (!isPerfEntryTypeSupported(FIRST_INPUT)) {
-    polyfillFID()
-  }
 }

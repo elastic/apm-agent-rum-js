@@ -25,13 +25,7 @@
 
 import { Promise } from '../common/polyfills'
 import Transaction from './transaction'
-import {
-  PerfEntryRecorder,
-  isPerfEntryTypeSupported,
-  captureObserverEntries,
-  createFirstInputDelaySpan,
-  metrics
-} from './metrics'
+import { PerfEntryRecorder, captureObserverEntries } from './metrics'
 import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
 import { captureNavigation } from './capture-navigation'
 import {
@@ -284,25 +278,6 @@ class TransactionService {
           )
           if (name === NAME_UNKNOWN && pageLoadTransactionName) {
             tr.name = pageLoadTransactionName
-          }
-
-          if (
-            tr.captureTimings &&
-            !isPerfEntryTypeSupported() &&
-            metrics.fid &&
-            !metrics.wasHidden
-          ) {
-            let { delay, event } = metrics.fid
-            let span = createFirstInputDelaySpan([
-              {
-                name: event.type,
-                startTime: event.timeStamp,
-                processingStart: event.timeStamp + delay
-              }
-            ])
-            if (span) {
-              tr.spans.push(span)
-            }
           }
         }
         captureNavigation(tr)
