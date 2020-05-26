@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@test/cdn') _
+@Library('apm@current') _
 
 pipeline {
   agent { label 'linux && immutable' }
