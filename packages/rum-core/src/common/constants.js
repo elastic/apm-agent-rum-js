@@ -127,6 +127,7 @@ const NAVIGATION = 'navigation'
 const RESOURCE = 'resource'
 const FIRST_CONTENTFUL_PAINT = 'first-contentful-paint'
 const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint'
+const FIRST_INPUT = 'first-input'
 
 /**
  * Managed transaction configs
@@ -199,5 +200,6 @@ export {
   CONFIG_SERVICE,
   LOGGING_SERVICE,
   APM_SERVER,
-  TRUNCATED_TYPE
+  TRUNCATED_TYPE,
+  FIRST_INPUT
 }

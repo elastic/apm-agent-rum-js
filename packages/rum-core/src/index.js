@@ -44,6 +44,7 @@ import {
 import { getInstrumentationFlags } from './common/instrument'
 import afterFrame from './common/after-frame'
 import { createTracer } from './opentracing'
+import { bootstrap } from './bootstrap'
 
 function createServiceFactory() {
   registerPerfServices()
@@ -67,5 +68,6 @@ export {
   PAGE_LOAD,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  bootstrap
 }

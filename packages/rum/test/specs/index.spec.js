@@ -36,6 +36,10 @@ describe('index', function() {
   beforeEach(function() {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000
+    let cache = require.cache
+    for (let moduleId in cache) {
+      delete cache[moduleId]
+    }
   })
 
   afterEach(function() {
@@ -49,8 +53,6 @@ describe('index', function() {
 
     spyOn(console, 'log')
 
-    delete require.cache[require.resolve('../../src/')]
-    delete require.cache[require.resolve('../../src/bootstrap')]
     require('../../src/')
 
     expect(console.log).toHaveBeenCalledWith(
@@ -129,10 +131,8 @@ describe('index', function() {
     }
 
     /**
-     * Delete bootstrap and init module cache and
      * execute module again to check if global promise is overriden
      */
-    delete require.cache[require.resolve('../../src/')]
     require('../../src/')
 
     /**

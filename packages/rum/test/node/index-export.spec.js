@@ -41,8 +41,10 @@ describe('apm base', () => {
     /**
      * Delete module cache and run bootstrap again
      */
-    delete require.cache[require.resolve('@elastic/apm-rum')]
-    delete require.cache[require.resolve('@elastic/apm-rum/dist/lib/bootstrap')]
+    let cache = require.cache
+    for (let moduleId in cache) {
+      delete cache[moduleId]
+    }
     require('@elastic/apm-rum')
 
     expect(console.log).not.toHaveBeenCalled()
