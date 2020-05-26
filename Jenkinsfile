@@ -337,13 +337,7 @@ pipeline {
             stage('Publish CDN') {
               options { skipDefaultCheckout() }
               steps {
-                script {
-                  def version = sh(label: 'Get package version', script: 'jq --raw-output .version packages/rum/package.json', returnStdout: true)
-                  publishToCDN(header: "Cache-Control:public,max-age=31536000,immutable",
-                              source: 'packages/rum/dist/bundles/*.js',
-                              target: "gs://beats-ci-temp/rum/${version}", // TODO: change bucket
-                              secret: 'secret/observability-team/ci/service-account/test-google-storage-plugin') // TODO: change secret
-                }
+                uploadToCDN()
               }
             }
           }
@@ -378,6 +372,26 @@ pipeline {
       notifyBuildResult()
     }
   }
+}
+
+def uploadToCDN() {
+  def source = 'packages/rum/dist/bundles/*.js'
+  def target = 'gs://beats-ci-temp/rum' // TODO: change bucket
+  def secret = 'secret/observability-team/ci/service-account/test-google-storage-plugin' // TODO: change secret
+  def version = sh(label: 'Get package version', script: 'jq --raw-output .version packages/rum/package.json', returnStdout: true)
+  def majorVersion = "${version.split('\\.')[0]}.x"
+
+  // Publish version with the semver format and cache them for 1 year.
+  publishToCDN(headers: ["Cache-Control:public,max-age=31536000,immutable"],
+               source: "${source}",
+               target: "${target}/${version}",
+               secret: "${secret}")
+
+  // Publish major.x and cache for 7 days
+  publishToCDN(headers: ["Cache-Control:public,max-age=604800,immutable"],
+               source: "${source}",
+               target: "${target}/${majorVersion}",
+               secret: "${secret}")
 }
 
 def runScript(Map args = [:]){
