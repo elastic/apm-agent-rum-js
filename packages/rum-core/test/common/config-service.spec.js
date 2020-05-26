@@ -30,7 +30,6 @@ describe('ConfigService', function() {
   var configService
   beforeEach(function() {
     configService = new ConfigService()
-    configService.init()
   })
   it('should merge configs with already set configs', function() {
     expect(configService.get('instrument')).toBe(true)

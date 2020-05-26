@@ -64,8 +64,7 @@ function getDataAttributesFromNode(node) {
 
 class Config {
   constructor() {
-    this.config = {}
-    this.defaults = {
+    this.config = {
       serviceName: '',
       serviceVersion: '',
       environment: '',
@@ -180,7 +179,7 @@ class Config {
       properties.serverUrl = properties.serverUrl.replace(/\/+$/, '')
     }
 
-    this.config = merge({}, this.defaults, this.config, properties)
+    merge(this.config, properties)
     this.events.send(CONFIG_CHANGE, [this.config])
   }
 

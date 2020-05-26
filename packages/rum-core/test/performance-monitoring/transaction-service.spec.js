@@ -57,7 +57,6 @@ describe('TransactionService', function() {
     spyOn(logger, 'debug')
 
     config = new Config()
-    config.init()
     transactionService = new TransactionService(logger, config)
   })
 
@@ -662,7 +661,6 @@ describe('TransactionService', function() {
   describe('performance entry recorder', () => {
     const logger = new LoggingService()
     const config = new Config()
-    config.init()
     const trService = new TransactionService(logger, config)
     const startSpy = jasmine.createSpy()
     const stopSpy = jasmine.createSpy()
