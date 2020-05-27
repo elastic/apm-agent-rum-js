@@ -23,9 +23,9 @@
  *
  */
 
-import { isPlatformSupported, isBrowser } from './utils'
-import { patchAll } from './patching'
-import { bootstrapMetrics } from '../performance-monitoring/metrics'
+import { isPlatformSupported, isBrowser } from './common/utils'
+import { patchAll } from './common/patching'
+import { bootstrapMetrics } from './performance-monitoring/metrics'
 
 let enabled = false
 export function bootstrap() {

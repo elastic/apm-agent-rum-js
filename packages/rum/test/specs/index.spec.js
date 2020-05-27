@@ -104,6 +104,13 @@ describe('index', function() {
     }
   })
 
+  it('should return same instance when loaded multiple times', () => {
+    require('../../src/')
+    expect(window.elasticApm).toEqual(apmBase)
+    const exportsObj = require('../../src/')
+    expect(exportsObj.apmBase).toEqual(window.elasticApm)
+  })
+
   it('should not throw error on global Promise patching', () => {
     window.count = 0
     window.Promise = {

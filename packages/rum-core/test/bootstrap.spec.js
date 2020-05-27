@@ -23,7 +23,7 @@
  *
  */
 
-import { bootstrap } from '../../src/common/bootstrap'
+import { bootstrap } from '../src/bootstrap'
 
 describe('bootstrap', function() {
   it('should log warning on unsupported environments', () => {

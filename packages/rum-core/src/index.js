@@ -44,7 +44,7 @@ import {
 } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
 import afterFrame from './common/after-frame'
-import { bootstrap } from './common/bootstrap'
+import { bootstrap } from './bootstrap'
 import { createTracer } from './opentracing'
 
 function createServiceFactory() {
