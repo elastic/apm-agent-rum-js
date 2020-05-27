@@ -41,6 +41,19 @@ function isReactClassComponent(Component) {
 }
 
 /**
+ * If the path is given as array, use the computed path
+ * to get the current transaction name
+ */
+function getTransactionName(name, props) {
+  const { match = {} } = props
+
+  if (Array.isArray(name) && match.path) {
+    return match.path
+  }
+  return name
+}
+
+/**
  * Usage:
  *  - Pure function: `withTransaction('name','route-change')(Component)`
  *  - As a decorator: `@withTransaction('name','route-change')`
@@ -90,7 +103,7 @@ function getWithTransaction(apm) {
            * start the transaction only on component mounting
            */
           const [transaction] = React.useState(() =>
-            apm.startTransaction(name, type, {
+            apm.startTransaction(getTransactionName(name, props), type, {
               managed: true,
               canReuse: true
             })
@@ -127,10 +140,14 @@ function getWithTransaction(apm) {
              * we won't be able to capture what happens in componentDidMount of child
              * components since the parent component is mounted after child
              */
-            this.transaction = apm.startTransaction(name, type, {
-              managed: true,
-              canReuse: true
-            })
+            this.transaction = apm.startTransaction(
+              getTransactionName(name, this.props),
+              type,
+              {
+                managed: true,
+                canReuse: true
+              }
+            )
           }
 
           componentDidMount() {
