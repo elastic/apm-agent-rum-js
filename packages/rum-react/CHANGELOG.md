@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.1.1...@elastic/apm-rum-react@1.1.2) (2020-05-28)
+
+
+### Bug Fixes
+
+* **rum-core:** consider user defined type of high precedence ([#798](https://github.com/elastic/apm-agent-rum-js/issues/798)) ([b1d247c](https://github.com/elastic/apm-agent-rum-js/commit/b1d247c3654978187e9491079208c18267161e98))
+
+
+### Performance Improvements
+
+* refactor ServiceFactory to use constant service names ([#764](https://github.com/elastic/apm-agent-rum-js/issues/764)) ([fdda235](https://github.com/elastic/apm-agent-rum-js/commit/fdda23555b418166727d85f143e84a16079d83e6)), closes [#238](https://github.com/elastic/apm-agent-rum-js/issues/238)
+
+
+
+
+
 ## [1.1.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.1.0...@elastic/apm-rum-react@1.1.1) (2020-04-15)
 
 

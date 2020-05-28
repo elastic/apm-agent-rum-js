@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.3.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.2.0...@elastic/apm-rum-core@5.3.0) (2020-05-28)
+
+
+### Bug Fixes
+
+* **rum:** allow setting labels before initializing ([#792](https://github.com/elastic/apm-agent-rum-js/issues/792)) ([e546e35](https://github.com/elastic/apm-agent-rum-js/commit/e546e35f78eece3373efbc002c5ec4964407566f))
+* **rum:** use single instance of apm across all packages ([#796](https://github.com/elastic/apm-agent-rum-js/issues/796)) ([d585324](https://github.com/elastic/apm-agent-rum-js/commit/d585324d56494684ee58005ab43e075e8267da8a))
+* **rum-core:** add subtype span info without camelcasing ([#753](https://github.com/elastic/apm-agent-rum-js/issues/753)) ([8b97075](https://github.com/elastic/apm-agent-rum-js/commit/8b9707561f20ceb44caeb8ab6f6cf6cfe97e4f40))
+* **rum-core:** consider user defined type of high precedence ([#798](https://github.com/elastic/apm-agent-rum-js/issues/798)) ([b1d247c](https://github.com/elastic/apm-agent-rum-js/commit/b1d247c3654978187e9491079208c18267161e98))
+* **rum-core:** treat truncated spans as actual in breakdown ([#777](https://github.com/elastic/apm-agent-rum-js/issues/777)) ([93d8fc2](https://github.com/elastic/apm-agent-rum-js/commit/93d8fc2ff1b506aeeb7e4f6b7268f065922c21cc))
+
+
+### Features
+
+* add first input delay span ([#787](https://github.com/elastic/apm-agent-rum-js/issues/787)) ([af7deb9](https://github.com/elastic/apm-agent-rum-js/commit/af7deb9fbf556dac4966175eaa71ac3a63854db4))
+* **rum-core:** capture total blocking time for navigation ([#788](https://github.com/elastic/apm-agent-rum-js/issues/788)) ([a48980b](https://github.com/elastic/apm-agent-rum-js/commit/a48980b5819d92854923f9ebe5b89f2b28b25b61))
+
+
+### Performance Improvements
+
+* **rum-core:** compress server payload for all events ([#771](https://github.com/elastic/apm-agent-rum-js/issues/771)) ([5a3c604](https://github.com/elastic/apm-agent-rum-js/commit/5a3c6048482b47a9ac6ef565e88ff3eff786cabf))
+* refactor ServiceFactory to use constant service names ([#764](https://github.com/elastic/apm-agent-rum-js/issues/764)) ([fdda235](https://github.com/elastic/apm-agent-rum-js/commit/fdda23555b418166727d85f143e84a16079d83e6)), closes [#238](https://github.com/elastic/apm-agent-rum-js/issues/238)
+
+
+
+
+
 # [5.2.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.1.0...@elastic/apm-rum-core@5.2.0) (2020-04-15)
 
 
