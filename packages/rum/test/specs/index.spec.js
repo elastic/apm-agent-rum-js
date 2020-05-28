@@ -46,22 +46,6 @@ describe('index', function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
-  it('should log only on browser environments', () => {
-    // Pass unsupported check
-    const nowFn = window.performance.now
-    window.performance.now = undefined
-
-    spyOn(console, 'log')
-
-    require('../../src/')
-
-    expect(console.log).toHaveBeenCalledWith(
-      '[Elastic APM] platform is not supported!'
-    )
-
-    window.performance.now = nowFn
-  })
-
   it('should init ApmBase', function(done) {
     var apmServer = apmBase.serviceFactory.getService('ApmServer')
     if (globalConfig.useMocks) {
@@ -118,6 +102,13 @@ describe('index', function() {
         done()
       }
     }
+  })
+
+  it('should return same instance when loaded multiple times', () => {
+    require('../../src/')
+    expect(window.elasticApm).toEqual(apmBase)
+    const exportsObj = require('../../src/')
+    expect(exportsObj.apmBase).toEqual(window.elasticApm)
   })
 
   it('should not throw error on global Promise patching', () => {

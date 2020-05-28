@@ -23,23 +23,20 @@
  *
  */
 
-import { isPlatformSupported, isBrowser } from './common/utils'
-import { patchAll } from './common/patching'
-import { bootstrapMetrics } from './performance-monitoring/metrics'
+import { bootstrap } from '../src/bootstrap'
 
-let enabled = false
-export function bootstrap() {
-  if (isPlatformSupported()) {
-    patchAll()
-    bootstrapMetrics()
-    enabled = true
-  } else if (isBrowser) {
-    /**
-     * Print this error message only on the browser console
-     * on unsupported browser versions
-     */
-    console.log('[Elastic APM] platform is not supported!')
-  }
+describe('bootstrap', function() {
+  it('should log warning on unsupported environments', () => {
+    // Pass unsupported check
+    const nowFn = window.performance.now
+    window.performance.now = undefined
 
-  return enabled
-}
+    spyOn(console, 'log')
+    bootstrap()
+
+    expect(console.log).toHaveBeenCalledWith(
+      '[Elastic APM] platform is not supported!'
+    )
+    window.performance.now = nowFn
+  })
+})

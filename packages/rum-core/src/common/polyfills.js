@@ -24,13 +24,14 @@
  */
 
 import PromisePollyfill from 'promise-polyfill'
+import { isBrowser } from './utils'
 
 /**
  * Use the globally available promise if it exists and
  * fallback to using the polyfilled Promise
  */
 let local = {}
-if (typeof window !== 'undefined') {
+if (isBrowser) {
   local = window
 } else if (typeof self !== 'undefined') {
   local = self

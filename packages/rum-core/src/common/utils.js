@@ -26,10 +26,8 @@
 import { Promise } from './polyfills'
 
 const slice = [].slice
-const PERF =
-  typeof window !== 'undefined' && typeof performance !== 'undefined'
-    ? performance
-    : {}
+const isBrowser = typeof window !== 'undefined'
+const PERF = isBrowser && typeof performance !== 'undefined' ? performance : {}
 
 function isCORSSupported() {
   var xhr = new window.XMLHttpRequest()
@@ -135,7 +133,7 @@ function checkSameOrigin(source, target) {
 
 function isPlatformSupported() {
   return (
-    typeof window !== 'undefined' &&
+    isBrowser &&
     typeof Array.prototype.forEach === 'function' &&
     typeof JSON.stringify === 'function' &&
     typeof Function.bind === 'function' &&
@@ -390,5 +388,6 @@ export {
   find,
   removeInvalidChars,
   PERF,
-  isPerfTimelineSupported
+  isPerfTimelineSupported,
+  isBrowser
 }

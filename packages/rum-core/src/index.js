@@ -31,7 +31,8 @@ import { ServiceFactory } from './common/service-factory'
 import {
   isPlatformSupported,
   scheduleMicroTask,
-  scheduleMacroTask
+  scheduleMacroTask,
+  isBrowser
 } from './common/utils'
 import { patchAll, patchEventHandler } from './common/patching'
 import {
@@ -43,8 +44,8 @@ import {
 } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
 import afterFrame from './common/after-frame'
-import { createTracer } from './opentracing'
 import { bootstrap } from './bootstrap'
+import { createTracer } from './opentracing'
 
 function createServiceFactory() {
   registerPerfServices()
@@ -59,6 +60,7 @@ export {
   patchAll,
   patchEventHandler,
   isPlatformSupported,
+  isBrowser,
   getInstrumentationFlags,
   createTracer,
   scheduleMicroTask,
