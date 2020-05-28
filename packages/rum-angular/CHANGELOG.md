@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@1.1.1...@elastic/apm-rum-angular@1.1.2) (2020-05-28)
+
+
+### Performance Improvements
+
+* refactor ServiceFactory to use constant service names ([#764](https://github.com/elastic/apm-agent-rum-js/issues/764)) ([fdda235](https://github.com/elastic/apm-agent-rum-js/commit/fdda23555b418166727d85f143e84a16079d83e6)), closes [#238](https://github.com/elastic/apm-agent-rum-js/issues/238)
+
+
+
+
+
 ## [1.1.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@1.1.0...@elastic/apm-rum-angular@1.1.1) (2020-04-15)
 
 **Note:** Version bump only for package @elastic/apm-rum-angular

@@ -49,7 +49,7 @@ export default class ApmBase {
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
-      configService.setVersion('5.1.1')
+      configService.setVersion('5.2.0')
       this.config(config)
       /**
        * Deactive agent when the active config flag is set to false
