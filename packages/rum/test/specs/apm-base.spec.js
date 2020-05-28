@@ -174,7 +174,7 @@ describe('ApmBase', function() {
     })
     expect(tr).toBeDefined()
     expect(tr.name).toBe('test-transaction')
-    expect(tr.type).toBe('page-load')
+    expect(tr.type).toBe('test-type')
 
     spyOn(tr, 'startSpan').and.callThrough()
     apmBase.startSpan('test-span', 'test-type')

@@ -137,27 +137,26 @@ class TransactionService {
        * allow a redefinition until there's a call that doesn't have that
        * or the threshold is exceeded.
        */
+      let redefineType = tr.type
+      const currentTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(tr.type)
+      const redefineTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(type)
+
+      /**
+       * Update type based on precedence defined in TRANSACTION_TYPE_ORDER.
+       * 1. If both orders doesn't exist, we don't redefine the type.
+       * 2. If only the redefined type is not present in predefined order, that implies
+       * it's a user defined type and it is of higher precedence
+       */
+      if (currentTypeOrder >= 0 && redefineTypeOrder < currentTypeOrder) {
+        redefineType = type
+      }
       if (__DEV__) {
         this._logger.debug(
           `redefining transaction(${tr.id}, ${tr.name}, ${tr.type})`,
           'to',
-          `(${name}, ${type})`,
+          `(${name || tr.name}, ${redefineType})`,
           tr
         )
-      }
-      /**
-       * We only update based precedence defined in TRANSACTION_TYPE_ORDER.
-       * If either orders don't exist we also don't redefine the type.
-       */
-      let redefineType
-      let currentTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(tr.type)
-      let redefineTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(type)
-      if (
-        currentTypeOrder !== -1 &&
-        redefineTypeOrder !== -1 &&
-        redefineTypeOrder < currentTypeOrder
-      ) {
-        redefineType = type
       }
       tr.redefine(name, redefineType, perfOptions)
       isRedefined = true
