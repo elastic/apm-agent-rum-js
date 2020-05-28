@@ -32,7 +32,7 @@ import {
   APM_SERVER
 } from '@elastic/apm-rum-core'
 
-class ApmBase {
+export default class ApmBase {
   constructor(serviceFactory, disable) {
     this._disable = disable
     this.serviceFactory = serviceFactory
@@ -277,5 +277,3 @@ class ApmBase {
     configService.addFilter(fn)
   }
 }
-
-export default ApmBase
