@@ -29,6 +29,32 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.2.0]]
+==== 5.2.0 (2020-05-28)
+
+[float]
+===== Features
+* Agent now supports compressing events payload sent to the APM server
+  via new configuration <<api-version, apiVersion>>. It yeilds a huge reduction of
+  around ~45% in the payload size for average sized web pages: {issue}768[#768]
+* Capture First Input Delay(FID) as Span for page-load transaction: {issue}732[#732]
+* Capture Total Blocking Time(TBT) as Span for page-load transaction: {issue}781[#781]
+
+[float]
+===== Bug fixes
+* Allow setting labels before agent is initialized: {issue}780[#780]
+* Use single instance of apm across all packages: {issue}791[#791]
+* User defined types for managed transactions are considered of
+  high precedence: {issue}758[#758]
+* Add span subtype information in payload without camelcasing: {issue}753[#753]
+* Treat truncated spans percentage as regular span in
+  breakdown calculation: {issue}776[#776]
+
+[float]
+===== Performance Improvements
+* Refactor ServiceFactory class to use constant service names: {issue}238[#238]
+
+
 [[release-notes-5.1.1]]
 ==== 5.1.1 (2020-04-15)
 
@@ -40,7 +66,6 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 ===== Bug fixes
 * Avoid full component re-rerender when query params are updated on current
 `ApmRoute` inside child components: {issue}748[#748]
-
 
 
 [[release-notes-5.1.0]]
