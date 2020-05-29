@@ -107,18 +107,18 @@ pipeline {
                   name 'STACK_VERSION'
                   values (
                     '8.0.0-SNAPSHOT',
-                    '7.7.0',
-                    '7.0.0'
+                    // '7.7.0',
+                    // '7.0.0'
                   )
                 }
                 axis {
                   name 'SCOPE'
                   values (
                     '@elastic/apm-rum',
-                    '@elastic/apm-rum-core',
-                    '@elastic/apm-rum-react',
-                    '@elastic/apm-rum-angular',
-                    '@elastic/apm-rum-vue',
+                    // '@elastic/apm-rum-core',
+                    // '@elastic/apm-rum-react',
+                    // '@elastic/apm-rum-angular',
+                    // '@elastic/apm-rum-vue',
                   )
                 }
             }
@@ -392,12 +392,33 @@ def runScript(Map args = [:]){
       // Another retry in case there are any environmental issues
       retry(3) {
         sleep randomNumber(min: 5, max: 10)
-        if(env.MODE == 'saucelabs'){
-          withSaucelabsEnv(){
+        try {
+          if(env.MODE == 'saucelabs'){
+            withSaucelabsEnv(){
+              sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
+            }
+          } else {
             sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
           }
-        } else {
-          sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
+        } finally {
+          sh '''#!/bin/bash
+          DOCKER_IDS=$(docker ps -aq)
+
+          for id in ${DOCKER_IDS}
+          do
+            echo "***********************************************************"
+            echo "***************Docker Container ${id}***************"
+            echo "***********************************************************"
+            docker ps -af id=${id} --no-trunc
+            echo "----"
+            docker logs ${id} | tail -n 10 || echo "It is not possible to grab the logs of ${id}"
+          done
+
+          echo "*******************************************************"
+          echo "***************Docker Containers Summary***************"
+          echo "*******************************************************"
+          docker ps -a
+          '''
         }
       }
     }
