@@ -27,6 +27,19 @@ import React from 'react'
 import { Route } from 'react-router-dom'
 import { getWithTransaction } from './get-with-transaction'
 
+/**
+ * If the path/name is given as array, use the computed path
+ * to get the current transaction name
+ */
+function getTransactionName(name, props) {
+  const { match = {} } = props
+
+  if (Array.isArray(name) && match.path) {
+    return match.path
+  }
+  return name
+}
+
 function getApmRoute(apm) {
   const withTransaction = getWithTransaction(apm)
 
@@ -48,7 +61,16 @@ function getApmRoute(apm) {
        */
       if (initial || pathChanged) {
         return {
-          apmComponent: withTransaction(path, 'route-change')(component),
+          apmComponent: withTransaction(
+            path,
+            'route-change',
+            (transaction, props) => {
+              if (transaction) {
+                const name = getTransactionName(path, props)
+                transaction.name = name
+              }
+            }
+          )(component),
           path
         }
       }

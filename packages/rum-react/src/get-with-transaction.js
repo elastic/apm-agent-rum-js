@@ -41,25 +41,12 @@ function isReactClassComponent(Component) {
 }
 
 /**
- * If the path is given as array, use the computed path
- * to get the current transaction name
- */
-function getTransactionName(name, props) {
-  const { match = {} } = props
-
-  if (Array.isArray(name) && match.path) {
-    return match.path
-  }
-  return name
-}
-
-/**
  * Usage:
  *  - Pure function: `withTransaction('name','route-change')(Component)`
  *  - As a decorator: `@withTransaction('name','route-change')`
  */
 function getWithTransaction(apm) {
-  return function withTransaction(name, type) {
+  return function withTransaction(name, type, callback = () => {}) {
     return function(Component) {
       const configService = apm.serviceFactory.getService('ConfigService')
       if (!configService.isActive()) {
@@ -102,12 +89,14 @@ function getWithTransaction(apm) {
            * want this piece of code to run on every render instead we want to
            * start the transaction only on component mounting
            */
-          const [transaction] = React.useState(() =>
-            apm.startTransaction(getTransactionName(name, props), type, {
+          const [transaction] = React.useState(() => {
+            const tr = apm.startTransaction(name, type, {
               managed: true,
               canReuse: true
             })
-          )
+            callback(tr, props)
+            return tr
+          })
 
           /**
            * React guarantees the parent component effects are run after the child components effects
@@ -140,14 +129,11 @@ function getWithTransaction(apm) {
              * we won't be able to capture what happens in componentDidMount of child
              * components since the parent component is mounted after child
              */
-            this.transaction = apm.startTransaction(
-              getTransactionName(name, this.props),
-              type,
-              {
-                managed: true,
-                canReuse: true
-              }
-            )
+            this.transaction = apm.startTransaction(name, type, {
+              managed: true,
+              canReuse: true
+            })
+            callback(this.transaction, props)
           }
 
           componentDidMount() {

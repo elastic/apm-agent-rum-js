@@ -109,7 +109,11 @@ describe('ApmRoute', function() {
     const ApmRoute = getApmRoute(apmBase)
 
     const transactionService = serviceFactory.getService('TransactionService')
-    spyOn(transactionService, 'startTransaction')
+    const dummyTr = {
+      name: 'test',
+      detectFinish: () => {}
+    }
+    spyOn(transactionService, 'startTransaction').and.returnValue(dummyTr)
 
     const Home = () => 'home'
     const Topics = () => 'Topics'
@@ -120,26 +124,12 @@ describe('ApmRoute', function() {
         <ApmRoute path={['/topic1', '/topic2']} component={Topics} />
       </Router>
     )
-    expect(transactionService.startTransaction).toHaveBeenCalledWith(
-      '/',
-      'route-change',
-      {
-        canReuse: true,
-        managed: true
-      }
-    )
+    expect(dummyTr.name).toEqual('/')
     expect(rendered.text()).toBe('home')
     const history = rendered.find(Home).props().history
-    history.push({ pathname: '/topic2' })
 
-    expect(transactionService.startTransaction).toHaveBeenCalledWith(
-      '/topic2',
-      'route-change',
-      {
-        canReuse: true,
-        managed: true
-      }
-    )
+    history.push({ pathname: '/topic2' })
+    expect(dummyTr.name).toEqual('/topic2')
     expect(transactionService.startTransaction).toHaveBeenCalledTimes(2)
     /**
      * Should not create transaction as component is not rerendered
