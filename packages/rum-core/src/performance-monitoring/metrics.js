@@ -33,9 +33,14 @@ import { noop, PERF } from '../common/utils'
 import Span from './span'
 
 export const metrics = {
-  fcp: 0
+  fcp: 0,
+  tbt: {
+    start: Infinity,
+    duration: 0
+  }
 }
 
+const LONG_TASK_THRESHOLD = 50
 /**
  * Create Spans for the long task entries
  * Spec - https://w3c.github.io/longtasks/
@@ -109,23 +114,27 @@ export function createFirstInputDelaySpan(fidEntries) {
   }
 }
 
+export function createTotalBlockingTimeSpan(tbtObject) {
+  const { start, duration } = tbtObject
+  const tbtSpan = new Span('Total Blocking Time', LONG_TASK, {
+    startTime: start
+  })
+  tbtSpan.end(start + duration)
+  return tbtSpan
+}
+
 /**
  * Calculate Total Blocking Time (TBT) from long tasks
  */
 export function calculateTotalBlockingTime(longtaskEntries) {
-  const threshold = 50
-  const totalBlockingTime = {
-    start: Infinity,
-    duration: 0
-  }
-  for (let i = 0; i < longtaskEntries.length; i++) {
-    const { name, startTime, duration } = longtaskEntries[i]
+  longtaskEntries.forEach(entry => {
+    const { name, startTime, duration } = entry
     /**
      * FCP is picked as the lower bound because there is little risk of user input happening
      * before FCP and it will not harm user experience.
      */
     if (startTime < metrics.fcp) {
-      continue
+      return
     }
     /**
      * Account for long task originated only from the current browsing context
@@ -133,25 +142,24 @@ export function calculateTotalBlockingTime(longtaskEntries) {
      * https://w3c.github.io/longtasks/#performancelongtasktiming
      */
     if (name !== 'self' && name.indexOf('same-origin') === -1) {
-      continue
+      return
     }
     /**
      * Calcualte the start time of the first long task so we can add it
      * as span start
      */
-    totalBlockingTime.start = Math.min(totalBlockingTime.start, startTime)
+    metrics.tbt.start = Math.min(metrics.tbt.start, startTime)
 
-    const blockingTime = duration - threshold
     /**
      * Theoretically blocking time would always be greater than 0 as Long tasks are
      * tasks that exceeds 50ms, but this would be configurable in the future so
      * the > 0 check acts as an extra guard
      */
+    const blockingTime = duration - LONG_TASK_THRESHOLD
     if (blockingTime > 0) {
-      totalBlockingTime.duration += blockingTime
+      metrics.tbt.duration += blockingTime
     }
-  }
-  return totalBlockingTime
+  })
 }
 
 /**
@@ -219,23 +227,15 @@ export function captureObserverEntries(list, { capturePaint }) {
   }
 
   /**
-   * Capture TBT as Span only for page load navigation
+   * Capture First Input Delay (FID) as span
    */
-  const { duration, start } = calculateTotalBlockingTime(longtaskEntries)
-
-  if (duration > 0) {
-    const tbtSpan = new Span('Total Blocking Time', LONG_TASK, {
-      startTime: start
-    })
-    tbtSpan.end(start + duration)
-    result.spans.push(tbtSpan)
-  }
-
   const fidEntries = list.getEntriesByType(FIRST_INPUT)
   const fidSpan = createFirstInputDelaySpan(fidEntries)
   if (fidSpan) {
     result.spans.push(fidSpan)
   }
+
+  calculateTotalBlockingTime(longtaskEntries)
 
   return result
 }
