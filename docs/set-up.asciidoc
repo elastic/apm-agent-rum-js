@@ -29,6 +29,8 @@ object to initialize the agent:
 [source,html]
 ----
 <script src="https://<your-cdn-host>.com/path/to/elastic-apm-rum.umd.min-<version>.js" crossorigin></script>
+//Or load latest 5.x version from an open source CDN
+<script src="https://cdn.jsdelivr.net/npm/@elastic/apm-rum@5/dist/bundles/elastic-apm-rum.umd.min.js" crossorigin></script>
 <script>
   elasticApm.init({
     serviceName: '<instrumeted-app>',
@@ -60,8 +62,8 @@ Even though this is the recommended pattern, there is a caveat to be aware of.
 Because the downloading and initializing of the agent happens asynchronously,
 distributed tracing will not work for requests that occur before the agent is initialized.
 
-NOTE: Please download the latest version of RUM agent from https://github.com/elastic/apm-agent-rum-js/releases/latest[GitHub] or
-https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG]
+NOTE: Please download the latest version of RUM agent from https://github.com/elastic/apm-agent-rum-js/releases/latest[GitHub],
+https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG] or https://cdn.jsdelivr.net/npm/@elastic/apm-rum@latest/dist/bundles/elastic-apm-rum.umd.min.js[jsDelivr]
 and host the file in your Server/CDN before deploying to production.Remember to
 use a proper versioning scheme and set a far future `max-age` and `immutable`
 in the https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control[cache-control]
