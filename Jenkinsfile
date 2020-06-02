@@ -404,7 +404,7 @@ def runScript(Map args = [:]){
       } catch(e) {
         throw e
       } finally {
-        dockerLogs(step: label, failNever: true)
+        dockerLogs(step: "${label}-${stack}", failNever: true)
       }
     }
   }
