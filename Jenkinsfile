@@ -389,16 +389,22 @@ def runScript(Map args = [:]){
         sleep randomNumber(min: 5, max: 10)
         sh(label: 'Pull and build docker infra', script: '.ci/scripts/pull_and_build.sh')
       }
-      // Another retry in case there are any environmental issues
-      retry(3) {
-        sleep randomNumber(min: 5, max: 10)
-        if(env.MODE == 'saucelabs'){
-          withSaucelabsEnv(){
+      try {
+        // Another retry in case there are any environmental issues
+        retry(3) {
+          sleep randomNumber(min: 5, max: 10)
+          if(env.MODE == 'saucelabs'){
+            withSaucelabsEnv(){
+              sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
+            }
+          } else {
             sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
           }
-        } else {
-          sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
         }
+      } catch(e) {
+        throw e
+      } finally {
+        dockerLogs(step: "${label}-${stack}", failNever: true)
       }
     }
   }
