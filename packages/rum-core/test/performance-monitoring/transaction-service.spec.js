@@ -565,57 +565,6 @@ describe('TransactionService', function() {
     expect(tr.type).toBe('temporary')
   })
 
-  it('should only call setInterval once for current transaction', () => {
-    let origSetInterval = window.setInterval
-    let origClearInterval = window.clearInterval
-    let count = 0
-    let callback
-
-    window.setInterval = cb => {
-      callback = cb
-      return count++
-    }
-
-    let clearCount = 0
-
-    window.clearInterval = () => {
-      clearCount++
-    }
-
-    var tr = transactionService.startTransaction('test', 'test', {
-      managed: true,
-      canReuse: true
-    })
-    expect(transactionService.getCurrentTransaction()).toBe(tr)
-    expect(count).toBe(1)
-    expect(transactionService.respIntervalId).toBe(0)
-
-    transactionService.startTransaction('test 1', 'test', {
-      managed: true,
-      canReuse: true
-    })
-    expect(transactionService.getCurrentTransaction()).toBe(tr)
-    expect(tr.name).toBe('test 1')
-    expect(count).toBe(1)
-
-    transactionService.startTransaction('test 2', 'test', {
-      managed: true,
-      canReuse: false
-    })
-    expect(transactionService.getCurrentTransaction()).not.toBe(tr)
-    expect(count).toBe(1)
-    expect(clearCount).toBe(0)
-    tr = transactionService.getCurrentTransaction()
-    tr.end()
-
-    callback()
-    expect(transactionService.respIntervalId).toBe(undefined)
-    expect(clearCount).toBe(1)
-
-    window.clearInterval = origClearInterval
-    window.setInterval = origSetInterval
-  })
-
   it('should redefine type based on the defined order', () => {
     transactionService.startSpan('span 1', 'span-type')
     let tr = transactionService.getCurrentTransaction()
