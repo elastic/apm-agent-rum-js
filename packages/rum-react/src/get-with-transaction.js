@@ -46,7 +46,7 @@ function isReactClassComponent(Component) {
  *  - As a decorator: `@withTransaction('name','route-change')`
  */
 function getWithTransaction(apm) {
-  return function withTransaction(name, type) {
+  return function withTransaction(name, type, callback = () => {}) {
     return function(Component) {
       const configService = apm.serviceFactory.getService('ConfigService')
       if (!configService.isActive()) {
@@ -89,12 +89,14 @@ function getWithTransaction(apm) {
            * want this piece of code to run on every render instead we want to
            * start the transaction only on component mounting
            */
-          const [transaction] = React.useState(() =>
-            apm.startTransaction(name, type, {
+          const [transaction] = React.useState(() => {
+            const tr = apm.startTransaction(name, type, {
               managed: true,
               canReuse: true
             })
-          )
+            callback(tr, props)
+            return tr
+          })
 
           /**
            * React guarantees the parent component effects are run after the child components effects
@@ -131,6 +133,7 @@ function getWithTransaction(apm) {
               managed: true,
               canReuse: true
             })
+            callback(this.transaction, props)
           }
 
           componentDidMount() {

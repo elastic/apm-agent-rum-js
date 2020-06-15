@@ -105,6 +105,43 @@ describe('ApmRoute', function() {
     )
   })
 
+  it('should work correctly with path array in props', function() {
+    const ApmRoute = getApmRoute(apmBase)
+
+    const transactionService = serviceFactory.getService('TransactionService')
+    const dummyTr = {
+      name: 'test',
+      detectFinish: () => {}
+    }
+    spyOn(transactionService, 'startTransaction').and.returnValue(dummyTr)
+
+    const Home = () => 'home'
+    class Topics extends React.Component {
+      render() {
+        return 'Topics'
+      }
+    }
+
+    const rendered = mount(
+      <Router initialEntries={['/', '/topic1', '/topic2']}>
+        <ApmRoute path={['/']} component={Home} />
+        <ApmRoute path={['/topic1', '/topic2']} component={Topics} />
+      </Router>
+    )
+    expect(dummyTr.name).toEqual('/')
+    expect(rendered.text()).toBe('home')
+    const history = rendered.find(Home).props().history
+
+    history.push({ pathname: '/topic2' })
+    expect(dummyTr.name).toEqual('/topic2')
+    expect(transactionService.startTransaction).toHaveBeenCalledTimes(2)
+    /**
+     * Should not create transaction as component is not rerendered
+     */
+    history.push({ pathname: '/topic1' })
+    expect(transactionService.startTransaction).toHaveBeenCalledTimes(2)
+  })
+
   it('should not trigger full rerender on query change', function() {
     const ApmRoute = getApmRoute(apmBase)
     const transactionService = serviceFactory.getService('TransactionService')
