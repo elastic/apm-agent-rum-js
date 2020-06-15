@@ -34,14 +34,15 @@ import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory, afterFrame } from '@elastic/apm-rum-core'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
-function TestComponent(apm) {
+function TestComponent(apm, cb) {
   const withTransaction = getWithTransaction(apm)
   function Component(props) {
     return <h1>Testing, {props.name}</h1>
   }
   const WrappedComponent = withTransaction(
     'test-transaction',
-    'test-type'
+    'test-type',
+    cb
   )(Component)
   expect(typeof WrappedComponent).toBe('function')
   const wrapped = mount(<WrappedComponent name="withTransaction" />)
@@ -143,6 +144,20 @@ describe('withTransaction', function() {
 
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
     expect(wrapper.text()).toBe('Testing, new-props')
+  })
+
+  it('should accept callback function for withTransaction', () => {
+    const transactionService = serviceFactory.getService('TransactionService')
+    const labels = {
+      foo: 'bar'
+    }
+    TestComponent(apmBase, tr => {
+      tr.name = 'name-changed'
+      tr.addLabels(labels)
+    })
+    const transaction = transactionService.getCurrentTransaction()
+    expect(transaction.name).toBe('name-changed')
+    expect(transaction.context.tags).toEqual(labels)
   })
 
   it('should end transaction when component unmounts', done => {

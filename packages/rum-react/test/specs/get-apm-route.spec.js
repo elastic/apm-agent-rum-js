@@ -116,7 +116,11 @@ describe('ApmRoute', function() {
     spyOn(transactionService, 'startTransaction').and.returnValue(dummyTr)
 
     const Home = () => 'home'
-    const Topics = () => 'Topics'
+    class Topics extends React.Component {
+      render() {
+        return 'Topics'
+      }
+    }
 
     const rendered = mount(
       <Router initialEntries={['/', '/topic1', '/topic2']}>
