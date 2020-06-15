@@ -198,10 +198,11 @@ export function captureObserverEntries(list, { capturePaint }) {
 
   if (lastLcpEntry) {
     /**
+     * `startTime` -  equals to renderTime if it's nonzero, otherwise equal to loadTime.
      * `renderTime` will not be available for Image element and for the element
      * that is loaded cross-origin without the `Timing-Allow-Origin` header.
      */
-    const lcp = parseInt(lastLcpEntry.renderTime || lastLcpEntry.loadTime)
+    const lcp = parseInt(lastLcpEntry.startTime)
     metrics.lcp = lcp
     result.marks.largestContentfulPaint = lcp
   }
