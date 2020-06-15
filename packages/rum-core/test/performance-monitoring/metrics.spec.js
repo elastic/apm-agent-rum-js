@@ -176,6 +176,26 @@ describe('Metrics', () => {
         })
       })
 
+      it('should update tbt when longtasks are dispatched at different times', () => {
+        list.getEntriesByType.and.callFake(mockObserverEntryTypes)
+        captureObserverEntries(list, {
+          capturePaint: true
+        })
+        expect(metrics.tbt).toEqual({
+          start: 745.4100000031758,
+          duration: 249.92999995592982
+        })
+
+        // simulating second longtask entry list
+        captureObserverEntries(list, {
+          capturePaint: true
+        })
+        expect(metrics.tbt).toEqual({
+          start: 745.4100000031758,
+          duration: 499.85999991185963
+        })
+      })
+
       it('should calculate total blocking time based on FCP', () => {
         metrics.fcp = 1000
         calculateTotalBlockingTime(longtaskEntries)

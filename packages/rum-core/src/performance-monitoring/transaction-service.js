@@ -288,7 +288,7 @@ class TransactionService {
            * and once performance observer is disconnected
            */
           if (tr.captureTimings && metrics.tbt.duration > 0) {
-            tr.push(createTotalBlockingTimeSpan(metrics.tbt))
+            tr.spans.push(createTotalBlockingTimeSpan(metrics.tbt))
           }
         }
         captureNavigation(tr)
