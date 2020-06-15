@@ -61,17 +61,17 @@ function getApmRoute(apm) {
        */
       if (initial || pathChanged) {
         return {
+          path,
           apmComponent: withTransaction(
             path,
             'route-change',
             (transaction, props) => {
               if (transaction) {
                 const name = getTransactionName(path, props)
-                transaction.name = name
+                name && (transaction.name = name)
               }
             }
-          )(component),
-          path
+          )(component)
         }
       }
       return null
