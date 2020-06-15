@@ -25,7 +25,12 @@
 
 import { Promise } from '../common/polyfills'
 import Transaction from './transaction'
-import { PerfEntryRecorder, captureObserverEntries } from './metrics'
+import {
+  PerfEntryRecorder,
+  captureObserverEntries,
+  metrics,
+  createTotalBlockingTimeSpan
+} from './metrics'
 import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
 import { captureNavigation } from './capture-navigation'
 import {
@@ -277,6 +282,13 @@ class TransactionService {
           )
           if (name === NAME_UNKNOWN && pageLoadTransactionName) {
             tr.name = pageLoadTransactionName
+          }
+          /**
+           * Capture the TBT as span after observing for all long task entries
+           * and once performance observer is disconnected
+           */
+          if (tr.captureTimings && metrics.tbt.duration > 0) {
+            tr.spans.push(createTotalBlockingTimeSpan(metrics.tbt))
           }
         }
         captureNavigation(tr)

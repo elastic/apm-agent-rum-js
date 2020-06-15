@@ -26,6 +26,7 @@ import {
   captureObserverEntries,
   calculateTotalBlockingTime,
   createFirstInputDelaySpan,
+  createTotalBlockingTimeSpan,
   PerfEntryRecorder,
   metrics
 } from '../../src/performance-monitoring/metrics'
@@ -46,6 +47,7 @@ describe('Metrics', () => {
     beforeEach(() => {
       list.getEntriesByType.and.returnValue([])
       list.getEntriesByName.and.returnValue([])
+      metrics.tbt = { start: Infinity, duration: 0 }
     })
 
     it('should not create long tasks spans if entries are not present', () => {
@@ -154,40 +156,57 @@ describe('Metrics', () => {
 
     describe('Total Blocking Time', () => {
       it('should create total blocking time as span', () => {
-        list.getEntriesByType.and.callFake(mockObserverEntryTypes)
-        const { spans } = captureObserverEntries(list, {
-          capturePaint: true
-        })
-        const tbtSpans = spans.filter(
-          span => span.name === 'Total Blocking Time'
-        )
-        expect(tbtSpans[0]).toEqual(
+        calculateTotalBlockingTime(longtaskEntries)
+        const tbtSpan = createTotalBlockingTimeSpan(metrics.tbt)
+        expect(tbtSpan).toEqual(
           jasmine.objectContaining({
             name: 'Total Blocking Time',
-            type: LONG_TASK
+            type: LONG_TASK,
+            _start: 745.4100000031758,
+            _end: 995.3399999591056
           })
         )
       })
 
       it('should calculate total blocking time from long tasks', () => {
-        const tbt = calculateTotalBlockingTime(longtaskEntries)
-        expect(tbt).toEqual({
+        calculateTotalBlockingTime(longtaskEntries)
+        expect(metrics.tbt).toEqual({
           start: 745.4100000031758,
           duration: 249.92999995592982
         })
       })
 
+      it('should update tbt when longtasks are dispatched at different times', () => {
+        list.getEntriesByType.and.callFake(mockObserverEntryTypes)
+        captureObserverEntries(list, {
+          capturePaint: true
+        })
+        expect(metrics.tbt).toEqual({
+          start: 745.4100000031758,
+          duration: 249.92999995592982
+        })
+
+        // simulating second longtask entry list
+        captureObserverEntries(list, {
+          capturePaint: true
+        })
+        expect(metrics.tbt).toEqual({
+          start: 745.4100000031758,
+          duration: 499.85999991185963
+        })
+      })
+
       it('should calculate total blocking time based on FCP', () => {
         metrics.fcp = 1000
-        const tbt = calculateTotalBlockingTime(longtaskEntries)
-        expect(tbt).toEqual({
+        calculateTotalBlockingTime(longtaskEntries)
+        expect(metrics.tbt).toEqual({
           start: 1023.40999995591,
           duration: 245.35999997751787
         })
       })
 
       it('should return tbt as 0 when entries are not self/same-origin', () => {
-        const tbt = calculateTotalBlockingTime([
+        calculateTotalBlockingTime([
           {
             name: 'unknown',
             startTime: 10
@@ -197,7 +216,7 @@ describe('Metrics', () => {
             startTime: 20
           }
         ])
-        expect(tbt).toEqual({
+        expect(metrics.tbt).toEqual({
           start: Infinity,
           duration: 0
         })
