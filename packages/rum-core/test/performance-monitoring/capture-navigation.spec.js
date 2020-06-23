@@ -27,15 +27,17 @@ import {
   createNavigationTimingSpans,
   createResourceTimingSpans,
   createUserTimingSpans,
-  captureNavigation
+  captureNavigation,
+  getPageLoadMarks
 } from '../../src/performance-monitoring/capture-navigation'
 import Transaction from '../../src/performance-monitoring/transaction'
+import { PAGE_LOAD, ROUTE_CHANGE } from '../../src/common/constants'
+import { extend } from '../../src/common/utils'
 import resourceEntries from '../fixtures/resource-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import navTimingSpans from '../fixtures/navigation-timing-span-snapshot'
 import { TIMING_LEVEL1_ENTRY as timings } from '../fixtures/navigation-entries'
 import { mockGetEntriesByType } from '../utils/globals-mock'
-import { PAGE_LOAD, ROUTE_CHANGE } from '../../src/common/constants'
 
 const spanSnapshot = navTimingSpans.map(mapSpan)
 
@@ -305,5 +307,51 @@ describe('Capture hard navigation', function() {
     expect(tr.spans.length, 23)
 
     unMock()
+  })
+
+  it('should capture page load navigation marks', () => {
+    const marks = getPageLoadMarks(timings)
+    expect(marks.navigationTiming).toEqual(
+      jasmine.objectContaining({
+        responseEnd: 209,
+        domInteractive: 542,
+        domComplete: 962
+      })
+    )
+  })
+
+  describe('Buggy Navigation Timing data', () => {
+    it('when timestamps are 0-based instead of unix epoch', () => {
+      /**
+       * navigationStart and DOM timings in Unix epoch, other timings 0-based for Back-Forward navigations
+       * https://bugs.webkit.org/show_bug.cgi?id=168057
+       */
+      const timingCopy = extend({}, timings)
+      timingCopy.fetchStart = 0
+      timingCopy.requestStart = 10
+      timingCopy.responseStart = 25
+      timingCopy.responseEnd = 0
+      timingCopy.loadEventStart = 0
+
+      const marks = getPageLoadMarks(timingCopy)
+      expect(marks).toBe(null)
+    })
+
+    it('requestStart & responseStart before fetchStart', () => {
+      /**
+       * requestStart, responseStart before navigationStart & fetchStart
+       * https://bugs.webkit.org/show_bug.cgi?id=168055
+       * https://bugs.chromium.org/p/chromium/issues/detail?id=127644
+       */
+      const timingCopy = extend({}, timings)
+      timingCopy.requestStart = timingCopy.fetchStart - 200
+      timingCopy.responseStart = timingCopy.fetchStart - 500
+
+      const marks = getPageLoadMarks(timingCopy)
+
+      expect(marks.navigationTiming.responseStart).toBe(undefined)
+      expect(marks.navigationTiming.requestStart).toBe(undefined)
+      expect(marks.agent.timeToFirstByte).toBe(undefined)
+    })
   })
 })
