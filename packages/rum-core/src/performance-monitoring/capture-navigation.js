@@ -255,9 +255,18 @@ const COMPRESSED_NAV_TIMING_MARKS = [
   'ee'
 ]
 
-function getNavigationTimingMarks() {
-  const timing = PERF.timing
-  const fetchStart = timing.fetchStart
+function getNavigationTimingMarks(timing) {
+  const { fetchStart, navigationStart } = timing
+  /**
+   * Detect if NavigationTiming data is buggy and discard
+   * capturing navigation marks for the transaction
+   *
+   * Webkit bug - https://bugs.webkit.org/show_bug.cgi?id=168057
+   */
+  if (navigationStart && fetchStart < navigationStart) {
+    return null
+  }
+
   const marks = {}
   NAVIGATION_TIMING_MARKS.forEach(function(timingKey) {
     const m = timing[timingKey]
@@ -268,16 +277,18 @@ function getNavigationTimingMarks() {
   return marks
 }
 
-function getPageLoadMarks() {
-  const marks = getNavigationTimingMarks()
-  const agent = {
-    timeToFirstByte: marks.responseStart,
-    domInteractive: marks.domInteractive,
-    domComplete: marks.domComplete
+function getPageLoadMarks(timing) {
+  const marks = getNavigationTimingMarks(timing)
+  if (marks == null) {
+    return null
   }
   return {
     navigationTiming: marks,
-    agent
+    agent: {
+      timeToFirstByte: marks.responseStart,
+      domInteractive: marks.domInteractive,
+      domComplete: marks.domComplete
+    }
   }
 }
 
@@ -334,9 +345,9 @@ function captureNavigation(transaction) {
     })
 
     /**
-     * Page load marks that are gathered from navigation and paint timing API
+     * Page load marks that are gathered from NavigationTiming API
      */
-    transaction.addMarks(getPageLoadMarks())
+    transaction.addMarks(getPageLoadMarks(timings))
   }
 
   if (isPerfTimelineSupported()) {
@@ -365,6 +376,7 @@ function captureNavigation(transaction) {
 }
 
 export {
+  getPageLoadMarks,
   captureNavigation,
   createNavigationTimingSpans,
   createResourceTimingSpans,
