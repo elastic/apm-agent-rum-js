@@ -29,6 +29,22 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.2.1]]
+==== 5.2.1 (2020-06-24)
+
+[float]
+===== Features
+* Added support for path array in `<ApmRoute>` React component that associates
+  the transaction based on the mounted path: {issue}702[#702]
+
+[float]
+===== Bug fixes
+* Capture Total Blocking Time (TBT) only after all longtask entries
+  are observed: {issue}803[#803]
+* Do not capture page load transaction marks when the NavigationTiming data from
+  the browsers are not trustable: {issue}818[#818]
+
+
 [[release-notes-5.2.0]]
 ==== 5.2.0 (2020-05-28)
 
