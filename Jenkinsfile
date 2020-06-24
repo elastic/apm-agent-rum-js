@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@feature/pr-comment-customise') _
 
 pipeline {
   agent { label 'linux && immutable' }
@@ -364,7 +364,7 @@ pipeline {
   }
   post {
     cleanup {
-      notifyBuildResult()
+      notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize.md': 'bundlesize.md' ])
     }
   }
 }
@@ -433,6 +433,28 @@ def bundlesize(){
       set -o pipefail
       npm run bundlesize|tee bundlesize.txt
     ''')
+    // TODO: generate md for the given json files
+    writeFile file: 'bundlesize.md', text: '''
+**Total Size:** 130221 B
+
+:warning:
+> asset size limit: The following asset(s) exceed the recommended size limit (60 KiB).
+> This can impact web performance.
+> Assets:
+>   elastic-apm-opentracing.umd.min.js (60.1 KiB)
+> Webpack performance recommendations:
+>   You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
+> For more info visit https://webpack.js.org/guides/code-splitting/
+
+<details><summary>:information_source: <strong>View Stats</strong></summary>
+| Filename | Size |
+|:--- |:---:|:---:|
+| `elastic-apm-opentracing.umd.min.js` | 61515 B |
+| `elastic-apm-opentracing.umd.min.js.map` | 278318 B |
+| `elastic-apm-rum.umd.min.js` | 55470 B |
+| `elastic-apm-rum.umd.min.js.map` | 240426 B |
+</details>'''
+    stash name: 'bundlesize.md', includes: 'bundlesize.md'
   }
   catchError(buildResult: 'SUCCESS', message: 'Bundlesize report issues', stageResult: 'UNSTABLE') {
     sh(label: "Process Bundlesize out", script: '''#!/bin/bash
