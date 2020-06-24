@@ -40,12 +40,12 @@ const REMOVE_EVENT_LISTENER_STR = 'removeEventListener'
  * Resource Timing initiator types that will be captured as spans
  */
 const RESOURCE_INITIATOR_TYPES = [
+  'xmlhttprequest',
+  'fetch',
   'link',
   'css',
   'script',
   'img',
-  'xmlhttprequest',
-  'fetch',
   'beacon',
   'iframe'
 ]

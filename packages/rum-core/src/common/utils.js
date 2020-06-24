@@ -355,6 +355,10 @@ function isPerfTimelineSupported() {
   return typeof PERF.getEntriesByType === 'function'
 }
 
+function createAPISpanName(parsedUrl, isRelative) {
+  return isRelative ? parsedUrl.path : stripQueryStringFromUrl(parsedUrl.href)
+}
+
 export {
   extend,
   merge,
@@ -389,5 +393,6 @@ export {
   removeInvalidChars,
   PERF,
   isPerfTimelineSupported,
-  isBrowser
+  isBrowser,
+  createAPISpanName
 }

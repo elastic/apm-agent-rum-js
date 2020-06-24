@@ -35,8 +35,10 @@ import {
 import {
   stripQueryStringFromUrl,
   PERF,
-  isPerfTimelineSupported
+  isPerfTimelineSupported,
+  createAPISpanName
 } from '../common/utils'
+import Url from '../common/url'
 
 /**
  * Navigation Timing Spans
@@ -119,60 +121,52 @@ function createResourceTimingSpan(resourceTimingEntry) {
   return span
 }
 
+function isCapturedByPatching(apiUrls, resourceName) {
+  let captured = false
+  for (let j = 0; j < apiUrls.length; j++) {
+    const spanName = apiUrls[j]
+    const isRelative = spanName.indexOf('http') === -1
+    const parsedUrl = new Url(resourceName)
+    const compareWith = createAPISpanName(parsedUrl, isRelative)
+    if (compareWith === spanName) {
+      captured = true
+      break
+    }
+  }
+  return captured
+}
+
 function createResourceTimingSpans(entries, filterUrls, trStart, trEnd) {
   const spans = []
   for (let i = 0; i < entries.length; i++) {
-    let { initiatorType, name, startTime, responseEnd } = entries[i]
+    const { initiatorType, name, startTime, responseEnd } = entries[i]
     /**
-     * Skipping the timing information of API calls because of auto patching XHR and Fetch
+     * Skip span creation if initiatorType is other than known types specified as part of RESOURCE_INITIATOR_TYPES
+     * The reason being, there are other types like embed, video, audio, navigation etc
+     *
+     * Check the below webplatform test to know more
+     * https://github.com/web-platform-tests/wpt/blob/b0020d5df18998609b38786878f7a0b92cc680aa/resource-timing/resource_initiator_types.html#L93
+     */
+    if (RESOURCE_INITIATOR_TYPES.indexOf(initiatorType) === -1) {
+      continue
+    }
+
+    /**
+     * Create Spans for API calls (XHR, Fetch) only if its not captured by the patch
+     *
+     * This would happen if our agent is downlaoded asyncrhonously and page does
+     * API requests before the agent patches the required modules.
      */
     if (
-      initiatorType === 'xmlhttprequest' ||
-      initiatorType === 'fetch' ||
-      !name
+      (initiatorType === RESOURCE_INITIATOR_TYPES[0] ||
+        initiatorType === RESOURCE_INITIATOR_TYPES[1]) &&
+      isCapturedByPatching(filterUrls, name)
     ) {
       continue
     }
-    /**
-     * Create spans for all known resource initiator types
-     */
-    if (RESOURCE_INITIATOR_TYPES.indexOf(initiatorType) !== -1) {
-      if (!shouldCreateSpan(startTime, responseEnd, trStart, trEnd)) {
-        continue
-      }
-      spans.push(createResourceTimingSpan(entries[i]))
-    } else {
-      /**
-       * Since IE does not support initiatorType in Resource timing entry,
-       * We have to manually filter the API calls from creating duplicate Spans
-       *
-       * Skip span creation if initiatorType is other than known types specified as part of RESOURCE_INITIATOR_TYPES
-       * The reason being, there are other types like embed, video, audio, navigation etc
-       *
-       * Check the below webplatform test to know more
-       * https://github.com/web-platform-tests/wpt/blob/b0020d5df18998609b38786878f7a0b92cc680aa/resource-timing/resource_initiator_types.html#L93
-       */
-      if (initiatorType != null) {
-        continue
-      }
 
-      let foundAjaxReq = false
-      for (let j = 0; j < filterUrls.length; j++) {
-        const idx = name.lastIndexOf(filterUrls[j])
-        if (idx > -1 && idx === name.length - filterUrls[j].length) {
-          foundAjaxReq = true
-          break
-        }
-      }
-      /**
-       * Create span if its not an ajax request
-       */
-      if (
-        !foundAjaxReq &&
-        shouldCreateSpan(startTime, responseEnd, trStart, trEnd)
-      ) {
-        spans.push(createResourceTimingSpan(entries[i]))
-      }
+    if (shouldCreateSpan(startTime, responseEnd, trStart, trEnd)) {
+      spans.push(createResourceTimingSpan(entries[i]))
     }
   }
   return spans
@@ -206,6 +200,10 @@ function getApiSpanNames({ spans }) {
   for (let i = 0; i < spans.length; i++) {
     const span = spans[i]
     if (span.type === 'external' && span.subtype === 'http') {
+      /**
+       * Removes the HTTP method part from the API calls
+       * GET /foo/bar -> /foo/bar
+       */
       apiCalls.push(span.name.split(' ')[1])
     }
   }
