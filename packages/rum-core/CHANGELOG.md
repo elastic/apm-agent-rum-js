@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.3.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.3.0...@elastic/apm-rum-core@5.3.1) (2020-06-24)
+
+
+### Bug Fixes
+
+* **rum-core:** capture tbt after all task entries are observed ([#803](https://github.com/elastic/apm-agent-rum-js/issues/803)) ([5ec41ba](https://github.com/elastic/apm-agent-rum-js/commit/5ec41bab4ac6861a8211ce12abbed347d26c9214))
+* **rum-core:** protect aganist buggy navigation timing data ([#819](https://github.com/elastic/apm-agent-rum-js/issues/819)) ([9459479](https://github.com/elastic/apm-agent-rum-js/commit/94594792e35f824c8733dd1c8ee5cb9bdb73059f))
+
+
+
+
+
 # [5.3.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.2.0...@elastic/apm-rum-core@5.3.0) (2020-05-28)
 
 
