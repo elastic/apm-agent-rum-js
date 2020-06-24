@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.1.2...@elastic/apm-rum-react@1.2.0) (2020-06-24)
+
+
+### Features
+
+* **rum-react:** use correct path when route is path array ([#800](https://github.com/elastic/apm-agent-rum-js/issues/800)) ([18ee0bf](https://github.com/elastic/apm-agent-rum-js/commit/18ee0bf28a8896975c940442f67a99e11089f41e))
+
+
+
+
+
 ## [1.1.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.1.1...@elastic/apm-rum-react@1.1.2) (2020-05-28)
 
 
