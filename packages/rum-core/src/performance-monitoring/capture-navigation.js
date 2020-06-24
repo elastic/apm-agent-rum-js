@@ -147,7 +147,10 @@ function createResourceTimingSpans(entries, filterUrls, trStart, trEnd) {
      * Check the below webplatform test to know more
      * https://github.com/web-platform-tests/wpt/blob/b0020d5df18998609b38786878f7a0b92cc680aa/resource-timing/resource_initiator_types.html#L93
      */
-    if (RESOURCE_INITIATOR_TYPES.indexOf(initiatorType) === -1) {
+    if (
+      RESOURCE_INITIATOR_TYPES.indexOf(initiatorType) === -1 ||
+      name == null
+    ) {
       continue
     }
 
