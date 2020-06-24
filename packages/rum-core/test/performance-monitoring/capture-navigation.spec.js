@@ -175,6 +175,32 @@ describe('Capture hard navigation', function() {
     expect(spans.map(mapSpan)).toEqual(spanSnapshot)
   })
 
+  it('should filter intake API calls from resource timing', function() {
+    const dummyEntries = [
+      {
+        name: 'http://localhost:8200/intake/v2/rum/events',
+        initiatorType: 'fetch',
+        entryType: 'resource',
+        startTime: 25,
+        responseEnd: 120
+      },
+      {
+        name: 'http://apm-server:8200/intake/v3/rum/events',
+        initiatorType: 'xmlhttprequest',
+        entryType: 'resource',
+        startTime: 100,
+        responseEnd: 150
+      }
+    ]
+    const spans = createResourceTimingSpans(
+      dummyEntries,
+      [],
+      transactionStart,
+      transactionEnd
+    )
+    expect(spans).toEqual([])
+  })
+
   it('should createUserTimingSpans', function() {
     const spans = createUserTimingSpans(
       userTimingEntries,

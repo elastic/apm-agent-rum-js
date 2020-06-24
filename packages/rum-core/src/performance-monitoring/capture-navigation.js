@@ -121,10 +121,14 @@ function createResourceTimingSpan(resourceTimingEntry) {
   return span
 }
 
-function isCapturedByPatching(apiUrls, resourceName) {
+/**
+ * Checks if the span is already captured via Patching by
+ * comparing the given URL aganist the list of span names
+ */
+function isAlreadyCaptured(spanUrls, resourceName) {
   let captured = false
-  for (let j = 0; j < apiUrls.length; j++) {
-    const spanName = apiUrls[j]
+  for (let j = 0; j < spanUrls.length; j++) {
+    const spanName = spanUrls[j]
     const isRelative = spanName.indexOf('http') === -1
     const parsedUrl = new Url(resourceName)
     const compareWith = createAPISpanName(parsedUrl, isRelative)
@@ -134,6 +138,14 @@ function isCapturedByPatching(apiUrls, resourceName) {
     }
   }
   return captured
+}
+
+/**
+ * Check if the given url matches APM Server's Intake
+ * API endpoint and ignore it from Spans
+ */
+function isIntakeAPIEndpoint(url) {
+  return /intake\/v\d+\/rum\/events/.test(url)
 }
 
 function createResourceTimingSpans(entries, filterUrls, trStart, trEnd) {
@@ -163,7 +175,7 @@ function createResourceTimingSpans(entries, filterUrls, trStart, trEnd) {
     if (
       (initiatorType === RESOURCE_INITIATOR_TYPES[0] ||
         initiatorType === RESOURCE_INITIATOR_TYPES[1]) &&
-      isCapturedByPatching(filterUrls, name)
+      (isIntakeAPIEndpoint(name) || isAlreadyCaptured(filterUrls, name))
     ) {
       continue
     }
