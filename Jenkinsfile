@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@feature/pr-comment-customise') _
+@Library('apm@master') _
 
 pipeline {
   agent { label 'linux && immutable' }
@@ -448,12 +448,14 @@ def bundlesize(){
 > For more info visit https://webpack.js.org/guides/code-splitting/
 
 <details><summary>:information_source: <strong>View Stats</strong></summary>
-| Filename | Size |
-|:--- |:---:|:---:|
-| `elastic-apm-opentracing.umd.min.js` | 61515 B |
-| `elastic-apm-opentracing.umd.min.js.map` | 278318 B |
-| `elastic-apm-rum.umd.min.js` | 55470 B |
-| `elastic-apm-rum.umd.min.js.map` | 240426 B |
+
+Filename | Size
+ --- | ---
+`elastic-apm-opentracing.umd.min.js` | 61515 B
+`elastic-apm-opentracing.umd.min.js.map` | 278318 B
+`elastic-apm-rum.umd.min.js` | 55470 B
+`elastic-apm-rum.umd.min.js.map` | 240426 B
+
 </details>'''
   stash name: 'bundlesize.md', includes: 'bundlesize.md'
   catchError(buildResult: 'SUCCESS', message: 'Bundlesize report issues', stageResult: 'UNSTABLE') {
