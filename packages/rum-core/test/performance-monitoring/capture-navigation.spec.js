@@ -176,7 +176,7 @@ describe('Capture hard navigation', function() {
   })
 
   it('should filter intake API calls from resource timing', function() {
-    const dummyEntries = [
+    const entries = [
       {
         name: 'http://localhost:8200/intake/v2/rum/events',
         initiatorType: 'fetch',
@@ -193,12 +193,76 @@ describe('Capture hard navigation', function() {
       }
     ]
     const spans = createResourceTimingSpans(
-      dummyEntries,
+      entries,
       [],
       transactionStart,
       transactionEnd
     )
     expect(spans).toEqual([])
+  })
+
+  it('should add/filter XHR/Fetch spans from RT data', function() {
+    const entries = [
+      {
+        name: 'http://localhost:8000/fetch',
+        initiatorType: 'fetch',
+        entryType: 'resource',
+        startTime: 25,
+        responseEnd: 120
+      },
+      {
+        name: 'http://localhost:8000/data?query=foo',
+        initiatorType: 'xmlhttprequest',
+        entryType: 'resource',
+        startTime: 100,
+        responseEnd: 150
+      }
+    ]
+    const getCount = (apiCalls = []) =>
+      createResourceTimingSpans(
+        entries,
+        apiCalls,
+        transactionStart,
+        transactionEnd
+      ).length
+
+    expect(getCount()).toBe(2)
+    // different url same time
+    expect(
+      getCount([
+        {
+          url: 'http://localhost:8000/data',
+          start: 100
+        }
+      ])
+    ).toBe(2)
+    // same url with different query params
+    expect(
+      getCount([
+        {
+          url: 'http://localhost:8000/data?query=bar',
+          start: 99
+        }
+      ])
+    ).toBe(2)
+    // same url different time
+    expect(
+      getCount([
+        {
+          url: 'http://localhost:8000/fetch',
+          start: 10
+        }
+      ])
+    ).toBe(2)
+    // same url same time
+    expect(
+      getCount([
+        {
+          url: 'http://localhost:8000/fetch',
+          start: 24
+        }
+      ])
+    ).toBe(1)
   })
 
   it('should createUserTimingSpans', function() {

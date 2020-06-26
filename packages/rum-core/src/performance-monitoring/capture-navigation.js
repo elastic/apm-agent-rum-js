@@ -226,10 +226,10 @@ function getAPISpans({ spans }) {
   for (let i = 0; i < spans.length; i++) {
     const span = spans[i]
     if (span.type === 'external' && span.subtype === 'http') {
-      const http = span.context.http
-      if (http && http.url) {
+      const context = span.context
+      if (context) {
         apiSpans.push({
-          url: http.url,
+          url: context.http.url,
           start: span._start
         })
       }
