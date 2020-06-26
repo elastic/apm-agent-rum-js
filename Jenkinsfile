@@ -90,6 +90,8 @@ pipeline {
                     bundlesize()
                   }
                   stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
+                }
+                dir("${BASE_DIR}"){
                   // To run in the worker otherwise some tools won't be in place when using the above docker container
                   generateReport(id: 'bundlesize', input: 'packages/rum/reports/apm-*-report.html', template: true, compare: true, templateFormat: 'md')
                 }
