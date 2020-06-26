@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@feature/bundlesize-step-1') _
 
 pipeline {
   agent { label 'linux && immutable' }
