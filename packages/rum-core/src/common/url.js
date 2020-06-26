@@ -78,7 +78,7 @@ const RULES = [
 ]
 const PROTOCOL_REGEX = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i
 
-class Url {
+export default class Url {
   constructor(url) {
     let { protocol, address, slashes } = this.extractProtocol(url || '')
     const relative = !protocol && !slashes
@@ -215,5 +215,3 @@ class Url {
     }
   }
 }
-
-export default Url

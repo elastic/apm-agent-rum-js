@@ -48,6 +48,7 @@ import {
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__, state } from '../state'
+import slugifyUrl from '../common/slugify'
 
 class TransactionService {
   constructor(logger, config) {
@@ -263,7 +264,7 @@ class TransactionService {
           const pageLoadTransactionName = this._config.get(
             'pageLoadTransactionName'
           )
-          if (name === NAME_UNKNOWN && pageLoadTransactionName) {
+          if (pageLoadTransactionName) {
             tr.name = pageLoadTransactionName
           }
           /**
@@ -274,6 +275,13 @@ class TransactionService {
             tr.spans.push(createTotalBlockingTimeSpan(metrics.tbt))
           }
         }
+        /**
+         * Categorize the transaction based on the current location
+         */
+        if (name === NAME_UNKNOWN) {
+          tr.name = slugifyUrl(window.location.href)
+        }
+
         captureNavigation(tr)
 
         /**
