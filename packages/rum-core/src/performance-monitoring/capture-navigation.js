@@ -35,10 +35,8 @@ import {
 import {
   stripQueryStringFromUrl,
   PERF,
-  isPerfTimelineSupported,
-  createAPISpanName
+  isPerfTimelineSupported
 } from '../common/utils'
-import Url from '../common/url'
 
 /**
  * Navigation Timing Spans
@@ -121,18 +119,31 @@ function createResourceTimingSpan(resourceTimingEntry) {
   return span
 }
 
+function isBetween(spanStart, resourceStart) {
+  /**
+   * Delta used for comparing the timings between patched
+   * API span timing and ResourceTiming data
+   */
+  const deltaTimeInMs = 2
+
+  return (
+    spanStart >= resourceStart - deltaTimeInMs &&
+    spanStart <= resourceStart + deltaTimeInMs
+  )
+}
+
 /**
- * Checks if the span is already captured via Patching by
- * comparing the given URL aganist the list of span names
+ * Checks if the span is already captured via XHR/Fetch patch by
+ * comparing the given resource URL aganist the list of span urls
+ * including the query parameters
  */
-function isAlreadyCaptured(spanUrls, resourceName) {
+function isAlreadyCaptured(apiSpans, entry) {
   let captured = false
-  for (let j = 0; j < spanUrls.length; j++) {
-    const spanName = spanUrls[j]
-    const isRelative = spanName.indexOf('http') === -1
-    const parsedUrl = new Url(resourceName)
-    const compareWith = createAPISpanName(parsedUrl, isRelative)
-    if (compareWith === spanName) {
+
+  for (let i = 0; i < apiSpans.length; i++) {
+    const { url, start } = apiSpans[i]
+
+    if (url === entry.name && isBetween(start, entry.startTime)) {
       captured = true
       break
     }
@@ -148,7 +159,7 @@ function isIntakeAPIEndpoint(url) {
   return /intake\/v\d+\/rum\/events/.test(url)
 }
 
-function createResourceTimingSpans(entries, filterUrls, trStart, trEnd) {
+function createResourceTimingSpans(entries, apiSpans, trStart, trEnd) {
   const spans = []
   for (let i = 0; i < entries.length; i++) {
     const { initiatorType, name, startTime, responseEnd } = entries[i]
@@ -175,7 +186,7 @@ function createResourceTimingSpans(entries, filterUrls, trStart, trEnd) {
     if (
       (initiatorType === RESOURCE_INITIATOR_TYPES[0] ||
         initiatorType === RESOURCE_INITIATOR_TYPES[1]) &&
-      (isIntakeAPIEndpoint(name) || isAlreadyCaptured(filterUrls, name))
+      (isIntakeAPIEndpoint(name) || isAlreadyCaptured(apiSpans, entries[i]))
     ) {
       continue
     }
@@ -209,20 +220,22 @@ function createUserTimingSpans(entries, trStart, trEnd) {
   return userTimingSpans
 }
 
-function getApiSpanNames({ spans }) {
-  const apiCalls = []
+function getAPISpans({ spans }) {
+  const apiSpans = []
 
   for (let i = 0; i < spans.length; i++) {
     const span = spans[i]
     if (span.type === 'external' && span.subtype === 'http') {
-      /**
-       * Removes the HTTP method part from the API calls
-       * GET /foo/bar -> /foo/bar
-       */
-      apiCalls.push(span.name.split(' ')[1])
+      const http = span.context.http
+      if (http && http.url) {
+        apiSpans.push({
+          url: http.url,
+          start: span._start
+        })
+      }
     }
   }
-  return apiCalls
+  return apiSpans
 }
 
 /**
@@ -369,11 +382,11 @@ function captureNavigation(transaction) {
      * Capture resource timing information as spans
      */
     const resourceEntries = PERF.getEntriesByType(RESOURCE)
-    const apiCalls = getApiSpanNames(transaction)
+    const apiSpans = getAPISpans(transaction)
 
     createResourceTimingSpans(
       resourceEntries,
-      apiCalls,
+      apiSpans,
       trStart,
       trEnd
     ).forEach(span => transaction.spans.push(span))

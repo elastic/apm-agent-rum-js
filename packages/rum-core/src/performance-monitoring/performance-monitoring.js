@@ -28,7 +28,7 @@ import {
   isDtHeaderValid,
   parseDtHeaderValue,
   getDtHeaderValue,
-  createAPISpanName
+  stripQueryStringFromUrl
 } from '../common/utils'
 import Url from '../common/url'
 import { patchEventHandler } from '../common/patching'
@@ -254,7 +254,11 @@ export default class PerformanceMonitoring {
       const data = task.data
       const requestUrl = new Url(data.url)
       const spanName =
-        data.method + ' ' + createAPISpanName(requestUrl, requestUrl.relative)
+        data.method +
+        ' ' +
+        (requestUrl.relative
+          ? requestUrl.path
+          : stripQueryStringFromUrl(requestUrl.href))
 
       if (!transactionService.getCurrentTransaction()) {
         transactionService.startTransaction(spanName, HTTP_REQUEST_TYPE, {
