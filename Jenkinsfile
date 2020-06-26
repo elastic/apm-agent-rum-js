@@ -364,7 +364,7 @@ pipeline {
   }
   post {
     cleanup {
-      notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize.md': 'bundlesize.md' ])
+      notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize': 'bundlesize.md' ])
     }
   }
 }
@@ -434,21 +434,7 @@ def bundlesize(){
       npm run bundlesize|tee bundlesize.txt
     ''')
   }
-  // TODO: generate md for the given json files
-  writeFile file: 'bundlesize.md', text: '''
-**Total Size:** 130221 B
-
-<details><summary>:information_source: <strong>View Stats</strong></summary>
-
-Filename | Size
- --- | ---
-`elastic-apm-opentracing.umd.min.js` | 61515 B
-`elastic-apm-opentracing.umd.min.js.map` | 278318 B
-`elastic-apm-rum.umd.min.js` | 55470 B
-`elastic-apm-rum.umd.min.js.map` | 240426 B
-
-</details>'''
-  stash name: 'bundlesize.md', includes: 'bundlesize.md'
+  generateReport(id: 'bundlesize', template: true, compare: true)
   catchError(buildResult: 'SUCCESS', message: 'Bundlesize report issues', stageResult: 'UNSTABLE') {
     sh(label: "Process Bundlesize out", script: '''#!/bin/bash
       grep -e "\\(FAIL\\|PASS\\)" bundlesize.txt|cut -d ":" -f 2 >bundlesize-lines.txt
