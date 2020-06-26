@@ -364,6 +364,7 @@ pipeline {
   }
   post {
     cleanup {
+      // bundlesize id was generated previously, see the bundlesize function
       notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize': 'bundlesize.md' ])
     }
   }
@@ -434,7 +435,7 @@ def bundlesize(){
       npm run bundlesize|tee bundlesize.txt
     ''')
   }
-  generateReport(id: 'bundlesize', template: true, compare: true)
+  generateReport(id: 'bundlesize', input: 'packages/rum/reports/apm-*-report.html', template: true, compare: true, templateFormat: 'md')
   catchError(buildResult: 'SUCCESS', message: 'Bundlesize report issues', stageResult: 'UNSTABLE') {
     sh(label: "Process Bundlesize out", script: '''#!/bin/bash
       grep -e "\\(FAIL\\|PASS\\)" bundlesize.txt|cut -d ":" -f 2 >bundlesize-lines.txt
