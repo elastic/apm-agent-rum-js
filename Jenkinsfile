@@ -90,6 +90,8 @@ pipeline {
                     bundlesize()
                   }
                   stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
+                  // To run in the worker otherwise some tools won't be in place when using the above docker container
+                  generateReport(id: 'bundlesize', input: 'packages/rum/reports/apm-*-report.html', template: true, compare: true, templateFormat: 'md')
                 }
               }
             }
@@ -435,7 +437,6 @@ def bundlesize(){
       npm run bundlesize|tee bundlesize.txt
     ''')
   }
-  generateReport(id: 'bundlesize', input: 'packages/rum/reports/apm-*-report.html', template: true, compare: true, templateFormat: 'md')
   catchError(buildResult: 'SUCCESS', message: 'Bundlesize report issues', stageResult: 'UNSTABLE') {
     sh(label: "Process Bundlesize out", script: '''#!/bin/bash
       grep -e "\\(FAIL\\|PASS\\)" bundlesize.txt|cut -d ":" -f 2 >bundlesize-lines.txt
