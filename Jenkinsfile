@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@master') _
+@Library('apm@current') _
 
 pipeline {
   agent { label 'linux && immutable' }
@@ -437,15 +437,6 @@ def bundlesize(){
   // TODO: generate md for the given json files
   writeFile file: 'bundlesize.md', text: '''
 **Total Size:** 130221 B
-
-:warning:
-> asset size limit: The following asset(s) exceed the recommended size limit (60 KiB).
-> This can impact web performance.
-> Assets:
->   elastic-apm-opentracing.umd.min.js (60.1 KiB)
-> Webpack performance recommendations:
->   You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
-> For more info visit https://webpack.js.org/guides/code-splitting/
 
 <details><summary>:information_source: <strong>View Stats</strong></summary>
 
