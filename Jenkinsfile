@@ -9,7 +9,7 @@ pipeline {
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     NOTIFY_TO = credentials('notify-to')
     JOB_GCS_BUCKET = credentials('gcs-bucket')
-    PIPELINE_LOG_LEVEL='INFO'
+    PIPELINE_LOG_LEVEL = 'DEBUG'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
     SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
