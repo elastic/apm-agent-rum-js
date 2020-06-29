@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@feature/bundlesize-step-1') _
+@Library('apm@current') _
 
 pipeline {
   agent { label 'linux && immutable' }
@@ -9,7 +9,7 @@ pipeline {
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     NOTIFY_TO = credentials('notify-to')
     JOB_GCS_BUCKET = credentials('gcs-bucket')
-    PIPELINE_LOG_LEVEL = 'DEBUG'
+    PIPELINE_LOG_LEVEL = 'INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
     SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
@@ -368,7 +368,7 @@ pipeline {
   }
   post {
     cleanup {
-      // bundlesize id was generated previously, see the bundlesize function
+      // bundlesize id was generated previously with the generateReport step in the lint stage.
       notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize': 'bundlesize.md' ])
     }
   }
