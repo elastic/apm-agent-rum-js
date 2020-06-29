@@ -28,12 +28,13 @@ import { patchFetch } from './fetch-patch'
 import { patchHistory } from './history-patch'
 import { patchEventTarget } from './event-target-patch'
 import EventHandler from '../event-handler'
-
+import { now } from '../utils'
 import { HISTORY, FETCH, XMLHTTPREQUEST, EVENT_TARGET } from '../constants'
 
 const patchEventHandler = new EventHandler()
-
+let patchedTime = null
 let alreadyPatched = false
+
 function patchAll() {
   if (!alreadyPatched) {
     alreadyPatched = true
@@ -43,6 +44,7 @@ function patchAll() {
     patchFetch(function(event, task) {
       patchEventHandler.send(FETCH, [event, task])
     })
+    patchedTime = now()
     patchHistory(function(event, task) {
       patchEventHandler.send(HISTORY, [event, task])
     })
@@ -54,4 +56,4 @@ function patchAll() {
   return patchEventHandler
 }
 
-export { patchAll, patchEventHandler }
+export { patchAll, patchEventHandler, patchedTime }

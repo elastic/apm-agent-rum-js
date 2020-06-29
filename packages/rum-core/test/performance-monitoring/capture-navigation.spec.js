@@ -154,7 +154,7 @@ describe('Capture hard navigation', function() {
   it('should createResourceTimingSpans', function() {
     const spans = createResourceTimingSpans(
       resourceEntries,
-      ['http://ajax-filter.test'],
+      null,
       transactionStart,
       transactionEnd
     )
@@ -194,14 +194,14 @@ describe('Capture hard navigation', function() {
     ]
     const spans = createResourceTimingSpans(
       entries,
-      [],
+      150,
       transactionStart,
       transactionEnd
     )
     expect(spans).toEqual([])
   })
 
-  it('should add/filter XHR/Fetch spans from RT data', function() {
+  it('should add/filter XHR/Fetch spans from RT data based on patch time', function() {
     const entries = [
       {
         name: 'http://localhost:8000/fetch',
@@ -218,51 +218,22 @@ describe('Capture hard navigation', function() {
         responseEnd: 150
       }
     ]
-    const getCount = (apiCalls = []) =>
+    const getCount = requestPatchTime =>
       createResourceTimingSpans(
         entries,
-        apiCalls,
+        requestPatchTime,
         transactionStart,
         transactionEnd
       ).length
 
     expect(getCount()).toBe(2)
-    // different url same time
-    expect(
-      getCount([
-        {
-          url: 'http://localhost:8000/data',
-          start: 100
-        }
-      ])
-    ).toBe(2)
-    // same url with different query params
-    expect(
-      getCount([
-        {
-          url: 'http://localhost:8000/data?query=bar',
-          start: 99
-        }
-      ])
-    ).toBe(2)
-    // same url different time
-    expect(
-      getCount([
-        {
-          url: 'http://localhost:8000/fetch',
-          start: 10
-        }
-      ])
-    ).toBe(2)
-    // same url same time
-    expect(
-      getCount([
-        {
-          url: 'http://localhost:8000/fetch',
-          start: 24
-        }
-      ])
-    ).toBe(1)
+    // same time as start of 1st resource
+    expect(getCount(25)).toBe(2)
+    // after first res start time
+    expect(getCount(30)).toBe(1)
+    expect(getCount(100)).toBe(1)
+    // after both resources
+    expect(getCount(101)).toBe(0)
   })
 
   it('should createUserTimingSpans', function() {

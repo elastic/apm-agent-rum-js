@@ -37,6 +37,7 @@ import {
   PERF,
   isPerfTimelineSupported
 } from '../common/utils'
+import * as patch from '../common/patching'
 
 /**
  * Navigation Timing Spans
@@ -119,36 +120,13 @@ function createResourceTimingSpan(resourceTimingEntry) {
   return span
 }
 
-function isBetween(spanStart, resourceStart) {
-  /**
-   * Delta used for comparing the timings between patched
-   * API span timing and ResourceTiming data
-   */
-  const deltaTimeInMs = 2
-
-  return (
-    spanStart >= resourceStart - deltaTimeInMs &&
-    spanStart <= resourceStart + deltaTimeInMs
-  )
-}
-
 /**
  * Checks if the span is already captured via XHR/Fetch patch by
- * comparing the given resource URL aganist the list of span urls
- * including the query parameters
+ * comparing the given resource startTime(fetchStart) aganist the
+ * patch code execution time.
  */
-function isAlreadyCaptured(apiSpans, entry) {
-  let captured = false
-
-  for (let i = 0; i < apiSpans.length; i++) {
-    const { url, start } = apiSpans[i]
-
-    if (url === entry.name && isBetween(start, entry.startTime)) {
-      captured = true
-      break
-    }
-  }
-  return captured
+function isCapturedByPatching(resourceStartTime, requestPatchTime) {
+  return requestPatchTime != null && resourceStartTime > requestPatchTime
 }
 
 /**
@@ -159,7 +137,7 @@ function isIntakeAPIEndpoint(url) {
   return /intake\/v\d+\/rum\/events/.test(url)
 }
 
-function createResourceTimingSpans(entries, apiSpans, trStart, trEnd) {
+function createResourceTimingSpans(entries, requestPatchTime, trStart, trEnd) {
   const spans = []
   for (let i = 0; i < entries.length; i++) {
     const { initiatorType, name, startTime, responseEnd } = entries[i]
@@ -186,7 +164,8 @@ function createResourceTimingSpans(entries, apiSpans, trStart, trEnd) {
     if (
       (initiatorType === RESOURCE_INITIATOR_TYPES[0] ||
         initiatorType === RESOURCE_INITIATOR_TYPES[1]) &&
-      (isIntakeAPIEndpoint(name) || isAlreadyCaptured(apiSpans, entries[i]))
+      (isIntakeAPIEndpoint(name) ||
+        isCapturedByPatching(startTime, requestPatchTime))
     ) {
       continue
     }
@@ -218,24 +197,6 @@ function createUserTimingSpans(entries, trStart, trEnd) {
     userTimingSpans.push(span)
   }
   return userTimingSpans
-}
-
-function getAPISpans({ spans }) {
-  const apiSpans = []
-
-  for (let i = 0; i < spans.length; i++) {
-    const span = spans[i]
-    if (span.type === 'external' && span.subtype === 'http') {
-      const context = span.context
-      if (context) {
-        apiSpans.push({
-          url: context.http.url,
-          start: span._start
-        })
-      }
-    }
-  }
-  return apiSpans
 }
 
 /**
@@ -338,7 +299,6 @@ function captureNavigation(transaction) {
    * for few extra spans than soft navigations which
    * happens on single page applications
    */
-
   if (transaction.type === PAGE_LOAD) {
     /**
      * Adjust custom marks properly to fit in the transaction timeframe
@@ -382,11 +342,9 @@ function captureNavigation(transaction) {
      * Capture resource timing information as spans
      */
     const resourceEntries = PERF.getEntriesByType(RESOURCE)
-    const apiSpans = getAPISpans(transaction)
-
     createResourceTimingSpans(
       resourceEntries,
-      apiSpans,
+      patch.patchedTime,
       trStart,
       trEnd
     ).forEach(span => transaction.spans.push(span))
