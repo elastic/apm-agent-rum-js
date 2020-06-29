@@ -9,7 +9,7 @@ pipeline {
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     NOTIFY_TO = credentials('notify-to')
     JOB_GCS_BUCKET = credentials('gcs-bucket')
-    PIPELINE_LOG_LEVEL='INFO'
+    PIPELINE_LOG_LEVEL = 'INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
     SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
@@ -90,6 +90,10 @@ pipeline {
                     bundlesize()
                   }
                   stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
+                }
+                dir("${BASE_DIR}"){
+                  // To run in the worker otherwise some tools won't be in place when using the above docker container
+                  generateReport(id: 'bundlesize', input: 'packages/rum/reports/apm-*-report.html', template: true, compare: true, templateFormat: 'md')
                 }
               }
             }
@@ -364,7 +368,8 @@ pipeline {
   }
   post {
     cleanup {
-      notifyBuildResult()
+      // bundlesize id was generated previously with the generateReport step in the lint stage.
+      notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize': 'bundlesize.md' ])
     }
   }
 }
