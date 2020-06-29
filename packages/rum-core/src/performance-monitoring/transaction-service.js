@@ -47,8 +47,7 @@ import {
   FIRST_INPUT
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
-import { state } from './bootstrap'
-import { __DEV__ } from '../env'
+import { __DEV__, state } from '../state'
 
 class TransactionService {
   constructor(logger, config) {

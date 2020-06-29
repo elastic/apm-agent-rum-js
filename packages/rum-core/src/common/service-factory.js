@@ -32,7 +32,7 @@ import {
   LOGGING_SERVICE,
   APM_SERVER
 } from './constants'
-import { __DEV__ } from '../env'
+import { __DEV__ } from '../state'
 
 const serviceCreators = {
   [CONFIG_SERVICE]: () => new ConfigService(),

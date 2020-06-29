@@ -50,7 +50,7 @@ import {
   SPAN_MODEL,
   TRANSACTION_MODEL
 } from '../common/truncate'
-import { __DEV__ } from '../env'
+import { __DEV__ } from '../state'
 
 /**
  * Parameters used for Managed Transactions
