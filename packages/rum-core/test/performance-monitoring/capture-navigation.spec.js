@@ -226,14 +226,15 @@ describe('Capture hard navigation', function() {
         transactionEnd
       ).length
 
-    expect(getCount()).toBe(2)
+    expect(getCount(null)).toBe(2)
     // same time as start of 1st resource
-    expect(getCount(25)).toBe(2)
+    expect(getCount(25)).toBe(1)
     // after first res start time
     expect(getCount(30)).toBe(1)
-    expect(getCount(100)).toBe(1)
     // after both resources
-    expect(getCount(101)).toBe(0)
+    expect(getCount(101)).toBe(2)
+    // before both resources
+    expect(getCount(10)).toBe(0)
   })
 
   it('should createUserTimingSpans', function() {
