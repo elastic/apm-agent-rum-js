@@ -28,7 +28,6 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 import {
   groupSmallContinuouslySimilarSpans,
-  checkBrowserResponsiveness,
   adjustTransactionSpans
 } from '../../src/performance-monitoring/performance-monitoring'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
@@ -118,31 +117,6 @@ describe('PerformanceMonitoring', function() {
     expect(performanceMonitoring.filterTransaction(transaction4)).toBe(false)
     expect(logger.debug).toHaveBeenCalledWith(
       'transaction(4, Unknown) was discarded! Transaction duration is 0'
-    )
-  })
-
-  it('should filter transactions based on browser responsiveness', function() {
-    spyOn(logger, 'debug').and.callThrough()
-    expect(logger.debug).not.toHaveBeenCalled()
-    var tr = new Transaction('transaction', 'transaction', {
-      id: 212,
-      transactionSampleRate: 1,
-      managed: true,
-      startTime: 1
-    })
-    var span = tr.startSpan('test span', 'test span type')
-    span.end()
-    tr.end(3501)
-
-    tr.browserResponsivenessCounter = 3
-    var wasBrowserResponsive = performanceMonitoring.filterTransaction(tr)
-    expect(wasBrowserResponsive).toBe(false)
-    expect(logger.debug).toHaveBeenCalledWith(
-      'transaction(212, transaction) was discarded! Browser was not responsive enough during the transaction.',
-      ' duration:',
-      3500,
-      ' browserResponsivenessCounter:',
-      3
     )
   })
 
@@ -814,32 +788,6 @@ describe('PerformanceMonitoring', function() {
       expect(grouped.length).toBe(2)
       expect(grouped[0].name).toBe('4x name')
       expect(grouped[1].name).toBe('another-name')
-    })
-
-    it('should calculate browser responsiveness', function() {
-      const tr = new Transaction('transaction', 'transaction', {
-        startTime: 1
-      })
-      tr.end(400)
-
-      tr.browserResponsivenessCounter = 0
-      var resp = checkBrowserResponsiveness(tr, 500, 2)
-      expect(resp).toBe(true)
-
-      tr._end = 1001
-      tr.browserResponsivenessCounter = 2
-      resp = checkBrowserResponsiveness(tr, 500, 2)
-      expect(resp).toBe(true)
-
-      tr._end = 1601
-      tr.browserResponsivenessCounter = 2
-      resp = checkBrowserResponsiveness(tr, 500, 2)
-      expect(resp).toBe(true)
-
-      tr._end = 3001
-      tr.browserResponsivenessCounter = 3
-      resp = checkBrowserResponsiveness(tr, 500, 2)
-      expect(resp).toBe(false)
     })
 
     it('should reset spans for unsampled transactions', function() {

@@ -25,13 +25,13 @@
 
 import { isPlatformSupported, isBrowser } from './common/utils'
 import { patchAll } from './common/patching'
-import { bootstrapMetrics } from './performance-monitoring/metrics'
+import { state } from './state'
 
 let enabled = false
 export function bootstrap() {
   if (isPlatformSupported()) {
     patchAll()
-    bootstrapMetrics()
+    bootstrapPerf()
     enabled = true
   } else if (isBrowser) {
     /**
@@ -42,4 +42,20 @@ export function bootstrap() {
   }
 
   return enabled
+}
+
+export function bootstrapPerf() {
+  if (document.visibilityState === 'hidden') {
+    state.lastHiddenStart = 0
+  }
+
+  window.addEventListener(
+    'visibilitychange',
+    () => {
+      if (document.visibilityState === 'hidden') {
+        state.lastHiddenStart = performance.now()
+      }
+    },
+    { capture: true }
+  )
 }
