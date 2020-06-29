@@ -38,7 +38,6 @@ import {
   NAME_UNKNOWN,
   TRANSACTION_START,
   TRANSACTION_END,
-  BROWSER_RESPONSIVENESS_INTERVAL,
   TEMPORARY_TYPE,
   TRANSACTION_TYPE_ORDER,
   LARGEST_CONTENTFUL_PAINT,
@@ -48,7 +47,7 @@ import {
   FIRST_INPUT
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
-import { __DEV__ } from '../env'
+import { __DEV__, state } from '../state'
 
 class TransactionService {
   constructor(logger, config) {
@@ -89,28 +88,6 @@ class TransactionService {
 
   setCurrentTransaction(value) {
     this.currentTransaction = value
-  }
-
-  ensureRespInterval(checkBrowserResponsiveness) {
-    const clearRespInterval = () => {
-      clearInterval(this.respIntervalId)
-      this.respIntervalId = undefined
-    }
-
-    if (checkBrowserResponsiveness) {
-      if (typeof this.respIntervalId === 'undefined') {
-        this.respIntervalId = setInterval(() => {
-          let tr = this.getCurrentTransaction()
-          if (tr) {
-            tr.browserResponsivenessCounter++
-          } else {
-            clearRespInterval()
-          }
-        }, BROWSER_RESPONSIVENESS_INTERVAL)
-      }
-    } else if (typeof this.respIntervalId !== 'undefined') {
-      clearRespInterval()
-    }
   }
 
   createOptions(options) {
@@ -176,14 +153,12 @@ class TransactionService {
       tr = this.ensureCurrentTransaction(name, type, perfOptions)
     }
 
-    let checkBrowserResponsiveness = true
     if (tr.type === PAGE_LOAD) {
       if (!isRedefined) {
         this.recorder.start(LARGEST_CONTENTFUL_PAINT)
         this.recorder.start(PAINT)
         this.recorder.start(FIRST_INPUT)
       }
-      checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
@@ -211,8 +186,6 @@ class TransactionService {
     if (tr.sampled) {
       tr.captureTimings = true
     }
-
-    this.ensureRespInterval(checkBrowserResponsiveness)
 
     return tr
   }
@@ -262,6 +235,16 @@ class TransactionService {
     return Promise.resolve().then(
       () => {
         const { name, type } = tr
+        let { lastHiddenStart } = state
+
+        if (lastHiddenStart >= tr._start) {
+          if (__DEV__) {
+            this._logger.debug(
+              `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
+            )
+          }
+          return
+        }
 
         if (this.shouldIgnoreTransaction(name) || type === TEMPORARY_TYPE) {
           if (__DEV__) {

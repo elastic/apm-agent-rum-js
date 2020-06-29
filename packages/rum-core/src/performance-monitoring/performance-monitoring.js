@@ -43,21 +43,18 @@ import {
   XMLHTTPREQUEST,
   EVENT_TARGET,
   HTTP_REQUEST_TYPE,
-  USER_INTERACTION,
-  PAGE_LOAD,
-  BROWSER_RESPONSIVENESS_INTERVAL
+  USER_INTERACTION
 } from '../common/constants'
 import {
   truncateModel,
   SPAN_MODEL,
   TRANSACTION_MODEL
 } from '../common/truncate'
-import { __DEV__ } from '../env'
+import { __DEV__ } from '../state'
 
 /**
  * Parameters used for Managed Transactions
  */
-const BROWSER_RESPONSIVENESS_BUFFER = 3
 const SIMILAR_SPAN_TO_TRANSACTION_RATIO = 0.05
 const TRANSACTION_DURATION_THRESHOLD = 60000
 
@@ -139,14 +136,6 @@ export function adjustTransactionSpans(transaction) {
   }
 
   return transaction
-}
-
-export function checkBrowserResponsiveness(transaction, interval, buffer) {
-  const counter = transaction.browserResponsivenessCounter
-  const duration = transaction.duration()
-  const expectedCount = Math.floor(duration / interval)
-
-  return counter + buffer >= expectedCount
 }
 
 export default class PerformanceMonitoring {
@@ -377,30 +366,6 @@ export default class PerformanceMonitoring {
           )
         }
         return false
-      }
-
-      /**
-       * TODO: Refactor the type check with better logic
-       */
-      if (tr.type !== PAGE_LOAD) {
-        const wasBrowserResponsive = checkBrowserResponsiveness(
-          tr,
-          BROWSER_RESPONSIVENESS_INTERVAL,
-          BROWSER_RESPONSIVENESS_BUFFER
-        )
-
-        if (!wasBrowserResponsive) {
-          if (__DEV__) {
-            this._logginService.debug(
-              `transaction(${tr.id}, ${tr.name}) was discarded! Browser was not responsive enough during the transaction.`,
-              ' duration:',
-              duration,
-              ' browserResponsivenessCounter:',
-              tr.browserResponsivenessCounter
-            )
-          }
-          return false
-        }
       }
     }
     return true

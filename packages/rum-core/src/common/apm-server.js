@@ -36,7 +36,7 @@ import {
   compressTransaction,
   compressError
 } from './compress'
-import { __DEV__ } from '../env'
+import { __DEV__ } from '../state'
 
 /**
  * Throttling interval defaults to 60 seconds

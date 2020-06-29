@@ -32,7 +32,7 @@ import {
 } from 'opentracing/lib/constants'
 import { Span as NoopSpan } from 'opentracing/lib/span'
 import { getTimeOrigin, find } from '../common/utils'
-import { __DEV__ } from '../env'
+import { __DEV__ } from '../state'
 import Span from './span'
 
 class Tracer extends otTracer {
