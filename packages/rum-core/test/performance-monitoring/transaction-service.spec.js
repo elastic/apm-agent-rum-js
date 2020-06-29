@@ -39,6 +39,7 @@ import {
   TRUNCATED_TYPE,
   FIRST_INPUT
 } from '../../src/common/constants'
+import { state } from '../../src/state'
 
 describe('TransactionService', function() {
   var transactionService
@@ -609,6 +610,24 @@ describe('TransactionService', function() {
 
     tr = transactionService.getCurrentTransaction()
     expect(tr.type).toBe('custom-type')
+  })
+
+  it('should discard transaction if page has been hidden', async () => {
+    let { lastHiddenStart } = state
+    state.lastHiddenStart = performance.now() + 1000
+    let tr = transactionService.startTransaction('test-name', 'test-type')
+    await tr.end()
+    expect(logger.debug).toHaveBeenCalledWith(
+      `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
+    )
+
+    state.lastHiddenStart = performance.now() - 1000
+    tr = transactionService.startTransaction('test-name', 'test-type')
+    await tr.end()
+    expect(logger.debug).not.toHaveBeenCalledWith(
+      `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
+    )
+    state.lastHiddenStart = lastHiddenStart
   })
 
   describe('performance entry recorder', () => {

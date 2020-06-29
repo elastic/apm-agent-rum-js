@@ -231,19 +231,20 @@ class TransactionService {
      * all the time
      */
     this.recorder.stop()
-    let { lastHidden } = state
-    if (lastHidden && lastHidden.start > tr._start) {
-      if (__DEV__) {
-        this._logger.debug(
-          `transaction(${tr.id}, ${name}, ${type}) is ignored due to page visibilityState.`
-        )
-      }
-      return
-    }
 
     return Promise.resolve().then(
       () => {
         const { name, type } = tr
+        let { lastHiddenStart } = state
+
+        if (lastHiddenStart >= tr._start) {
+          if (__DEV__) {
+            this._logger.debug(
+              `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
+            )
+          }
+          return
+        }
 
         if (this.shouldIgnoreTransaction(name) || type === TEMPORARY_TYPE) {
           if (__DEV__) {

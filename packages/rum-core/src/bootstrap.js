@@ -46,18 +46,14 @@ export function bootstrap() {
 
 export function bootstrapPerf() {
   if (document.visibilityState === 'hidden') {
-    state.lastHidden = {
-      start: 0
-    }
+    state.lastHiddenStart = 0
   }
 
   window.addEventListener(
     'visibilitychange',
     () => {
       if (document.visibilityState === 'hidden') {
-        state.lastHidden = {
-          start: performance.now()
-        }
+        state.lastHiddenStart = performance.now()
       }
     },
     { capture: true }
