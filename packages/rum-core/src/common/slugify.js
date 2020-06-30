@@ -30,23 +30,23 @@ import Url from './url'
  */
 export default function slugifyUrl(urlStr, depth = 2) {
   const parsedUrl = new Url(urlStr)
-  const { origin, query, path } = parsedUrl
+  const { query, path } = parsedUrl
   const pathParts = path.substring(1).split('/')
 
   const redactString = ':id'
-  const end = '*'
+  const end = '**'
   const specialCharsRegex = /\W|_/g
   const digitsRegex = /[0-9]/g
   const lowerCaseRegex = /[a-z]/g
   const upperCaseRegex = /[A-Z]/g
 
-  var redactedParts = []
-  var redcatedBefore = false
+  const redactedParts = []
+  let redactedBefore = false
 
   for (let index = 0; index < pathParts.length; index++) {
     const part = pathParts[index]
 
-    if (redcatedBefore || index > depth - 1) {
+    if (redactedBefore || index > depth - 1) {
       if (part) {
         redactedParts.push(end)
       }
@@ -56,7 +56,7 @@ export default function slugifyUrl(urlStr, depth = 2) {
     const numberOfSpecialChars = (part.match(specialCharsRegex) || []).length
     if (numberOfSpecialChars >= 2) {
       redactedParts.push(redactString)
-      redcatedBefore = true
+      redactedBefore = true
       continue
     }
 
@@ -66,7 +66,7 @@ export default function slugifyUrl(urlStr, depth = 2) {
       (part.length > 3 && numberOfDigits / part.length >= 0.3)
     ) {
       redactedParts.push(redactString)
-      redcatedBefore = true
+      redactedBefore = true
       continue
     }
 
@@ -80,7 +80,7 @@ export default function slugifyUrl(urlStr, depth = 2) {
         (lowerCaseRate > 0.3 && lowerCaseRate < 0.6))
     ) {
       redactedParts.push(redactString)
-      redcatedBefore = true
+      redactedBefore = true
       continue
     }
 
@@ -88,7 +88,6 @@ export default function slugifyUrl(urlStr, depth = 2) {
   }
 
   const redacted =
-    origin +
     '/' +
     (redactedParts.length >= 2
       ? redactedParts.join('/')

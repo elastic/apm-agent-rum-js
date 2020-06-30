@@ -26,16 +26,13 @@
 import slugifyUrl from '../../src/common/slugify'
 
 describe('Slug URL', () => {
-  const hostname = 'http://test.com'
   const validate = (before, after, depth) => {
-    expect(slugifyUrl(`${hostname}${before}`, depth)).toBe(
-      `${hostname}${after}`
-    )
+    expect(slugifyUrl(before, depth)).toBe(after)
   }
 
   it('accept depth parameter', () => {
-    validate('/a/b/c/d', '/a/b/*')
-    validate('/a/b/c/d', '/a/*', 1)
+    validate('/a/b/c/d', '/a/b/**')
+    validate('/a/b/c/d', '/a/**', 1)
   })
 
   it('handle trailing slash', () => {
@@ -60,12 +57,12 @@ describe('Slug URL', () => {
   it('redact special characters', () => {
     validate('/a-b-c-d', '/:id')
     validate('/a~b-c', '/:id')
-    validate('/a~b-c/d/e/f', '/:id/*')
+    validate('/a~b-c/d/e/f', '/:id/**')
     validate('/b%c%d-ef', '/:id')
   })
 
   it('react mix of lower-uppercase characters', () => {
     validate('/abcDEF', '/:id')
-    validate('/a1W9FtW5DnkyP3Bucng4aLvqT/edit', '/:id/*')
+    validate('/a1W9FtW5DnkyP3Bucng4aLvqT/edit', '/:id/**')
   })
 })

@@ -241,7 +241,7 @@ class TransactionService {
         if (lastHiddenStart >= tr._start) {
           if (__DEV__) {
             this._logger.debug(
-              `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
+              `transaction(${tr.id}, ${name}, ${type}) was discarded! The page was hidden during the transaction!`
             )
           }
           return
@@ -278,7 +278,7 @@ class TransactionService {
         /**
          * Categorize the transaction based on the current location
          */
-        if (name === NAME_UNKNOWN) {
+        if (tr.name === NAME_UNKNOWN) {
           tr.name = slugifyUrl(window.location.href)
         }
 
