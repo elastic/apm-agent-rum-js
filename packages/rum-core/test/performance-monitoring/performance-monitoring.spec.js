@@ -301,6 +301,9 @@ describe('PerformanceMonitoring', function() {
 
   if (window.fetch) {
     it('should create fetch spans', function(done) {
+      const origPatchTime = state.patchedTime
+      // ignore capturing resource timing spans
+      state.patchedTime = 0
       var fn = performanceMonitoring.getFetchSub()
       var dTHeaderValue
       const cancelFetchSub = patchEventHandler.observe(FETCH, function(
@@ -344,6 +347,7 @@ describe('PerformanceMonitoring', function() {
           })
           expect(dTHeaderValue).toBeDefined()
           cancelFetchSub()
+          state.patchedTime = origPatchTime
           done()
         })
       })
@@ -374,7 +378,7 @@ describe('PerformanceMonitoring', function() {
 
     it('should not duplicate xhr spans if fetch is a polyfill', function(done) {
       const origPatchTime = state.patchedTime
-      // ignore resource timing spans
+      // ignore capturing resource timing spans
       state.patchedTime = 0
       const xhrFn = performanceMonitoring.getXHRSub()
       const fetchFn = performanceMonitoring.getFetchSub()
