@@ -46,6 +46,7 @@ import {
   TRANSACTION_END,
   TRANSACTIONS
 } from '../../src/common/constants'
+import { state } from '../../src/state'
 import patchEventHandler from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
 import resourceEntries from '../fixtures/resource-entries'
@@ -372,6 +373,9 @@ describe('PerformanceMonitoring', function() {
     })
 
     it('should not duplicate xhr spans if fetch is a polyfill', function(done) {
+      const origPatchTime = state.patchedTime
+      // ignore resource timing spans
+      state.patchedTime = 0
       const xhrFn = performanceMonitoring.getXHRSub()
       const fetchFn = performanceMonitoring.getFetchSub()
 
@@ -449,6 +453,7 @@ describe('PerformanceMonitoring', function() {
           ])
           cancelXHRSub()
           cancelFetchSub()
+          state.patchedTime = origPatchTime
           done()
         })
       })

@@ -37,7 +37,7 @@ import {
   PERF,
   isPerfTimelineSupported
 } from '../common/utils'
-import * as patch from '../common/patching'
+import { state } from '../state'
 
 /**
  * Navigation Timing Spans
@@ -344,7 +344,7 @@ function captureNavigation(transaction) {
     const resourceEntries = PERF.getEntriesByType(RESOURCE)
     createResourceTimingSpans(
       resourceEntries,
-      patch.patchedTime,
+      state.patchedTime,
       trStart,
       trEnd
     ).forEach(span => transaction.spans.push(span))
