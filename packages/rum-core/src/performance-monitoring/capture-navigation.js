@@ -162,8 +162,7 @@ function createResourceTimingSpans(entries, requestPatchTime, trStart, trEnd) {
      * API requests before the agent patches the required modules.
      */
     if (
-      (initiatorType === RESOURCE_INITIATOR_TYPES[0] ||
-        initiatorType === RESOURCE_INITIATOR_TYPES[1]) &&
+      (initiatorType === 'xmlhttprequest' || initiatorType === 'fetch') &&
       (isIntakeAPIEndpoint(name) ||
         isCapturedByPatching(startTime, requestPatchTime))
     ) {
@@ -344,7 +343,7 @@ function captureNavigation(transaction) {
     const resourceEntries = PERF.getEntriesByType(RESOURCE)
     createResourceTimingSpans(
       resourceEntries,
-      state.patchedTime,
+      state.bootstrapTime,
       trStart,
       trEnd
     ).forEach(span => transaction.spans.push(span))
