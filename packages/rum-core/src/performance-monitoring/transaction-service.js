@@ -264,7 +264,7 @@ class TransactionService {
           const pageLoadTransactionName = this._config.get(
             'pageLoadTransactionName'
           )
-          if (pageLoadTransactionName) {
+          if (name === NAME_UNKNOWN && pageLoadTransactionName) {
             tr.name = pageLoadTransactionName
           }
           /**
