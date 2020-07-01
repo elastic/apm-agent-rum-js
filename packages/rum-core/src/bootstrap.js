@@ -23,7 +23,7 @@
  *
  */
 
-import { isPlatformSupported, isBrowser } from './common/utils'
+import { isPlatformSupported, isBrowser, now } from './common/utils'
 import { patchAll } from './common/patching'
 import { state } from './state'
 
@@ -32,6 +32,7 @@ export function bootstrap() {
   if (isPlatformSupported()) {
     patchAll()
     bootstrapPerf()
+    state.bootstrapTime = now()
     enabled = true
   } else if (isBrowser) {
     /**

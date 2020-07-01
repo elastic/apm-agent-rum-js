@@ -46,6 +46,7 @@ import {
   TRANSACTION_END,
   TRANSACTIONS
 } from '../../src/common/constants'
+import { state } from '../../src/state'
 import patchEventHandler from '../common/patch'
 import { mockGetEntriesByType } from '../utils/globals-mock'
 import resourceEntries from '../fixtures/resource-entries'
@@ -300,6 +301,9 @@ describe('PerformanceMonitoring', function() {
 
   if (window.fetch) {
     it('should create fetch spans', function(done) {
+      const origBootstrapTime = state.bootstrapTime
+      // ignore capturing resource timing spans
+      state.bootstrapTime = 0
       var fn = performanceMonitoring.getFetchSub()
       var dTHeaderValue
       const cancelFetchSub = patchEventHandler.observe(FETCH, function(
@@ -343,6 +347,7 @@ describe('PerformanceMonitoring', function() {
           })
           expect(dTHeaderValue).toBeDefined()
           cancelFetchSub()
+          state.bootstrapTime = origBootstrapTime
           done()
         })
       })
@@ -372,6 +377,9 @@ describe('PerformanceMonitoring', function() {
     })
 
     it('should not duplicate xhr spans if fetch is a polyfill', function(done) {
+      const origBootstrapTime = state.bootstrapTime
+      // ignore capturing resource timing spans
+      state.bootstrapTime = 0
       const xhrFn = performanceMonitoring.getXHRSub()
       const fetchFn = performanceMonitoring.getFetchSub()
 
@@ -449,6 +457,7 @@ describe('PerformanceMonitoring', function() {
           ])
           cancelXHRSub()
           cancelFetchSub()
+          state.bootstrapTime = origBootstrapTime
           done()
         })
       })
