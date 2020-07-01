@@ -27,8 +27,8 @@ import {
   checkSameOrigin,
   isDtHeaderValid,
   parseDtHeaderValue,
-  stripQueryStringFromUrl,
-  getDtHeaderValue
+  getDtHeaderValue,
+  stripQueryStringFromUrl
 } from '../common/utils'
 import Url from '../common/url'
 import { patchEventHandler } from '../common/patching'

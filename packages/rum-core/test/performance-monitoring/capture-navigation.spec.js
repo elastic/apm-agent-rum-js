@@ -154,7 +154,7 @@ describe('Capture hard navigation', function() {
   it('should createResourceTimingSpans', function() {
     const spans = createResourceTimingSpans(
       resourceEntries,
-      ['http://ajax-filter.test'],
+      null,
       transactionStart,
       transactionEnd
     )
@@ -164,15 +164,77 @@ describe('Capture hard navigation', function() {
         http: {
           url: jasmine.any(String),
           response: {
-            transfer_size: 420580,
-            encoded_body_size: 420379,
-            decoded_body_size: 420379
+            transfer_size: 3805,
+            encoded_body_size: 0,
+            decoded_body_size: 0
           }
         }
       })
     )
 
     expect(spans.map(mapSpan)).toEqual(spanSnapshot)
+  })
+
+  it('should filter intake API calls from resource timing', function() {
+    const entries = [
+      {
+        name: 'http://localhost:8200/intake/v2/rum/events',
+        initiatorType: 'fetch',
+        entryType: 'resource',
+        startTime: 25,
+        responseEnd: 120
+      },
+      {
+        name: 'http://apm-server:8200/intake/v3/rum/events',
+        initiatorType: 'xmlhttprequest',
+        entryType: 'resource',
+        startTime: 100,
+        responseEnd: 150
+      }
+    ]
+    const spans = createResourceTimingSpans(
+      entries,
+      150,
+      transactionStart,
+      transactionEnd
+    )
+    expect(spans).toEqual([])
+  })
+
+  it('should add/filter XHR/Fetch spans from RT data based on patch time', function() {
+    const entries = [
+      {
+        name: 'http://localhost:8000/fetch',
+        initiatorType: 'fetch',
+        entryType: 'resource',
+        startTime: 25,
+        responseEnd: 120
+      },
+      {
+        name: 'http://localhost:8000/data?query=foo',
+        initiatorType: 'xmlhttprequest',
+        entryType: 'resource',
+        startTime: 100,
+        responseEnd: 150
+      }
+    ]
+    const getCount = requestPatchTime =>
+      createResourceTimingSpans(
+        entries,
+        requestPatchTime,
+        transactionStart,
+        transactionEnd
+      ).length
+
+    expect(getCount(null)).toBe(2)
+    // same time as start of 1st resource
+    expect(getCount(25)).toBe(1)
+    // after first res start time
+    expect(getCount(30)).toBe(1)
+    // after both resources
+    expect(getCount(101)).toBe(2)
+    // before both resources
+    expect(getCount(10)).toBe(0)
   })
 
   it('should createUserTimingSpans', function() {
