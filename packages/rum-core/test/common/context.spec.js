@@ -165,6 +165,25 @@ describe('Context', () => {
     })
   })
 
+  it('should add navigation timing span context', () => {
+    const url = 'https://example.com'
+    const span = new Span(url, 'hard-navigation')
+    span.end()
+    addSpanContext(span, { url })
+
+    expect(span.context).toEqual({
+      destination: {
+        service: {
+          name: 'https://example.com',
+          resource: 'example.com:443',
+          type: 'hard-navigation'
+        },
+        address: 'example.com',
+        port: 443
+      }
+    })
+  })
+
   it('should enrich transaction with context info based on type', () => {
     const transaction = new Transaction('test', 'custom')
     const trContext = { tags: { tag1: 'tag1' } }

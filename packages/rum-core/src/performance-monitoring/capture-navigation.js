@@ -96,11 +96,20 @@ function createNavigationTimingSpans(timings, baseTime, trStart, trEnd) {
       continue
     }
     const span = new Span(eventPairs[i][2], 'hard-navigation.browser-timing')
+    let data = null
+    /**
+     * - pageResponse flag is used to set the id of the span to
+     *  `pageLoadSpanId` if set in config to make the distributed tracing work
+     *   when HTML is genrated dynamically from backend agents
+     *
+     * - Populate the context.destination fields only for the Request Span
+     */
     if (eventPairs[i][0] === 'requestStart') {
       span.pageResponse = true
+      data = { url: location.origin }
     }
     span._start = start - baseTime
-    span.end(end - baseTime)
+    span.end(end - baseTime, data)
     spans.push(span)
   }
   return spans

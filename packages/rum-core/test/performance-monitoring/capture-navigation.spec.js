@@ -151,6 +151,40 @@ describe('Capture hard navigation', function() {
     ])
   })
 
+  it('should populate desination context only for requestStart span', () => {
+    const spans = createNavigationTimingSpans(
+      timings,
+      timings.fetchStart,
+      transactionStart,
+      transactionEnd
+    )
+
+    expect(spans.map(({ name, context }) => ({ name, context }))).toEqual([
+      { name: 'Domain lookup', context: undefined },
+      { name: 'Making a connection to the server', context: undefined },
+      {
+        name: 'Requesting and receiving the document',
+        context: {
+          destination: {
+            service: {
+              name: 'http://localhost:9876',
+              resource: 'localhost:9876',
+              type: 'hard-navigation'
+            },
+            address: 'localhost',
+            port: 9876
+          }
+        }
+      },
+      {
+        name: 'Parsing the document, executing sync. scripts',
+        context: undefined
+      },
+      { name: 'Fire "DOMContentLoaded" event', context: undefined },
+      { name: 'Fire "load" event', context: undefined }
+    ])
+  })
+
   it('should createResourceTimingSpans', function() {
     const spans = createResourceTimingSpans(
       resourceEntries,

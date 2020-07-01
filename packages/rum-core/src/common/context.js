@@ -31,6 +31,7 @@ const LEFT_SQUARE_BRACKET = 91 // [
 const RIGHT_SQUARE_BRACKET = 93 // ]
 const EXTERNAL = 'external'
 const RESOURCE = 'resource'
+const HARD_NAVIGATION = 'hard-navigation'
 
 /**
  * Get the port number including the default ports
@@ -141,11 +142,19 @@ function getExternalContext(data) {
   return context
 }
 
+function getNavigationContext(data) {
+  const { url } = data
+  const parsedUrl = new Url(url)
+
+  const destination = getDestination(parsedUrl, HARD_NAVIGATION)
+  return { destination }
+}
+
 export function getPageContext() {
   return {
     page: {
       referer: document.referrer,
-      url: window.location.href
+      url: location.href
     }
   }
 }
@@ -162,6 +171,9 @@ export function addSpanContext(span, data) {
       break
     case RESOURCE:
       context = getResourceContext(data)
+      break
+    case HARD_NAVIGATION:
+      context = getNavigationContext(data)
       break
   }
   span.addContext(context)
