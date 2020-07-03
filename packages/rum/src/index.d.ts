@@ -105,6 +105,7 @@ declare class Span extends BaseSpan {
 }
 
 interface AgentConfigOptions {
+  apiVersion?: number
   serviceName?: string
   serverUrl?: string
   serviceVersion?: string
