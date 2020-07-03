@@ -85,7 +85,9 @@ pipeline {
                 deleteDir()
                 unstash 'source'
                 dir("${BASE_DIR}") {
-                  sh(label: 'Lerna run build', script: 'npx lerna run build')
+                  prepareRelease() {
+                    sh(label: 'Lerna run build', script: 'npx lerna run build')
+                  }
                 }
               }
             }
@@ -229,18 +231,18 @@ def wrappingUp(){
 }
 
 def prepareRelease(String nodeVersion='node:lts', Closure body){
-  withNpmrc(secret: "${env.NPMRC_SECRET}", path: "${env.WORKSPACE}/${env.BASE_DIR}") {
+  //withNpmrc(secret: "${env.NPMRC_SECRET}", path: "${env.WORKSPACE}/${env.BASE_DIR}") {
     docker.image(nodeVersion).inside(){
       withEnv(["HOME=${env.WORKSPACE}/${env.BASE_DIR}"]) {
-        withGitRelease(credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken') {
+        //withGitRelease(credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken') {
           sh 'npm ci'
-          withTotpVault(secret: "${env.TOTP_SECRET}", code_var_name: 'TOTP_CODE'){
+          //withTotpVault(secret: "${env.TOTP_SECRET}", code_var_name: 'TOTP_CODE'){
             body()
-          }
-        }
+          //}
+        //}
       }
     }
-  }
+  //}
 }
 
 def runAllScopes(){
