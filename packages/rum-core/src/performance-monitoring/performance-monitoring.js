@@ -30,7 +30,7 @@ import {
   getDtHeaderValue,
   stripQueryStringFromUrl
 } from '../common/utils'
-import Url from '../common/url'
+import { Url } from '../common/url'
 import { patchEventHandler } from '../common/patching'
 import { globalState } from '../common/patching/patch-utils'
 import {

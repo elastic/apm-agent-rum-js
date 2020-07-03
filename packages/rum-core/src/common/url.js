@@ -78,7 +78,7 @@ const RULES = [
 ]
 const PROTOCOL_REGEX = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i
 
-class Url {
+export class Url {
   constructor(url) {
     let { protocol, address, slashes } = this.extractProtocol(url || '')
     const relative = !protocol && !slashes
@@ -216,4 +216,74 @@ class Url {
   }
 }
 
-export default Url
+/**
+ * Converts URL path tree in to slug based on tree depth
+ */
+export function slugifyUrl(urlStr, depth = 2) {
+  const parsedUrl = new Url(urlStr)
+  const { query, path } = parsedUrl
+  const pathParts = path.substring(1).split('/')
+
+  const redactString = ':id'
+  const wildcard = '*'
+  const specialCharsRegex = /\W|_/g
+  const digitsRegex = /[0-9]/g
+  const lowerCaseRegex = /[a-z]/g
+  const upperCaseRegex = /[A-Z]/g
+
+  const redactedParts = []
+  let redactedBefore = false
+
+  for (let index = 0; index < pathParts.length; index++) {
+    const part = pathParts[index]
+
+    if (redactedBefore || index > depth - 1) {
+      if (part) {
+        redactedParts.push(wildcard)
+      }
+      break
+    }
+
+    const numberOfSpecialChars = (part.match(specialCharsRegex) || []).length
+    if (numberOfSpecialChars >= 2) {
+      redactedParts.push(redactString)
+      redactedBefore = true
+      continue
+    }
+
+    const numberOfDigits = (part.match(digitsRegex) || []).length
+    if (
+      numberOfDigits > 3 ||
+      (part.length > 3 && numberOfDigits / part.length >= 0.3)
+    ) {
+      redactedParts.push(redactString)
+      redactedBefore = true
+      continue
+    }
+
+    const numberofUpperCase = (part.match(upperCaseRegex) || []).length
+    const numberofLowerCase = (part.match(lowerCaseRegex) || []).length
+    const lowerCaseRate = numberofLowerCase / part.length
+    const upperCaseRate = numberofUpperCase / part.length
+    if (
+      part.length > 5 &&
+      ((upperCaseRate > 0.3 && upperCaseRate < 0.6) ||
+        (lowerCaseRate > 0.3 && lowerCaseRate < 0.6))
+    ) {
+      redactedParts.push(redactString)
+      redactedBefore = true
+      continue
+    }
+
+    part && redactedParts.push(part)
+  }
+
+  const redacted =
+    '/' +
+    (redactedParts.length >= 2
+      ? redactedParts.join('/')
+      : redactedParts.join('')) +
+    (query ? '?{query}' : '')
+
+  return redacted
+}

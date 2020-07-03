@@ -23,7 +23,7 @@
  *
  */
 
-import Url from './url'
+import { Url } from './url'
 import { PAGE_LOAD, NAVIGATION } from './constants'
 import { getServerTimingInfo, PERF, isPerfTimelineSupported } from './utils'
 
