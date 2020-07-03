@@ -24,9 +24,12 @@
  */
 
 import ApmBase from '../../src/apm-base'
-import { createServiceFactory, PAGE_LOAD } from '@elastic/apm-rum-core'
+import {
+  createServiceFactory,
+  bootstrap,
+  PAGE_LOAD
+} from '@elastic/apm-rum-core'
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
-import bootstrap from '../../src/bootstrap'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import Promise from 'promise-polyfill'
 import { scheduleTaskCycles } from '../../../rum-core/test'
@@ -171,7 +174,7 @@ describe('ApmBase', function() {
     })
     expect(tr).toBeDefined()
     expect(tr.name).toBe('test-transaction')
-    expect(tr.type).toBe('page-load')
+    expect(tr.type).toBe('test-type')
 
     spyOn(tr, 'startSpan').and.callThrough()
     apmBase.startSpan('test-span', 'test-type')
@@ -306,6 +309,21 @@ describe('ApmBase', function() {
 
     expect(tr.spans.length).toBe(1)
     expect(tr.spans[0].name).toBe('GET /')
+  })
+
+  it('should allow setting labels before calling init', () => {
+    const labels = {
+      foo: '1',
+      bar: 2
+    }
+    apmBase.addLabels(labels)
+    apmBase.init({
+      serviceName,
+      serverUrl,
+      disableInstrumentations: [PAGE_LOAD]
+    })
+    const configService = serviceFactory.getService('ConfigService')
+    expect(configService.get('context.tags')).toEqual(labels)
   })
 
   it('should fetch central config', done => {

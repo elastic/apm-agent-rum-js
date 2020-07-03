@@ -88,7 +88,7 @@ describe('General usecase with react-router', function() {
 
     const routeTransaction = transactions[1]
     expect(routeTransaction.name).toBe('ManualComponent')
-    expect(routeTransaction.type).toBe('route-change')
+    expect(routeTransaction.type).toBe('component')
 
     const spanTypes = ['app', 'resource', 'external']
     const foundSpans = routeTransaction.spans.filter(

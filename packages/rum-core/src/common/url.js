@@ -45,6 +45,8 @@
  *
  */
 
+import { isBrowser } from './utils'
+
 /**
  * Add default ports for other protocols(ws, wss) after
  * RUM agent starts instrumenting those
@@ -197,7 +199,7 @@ class Url {
 
   getLocation() {
     var globalVar = {}
-    if (typeof window !== 'undefined') {
+    if (isBrowser) {
       globalVar = window
     }
 

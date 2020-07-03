@@ -23,27 +23,12 @@
  *
  */
 
-import { isPlatformSupported, patchAll } from '@elastic/apm-rum-core'
-
-var alreadyBootstrap = false
-var enabled = false
-
-export default function bootstrap() {
-  if (alreadyBootstrap) {
-    return enabled
-  }
-  alreadyBootstrap = true
-
-  if (isPlatformSupported()) {
-    patchAll()
-    enabled = true
-  } else if (typeof window !== 'undefined') {
-    /**
-     * Print this error message only on the browser console
-     * on unsupported browser versions
-     */
-    console.log('[Elastic APM] platform is not supported!')
-  }
-
-  return enabled
+const __DEV__ = process.env.NODE_ENV !== 'production'
+const state = {
+  //  Time when agent is bootstrapped and patching of modules happens
+  bootstrapTime: null,
+  // Time when the document is last backgrounded
+  lastHiddenStart: Number.MIN_SAFE_INTEGER
 }
+
+export { __DEV__, state }

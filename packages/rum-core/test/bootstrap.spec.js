@@ -23,7 +23,20 @@
  *
  */
 
-export const metrics = {
-  fcp: 0,
-  lcp: 0
-}
+import { bootstrap } from '../src/bootstrap'
+
+describe('bootstrap', function() {
+  it('should log warning on unsupported environments', () => {
+    // Pass unsupported check
+    const nowFn = window.performance.now
+    window.performance.now = undefined
+
+    spyOn(console, 'log')
+    bootstrap()
+
+    expect(console.log).toHaveBeenCalledWith(
+      '[Elastic APM] platform is not supported!'
+    )
+    window.performance.now = nowFn
+  })
+})

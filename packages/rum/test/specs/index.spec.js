@@ -36,28 +36,14 @@ describe('index', function() {
   beforeEach(function() {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000
+    let cache = require.cache
+    for (let moduleId in cache) {
+      delete cache[moduleId]
+    }
   })
 
   afterEach(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
-  })
-
-  it('should log only on browser environments', () => {
-    // Pass unsupported check
-    const nowFn = window.performance.now
-    window.performance.now = undefined
-
-    spyOn(console, 'log')
-
-    delete require.cache[require.resolve('../../src/')]
-    delete require.cache[require.resolve('../../src/bootstrap')]
-    require('../../src/')
-
-    expect(console.log).toHaveBeenCalledWith(
-      '[Elastic APM] platform is not supported!'
-    )
-
-    window.performance.now = nowFn
   })
 
   it('should init ApmBase', function(done) {
@@ -118,6 +104,13 @@ describe('index', function() {
     }
   })
 
+  it('should return same instance when loaded multiple times', () => {
+    require('../../src/')
+    expect(window.elasticApm).toEqual(apmBase)
+    const exportsObj = require('../../src/')
+    expect(exportsObj.apmBase).toEqual(window.elasticApm)
+  })
+
   it('should not throw error on global Promise patching', () => {
     window.count = 0
     window.Promise = {
@@ -129,10 +122,8 @@ describe('index', function() {
     }
 
     /**
-     * Delete bootstrap and init module cache and
      * execute module again to check if global promise is overriden
      */
-    delete require.cache[require.resolve('../../src/')]
     require('../../src/')
 
     /**

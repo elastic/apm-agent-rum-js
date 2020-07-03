@@ -8,7 +8,8 @@ pipeline {
     REPO = 'apm-agent-rum-js'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     NOTIFY_TO = credentials('notify-to')
-    PIPELINE_LOG_LEVEL='INFO'
+    JOB_GCS_BUCKET = credentials('gcs-bucket')
+    PIPELINE_LOG_LEVEL = 'INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
     SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
@@ -32,7 +33,7 @@ pipeline {
     quietPeriod(10)
   }
   triggers {
-    issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
+    issueCommentTrigger('(?i).*(?:jenkins\\W+)?run\\W+(?:the\\W+)?(?:benchmark\\W+)?tests(?:\\W+please)?.*')
   }
   parameters {
     booleanParam(name: 'Run_As_Master_Branch', defaultValue: false, description: 'Allow to run any steps on a PR, some steps normally only run on master branch.')
@@ -90,6 +91,10 @@ pipeline {
                   }
                   stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
                 }
+                dir("${BASE_DIR}"){
+                  // To run in the worker otherwise some tools won't be in place when using the above docker container
+                  generateReport(id: 'bundlesize', input: 'packages/rum/reports/apm-*-report.html', template: true, compare: true, templateFormat: 'md')
+                }
               }
             }
           }
@@ -106,7 +111,7 @@ pipeline {
                   name 'STACK_VERSION'
                   values (
                     '8.0.0-SNAPSHOT',
-                    '7.6.0',
+                    '7.7.0',
                     '7.0.0'
                   )
                 }
@@ -219,6 +224,7 @@ pipeline {
                 tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
                 expression { return params.Run_As_Master_Branch }
                 expression { return env.BENCHMARK_UPDATED != "false" }
+                expression { return env.GITHUB_COMMENT?.contains('benchmark tests') }
               }
               expression { return params.bench_ci }
               expression { return env.ONLY_DOCS == "false" }
@@ -369,7 +375,8 @@ pipeline {
   }
   post {
     cleanup {
-      notifyBuildResult()
+      // bundlesize id was generated previously with the generateReport step in the lint stage.
+      notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize': 'bundlesize.md' ])
     }
   }
 }
@@ -415,16 +422,22 @@ def runScript(Map args = [:]){
         sleep randomNumber(min: 5, max: 10)
         sh(label: 'Pull and build docker infra', script: '.ci/scripts/pull_and_build.sh')
       }
-      // Another retry in case there are any environmental issues
-      retry(3) {
-        sleep randomNumber(min: 5, max: 10)
-        if(env.MODE == 'saucelabs'){
-          withSaucelabsEnv(){
+      try {
+        // Another retry in case there are any environmental issues
+        retry(3) {
+          sleep randomNumber(min: 5, max: 10)
+          if(env.MODE == 'saucelabs'){
+            withSaucelabsEnv(){
+              sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
+            }
+          } else {
             sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
           }
-        } else {
-          sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
         }
+      } catch(e) {
+        throw e
+      } finally {
+        dockerLogs(step: "${label}-${stack}", failNever: true)
       }
     }
   }

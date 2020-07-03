@@ -36,8 +36,10 @@ import {
   LONG_TASK,
   LARGEST_CONTENTFUL_PAINT,
   PAINT,
-  TRUNCATED_TYPE
+  TRUNCATED_TYPE,
+  FIRST_INPUT
 } from '../../src/common/constants'
+import { state } from '../../src/state'
 
 describe('TransactionService', function() {
   var transactionService
@@ -57,7 +59,6 @@ describe('TransactionService', function() {
     spyOn(logger, 'debug')
 
     config = new Config()
-    config.init()
     transactionService = new TransactionService(logger, config)
   })
 
@@ -565,68 +566,9 @@ describe('TransactionService', function() {
     expect(tr.type).toBe('temporary')
   })
 
-  it('should only call setInterval once for current transaction', () => {
-    let origSetInterval = window.setInterval
-    let origClearInterval = window.clearInterval
-    let count = 0
-    let callback
-
-    window.setInterval = cb => {
-      callback = cb
-      return count++
-    }
-
-    let clearCount = 0
-
-    window.clearInterval = () => {
-      clearCount++
-    }
-
-    var tr = transactionService.startTransaction('test', 'test', {
-      managed: true,
-      canReuse: true
-    })
-    expect(transactionService.getCurrentTransaction()).toBe(tr)
-    expect(count).toBe(1)
-    expect(transactionService.respIntervalId).toBe(0)
-
-    transactionService.startTransaction('test 1', 'test', {
-      managed: true,
-      canReuse: true
-    })
-    expect(transactionService.getCurrentTransaction()).toBe(tr)
-    expect(tr.name).toBe('test 1')
-    expect(count).toBe(1)
-
-    transactionService.startTransaction('test 2', 'test', {
-      managed: true,
-      canReuse: false
-    })
-    expect(transactionService.getCurrentTransaction()).not.toBe(tr)
-    expect(count).toBe(1)
-    expect(clearCount).toBe(0)
-    tr = transactionService.getCurrentTransaction()
-    tr.end()
-
-    callback()
-    expect(transactionService.respIntervalId).toBe(undefined)
-    expect(clearCount).toBe(1)
-
-    window.clearInterval = origClearInterval
-    window.setInterval = origSetInterval
-  })
-
   it('should redefine type based on the defined order', () => {
     transactionService.startSpan('span 1', 'span-type')
     let tr = transactionService.getCurrentTransaction()
-    expect(tr.type).toBe('temporary')
-
-    transactionService.startTransaction('test 1', 'random-type', {
-      managed: true,
-      canReuse: true
-    })
-
-    tr = transactionService.getCurrentTransaction()
     expect(tr.type).toBe('temporary')
 
     transactionService.startTransaction('test 1', 'route-change', {
@@ -650,19 +592,47 @@ describe('TransactionService', function() {
       canReuse: true
     })
 
-    transactionService.startTransaction('test 1', 'random-type', {
+    tr = transactionService.getCurrentTransaction()
+    expect(tr.type).toBe('page-load')
+
+    transactionService.startTransaction('test 1', 'custom-type', {
       managed: true,
       canReuse: true
     })
 
     tr = transactionService.getCurrentTransaction()
-    expect(tr.type).toBe('page-load')
+    expect(tr.type).toBe('custom-type')
+
+    transactionService.startTransaction('test 1', 'page-load', {
+      managed: true,
+      canReuse: true
+    })
+
+    tr = transactionService.getCurrentTransaction()
+    expect(tr.type).toBe('custom-type')
+  })
+
+  it('should discard transaction if page has been hidden', async () => {
+    let { lastHiddenStart } = state
+    state.lastHiddenStart = performance.now() + 1000
+    let tr = transactionService.startTransaction('test-name', 'test-type')
+    await tr.end()
+    expect(logger.debug).toHaveBeenCalledWith(
+      `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
+    )
+
+    state.lastHiddenStart = performance.now() - 1000
+    tr = transactionService.startTransaction('test-name', 'test-type')
+    await tr.end()
+    expect(logger.debug).not.toHaveBeenCalledWith(
+      `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
+    )
+    state.lastHiddenStart = lastHiddenStart
   })
 
   describe('performance entry recorder', () => {
     const logger = new LoggingService()
     const config = new Config()
-    config.init()
     const trService = new TransactionService(logger, config)
     const startSpy = jasmine.createSpy()
     const stopSpy = jasmine.createSpy()
@@ -682,10 +652,11 @@ describe('TransactionService', function() {
       const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
         managed: true
       })
-      expect(startSpy).toHaveBeenCalledTimes(3)
+      expect(startSpy).toHaveBeenCalledTimes(4)
       expect(startSpy.calls.allArgs()).toEqual([
         [LARGEST_CONTENTFUL_PAINT],
         [PAINT],
+        [FIRST_INPUT],
         [LONG_TASK]
       ])
       await pageLoadTr.end()
@@ -741,10 +712,11 @@ describe('TransactionService', function() {
       const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
         managed: true
       })
-      expect(startSpy).toHaveBeenCalledTimes(2)
+      expect(startSpy).toHaveBeenCalledTimes(3)
       expect(startSpy.calls.allArgs()).toEqual([
         [LARGEST_CONTENTFUL_PAINT],
-        [PAINT]
+        [PAINT],
+        [FIRST_INPUT]
       ])
       await pageLoadTr.end()
       expect(stopSpy).toHaveBeenCalled()

@@ -27,8 +27,10 @@ import { Promise } from '../common/polyfills'
 import Transaction from './transaction'
 import {
   PerfEntryRecorder,
-  captureObserverEntries
-} from './perf-entry-recorder'
+  captureObserverEntries,
+  metrics,
+  createTotalBlockingTimeSpan
+} from './metrics'
 import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
 import { captureNavigation } from './capture-navigation'
 import {
@@ -36,16 +38,16 @@ import {
   NAME_UNKNOWN,
   TRANSACTION_START,
   TRANSACTION_END,
-  BROWSER_RESPONSIVENESS_INTERVAL,
   TEMPORARY_TYPE,
   TRANSACTION_TYPE_ORDER,
   LARGEST_CONTENTFUL_PAINT,
   LONG_TASK,
   PAINT,
-  TRUNCATED_TYPE
+  TRUNCATED_TYPE,
+  FIRST_INPUT
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
-import { __DEV__ } from '../env'
+import { __DEV__, state } from '../state'
 
 class TransactionService {
   constructor(logger, config) {
@@ -88,28 +90,6 @@ class TransactionService {
     this.currentTransaction = value
   }
 
-  ensureRespInterval(checkBrowserResponsiveness) {
-    const clearRespInterval = () => {
-      clearInterval(this.respIntervalId)
-      this.respIntervalId = undefined
-    }
-
-    if (checkBrowserResponsiveness) {
-      if (typeof this.respIntervalId === 'undefined') {
-        this.respIntervalId = setInterval(() => {
-          let tr = this.getCurrentTransaction()
-          if (tr) {
-            tr.browserResponsivenessCounter++
-          } else {
-            clearRespInterval()
-          }
-        }, BROWSER_RESPONSIVENESS_INTERVAL)
-      }
-    } else if (typeof this.respIntervalId !== 'undefined') {
-      clearRespInterval()
-    }
-  }
-
   createOptions(options) {
     const config = this._config.config
     let presetOptions = { transactionSampleRate: config.transactionSampleRate }
@@ -139,27 +119,26 @@ class TransactionService {
        * allow a redefinition until there's a call that doesn't have that
        * or the threshold is exceeded.
        */
+      let redefineType = tr.type
+      const currentTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(tr.type)
+      const redefineTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(type)
+
+      /**
+       * Update type based on precedence defined in TRANSACTION_TYPE_ORDER.
+       * 1. If both orders doesn't exist, we don't redefine the type.
+       * 2. If only the redefined type is not present in predefined order, that implies
+       * it's a user defined type and it is of higher precedence
+       */
+      if (currentTypeOrder >= 0 && redefineTypeOrder < currentTypeOrder) {
+        redefineType = type
+      }
       if (__DEV__) {
         this._logger.debug(
           `redefining transaction(${tr.id}, ${tr.name}, ${tr.type})`,
           'to',
-          `(${name}, ${type})`,
+          `(${name || tr.name}, ${redefineType})`,
           tr
         )
-      }
-      /**
-       * We only update based precedence defined in TRANSACTION_TYPE_ORDER.
-       * If either orders don't exist we also don't redefine the type.
-       */
-      let redefineType
-      let currentTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(tr.type)
-      let redefineTypeOrder = TRANSACTION_TYPE_ORDER.indexOf(type)
-      if (
-        currentTypeOrder !== -1 &&
-        redefineTypeOrder !== -1 &&
-        redefineTypeOrder < currentTypeOrder
-      ) {
-        redefineType = type
       }
       tr.redefine(name, redefineType, perfOptions)
       isRedefined = true
@@ -174,13 +153,12 @@ class TransactionService {
       tr = this.ensureCurrentTransaction(name, type, perfOptions)
     }
 
-    let checkBrowserResponsiveness = true
     if (tr.type === PAGE_LOAD) {
       if (!isRedefined) {
         this.recorder.start(LARGEST_CONTENTFUL_PAINT)
         this.recorder.start(PAINT)
+        this.recorder.start(FIRST_INPUT)
       }
-      checkBrowserResponsiveness = false
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
       }
@@ -208,8 +186,6 @@ class TransactionService {
     if (tr.sampled) {
       tr.captureTimings = true
     }
-
-    this.ensureRespInterval(checkBrowserResponsiveness)
 
     return tr
   }
@@ -259,6 +235,16 @@ class TransactionService {
     return Promise.resolve().then(
       () => {
         const { name, type } = tr
+        let { lastHiddenStart } = state
+
+        if (lastHiddenStart >= tr._start) {
+          if (__DEV__) {
+            this._logger.debug(
+              `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
+            )
+          }
+          return
+        }
 
         if (this.shouldIgnoreTransaction(name) || type === TEMPORARY_TYPE) {
           if (__DEV__) {
@@ -279,6 +265,13 @@ class TransactionService {
           )
           if (name === NAME_UNKNOWN && pageLoadTransactionName) {
             tr.name = pageLoadTransactionName
+          }
+          /**
+           * Capture the TBT as span after observing for all long task entries
+           * and once performance observer is disconnected
+           */
+          if (tr.captureTimings && metrics.tbt.duration > 0) {
+            tr.spans.push(createTotalBlockingTimeSpan(metrics.tbt))
           }
         }
         captureNavigation(tr)

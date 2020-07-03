@@ -23,17 +23,33 @@
  *
  */
 
-import bootstrap from './bootstrap'
-import { createServiceFactory } from '@elastic/apm-rum-core'
+import {
+  createServiceFactory,
+  bootstrap,
+  isBrowser
+} from '@elastic/apm-rum-core'
 import ApmBase from './apm-base'
 
-const enabled = bootstrap()
-const serviceFactory = createServiceFactory()
-const apmBase = new ApmBase(serviceFactory, !enabled)
+/**
+ * Use a single instance of ApmBase across all instance of the agent
+ * including the instanes used in framework specific integrations
+ */
+function getApmBase() {
+  if (isBrowser && window.elasticApm) {
+    return window.elasticApm
+  }
+  const enabled = bootstrap()
+  const serviceFactory = createServiceFactory()
+  const apmBase = new ApmBase(serviceFactory, !enabled)
 
-if (typeof window !== 'undefined') {
-  window.elasticApm = apmBase
+  if (isBrowser) {
+    window.elasticApm = apmBase
+  }
+
+  return apmBase
 }
+
+const apmBase = getApmBase()
 
 const init = apmBase.init.bind(apmBase)
 

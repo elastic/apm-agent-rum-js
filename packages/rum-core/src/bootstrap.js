@@ -23,6 +23,40 @@
  *
  */
 
-const __DEV__ = process.env.NODE_ENV !== 'production'
+import { isPlatformSupported, isBrowser, now } from './common/utils'
+import { patchAll } from './common/patching'
+import { state } from './state'
 
-export { __DEV__ }
+let enabled = false
+export function bootstrap() {
+  if (isPlatformSupported()) {
+    patchAll()
+    bootstrapPerf()
+    state.bootstrapTime = now()
+    enabled = true
+  } else if (isBrowser) {
+    /**
+     * Print this error message only on the browser console
+     * on unsupported browser versions
+     */
+    console.log('[Elastic APM] platform is not supported!')
+  }
+
+  return enabled
+}
+
+export function bootstrapPerf() {
+  if (document.visibilityState === 'hidden') {
+    state.lastHiddenStart = 0
+  }
+
+  window.addEventListener(
+    'visibilitychange',
+    () => {
+      if (document.visibilityState === 'hidden') {
+        state.lastHiddenStart = performance.now()
+      }
+    },
+    { capture: true }
+  )
+}

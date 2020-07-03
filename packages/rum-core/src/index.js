@@ -31,7 +31,8 @@ import { ServiceFactory } from './common/service-factory'
 import {
   isPlatformSupported,
   scheduleMicroTask,
-  scheduleMacroTask
+  scheduleMacroTask,
+  isBrowser
 } from './common/utils'
 import { patchAll, patchEventHandler } from './common/patching'
 import {
@@ -43,6 +44,7 @@ import {
 } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
 import afterFrame from './common/after-frame'
+import { bootstrap } from './bootstrap'
 import { createTracer } from './opentracing'
 
 function createServiceFactory() {
@@ -58,6 +60,7 @@ export {
   patchAll,
   patchEventHandler,
   isPlatformSupported,
+  isBrowser,
   getInstrumentationFlags,
   createTracer,
   scheduleMicroTask,
@@ -67,5 +70,6 @@ export {
   PAGE_LOAD,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  bootstrap
 }

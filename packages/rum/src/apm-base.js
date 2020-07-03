@@ -32,7 +32,7 @@ import {
   APM_SERVER
 } from '@elastic/apm-rum-core'
 
-class ApmBase {
+export default class ApmBase {
   constructor(serviceFactory, disable) {
     this._disable = disable
     this.serviceFactory = serviceFactory
@@ -49,7 +49,7 @@ class ApmBase {
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
-      configService.setVersion('5.1.1')
+      configService.setVersion('5.2.1')
       this.config(config)
       /**
        * Deactive agent when the active config flag is set to false
@@ -277,5 +277,3 @@ class ApmBase {
     configService.addFilter(fn)
   }
 }
-
-export default ApmBase
