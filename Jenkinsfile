@@ -343,7 +343,9 @@ pipeline {
             stage('Publish CDN') {
               options { skipDefaultCheckout() }
               steps {
-                uploadToCDN()
+                dir("${BASE_DIR}") {
+                  uploadToCDN()
+                }
               }
             }
           }
@@ -398,6 +400,13 @@ def uploadToCDN() {
   publishToCDN(headers: ["Cache-Control:public,max-age=604800,immutable"],
                source: "${source}",
                target: "${target}/${majorVersion}",
+               secret: "${secret}")
+
+  // Prepare index.html, publish and cache for 7 days
+  sh(label: 'prepare index.html', script: """ sed "s#VERSION#${majorVersion}#g" .ci/scripts/index.html.template > index.html""")
+  publishToCDN(headers: ["Cache-Control:public,max-age=604800,immutable"],
+               source: "index.html",
+               target: "${target}",
                secret: "${secret}")
 }
 
