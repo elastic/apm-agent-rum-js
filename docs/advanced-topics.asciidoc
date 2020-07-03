@@ -4,7 +4,6 @@
 * <<longtasks>>
 * <<typescript>>
 * <<custom-transactions, Custom Transactions>>
-* <<custom-transaction-name, Initial page load transaction names>>
 
 [[longtasks]]
 === How to interpret long task spans in the UI
@@ -43,4 +42,3 @@ and method signature information on supported platforms (Visual Studio Code, etc
 
 
 include::./custom-transactions.asciidoc[Custom Transactions]
-include::./custom-transaction-name.asciidoc[Initial page load transaction names]

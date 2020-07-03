@@ -192,8 +192,29 @@ This option overrides the ID of the span that is generated for receiving the ini
 
 * *Type:* String
 
-This option sets the name for the page load transaction.
-See the <<custom-transaction-name,custom initial page load transaction names>> documentation for strategies on using this method.
+This option sets the name for the page load transaction. By default, Transaction names for Hard and Soft navigations are 
+inferred by the agent based on the current URL. Let's look at the below example
+
+[source,js]
+----
+// Blog Posts
+https://www.elastic.co/blog/reflections-on-three-years-in-the-elastic-public-sector
+https://www.elastic.co/blog/say-heya-to-the-elastic-search-awards
+https://www.elastic.co/blog/and-the-winner-of-the-elasticon-2018-training-subscription-drawing-is
+
+// Documentation
+https://www.elastic.co/guide/en/elastic-stack/current/index.html
+https://www.elastic.co/guide/en/apm/get-started/current/index.html
+https://www.elastic.co/guide/en/infrastructure/guide/current/index.html
+----
+
+The page load transactions for the above URL's would be inferred automatically and transaction names will be categorized
+as `/blog/:id` and `/guide/en/*` by the agent. A common pattern to name the transactions would be to use the current
+URL(window.location.href). However, it creates too many unique transactions(blog titles, query strings, etc) 
+and would be less useful when visualizing the traces in UI.
+
+If the default transaction names are not helpful, please set `pageLoadTransactionName` to something
+meaningful that groups transactions under the same categories(blog, guide, etc) and avoid using the current URL.
 
 
 [float]
