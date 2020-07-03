@@ -1,0 +1,12 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Real User Monitoring - Elastic</title>
+  </head>
+  <body>
+    <a href="VERSION">VERSION</a>
+    <br>
+    <br>
+    For further details see this <a href="https://www.elastic.co/guide/en/apm/agent/rum-js/current/install-the-agent.html">guide</a>.
+  </body>
+</html>

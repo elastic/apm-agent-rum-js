@@ -336,6 +336,15 @@ pipeline {
                   script {
                     currentBuild.description = "${currentBuild.description?.trim() ? currentBuild.description : ''} released"
                   }
+                  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/packages/rum/dist/bundles/*.js")
+                }
+              }
+            }
+            stage('Publish CDN') {
+              options { skipDefaultCheckout() }
+              steps {
+                dir("${BASE_DIR}") {
+                  uploadToCDN()
                 }
               }
             }
@@ -372,6 +381,33 @@ pipeline {
       notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize': 'bundlesize.md' ])
     }
   }
+}
+
+def uploadToCDN() {
+  def source = 'packages/rum/dist/bundles/*.js'
+  def target = 'gs://apm-rum-357700bc'
+  def secret = 'secret/gce/elastic-cdn/service-account/apm-rum-admin'
+  def version = sh(label: 'Get package version', script: 'jq --raw-output .version packages/rum/package.json', returnStdout: true)
+  def majorVersion = "${version.split('\\.')[0]}.x"
+
+  // Publish version with the semver format and cache them for 1 year.
+  publishToCDN(headers: ["Cache-Control:public,max-age=31536000,immutable"],
+               source: "${source}",
+               target: "${target}/${version}",
+               secret: "${secret}")
+
+  // Publish major.x and cache for 7 days
+  publishToCDN(headers: ["Cache-Control:public,max-age=604800,immutable"],
+               source: "${source}",
+               target: "${target}/${majorVersion}",
+               secret: "${secret}")
+
+  // Prepare index.html, publish and cache for 7 days
+  sh(label: 'prepare index.html', script: """ sed "s#VERSION#${majorVersion}#g" .ci/scripts/index.html.template > index.html""")
+  publishToCDN(headers: ["Cache-Control:public,max-age=604800,immutable"],
+               source: "index.html",
+               target: "${target}",
+               secret: "${secret}")
 }
 
 def runScript(Map args = [:]){
