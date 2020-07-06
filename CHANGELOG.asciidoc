@@ -29,6 +29,23 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.3.0]]
+==== 5.3.0 (2020-07-06)
+
+[float]
+===== Features
+* Introduced better grouping strategy for all managed transactions based on the
+  current browser's location by default instead of grouping all transactions
+  under `UNKNOWN` category: {issue}827[#827]
+* Capture XHR, Fetch calls as spans that happened before the agent script is
+  downloaded using the browser's Resource Timing API: {issue}825[#825]
+* Populate `span.destination.*` context fields for Navigation Timing span that
+  denotes the HTML downloading phase: {issue}829[#829]
+* Use Page Visibility API to discard transactions if the page was backgrounded 
+  at any point during the lifetime of the transaction: {issue}295[#295]
+* Add `apiVersion` config to TypeScript typings: {issue}833[#833]
+
+
 [[release-notes-5.2.1]]
 ==== 5.2.1 (2020-06-24)
 
