@@ -39,7 +39,7 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
   under `UNKNOWN` category: {issue}827[#827]
 * Capture XHR, Fetch calls as spans that happened before the agent script is
   downloaded using the browser's Resource Timing API: {issue}825[#825]
-* Populate `span.destination.*` context fields for Navigation Timing span that is
+* Populate `span.destination.*` context fields for Navigation Timing span that
   denotes the HTML downloading phase: {issue}829[#829]
 * Use Page Visibility API to discard transactions if the page was backgrounded 
   at any point during the lifetime of the transaction: {issue}295[#295]
