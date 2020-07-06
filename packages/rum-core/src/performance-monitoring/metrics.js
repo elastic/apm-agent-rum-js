@@ -105,7 +105,7 @@ function createLongTaskSpans(longtasks) {
 export function createFirstInputDelaySpan(fidEntries) {
   let firstInput = fidEntries[0]
 
-  if (firstInput && !metrics.wasHidden) {
+  if (firstInput) {
     const { startTime, processingStart } = firstInput
 
     const span = new Span('First Input Delay', FIRST_INPUT, { startTime })
@@ -291,18 +291,4 @@ export class PerfEntryRecorder {
   stop() {
     this.po.disconnect()
   }
-}
-
-export function bootstrapMetrics() {
-  metrics.wasHidden = document.visibilityState === 'hidden'
-
-  window.addEventListener(
-    'visibilitychange',
-    () => {
-      if (document.visibilityState === 'hidden') {
-        metrics.wasHidden = true
-      }
-    },
-    { capture: true, once: true }
-  )
 }

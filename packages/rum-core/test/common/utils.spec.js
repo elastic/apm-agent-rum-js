@@ -25,7 +25,7 @@
 
 import * as utils from '../../src/common/utils'
 import Span from '../../src/performance-monitoring/span'
-import Url from '../../src/common/url'
+import { Url } from '../../src/common/url'
 
 describe('lib/utils', function() {
   it('should merge objects', function() {

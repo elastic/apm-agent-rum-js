@@ -130,11 +130,6 @@ const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint'
 const FIRST_INPUT = 'first-input'
 
 /**
- * Managed transaction configs
- */
-const BROWSER_RESPONSIVENESS_INTERVAL = 500
-
-/**
  * Event types sent to APM Server on the queue
  */
 const ERRORS = 'errors'
@@ -194,7 +189,6 @@ export {
   TEMPORARY_TYPE,
   USER_INTERACTION,
   TRANSACTION_TYPE_ORDER,
-  BROWSER_RESPONSIVENESS_INTERVAL,
   ERRORS,
   TRANSACTIONS,
   CONFIG_SERVICE,

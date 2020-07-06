@@ -9,7 +9,7 @@ pipeline {
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     NOTIFY_TO = credentials('notify-to')
     JOB_GCS_BUCKET = credentials('gcs-bucket')
-    PIPELINE_LOG_LEVEL='INFO'
+    PIPELINE_LOG_LEVEL = 'INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
     SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
@@ -90,6 +90,10 @@ pipeline {
                     bundlesize()
                   }
                   stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
+                }
+                dir("${BASE_DIR}"){
+                  // To run in the worker otherwise some tools won't be in place when using the above docker container
+                  generateReport(id: 'bundlesize', input: 'packages/rum/reports/apm-*-report.html', template: true, compare: true, templateFormat: 'md')
                 }
               }
             }
@@ -332,6 +336,15 @@ pipeline {
                   script {
                     currentBuild.description = "${currentBuild.description?.trim() ? currentBuild.description : ''} released"
                   }
+                  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/packages/rum/dist/bundles/*.js")
+                }
+              }
+            }
+            stage('Publish CDN') {
+              options { skipDefaultCheckout() }
+              steps {
+                dir("${BASE_DIR}") {
+                  uploadToCDN()
                 }
               }
             }
@@ -364,9 +377,37 @@ pipeline {
   }
   post {
     cleanup {
-      notifyBuildResult()
+      // bundlesize id was generated previously with the generateReport step in the lint stage.
+      notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize': 'bundlesize.md' ])
     }
   }
+}
+
+def uploadToCDN() {
+  def source = 'packages/rum/dist/bundles/*.js'
+  def target = 'gs://apm-rum-357700bc'
+  def secret = 'secret/gce/elastic-cdn/service-account/apm-rum-admin'
+  def version = sh(label: 'Get package version', script: 'jq --raw-output .version packages/rum/package.json', returnStdout: true)
+  def majorVersion = "${version.split('\\.')[0]}.x"
+
+  // Publish version with the semver format and cache them for 1 year.
+  publishToCDN(headers: ["Cache-Control:public,max-age=31536000,immutable"],
+               source: "${source}",
+               target: "${target}/${version}",
+               secret: "${secret}")
+
+  // Publish major.x and cache for 7 days
+  publishToCDN(headers: ["Cache-Control:public,max-age=604800,immutable"],
+               source: "${source}",
+               target: "${target}/${majorVersion}",
+               secret: "${secret}")
+
+  // Prepare index.html, publish and cache for 7 days
+  sh(label: 'prepare index.html', script: """ sed "s#VERSION#${majorVersion}#g" .ci/scripts/index.html.template > index.html""")
+  publishToCDN(headers: ["Cache-Control:public,max-age=604800,immutable"],
+               source: "index.html",
+               target: "${target}",
+               secret: "${secret}")
 }
 
 def runScript(Map args = [:]){

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.3.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.2.1...@elastic/apm-rum@5.3.0) (2020-07-06)
+
+
+### Features
+
+* **rum:** add apiVersion config to types ([#833](https://github.com/elastic/apm-agent-rum-js/issues/833)) ([0679a71](https://github.com/elastic/apm-agent-rum-js/commit/0679a71e421251a7916d47e2128030e44cb9e334))
+
+
+
+
+
 ## [5.2.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.2.0...@elastic/apm-rum@5.2.1) (2020-06-24)
 
 **Note:** Version bump only for package @elastic/apm-rum
