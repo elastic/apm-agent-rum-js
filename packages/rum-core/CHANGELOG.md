@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.3.1...@elastic/apm-rum-core@5.4.0) (2020-07-06)
+
+
+### Features
+
+* **rum:** categorize transactions based on current url ([#827](https://github.com/elastic/apm-agent-rum-js/issues/827)) ([3888653](https://github.com/elastic/apm-agent-rum-js/commit/3888653b85c5fea4f9590601f45bd0219366fa35))
+* **rum-core:** capture XHR/Fetch spans using resource timing ([#825](https://github.com/elastic/apm-agent-rum-js/issues/825)) ([5983e71](https://github.com/elastic/apm-agent-rum-js/commit/5983e712578c0fef2c3c46827c8aeb618e5a1bbf))
+* **rum-core:** populate destination info for NT spans ([#831](https://github.com/elastic/apm-agent-rum-js/issues/831)) ([66c322e](https://github.com/elastic/apm-agent-rum-js/commit/66c322e7492b1ab65abe830a558ffd8becf67ed2))
+* use page visibilityState for browser responsiveness check ([#813](https://github.com/elastic/apm-agent-rum-js/issues/813)) ([9de8344](https://github.com/elastic/apm-agent-rum-js/commit/9de8344b3e994c06f5d2d72b6e6a3fd736a7c039))
+
+
+
+
+
 ## [5.3.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.3.0...@elastic/apm-rum-core@5.3.1) (2020-06-24)
 
 
