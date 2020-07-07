@@ -44,7 +44,7 @@ and method signature information on supported platforms (Visual Studio Code, etc
 [[custom-transaction-name]]
 === Custom page load transaction names
 
-A common pattern to name the transactions would be to use the current URL(window.location.href).
+A common pattern to name the transactions would be to use the current URL (`window.location.href`).
 However, it creates too many unique transactions (blog titles, query strings, etc.)
 and would be less useful when visualizing the traces in Kibana APM UI.
 
@@ -66,11 +66,11 @@ https://www.elastic.co/guide/en/infrastructure/guide/current/index.html
 
 The page load transaction names for the above URL's would be inferred automatically and categorized
 as `/blog/:id` and `/guide/en/*` by the agent. The grouping logic in the agent works by recursively traversing the
-URL path tree until the depth of 2 and converts them to wildcard or slugged matches based on the number of digits, special characters,
-the mix of upper and lowercase characters in the path.
+URL path tree until the depth of 2 and converting them to wildcard or slugged matches based on the number of digits, special characters,
+the mix of upper and lowercase characters in the path. The algorithm uses heuristics that are derived from common patterns in URL's and therefore, it might not correctly identify matches in some cases.
 
 If the inferred transaction names are not helpful, please set <<page-load-transaction-name,`pageLoadTransactionName`>> configuration to something
-meaningful that groups transactions under the same categories (blog, guide, etc.) and avoid using the current URL at all costs.
+meaningful that groups transactions under the same categories (blog, guide, etc.) and avoid using the full URL at all costs.
 
 [source,js]
 ----
