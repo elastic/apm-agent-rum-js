@@ -192,10 +192,10 @@ This option overrides the ID of the span that is generated for receiving the ini
 
 * *Type:* String
 
-This option sets the name for the page load transaction. By default, Transaction names for Hard and Soft navigations are 
+This option sets the name for the page load transaction. By default, transaction names for hard (page load) and soft (route change) navigations are 
 inferred by the agent based on the current URL. Let's look at the below example
 
-[source,js]
+[source,text]
 ----
 // Blog Posts
 https://www.elastic.co/blog/reflections-on-three-years-in-the-elastic-public-sector
