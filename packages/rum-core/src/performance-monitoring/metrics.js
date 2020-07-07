@@ -27,7 +27,8 @@ import {
   LONG_TASK,
   LARGEST_CONTENTFUL_PAINT,
   FIRST_CONTENTFUL_PAINT,
-  FIRST_INPUT
+  FIRST_INPUT,
+  LAYOUT_SHIFT
 } from '../common/constants'
 import { noop, PERF } from '../common/utils'
 import Span from './span'
@@ -37,7 +38,8 @@ export const metrics = {
   tbt: {
     start: Infinity,
     duration: 0
-  }
+  },
+  cls: 0
 }
 
 const LONG_TASK_THRESHOLD = 50
@@ -162,6 +164,14 @@ export function calculateTotalBlockingTime(longtaskEntries) {
   })
 }
 
+export function calculateCumulativeLayoutShift(clsEntries) {
+  clsEntries.forEach(entry => {
+    if (!entry.hadRecentInput) {
+      metrics.cls += entry.value
+    }
+  })
+}
+
 /**
  * Captures all the observed entries as Spans and Marks depending on the
  * observed entry types and returns in the format
@@ -237,6 +247,8 @@ export function captureObserverEntries(list, { capturePaint }) {
   }
 
   calculateTotalBlockingTime(longtaskEntries)
+  const clsEntries = list.getEntriesByType(LAYOUT_SHIFT)
+  calculateCumulativeLayoutShift(clsEntries)
 
   return result
 }

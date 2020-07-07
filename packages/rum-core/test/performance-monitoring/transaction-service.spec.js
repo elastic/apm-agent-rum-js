@@ -37,7 +37,8 @@ import {
   LARGEST_CONTENTFUL_PAINT,
   PAINT,
   TRUNCATED_TYPE,
-  FIRST_INPUT
+  FIRST_INPUT,
+  LAYOUT_SHIFT
 } from '../../src/common/constants'
 import { state } from '../../src/state'
 
@@ -652,11 +653,12 @@ describe('TransactionService', function() {
       const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
         managed: true
       })
-      expect(startSpy).toHaveBeenCalledTimes(4)
+      expect(startSpy).toHaveBeenCalledTimes(5)
       expect(startSpy.calls.allArgs()).toEqual([
         [LARGEST_CONTENTFUL_PAINT],
         [PAINT],
         [FIRST_INPUT],
+        [LAYOUT_SHIFT],
         [LONG_TASK]
       ])
       await pageLoadTr.end()
@@ -712,11 +714,12 @@ describe('TransactionService', function() {
       const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
         managed: true
       })
-      expect(startSpy).toHaveBeenCalledTimes(3)
+      expect(startSpy).toHaveBeenCalledTimes(4)
       expect(startSpy.calls.allArgs()).toEqual([
         [LARGEST_CONTENTFUL_PAINT],
         [PAINT],
-        [FIRST_INPUT]
+        [FIRST_INPUT],
+        [LAYOUT_SHIFT]
       ])
       await pageLoadTr.end()
       expect(stopSpy).toHaveBeenCalled()
