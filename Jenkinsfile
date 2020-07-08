@@ -75,10 +75,6 @@ pipeline {
         Lint the code.
         */
         stage('Lint') {
-          when {
-            beforeAgent true
-            expression { return env.ONLY_DOCS == "false" }
-          }
           steps {
             withGithubNotify(context: 'Lint') {
               deleteDir()
