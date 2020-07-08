@@ -192,8 +192,9 @@ This option overrides the ID of the span that is generated for receiving the ini
 
 * *Type:* String
 
-This option sets the name for the page load transaction.
-See the <<custom-transaction-name,custom initial page load transaction names>> documentation for strategies on using this method.
+This option sets the name for the page load transaction. By default, transaction names for hard (page load) and soft (route change) navigations are
+inferred by the agent based on the current URL. Check the <<custom-transaction-name,custom initial page load transaction names>>
+documentation for more details.
 
 
 [float]
