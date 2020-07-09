@@ -128,14 +128,16 @@ $ MODE=saucelabs SAUCE_USERNAME=<username> SAUCE_ACCESS_KEY=<access-key> npx ler
 
 We use [prettier](https://github.com/prettier/prettier) for formatting code and [eslint](https://github.com/eslint/eslint) for other linting.
 
+We use a git pre-commit hook to fix formatting and other auto-fixable eslint errors. Installing dependencies ensures this is enabled and should be run before the first commit.
+
+```
+$ npm install
+```
+
+To view the output of the linters.
+
 ```
 $ npm run lint
-```
-
-To fix formatting and other auto-fixable eslint errors:
-
-```
-$ npm run format
 ```
 
 ### Releasing
