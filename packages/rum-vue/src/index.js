@@ -29,7 +29,7 @@ import { getErrorHandler } from './error-handler'
 
 export const ApmVuePlugin = {
   install: (Vue, options) => {
-    const { router, apm = apmBase, config, captureErrors = true } = options
+    const { router, apm = apmBase, config, captureErrors = true, userContext } = options
     /**
      * Initialize the APM with the config
      */
@@ -40,6 +40,13 @@ export const ApmVuePlugin = {
      */
     if (router) {
       routeHooks(router, apm)
+    }
+
+    /**
+     * Set userContext if provided
+     */
+    if (userContext) {
+      apm.setUserContext(userContext);
     }
 
     if (captureErrors) {
