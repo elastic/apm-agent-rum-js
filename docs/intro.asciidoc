@@ -20,8 +20,8 @@ captures the following information:
 * API requests (XMLHttpRequest and Fetch)
 * Single page application interactions and navigation
 * <<user-interactions, User interactions>> (click events that trigger navigation changes)
-* User-centric metrics (Long tasks, FCP, LCP, FID, etc.)
-* Page information (URL's visited and Referrer)
+* <<user-centric-metrics, User-centric metrics>> (Long tasks, FCP, LCP, FID, etc.)
+* Page information (URLs visited and referrer)
 * Network connection information
 * JavaScript errors
 * <<<<distributed-tracing-guide, Distributed tracing>>

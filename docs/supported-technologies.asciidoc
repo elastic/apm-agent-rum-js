@@ -39,12 +39,14 @@ https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event[Load] event o
 If you are interested in accurately measuring the duration of load event, the information can be extracted by using 
 `Fire load event` Span or from the Transaction marks available as `transaction.marks.agent.domComplete` in the Elasticsearch document.
 
+NOTE: The page load transaction is measured relative to the `fetchStart` timestamp from the Navigation Timing API.
+
 
 [float]
 [[user-centric-metrics]]
 === User-centric Metrics
 
-To understand the performance characteristics of a web page beyond the page load and how the user perceives performance, the agent supports capturing these responsiveness metrics.
+To understand the performance characteristics of a web page beyond the page load and how the user perceives performance, the agent supports capturing these https://web.dev/user-centric-performance-metrics/[responsiveness metrics].
 
 `First contentful paint (FCP)`::
 Focusses on the initial rendering and measures the time from when the page starts loading to when any part of the page's content is displayed on the screen. Captured as transaction mark for `page-load` transaction.
