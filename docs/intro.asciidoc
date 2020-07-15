@@ -18,8 +18,8 @@ captures the following information:
 * <<page-load-metrics,Page load metrics>>
 * Load time of Static Assets (JS, CSS, images, fonts, etc.)
 * API requests (XMLHttpRequest and Fetch)
-* Single page application interactions and navigation
-* <<user-interactions, User interactions>> (click events that trigger navigation changes)
+* Single page application navigations
+* <<user-interactions, User interactions>> (click events that trigger network activity)
 * <<user-centric-metrics, User-centric metrics>> (Long tasks, FCP, LCP, FID, etc.)
 * Page information (URLs visited and referrer)
 * Network connection information
