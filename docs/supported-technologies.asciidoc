@@ -7,7 +7,7 @@
 
 The RUM agent tries to capture the overall user experience on how the page is loaded/rendered as part of the page load Transaction.
 It includes all of the dependent resources, like JavaScript, stylesheets, images, etc., which are included as part of the page. In addition
-to capturing the resource timing information as Spans, the transaction also includes navigation spans, marks that are associated with the rest
+to capturing the resource timing information as Spans, the transaction also includes navigation spans—marks that are associated with the rest
 of the captured information to make the waterfall more appealing.
 
 `Domain lookup`::
@@ -30,7 +30,7 @@ is executed: `domContentLoadedEventEnd` - `domContentLoadedEventStart`.
 Trigged when the browser finishes loading its document and dependent resources: `loadEventEnd` - `loadEventStart`.
 
 `Time to first byte (TTFB)`::
-Duration from the browser making an HTTP request for the initial document to the first byte of the page being received. TTFB is avaialble from the Navigation Timing API as `reponseStart` timestamp and captured as transaction mark `transaction.marks.agent.timeToFirstByte` in the ES document.
+Duration from the browser making an HTTP request for the initial document to the first byte of the page being received. TTFB is available from the Navigation Timing API as the `reponseStart` timestamp, and captured as transaction mark `transaction.marks.agent.timeToFirstByte` in the ElasticSearch document.
 
 To capture the overall user experience of the page including all of the above information plus additional resource requests that might be
 triggered during the execution of dependent resources, the `page-load` transaction duration might not always reflect the 
@@ -42,9 +42,9 @@ If you are interested in accurately measuring the duration of load event, the in
 
 [float]
 [[user-centric-metrics]]
-=== User-Centric Metrics
+=== User-centric Metrics
 
-To understand the performance characteristics of a web page beyond the page load and how the user perceives performance, the agent supports capturing the responsiveness metrics.
+To understand the performance characteristics of a web page beyond the page load and how the user perceives performance, the agent supports capturing these responsiveness metrics.
 
 `First contentful paint (FCP)`::
 Focusses on the initial rendering and measures the time from when the page starts loading to when any part of the page's content is displayed on the screen. Captured as transaction mark for `page-load` transaction.

@@ -11,21 +11,21 @@ This enables you to analyze performance throughout your microservice architectur
 [[features]]
 === Features
 
-The agent uses browser timing API's such as https://w3c.github.io/navigation-timing/[Navigation Timing]
-https://w3c.github.io/resource-timing/[Resource Timing], https://w3c.github.io/paint-timing/[Paint Timing], https://w3c.github.io/user-timing/[User Timing] etc. and
-captures the following information
+The agent uses browser timing APIs such as https://w3c.github.io/navigation-timing/[Navigation Timing]
+https://w3c.github.io/resource-timing/[Resource Timing], https://w3c.github.io/paint-timing/[Paint Timing], https://w3c.github.io/user-timing/[User Timing], etc., and
+captures the following information:
 
 * <<page-load-metrics,Page load metrics>>
-* Load time of Static Assets (JS, CSS, Images, Fonts, etc.)
+* Load time of Static Assets (JS, CSS, images, fonts, etc.)
 * API requests (XMLHttpRequest and Fetch)
-* Single Page Application Interactions/Navigation
-* <<user-interactions, User Interactions>> (Click events that triggers Navigation changes)
-* User-Centric metrics (Long tasks, FCP, LCP, FID, etc.)
+* Single page application interactions and navigation
+* <<user-interactions, User interactions>> (click events that trigger navigation changes)
+* User-centric metrics (Long tasks, FCP, LCP, FID, etc.)
 * Page information (URL's visited and Referrer)
-* Network Connection information
-* JavaScript Errors
-* <<<<distributed-tracing-guide, Distributed Tracing>>
-* <<breakdown-metrics-docs, Breakdown Metrics>>
+* Network connection information
+* JavaScript errors
+* <<<<distributed-tracing-guide, Distributed tracing>>
+* <<breakdown-metrics-docs, Breakdown metrics>>
 
 [float]
 [[additional-components]]
