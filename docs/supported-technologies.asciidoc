@@ -58,15 +58,15 @@ available only in Chrome >77. Captured as transaction mark for `page-load` trans
 
 `First input delay (FID)`::
 FID quantifies the experience the user feels when trying to interact with the page. It is measured as the time between when a user first interacts with your site (mouse clicks, taps, select dropdowns, etc.) to the time when the
-browser can respond to that interaction. FID is one of the https://web.dev/vitals/[core web vitals] metric and available only in Chrome >85 via https://wicg.github.io/event-timing/[Event Timing API]. Captured as `First Input Delay` span for `page-load` transaction, maintain *less than 100 milliseconds* to provide a good user experience.
+browser can respond to that interaction. FID is one of the https://web.dev/vitals/[core web vitals] metric and available only in Chrome >85 via https://wicg.github.io/event-timing/[Event Timing API]. Captured as `First Input Delay` span for `page-load` transaction, maintain FID of *less than 100 milliseconds* to provide a good user experience.
 
 `Total blocking time (TBT)`::
 The sum of the blocking time (duration above 50 ms) for each long task that occurs between the First contentful paint and the time when the transaction is completed. https://web.dev/tbt/[Total blocking time] is a
-great companion metric https://web.dev/tti/[Time to interactive] (TTI) which is lab metric and not available through browser API. The agent captures TBT based on the number of long tasks that occurred during the page load lifecycle. Captured as `Total Blocking Time` span for `page-load` transaction.
+great companion metric https://web.dev/tti/[Time to interactive] (TTI) which is lab metric and not available in the field through browser APIs. The agent captures TBT based on the number of long tasks that occurred during the page load lifecycle. Captured as `Total Blocking Time` span for `page-load` transaction.
 
-Cumulative layout shift (CLS)::
-Metric that represents the cumulative score of the sum of all unexpected layout shifts that occurs during the entire lifespan of the page. CLS is part of https://web.dev/vitals/[core web vitals], along with FID and LCP.
-Here is https://web.dev/cls/#layout-shift-score[how the score is calculated by Chrome], maintain a score of *less than 0.1* to provide a good user experience.
+`Cumulative layout shift (CLS)`::
+Metric that represents the cumulative score of the sum of all unexpected layout shifts that occurs during the entire lifespan of the page. CLS is one of the https://web.dev/vitals/[core web vitals] and here is
+https://web.dev/cls/#layout-shift-score[how the score is calculated by Chrome]. Maintain a score of *less than 0.1* to provide a good user experience.
 
 `Long Tasks`::
 A long task is any user activity or browser task that monopolize the UI thread for extended periods (greater than 50 milliseconds) and block other critical tasks (frame rate or input latency)
@@ -74,7 +74,7 @@ from being executed. The agent uses the https://www.w3.org/TR/longtasks/[Long Ta
 Learn more about <<longtasks, long task spans>>, and how to interpret them.
 
 `User Timing`::
-The https://www.w3.org/TR/user-timing/[User Timing] spec exposes API for developers to add custom performance entries to their web application. These custom metrics allow users to measure the hot paths of the app code that helps to identify a good user experience. RUM agent records all of the https://developer.mozilla.org/en-US/docs/Web/API/PerformanceMeasure[performance.measure events] as spans by their measure name in the waterfall for all managed transactions.
+The https://www.w3.org/TR/user-timing/[User Timing] spec exposes API for developers to add custom performance entries to their web application. These custom metrics allow users to measure the hot paths of the app code that helps to identify a good user experience. RUM agent records all of the https://developer.mozilla.org/en-US/docs/Web/API/PerformanceMeasure[performance.measure] calls as spans by their measure name in the waterfall for all managed transactions.
 
 
 [float]
