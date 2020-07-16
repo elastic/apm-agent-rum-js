@@ -7,7 +7,7 @@
 
 The RUM agent tries to capture the overall user experience on how the page is loaded/rendered as part of the page load Transaction.
 It includes all of the dependent resources, like JavaScript, stylesheets, images, etc., which are included as part of the page. In addition
-to capturing the resource timing information as Spans, the transaction also includes navigation spans that are associated with the rest
+to capturing the resource timing information as Spans, the transaction also includes navigation spans—marks that are associated with the rest
 of the captured information to make the waterfall more appealing.
 
 `Domain lookup`::
@@ -29,6 +29,8 @@ is executed: `domContentLoadedEventEnd` - `domContentLoadedEventStart`.
 `Fire "load" event`::
 Trigged when the browser finishes loading its document and dependent resources: `loadEventEnd` - `loadEventStart`.
 
+`Time to first byte (TTFB)`::
+Duration from the browser making an HTTP request for the initial document to the first byte of the page being received. TTFB is available from the Navigation Timing API as the `reponseStart` timestamp, and captured as transaction mark `transaction.marks.agent.timeToFirstByte` in the ElasticSearch document.
 
 To capture the overall user experience of the page including all of the above information plus additional resource requests that might be
 triggered during the execution of dependent resources, the `page-load` transaction duration might not always reflect the 
@@ -36,6 +38,33 @@ https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event[Load] event o
 
 If you are interested in accurately measuring the duration of load event, the information can be extracted by using 
 `Fire load event` Span or from the Transaction marks available as `transaction.marks.agent.domComplete` in the Elasticsearch document.
+
+NOTE: The page load transaction is measured relative to the `fetchStart` timestamp from the Navigation Timing API.
+
+
+[float]
+[[user-centric-metrics]]
+=== User-centric Metrics
+
+To understand the performance characteristics of a web page beyond the page load and how the user perceives performance, the agent supports capturing these https://web.dev/user-centric-performance-metrics/[responsiveness metrics].
+
+`First contentful paint (FCP)`::
+Focusses on the initial rendering and measures the time from when the page starts loading to when any part of the page's content is displayed on the screen. Captured as transaction mark for `page-load` transaction.
+
+`Largest contentful paint (LCP)`::
+A new page-load metric that denotes the time from when the page starts loading to when the critical element (largest text or image element) is displayed on the screen. Captured as transaction mark for `page-load` transaction.
+
+`First input delay (FID)`::
+The time from when a user first interacts with your site (mouse clicks, taps, select dropdowns, etc.) to the time when the browser is able to respond to that interaction. Captured as `First Input Delay` span for `page-load` transaction.
+
+`Total blocking time (TBT)`::
+The sum of the blocking time (duration above 50 ms) for each long task that occurs between the First contentful paint and the time when the transaction is ended. Captured as `Total Blocking Time` span for `page-load` transaction.
+
+`Long Tasks`::
+Any user activity or tasks that monopolize the UI thread for extended periods (greater than 50 milliseconds) and block other critical tasks (frame rate or input latency) from being executed. Captured as `Longtask<name>` span for all managed transactions. Learn more about <<longtasks, long task spans>>, and how to interpret them.
+
+`User Timing`::
+Custom metrics that are annotated by the developers in their application code which helps analyze the performance characteristics. https://developer.mozilla.org/en-US/docs/Web/API/PerformanceMeasure[Measure events] are captured as spans with the measure name in the waterfall for all managed transactions.
 
 
 [float]
