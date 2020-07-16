@@ -8,24 +8,24 @@ The Agent also supports <<distributed-tracing-guide,distributed tracing>> for al
 This enables you to analyze performance throughout your microservice architecture -- all in one view.
 
 [float]
-[[how-it-works]]
-=== How does the Agent work?
+[[features]]
+=== Features
 
-The RUM Agent automatically instruments the following:
+The agent uses browser timing APIs such as https://w3c.github.io/navigation-timing/[Navigation Timing]
+https://w3c.github.io/resource-timing/[Resource Timing], https://w3c.github.io/paint-timing/[Paint Timing], https://w3c.github.io/user-timing/[User Timing], etc., and
+captures the following information:
 
 * <<page-load-metrics,Page load metrics>>
-* Load time of Static Assets
+* Load time of Static Assets (JS, CSS, images, fonts, etc.)
 * API requests (XMLHttpRequest and Fetch)
-
-The agent uses the https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API[Navigation Timing API]
-and https://developer.mozilla.org/en-US/docs/Web/API/Resource_Timing_API[Resource Timing API]
-available in the browser to instrument the page load performance and static assets load times.
-
-The agent automatically captures all outgoing http requests,
-by instrumenting both XHR and Fetch API requests from the webpage to backend servers.
-
-For all transactions, the agent automatically captures <<breakdown-metrics-docs, breakdown metrics>>.
-
+* Single page application navigations
+* <<user-interactions, User interactions>> (click events that trigger network activity)
+* <<user-centric-metrics, User-centric metrics>> (Long tasks, FCP, LCP, FID, etc.)
+* Page information (URLs visited and referrer)
+* Network connection information
+* JavaScript errors
+* <<<<distributed-tracing-guide, Distributed tracing>>
+* <<breakdown-metrics-docs, Breakdown metrics>>
 
 [float]
 [[additional-components]]
