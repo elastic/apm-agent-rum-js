@@ -23,7 +23,6 @@
  *
  */
 
-import { compress } from 'compress-payload'
 import Queue from './queue'
 import throttle from './throttle'
 import NDJSON from './ndjson'
@@ -35,7 +34,8 @@ import { Promise } from './polyfills'
 import {
   compressMetadata,
   compressTransaction,
-  compressError
+  compressError,
+  compressPayload
 } from './compress'
 import { __DEV__ } from '../state'
 
@@ -78,15 +78,23 @@ class ApmServer {
   }
 
   _postJson(endPoint, payload) {
-    return compress(payload).then(blob =>
+    const isCompressionStreamSupported = typeof CompressionStream === 'function'
+    const headers = {
+      'Content-Type': 'application/x-ndjson'
+    }
+    if (isCompressionStreamSupported) {
+      headers['Content-Encoding'] = 'gzip'
+    }
+
+    const processRequest = data =>
       this._makeHttpRequest('POST', endPoint, {
-        payload: blob,
-        headers: {
-          'Content-Type': 'application/x-ndjson',
-          'Content-Encoding': 'gzip'
-        }
+        payload: data,
+        headers
       }).then(({ responseText }) => responseText)
-    )
+
+    return isCompressionStreamSupported
+      ? compressPayload(payload).then(processRequest)
+      : processRequest(payload)
   }
 
   _constructError(reason) {

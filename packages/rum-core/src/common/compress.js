@@ -271,3 +271,54 @@ export function compressMetricsets(breakdowns) {
     }
   })
 }
+
+/**
+ * Compress the payload object using the draft
+ * CompressionStream spec supported only in Chromium browsers
+ * Spec : https://wicg.github.io/compression/
+ */
+export function compressPayload(payload, type = 'gzip') {
+  // create a blob with the original payload data and convert it
+  // as redable stream
+  const payloadStream = new Blob([payload]).stream()
+  // pipe the readable blob stream through the compression stream
+  // which is a transform stream that drains its contents
+  const compressedStream = payloadStream.pipeThrough(
+    new CompressionStream(type)
+  )
+
+  return readContentsFromStream(compressedStream).then(
+    contents => new Blob(contents)
+  )
+}
+
+function readContentsFromStream(stream) {
+  const reader = stream.getReader()
+  const chunks = []
+
+  return reader.read().then(function processChunks(chunk) {
+    const { value, done } = chunk
+    if (done) {
+      return chunks
+    }
+    chunks.push(value)
+
+    return reader.read().then(processChunks)
+  })
+}
+
+/**
+ * Utility functions that helps to decompress the compressed payload and
+ * also view them as text output.
+ *
+ * Commented out to exclude these functions from production bundles.
+ */
+// function decompress(blob, type = 'gzip') {
+//   const ds = new DecompressionStream(type)
+//   const decompressedStream = blob.stream().pipeThrough(ds)
+//   return readContentsFromStream(decompressedStream)
+// }
+
+// function view(blob) {
+//   return blob.text()
+// }
