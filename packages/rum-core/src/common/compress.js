@@ -278,11 +278,15 @@ export function compressMetricsets(breakdowns) {
  * Spec : https://wicg.github.io/compression/
  */
 export function compressPayload(payload, type = 'gzip') {
-  // create a blob with the original payload data and convert it
-  // as redable stream
+  /**
+   * create a blob with the original payload data and convert it
+   * as readable stream
+   */
   const payloadStream = new Blob([payload]).stream()
-  // pipe the readable blob stream through the compression stream
-  // which is a transform stream that drains its contents
+  /**
+   * pipe the readable stream from blob through the compression stream which is a
+   * transform stream that reads blobs contents to its destination (writable)
+   */
   const compressedStream = payloadStream.pipeThrough(
     new CompressionStream(type)
   )
@@ -296,14 +300,14 @@ function readContentsFromStream(stream) {
   const reader = stream.getReader()
   const chunks = []
 
-  return reader.read().then(function processChunks(chunk) {
+  return reader.read().then(function processChunk(chunk) {
     const { value, done } = chunk
     if (done) {
       return chunks
     }
     chunks.push(value)
 
-    return reader.read().then(processChunks)
+    return reader.read().then(processChunk)
   })
 }
 
@@ -312,6 +316,13 @@ function readContentsFromStream(stream) {
  * also view them as text output.
  *
  * Commented out to exclude these functions from production bundles.
+ *
+ * Example:
+ *
+ * const compressedPayload = compressPayload(payload)
+ * const decompressed = decompress(compressedPayload)
+ * const contents = view(decompressed).then(console.log)
+ *
  */
 // function decompress(blob, type = 'gzip') {
 //   const ds = new DecompressionStream(type)
@@ -319,6 +330,6 @@ function readContentsFromStream(stream) {
 //   return readContentsFromStream(decompressedStream)
 // }
 
-// function view(blob) {
-//   return blob.text()
+// function view(contents) {
+//   return new Blob(contents).text()
 // }
