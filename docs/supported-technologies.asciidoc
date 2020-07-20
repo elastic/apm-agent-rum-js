@@ -65,7 +65,7 @@ The sum of the blocking time (duration above 50 ms) for each long task that occu
 great companion metric for https://web.dev/tti/[Time to interactive] (TTI) which is lab metric and not available in the field through browser APIs. The agent captures TBT based on the number of long tasks that occurred during the page load lifecycle. Captured as `Total Blocking Time` span for `page-load` transaction.
 
 `Cumulative layout shift (CLS)`::
-Metric that represents the cumulative score of the sum of all unexpected layout shifts that occurs during the entire lifespan of the page. CLS is one of the https://web.dev/vitals/[core web vitals] and here is
+Metric that represents the cumulative score of all unexpected layout shifts that occur during the entire lifespan of the page. CLS is one of the https://web.dev/vitals/[core web vitals] metrics and here is
 https://web.dev/cls/#layout-shift-score[how the score is calculated by Chrome]. Maintain a score of *less than 0.1* to provide a good user experience.
 
 `Long Tasks`::
