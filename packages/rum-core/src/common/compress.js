@@ -23,6 +23,7 @@
  *
  */
 
+import { Promise } from './polyfills'
 import {
   NAVIGATION_TIMING_MARKS,
   COMPRESSED_NAV_TIMING_MARKS
@@ -278,6 +279,19 @@ export function compressMetricsets(breakdowns) {
  * Spec : https://wicg.github.io/compression/
  */
 export function compressPayload(payload, type = 'gzip') {
+  const isCompressionStreamSupported = typeof CompressionStream === 'function'
+  const headers = {
+    'Content-Type': 'application/x-ndjson'
+  }
+  /**
+   * Resolve with unmodified payload if the compression stream
+   * is not supported in browser
+   */
+  if (!isCompressionStreamSupported) {
+    return Promise.resolve({ payload, headers })
+  }
+
+  headers['Content-Encoding'] = 'gzip'
   /**
    * create a blob with the original payload data and convert it
    * as readable stream
@@ -291,12 +305,13 @@ export function compressPayload(payload, type = 'gzip') {
     new CompressionStream(type)
   )
 
-  return readContentsFromStream(compressedStream).then(
-    contents => new Blob(contents)
-  )
+  return readContentsFromStream(compressedStream).then(contents => ({
+    payload: new Blob(contents),
+    headers
+  }))
 }
 
-function readContentsFromStream(stream) {
+export function readContentsFromStream(stream) {
   const reader = stream.getReader()
   const chunks = []
 
@@ -310,26 +325,3 @@ function readContentsFromStream(stream) {
     return reader.read().then(processChunk)
   })
 }
-
-/**
- * Utility functions that helps to decompress the compressed payload and
- * also view them as text output.
- *
- * Commented out to exclude these functions from production bundles.
- *
- * Example:
- *
- * const compressedPayload = compressPayload(payload)
- * const decompressed = decompress(compressedPayload)
- * const contents = view(decompressed).then(console.log)
- *
- */
-// function decompress(blob, type = 'gzip') {
-//   const ds = new DecompressionStream(type)
-//   const decompressedStream = blob.stream().pipeThrough(ds)
-//   return readContentsFromStream(decompressedStream)
-// }
-
-// function view(contents) {
-//   return new Blob(contents).text()
-// }

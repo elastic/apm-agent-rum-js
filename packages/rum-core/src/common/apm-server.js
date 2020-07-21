@@ -78,23 +78,9 @@ class ApmServer {
   }
 
   _postJson(endPoint, payload) {
-    const isCompressionStreamSupported = typeof CompressionStream === 'function'
-    const headers = {
-      'Content-Type': 'application/x-ndjson'
-    }
-    if (isCompressionStreamSupported) {
-      headers['Content-Encoding'] = 'gzip'
-    }
-
-    const processRequest = data =>
-      this._makeHttpRequest('POST', endPoint, {
-        payload: data,
-        headers
-      }).then(({ responseText }) => responseText)
-
-    return isCompressionStreamSupported
-      ? compressPayload(payload).then(processRequest)
-      : processRequest(payload)
+    return compressPayload(payload)
+      .then(result => this._makeHttpRequest('POST', endPoint, result))
+      .then(({ responseText }) => responseText)
   }
 
   _constructError(reason) {
