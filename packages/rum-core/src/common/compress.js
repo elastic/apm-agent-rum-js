@@ -304,24 +304,12 @@ export function compressPayload(payload, type = 'gzip') {
   const compressedStream = payloadStream.pipeThrough(
     new CompressionStream(type)
   )
-
-  return readContentsFromStream(compressedStream).then(contents => ({
-    payload: new Blob(contents),
+  /**
+   * Response accepts a readable stream as input and reads its to completion
+   * to generate the Blob content
+   */
+  return new Response(compressedStream).blob().then(blob => ({
+    payload: blob,
     headers
   }))
-}
-
-export function readContentsFromStream(stream) {
-  const reader = stream.getReader()
-  const chunks = []
-
-  return reader.read().then(function processChunk(chunk) {
-    const { value, done } = chunk
-    if (done) {
-      return chunks
-    }
-    chunks.push(value)
-
-    return reader.read().then(processChunk)
-  })
 }

@@ -28,8 +28,7 @@ import {
   compressTransaction,
   compressMetadata,
   compressError,
-  compressPayload,
-  readContentsFromStream
+  compressPayload
 } from '../../src/common/compress'
 import { addTransactionContext } from '../../src/common/context'
 
@@ -281,9 +280,7 @@ describe('Compress', function() {
     function decompressPayload(blob, type = 'gzip') {
       const ds = new DecompressionStream(type)
       const decompressedStream = blob.stream().pipeThrough(ds)
-      return readContentsFromStream(decompressedStream).then(
-        contents => new Blob(contents)
-      )
+      return new Response(decompressedStream).blob()
     }
 
     function view(blob) {
