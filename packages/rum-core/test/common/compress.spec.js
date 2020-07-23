@@ -295,19 +295,20 @@ describe('Compress', function() {
       .ndjsonTransactions(transactions, true)
       .join('')
     const isCompressionStreamSupported = typeof CompressionStream === 'function'
-
-    let { payload, headers } = await compressPayload(ndjsonPayload)
+    const originalHeaders = { 'Content-Type': 'application/x-ndjson' }
+    let { payload, headers } = await compressPayload(
+      ndjsonPayload,
+      originalHeaders
+    )
     if (isCompressionStreamSupported) {
       const decompressedBlob = await decompressPayload(payload)
       payload = await view(decompressedBlob)
       expect(headers).toEqual({
-        'Content-Type': 'application/x-ndjson',
+        ...originalHeaders,
         'Content-Encoding': 'gzip'
       })
     } else {
-      expect(headers).toEqual({
-        'Content-Type': 'application/x-ndjson'
-      })
+      expect(headers).toEqual(originalHeaders)
     }
     expect(payload).toEqual(ndjsonPayload)
   })

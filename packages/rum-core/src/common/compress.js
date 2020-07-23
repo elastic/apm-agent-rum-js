@@ -278,11 +278,8 @@ export function compressMetricsets(breakdowns) {
  * CompressionStream spec supported only in Chromium browsers
  * Spec : https://wicg.github.io/compression/
  */
-export function compressPayload(payload, type = 'gzip') {
+export function compressPayload(payload, headers, type = 'gzip') {
   const isCompressionStreamSupported = typeof CompressionStream === 'function'
-  const headers = {
-    'Content-Type': 'application/x-ndjson'
-  }
   /**
    * Resolve with unmodified payload if the compression stream
    * is not supported in browser
@@ -291,7 +288,7 @@ export function compressPayload(payload, type = 'gzip') {
     return Promise.resolve({ payload, headers })
   }
 
-  headers['Content-Encoding'] = 'gzip'
+  headers['Content-Encoding'] = type
   /**
    * create a blob with the original payload data and convert it
    * as readable stream

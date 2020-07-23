@@ -78,8 +78,22 @@ class ApmServer {
   }
 
   _postJson(endPoint, payload) {
-    return compressPayload(payload)
-      .then(result => this._makeHttpRequest('POST', endPoint, result))
+    const headers = {
+      'Content-Type': 'application/x-ndjson'
+    }
+    return compressPayload(payload, headers)
+      .catch(error => {
+        if (__DEV__) {
+          this._loggingService.debug(
+            'Error compressing the payload using CompressionSteam API',
+            error
+          )
+        }
+        return { payload, headers }
+      })
+      .then(result => {
+        return this._makeHttpRequest('POST', endPoint, result)
+      })
       .then(({ responseText }) => responseText)
   }
 
