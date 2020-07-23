@@ -85,7 +85,7 @@ class ApmServer {
       .catch(error => {
         if (__DEV__) {
           this._loggingService.debug(
-            'Error compressing the payload using CompressionSteam API',
+            'Compressing the payload using CompressionSteam API failed',
             error
           )
         }
