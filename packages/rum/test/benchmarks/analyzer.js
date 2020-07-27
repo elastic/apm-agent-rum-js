@@ -152,8 +152,6 @@ async function analyzeMetrics(metric, resultMap) {
     'total-cpu-time': cpu.cpuTime,
     'rum-cpu-time': cpu.cpuTimeFiltered,
     'payload-size': payload.size,
-    transactions: payload.transactions,
-    spans: payload.spans,
     memory
   }
 
@@ -217,34 +215,6 @@ function filterCpuMetrics(profile, url) {
   })
 }
 
-/**
- * APM server payload is in NDJSON format
- */
-function getTransactionPaylod(payload) {
-  const parsedData = payload.split('\n')
-  /**
-   * 0 -  Metadata
-   * 1 - Transaction
-   * 2* - Spans
-   */
-  const transactionData = parsedData[1]
-  return JSON.parse(transactionData)
-}
-
-function capturePayloadInfo(payload) {
-  const { transaction } = getTransactionPaylod(payload)
-  const { started } = transaction.span_count
-  /**
-   * there will be only one page-load transaction in
-   * the test, so hard coding number of transaction to 1
-   */
-  return {
-    transactions: 1,
-    spans: started,
-    size: payload.length
-  }
-}
-
 function getMemoryAllocationPerFunction({ profile }) {
   const allocations = []
   /**
@@ -293,7 +263,6 @@ module.exports = {
   customApmBuild,
   calculateResults,
   filterCpuMetrics,
-  capturePayloadInfo,
   getMinifiedApmBundle,
   getApmBundleSize,
   getCommonFields,

@@ -27,7 +27,6 @@ const playwright = require('playwright')
 const config = require('./config')
 const {
   filterCpuMetrics,
-  capturePayloadInfo,
   getMemoryAllocationPerFunction
 } = require('./analyzer')
 
@@ -82,36 +81,31 @@ function gatherRawMetrics(browser, url) {
      */
     let metrics = {}
 
-    page.on('request', async request => {
-      const requestUrl = request.url()
-      if (requestUrl.indexOf('/intake/v2/rum/events') >= 0) {
-        /**
-         * Stop the profiler once we post the transaction to
-         * the apm server
-         */
-        let filteredCpuMetrics = {}
-        let memoryMetrics = []
-        if (client) {
-          const result = await client.send('Profiler.stop')
-          const sample = await client.send('HeapProfiler.stopSampling')
+    await page.route(/intake\/v\d+\/rum\/events/, async () => {
+      let filteredCpuMetrics = {}
+      let memoryMetrics = []
+      if (client) {
+        const result = await client.send('Profiler.stop')
+        const sample = await client.send('HeapProfiler.stopSampling')
 
-          memoryMetrics = getMemoryAllocationPerFunction(sample)
-          filteredCpuMetrics = filterCpuMetrics(result.profile, url)
-        }
-        const response = request.postData()
-        const payload = capturePayloadInfo(response)
-
-        Object.assign(metrics, {
-          cpu: filteredCpuMetrics,
-          payload,
-          memory: memoryMetrics
-        })
-        /**
-         * Resolve the promise once we measure the size
-         * of the payload to APM Server
-         */
-        resolve(metrics)
+        memoryMetrics = getMemoryAllocationPerFunction(sample)
+        filteredCpuMetrics = filterCpuMetrics(result.profile, url)
       }
+      const size = await page.evaluate(() => window.PAYLOAD_SIZE)
+
+      Object.assign(metrics, {
+        cpu: filteredCpuMetrics,
+        payload: {
+          size
+        },
+        memory: memoryMetrics
+      })
+
+      /**
+       * Resolve the promise once we measure the size
+       * of the payload to APM Server
+       */
+      resolve(metrics)
     })
 
     page.on('load', async function() {
@@ -131,6 +125,24 @@ function gatherRawMetrics(browser, url) {
           navigation: JSON.stringify(entries),
           resource: JSON.stringify(performance.getEntriesByType('resource')),
           measure: JSON.stringify(performance.getEntriesByType('measure'))
+        }
+      })
+
+      /**
+       * Patching the APM server request function to capture the payload size
+       */
+      await page.evaluate(() => {
+        const apmServer = window.elasticApm.serviceFactory.getService(
+          'ApmServer'
+        )
+        const original = apmServer._makeHttpRequest
+
+        apmServer._makeHttpRequest = function(method, url, options) {
+          const { payload } = options
+          window.PAYLOAD_SIZE =
+            payload instanceof Blob ? payload.size : payload.length
+
+          return original.call(this, method, url, options)
         }
       })
 
