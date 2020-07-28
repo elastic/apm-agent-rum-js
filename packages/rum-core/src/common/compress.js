@@ -288,7 +288,6 @@ export function compressPayload(payload, headers, type = 'gzip') {
     return Promise.resolve({ payload, headers })
   }
 
-  headers['Content-Encoding'] = type
   /**
    * create a blob with the original payload data and convert it
    * as readable stream
@@ -305,8 +304,11 @@ export function compressPayload(payload, headers, type = 'gzip') {
    * Response accepts a readable stream as input and reads its to completion
    * to generate the Blob content
    */
-  return new Response(compressedStream).blob().then(blob => ({
-    payload: blob,
-    headers
-  }))
+  return new Response(compressedStream).blob().then(blob => {
+    headers['Content-Encoding'] = type
+    return {
+      payload: blob,
+      headers
+    }
+  })
 }

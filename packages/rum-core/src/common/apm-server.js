@@ -85,15 +85,13 @@ class ApmServer {
       .catch(error => {
         if (__DEV__) {
           this._loggingService.debug(
-            'Compressing the payload using CompressionSteam API failed',
-            error
+            'Compressing the payload using CompressionStream API failed',
+            error.message
           )
         }
         return { payload, headers }
       })
-      .then(result => {
-        return this._makeHttpRequest('POST', endPoint, result)
-      })
+      .then(result => this._makeHttpRequest('POST', endPoint, result))
       .then(({ responseText }) => responseText)
   }
 
