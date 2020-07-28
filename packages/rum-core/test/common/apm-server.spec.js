@@ -428,7 +428,10 @@ describe('ApmServer', function() {
     ])
   })
 
-  if (window.Response) {
+  /**
+   * Stream API in blob is only supported on few browsers
+   */
+  if (window.Response && typeof new Blob().stream === 'function') {
     it('should send uncompressed payload when compression failed', async () => {
       const transactions = generateTransaction(1, true).map(tr => {
         const model = performanceMonitoring.createTransactionDataModel(tr)
