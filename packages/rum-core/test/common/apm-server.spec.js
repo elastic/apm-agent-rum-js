@@ -441,18 +441,16 @@ describe('ApmServer', function() {
       })
       spyOn(loggingService, 'debug')
 
-      function mockResponse() {
-        const original = window.Response
-        window.Response = function() {
-          return {
-            blob: () => Promise.reject(new Error('Compression Failed'))
-          }
+      function mockCompressionStream() {
+        const original = window.CompressionStream
+        window.CompressionStream = function() {
+          throw new Error('Compression Failed')
         }
         return function unMock() {
-          window.Response = original
+          window.CompressionStream = original
         }
       }
-      const unMockResponse = mockResponse()
+      const unMock = mockCompressionStream()
       const isCompressionStreamSupported =
         typeof CompressionStream === 'function'
 
@@ -468,7 +466,7 @@ describe('ApmServer', function() {
         payload,
         headers: { 'Content-Type': 'application/x-ndjson' }
       })
-      unMockResponse()
+      unMock()
     })
   }
 
