@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.4.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.3.0...@elastic/apm-rum@5.4.0) (2020-07-29)
+
+
+### Features
+
+* **rum-core:** compress payload sent to APM Server ([#572](https://github.com/elastic/apm-agent-rum-js/issues/572)) ([a8f02c6](https://github.com/elastic/apm-agent-rum-js/commit/a8f02c663e2579a3a427c7f461416d17f45b7c62))
+
+
+
+
+
 # [5.3.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.2.1...@elastic/apm-rum@5.3.0) (2020-07-06)
 
 
