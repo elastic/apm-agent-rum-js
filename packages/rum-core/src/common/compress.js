@@ -23,6 +23,7 @@
  *
  */
 
+import { Promise } from './polyfills'
 import {
   NAVIGATION_TIMING_MARKS,
   COMPRESSED_NAV_TIMING_MARKS
@@ -269,5 +270,44 @@ export function compressMetricsets(breakdowns) {
         }
       }
     }
+  })
+}
+
+/**
+ * Compress the payload object using the draft
+ * CompressionStream spec supported only in Chromium browsers
+ * Spec : https://wicg.github.io/compression/
+ */
+export function compressPayload(payload, headers, type = 'gzip') {
+  const isCompressionStreamSupported = typeof CompressionStream === 'function'
+  return new Promise(resolve => {
+    /**
+     * Resolve with unmodified payload if the compression stream
+     * is not supported in browser
+     */
+    if (!isCompressionStreamSupported) {
+      return resolve({ payload, headers })
+    }
+
+    /**
+     * create a blob with the original payload data and convert it
+     * as readable stream
+     */
+    const payloadStream = new Blob([payload]).stream()
+    /**
+     * pipe the readable stream from blob through the compression stream which is a
+     * transform stream that reads blobs contents to its destination (writable)
+     */
+    const compressedStream = payloadStream.pipeThrough(
+      new CompressionStream(type)
+    )
+    /**
+     * Response accepts a readable stream as input and reads its to completion
+     * to generate the Blob content
+     */
+    return new Response(compressedStream).blob().then(payload => {
+      headers['Content-Encoding'] = type
+      return resolve({ payload, headers })
+    })
   })
 }

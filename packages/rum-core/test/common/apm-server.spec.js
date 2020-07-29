@@ -428,6 +428,51 @@ describe('ApmServer', function() {
     ])
   })
 
+  /**
+   * Stream API in blob is only supported on few browsers
+   */
+  if (window.Response && typeof new Blob().stream === 'function') {
+    it('should send uncompressed payload when compression failed', async () => {
+      const transactions = generateTransaction(1, true).map(tr => {
+        const model = performanceMonitoring.createTransactionDataModel(tr)
+        return model
+      })
+      const payload = apmServer.ndjsonTransactions(transactions, true).join('')
+
+      spyOn(apmServer, '_makeHttpRequest').and.resolveTo({
+        responseText: 'success'
+      })
+      spyOn(loggingService, 'debug')
+
+      function mockCompressionStream() {
+        const original = window.CompressionStream
+        window.CompressionStream = function() {
+          throw new Error('Compression Failed')
+        }
+        return function unMock() {
+          window.CompressionStream = original
+        }
+      }
+      const unMock = mockCompressionStream()
+      const isCompressionStreamSupported =
+        typeof CompressionStream === 'function'
+
+      await apmServer._postJson('/test', payload)
+
+      if (isCompressionStreamSupported) {
+        expect(loggingService.debug).toHaveBeenCalledWith(
+          'Compressing the payload using CompressionStream API failed',
+          'Compression Failed'
+        )
+      }
+      expect(apmServer._makeHttpRequest).toHaveBeenCalledWith('POST', '/test', {
+        payload,
+        headers: { 'Content-Type': 'application/x-ndjson' }
+      })
+      unMock()
+    })
+  }
+
   describeIf(
     '7.5+',
     () => {

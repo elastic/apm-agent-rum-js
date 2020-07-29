@@ -27,7 +27,8 @@ import { createServiceFactory, generateTransaction, generateErrors } from '..'
 import {
   compressTransaction,
   compressMetadata,
-  compressError
+  compressError,
+  compressPayload
 } from '../../src/common/compress'
 import { addTransactionContext } from '../../src/common/context'
 
@@ -269,5 +270,46 @@ describe('Compress', function() {
     const compressed = compressError(error)
 
     testMappedObject(error, compressed)
+  })
+
+  it('should compress payload', async () => {
+    /**
+     * Utility functions that helps to decompress the compressed payload and
+     * also view them as text output.
+     */
+    function decompressPayload(blob, type = 'gzip') {
+      const ds = new DecompressionStream(type)
+      const decompressedStream = blob.stream().pipeThrough(ds)
+      return new Response(decompressedStream).blob()
+    }
+
+    function view(blob) {
+      return blob.text()
+    }
+
+    const transactions = generateTransaction(1, true).map(tr => {
+      const model = performanceMonitoring.createTransactionDataModel(tr)
+      return model
+    })
+    const ndjsonPayload = apmServer
+      .ndjsonTransactions(transactions, true)
+      .join('')
+    const isCompressionStreamSupported = typeof CompressionStream === 'function'
+    const originalHeaders = { 'Content-Type': 'application/x-ndjson' }
+    let { payload, headers } = await compressPayload(
+      ndjsonPayload,
+      originalHeaders
+    )
+    if (isCompressionStreamSupported) {
+      const decompressedBlob = await decompressPayload(payload)
+      payload = await view(decompressedBlob)
+      expect(headers).toEqual({
+        ...originalHeaders,
+        'Content-Encoding': 'gzip'
+      })
+    } else {
+      expect(headers).toEqual(originalHeaders)
+    }
+    expect(payload).toEqual(ndjsonPayload)
   })
 })
