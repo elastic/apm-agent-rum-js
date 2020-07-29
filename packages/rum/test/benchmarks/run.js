@@ -38,6 +38,14 @@ const startServer = require('./server')
 
 const REPORTS_DIR = join(__dirname, '../../reports')
 
+/**
+ * catch script errors thrown inside browser process
+ */
+process.on('unhandledRejection', reason => {
+  console.error('Unhandled Promise Rejection', reason)
+  process.exit(1)
+})
+
 !(async function run() {
   let exitCode = 0
   try {
