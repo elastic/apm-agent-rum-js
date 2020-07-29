@@ -31,6 +31,14 @@ In order to debug the agent consider performing the following steps:
 3. Wait at least 5 seconds after the page has loaded
 4. Monitor the Console and Network panel in your browsers developer tools
 
+[float]
+[[disable-agent]]
+=== Disable the Agent
+
+In the unlikely event the agent causes disruptions to a production application,
+you can disable the agent while you troubleshoot.
+
+To disable the agent, set <<active,`active`>> to `false`.
 
 [float]
 [[get-in-touch]]
