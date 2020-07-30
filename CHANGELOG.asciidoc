@@ -29,6 +29,17 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.4.0]]
+==== 5.4.0 (2020-07-29)
+
+[float]
+===== Features
+* Agent now uses the new CompressionStream API available on modern browsers to
+  gzip compress the payload sent to the APM server. This yields a huge reduction of
+  around ~96% in the payload size for an example web application when compared with the v3
+  specification: {issue}572[#572]
+
+
 [[release-notes-5.3.0]]
 ==== 5.3.0 (2020-07-06)
 
