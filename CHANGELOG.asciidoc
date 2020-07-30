@@ -35,7 +35,7 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [float]
 ===== Features
 * Agent now uses the new CompressionStream API available on modern browsers to
-  gzip compress the events payload sent to the APM server. This yeilds a huge reduction of
+  gzip compress the payload sent to the APM server. This yields a huge reduction of
   around ~96% in the payload size for an example web application when compared with the v3
   specification: {issue}572[#572]
 
