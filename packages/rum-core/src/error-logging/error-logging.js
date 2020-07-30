@@ -171,32 +171,24 @@ class ErrorLogging {
   }
 
   logPromiseEvent(promiseRejectionEvent) {
-    const prefix = 'Unhandled promise rejection: '
-    const { reason } = promiseRejectionEvent
+    const prefix = 'Uncaught (in promise) '
+    const { reason = '<no reason specified>' } = promiseRejectionEvent
+    let errorEvent
 
-    if (reason == null) {
-      this.logError(prefix + '<no reason specified>')
-    } else if (typeof reason.message === 'string') {
+    if (typeof reason.name === 'string' && typeof reason.message === 'string') {
       /**
        * Promise is rejected with an error or error like object
        */
-      this.logError({
-        message: prefix + reason.message,
-        stack: reason.stack ? reason.stack : null
-      })
-    } else if (typeof reason !== 'object') {
-      this.logError(prefix + reason)
-    }
-  }
-
-  logError(messageOrError) {
-    let errorEvent = {}
-    if (typeof messageOrError === 'string') {
-      errorEvent.message = messageOrError
+      errorEvent = {
+        error: reason,
+        message: `${prefix}${reason.name}: ${reason.message}`
+      }
     } else {
-      errorEvent.error = messageOrError
+      errorEvent = {
+        message: `${prefix}${reason}`
+      }
     }
-    return this.logErrorEvent(errorEvent)
+    this.logErrorEvent(errorEvent)
   }
 }
 

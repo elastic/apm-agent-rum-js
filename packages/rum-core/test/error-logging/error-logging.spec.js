@@ -349,6 +349,7 @@ describe('ErrorLogging', function() {
     expect(getEvents()[2][ERRORS].exception.message).toMatch(testErrorMessage)
 
     const errorObj = {
+      name: 'ReferenceError',
       message: testErrorMessage,
       stack: 'ReferenceError: At example.js:23'
     }
@@ -361,6 +362,7 @@ describe('ErrorLogging', function() {
     )
 
     const errorLikeObj = {
+      name: 'Error',
       message: testErrorMessage,
       foo: 'bar'
     }
@@ -374,20 +376,22 @@ describe('ErrorLogging', function() {
       reason: 200
     })
     expect(getEvents()[5][ERRORS].exception.message).toBe(
-      'Unhandled promise rejection: 200'
+      'Uncaught (in promise) 200'
     )
 
     errorLogging.logPromiseEvent({
       reason: true
     })
     expect(getEvents()[6][ERRORS].exception.message).toBe(
-      'Unhandled promise rejection: true'
+      'Uncaught (in promise) true'
     )
 
     errorLogging.logPromiseEvent({
       reason: [{ a: '1' }]
     })
-    expect(getEvents()[7]).toBeUndefined()
+    expect(getEvents()[7][ERRORS].exception.message).toBe(
+      'Uncaught (in promise) [object Object]'
+    )
 
     const events = getEvents()
 
