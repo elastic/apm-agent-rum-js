@@ -34,7 +34,8 @@ import { Promise } from './polyfills'
 import {
   compressMetadata,
   compressTransaction,
-  compressError
+  compressError,
+  compressPayload
 } from './compress'
 import { __DEV__ } from '../state'
 
@@ -77,12 +78,21 @@ class ApmServer {
   }
 
   _postJson(endPoint, payload) {
-    return this._makeHttpRequest('POST', endPoint, {
-      payload,
-      headers: {
-        'Content-Type': 'application/x-ndjson'
-      }
-    }).then(({ responseText }) => responseText)
+    const headers = {
+      'Content-Type': 'application/x-ndjson'
+    }
+    return compressPayload(payload, headers)
+      .catch(error => {
+        if (__DEV__) {
+          this._loggingService.debug(
+            'Compressing the payload using CompressionStream API failed',
+            error.message
+          )
+        }
+        return { payload, headers }
+      })
+      .then(result => this._makeHttpRequest('POST', endPoint, result))
+      .then(({ responseText }) => responseText)
   }
 
   _constructError(reason) {

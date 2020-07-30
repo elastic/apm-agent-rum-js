@@ -49,22 +49,32 @@ NOTE: The page load transaction is measured relative to the `fetchStart` timesta
 To understand the performance characteristics of a web page beyond the page load and how the user perceives performance, the agent supports capturing these https://web.dev/user-centric-performance-metrics/[responsiveness metrics].
 
 `First contentful paint (FCP)`::
-Focusses on the initial rendering and measures the time from when the page starts loading to when any part of the page's content is displayed on the screen. Captured as transaction mark for `page-load` transaction.
+Focusses on the initial rendering and measures the time from when the page starts loading to when any part of the page's content is displayed on the screen. The agent uses the https://www.w3.org/TR/paint-timing/#first-contentful-paint[Paint timing API] available in the browser to capture the timing information. FCP is captured as transaction mark for `page-load` transaction for all chromium-based browsers (Chrome >60, Edge >79, Opera >47, etc.).
 
 `Largest contentful paint (LCP)`::
-A new page-load metric that denotes the time from when the page starts loading to when the critical element (largest text or image element) is displayed on the screen. Captured as transaction mark for `page-load` transaction.
+A new page-load metric that denotes the time from when the page starts loading to when the critical element (largest text, image, video elements) is displayed on the screen. LCP is available in the browser through 
+https://wicg.github.io/largest-contentful-paint/[LargestContentfulPaint API] which relies on the draft https://wicg.github.io/element-timing/[Element Timing API]. LCP is one of the https://web.dev/vitals/[core web vitals] metrics and
+available only in Chrome >77. Captured as transaction mark for `page-load` transaction, maintain LCP within the first *2.5 seconds* of page-load to provide a good user experience.
 
 `First input delay (FID)`::
-The time from when a user first interacts with your site (mouse clicks, taps, select dropdowns, etc.) to the time when the browser is able to respond to that interaction. Captured as `First Input Delay` span for `page-load` transaction.
+FID quantifies the experience of the user when they interact with the page during the page load. It is measured as the time between when a user first interacts with your site (mouse clicks, taps, select dropdowns, etc.) to the time when the
+browser can respond to that interaction. FID is one of the https://web.dev/vitals/[core web vitals] metrics and available only in Chrome >85 via https://wicg.github.io/event-timing/[Event Timing API]. FID is captured as `First Input Delay` span for `page-load` transaction. Maintain FID *below 100 milliseconds* to provide a good user experience.
 
 `Total blocking time (TBT)`::
-The sum of the blocking time (duration above 50 ms) for each long task that occurs between the First contentful paint and the time when the transaction is ended. Captured as `Total Blocking Time` span for `page-load` transaction.
+The sum of the blocking time (duration above 50 ms) for each long task that occurs between the First contentful paint and the time when the transaction is completed. https://web.dev/tbt/[Total blocking time] is a
+great companion metric for https://web.dev/tti/[Time to interactive] (TTI) which is lab metric and not available in the field through browser APIs. The agent captures TBT based on the number of long tasks that occurred during the page load lifecycle. Captured as `Total Blocking Time` span for `page-load` transaction.
+
+`Cumulative layout shift (CLS)`::
+Metric that represents the cumulative score of all unexpected layout shifts that occur during the entire lifespan of the page. CLS is one of the https://web.dev/vitals/[core web vitals] metrics and here is
+https://web.dev/cls/#layout-shift-score[how the score is calculated by Chrome]. Maintain a score of *less than 0.1* to provide a good user experience.
 
 `Long Tasks`::
-Any user activity or tasks that monopolize the UI thread for extended periods (greater than 50 milliseconds) and block other critical tasks (frame rate or input latency) from being executed. Captured as `Longtask<name>` span for all managed transactions. Learn more about <<longtasks, long task spans>>, and how to interpret them.
+A long task is any user activity or browser task that monopolize the UI thread for extended periods (greater than 50 milliseconds) and block other critical tasks (frame rate or input latency)
+from being executed. The agent uses the https://www.w3.org/TR/longtasks/[Long Task API] which is only available in chromium-based browsers (Chrome >58, Edge >79, Opera >69). Captured as `Longtask<name>` span for all managed transactions.
+Learn more about <<longtasks, long task spans>>, and how to interpret them.
 
 `User Timing`::
-Custom metrics that are annotated by the developers in their application code which helps analyze the performance characteristics. https://developer.mozilla.org/en-US/docs/Web/API/PerformanceMeasure[Measure events] are captured as spans with the measure name in the waterfall for all managed transactions.
+The https://www.w3.org/TR/user-timing/[User Timing] spec exposes API for developers to add custom performance entries to their web application. These custom metrics allow users to measure the hot paths of the app code that helps to identify a good user experience. RUM agent records all of the https://developer.mozilla.org/en-US/docs/Web/API/PerformanceMeasure[performance.measure] calls as spans by their measure name in the waterfall for all managed transactions.
 
 
 [float]
