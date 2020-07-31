@@ -190,6 +190,16 @@ class ErrorLogging {
     }
     this.logErrorEvent(errorEvent)
   }
+
+  logError(messageOrError) {
+    let errorEvent = {}
+    if (typeof messageOrError === 'string') {
+      errorEvent.message = messageOrError
+    } else {
+      errorEvent.error = messageOrError
+    }
+    return this.logErrorEvent(errorEvent)
+  }
 }
 
 export default ErrorLogging
