@@ -299,10 +299,8 @@ describe('ErrorLogging', function() {
     } catch (error) {
       errorLogging.logErrorEvent({ error })
       errorLogging.logErrorEvent({ error })
-      errorLogging.logError(error)
-      errorLogging.logError('test error')
       expect(apmServer.sendEvents).not.toHaveBeenCalled()
-      expect(apmServer.queue.items.length).toBe(4)
+      expect(apmServer.queue.items.length).toBe(2)
     }
   })
 
