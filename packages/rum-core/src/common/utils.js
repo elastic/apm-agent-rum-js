@@ -355,6 +355,13 @@ function isPerfTimelineSupported() {
   return typeof PERF.getEntriesByType === 'function'
 }
 
+function isPerfTypeSupported(type) {
+  let po = PerformanceObserver
+  return (
+    po && po.supportedEntryTypes && po.supportedEntryTypes.indexOf(type) >= 0
+  )
+}
+
 export {
   extend,
   merge,
@@ -389,5 +396,6 @@ export {
   removeInvalidChars,
   PERF,
   isPerfTimelineSupported,
-  isBrowser
+  isBrowser,
+  isPerfTypeSupported
 }

@@ -31,7 +31,13 @@ import {
   metrics,
   createTotalBlockingTimeSpan
 } from './metrics'
-import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
+import {
+  extend,
+  getEarliestSpan,
+  getLatestNonXHRSpan,
+  isUndefined,
+  isPerfTypeSupported
+} from '../common/utils'
 import { captureNavigation } from './capture-navigation'
 import {
   PAGE_LOAD,
@@ -280,13 +286,23 @@ class TransactionService {
            * and once performance observer is disconnected
            */
           if (tr.captureTimings) {
-            if (metrics.tbt.duration > 0) {
-              tr.spans.push(createTotalBlockingTimeSpan(metrics.tbt))
+            const { cls, fid, tbt } = metrics
+            if (tbt.duration > 0) {
+              tr.spans.push(createTotalBlockingTimeSpan(tbt))
             }
-            /**
-             * TODO: define the proper place to store cls.
-             */
-            tr.addContext({ cls: metrics.cls })
+
+            tr.experience = {}
+            if (isPerfTypeSupported(LONG_TASK)) {
+              tr.experience.tbt = tbt.duration
+            }
+
+            if (isPerfTypeSupported(LAYOUT_SHIFT)) {
+              tr.experience.cls = cls
+            }
+
+            if (!isUndefined(fid)) {
+              tr.experience.fid = fid
+            }
           }
         }
         /**

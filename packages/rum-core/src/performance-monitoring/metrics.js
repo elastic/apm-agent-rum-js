@@ -164,6 +164,12 @@ export function calculateTotalBlockingTime(longtaskEntries) {
   })
 }
 
+/**
+ * Calculates Cumulative Layout Shift using
+ * 'layout-shift' entries captured through PerformanceObserver.
+ * https://developer.mozilla.org/en-US/docs/Web/API/LayoutShift
+ * https://web.dev/cls/
+ */
 export function calculateCumulativeLayoutShift(clsEntries) {
   clsEntries.forEach(entry => {
     if (!entry.hadRecentInput) {
@@ -243,6 +249,7 @@ export function captureObserverEntries(list, { capturePaint }) {
   const fidEntries = list.getEntriesByType(FIRST_INPUT)
   const fidSpan = createFirstInputDelaySpan(fidEntries)
   if (fidSpan) {
+    metrics.fid = fidSpan._start
     result.spans.push(fidSpan)
   }
 

@@ -49,6 +49,7 @@ describe('Metrics', () => {
       list.getEntriesByType.and.returnValue([])
       list.getEntriesByName.and.returnValue([])
       metrics.tbt = { start: Infinity, duration: 0 }
+      metrics.cls = 0
     })
 
     it('should not create long tasks spans if entries are not present', () => {
@@ -248,7 +249,6 @@ describe('Metrics', () => {
     })
 
     it('should calculate Cumulative Layout Shift', () => {
-      metrics.cls = 0
       calculateCumulativeLayoutShift([
         {
           duration: 0,
