@@ -34,6 +34,7 @@ import { noop, PERF } from '../common/utils'
 import Span from './span'
 
 export const metrics = {
+  fid: 0,
   fcp: 0,
   tbt: {
     start: Infinity,

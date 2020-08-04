@@ -35,7 +35,6 @@ import {
   extend,
   getEarliestSpan,
   getLatestNonXHRSpan,
-  isUndefined,
   isPerfTypeSupported
 } from '../common/utils'
 import { captureNavigation } from './capture-navigation'
@@ -300,7 +299,7 @@ class TransactionService {
               tr.experience.cls = cls
             }
 
-            if (!isUndefined(fid)) {
+            if (fid > 0) {
               tr.experience.fid = fid
             }
           }
