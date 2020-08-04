@@ -356,9 +356,10 @@ function isPerfTimelineSupported() {
 }
 
 function isPerfTypeSupported(type) {
-  let po = PerformanceObserver
   return (
-    po && po.supportedEntryTypes && po.supportedEntryTypes.indexOf(type) >= 0
+    typeof PerformanceObserver !== 'undefined' &&
+    PerformanceObserver.supportedEntryTypes &&
+    PerformanceObserver.supportedEntryTypes.indexOf(type) >= 0
   )
 }
 
