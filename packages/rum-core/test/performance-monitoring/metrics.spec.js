@@ -28,7 +28,8 @@ import {
   createFirstInputDelaySpan,
   createTotalBlockingTimeSpan,
   PerfEntryRecorder,
-  metrics
+  metrics,
+  calculateCumulativeLayoutShift
 } from '../../src/performance-monitoring/metrics'
 import { LARGEST_CONTENTFUL_PAINT, LONG_TASK } from '../../src/common/constants'
 import {
@@ -48,6 +49,7 @@ describe('Metrics', () => {
       list.getEntriesByType.and.returnValue([])
       list.getEntriesByName.and.returnValue([])
       metrics.tbt = { start: Infinity, duration: 0 }
+      metrics.cls = 0
     })
 
     it('should not create long tasks spans if entries are not present', () => {
@@ -244,6 +246,48 @@ describe('Metrics', () => {
           _start: 5482.669999997597
         })
       )
+    })
+
+    it('should calculate Cumulative Layout Shift', () => {
+      calculateCumulativeLayoutShift([
+        {
+          duration: 0,
+          entryType: 'layout-shift',
+          hadRecentInput: true,
+          lastInputTime: 28846.710000012536,
+          name: '',
+          startTime: 28932.589999982156,
+          value: 0.04
+        },
+        {
+          duration: 0,
+          entryType: 'layout-shift',
+          hadRecentInput: false,
+          lastInputTime: 28846.710000012536,
+          name: '',
+          startTime: 28932.589999982156,
+          value: 0.02
+        },
+        {
+          duration: 0,
+          entryType: 'layout-shift',
+          hadRecentInput: false,
+          lastInputTime: 28846.710000012536,
+          name: '',
+          startTime: 28932.589999982156,
+          value: 0.03
+        },
+        {
+          duration: 0,
+          entryType: 'layout-shift',
+          hadRecentInput: false,
+          lastInputTime: 28846.710000012536,
+          name: '',
+          startTime: 28932.589999982156,
+          value: 0.01
+        }
+      ])
+      expect(metrics.cls.toFixed(5)).toEqual('0.06000')
     })
   })
 })
