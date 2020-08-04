@@ -128,6 +128,7 @@ const RESOURCE = 'resource'
 const FIRST_CONTENTFUL_PAINT = 'first-contentful-paint'
 const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint'
 const FIRST_INPUT = 'first-input'
+const LAYOUT_SHIFT = 'layout-shift'
 
 /**
  * Event types sent to APM Server on the queue
@@ -195,5 +196,6 @@ export {
   LOGGING_SERVICE,
   APM_SERVER,
   TRUNCATED_TYPE,
-  FIRST_INPUT
+  FIRST_INPUT,
+  LAYOUT_SHIFT
 }

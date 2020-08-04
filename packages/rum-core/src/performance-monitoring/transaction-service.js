@@ -31,7 +31,12 @@ import {
   metrics,
   createTotalBlockingTimeSpan
 } from './metrics'
-import { extend, getEarliestSpan, getLatestNonXHRSpan } from '../common/utils'
+import {
+  extend,
+  getEarliestSpan,
+  getLatestNonXHRSpan,
+  isPerfTypeSupported
+} from '../common/utils'
 import { captureNavigation } from './capture-navigation'
 import {
   PAGE_LOAD,
@@ -44,7 +49,8 @@ import {
   LONG_TASK,
   PAINT,
   TRUNCATED_TYPE,
-  FIRST_INPUT
+  FIRST_INPUT,
+  LAYOUT_SHIFT
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__, state } from '../state'
@@ -159,6 +165,7 @@ class TransactionService {
         this.recorder.start(LARGEST_CONTENTFUL_PAINT)
         this.recorder.start(PAINT)
         this.recorder.start(FIRST_INPUT)
+        this.recorder.start(LAYOUT_SHIFT)
       }
       if (perfOptions.pageLoadTraceId) {
         tr.traceId = perfOptions.pageLoadTraceId
@@ -277,8 +284,24 @@ class TransactionService {
            * Capture the TBT as span after observing for all long task entries
            * and once performance observer is disconnected
            */
-          if (tr.captureTimings && metrics.tbt.duration > 0) {
-            tr.spans.push(createTotalBlockingTimeSpan(metrics.tbt))
+          if (tr.captureTimings) {
+            const { cls, fid, tbt } = metrics
+            if (tbt.duration > 0) {
+              tr.spans.push(createTotalBlockingTimeSpan(tbt))
+            }
+
+            tr.experience = {}
+            if (isPerfTypeSupported(LONG_TASK)) {
+              tr.experience.tbt = tbt.duration
+            }
+
+            if (isPerfTypeSupported(LAYOUT_SHIFT)) {
+              tr.experience.cls = cls
+            }
+
+            if (fid > 0) {
+              tr.experience.fid = fid
+            }
           }
         }
         /**

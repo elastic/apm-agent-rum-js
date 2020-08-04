@@ -210,7 +210,8 @@ export function compressTransaction(transaction) {
     yc: {
       sd: spans.length
     },
-    sm: transaction.sampled
+    sm: transaction.sampled,
+    exp: transaction.experience
   }
 }
 

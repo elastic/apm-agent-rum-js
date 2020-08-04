@@ -37,9 +37,11 @@ import {
   LARGEST_CONTENTFUL_PAINT,
   PAINT,
   TRUNCATED_TYPE,
-  FIRST_INPUT
+  FIRST_INPUT,
+  LAYOUT_SHIFT
 } from '../../src/common/constants'
 import { state } from '../../src/state'
+import { isPerfTypeSupported } from '../../src/common/utils'
 
 describe('TransactionService', function() {
   var transactionService
@@ -652,11 +654,12 @@ describe('TransactionService', function() {
       const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
         managed: true
       })
-      expect(startSpy).toHaveBeenCalledTimes(4)
+      expect(startSpy).toHaveBeenCalledTimes(5)
       expect(startSpy.calls.allArgs()).toEqual([
         [LARGEST_CONTENTFUL_PAINT],
         [PAINT],
         [FIRST_INPUT],
+        [LAYOUT_SHIFT],
         [LONG_TASK]
       ])
       await pageLoadTr.end()
@@ -712,11 +715,12 @@ describe('TransactionService', function() {
       const pageLoadTr = trService.startTransaction('test', PAGE_LOAD, {
         managed: true
       })
-      expect(startSpy).toHaveBeenCalledTimes(3)
+      expect(startSpy).toHaveBeenCalledTimes(4)
       expect(startSpy.calls.allArgs()).toEqual([
         [LARGEST_CONTENTFUL_PAINT],
         [PAINT],
-        [FIRST_INPUT]
+        [FIRST_INPUT],
+        [LAYOUT_SHIFT]
       ])
       await pageLoadTr.end()
       expect(stopSpy).toHaveBeenCalled()
@@ -728,6 +732,21 @@ describe('TransactionService', function() {
       expect(startSpy).not.toHaveBeenCalled()
       await routeChangeTr.end()
       expect(stopSpy).toHaveBeenCalled()
+    })
+
+    it('should set experience on Transaction', async () => {
+      const tr = trService.startTransaction('test', PAGE_LOAD, {
+        managed: true
+      })
+      expect(tr.captureTimings).toBe(true)
+      await tr.end()
+      expect(tr.experience).toBeDefined()
+      if (isPerfTypeSupported(LONG_TASK)) {
+        expect(tr.experience.tbt).toBeGreaterThanOrEqual(0)
+      }
+      if (isPerfTypeSupported(LAYOUT_SHIFT)) {
+        expect(tr.experience.cls).toBeGreaterThanOrEqual(0)
+      }
     })
   })
 })
