@@ -24,7 +24,7 @@ captures the following information:
 * Page information (URLs visited and referrer)
 * Network connection information
 * JavaScript errors
-* <<<<distributed-tracing-guide, Distributed tracing>>
+* <<distributed-tracing-guide, Distributed tracing>>
 * <<breakdown-metrics-docs, Breakdown metrics>>
 
 [float]
