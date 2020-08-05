@@ -44,30 +44,18 @@ class LoggingService {
   }
 
   resetLogMethods() {
-    var loggingService = this
-    this.levels.forEach(function(level) {
-      loggingService[level] = loggingService.shouldLog(level) ? log : noop
+    this.levels.forEach(level => {
+      this[level] = this.shouldLog(level) ? log : noop
 
       function log() {
-        var prefix = loggingService.prefix
-        var normalizedLevel
-
-        switch (level) {
-          case 'trace':
-            normalizedLevel = 'info'
-            break
-          case 'debug':
-            normalizedLevel = 'info'
-            break
-          default:
-            normalizedLevel = level
+        let normalizedLevel = level
+        if (level === 'trace' || level === 'debug') {
+          normalizedLevel = 'info'
         }
-        var args = arguments
-        if (prefix) {
-          args[0] = prefix + args[0]
-        }
+        let args = arguments
+        args[0] = this.prefix + args[0]
         if (console) {
-          var realMethod = console[normalizedLevel] || console.log
+          const realMethod = console[normalizedLevel] || console.log
           if (typeof realMethod === 'function') {
             realMethod.apply(console, args)
           }

@@ -161,6 +161,26 @@ describe('ApmBase', function() {
     expect(apmBase.getCurrentTransaction()).toBeUndefined()
   })
 
+  it('should use user provided logLevel when agent is inactive', () => {
+    const infoSpy = spyOn(console, 'info')
+    apmBase.init({
+      active: false,
+      logLevel: 'warn'
+    })
+    expect(console.info).not.toHaveBeenCalled()
+    infoSpy.calls.reset()
+
+    const apmInstance = new ApmBase(serviceFactory, !enabled)
+    apmInstance.init({
+      active: false,
+      logLevel: 'debug'
+    })
+    expect(console.info).toHaveBeenCalledWith(
+      '[Elastic APM] RUM agent is inactive'
+    )
+    infoSpy.calls.reset()
+  })
+
   it('should provide the public api', function() {
     apmBase.init({ serviceName, serverUrl })
     apmBase.setInitialPageLoadName('test')
