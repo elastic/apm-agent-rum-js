@@ -42,10 +42,7 @@ export default class ApmBase {
   init(config) {
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
-      const [configService, loggingService] = this.serviceFactory.getService([
-        CONFIG_SERVICE,
-        LOGGING_SERVICE
-      ])
+      const configService = this.serviceFactory.getService(CONFIG_SERVICE)
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
@@ -85,7 +82,12 @@ export default class ApmBase {
         }
       } else {
         this._disable = true
-        loggingService.info('RUM agent is inactive')
+        /**
+         * Creation of LoggingService should happen only after config update.
+         * This order gurantees that we use the proper logLevel
+         */
+        const loggingService = this.serviceFactory.getService(LOGGING_SERVICE)
+        loggingService.warn('RUM agent is inactive')
       }
     }
     return this

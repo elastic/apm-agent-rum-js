@@ -121,11 +121,9 @@ describe('ApmBase', function() {
 
   it('should be noop for auto instrumentaion when agent is not active', done => {
     const loggingService = serviceFactory.getService('LoggingService')
-    spyOn(loggingService, 'info')
+    spyOn(loggingService, 'warn')
 
-    apmBase.init({
-      active: false
-    })
+    apmBase.init({ active: false })
     /**
      * Start a XHR which shouldn't be captured as transaction
      */
@@ -135,7 +133,7 @@ describe('ApmBase', function() {
       setTimeout(() => {
         const tr = apmBase.getCurrentTransaction()
         expect(tr).toBeUndefined()
-        expect(loggingService.info).toHaveBeenCalledWith(
+        expect(loggingService.warn).toHaveBeenCalledWith(
           'RUM agent is inactive'
         )
         done()
@@ -147,12 +145,10 @@ describe('ApmBase', function() {
 
   it('should be noop when API methods are used and agent is not active', () => {
     const loggingService = serviceFactory.getService('LoggingService')
-    spyOn(loggingService, 'info')
+    spyOn(loggingService, 'warn')
 
-    apmBase.init({
-      active: false
-    })
-    expect(loggingService.info).toHaveBeenCalledWith('RUM agent is inactive')
+    apmBase.init({ active: false })
+    expect(loggingService.warn).toHaveBeenCalledWith('RUM agent is inactive')
     const tr = apmBase.startTransaction('test')
     const span = apmBase.startSpan('span1')
 
@@ -162,23 +158,16 @@ describe('ApmBase', function() {
   })
 
   it('should use user provided logLevel when agent is inactive', () => {
-    const infoSpy = spyOn(console, 'info')
-    apmBase.init({
-      active: false,
-      logLevel: 'warn'
-    })
-    expect(console.info).not.toHaveBeenCalled()
-    infoSpy.calls.reset()
-
     const apmInstance = new ApmBase(serviceFactory, !enabled)
     apmInstance.init({
       active: false,
-      logLevel: 'debug'
+      logLevel: 'error'
     })
-    expect(console.info).toHaveBeenCalledWith(
-      '[Elastic APM] RUM agent is inactive'
+    const loggingService = apmInstance.serviceFactory.getService(
+      'LoggingService'
     )
-    infoSpy.calls.reset()
+    spyOn(loggingService, 'warn')
+    expect(loggingService.warn).not.toHaveBeenCalled()
   })
 
   it('should provide the public api', function() {
@@ -260,7 +249,7 @@ describe('ApmBase', function() {
 
   it('should patch xhr when not active', function(done) {
     const loggingService = serviceFactory.getService('LoggingService')
-    spyOn(loggingService, 'info')
+    spyOn(loggingService, 'warn')
 
     apmBase.init({ active: false })
 
@@ -279,12 +268,12 @@ describe('ApmBase', function() {
     req.send()
     const tr = apmBase.getCurrentTransaction()
     expect(tr).toBeUndefined()
-    expect(loggingService.info).toHaveBeenCalledWith('RUM agent is inactive')
+    expect(loggingService.warn).toHaveBeenCalledWith('RUM agent is inactive')
   })
 
   it('should log errors when config is invalid', () => {
     const loggingService = serviceFactory.getService('LoggingService')
-    spyOn(loggingService, 'info')
+    spyOn(loggingService, 'warn')
     const logErrorSpy = spyOn(loggingService, 'error')
     apmBase.init({
       serverUrl: undefined,

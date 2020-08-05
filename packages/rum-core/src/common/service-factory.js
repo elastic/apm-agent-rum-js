@@ -39,19 +39,10 @@ const serviceCreators = {
   [LOGGING_SERVICE]: factory => {
     const configService = factory.getService(CONFIG_SERVICE)
     const logLevel = configService.get('logLevel')
-    const loggingService = new LoggingService({
+    return new LoggingService({
       prefix: '[Elastic APM] ',
       level: logLevel
     })
-    /**
-     * Reset logLevel whenever config update happens
-     */
-    configService.events.observe(CONFIG_CHANGE, () => {
-      const logLevel = configService.get('logLevel')
-      loggingService.setLevel(logLevel)
-    })
-
-    return loggingService
   },
   [APM_SERVER]: factory => {
     const [configService, loggingService] = factory.getService([
@@ -77,7 +68,17 @@ class ServiceFactory {
     const configService = this.getService(CONFIG_SERVICE)
     configService.init()
 
-    const apmServer = this.getService(APM_SERVER)
+    const [loggingService, apmServer] = this.getService([
+      LOGGING_SERVICE,
+      APM_SERVER
+    ])
+    /**
+     * Reset logLevel whenever config update happens
+     */
+    configService.events.observe(CONFIG_CHANGE, () => {
+      const logLevel = configService.get('logLevel')
+      loggingService.setLevel(logLevel)
+    })
     apmServer.init()
   }
 
