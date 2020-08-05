@@ -27,17 +27,20 @@ import {
   LONG_TASK,
   LARGEST_CONTENTFUL_PAINT,
   FIRST_CONTENTFUL_PAINT,
-  FIRST_INPUT
+  FIRST_INPUT,
+  LAYOUT_SHIFT
 } from '../common/constants'
 import { noop, PERF } from '../common/utils'
 import Span from './span'
 
 export const metrics = {
+  fid: 0,
   fcp: 0,
   tbt: {
     start: Infinity,
     duration: 0
-  }
+  },
+  cls: 0
 }
 
 const LONG_TASK_THRESHOLD = 50
@@ -163,6 +166,20 @@ export function calculateTotalBlockingTime(longtaskEntries) {
 }
 
 /**
+ * Calculates Cumulative Layout Shift using
+ * 'layout-shift' entries captured through PerformanceObserver.
+ * https://developer.mozilla.org/en-US/docs/Web/API/LayoutShift
+ * https://web.dev/cls/
+ */
+export function calculateCumulativeLayoutShift(clsEntries) {
+  clsEntries.forEach(entry => {
+    if (!entry.hadRecentInput) {
+      metrics.cls += entry.value
+    }
+  })
+}
+
+/**
  * Captures all the observed entries as Spans and Marks depending on the
  * observed entry types and returns in the format
  * {
@@ -233,10 +250,13 @@ export function captureObserverEntries(list, { capturePaint }) {
   const fidEntries = list.getEntriesByType(FIRST_INPUT)
   const fidSpan = createFirstInputDelaySpan(fidEntries)
   if (fidSpan) {
+    metrics.fid = fidSpan._start
     result.spans.push(fidSpan)
   }
 
   calculateTotalBlockingTime(longtaskEntries)
+  const clsEntries = list.getEntriesByType(LAYOUT_SHIFT)
+  calculateCumulativeLayoutShift(clsEntries)
 
   return result
 }

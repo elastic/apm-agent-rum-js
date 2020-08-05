@@ -11,25 +11,39 @@ RUN apt-get -qq update && apt-get -qq install -y curl && \
 RUN apt-get -qq install -y git --no-install-recommends
 
 # 3. Install WebKit dependencies
-RUN apt-get -qq install -y libwoff1 \
-                       libopus0 \
-                       libwebp6 \
-                       libwebpdemux2 \
-                       libenchant1c2a \
-                       libgudev-1.0-0 \
-                       libsecret-1-0 \
-                       libhyphen0 \
-                       libgdk-pixbuf2.0-0 \
-                       libegl1 \
-                       libnotify4 \
-                       libxslt1.1 \
-                       libevent-2.1-6 \
-                       libgles2 \
-                       libvpx5
+RUN apt-get -qq install -y  --no-install-recommends \
+    libwoff1 \
+    libopus0 \
+    libwebp6 \
+    libwebpdemux2 \
+    libenchant1c2a \
+    libgudev-1.0-0 \
+    libsecret-1-0 \
+    libhyphen0 \
+    libgdk-pixbuf2.0-0 \
+    libegl1 \
+    libnotify4 \
+    libxslt1.1 \
+    libevent-2.1-6 \
+    libgles2 \
+    libvpx5 \
+    libxcomposite1 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libepoxy0 \
+    libgtk-3-0 \
+    libharfbuzz-icu0 \
+    libgstreamer-gl1.0-0 \
+    libgstreamer-plugins-bad1.0-0 \
+    gstreamer1.0-plugins-good
+
 # 4. Install Chromium dependencies
-RUN apt-get -qq install -y libnss3 \
-                       libxss1 \
-                       libasound2
+RUN apt-get install -y --no-install-recommends \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    fonts-noto-color-emoji \
+    libxtst6
 
 # 5. Install Chrome unstable to run karma benchmark tests inside puppeteer
 RUN apt-get -qq install -y wget --no-install-recommends \
@@ -45,5 +59,6 @@ RUN apt-get -qq install -y wget --no-install-recommends \
         --no-install-recommends
 
 # 6. Install Firefox dependencies
-RUN apt-get -qq install -y libdbus-glib-1-2 \
-                          xvfb
+RUN apt-get install -y --no-install-recommends \
+    libdbus-glib-1-2 \
+    libxt6

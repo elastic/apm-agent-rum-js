@@ -405,7 +405,8 @@ export default class PerformanceMonitoring {
       span_count: {
         started: spans.length
       },
-      sampled: transaction.sampled
+      sampled: transaction.sampled,
+      experience: transaction.experience
     }
     return truncateModel(TRANSACTION_MODEL, transactionData)
   }

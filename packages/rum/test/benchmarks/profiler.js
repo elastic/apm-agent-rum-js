@@ -51,13 +51,8 @@ function gatherRawMetrics(browser, url) {
      */
     let client = null
     try {
-      client = await browser.pageTarget(page).createCDPSession()
+      client = await context.newCDPSession(page)
     } catch (_) {}
-
-    /**
-     * Disable cache for each run
-     */
-    await page.setCacheEnabled(false)
 
     if (client) {
       /**
