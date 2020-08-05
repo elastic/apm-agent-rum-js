@@ -182,12 +182,17 @@ class ErrorLogging {
       const name = reason.name ? reason.name + ': ' : ''
       errorEvent = {
         error: reason,
-        message: `${prefix}${name}${reason.message}`
+        message: prefix + name + reason.message
       }
     } else {
-      reason = typeof reason === 'object' ? '<object>' : reason
+      reason =
+        typeof reason === 'object'
+          ? '<object>'
+          : typeof reason === 'function'
+          ? '<function>'
+          : reason
       errorEvent = {
-        message: `${prefix}${reason}`
+        message: prefix + reason
       }
     }
     this.logErrorEvent(errorEvent)
