@@ -36,14 +36,10 @@ import { __DEV__ } from '../state'
 
 const serviceCreators = {
   [CONFIG_SERVICE]: () => new ConfigService(),
-  [LOGGING_SERVICE]: factory => {
-    const configService = factory.getService(CONFIG_SERVICE)
-    const logLevel = configService.get('logLevel')
-    return new LoggingService({
-      prefix: '[Elastic APM] ',
-      level: logLevel
-    })
-  },
+  [LOGGING_SERVICE]: () =>
+    new LoggingService({
+      prefix: '[Elastic APM] '
+    }),
   [APM_SERVER]: factory => {
     const [configService, loggingService] = factory.getService([
       CONFIG_SERVICE,
@@ -64,7 +60,6 @@ class ServiceFactory {
       return
     }
     this.initialized = true
-
     const configService = this.getService(CONFIG_SERVICE)
     configService.init()
 

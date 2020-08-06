@@ -28,7 +28,7 @@ import { noop } from './utils'
 class LoggingService {
   constructor(spec = {}) {
     this.levels = ['trace', 'debug', 'info', 'warn', 'error']
-    this.level = spec.level || 'info'
+    this.level = spec.level || 'warn'
     this.prefix = spec.prefix || ''
 
     this.resetLogMethods()
@@ -39,6 +39,9 @@ class LoggingService {
   }
 
   setLevel(level) {
+    if (level === this.level) {
+      return
+    }
     this.level = level
     this.resetLogMethods()
   }

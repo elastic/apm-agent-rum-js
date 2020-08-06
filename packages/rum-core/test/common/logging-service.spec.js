@@ -28,7 +28,7 @@ import LoggingService from '../../src/common/logging-service'
 describe('LoggingService', function() {
   var loggingService
   beforeEach(function() {
-    loggingService = new LoggingService({})
+    loggingService = new LoggingService({ level: 'info' })
   })
   it('should log', function() {
     expect(loggingService.level).toBe('info')
@@ -98,7 +98,8 @@ describe('LoggingService', function() {
   it('should set prefix for logs', function() {
     spyOn(console, 'info')
     loggingService = new LoggingService({
-      prefix: 'APM: '
+      prefix: 'APM: ',
+      level: 'info'
     })
     loggingService.info('info')
     expect(console.info).toHaveBeenCalledWith('APM: info')

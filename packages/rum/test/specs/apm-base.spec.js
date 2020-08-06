@@ -158,16 +158,12 @@ describe('ApmBase', function() {
   })
 
   it('should use user provided logLevel when agent is inactive', () => {
-    const apmInstance = new ApmBase(serviceFactory, !enabled)
-    apmInstance.init({
+    const loggingService = serviceFactory.getService('LoggingService')
+    apmBase.init({
       active: false,
       logLevel: 'error'
     })
-    const loggingService = apmInstance.serviceFactory.getService(
-      'LoggingService'
-    )
-    spyOn(loggingService, 'warn')
-    expect(loggingService.warn).not.toHaveBeenCalled()
+    expect(loggingService.warn.toString()).toBe('function noop() {}')
   })
 
   it('should provide the public api', function() {
