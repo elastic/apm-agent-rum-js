@@ -52,6 +52,11 @@ export default class ApmBase {
       configService.setVersion('5.4.0')
       this.config(config)
       /**
+       * Set level here to account for both active and inactive cases
+       */
+      const logLevel = configService.get('logLevel')
+      loggingService.setLevel(logLevel)
+      /**
        * Deactive agent when the active config flag is set to false
        */
       if (configService.isActive()) {
@@ -85,7 +90,7 @@ export default class ApmBase {
         }
       } else {
         this._disable = true
-        loggingService.info('RUM agent is inactive')
+        loggingService.warn('RUM agent is inactive')
       }
     }
     return this
