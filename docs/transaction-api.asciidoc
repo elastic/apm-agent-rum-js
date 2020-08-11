@@ -51,7 +51,7 @@ which might not always be accurate.
 
 [source,js]
 ----
-var span = transaction.startSpan('My custom span')
+const span = transaction.startSpan('My custom span')
 ----
 
 Start and return a new custom span associated with this transaction.

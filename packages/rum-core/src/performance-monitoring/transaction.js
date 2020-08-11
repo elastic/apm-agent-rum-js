@@ -45,8 +45,8 @@ class Transaction extends SpanBase {
     this.spans = []
     this._activeSpans = {}
 
-    this.nextAutoTaskId = 1
-    this._scheduledTasks = []
+    this.nextTaskId = 1
+    this._activeTasks = new Set()
 
     this.captureTimings = false
 
@@ -110,7 +110,7 @@ class Transaction extends SpanBase {
   }
 
   isFinished() {
-    return this._scheduledTasks.length === 0
+    return this._activeTasks.size === 0
   }
 
   detectFinish() {
@@ -138,20 +138,15 @@ class Transaction extends SpanBase {
   }
 
   addTask(taskId) {
-    if (typeof taskId === 'undefined') {
-      taskId = 'task' + this.nextAutoTaskId++
+    if (!taskId) {
+      taskId = 'task' + this.nextTaskId++
     }
-    if (this._scheduledTasks.indexOf(taskId) == -1) {
-      this._scheduledTasks.push(taskId)
-      return taskId
-    }
+    this._activeTasks.add(taskId)
+    return taskId
   }
 
   removeTask(taskId) {
-    let index = this._scheduledTasks.indexOf(taskId)
-    if (index > -1) {
-      this._scheduledTasks.splice(index, 1)
-    }
+    this._activeTasks.delete(taskId)
     this.detectFinish()
   }
 

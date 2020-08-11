@@ -70,19 +70,21 @@ describe('transaction.Transaction', function() {
 
   it('should add and remove tasks', function() {
     var tr = new Transaction('/', 'transaction')
-    expect(tr._scheduledTasks).toEqual([])
+    expect(tr._activeTasks.size).toEqual(0)
     tr.addTask()
-    expect(tr._scheduledTasks).toEqual(['task1'])
+    expect(tr._activeTasks).toContain('task1')
     tr.addTask('task2')
-    expect(tr._scheduledTasks).toEqual(['task1', 'task2'])
+    expect(tr._activeTasks).toContain('task2')
     tr.removeTask('task1')
+    expect(tr._activeTasks.size).toEqual(1)
     tr.addTask('my-task')
-    expect(tr._scheduledTasks).toEqual(['task2', 'my-task'])
+    expect(tr._activeTasks).toContain('my-task')
+    expect(tr._activeTasks.size).toEqual(2)
+    tr.addTask('my-task')
+    expect(tr._activeTasks.size).toEqual(2)
     tr.removeTask('task2')
-    tr.addTask('my-task')
-    expect(tr._scheduledTasks).toEqual(['my-task'])
     tr.removeTask('my-task')
-    expect(tr._scheduledTasks).toEqual([])
+    expect(tr._activeTasks.size).toEqual(0)
   })
 
   it('should mark events', function() {

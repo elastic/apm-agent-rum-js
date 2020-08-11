@@ -149,16 +149,14 @@ export default class ApmBase {
       canReuse: true
     })
 
-    if (tr) {
-      tr.addTask(PAGE_LOAD)
+    if (!tr) {
+      return
     }
-    const sendPageLoadMetrics = function sendPageLoadMetrics() {
+
+    tr.addTask(PAGE_LOAD)
+    const sendPageLoadMetrics = () => {
       // to make sure PerformanceTiming.loadEventEnd has a value
-      setTimeout(function() {
-        if (tr) {
-          tr.removeTask(PAGE_LOAD)
-        }
-      })
+      setTimeout(() => tr.removeTask(PAGE_LOAD))
     }
 
     if (document.readyState === 'complete') {

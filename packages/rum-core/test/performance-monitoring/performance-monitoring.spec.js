@@ -485,14 +485,14 @@ describe('PerformanceMonitoring', function() {
     req.addEventListener('readystatechange', function() {
       if (req.readyState === req.DONE) {
         fn('invoke', task)
-        expect(tr._scheduledTasks).toEqual([])
+        expect(tr._activeTasks.size).toEqual(0)
         expect(tr.ended).toBeTruthy()
         done()
       }
     })
     fn('schedule', task)
     expect(task.id).toBeDefined()
-    expect(tr._scheduledTasks).toEqual(['task1'])
+    expect(tr._activeTasks).toContain('task1')
     req.send()
   })
 
