@@ -330,7 +330,10 @@ class TransactionService {
 
         this._config.events.send(TRANSACTION_END, [tr])
         if (__DEV__) {
-          this._logger.debug(`end transaction(${tr.id}, ${tr.name})`, tr)
+          this._logger.debug(
+            `end transaction(${tr.id}, ${tr.name}, ${tr.type})`,
+            tr
+          )
         }
       },
       err => {
@@ -398,7 +401,7 @@ class TransactionService {
     return false
   }
 
-  startSpan(name, type, options = {}) {
+  startSpan(name, type, options) {
     const tr = this.ensureCurrentTransaction(
       undefined,
       TEMPORARY_TYPE,
@@ -410,12 +413,9 @@ class TransactionService {
 
     if (tr) {
       const span = tr.startSpan(name, type, options)
-      if (options.blocked) {
-        tr.addTask(span.id)
-      }
       if (__DEV__) {
         this._logger.debug(
-          `startSpan(${name}, ${type})`,
+          `startSpan(${name}, ${span.type})`,
           `on transaction(${tr.id}, ${tr.name})`
         )
       }
@@ -424,20 +424,17 @@ class TransactionService {
   }
 
   endSpan(span, context) {
-    const tr = this.getCurrentTransaction()
-    if (!span || !tr) {
+    if (!span) {
       return
     }
-
-    span.end(null, context)
-    tr.removeTask(span.id)
     if (__DEV__) {
       const tr = this.getCurrentTransaction()
       this._logger.debug(
-        `endSpan(${span.name}, ${span.type}.${span.subtype})`,
+        `endSpan(${span.name}, ${span.type})`,
         `on transaction(${tr.id}, ${tr.name})`
       )
     }
+    span.end(null, context)
   }
 }
 

@@ -45,7 +45,6 @@ class Transaction extends SpanBase {
     this.spans = []
     this._activeSpans = {}
 
-    this.nextTaskId = 1
     this._activeTasks = new Set()
 
     this.captureTimings = false
@@ -105,6 +104,12 @@ class Transaction extends SpanBase {
 
     const span = new Span(name, type, opts)
     this._activeSpans[span.id] = span
+    /**
+     * Blocked spans/tasks hold the transaction from getting closed
+     */
+    if (opts.blocked) {
+      this.addTask(span.id)
+    }
 
     return span
   }
@@ -139,15 +144,15 @@ class Transaction extends SpanBase {
 
   addTask(taskId) {
     if (!taskId) {
-      taskId = 'task' + this.nextTaskId++
+      taskId = 'task-' + generateRandomId(16)
     }
     this._activeTasks.add(taskId)
     return taskId
   }
 
   removeTask(taskId) {
-    this._activeTasks.delete(taskId)
-    this.detectFinish()
+    const deleted = this._activeTasks.delete(taskId)
+    deleted && this.detectFinish()
   }
 
   resetSpans() {
@@ -156,8 +161,12 @@ class Transaction extends SpanBase {
 
   _onSpanEnd(span) {
     this.spans.push(span)
-    // Remove span from _activeSpans
+    /**
+     * Remove span from _activeSpans and the
+     * task associated with the span if its blocked
+     */
     delete this._activeSpans[span.id]
+    this.removeTask(span.id)
   }
 
   isManaged() {

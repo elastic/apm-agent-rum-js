@@ -71,11 +71,11 @@ describe('transaction.Transaction', function() {
   it('should add and remove tasks', function() {
     var tr = new Transaction('/', 'transaction')
     expect(tr._activeTasks.size).toEqual(0)
-    tr.addTask()
-    expect(tr._activeTasks).toContain('task1')
+    const task1 = tr.addTask()
+    expect(tr._activeTasks).toContain(task1)
     tr.addTask('task2')
     expect(tr._activeTasks).toContain('task2')
-    tr.removeTask('task1')
+    tr.removeTask(task1)
     expect(tr._activeTasks.size).toEqual(1)
     tr.addTask('my-task')
     expect(tr._activeTasks).toContain('my-task')
@@ -85,6 +85,18 @@ describe('transaction.Transaction', function() {
     tr.removeTask('task2')
     tr.removeTask('my-task')
     expect(tr._activeTasks.size).toEqual(0)
+  })
+
+  it('should create task only for blocked spans', () => {
+    const tr = new Transaction('/', 'transaction')
+    const span1 = tr.startSpan('span1', 'custom', { blocked: true })
+    const span2 = tr.startSpan('span2', 'custom')
+
+    expect(tr._activeTasks.size).toBe(1)
+    span1.end()
+    span2.end()
+    expect(tr._activeTasks.size).toBe(0)
+    expect(tr.spans.length).toBe(2)
   })
 
   it('should mark events', function() {
