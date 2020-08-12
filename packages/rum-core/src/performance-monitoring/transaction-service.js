@@ -429,10 +429,11 @@ class TransactionService {
     }
     if (__DEV__) {
       const tr = this.getCurrentTransaction()
-      this._logger.debug(
-        `endSpan(${span.name}, ${span.type})`,
-        `on transaction(${tr.id}, ${tr.name})`
-      )
+      tr &&
+        this._logger.debug(
+          `endSpan(${span.name}, ${span.type})`,
+          `on transaction(${tr.id}, ${tr.name})`
+        )
     }
     span.end(null, context)
   }
