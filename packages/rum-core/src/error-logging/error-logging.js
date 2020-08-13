@@ -154,11 +154,31 @@ class ErrorLogging {
       return
     }
     var errorObject = this.createErrorDataModel(errorEvent)
-    if (typeof errorObject.exception.message === 'undefined') {
+    if (
+      typeof errorObject.exception.message === 'undefined' ||
+      this.shouldIgnoreError(errorObject.exception.message)
+    ) {
       return
     }
 
     this._apmServer.addError(errorObject)
+  }
+
+  shouldIgnoreError(errorMessage) {
+    const ignoreList = this._configService.get('ignoreErrors')
+    if (ignoreList && ignoreList.length) {
+      for (let i = 0; i < ignoreList.length; i++) {
+        const element = ignoreList[i]
+        if (typeof element.test === 'function') {
+          if (element.test(errorMessage)) {
+            return true
+          }
+        } else if (element === errorMessage) {
+          return true
+        }
+      }
+    }
+    return false
   }
 
   registerListeners() {

@@ -458,4 +458,24 @@ describe('ErrorLogging', function() {
       .then(done)
       .catch(reason => fail(reason))
   })
+
+  it('should ignore error', function() {
+    apmServer.init()
+    configService.setConfig({
+      serviceName: 'serviceName',
+      ignoreErrors: [/ignore*/, 'some error']
+    })
+    spyOn(apmServer, 'sendEvents')
+    try {
+      throw new Error('ignore error')
+    } catch (error) {
+      errorLogging.logErrorEvent({ error })
+      errorLogging.logErrorEvent({ error })
+      errorLogging.logError(error)
+      errorLogging.logError('some error')
+      errorLogging.logError('test error')
+      expect(apmServer.sendEvents).not.toHaveBeenCalled()
+      expect(apmServer.queue.items.length).toBe(1)
+    }
+  })
 })
