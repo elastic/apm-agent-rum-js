@@ -64,57 +64,51 @@ Arguments:
 
 * `options` - The following options are supported:
 
-** `blocked` - Blocks the associated transaction from ending till this span is ended. Blocked spans
-    automatically creates a task. Defaults to false
+** `blocking` - Blocks the associated transaction from ending till this span is ended. Blocked spans
+    automatically internally creates a task. Defaults to false
 
 ** `parentId` - Parent id associated with the new span. Defaults to current transaction id
 
 ** `sync` - Denotes if the span is synchronous or asynchronous.
 
-When a span is started it will measure the time until <<span-end,`span.end()`>> is called.
+When a span is started it will measure the time until <<span-end,`span.end()`>> is called. Blocked
+spans allow users to control the early closing of <<custom-managed-transactions, managed transactions>> in some cases.
 
-See <<span-api,Span API>> docs for details on how to use custom spans.
+See also the <<span-api,Span API>> docs for details on how to use custom spans.
 
 [float]
-[[transaction-add-task]]
-==== `transaction.addTask([taskId])`
+[[transaction-block]]
+==== `transaction.block(flag)`
 
 [source,js]
 ----
-const taskId = transaction.addTask('async-task')
+transaction.block(true)
 ----
 
-Starts a new task for the current transaction and returns the new task id. The transaction does not end till all the tasks are
-removed from the transacion.
+Blocks the currently running auto-instrumented or custom transactions from getting automatically closed once the associated spans are ended.
 
 Arguments:
 
-* `name` - Optional. The name of the task (string). Defaults to a random id.
+* `flag` - Boolean. Defaults to false.
 
-Tasks are pretty new and its available only on the RUM agent. Most of the time, the users shouldn't need to create tasks as
-custom transactions created by the user ends only when `transaction.end` method is called. However in the case of managed transactions like page-load, route-change and other user created ones by setting `managed: true` flag, the transaction might get closed automatically prior to the user's expectation once all the associated tasks are completed. Please check the <<custom-managed-transactions, custom transactions>> guide to understand how you can control the behaviour of transaction using tasks.
-
-
-NOTE: This API will be removed in the next major version, Please use the `startSpan` method with `blocking: true`.
-
-
-[float]
-[[transaction-remove-task]]
-==== `transaction.removeTask(taskId)`
+Most of the time, users shouldn't need to block the running transaction as the agent tries to account for all of the async network activity and capture
+the required information. The block API is useful when the user feels the auto instrumented code missed some important activity and ends up prematurely
+closing the transaction and the page contains lots of asynchronous tasks that cannot be automatically instrumented (eg: web workers).
 
 [source,js]
 ----
-transaction.removeTask('async-task')
+// get the current active autoinstrumented transaction (page-load, route-change, etc.)
+const activeTransaction = apm.getCurrentTransaction()
+
+if (activeTransaction) {
+  activeTransaction.block(true)
+}
+
+// Perform some more async tasks and unblock it
+activeTransaction.block(false)
 ----
 
-Removes the task if its present from the associated transaction and also checks if the transaction can be ended when there are no pending tasks to be completed.
-
-Arguments:
-
-* `name` - Required. The name of the task (string).
-
-
-NOTE: This API will be removed in the next major version, Please use the `startSpan` method with `blocking: true`.
+One can also achieve a similar action by creating blocked spans. Check the <<custom-managed-transactions, managed transactions>> guide to learn more.
 
 
 [float]
@@ -154,8 +148,8 @@ Defining too many unique fields in an index is a condition that can lead to a
 transaction.end()
 ----
 
-Ends the transaction. If the transaction has already ended, nothing happens.
-
+Ends the transaction. Calling `transaction.end` on an active transaction would end all of the underlying spans and marks them as `truncated`.
+If the transaction has already ended, nothing happens.
 
 [float]
 [[transaction-mark]]
