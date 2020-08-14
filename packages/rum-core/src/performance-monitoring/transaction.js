@@ -46,6 +46,7 @@ class Transaction extends SpanBase {
     this._activeSpans = {}
 
     this._activeTasks = new Set()
+    this.blocked = false
 
     this.captureTimings = false
 
@@ -105,9 +106,10 @@ class Transaction extends SpanBase {
     const span = new Span(name, type, opts)
     this._activeSpans[span.id] = span
     /**
-     * Blocked spans/tasks hold the transaction from getting closed
+     * Blocked spans adds internal tasks and blocks
+     * the underlying transaction from getting closed
      */
-    if (opts.blocked) {
+    if (opts.blocking) {
       this.addTask(span.id)
     }
 
@@ -115,10 +117,14 @@ class Transaction extends SpanBase {
   }
 
   isFinished() {
-    return this._activeTasks.size === 0
+    return !this.blocked && this._activeTasks.size === 0
   }
 
   detectFinish() {
+    /**
+     * Ends the transaction when there are no pending tasks
+     * and transaction state is not blocked
+     */
     if (this.isFinished()) this.end()
   }
 
@@ -140,6 +146,17 @@ class Transaction extends SpanBase {
 
   captureBreakdown() {
     this.breakdownTimings = captureBreakdown(this)
+  }
+
+  block(flag) {
+    this.blocked = flag
+    /**
+     * If transaction is unblocked, we check if
+     * transaction can be closed
+     */
+    if (!this.blocked) {
+      this.detectFinish()
+    }
   }
 
   addTask(taskId) {

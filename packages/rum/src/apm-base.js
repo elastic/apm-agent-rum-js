@@ -153,10 +153,10 @@ export default class ApmBase {
       return
     }
 
-    tr.addTask(PAGE_LOAD)
+    tr.block(true)
     const sendPageLoadMetrics = () => {
       // to make sure PerformanceTiming.loadEventEnd has a value
-      setTimeout(() => tr.removeTask(PAGE_LOAD))
+      setTimeout(() => tr.block(false))
     }
 
     if (document.readyState === 'complete') {

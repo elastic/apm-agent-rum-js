@@ -101,7 +101,7 @@ describe('TransactionService', function() {
       return r
     }
     spyOn(result, 'onEnd').and.callThrough()
-    var span = transactionService.startSpan('test', 'test', { blocked: true })
+    var span = transactionService.startSpan('test', 'test', { blocking: true })
     result.detectFinish()
     expect(result.onEnd).not.toHaveBeenCalled()
     span.end()
@@ -432,7 +432,7 @@ describe('TransactionService', function() {
     spyOn(tr1, 'end')
 
     const span1 = transactionService.startSpan('blocked-span', 'custom', {
-      blocked: true
+      blocking: true
     })
     expect(tr1.addTask).toHaveBeenCalled()
     expect(tr2.addTask).not.toHaveBeenCalled()

@@ -267,7 +267,7 @@ export default class PerformanceMonitoring {
       }
 
       const span = transactionService.startSpan(spanName, 'external.http', {
-        blocked: true
+        blocking: true
       })
       if (!span) {
         return

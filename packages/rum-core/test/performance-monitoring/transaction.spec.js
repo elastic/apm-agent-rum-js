@@ -26,7 +26,7 @@
 import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 
-describe('transaction.Transaction', function() {
+describe('Transaction', function() {
   it('should contain correct number of spans in the end', function(done) {
     var firstSpan = new Span('first-span-name', 'first-span')
     firstSpan.end()
@@ -89,7 +89,7 @@ describe('transaction.Transaction', function() {
 
   it('should create task only for blocked spans', () => {
     const tr = new Transaction('/', 'transaction')
-    const span1 = tr.startSpan('span1', 'custom', { blocked: true })
+    const span1 = tr.startSpan('span1', 'custom', { blocking: true })
     const span2 = tr.startSpan('span2', 'custom')
 
     expect(tr._activeTasks.size).toBe(1)
@@ -97,6 +97,19 @@ describe('transaction.Transaction', function() {
     span2.end()
     expect(tr._activeTasks.size).toBe(0)
     expect(tr.spans.length).toBe(2)
+  })
+
+  it('should support blocking and unblocking transaction', () => {
+    const tr = new Transaction('/', 'transaction')
+    spyOn(tr, 'end').and.callThrough()
+
+    tr.block(true)
+    expect(tr.blocked).toBe(true)
+    tr.detectFinish()
+    expect(tr.end).not.toHaveBeenCalled()
+
+    tr.block(false)
+    expect(tr.end).toHaveBeenCalled()
   })
 
   it('should mark events', function() {

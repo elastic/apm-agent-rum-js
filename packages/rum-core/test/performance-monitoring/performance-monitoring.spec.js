@@ -354,7 +354,7 @@ describe('PerformanceMonitoring', function() {
       expect(transactionService.startSpan).toHaveBeenCalledWith(
         'GET /',
         'external.http',
-        { blocked: true }
+        { blocking: true }
       )
     })
 
@@ -376,7 +376,7 @@ describe('PerformanceMonitoring', function() {
       ).toHaveBeenCalledWith(
         'GET https://[REDACTED]:[REDACTED]@c.com/d',
         'external.http',
-        { blocked: true }
+        { blocking: true }
       )
     })
 
