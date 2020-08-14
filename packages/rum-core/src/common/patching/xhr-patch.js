@@ -39,9 +39,13 @@ import {
 
 export function patchXMLHttpRequest(callback) {
   const XMLHttpRequestPrototype = XMLHttpRequest.prototype
-
-  let oriAddListener = XMLHttpRequestPrototype[ADD_EVENT_LISTENER_STR]
-  if (!oriAddListener) {
+  /**
+   * Handle if the XMLHttpRequest object is patched on the page
+   */
+  if (
+    !XMLHttpRequestPrototype ||
+    !XMLHttpRequestPrototype[ADD_EVENT_LISTENER_STR]
+  ) {
     return
   }
 
@@ -73,7 +77,7 @@ export function patchXMLHttpRequest(callback) {
     const { target } = task.data
 
     function addListener(name) {
-      target.addEventListener(name, ({ type }) => {
+      target[ADD_EVENT_LISTENER_STR](name, ({ type }) => {
         /**
          * Invoke task when the request is completed and when the status is non-zero,
          * denoting the request was aborted, timed out or errored which is handled in
