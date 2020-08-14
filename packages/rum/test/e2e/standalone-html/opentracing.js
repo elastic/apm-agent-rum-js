@@ -37,6 +37,6 @@ window.elasticApm.init({
 
 const tracer = window.elasticApm.createTracer()
 const span = tracer.startSpan('Opentracing span')
-span.finish(Date.now() + 100)
+span && span.finish(Date.now() + 100)
 
 testXHR(mockBackendUrl, renderTestElement)
