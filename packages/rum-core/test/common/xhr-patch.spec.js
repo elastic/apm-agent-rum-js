@@ -186,12 +186,21 @@ describe('xhrPatch', function() {
     ])
   })
 
+  it('should schedule events correctly for CORS requests', function(done) {
+    const req = new window.XMLHttpRequest()
+    const getEvents = registerEventListener(req)
+    req.open('GET', 'https://elastic.co/guide', true)
+    req.addEventListener('loadend', () => {
+      expect(getEvents(done).map(e => e.event)).toEqual(['schedule', 'invoke'])
+    })
+    req.send()
+  })
+
   it('should capture events correctly for timeouts', function(done) {
     const req = new XMLHttpRequest()
     const getEvents = registerEventListener(req)
-    req.timeout = 1
     req.open('GET', '/timeout', true)
-
+    req.timeout = 1
     req.addEventListener('loadend', () => {
       expect(
         getEvents(done).map(e => ({
@@ -203,7 +212,6 @@ describe('xhrPatch', function() {
         { event: 'invoke', status: 'timeout' }
       ])
     })
-
     req.send()
   })
 
