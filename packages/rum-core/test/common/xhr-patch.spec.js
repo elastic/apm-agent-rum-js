@@ -121,7 +121,7 @@ describe('xhrPatch', function() {
     expect(getEvents(true).map(e => e.event)).toEqual(['schedule', 'invoke'])
   })
 
-  it('should correctly schedule events when sync xhr fails', function() {
+  it('should correctly schedule events when sync xhr fails', function(done) {
     const req = new window.XMLHttpRequest()
     const getEvents = registerEventListener(req)
     try {
@@ -129,7 +129,7 @@ describe('xhrPatch', function() {
       req.send()
     } catch (e) {
       expect(
-        getEvents(true).map(e => ({
+        getEvents(done).map(e => ({
           event: e.event,
           status: e.task.data.status
         }))
@@ -155,6 +155,7 @@ describe('xhrPatch', function() {
     var req = new window.XMLHttpRequest()
     let getEvents = registerEventListener(req)
     req.open('GET', 'https://elastic.co', true)
+    req.withCredentials = true
     req.addEventListener('loadend', () => {
       expect(
         getEvents(done).map(e => ({
@@ -183,6 +184,27 @@ describe('xhrPatch', function() {
       { event: 'schedule', status: 'abort' },
       { event: 'invoke', status: 'abort' }
     ])
+  })
+
+  it('should capture events correctly for timeouts', function(done) {
+    const req = new XMLHttpRequest()
+    const getEvents = registerEventListener(req)
+    req.timeout = 1
+    req.open('GET', '/timeout', true)
+
+    req.addEventListener('loadend', () => {
+      expect(
+        getEvents(done).map(e => ({
+          event: e.event,
+          status: e.task.data.status
+        }))
+      ).toEqual([
+        { event: 'schedule', status: 'timeout' },
+        { event: 'invoke', status: 'timeout' }
+      ])
+    })
+
+    req.send()
   })
 
   it('should work properly when send request multiple times on single xmlRequest instance', function(done) {
@@ -278,7 +300,6 @@ describe('xhrPatch', function() {
     req.send()
     req.addEventListener('load', function() {
       expect(getEvents(done).map(e => e.event)).toEqual(['schedule', 'invoke'])
-      done()
     })
     expect(getEvents().map(e => e.event)).toEqual(['schedule'])
   })
