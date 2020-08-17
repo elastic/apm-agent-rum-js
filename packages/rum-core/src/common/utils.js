@@ -134,9 +134,8 @@ function checkSameOrigin(source, target) {
 function isPlatformSupported() {
   return (
     isBrowser &&
-    typeof Array.prototype.forEach === 'function' &&
+    typeof Set === 'function' &&
     typeof JSON.stringify === 'function' &&
-    typeof Function.bind === 'function' &&
     PERF &&
     typeof PERF.now === 'function' &&
     isCORSSupported()

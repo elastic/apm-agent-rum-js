@@ -1,29 +1,20 @@
 [[custom-transactions]]
 === Custom Transactions
 
-This is an example of how to use custom transactions and custom spans. 
-Please also see <<api, API documentation>>.
+Elastic APM uses the concept of transactions and spans to collect performance data. Spans are used to measure a unit of 
+operation and they are grouped into the transactions.
 
+By default, Elastic APM JS agent creates transactions for all the <<supported-technologies, Supported Technologies>> and
+send them to the apm-server, however if the current instrumentation doesn't provide all the insights, you can create
+custom transactions to fill the gaps.
 
-Elastic APM uses the concept of transactions and spans to collect performance data. Spans are used to measure an operation and spans
-are grouped into what transactions.
-
-By default Elastic APM JS agent collects some transactions (`page-load` transaction for example) and send them to apm-server, however
-if the current instrumentation doesn't provide what you need, you can create custom transactions to fill the gaps.
-
-Here is an example application using custom transactions:
+Here is an example of using custom transactions and spans:
 
 [source,js]
 ----
-import { init as initApm } from '@elastic/apm-rum'
-var apm = initApm({
-  serviceName: 'service-name',
-  serverUrl: 'http://localhost:8200'
-})
-
-var transaction = apm.startTransaction('Application start', 'custom')
-var url = 'http://example.com/data.json'
-var httpSpan = transaction.startSpan('FETCH ' + url, 'http')
+const transaction = apm.startTransaction('Application start', 'custom')
+const url = 'http://example.com/data.json'
+const httpSpan = transaction.startSpan('GET ' + url, 'external.http')
 fetch(url)
   .then((resp) => {
     if (!resp.ok) {
@@ -34,8 +25,33 @@ fetch(url)
   })
 ----
 
+NOTE: custom transactions are not managed by the agent, therefore, the agent does not capture spans and
+other timing information based on <<supported-technologies,automatic instrumentations>>, e.g. XHR, Resource Timing etc.
 
-NOTE: By default custom transactions are not managed by the agent, therefore,
-the agent does not create spans based on <<supported-technologies,automatic instrumentations>>, e.g. XHR instrumentation.
- 
-NOTE: Transactions are queued and sent together automatically after `Transaction.end` is called.
+[float]
+[[custom-managed-transactions]]
+==== Creating a Managed transaction
+
+If the user is interested in associating all the other timing information and spans in the custom transactions based
+on the <<supported-technologies,supported technologies>>, they can pass the `managed` flag to `true` while creating the
+transaction and will be controlled by the agent. However, the transaction might get closed automatically once all the
+associated spans are completed. If the user wants to control this behavior, they can create a blocking span that will
+hold the transaction until `span.end` is called.
+
+[source,js]
+----
+const transaction = apm.startTransaction('custom managed', 'custom', { managed: true })
+const span = transaction.startSpan('async-task', 'app', { blocking: true })
+
+setTimeout(() => {
+  span.end()
+  /**
+   * This would also end the managed transaction once all the blocking tasks are completed and
+   * transaction would also contain other timing information and spans similar to auto
+   * instrumented transactions like `page-load` and `route-change`.
+   */
+}, 1000)
+
+----
+
+NOTE: Both custom and managed transactions are queued and sent together automatically at configured intervals after `transaction.end` is called.

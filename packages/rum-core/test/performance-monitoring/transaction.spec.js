@@ -26,7 +26,7 @@
 import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 
-describe('transaction.Transaction', function() {
+describe('Transaction', function() {
   it('should contain correct number of spans in the end', function(done) {
     var firstSpan = new Span('first-span-name', 'first-span')
     firstSpan.end()
@@ -70,19 +70,46 @@ describe('transaction.Transaction', function() {
 
   it('should add and remove tasks', function() {
     var tr = new Transaction('/', 'transaction')
-    expect(tr._scheduledTasks).toEqual([])
-    tr.addTask()
-    expect(tr._scheduledTasks).toEqual(['task1'])
+    expect(tr._activeTasks.size).toEqual(0)
+    const task1 = tr.addTask()
+    expect(tr._activeTasks).toContain(task1)
     tr.addTask('task2')
-    expect(tr._scheduledTasks).toEqual(['task1', 'task2'])
-    tr.removeTask('task1')
+    expect(tr._activeTasks).toContain('task2')
+    tr.removeTask(task1)
+    expect(tr._activeTasks.size).toEqual(1)
     tr.addTask('my-task')
-    expect(tr._scheduledTasks).toEqual(['task2', 'my-task'])
+    expect(tr._activeTasks).toContain('my-task')
+    expect(tr._activeTasks.size).toEqual(2)
+    tr.addTask('my-task')
+    expect(tr._activeTasks.size).toEqual(2)
     tr.removeTask('task2')
-    tr.addTask('my-task')
-    expect(tr._scheduledTasks).toEqual(['my-task'])
     tr.removeTask('my-task')
-    expect(tr._scheduledTasks).toEqual([])
+    expect(tr._activeTasks.size).toEqual(0)
+  })
+
+  it('should create task only for blocked spans', () => {
+    const tr = new Transaction('/', 'transaction')
+    const span1 = tr.startSpan('span1', 'custom', { blocking: true })
+    const span2 = tr.startSpan('span2', 'custom')
+
+    expect(tr._activeTasks.size).toBe(1)
+    span1.end()
+    span2.end()
+    expect(tr._activeTasks.size).toBe(0)
+    expect(tr.spans.length).toBe(2)
+  })
+
+  it('should support blocking and unblocking transaction', () => {
+    const tr = new Transaction('/', 'transaction')
+    spyOn(tr, 'end').and.callThrough()
+
+    tr.block(true)
+    expect(tr.blocked).toBe(true)
+    tr.detectFinish()
+    expect(tr.end).not.toHaveBeenCalled()
+
+    tr.block(false)
+    expect(tr.end).toHaveBeenCalled()
   })
 
   it('should mark events', function() {

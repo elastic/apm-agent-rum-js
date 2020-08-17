@@ -353,7 +353,8 @@ describe('PerformanceMonitoring', function() {
       })
       expect(transactionService.startSpan).toHaveBeenCalledWith(
         'GET /',
-        'external.http'
+        'external.http',
+        { blocking: true }
       )
     })
 
@@ -370,9 +371,12 @@ describe('PerformanceMonitoring', function() {
       spyOn(transactionService, 'startSpan').and.callThrough()
       fn(SCHEDULE, fakeXHRTask)
 
-      expect(transactionService.startSpan).toHaveBeenCalledWith(
+      expect(
+        transactionService.startSpan
+      ).toHaveBeenCalledWith(
         'GET https://[REDACTED]:[REDACTED]@c.com/d',
-        'external.http'
+        'external.http',
+        { blocking: true }
       )
     })
 
@@ -485,14 +489,13 @@ describe('PerformanceMonitoring', function() {
     req.addEventListener('readystatechange', function() {
       if (req.readyState === req.DONE) {
         fn('invoke', task)
-        expect(tr._scheduledTasks).toEqual([])
+        expect(tr._activeTasks.size).toBe(0)
         expect(tr.ended).toBeTruthy()
         done()
       }
     })
     fn('schedule', task)
-    expect(task.id).toBeDefined()
-    expect(tr._scheduledTasks).toEqual(['task1'])
+    expect(tr._activeTasks.size).toBe(1)
     req.send()
   })
 
