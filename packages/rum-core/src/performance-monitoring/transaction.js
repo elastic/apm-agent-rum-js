@@ -45,8 +45,8 @@ class Transaction extends SpanBase {
     this.spans = []
     this._activeSpans = {}
 
-    this.nextAutoTaskId = 1
-    this._scheduledTasks = []
+    this._activeTasks = new Set()
+    this.blocked = false
 
     this.captureTimings = false
 
@@ -105,15 +105,26 @@ class Transaction extends SpanBase {
 
     const span = new Span(name, type, opts)
     this._activeSpans[span.id] = span
+    /**
+     * Blocked spans adds internal tasks and blocks
+     * the underlying transaction from getting closed
+     */
+    if (opts.blocking) {
+      this.addTask(span.id)
+    }
 
     return span
   }
 
   isFinished() {
-    return this._scheduledTasks.length === 0
+    return !this.blocked && this._activeTasks.size === 0
   }
 
   detectFinish() {
+    /**
+     * Ends the transaction when there are no pending tasks
+     * and transaction state is not blocked
+     */
     if (this.isFinished()) this.end()
   }
 
@@ -137,22 +148,28 @@ class Transaction extends SpanBase {
     this.breakdownTimings = captureBreakdown(this)
   }
 
-  addTask(taskId) {
-    if (typeof taskId === 'undefined') {
-      taskId = 'task' + this.nextAutoTaskId++
-    }
-    if (this._scheduledTasks.indexOf(taskId) == -1) {
-      this._scheduledTasks.push(taskId)
-      return taskId
+  block(flag) {
+    this.blocked = flag
+    /**
+     * If transaction is unblocked, we check if
+     * transaction can be closed
+     */
+    if (!this.blocked) {
+      this.detectFinish()
     }
   }
 
-  removeTask(taskId) {
-    let index = this._scheduledTasks.indexOf(taskId)
-    if (index > -1) {
-      this._scheduledTasks.splice(index, 1)
+  addTask(taskId) {
+    if (!taskId) {
+      taskId = 'task-' + generateRandomId(16)
     }
-    this.detectFinish()
+    this._activeTasks.add(taskId)
+    return taskId
+  }
+
+  removeTask(taskId) {
+    const deleted = this._activeTasks.delete(taskId)
+    deleted && this.detectFinish()
   }
 
   resetSpans() {
@@ -161,8 +178,12 @@ class Transaction extends SpanBase {
 
   _onSpanEnd(span) {
     this.spans.push(span)
-    // Remove span from _activeSpans
+    /**
+     * Remove span from _activeSpans and the
+     * task associated with the span if its blocked
+     */
     delete this._activeSpans[span.id]
+    this.removeTask(span.id)
   }
 
   isManaged() {

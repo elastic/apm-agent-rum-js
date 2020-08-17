@@ -101,12 +101,10 @@ describe('TransactionService', function() {
       return r
     }
     spyOn(result, 'onEnd').and.callThrough()
-    transactionService.addTask('task1')
-    var span = transactionService.startSpan('test', 'test')
-    span.end()
+    var span = transactionService.startSpan('test', 'test', { blocking: true })
     result.detectFinish()
     expect(result.onEnd).not.toHaveBeenCalled()
-    transactionService.removeTask('task1')
+    span.end()
     expect(result.onEnd).toHaveBeenCalled()
   })
 
@@ -399,10 +397,7 @@ describe('TransactionService', function() {
     const tr1 = transactionService.startTransaction('test-name', 'test-type')
     expect(tr1.name).toBe('test-name')
     expect(transactionService.currentTransaction).toBeUndefined()
-    spyOn(tr1, 'removeTask')
     spyOn(tr1, 'startSpan')
-    transactionService.removeTask('testId')
-    expect(tr1.removeTask).not.toHaveBeenCalled()
     transactionService.startSpan('test-name', 'test-type')
     expect(tr1.startSpan).not.toHaveBeenCalled()
     expect(tr1.spans.length).toBe(0)
@@ -435,12 +430,15 @@ describe('TransactionService', function() {
     spyOn(tr1, 'addTask').and.callThrough()
     spyOn(tr1, 'removeTask').and.callThrough()
     spyOn(tr1, 'end')
-    transactionService.addTask('taskId')
-    expect(tr1.addTask).toHaveBeenCalledWith('taskId')
-    expect(tr2.addTask).not.toHaveBeenCalled()
 
-    transactionService.removeTask('taskId')
-    expect(tr1.removeTask).toHaveBeenCalledWith('taskId')
+    const span1 = transactionService.startSpan('blocked-span', 'custom', {
+      blocking: true
+    })
+    expect(tr1.addTask).toHaveBeenCalled()
+    expect(tr2.addTask).not.toHaveBeenCalled()
+    span1.end()
+    expect(tr1.spans.length).toBe(2)
+    expect(tr1.removeTask).toHaveBeenCalled()
     expect(tr1.end).toHaveBeenCalled()
     expect(tr2.removeTask).not.toHaveBeenCalled()
     expect(tr2.end).not.toHaveBeenCalled()

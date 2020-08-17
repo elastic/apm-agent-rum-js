@@ -51,7 +51,7 @@ which might not always be accurate.
 
 [source,js]
 ----
-var span = transaction.startSpan('My custom span')
+const span = transaction.startSpan('My custom span')
 ----
 
 Start and return a new custom span associated with this transaction.
@@ -64,13 +64,51 @@ Arguments:
 
 * `options` - The following options are supported:
 
+** `blocking` - Blocks the associated transaction from ending till this span is ended. Blocked spans
+    automatically internally creates a task. Defaults to false
+
 ** `parentId` - Parent id associated with the new span. Defaults to current transaction id
 
-** `sync` - Denotes if the span is blocking (sync) or non-blocking(async). 
+** `sync` - Denotes if the span is synchronous or asynchronous.
 
-When a span is started it will measure the time until <<span-end,`span.end()`>> is called.
+When a span is started it will measure the time until <<span-end,`span.end()`>> is called. Blocked
+spans allow users to control the early closing of <<custom-managed-transactions, managed transactions>> in some cases.
 
-See <<span-api,Span API>> docs for details on how to use custom spans.
+See also the <<span-api,Span API>> docs for details on how to use custom spans.
+
+[float]
+[[transaction-block]]
+==== `transaction.block(flag)`
+
+[source,js]
+----
+transaction.block(true)
+----
+
+Blocks the currently running auto-instrumented or custom transactions from getting automatically closed once the associated spans are ended.
+
+Arguments:
+
+* `flag` - Boolean. Defaults to false.
+
+Most of the time, users shouldn't need to block the running transaction as the agent tries to account for all of the async network activity and capture
+the required information. The block API is useful when the user feels the auto instrumented code missed some important activity and ends up prematurely
+closing the transaction and the page contains lots of asynchronous tasks that cannot be automatically instrumented (eg: web workers).
+
+[source,js]
+----
+// get the current active autoinstrumented transaction (page-load, route-change, etc.)
+const activeTransaction = apm.getCurrentTransaction()
+
+if (activeTransaction) {
+  activeTransaction.block(true)
+}
+
+// Perform some more async tasks and unblock it
+activeTransaction.block(false)
+----
+
+One can also achieve a similar action by creating blocked spans. Check the <<custom-managed-transactions, managed transactions>> guide to learn more.
 
 
 [float]
@@ -110,8 +148,8 @@ Defining too many unique fields in an index is a condition that can lead to a
 transaction.end()
 ----
 
-Ends the transaction. If the transaction has already ended, nothing happens.
-
+Ends the transaction. Calling `transaction.end` on an active transaction would end all of the underlying spans and marks them as `truncated`.
+If the transaction has already ended, nothing happens.
 
 [float]
 [[transaction-mark]]

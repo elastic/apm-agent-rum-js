@@ -330,7 +330,10 @@ class TransactionService {
 
         this._config.events.send(TRANSACTION_END, [tr])
         if (__DEV__) {
-          this._logger.debug(`end transaction(${tr.id}, ${tr.name})`, tr)
+          this._logger.debug(
+            `end transaction(${tr.id}, ${tr.name}, ${tr.type})`,
+            tr
+          )
         }
       },
       err => {
@@ -412,7 +415,7 @@ class TransactionService {
       const span = tr.startSpan(name, type, options)
       if (__DEV__) {
         this._logger.debug(
-          `startSpan(${name}, ${type})`,
+          `startSpan(${name}, ${span.type})`,
           `on transaction(${tr.id}, ${tr.name})`
         )
       }
@@ -420,39 +423,19 @@ class TransactionService {
     }
   }
 
-  addTask(taskId) {
-    const tr = this.ensureCurrentTransaction(
-      undefined,
-      TEMPORARY_TYPE,
-      this.createOptions({
-        canReuse: true,
-        managed: true
-      })
-    )
-
-    if (tr) {
-      var taskId = tr.addTask(taskId)
-      if (__DEV__) {
+  endSpan(span, context) {
+    if (!span) {
+      return
+    }
+    if (__DEV__) {
+      const tr = this.getCurrentTransaction()
+      tr &&
         this._logger.debug(
-          `addTask(${taskId})`,
+          `endSpan(${span.name}, ${span.type})`,
           `on transaction(${tr.id}, ${tr.name})`
         )
-      }
     }
-    return taskId
-  }
-
-  removeTask(taskId) {
-    var tr = this.getCurrentTransaction()
-    if (tr) {
-      tr.removeTask(taskId)
-      if (__DEV__) {
-        this._logger.debug(
-          `removeTask(${taskId})`,
-          `on transaction(${tr.id}, ${tr.name})`
-        )
-      }
-    }
+    span.end(null, context)
   }
 }
 
