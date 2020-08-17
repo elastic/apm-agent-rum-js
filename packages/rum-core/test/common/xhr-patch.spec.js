@@ -121,7 +121,7 @@ describe('xhrPatch', function() {
     expect(getEvents(true).map(e => e.event)).toEqual(['schedule', 'invoke'])
   })
 
-  it('should correctly schedule events when sync xhr fails', function(done) {
+  it('should correctly schedule events when sync xhr fails', function() {
     const req = new window.XMLHttpRequest()
     const getEvents = registerEventListener(req)
     try {
@@ -129,7 +129,7 @@ describe('xhrPatch', function() {
       req.send()
     } catch (e) {
       expect(
-        getEvents(done).map(e => ({
+        getEvents(true).map(e => ({
           event: e.event,
           status: e.task.data.status
         }))
