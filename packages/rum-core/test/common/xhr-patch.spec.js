@@ -154,8 +154,8 @@ describe('xhrPatch', function() {
   it('should schedule events correctly for CORS requests', function(done) {
     var req = new window.XMLHttpRequest()
     let getEvents = registerEventListener(req)
-    req.open('GET', 'https://elastic.co', true)
-    req.withCredentials = true
+    // This page has CSP headers set to same origin
+    req.open('GET', 'https://elastic.co/guide', true)
     req.addEventListener('loadend', () => {
       expect(
         getEvents(done).map(e => ({

@@ -83,7 +83,6 @@ export function patchXMLHttpRequest(callback) {
          * denoting the request was aborted, timed out or errored which is handled in
          * else block
          */
-        console.log('XHR', type, target.readyState, target.status)
         if (type === READY_STATE_CHANGE) {
           if (target.readyState === 4 && target.status !== 0) {
             invokeTask(task, 'success')
