@@ -121,11 +121,22 @@ describe('xhrPatch', function() {
     expect(getEvents(true).map(e => e.event)).toEqual(['schedule', 'invoke'])
   })
 
+  it('should schedule events correctly for 404', function(done) {
+    var req = new window.XMLHttpRequest()
+    let getEvents = registerEventListener(req)
+    req.open('GET', '/test.json', true)
+    req.addEventListener('load', () => {
+      expect(getEvents(done).map(e => e.event)).toEqual(['schedule', 'invoke'])
+    })
+
+    req.send()
+  })
+
   it('should correctly schedule events when sync xhr fails', function() {
     const req = new window.XMLHttpRequest()
     const getEvents = registerEventListener(req)
     try {
-      req.open('GET', 'http://somewhere.org/does-not-exist', false)
+      req.open('GET', 'https://somewhere.org/i-dont-exist', false)
       req.send()
     } catch (e) {
       expect(
@@ -140,22 +151,11 @@ describe('xhrPatch', function() {
     }
   })
 
-  it('should schedule events correctly for 404', function(done) {
-    var req = new window.XMLHttpRequest()
-    let getEvents = registerEventListener(req)
-    req.open('GET', '/test.json', true)
-    req.addEventListener('load', () => {
-      expect(getEvents(done).map(e => e.event)).toEqual(['schedule', 'invoke'])
-    })
+  it('should correctly schedule events when async xhr fails', function(done) {
+    const req = new window.XMLHttpRequest()
+    const getEvents = registerEventListener(req)
+    req.open('GET', 'https://somewhere.org/i-dont-exist')
 
-    req.send()
-  })
-
-  it('should schedule events correctly for CORS requests', function(done) {
-    var req = new window.XMLHttpRequest()
-    let getEvents = registerEventListener(req)
-    // This page has CSP headers set to same origin
-    req.open('GET', 'https://elastic.co/guide', true)
     req.addEventListener('loadend', () => {
       expect(
         getEvents(done).map(e => ({
@@ -250,16 +250,8 @@ describe('xhrPatch', function() {
       }
     })
 
-    req.addEventListener('abort', () => {
-      expect(
-        getEvents(done).map(e => ({
-          event: e.event,
-          status: e.task.data.status
-        }))
-      ).toEqual([
-        { event: 'schedule', status: 'abort' },
-        { event: 'invoke', status: 'abort' }
-      ])
+    req.addEventListener('loadend', () => {
+      expect(getEvents(done).map(e => e.event)).toEqual(['schedule', 'invoke'])
     })
   })
 

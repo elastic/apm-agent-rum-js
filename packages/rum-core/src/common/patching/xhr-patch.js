@@ -50,6 +50,7 @@ export function patchXMLHttpRequest(callback) {
   }
 
   const READY_STATE_CHANGE = 'readystatechange'
+  const LOAD = 'load'
   const ERROR = 'error'
   const TIMEOUT = 'timeout'
   const ABORT = 'abort'
@@ -88,7 +89,8 @@ export function patchXMLHttpRequest(callback) {
             invokeTask(task, 'success')
           }
         } else {
-          invokeTask(task, type)
+          const status = type === LOAD ? 'success' : type
+          invokeTask(task, status)
         }
       })
     }
@@ -99,6 +101,7 @@ export function patchXMLHttpRequest(callback) {
      * is garbage collected once its done
      */
     addListener(READY_STATE_CHANGE)
+    addListener(LOAD)
     addListener(TIMEOUT)
     addListener(ERROR)
     addListener(ABORT)
