@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.5.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.4.0...@elastic/apm-rum@5.5.0) (2020-08-18)
+
+
+### Bug Fixes
+
+* **rum:** use logLevel config when agent is inactive ([#863](https://github.com/elastic/apm-agent-rum-js/issues/863)) ([bf524c1](https://github.com/elastic/apm-agent-rum-js/commit/bf524c1309a7a37d6406c59d802e12b4c5bc1706))
+* **rum:** use noop tracer on unsupported platforms ([#872](https://github.com/elastic/apm-agent-rum-js/issues/872)) ([b9e36ec](https://github.com/elastic/apm-agent-rum-js/commit/b9e36ece17a4d0aa7b6a1cae8eb95c102765e35d))
+* **rum-core:** capture xhr error states in transaction ([#873](https://github.com/elastic/apm-agent-rum-js/issues/873)) ([cc6812a](https://github.com/elastic/apm-agent-rum-js/commit/cc6812a1bfcd0bcbbd90516426b7dda148b48e09))
+
+
+### Features
+
+* **rum:** allow creating blocking spans from agent api ([#875](https://github.com/elastic/apm-agent-rum-js/issues/875)) ([50e692d](https://github.com/elastic/apm-agent-rum-js/commit/50e692daed13ed546a116e0921d639e41c0a3080))
+* **rum-core:** provide api to block managed transactions  ([#866](https://github.com/elastic/apm-agent-rum-js/issues/866)) ([5829a37](https://github.com/elastic/apm-agent-rum-js/commit/5829a37c5aff886834bd3a6dce3c415314ffccb6))
+
+
+
+
+
 # [5.4.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.3.0...@elastic/apm-rum@5.4.0) (2020-07-29)
 
 

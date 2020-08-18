@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.6.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.5.0...@elastic/apm-rum-core@5.6.0) (2020-08-18)
+
+
+### Bug Fixes
+
+* **rum:** use logLevel config when agent is inactive ([#863](https://github.com/elastic/apm-agent-rum-js/issues/863)) ([bf524c1](https://github.com/elastic/apm-agent-rum-js/commit/bf524c1309a7a37d6406c59d802e12b4c5bc1706))
+* **rum-core:** capture xhr error states in transaction ([#873](https://github.com/elastic/apm-agent-rum-js/issues/873)) ([cc6812a](https://github.com/elastic/apm-agent-rum-js/commit/cc6812a1bfcd0bcbbd90516426b7dda148b48e09))
+
+
+### Features
+
+* **rum-core:** keep name and change message in rejection reason ([#857](https://github.com/elastic/apm-agent-rum-js/issues/857)) ([716d168](https://github.com/elastic/apm-agent-rum-js/commit/716d168a076334ab2262603312d43fb20f9e93f0))
+* **rum-core:** provide api to block managed transactions  ([#866](https://github.com/elastic/apm-agent-rum-js/issues/866)) ([5829a37](https://github.com/elastic/apm-agent-rum-js/commit/5829a37c5aff886834bd3a6dce3c415314ffccb6))
+* add CLS, FID and TBT to experience field ([#838](https://github.com/elastic/apm-agent-rum-js/issues/838)) ([7b02f14](https://github.com/elastic/apm-agent-rum-js/commit/7b02f14f626e41eb14172064afb4d51076ee379a))
+
+
+
+
+
 # [5.5.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.4.0...@elastic/apm-rum-core@5.5.0) (2020-07-29)
 
 
