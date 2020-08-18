@@ -361,12 +361,14 @@ describe('ErrorLogging', function() {
     )
 
     const errorLikeObj = {
+      name: 'CustomError',
       message: testErrorMessage,
       foo: 'bar'
     }
     errorLogging.logPromiseEvent({
       reason: errorLikeObj
     })
+    expect(getEvents()[4][ERRORS].exception.type).toBe('CustomError')
     expect(getEvents()[4][ERRORS].exception.message).toMatch(testErrorMessage)
     expect(getEvents()[4][ERRORS].exception.stacktrace.length).toBe(0)
 
@@ -387,7 +389,17 @@ describe('ErrorLogging', function() {
     errorLogging.logPromiseEvent({
       reason: [{ a: '1' }]
     })
-    expect(getEvents()[7]).toBeUndefined()
+    expect(getEvents()[7][ERRORS].exception.message).toBe(
+      'Unhandled promise rejection: <object>'
+    )
+
+    const noop = function() {}
+    errorLogging.logPromiseEvent({
+      reason: noop
+    })
+    expect(getEvents()[8][ERRORS].exception.message).toBe(
+      'Unhandled promise rejection: <function>'
+    )
 
     const events = getEvents()
 

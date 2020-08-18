@@ -28,7 +28,6 @@
  */
 const SCHEDULE = 'schedule'
 const INVOKE = 'invoke'
-const CLEAR = 'clear'
 
 /**
  * Event listener methods
@@ -128,6 +127,7 @@ const RESOURCE = 'resource'
 const FIRST_CONTENTFUL_PAINT = 'first-contentful-paint'
 const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint'
 const FIRST_INPUT = 'first-input'
+const LAYOUT_SHIFT = 'layout-shift'
 
 /**
  * Event types sent to APM Server on the queue
@@ -155,7 +155,6 @@ const KEYWORD_LIMIT = 1024
 export {
   SCHEDULE,
   INVOKE,
-  CLEAR,
   ADD_EVENT_LISTENER_STR,
   REMOVE_EVENT_LISTENER_STR,
   RESOURCE_INITIATOR_TYPES,
@@ -195,5 +194,6 @@ export {
   LOGGING_SERVICE,
   APM_SERVER,
   TRUNCATED_TYPE,
-  FIRST_INPUT
+  FIRST_INPUT,
+  LAYOUT_SHIFT
 }

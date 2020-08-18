@@ -49,8 +49,13 @@ export default class ApmBase {
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
-      configService.setVersion('5.4.0')
+      configService.setVersion('5.5.0')
       this.config(config)
+      /**
+       * Set level here to account for both active and inactive cases
+       */
+      const logLevel = configService.get('logLevel')
+      loggingService.setLevel(logLevel)
       /**
        * Deactive agent when the active config flag is set to false
        */
@@ -85,7 +90,7 @@ export default class ApmBase {
         }
       } else {
         this._disable = true
-        loggingService.info('RUM agent is inactive')
+        loggingService.warn('RUM agent is inactive')
       }
     }
     return this
@@ -144,16 +149,14 @@ export default class ApmBase {
       canReuse: true
     })
 
-    if (tr) {
-      tr.addTask(PAGE_LOAD)
+    if (!tr) {
+      return
     }
-    const sendPageLoadMetrics = function sendPageLoadMetrics() {
+
+    tr.addTask(PAGE_LOAD)
+    const sendPageLoadMetrics = () => {
       // to make sure PerformanceTiming.loadEventEnd has a value
-      setTimeout(function() {
-        if (tr) {
-          tr.removeTask(PAGE_LOAD)
-        }
-      })
+      setTimeout(() => tr.removeTask(PAGE_LOAD))
     }
 
     if (document.readyState === 'complete') {
@@ -247,12 +250,12 @@ export default class ApmBase {
     }
   }
 
-  startSpan(name, type) {
+  startSpan(name, type, options) {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
         'TransactionService'
       )
-      return transactionService.startSpan(name, type)
+      return transactionService.startSpan(name, type, options)
     }
   }
 

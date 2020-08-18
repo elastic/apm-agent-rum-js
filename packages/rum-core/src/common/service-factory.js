@@ -62,19 +62,18 @@ class ServiceFactory {
     this.initialized = true
     const configService = this.getService(CONFIG_SERVICE)
     configService.init()
-    const loggingService = this.getService(LOGGING_SERVICE)
 
-    function setLogLevel(loggingService, configService) {
+    const [loggingService, apmServer] = this.getService([
+      LOGGING_SERVICE,
+      APM_SERVER
+    ])
+    /**
+     * Reset logLevel whenever config update happens
+     */
+    configService.events.observe(CONFIG_CHANGE, () => {
       const logLevel = configService.get('logLevel')
       loggingService.setLevel(logLevel)
-    }
-
-    setLogLevel(loggingService, configService)
-    configService.events.observe(CONFIG_CHANGE, function() {
-      setLogLevel(loggingService, configService)
     })
-
-    const apmServer = this.getService(APM_SERVER)
     apmServer.init()
   }
 

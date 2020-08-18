@@ -352,12 +352,19 @@ describe('Capture hard navigation', function() {
     tr.captureTimings = true
     captureNavigation(tr)
     tr.end()
-    const agentMarks = ['timeToFirstByte', 'domInteractive', 'domComplete']
-
-    expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
-    agentMarks.forEach(mark => {
-      expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
-    })
+    const marks = getPageLoadMarks(performance.timing)
+    /**
+     * Account for buggy data in Navigation Timing
+     */
+    if (marks == null) {
+      expect(tr.marks.agent).toBeUndefined()
+    } else {
+      const agentMarks = ['timeToFirstByte', 'domInteractive', 'domComplete']
+      expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
+      agentMarks.forEach(mark => {
+        expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
+      })
+    }
     unMock()
   })
 

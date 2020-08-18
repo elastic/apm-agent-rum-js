@@ -24,9 +24,17 @@
  */
 
 import { init, apm, apmBase, ApmBase } from './index'
+import { Tracer } from 'opentracing/lib/tracer'
 import { createTracer as createElasticTracer } from '@elastic/apm-rum-core'
 
 function createTracer(apmBase) {
+  /**
+   * If the platform is not supported, return
+   * the default tracer from OT
+   */
+  if (apmBase._disable) {
+    return new Tracer()
+  }
   return createElasticTracer(apmBase.serviceFactory)
 }
 

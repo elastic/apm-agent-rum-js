@@ -43,7 +43,7 @@ const elasticApm = createApmBase({
 
 const tracer = createTracer(elasticApm)
 const otSpan = tracer.startSpan('OpenTracing span')
-otSpan.finish(Date.now() + 200)
+otSpan && otSpan.finish(Date.now() + 200)
 
 elasticApm.setInitialPageLoadName('general-usecase-initial-page-load')
 

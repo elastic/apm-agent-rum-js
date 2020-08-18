@@ -134,9 +134,8 @@ function checkSameOrigin(source, target) {
 function isPlatformSupported() {
   return (
     isBrowser &&
-    typeof Array.prototype.forEach === 'function' &&
+    typeof Set === 'function' &&
     typeof JSON.stringify === 'function' &&
-    typeof Function.bind === 'function' &&
     PERF &&
     typeof PERF.now === 'function' &&
     isCORSSupported()
@@ -355,6 +354,14 @@ function isPerfTimelineSupported() {
   return typeof PERF.getEntriesByType === 'function'
 }
 
+function isPerfTypeSupported(type) {
+  return (
+    typeof PerformanceObserver !== 'undefined' &&
+    PerformanceObserver.supportedEntryTypes &&
+    PerformanceObserver.supportedEntryTypes.indexOf(type) >= 0
+  )
+}
+
 export {
   extend,
   merge,
@@ -389,5 +396,6 @@ export {
   removeInvalidChars,
   PERF,
   isPerfTimelineSupported,
-  isBrowser
+  isBrowser,
+  isPerfTypeSupported
 }

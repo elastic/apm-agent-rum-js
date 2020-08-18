@@ -266,9 +266,9 @@ export default class PerformanceMonitoring {
         })
       }
 
-      const span = transactionService.startSpan(spanName, 'external.http')
-      const taskId = transactionService.addTask()
-
+      const span = transactionService.startSpan(spanName, 'external.http', {
+        blocking: true
+      })
       if (!span) {
         return
       }
@@ -295,13 +295,10 @@ export default class PerformanceMonitoring {
         span.sync = data.sync
       }
       data.span = span
-      task.id = taskId
     } else if (event === INVOKE) {
-      if (task.data && task.data.span) {
-        task.data.span.end(null, task.data)
-      }
-      if (task.id) {
-        transactionService.removeTask(task.id)
+      const data = task.data
+      if (data && data.span) {
+        transactionService.endSpan(data.span, data)
       }
     }
   }
@@ -405,7 +402,8 @@ export default class PerformanceMonitoring {
       span_count: {
         started: spans.length
       },
-      sampled: transaction.sampled
+      sampled: transaction.sampled,
+      experience: transaction.experience
     }
     return truncateModel(TRANSACTION_MODEL, transactionData)
   }
