@@ -29,6 +29,27 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.5.0]]
+==== 5.5.0 (2020-08-18)
+
+[float]
+===== Features
+* Provide an API to block all auto instrumented transactions created by the agent through
+  `transaction.block` method. Users can also use the `startSpan` API to create blocking spans
+  to control this behaviour: {issue}866[#866]
+* Expose options to create blocking spans from the agent API via `startSpan`: {issue}875[#875]
+* Capture Cumulative layout shift(CLS), Total blocking time(TBT) and First input delay(FID) as
+  part of experience metrics under page-load transactions: {issue}838[#838]
+
+[float]
+===== Bug fixes
+* Track various XHR states like timeouts, errors and aborts and end all managed
+  transactions correctly: {issue}871[#871]
+* Fix inconsistencies in the XHR timings by removing the task scheduling logic: {issue}871[#871]
+* Accept the user provided `logLevel` configuration when agent is not active: {issue}861[#861]
+* Opentracing Tracer should return Noop on unsupported platforms: {issue}872[#872]s
+
+
 [[release-notes-5.4.0]]
 ==== 5.4.0 (2020-07-29)
 
