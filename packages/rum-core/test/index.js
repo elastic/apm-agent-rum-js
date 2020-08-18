@@ -26,7 +26,6 @@
 import { createServiceFactory as originalFactory } from '../src'
 import Transaction from '../src/performance-monitoring/transaction'
 import { captureBreakdown } from '../src/performance-monitoring/breakdown'
-import { scheduleMacroTask } from '../src/common/utils'
 
 export function createServiceFactory() {
   var serviceFactory = originalFactory()
@@ -37,14 +36,6 @@ export function createServiceFactory() {
     }
   }
   return serviceFactory
-}
-
-export function scheduleTaskCycles(callback, cycles = 0) {
-  if (cycles > 0) {
-    scheduleMacroTask(scheduleTaskCycles.bind(this, callback, cycles - 1))
-  } else {
-    callback()
-  }
 }
 
 /**
