@@ -46,7 +46,7 @@ const span = transaction.startSpan('async-task', 'app', { blocking: true })
 setTimeout(() => {
   span.end()
   /**
-   * This would also end the managed transaction once all the blocking tasks are completed and
+   * This would also end the managed transaction once all the blocking spans are completed and
    * transaction would also contain other timing information and spans similar to auto
    * instrumented transactions like `page-load` and `route-change`.
    */

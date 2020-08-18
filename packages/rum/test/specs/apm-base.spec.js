@@ -326,6 +326,25 @@ describe('ApmBase', function() {
     expect(configService.get('context.tags')).toEqual(labels)
   })
 
+  it('should allow creating blocked spans on current transaction', () => {
+    apmBase.init({
+      serviceName,
+      serverUrl,
+      instrument: false
+    })
+    const tr = apmBase.startTransaction('blocking-transaction', 'custom', {
+      managed: true
+    })
+    const span1 = apmBase.startSpan('span1')
+    const span2 = apmBase.startSpan('span2', 'custom', { blocking: true })
+
+    expect(tr._activeTasks.size).toBe(1)
+    span1.end()
+    expect(tr.ended).toBe(false)
+    span2.end()
+    expect(tr.ended).toBe(true)
+  })
+
   it('should fetch central config', done => {
     const apmServer = serviceFactory.getService('ApmServer')
     const configService = serviceFactory.getService('ConfigService')
