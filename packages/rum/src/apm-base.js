@@ -250,12 +250,12 @@ export default class ApmBase {
     }
   }
 
-  startSpan(name, type) {
+  startSpan(name, type, options) {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
         'TransactionService'
       )
-      return transactionService.startSpan(name, type)
+      return transactionService.startSpan(name, type, options)
     }
   }
 

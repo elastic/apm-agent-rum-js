@@ -141,7 +141,7 @@ NOTE: The payload will be dropped if one of the filters return a falsy value.
 
 [source,js]
 ----
-apm.startTransaction(name, type, options)
+const transaction = apm.startTransaction(name, type, options)
 ----
 
 
@@ -185,16 +185,28 @@ NOTE: This method returns `undefined` if apm is disabled or if <<active,active>>
 
 [source,js]
 ----
-var span = apm.startSpan(name, type)
+const span = apm.startSpan(name, type, options)
 ----
 
-Starts and returns a new span on the current transaction.
+Starts and returns a new span associated with the current active transaction.
 
 Arguments:
 
 * `name` - The name of the span (string). Defaults to `Unknown`
 
 * `type` - The type of the span (string). Defaults to `custom`
+
+* `options` - The following options are supported:
+
+** `blocking` - Blocks the associated transaction from ending till this span is ended. Blocked spans
+    automatically creates an internal task. Defaults to false
+
+** `parentId` - Parent id associated with the new span. Defaults to current transaction id
+
+** `sync` - Denotes if the span is synchronous or asynchronous. Defaults to null
+
+
+Blocked spans allow users to control the early closing of <<custom-managed-transactions, managed transactions>> in few cases when the app contains lots of async activity which cannot be tracked by the agent.
 
 NOTE: This method returns `undefined` if apm is disabled or if <<active,active>> flag is set to `false` in the config.
 
