@@ -452,11 +452,11 @@ describe('PerformanceMonitoring', function() {
             },
             {
               event: 'invoke',
-              source: FETCH
+              source: XMLHTTPREQUEST
             },
             {
               event: 'invoke',
-              source: XMLHTTPREQUEST
+              source: FETCH
             }
           ])
           cancelXHRSub()

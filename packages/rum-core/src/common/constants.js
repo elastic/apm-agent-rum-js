@@ -28,7 +28,6 @@
  */
 const SCHEDULE = 'schedule'
 const INVOKE = 'invoke'
-const CLEAR = 'clear'
 
 /**
  * Event listener methods
@@ -156,7 +155,6 @@ const KEYWORD_LIMIT = 1024
 export {
   SCHEDULE,
   INVOKE,
-  CLEAR,
   ADD_EVENT_LISTENER_STR,
   REMOVE_EVENT_LISTENER_STR,
   RESOURCE_INITIATOR_TYPES,

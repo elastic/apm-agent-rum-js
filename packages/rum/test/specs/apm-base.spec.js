@@ -32,7 +32,6 @@ import {
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import Promise from 'promise-polyfill'
-import { scheduleTaskCycles } from '../../../rum-core/test'
 
 var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
@@ -209,11 +208,9 @@ describe('ApmBase', function() {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     req.addEventListener('load', function() {
-      scheduleTaskCycles(() => {
-        expect(tr.spans.length).toBe(1)
-        expect(tr.spans[0].name).toBe('GET /')
-        done()
-      }, 2)
+      expect(tr.spans.length).toBe(1)
+      expect(tr.spans[0].name).toBe('GET /')
+      done()
     })
 
     req.send()
@@ -231,11 +228,9 @@ describe('ApmBase', function() {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     req.addEventListener('load', function() {
-      scheduleTaskCycles(() => {
-        expect(tr.spans.length).toBe(1)
-        expect(tr.spans[0].name).toBe('GET /')
-        done()
-      }, 2)
+      expect(tr.spans.length).toBe(1)
+      expect(tr.spans[0].name).toBe('GET /')
+      done()
     })
     req.send()
     tr = apmBase.getCurrentTransaction()
@@ -257,7 +252,7 @@ describe('ApmBase', function() {
          * We patch and register symbols on the native XHR with
          * our own APM symbol keys
          */
-        expect(Object.keys(req).length).toBeGreaterThanOrEqual(5)
+        expect(Object.keys(req).length).toBeGreaterThanOrEqual(3)
         done()
       })
     })
