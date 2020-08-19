@@ -1,11 +1,11 @@
 [[custom-transactions]]
 === Custom Transactions
 
-Elastic APM uses the concept of transactions and spans to collect performance data. Spans are used to measure a unit of 
-operation and they are grouped into the transactions.
+Elastic APM uses the concept of transactions and spans to collect performance data:
+Spans measure a unit of operation and are grouped into transactions.
 
-By default, Elastic APM JS agent creates transactions for all the <<supported-technologies, Supported Technologies>> and
-send them to the apm-server, however if the current instrumentation doesn't provide all the insights, you can create
+By default, the Elastic APM JS agent creates transactions for all <<supported-technologies,supported technologies>> and
+sends them to the apm-server. However, if the current instrumentation doesn't provide all the insights, you can create
 custom transactions to fill the gaps.
 
 Here is an example of using custom transactions and spans:
@@ -25,8 +25,8 @@ fetch(url)
   })
 ----
 
-NOTE: custom transactions are not managed by the agent, therefore, the agent does not capture spans and
-other timing information based on <<supported-technologies,automatic instrumentations>>, e.g. XHR, Resource Timing etc.
+NOTE: Custom transactions are not managed by the agent, and therefore the agent does not capture spans and
+other timing information shown in <<supported-technologies,automatic instrumentation>>, like XHR, resource timing, etc.
 
 [float]
 [[custom-managed-transactions]]
