@@ -31,7 +31,7 @@ object to initialize the agent:
 <script src="https://<your-cdn-host>.com/path/to/elastic-apm-rum.umd.min-<version>.js" crossorigin></script>
 <script>
   elasticApm.init({
-    serviceName: '<instrumeted-app>',
+    serviceName: '<instrumented-app>',
     serverUrl: '<apm-server-url>',
   })
 </script>
@@ -40,7 +40,7 @@ object to initialize the agent:
 ==== Asynchronous / Non-Blocking Pattern
 
 Loading the script asynchronously ensures the agent script will not block other
-resources on the page, however, it will stick block browsers `onload` event.
+resources on the page, however, it will still block browsers `onload` event.
 
 [source,html]
 ----
@@ -108,7 +108,7 @@ By default, RUM agent logs all the debug messages to the browser console. These
 logs are very useful in development. However, they make the RUM agent bundle
 size larger so you should make sure to use the optimized production version when deploying your application.
 
-You can find instructions for building optimized code below for different bundlers
+You can find instructions for building optimized code below for different bundlers.
 
 [float]
 ==== Webpack
