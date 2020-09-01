@@ -77,13 +77,8 @@ class TransactionService {
   }
 
   ensureCurrentTransaction(name, type, options) {
-    let tr = this.getCurrentTransaction()
-    if (tr) {
-      return tr
-    } else {
-      tr = new Transaction(name, type, options)
-      this.setCurrentTransaction(tr)
-    }
+    const tr = new Transaction(name, type, options)
+    this.setCurrentTransaction(tr)
     return tr
   }
 
@@ -402,25 +397,26 @@ class TransactionService {
   }
 
   startSpan(name, type, options) {
-    const tr = this.ensureCurrentTransaction(
-      undefined,
-      TEMPORARY_TYPE,
-      this.createOptions({
-        canReuse: true,
-        managed: true
-      })
-    )
-
-    if (tr) {
-      const span = tr.startSpan(name, type, options)
-      if (__DEV__) {
-        this._logger.debug(
-          `startSpan(${name}, ${span.type})`,
-          `on transaction(${tr.id}, ${tr.name})`
-        )
-      }
-      return span
+    let tr = this.getCurrentTransaction()
+    if (!tr) {
+      tr = this.ensureCurrentTransaction(
+        undefined,
+        TEMPORARY_TYPE,
+        this.createOptions({
+          canReuse: true,
+          managed: true
+        })
+      )
     }
+
+    const span = tr.startSpan(name, type, options)
+    if (__DEV__) {
+      this._logger.debug(
+        `startSpan(${name}, ${span.type})`,
+        `on transaction(${tr.id}, ${tr.name})`
+      )
+    }
+    return span
   }
 
   endSpan(span, context) {
