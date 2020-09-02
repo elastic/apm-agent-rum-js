@@ -24,7 +24,6 @@
  */
 
 import TransactionService from '../../src/performance-monitoring/transaction-service'
-import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 import Config from '../../src/common/config-service'
 import LoggingService from '../../src/common/logging-service'
@@ -70,9 +69,11 @@ describe('TransactionService', function() {
   })
 
   it('should call startSpan on current Transaction', function() {
-    var tr = new Transaction('transaction', 'transaction')
+    const tr = transactionService.createCurrentTransaction(
+      'transaction',
+      'transaction'
+    )
     spyOn(tr, 'startSpan').and.callThrough()
-    transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span', { test: 'passed' })
     expect(
       transactionService.getCurrentTransaction().startSpan
@@ -201,10 +202,13 @@ describe('TransactionService', function() {
 
   it('should reuse Transaction', function() {
     transactionService = new TransactionService(logger, config)
-    const reusableTr = new Transaction('test-name', 'test-type', {
-      canReuse: true
-    })
-    transactionService.setCurrentTransaction(reusableTr)
+    const reusableTr = transactionService.createCurrentTransaction(
+      'test-name',
+      'test-type',
+      {
+        canReuse: true
+      }
+    )
     const pageLoadTr = transactionService.startTransaction(name, 'page-load', {
       managed: true,
       canReuse: true
@@ -268,8 +272,10 @@ describe('TransactionService', function() {
       done()
     })
 
-    const zoneTr = new Transaction('test', 'test-transaction')
-    customTransactionService.setCurrentTransaction(zoneTr)
+    const zoneTr = transactionService.createCurrentTransaction(
+      'test',
+      'test-transaction'
+    )
     const span = zoneTr.startSpan('GET http://example.com', 'external.http')
     span.end()
 
@@ -349,14 +355,6 @@ describe('TransactionService', function() {
       unMock()
       done()
     })
-  })
-
-  it('should ensureCurrentTransaction once per startTransaction', function() {
-    spyOn(transactionService, 'ensureCurrentTransaction').and.callThrough()
-    transactionService.startTransaction('test-name', 'test-type', {
-      managed: true
-    })
-    expect(transactionService.ensureCurrentTransaction).toHaveBeenCalledTimes(1)
   })
 
   it('should include size & server timing in page load context', done => {

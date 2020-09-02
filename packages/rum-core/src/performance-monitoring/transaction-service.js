@@ -76,9 +76,9 @@ class TransactionService {
     })
   }
 
-  ensureCurrentTransaction(name, type, options) {
+  createCurrentTransaction(name, type, options) {
     const tr = new Transaction(name, type, options)
-    this.setCurrentTransaction(tr)
+    this.currentTransaction = tr
     return tr
   }
 
@@ -86,10 +86,6 @@ class TransactionService {
     if (this.currentTransaction && !this.currentTransaction.ended) {
       return this.currentTransaction
     }
-  }
-
-  setCurrentTransaction(value) {
-    this.currentTransaction = value
   }
 
   createOptions(options) {
@@ -114,7 +110,7 @@ class TransactionService {
     let tr = this.getCurrentTransaction()
     let isRedefined = false
     if (!tr) {
-      tr = this.ensureCurrentTransaction(name, type, perfOptions)
+      tr = this.createCurrentTransaction(name, type, perfOptions)
     } else if (tr.canReuse() && perfOptions.canReuse) {
       /*
        * perfOptions could also have `canReuse:true` in which case we
@@ -152,7 +148,7 @@ class TransactionService {
         )
       }
       tr.end()
-      tr = this.ensureCurrentTransaction(name, type, perfOptions)
+      tr = this.createCurrentTransaction(name, type, perfOptions)
     }
 
     if (tr.type === PAGE_LOAD) {
@@ -399,7 +395,7 @@ class TransactionService {
   startSpan(name, type, options) {
     let tr = this.getCurrentTransaction()
     if (!tr) {
-      tr = this.ensureCurrentTransaction(
+      tr = this.createCurrentTransaction(
         undefined,
         TEMPORARY_TYPE,
         this.createOptions({
