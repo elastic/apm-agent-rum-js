@@ -35,6 +35,10 @@ export const ApmVuePlugin = {
      */
     apm.init(config)
 
+    if (!apm.isActive()) {
+      return
+    }
+
     /**
      * Hook router if provided
      */
