@@ -76,14 +76,9 @@ class TransactionService {
     })
   }
 
-  ensureCurrentTransaction(name, type, options) {
-    let tr = this.getCurrentTransaction()
-    if (tr) {
-      return tr
-    } else {
-      tr = new Transaction(name, type, options)
-      this.setCurrentTransaction(tr)
-    }
+  createCurrentTransaction(name, type, options) {
+    const tr = new Transaction(name, type, options)
+    this.currentTransaction = tr
     return tr
   }
 
@@ -91,10 +86,6 @@ class TransactionService {
     if (this.currentTransaction && !this.currentTransaction.ended) {
       return this.currentTransaction
     }
-  }
-
-  setCurrentTransaction(value) {
-    this.currentTransaction = value
   }
 
   createOptions(options) {
@@ -119,7 +110,7 @@ class TransactionService {
     let tr = this.getCurrentTransaction()
     let isRedefined = false
     if (!tr) {
-      tr = this.ensureCurrentTransaction(name, type, perfOptions)
+      tr = this.createCurrentTransaction(name, type, perfOptions)
     } else if (tr.canReuse() && perfOptions.canReuse) {
       /*
        * perfOptions could also have `canReuse:true` in which case we
@@ -157,7 +148,7 @@ class TransactionService {
         )
       }
       tr.end()
-      tr = this.ensureCurrentTransaction(name, type, perfOptions)
+      tr = this.createCurrentTransaction(name, type, perfOptions)
     }
 
     if (tr.type === PAGE_LOAD) {
@@ -402,25 +393,26 @@ class TransactionService {
   }
 
   startSpan(name, type, options) {
-    const tr = this.ensureCurrentTransaction(
-      undefined,
-      TEMPORARY_TYPE,
-      this.createOptions({
-        canReuse: true,
-        managed: true
-      })
-    )
-
-    if (tr) {
-      const span = tr.startSpan(name, type, options)
-      if (__DEV__) {
-        this._logger.debug(
-          `startSpan(${name}, ${span.type})`,
-          `on transaction(${tr.id}, ${tr.name})`
-        )
-      }
-      return span
+    let tr = this.getCurrentTransaction()
+    if (!tr) {
+      tr = this.createCurrentTransaction(
+        undefined,
+        TEMPORARY_TYPE,
+        this.createOptions({
+          canReuse: true,
+          managed: true
+        })
+      )
     }
+
+    const span = tr.startSpan(name, type, options)
+    if (__DEV__) {
+      this._logger.debug(
+        `startSpan(${name}, ${span.type})`,
+        `on transaction(${tr.id}, ${tr.name})`
+      )
+    }
+    return span
   }
 
   endSpan(span, context) {
