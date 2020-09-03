@@ -357,6 +357,14 @@ describe('TransactionService', function() {
     })
   })
 
+  it('should call createCurrentTransaction once per startTransaction', function() {
+    spyOn(transactionService, 'createCurrentTransaction').and.callThrough()
+    transactionService.startTransaction('test-name', 'test-type', {
+      managed: true
+    })
+    expect(transactionService.createCurrentTransaction).toHaveBeenCalledTimes(1)
+  })
+
   it('should include size & server timing in page load context', done => {
     const unMock = mockGetEntriesByType()
     const customTrService = new TransactionService(logger, config)
