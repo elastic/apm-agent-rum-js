@@ -239,7 +239,7 @@ export default class ApmBase {
 
   // Should call this method before 'load' event on window is fired
   setInitialPageLoadName(name) {
-    var configService = this.serviceFactory.getService(CONFIG_SERVICE)
+    const configService = this.serviceFactory.getService(CONFIG_SERVICE)
     configService.setConfig({
       pageLoadTransactionName: name
     })

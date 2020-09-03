@@ -82,8 +82,9 @@ describe('withTransaction', function() {
 
     const notInitializedAPM = new ApmBase(serviceFactory, false)
     const withTransaction = getWithTransaction(notInitializedAPM)
-    const comp = withTransaction('test-name', 'test-type')(undefined)
-    expect(comp).toBe(undefined)
+    const testComponent = {}
+    const comp = withTransaction('test-name', 'test-type')(testComponent)
+    expect(comp).toEqual(testComponent)
     expect(loggingService.warn).not.toHaveBeenCalled()
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
   })

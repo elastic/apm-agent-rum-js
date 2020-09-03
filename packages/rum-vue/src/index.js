@@ -35,23 +35,21 @@ export const ApmVuePlugin = {
      */
     apm.init(config)
 
-    if (!apm.isActive()) {
-      return
-    }
-
-    /**
-     * Hook router if provided
-     */
-    if (router) {
-      routeHooks(router, apm)
-    }
-
-    if (captureErrors) {
+    if (apm.isActive()) {
       /**
-       * Global error handler for capturing errors during
-       * component renders
+       * Hook router if provided
        */
-      Vue.config.errorHandler = getErrorHandler(Vue, apm)
+      if (router) {
+        routeHooks(router, apm)
+      }
+
+      if (captureErrors) {
+        /**
+         * Global error handler for capturing errors during
+         * component renders
+         */
+        Vue.config.errorHandler = getErrorHandler(Vue, apm)
+      }
     }
     /**
      * Provide the APM instance via $apm to be accessed in all Vue Components
