@@ -38,10 +38,7 @@ export class ApmService {
   init(config) {
     const apmInstance = ApmService.apm.init(config)
 
-    const configService = ApmService.apm.serviceFactory.getService(
-      'ConfigService'
-    )
-    if (!configService.isActive()) {
+    if (!apmInstance.isActive()) {
       return apmInstance
     }
 

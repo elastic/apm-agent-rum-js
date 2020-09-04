@@ -106,10 +106,6 @@ class Config {
     this.setConfig(scriptData)
   }
 
-  isActive() {
-    return this.get('active')
-  }
-
   setVersion(version) {
     this.version = version
   }

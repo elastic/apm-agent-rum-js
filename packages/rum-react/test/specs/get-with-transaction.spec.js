@@ -72,6 +72,23 @@ describe('withTransaction', function() {
     TestComponent(apmBase)
   })
 
+  it('should not log warning or create transaction if apm is not active', function() {
+    const [loggingService, transactionService] = serviceFactory.getService([
+      'LoggingService',
+      'TransactionService'
+    ])
+    spyOn(loggingService, 'warn')
+    spyOn(transactionService, 'startTransaction')
+
+    const notInitializedAPM = new ApmBase(serviceFactory, false)
+    const withTransaction = getWithTransaction(notInitializedAPM)
+    const testComponent = {}
+    const comp = withTransaction('test-name', 'test-type')(testComponent)
+    expect(comp).toEqual(testComponent)
+    expect(loggingService.warn).not.toHaveBeenCalled()
+    expect(transactionService.startTransaction).not.toHaveBeenCalled()
+  })
+
   it('should start transaction for components', function() {
     const transactionService = serviceFactory.getService('TransactionService')
     spyOn(transactionService, 'startTransaction')
