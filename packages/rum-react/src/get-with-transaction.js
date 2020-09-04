@@ -48,8 +48,7 @@ function isReactClassComponent(Component) {
 function getWithTransaction(apm) {
   return function withTransaction(name, type, callback = () => {}) {
     return function(Component) {
-      const configService = apm.serviceFactory.getService('ConfigService')
-      if (!configService.isActive()) {
+      if (!apm.isActive()) {
         return Component
       }
 

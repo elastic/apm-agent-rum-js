@@ -44,6 +44,21 @@ describe('ApmBase', function() {
     apmBase = new ApmBase(serviceFactory, !enabled)
   })
 
+  it('should report whether agent is active or inactive', () => {
+    expect(apmBase.isActive()).toBe(false)
+    apmBase.config({ active: false })
+    expect(apmBase.isActive()).toBe(false)
+    apmBase.config({ active: true })
+    expect(apmBase.isActive()).toBe(false)
+    apmBase.init({
+      serviceName,
+      serverUrl,
+      active: true,
+      instrument: false
+    })
+    expect(apmBase.isActive()).toBe(true)
+  })
+
   it('should send page load metrics after load event', done => {
     apmBase.config({ serviceName, serverUrl })
     apmBase._sendPageLoadMetrics()
