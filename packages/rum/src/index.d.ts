@@ -39,7 +39,6 @@ declare module '@elastic/apm-rum' {
      */
     isEnabled(): boolean
     isActive(): boolean
-    fetchCentralConfig(): Promise<AgentConfigOptions | undefined>
     observe(name: TransactionEvents, callback: (tr: Transaction) => void): void
     config(config: AgentConfigOptions): void
     setUserContext(user: UserObject): void
