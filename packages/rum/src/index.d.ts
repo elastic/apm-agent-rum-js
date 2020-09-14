@@ -38,7 +38,9 @@ declare module '@elastic/apm-rum' {
      * undocumented, might be removed in future versions
      */
     isEnabled(): boolean
+    isActive(): boolean
     observe(name: TransactionEvents, callback: (tr: Transaction) => void): void
+    config(config: AgentConfigOptions): void
     setUserContext(user: UserObject): void
     setCustomContext(custom: object): void
     addLabels(labels: Labels): void
