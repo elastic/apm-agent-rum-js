@@ -119,11 +119,7 @@ class ApmServer {
     return new Error(message)
   }
 
-  _makeHttpRequest(
-    method,
-    url,
-    { timeout, payload, headers } = { timeout: 10000 }
-  ) {
+  _makeHttpRequest(method, url, { timeout = 10000, payload, headers } = {}) {
     return new Promise(function(resolve, reject) {
       var xhr = new window.XMLHttpRequest()
       xhr[XHR_IGNORE] = true
