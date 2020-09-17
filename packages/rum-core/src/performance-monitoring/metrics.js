@@ -250,7 +250,7 @@ export function captureObserverEntries(list, { capturePaint }) {
   const fidEntries = list.getEntriesByType(FIRST_INPUT)
   const fidSpan = createFirstInputDelaySpan(fidEntries)
   if (fidSpan) {
-    metrics.fid = fidSpan._start
+    metrics.fid = fidSpan.duration()
     result.spans.push(fidSpan)
   }
 
