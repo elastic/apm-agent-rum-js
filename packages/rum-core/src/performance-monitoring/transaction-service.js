@@ -287,7 +287,7 @@ class TransactionService {
             }
 
             if (isPerfTypeSupported(LAYOUT_SHIFT)) {
-              tr.experience.cls = cls.toFixed(3)
+              tr.experience.cls = cls
             }
 
             if (fid > 0) {
