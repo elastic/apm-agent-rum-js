@@ -37,6 +37,7 @@ import {
   mockObserverEntryNames
 } from '../utils/globals-mock'
 import longtaskEntries from '../fixtures/longtask-entries'
+import fidEntries from '../fixtures/fid-entries'
 
 describe('Metrics', () => {
   describe('PerfEntryRecorder', () => {
@@ -50,6 +51,7 @@ describe('Metrics', () => {
       list.getEntriesByName.and.returnValue([])
       metrics.tbt = { start: Infinity, duration: 0 }
       metrics.cls = 0
+      metrics.fid = 0
     })
 
     it('should not create long tasks spans if entries are not present', () => {
@@ -225,27 +227,27 @@ describe('Metrics', () => {
       })
     })
 
-    it('should create first input delay span', () => {
-      let span = createFirstInputDelaySpan([
-        {
-          name: 'mousedown',
-          entryType: 'first-input',
-          startTime: 5482.669999997597,
-          duration: 16,
-          processingStart: 5489.029999997001,
-          processingEnd: 5489.0550000127405,
-          cancelable: true
-        }
-      ])
-      expect(span).toEqual(
-        jasmine.objectContaining({
-          name: 'First Input Delay',
-          type: 'first-input',
-          ended: true,
-          _end: 5489.029999997001,
-          _start: 5482.669999997597
+    describe('First Input Delay', () => {
+      it('should capture fid experience metric on input entries', () => {
+        list.getEntriesByType.and.callFake(mockObserverEntryTypes)
+        captureObserverEntries(list, {
+          capturePaint: true
         })
-      )
+        expect(metrics.fid).toBe(6)
+      })
+
+      it('should create first input delay span', () => {
+        let span = createFirstInputDelaySpan(fidEntries)
+        expect(span).toEqual(
+          jasmine.objectContaining({
+            name: 'First Input Delay',
+            type: 'first-input',
+            ended: true,
+            _end: 5489.029999997001,
+            _start: 5482.669999997597
+          })
+        )
+      })
     })
 
     it('should calculate Cumulative Layout Shift', () => {
@@ -287,7 +289,7 @@ describe('Metrics', () => {
           value: 0.01
         }
       ])
-      expect(metrics.cls.toFixed(5)).toEqual('0.06000')
+      expect(metrics.cls.toFixed(3)).toEqual('0.060')
     })
   })
 })
