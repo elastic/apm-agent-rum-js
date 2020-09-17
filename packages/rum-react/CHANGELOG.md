@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.4](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.2.3...@elastic/apm-rum-react@1.2.4) (2020-09-17)
+
+
+### Bug Fixes
+
+* **rum:** do not instrument frameworks when agent is inactive ([#885](https://github.com/elastic/apm-agent-rum-js/issues/885)) ([861a499](https://github.com/elastic/apm-agent-rum-js/commit/861a499b0fa6f524e590a2e8368e8e1a2bbac684))
+
+
+
+
+
 ## [1.2.3](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.2.2...@elastic/apm-rum-react@1.2.3) (2020-08-18)
 
 **Note:** Version bump only for package @elastic/apm-rum-react
