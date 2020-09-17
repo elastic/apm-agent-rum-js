@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.6.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.6.0...@elastic/apm-rum-core@5.6.1) (2020-09-17)
+
+
+### Bug Fixes
+
+* **rum:** do not instrument frameworks when agent is inactive ([#885](https://github.com/elastic/apm-agent-rum-js/issues/885)) ([861a499](https://github.com/elastic/apm-agent-rum-js/commit/861a499b0fa6f524e590a2e8368e8e1a2bbac684))
+* **rum-core:** add default timeout for xhr post requests ([#897](https://github.com/elastic/apm-agent-rum-js/issues/897)) ([e95a025](https://github.com/elastic/apm-agent-rum-js/commit/e95a0254567796b04bb768490d8fee5dc494d243))
+* **rum-core:** measure fid correctly for experience metric ([#899](https://github.com/elastic/apm-agent-rum-js/issues/899)) ([19bee12](https://github.com/elastic/apm-agent-rum-js/commit/19bee121f0d55b9503fc50e8d6e955fe19c63dd3))
+
+
+### Performance Improvements
+
+* **rum-core:** avoid creating options when transaction exists ([#883](https://github.com/elastic/apm-agent-rum-js/issues/883)) ([94798b6](https://github.com/elastic/apm-agent-rum-js/commit/94798b65d4f5298cab97fdc7969ec828667be536))
+
+
+
+
+
 # [5.6.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.5.0...@elastic/apm-rum-core@5.6.0) (2020-08-18)
 
 

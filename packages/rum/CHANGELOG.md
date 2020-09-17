@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.6.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.5.0...@elastic/apm-rum@5.6.0) (2020-09-17)
+
+
+### Bug Fixes
+
+* **rum:** do not instrument frameworks when agent is inactive ([#885](https://github.com/elastic/apm-agent-rum-js/issues/885)) ([861a499](https://github.com/elastic/apm-agent-rum-js/commit/861a499b0fa6f524e590a2e8368e8e1a2bbac684))
+
+
+### Features
+
+* **rum:** add missing methods to types ([#890](https://github.com/elastic/apm-agent-rum-js/issues/890)) ([541e4aa](https://github.com/elastic/apm-agent-rum-js/commit/541e4aacc15a568673bb0189e9907ec35bd8394b))
+
+
+
+
+
 # [5.5.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.4.0...@elastic/apm-rum@5.5.0) (2020-08-18)
 
 
