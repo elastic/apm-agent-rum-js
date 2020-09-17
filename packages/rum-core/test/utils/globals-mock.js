@@ -29,13 +29,15 @@ import userTimingEntries from '../fixtures/user-timing-entries'
 import { TIMING_LEVEL2_ENTRIES } from '../fixtures/navigation-entries'
 import longtaskEntries from '../fixtures/longtask-entries'
 import largestContentfulPaintEntries from '../fixtures/lcp-entries'
+import firstInputDelayEntries from '../fixtures/fid-entries'
 import {
   LONG_TASK,
   LARGEST_CONTENTFUL_PAINT,
   MEASURE,
   NAVIGATION,
   RESOURCE,
-  FIRST_CONTENTFUL_PAINT
+  FIRST_CONTENTFUL_PAINT,
+  FIRST_INPUT
 } from '../../src/common/constants'
 
 export function mockObserverEntryTypes(type) {
@@ -43,6 +45,8 @@ export function mockObserverEntryTypes(type) {
     return longtaskEntries
   } else if (type === LARGEST_CONTENTFUL_PAINT) {
     return largestContentfulPaintEntries
+  } else if (type === FIRST_INPUT) {
+    return firstInputDelayEntries
   }
   return []
 }
