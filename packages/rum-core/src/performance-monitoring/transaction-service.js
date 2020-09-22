@@ -276,7 +276,7 @@ class TransactionService {
            * and once performance observer is disconnected
            */
           if (tr.captureTimings) {
-            const { cls, fid, tbt } = metrics
+            const { cls, fid, tbt, longtask } = metrics
             if (tbt.duration > 0) {
               tr.spans.push(createTotalBlockingTimeSpan(tbt))
             }
@@ -294,25 +294,11 @@ class TransactionService {
               tr.experience.fid = fid
             }
 
-            let longtaskCount = 0
-            let longtaskDuration = 0
-            let longtaskMax = 0
-            for (let i = 0; i < tr.spans.length; i++) {
-              const span = tr.spans[i]
-              if (span.type === LONG_TASK) {
-                longtaskCount++
-                const dur = span.duration()
-                longtaskDuration += dur
-                if (dur > longtaskMax) {
-                  longtaskMax = dur
-                }
-              }
-            }
-            if (longtaskCount > 0) {
+            if (longtask.count > 0) {
               tr.experience.longtask = {
-                duration: longtaskDuration,
-                count: longtaskCount,
-                max: longtaskMax
+                count: longtask.count,
+                duration: longtask.duration,
+                max: longtask.max
               }
             }
           }
