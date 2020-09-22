@@ -752,5 +752,27 @@ describe('TransactionService', function() {
         expect(tr.experience.cls).toBeGreaterThanOrEqual(0)
       }
     })
+
+    it('should add longtask to experience on transactions', async () => {
+      const tr = trService.startTransaction('test', PAGE_LOAD, {
+        managed: true,
+        startTime: 1
+      })
+
+      let span = new Span(`Longtask(test-1)`, LONG_TASK, { startTime: 10 })
+      span.end(20)
+      tr.spans.push(span)
+      span = new Span(`Longtask(test-2)`, LONG_TASK, { startTime: 30 })
+      span.end(50)
+      tr.spans.push(span)
+
+      expect(tr.captureTimings).toBe(true)
+      await tr.end()
+      expect(tr.experience.longtask).toEqual({
+        count: 2,
+        duration: 30,
+        max: 20
+      })
+    })
   })
 })
