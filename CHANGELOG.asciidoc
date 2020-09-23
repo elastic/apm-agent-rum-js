@@ -29,6 +29,24 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.6.0]]
+==== 5.6.0 (2020-09-17)
+
+[float]
+===== Features
+* Add new method signaturtes to the exported type definitions: {issue}890[#890]
+
+[float]
+===== Bug fixes
+* Frameworks should not be automatically instrumented when the apm is inactive : {issue}885[#885]
+* Add default XHR timeout for compressed requests to APM server: {issue}897[#897]
+* Measure First Input Delay metrics properly for page load transactions: {issue}899[#899]
+
+[float]
+===== Performance Improvements
+* Improve the span creation time when there is an active transaction on page: {issue}883[#883]
+
+
 [[release-notes-5.5.0]]
 ==== 5.5.0 (2020-08-18)
 
