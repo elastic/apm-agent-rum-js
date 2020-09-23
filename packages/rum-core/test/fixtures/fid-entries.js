@@ -23,37 +23,14 @@
  *
  */
 
-import { apmBase } from '@elastic/apm-rum'
-import { routeHooks } from './route-hooks'
-import { getErrorHandler } from './error-handler'
-
-export const ApmVuePlugin = {
-  install: (Vue, options) => {
-    const { router, apm = apmBase, config, captureErrors = true } = options
-    /**
-     * Initialize the APM with the config
-     */
-    apm.init(config)
-
-    if (apm.isActive()) {
-      /**
-       * Hook router if provided
-       */
-      if (router) {
-        routeHooks(router, apm)
-      }
-
-      if (captureErrors) {
-        /**
-         * Global error handler for capturing errors during
-         * component renders
-         */
-        Vue.config.errorHandler = getErrorHandler(Vue, apm)
-      }
-    }
-    /**
-     * Provide the APM instance via $apm to be accessed in all Vue Components
-     */
-    Vue.prototype.$apm = apm
+export default [
+  {
+    name: 'mousedown',
+    entryType: 'first-input',
+    startTime: 5482.669999997597,
+    duration: 16,
+    processingStart: 5489.029999997001,
+    processingEnd: 5489.0550000127405,
+    cancelable: true
   }
-}
+]

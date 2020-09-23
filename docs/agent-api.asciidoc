@@ -198,8 +198,8 @@ Arguments:
 
 * `options` - The following options are supported:
 
-** `blocking` - Blocks the associated transaction from ending till this span is ended. Blocked spans
-    automatically creates an internal task. Defaults to false
+** `blocking` - Blocks the associated transaction from ending until this span is ended. Blocked spans
+    automatically create an internal task. Defaults to false.
 
 ** `parentId` - Parent id associated with the new span. Defaults to current transaction id
 

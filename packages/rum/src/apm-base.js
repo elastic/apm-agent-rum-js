@@ -39,6 +39,15 @@ export default class ApmBase {
     this._initialized = false
   }
 
+  isEnabled() {
+    return !this._disable
+  }
+
+  isActive() {
+    const configService = this.serviceFactory.getService(CONFIG_SERVICE)
+    return this.isEnabled() && this._initialized && configService.get('active')
+  }
+
   init(config) {
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
@@ -49,7 +58,7 @@ export default class ApmBase {
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
-      configService.setVersion('5.5.0')
+      configService.setVersion('5.6.0')
       this.config(config)
       /**
        * Set level here to account for both active and inactive cases
@@ -59,7 +68,8 @@ export default class ApmBase {
       /**
        * Deactive agent when the active config flag is set to false
        */
-      if (configService.isActive()) {
+      const isConfigActive = configService.get('active')
+      if (isConfigActive) {
         this.serviceFactory.init()
 
         const flags = getInstrumentationFlags(
@@ -166,10 +176,6 @@ export default class ApmBase {
     }
   }
 
-  isEnabled() {
-    return !this._disable
-  }
-
   observe(name, fn) {
     const configService = this.serviceFactory.getService(CONFIG_SERVICE)
     configService.events.observe(name, fn)
@@ -233,12 +239,10 @@ export default class ApmBase {
 
   // Should call this method before 'load' event on window is fired
   setInitialPageLoadName(name) {
-    if (this.isEnabled()) {
-      var configService = this.serviceFactory.getService(CONFIG_SERVICE)
-      configService.setConfig({
-        pageLoadTransactionName: name
-      })
-    }
+    const configService = this.serviceFactory.getService(CONFIG_SERVICE)
+    configService.setConfig({
+      pageLoadTransactionName: name
+    })
   }
 
   startTransaction(name, type, options) {

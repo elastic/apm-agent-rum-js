@@ -32,13 +32,14 @@ RUN apt-get -qq install -y  --no-install-recommends \
     libatk-bridge2.0-0 \
     libepoxy0 \
     libgtk-3-0 \
+    libopenjp2-7 \
     libharfbuzz-icu0 \
     libgstreamer-gl1.0-0 \
     libgstreamer-plugins-bad1.0-0 \
     gstreamer1.0-plugins-good
 
 # 4. Install Chromium dependencies
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update --fix-missing && apt-get install -y --no-install-recommends \
     libnss3 \
     libxss1 \
     libasound2 \
