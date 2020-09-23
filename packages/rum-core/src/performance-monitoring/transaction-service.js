@@ -276,7 +276,7 @@ class TransactionService {
            * and once performance observer is disconnected
            */
           if (tr.captureTimings) {
-            const { cls, fid, tbt } = metrics
+            const { cls, fid, tbt, longtask } = metrics
             if (tbt.duration > 0) {
               tr.spans.push(createTotalBlockingTimeSpan(tbt))
             }
@@ -292,6 +292,14 @@ class TransactionService {
 
             if (fid > 0) {
               tr.experience.fid = fid
+            }
+
+            if (longtask.count > 0) {
+              tr.experience.longtask = {
+                count: longtask.count,
+                sum: longtask.duration,
+                max: longtask.max
+              }
             }
           }
         }

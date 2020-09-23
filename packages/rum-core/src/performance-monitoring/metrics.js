@@ -40,7 +40,12 @@ export const metrics = {
     start: Infinity,
     duration: 0
   },
-  cls: 0
+  cls: 0,
+  longtask: {
+    count: 0,
+    duration: 0,
+    max: 0
+  }
 }
 
 const LONG_TASK_THRESHOLD = 50
@@ -48,7 +53,7 @@ const LONG_TASK_THRESHOLD = 50
  * Create Spans for the long task entries
  * Spec - https://w3c.github.io/longtasks/
  */
-function createLongTaskSpans(longtasks) {
+export function createLongTaskSpans(longtasks, agg) {
   const spans = []
 
   for (let i = 0; i < longtasks.length; i++) {
@@ -60,6 +65,11 @@ function createLongTaskSpans(longtasks) {
     const { name, startTime, duration, attribution } = longtasks[i]
     const end = startTime + duration
     const span = new Span(`Longtask(${name})`, LONG_TASK, { startTime })
+    agg.count++
+    agg.duration += duration
+    if (duration > agg.max) {
+      agg.max = duration
+    }
 
     /**
      * use attribution data to figure out the culprits of the longtask
@@ -189,7 +199,7 @@ export function calculateCumulativeLayoutShift(clsEntries) {
  */
 export function captureObserverEntries(list, { capturePaint }) {
   const longtaskEntries = list.getEntriesByType(LONG_TASK)
-  const longTaskSpans = createLongTaskSpans(longtaskEntries)
+  const longTaskSpans = createLongTaskSpans(longtaskEntries, metrics.longtask)
 
   const result = {
     spans: longTaskSpans,

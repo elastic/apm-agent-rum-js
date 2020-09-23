@@ -29,7 +29,8 @@ import {
   createTotalBlockingTimeSpan,
   PerfEntryRecorder,
   metrics,
-  calculateCumulativeLayoutShift
+  calculateCumulativeLayoutShift,
+  createLongTaskSpans
 } from '../../src/performance-monitoring/metrics'
 import { LARGEST_CONTENTFUL_PAINT, LONG_TASK } from '../../src/common/constants'
 import {
@@ -52,6 +53,11 @@ describe('Metrics', () => {
       metrics.tbt = { start: Infinity, duration: 0 }
       metrics.cls = 0
       metrics.fid = 0
+      metrics.longtask = {
+        count: 0,
+        duration: 0,
+        max: 0
+      }
     })
 
     it('should not create long tasks spans if entries are not present', () => {
@@ -290,6 +296,16 @@ describe('Metrics', () => {
         }
       ])
       expect(metrics.cls.toFixed(3)).toEqual('0.060')
+    })
+
+    it('should aggregate longtasks in metrics', () => {
+      const agg = { count: 0, duration: 0, max: 0 }
+      createLongTaskSpans(longtaskEntries, agg)
+      expect(agg).toEqual({
+        count: 3,
+        duration: 399.9299999559298,
+        max: 187.19000002602115
+      })
     })
   })
 })
