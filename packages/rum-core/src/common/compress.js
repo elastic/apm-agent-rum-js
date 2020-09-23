@@ -197,7 +197,7 @@ export function compressTransaction(transaction) {
     return spanData
   })
 
-  return {
+  const tr = {
     id: transaction.id,
     tid: transaction.trace_id,
     n: transaction.name,
@@ -210,9 +210,15 @@ export function compressTransaction(transaction) {
     yc: {
       sd: spans.length
     },
-    sm: transaction.sampled,
-    exp: transaction.experience
+    sm: transaction.sampled
   }
+
+  if (transaction.experience) {
+    let { cls, fid, tbt, longtask } = transaction.experience
+    tr.exp = { cls, fid, tbt, lt: longtask }
+  }
+
+  return tr
 }
 
 export function compressError(error) {
