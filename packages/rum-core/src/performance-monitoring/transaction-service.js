@@ -297,7 +297,7 @@ class TransactionService {
             if (longtask.count > 0) {
               tr.experience.longtask = {
                 count: longtask.count,
-                duration: longtask.duration,
+                sum: longtask.duration,
                 max: longtask.max
               }
             }
