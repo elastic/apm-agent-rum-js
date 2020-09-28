@@ -437,7 +437,7 @@ describe('Capture hard navigation', function() {
       timingCopy.loadEventStart = 0
 
       const marks = getPageLoadMarks(timingCopy)
-      expect(marks).toBe(null)
+      expect(marks).toEqual(null)
     })
 
     it('requestStart & responseStart before fetchStart', () => {
@@ -451,10 +451,19 @@ describe('Capture hard navigation', function() {
       timingCopy.responseStart = timingCopy.fetchStart - 500
 
       const marks = getPageLoadMarks(timingCopy)
+      expect(marks).toEqual(null)
+    })
 
-      expect(marks.navigationTiming.responseStart).toBe(undefined)
-      expect(marks.navigationTiming.requestStart).toBe(undefined)
-      expect(marks.agent.timeToFirstByte).toBe(undefined)
+    it('responseStart > responseEnd out of order data', () => {
+      /**
+       * Webkit bug NavigationTiming corrupt data
+       * https://bugs.webkit.org/show_bug.cgi?id=186919
+       */
+      const timingCopy = extend({}, timings)
+      timingCopy.responseStart = timingCopy.responseEnd + 100
+
+      const marks = getPageLoadMarks(timingCopy)
+      expect(marks).toEqual(null)
     })
   })
 })

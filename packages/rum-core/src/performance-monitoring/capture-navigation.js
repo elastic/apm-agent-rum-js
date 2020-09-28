@@ -251,14 +251,19 @@ const COMPRESSED_NAV_TIMING_MARKS = [
 ]
 
 function getNavigationTimingMarks(timing) {
-  const { fetchStart, navigationStart } = timing
+  const { fetchStart, navigationStart, responseStart, responseEnd } = timing
   /**
    * Detect if NavigationTiming data is buggy and discard
    * capturing navigation marks for the transaction
    *
-   * Webkit bug - https://bugs.webkit.org/show_bug.cgi?id=168057
+   * https://bugs.webkit.org/show_bug.cgi?id=168057
+   * https://bugs.webkit.org/show_bug.cgi?id=186919
    */
-  if (navigationStart && fetchStart < navigationStart) {
+  if (
+    (navigationStart && fetchStart < navigationStart) ||
+    (responseStart && responseStart < fetchStart) ||
+    (responseStart && responseEnd && responseEnd < responseStart)
+  ) {
     return null
   }
 
