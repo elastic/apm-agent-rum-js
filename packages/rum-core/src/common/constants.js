@@ -80,6 +80,13 @@ const TRANSACTION_TYPE_ORDER = [
 ]
 
 /**
+ * Transaction & Span outcomes
+ */
+
+const OUTCOME_SUCCESS = 'success'
+const OUTCOME_FAILURE = 'failure'
+
+/**
  * Check only for long tasks that are more than 60ms
  */
 const USER_TIMING_THRESHOLD = 60
@@ -195,5 +202,7 @@ export {
   APM_SERVER,
   TRUNCATED_TYPE,
   FIRST_INPUT,
-  LAYOUT_SHIFT
+  LAYOUT_SHIFT,
+  OUTCOME_SUCCESS,
+  OUTCOME_FAILURE
 }

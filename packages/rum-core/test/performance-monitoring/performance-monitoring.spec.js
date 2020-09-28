@@ -752,6 +752,30 @@ describe('PerformanceMonitoring', function() {
     })
   }
 
+  it('should set outcome on transaction and spans', () => {
+    let transactionService = performanceMonitoring._transactionService
+
+    let task = createXHRTask('GET', '/')
+
+    performanceMonitoring.processAPICalls('schedule', task)
+    let tr = transactionService.getCurrentTransaction()
+
+    let spanTask = createXHRTask('GET', '/span')
+    performanceMonitoring.processAPICalls('schedule', spanTask)
+
+    spanTask.data.target = { status: 200 }
+    performanceMonitoring.processAPICalls('invoke', spanTask)
+
+    expect(tr.type).toBe('http-request')
+    expect(task.data.target.status).toBe(0)
+    performanceMonitoring.processAPICalls('invoke', task)
+    expect(tr.ended).toBe(true)
+    expect(tr.outcome).toBe('failure')
+    expect(tr.spans.length).toBe(2)
+    expect(tr.spans[0].outcome).toBe('success')
+    expect(tr.spans[1].outcome).toBe('failure')
+  })
+
   describe('PerformanceMonitoring Utils', () => {
     it('should group small continuously similar spans up until the last one', function() {
       var tr = new Transaction('transaction', 'transaction', { startTime: 10 })
