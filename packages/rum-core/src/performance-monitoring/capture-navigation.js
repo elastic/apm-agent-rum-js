@@ -260,21 +260,20 @@ function getNavigationTimingMarks(timing) {
    * https://bugs.webkit.org/show_bug.cgi?id=186919
    */
   if (
-    (navigationStart && fetchStart < navigationStart) ||
-    (responseStart && responseStart < fetchStart) ||
-    (responseStart && responseEnd && responseEnd < responseStart)
+    fetchStart >= navigationStart &&
+    responseStart >= fetchStart &&
+    responseEnd >= responseStart
   ) {
-    return null
+    const marks = {}
+    NAVIGATION_TIMING_MARKS.forEach(function(timingKey) {
+      const m = timing[timingKey]
+      if (m && m >= fetchStart) {
+        marks[timingKey] = parseInt(m - fetchStart)
+      }
+    })
+    return marks
   }
-
-  const marks = {}
-  NAVIGATION_TIMING_MARKS.forEach(function(timingKey) {
-    const m = timing[timingKey]
-    if (m && m >= fetchStart) {
-      marks[timingKey] = parseInt(m - fetchStart)
-    }
-  })
-  return marks
+  return null
 }
 
 function getPageLoadMarks(timing) {
