@@ -752,7 +752,7 @@ describe('PerformanceMonitoring', function() {
     })
   }
 
-  it('should set outcome on transaction and spans', () => {
+  it('should set outcome on transaction and spans', done => {
     let transactionService = performanceMonitoring._transactionService
 
     let task = createXHRTask('GET', '/')
@@ -778,6 +778,17 @@ describe('PerformanceMonitoring', function() {
     const payload = performanceMonitoring.createTransactionDataModel(tr)
     expect(payload.outcome).toBe('failure')
     expect(payload.spans[0].outcome).toBe('success')
+    const promise = apmServer.sendEvents([
+      {
+        [TRANSACTIONS]: payload
+      }
+    ])
+    expect(promise).toBeDefined()
+    promise
+      .catch(reason => {
+        fail('Failed sending transactions to the server, reason: ' + reason)
+      })
+      .then(() => done())
   })
 
   describe('PerformanceMonitoring Utils', () => {

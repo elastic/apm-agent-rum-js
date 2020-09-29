@@ -309,7 +309,7 @@ export default class PerformanceMonitoring {
         }
 
         let outcome = OUTCOME_SUCCESS
-        if (status >= 400 || status == 0) {
+        if (status >= 400 || (status == 0 && data.status != 'abort')) {
           outcome = OUTCOME_FAILURE
         }
         span.outcome = outcome
