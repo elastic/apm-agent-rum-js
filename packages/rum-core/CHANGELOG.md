@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.7.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.6.1...@elastic/apm-rum-core@5.7.0) (2020-09-29)
+
+
+### Bug Fixes
+
+* **rum-core:** discard buggy navigation marks for page-load ([#903](https://github.com/elastic/apm-agent-rum-js/issues/903)) ([9ac74c6](https://github.com/elastic/apm-agent-rum-js/commit/9ac74c684c2c3343b6f15778c9f8a7f8f4834d4a))
+
+
+### Features
+
+* **rum-core:** add longtask to experience metrics ([#900](https://github.com/elastic/apm-agent-rum-js/issues/900)) ([e0e0464](https://github.com/elastic/apm-agent-rum-js/commit/e0e04642b688274c7a1b9e1c2f8db048d92343c7))
+
+
+
+
+
 ## [5.6.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.6.0...@elastic/apm-rum-core@5.6.1) (2020-09-17)
 
 
