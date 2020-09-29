@@ -1,6 +1,6 @@
 {
   "name": "@elastic/apm-rum-angular",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Elastic APM Real User Monitoring for Angular applications",
   "homepage": "https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html",
   "license": "MIT",
