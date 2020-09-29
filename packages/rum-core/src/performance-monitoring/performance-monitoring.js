@@ -403,7 +403,8 @@ export default class PerformanceMonitoring {
         sync: span.sync,
         start: parseInt(span._start - transactionStart),
         duration: span.duration(),
-        context: span.context
+        context: span.context,
+        outcome: span.outcome
       }
       return truncateModel(SPAN_MODEL, spanData)
     })
@@ -422,7 +423,8 @@ export default class PerformanceMonitoring {
         started: spans.length
       },
       sampled: transaction.sampled,
-      experience: transaction.experience
+      experience: transaction.experience,
+      outcome: transaction.outcome
     }
     return truncateModel(TRANSACTION_MODEL, transactionData)
   }

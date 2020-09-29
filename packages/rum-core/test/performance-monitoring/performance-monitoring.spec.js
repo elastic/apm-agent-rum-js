@@ -774,6 +774,10 @@ describe('PerformanceMonitoring', function() {
     expect(tr.spans.length).toBe(2)
     expect(tr.spans[0].outcome).toBe('success')
     expect(tr.spans[1].outcome).toBe('failure')
+
+    const payload = performanceMonitoring.createTransactionDataModel(tr)
+    expect(payload.outcome).toBe('failure')
+    expect(payload.spans[0].outcome).toBe('success')
   })
 
   describe('PerformanceMonitoring Utils', () => {

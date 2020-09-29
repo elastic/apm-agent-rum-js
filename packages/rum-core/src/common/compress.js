@@ -173,7 +173,8 @@ export function compressTransaction(transaction) {
       t: span.type,
       s: span.start,
       d: span.duration,
-      c: compressContext(span.context)
+      c: compressContext(span.context),
+      o: span.outcome
     }
     /**
      * Set parentId only for spans that are child of other spans
@@ -210,7 +211,8 @@ export function compressTransaction(transaction) {
     yc: {
       sd: spans.length
     },
-    sm: transaction.sampled
+    sm: transaction.sampled,
+    o: transaction.outcome
   }
 
   if (transaction.experience) {
