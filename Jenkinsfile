@@ -69,8 +69,6 @@ pipeline {
                 env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true)
               }
             }
-            notifyStatus(slackStatus: 'warning', subject: "TEST [${env.REPO}] notifications",
-                          body: "Please (<${env.BUILD_URL}input|approve>) it or reject within 12 hours.")
           }
         }
         /**
