@@ -38,9 +38,8 @@ pipeline {
   parameters {
     booleanParam(name: 'Run_As_Master_Branch', defaultValue: false, description: 'Allow to run any steps on a PR, some steps normally only run on master branch.')
     booleanParam(name: 'saucelab_test', defaultValue: "true", description: "Enable run a Sauce lab test")
-    booleanParam(name: 'parallel_test', defaultValue: "true", description: "Enable run tests in parallel")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
-    booleanParam(name: 'release', defaultValue: false, description: 'Release.')
+    booleanParam(name: 'release', defaultValue: false, description: 'Release. If so, all the other parameters will be ignored when releasing from master.')
   }
   stages {
     stage('Initializing'){
@@ -148,6 +147,13 @@ pipeline {
               branch 'master'
               expression { return params.saucelab_test }
               expression { return env.ONLY_DOCS == "false" }
+              // Releases from master should skip this particular stage.
+              not {
+                allOf {
+                  branch 'master'
+                  expression { return params.release }
+                }
+              }
             }
           }
           steps {
@@ -171,6 +177,13 @@ pipeline {
               changeRequest()
               expression { return params.saucelab_test }
               expression { return env.ONLY_DOCS == "false" }
+              // Releases from master should skip this particular stage.
+              not {
+                allOf {
+                  branch 'master'
+                  expression { return params.release }
+                }
+              }
             }
           }
           steps {
@@ -224,6 +237,13 @@ pipeline {
               }
               expression { return params.bench_ci }
               expression { return env.ONLY_DOCS == "false" }
+              // Releases from master should skip this particular stage.
+              not {
+                allOf {
+                  branch 'master'
+                  expression { return params.release }
+                }
+              }
             }
           }
           steps {
