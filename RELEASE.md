@@ -44,10 +44,8 @@ The release process is also automated in the way any specific commit from the ma
 
 1. Login to apm-ci.elastic.co
 1. Go to the [master](https://apm-ci.elastic.co/job/apm-agent-rum/job/apm-agent-rum-mbp/job/master/) pipeline.
-1. Click on `Build with parameters` with the below checkboxes:
+1. Click on `Build with parameters` with the below checkbox:
   * `release` to be selected.
-  * `bench_ci` to be unselected.
-  * `saucelab_test` to be unselected.
   * other checkboxes should be left as default.
 1. Click on `Build`.
 1. Wait for an email to confirm the release is ready to be approved, it might take roughly 30 minutes.
