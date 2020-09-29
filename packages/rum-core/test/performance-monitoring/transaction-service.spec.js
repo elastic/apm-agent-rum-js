@@ -267,7 +267,6 @@ describe('TransactionService', function() {
       expect(
         tr.spans.filter(({ type }) => type === 'app').length
       ).toBeGreaterThanOrEqual(1)
-      expect(tr.marks.navigationTiming).toBeDefined()
       unMock()
       done()
     })
