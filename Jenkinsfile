@@ -177,6 +177,13 @@ pipeline {
               changeRequest()
               expression { return params.saucelab_test }
               expression { return env.ONLY_DOCS == "false" }
+              // Releases from master should skip this particular stage.
+              not {
+                allOf {
+                  branch 'master'
+                  expression { return params.release }
+                }
+              }
             }
           }
           steps {
