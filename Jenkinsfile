@@ -304,7 +304,7 @@ pipeline {
                       def releaseVersions = sh(label: 'Gather versions from last commit', script: 'git log -1 --format="%b"', returnStdout: true)
                       log(level: 'INFO', text: "Versions: ${releaseVersions}")
                       notifyStatus(slackStatus: 'warning', subject: "[${env.REPO}] Release ready to be pushed",
-                                   body: "Please (<${env.BUILD_URL}input|approve>) it or reject within 12 hours.\n Changes: ${releaseVersions}")
+                                   body: "Please go to (<${env.BUILD_URL}input|here>) to approve or reject within 12 hours.\n Changes: ${releaseVersions}")
                       input(message: 'Should we release a new version?', ok: 'Yes, we should.',
                             parameters: [text(description: 'Look at the versions to be released. They cannot be edited here',
                                               defaultValue: "${releaseVersions}", name: 'versions')])
