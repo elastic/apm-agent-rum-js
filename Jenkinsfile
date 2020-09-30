@@ -323,8 +323,8 @@ pipeline {
                       sh(label: 'Lerna version dry-run', script: 'npx lerna version --no-push --yes', returnStdout: true)
                       def releaseVersions = sh(label: 'Gather versions from last commit', script: 'git log -1 --format="%b"', returnStdout: true)
                       log(level: 'INFO', text: "Versions: ${releaseVersions}")
-                      emailext subject: "[${env.REPO}] Release ready to be pushed", to: "${NOTIFY_TO}",
-                               body: "Please go to ${env.BUILD_URL}input to approve or reject within 12 hours.\n Changes: ${releaseVersions}"
+                      notifyStatus(slackStatus: 'warning', subject: "[${env.REPO}] Release ready to be pushed",
+                                   body: "Please go to (<${env.BUILD_URL}input|here>) to approve or reject within 12 hours.\n Changes: ${releaseVersions}")
                       input(message: 'Should we release a new version?', ok: 'Yes, we should.',
                             parameters: [text(description: 'Look at the versions to be released. They cannot be edited here',
                                               defaultValue: "${releaseVersions}", name: 'versions')])
@@ -346,7 +346,7 @@ pipeline {
               }
               post {
                 success {
-                  emailext subject: "[${env.REPO}] Release published", to: "${env.NOTIFY_TO}", body: "Great news, the release has been done successfully."
+                  notifyStatus(slackStatus: 'good', subject: "[${env.REPO}] Release published", body: "Great news, the release has been done successfully. (<${env.RUN_DISPLAY_URL}|Open>). \n Release URL: (<https://github.com/elastic/apm-agent-rum-js/releases|Here>)")
                 }
                 always {
                   script {
@@ -363,6 +363,11 @@ pipeline {
                   uploadToCDN()
                 }
               }
+            }
+          }
+          post {
+            failure {
+              notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Release failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
             }
           }
         }
@@ -551,4 +556,12 @@ def runTest(){
       goal: 'test'
     )
   }
+}
+
+def notifyStatus(def args = [:]) {
+  slackSend(channel: '#apm-agent-js', color: args.slackStatus, message: "${args.subject}. ${args.body}",
+            tokenCredentialId: 'jenkins-slack-integration-token')
+  // transform slack URL format '(<URL|description>)' to 'URL'.
+  def bodyEmail = args.body.replaceAll('\\(<', '').replaceAll('\\|.*>\\)', '')
+  emailext(subject: args.subject, to: "${env.NOTIFY_TO}", body: bodyEmail)
 }
