@@ -308,9 +308,13 @@ export default class PerformanceMonitoring {
           status = target.status
         }
 
-        let outcome = OUTCOME_SUCCESS
-        if (status >= 400 || (status == 0 && data.status != 'abort')) {
-          outcome = OUTCOME_FAILURE
+        let outcome = null
+        if (data.status != 'abort') {
+          if (status >= 400 || status == 0) {
+            outcome = OUTCOME_FAILURE
+          } else {
+            outcome = OUTCOME_SUCCESS
+          }
         }
         span.outcome = outcome
         const tr = transactionService.getCurrentTransaction()
