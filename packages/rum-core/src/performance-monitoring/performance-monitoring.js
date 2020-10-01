@@ -308,7 +308,7 @@ export default class PerformanceMonitoring {
           status = target.status
         }
 
-        let outcome = null
+        let outcome
         if (data.status != 'abort') {
           if (status >= 400 || status == 0) {
             outcome = OUTCOME_FAILURE
