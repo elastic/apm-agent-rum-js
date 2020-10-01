@@ -43,7 +43,9 @@ import {
   XMLHTTPREQUEST,
   EVENT_TARGET,
   HTTP_REQUEST_TYPE,
-  USER_INTERACTION
+  USER_INTERACTION,
+  OUTCOME_FAILURE,
+  OUTCOME_SUCCESS
 } from '../common/constants'
 import {
   truncateModel,
@@ -298,7 +300,28 @@ export default class PerformanceMonitoring {
     } else if (event === INVOKE) {
       const data = task.data
       if (data && data.span) {
-        transactionService.endSpan(data.span, data)
+        const { span, response, target } = data
+        let status
+        if (response) {
+          status = response.status
+        } else {
+          status = target.status
+        }
+
+        let outcome
+        if (data.status != 'abort') {
+          if (status >= 400 || status == 0) {
+            outcome = OUTCOME_FAILURE
+          } else {
+            outcome = OUTCOME_SUCCESS
+          }
+        }
+        span.outcome = outcome
+        const tr = transactionService.getCurrentTransaction()
+        if (tr && tr.type === HTTP_REQUEST_TYPE) {
+          tr.outcome = outcome
+        }
+        transactionService.endSpan(span, data)
       }
     }
   }
@@ -384,7 +407,8 @@ export default class PerformanceMonitoring {
         sync: span.sync,
         start: parseInt(span._start - transactionStart),
         duration: span.duration(),
-        context: span.context
+        context: span.context,
+        outcome: span.outcome
       }
       return truncateModel(SPAN_MODEL, spanData)
     })
@@ -403,7 +427,8 @@ export default class PerformanceMonitoring {
         started: spans.length
       },
       sampled: transaction.sampled,
-      experience: transaction.experience
+      experience: transaction.experience,
+      outcome: transaction.outcome
     }
     return truncateModel(TRANSACTION_MODEL, transactionData)
   }
