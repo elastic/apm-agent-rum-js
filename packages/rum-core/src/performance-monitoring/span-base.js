@@ -53,6 +53,7 @@ class SpanBase {
     this._start = getTime(options.startTime)
     this._end = undefined
     this.ended = false
+    this.outcome = undefined
     this.onEnd = options.onEnd
   }
 
