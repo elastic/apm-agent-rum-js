@@ -79,14 +79,10 @@ describe('Using Switch component of react router', function() {
       'expected topic component to be rendered'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 2)
+    const { sendEvents } = waitForApmServerCalls(0, 3)
     const { transactions } = sendEvents
 
-    const pageLoadTransaction = transactions[0]
-    expect(pageLoadTransaction.type).toBe('page-load')
-    expect(pageLoadTransaction.name).toBe('/notfound')
-
-    const routeTransaction = transactions[1]
+    const routeTransaction = transactions[2]
     expect(routeTransaction.name).toBe('/topics')
     expect(routeTransaction.type).toBe('route-change')
 
