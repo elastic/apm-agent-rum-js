@@ -52,7 +52,7 @@ resources on the page, however, it will still block browsers `onload` event.
     j.src = 'https://<your-cdn-host>.com/path/to/elastic-apm-rum.umd.min-<version>.js'
     j.onload = function() {elasticApm.init(c)}
     t.parentNode.insertBefore(j, t)
-  })(document, 'script', {serviceName: '<instrumeted-app>', serverUrl: '<apm-server-url>'})
+  })(document, 'script', {serviceName: '<instrumented-app>', serverUrl: '<apm-server-url>'})
 </script>
 ----
 
@@ -62,13 +62,13 @@ distributed tracing will not work for requests that occur before the agent is in
 
 NOTE: Please download the latest version of RUM agent from https://github.com/elastic/apm-agent-rum-js/releases/latest[GitHub] or
 https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js[UNPKG]
-and host the file in your Server/CDN before deploying to production.Remember to
+and host the file in your Server/CDN before deploying to production. Remember to
 use a proper versioning scheme and set a far future `max-age` and `immutable`
 in the https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control[cache-control]
 header, as the file never changes.
 
 The debug messages are removed by default from the minified bundles. It is strongly recommended
-to use the unminfined version for debugging purposes.
+to use the unminified version for debugging purposes.
 
 [float]
 [[using-bundlers]]
@@ -159,7 +159,7 @@ By default, APM Server allows all origins.
 [float]
 ==== How CORS works
 
-When the RUM agent makes it's initial `POST` request, the browser will check to see if it is a cross-origin request.
+When the RUM agent makes its initial `POST` request, the browser will check to see if it is a cross-origin request.
 If it is, the browser automatically makes a preflight `OPTIONS` request to the server to ensure the original `POST` request is allowed.
 If this `OPTIONS` check passes, then the original `POST` request is allowed.
 This request will fail if RUM support is not configured in the APM Server.
