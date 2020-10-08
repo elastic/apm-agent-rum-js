@@ -29,34 +29,10 @@ staleLabel: Stalled
 
 # Comment to post when marking as stale. Set to `false` to disable
 markComment: >
-  This PR/Issue has been automatically marked as stale because it has not had
-  recent activity. It will be closed if no further activity occurs. Thank you
-  for your contributions.
-
-# Comment to post when removing the stale label.
-# unmarkComment: >
-#   Your comment here.
-
-# Comment to post when closing a stale Issue or Pull Request.
-# closeComment: >
-#   Your comment here.
-
-# Limit the number of actions per hour, from 1-30. Default is 30
-limitPerRun: 30
-
-# Limit to only `issues` or `pulls`
-# only: issues
-
-# Optionally, specify configuration settings that are specific to just 'issues' or 'pulls':
-pulls:
-  daysUntilStale: 30
-  daysUntilClose: 30
-  markComment: >
     Hi!
 
-    We just realized that we haven't looked into this PR/Issue in a while. We're
+    We just realized that we haven't looked into this issue in a while. We're
     sorry!
-
 
     We're labeling this issue as `Stale` to make it hit our filters and 
     make sure we get back to it in as soon as possible. In the meantime, it'd
@@ -64,20 +40,33 @@ pulls:
     relevance. A simple comment with a nice emoji will be enough `:+1`.
 
     Thank you for your contribution!
- 
-  closeComment: >
+
+# Comment to post when removing the stale label.
+# unmarkComment: >
+#   Your comment here.
+
+# Comment to post when closing a stale Issue or Pull Request.
+closeComment: >
     Hi!
 
-    This PR/Issue has been stale for a while and we're going to close it as part of
+    This issue has been stale for a while and we're going to close it as part of
     our cleanup procedure.
 
     We appreciate your contribution and would like to apologize if we have not
     been able to review it, due to the current heavy load of the team.
 
-    Feel free to re-open this PR/Issue if you think it should stay open and is worth rebasing.
+    Feel free to re-open this issue if you think it should stay open.
 
     Thank you for your contribution!
 
+# Limit the number of actions per hour, from 1-30. Default is 30
+limitPerRun: 30
+
+# Limit to only `issues` or `pulls`
+only: issues
+
+# Optionally, specify configuration settings that are specific to just 'issues' or 'pulls':
+# pulls:
 
 # issues:
 #   exemptLabels:
