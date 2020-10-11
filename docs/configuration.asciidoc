@@ -134,7 +134,7 @@ NOTE: This feature requires APM Server >= 7.8. Setting this flag to number > 2 w
 APM server version would break the RUM payload from reaching the server.
 
 [float]
-[[breakdown-metrics]]
+[[breakdown-metrics-docs]]
 === `breakdownMetrics`
 
 * *Type:* Boolean
