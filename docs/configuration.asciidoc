@@ -134,7 +134,7 @@ NOTE: This feature requires APM Server >= 7.8. Setting this flag to number > 2 w
 APM server version would break the RUM payload from reaching the server.
 
 [float]
-[[breakdown-metrics-docs]]
+[[breakdown-metrics]]
 === `breakdownMetrics`
 
 * *Type:* Boolean
@@ -146,7 +146,7 @@ NOTE: This feature requires APM Server and Kibana >= 7.4. Setting this flag to `
 would break the RUM payload from reaching the server.
 
 NOTE: Breakdown distribution for the transaction varies depending on the type of the transaction.
-To understand the different types, see <<breakdown-metrics-docs>>
+To understand the different types, see <<breakdown-metrics.asciidoc#breakdown-metrics>>
 
 [float]
 [[flush-interval]]
