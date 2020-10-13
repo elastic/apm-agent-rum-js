@@ -181,7 +181,9 @@ type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error'
 type TransactionEvents = 'transaction:start' | 'transaction:end'
 type InstrumentationTypes =
   | 'page-load'
+  | 'eventtarget'
   | 'error'
   | 'history'
   | 'fetch'
   | 'xmlhttprequest'
+  
