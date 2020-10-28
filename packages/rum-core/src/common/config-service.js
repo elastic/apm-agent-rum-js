@@ -23,7 +23,7 @@
  *
  */
 
-import { getCurrentScript, setLabel, merge, extend } from './utils'
+import { getCurrentScript, setLabel, merge, extend, isUndefined } from './utils'
 import EventHandler from './event-handler'
 import { CONFIG_CHANGE, LOCAL_CONFIG_KEY } from './constants'
 
@@ -165,14 +165,23 @@ class Config {
   }
 
   setConfig(properties = {}) {
+    let { transactionSampleRate, serverUrl } = properties
     /**
      * Normalize config
      *
      * Remove all trailing slash for serverUrl since SERVER_URL_PREFIX
      * already includes a forward slash for the path
      */
-    if (properties.serverUrl) {
-      properties.serverUrl = properties.serverUrl.replace(/\/+$/, '')
+    if (serverUrl) {
+      properties.serverUrl = serverUrl.replace(/\/+$/, '')
+    }
+
+    if (!isUndefined(transactionSampleRate)) {
+      if (transactionSampleRate < 0.0001 && transactionSampleRate > 0) {
+        transactionSampleRate = 0.0001
+      }
+      properties.transactionSampleRate =
+        Math.round(transactionSampleRate * 10000) / 10000
     }
 
     merge(this.config, properties)

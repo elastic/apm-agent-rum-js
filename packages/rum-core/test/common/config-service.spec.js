@@ -259,4 +259,13 @@ describe('ConfigService', function() {
     expect(config).toEqual({ key: 'value' })
     sessionStorage.removeItem(LOCAL_CONFIG_KEY)
   })
+
+  it('should consider transactionSampleRate precision', () => {
+    configService.setConfig({ transactionSampleRate: 0.55554 })
+    expect(configService.config.transactionSampleRate).toBe(0.5555)
+    configService.setConfig({ transactionSampleRate: 0.55556 })
+    expect(configService.config.transactionSampleRate).toBe(0.5556)
+    configService.setConfig({ transactionSampleRate: 0.00001 })
+    expect(configService.config.transactionSampleRate).toBe(0.0001)
+  })
 })
