@@ -131,30 +131,6 @@ describe('ApmServer', function() {
     clock.uninstall()
   })
 
-  it('should capture errors logs from apm-server', done => {
-    apmServer.init()
-    spyOn(loggingService, 'warn').and.callFake((failedMsg, error) => {
-      expect(failedMsg).toEqual('Failed sending events!')
-      /**
-       * APM server error varies by stack, So we check for
-       * explicit characters instead of whole message
-       */
-      expect(error.message).toContain(
-        ': I[#] S[#] doesn\'t validate with "transaction#'
-      )
-      expect(error.message).toContain('missing properties: "trace_id"')
-      done()
-    })
-
-    apmServer.addTransaction({
-      id: '21312',
-      span_count: 0,
-      duration: 100,
-      type: 'app'
-    })
-    apmServer.queue.flush()
-  })
-
   it('should log parse error when response is invalid', done => {
     spyOn(loggingService, 'debug').and.callFake(message => {
       expect(message).toEqual('Error parsing response from APM server')
@@ -549,5 +525,62 @@ describe('ApmServer', function() {
     },
     testConfig.stackVersion &&
       compareVersions(testConfig.stackVersion, '7.8.0') >= 0
+  )
+
+  describeIf(
+    '7.10-',
+    () => {
+      it('should capture errors logs from apm-server', done => {
+        apmServer.init()
+        spyOn(loggingService, 'warn').and.callFake((failedMsg, error) => {
+          expect(failedMsg).toEqual('Failed sending events!')
+          /**
+           * APM server error varies by stack, So we check for
+           * explicit characters instead of whole message
+           */
+          expect(error.message).toContain(
+            ': I[#] S[#] doesn\'t validate with "transaction#'
+          )
+          expect(error.message).toContain('missing properties: "trace_id"')
+          done()
+        })
+
+        apmServer.addTransaction({
+          id: '21312',
+          span_count: 0,
+          duration: 100,
+          type: 'app'
+        })
+        apmServer.queue.flush()
+      })
+    },
+    testConfig.stackVersion &&
+      compareVersions(testConfig.stackVersion, '7.10.0') < 0
+  )
+
+  describeIf(
+    '7.10+',
+    () => {
+      it('should capture errors logs from apm-server', done => {
+        apmServer.init()
+        spyOn(loggingService, 'warn').and.callFake((failedMsg, error) => {
+          expect(failedMsg).toEqual('Failed sending events!')
+          expect(error.message).toContain(
+            `validation error: transaction: 'trace_id' required`
+          )
+          done()
+        })
+
+        apmServer.addTransaction({
+          id: '21312',
+          span_count: { started: 0 },
+          duration: 100,
+          type: 'app'
+        })
+        apmServer.queue.flush()
+      })
+    },
+    testConfig.stackVersion &&
+      compareVersions(testConfig.stackVersion, '7.10.0') >= 0
   )
 })
