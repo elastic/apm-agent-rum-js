@@ -29,6 +29,17 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.6.2]]
+==== 5.6.2 (2020-11-06)
+
+[float]
+===== Features
+* Add transaction sampling rate precision which ensures `transaction_sample_rate` configuration option 
+has a maximum precision of 4 decimal places: {issue}927[#927]
+* Add `outcome` field to applicable transactions and spans that is used by the APM UI for displaying
+the error rate chart: {issue}904[#904]
+
+
 [[release-notes-5.6.1]]
 ==== 5.6.1 (2020-09-29)
 
