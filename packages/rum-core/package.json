@@ -1,6 +1,6 @@
 {
   "name": "@elastic/apm-rum-core",
-  "version": "5.7.0",
+  "version": "5.8.0",
   "description": "Elastic apm core",
   "license": "MIT",
   "main": "dist/lib/index.js",
