@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.8.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.7.0...@elastic/apm-rum-core@5.8.0) (2020-11-06)
+
+
+### Features
+
+* **rum-core:** transactionSampleRate precision ([#927](https://github.com/elastic/apm-agent-rum-js/issues/927)) ([bd3eb9b](https://github.com/elastic/apm-agent-rum-js/commit/bd3eb9be32f494a50170bde5a14206ef8eb1253a)), closes [#888](https://github.com/elastic/apm-agent-rum-js/issues/888)
+* add span and transaction outcome ([#904](https://github.com/elastic/apm-agent-rum-js/issues/904)) ([4de1490](https://github.com/elastic/apm-agent-rum-js/commit/4de1490c6a08260423d42176d999819408d158e5))
+
+
+
+
+
 # [5.7.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.6.1...@elastic/apm-rum-core@5.7.0) (2020-09-29)
 
 

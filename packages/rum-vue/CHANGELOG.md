@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.9](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.1.8...@elastic/apm-rum-vue@1.1.9) (2020-11-06)
+
+**Note:** Version bump only for package @elastic/apm-rum-vue
+
+
+
+
+
 ## [1.1.8](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.1.7...@elastic/apm-rum-vue@1.1.8) (2020-09-29)
 
 **Note:** Version bump only for package @elastic/apm-rum-vue
