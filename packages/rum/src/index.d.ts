@@ -186,4 +186,3 @@ type InstrumentationTypes =
   | 'history'
   | 'fetch'
   | 'xmlhttprequest'
-  
