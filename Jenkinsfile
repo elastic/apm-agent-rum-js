@@ -458,10 +458,10 @@ def runScript(Map args = [:]){
           sleep randomNumber(min: 5, max: 10)
           if(env.MODE == 'saucelabs'){
             withSaucelabsEnv(){
-              sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
+              sh(label: "Run tests: Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
             }
           } else {
-            sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
+            sh(label: "Run tests: Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
           }
         }
       } catch(e) {
