@@ -138,7 +138,7 @@ pipeline {
         stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
           agent { label 'linux && immutable' }
           environment {
-            SAUCELABS_SECRET=  "${isPR() ? env.SAUCELABS_SECRET : env.SAUCELABS_SECRET_CORE}"
+            SAUCELABS_SECRET =  "${isPR() ? env.SAUCELABS_SECRET : env.SAUCELABS_SECRET_CORE}"
             STACK_VERSION = "8.0.0-SNAPSHOT"
             MODE = "saucelabs"
           }
