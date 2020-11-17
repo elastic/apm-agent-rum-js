@@ -1,10 +1,12 @@
 # Little bit customized version of microsoft/playwright:bionic image
-
+ARG NODEJS_VERSION
 FROM ubuntu:bionic
+# this second declaration is needed because ARG before FROM works differently. See https://docs.docker.com/compose/compose-file/#args
+ARG NODEJS_VERSION
 
 # 1. Install node12
 RUN apt-get -qq update && apt-get -qq install -y curl && \
-    curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_${NODEJS_VERSION}.x | bash - && \
     apt-get -qq install -y nodejs
 
 # 2. Install git (used to tag commit in benchmark runner)
