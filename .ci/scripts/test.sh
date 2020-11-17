@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -xueo pipefail
 
-pip install docker-compose>=1.25.4
+pip3 install docker-compose>=1.25.4
 
 USER_ID="$(id -u):$(id -g)" \
 docker-compose \
