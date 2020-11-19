@@ -1,5 +1,5 @@
 # Little bit customized version of microsoft/playwright:bionic image
-ARG NODEJS_VERSION
+ARG NODEJS_VERSION=12
 FROM ubuntu:bionic
 # this second declaration is needed because ARG before FROM works differently. See https://docs.docker.com/compose/compose-file/#args
 ARG NODEJS_VERSION
