@@ -1,4 +1,7 @@
 #Dockerfile for docker.elastic.co/observability-ci/node-puppeteer:12
+# When changing Node version, please build the Docker image for RUM here:
+#   https://apm-ci.elastic.co/job/apm-shared/job/apm-docker-images-pipeline/build?delay=0sec
+# Remember checking the 'rum' parameter
 ARG NODEJS_VERSION=12
 FROM node:${NODEJS_VERSION}
 
