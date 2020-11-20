@@ -125,10 +125,6 @@ services:
           - wait-for-apm-server
 
   node-puppeteer:
-    build:
-      context: ../.ci/docker/node-puppeteer
-      args:
-        - NODEJS_VERSION=12
     container_name: node-puppeteer
     image: docker.elastic.co/observability-ci/node-puppeteer:12
     environment:
@@ -160,10 +156,6 @@ services:
     user: ${USER_ID}
 
   node-benchmark:
-    build:
-      context: ../.ci/docker/node-playwright
-      args:
-        - NODEJS_VERSION=12
     container_name: node-playwright
     image: docker.elastic.co/observability-ci/node-playwright:12
     environment:
