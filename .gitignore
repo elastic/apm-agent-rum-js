@@ -1,4 +1,6 @@
 node_modules
+.config
+.npm
 .DS_Store
 
 *.e2e-bundle.*
