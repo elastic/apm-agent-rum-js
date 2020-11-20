@@ -423,7 +423,7 @@ def runScript(Map args = [:]){
       "GOAL=${goal}"]) {
       retry(2) {
         sleep randomNumber(min: 5, max: 10)
-        sh(label: 'Pull and build docker infra', script: '.ci/scripts/pull_and_build.sh')
+        sh(label: 'Pull and build docker infra', script: '.ci/scripts/pull.sh')
       }
       try {
         // Another retry in case there are any environmental issues
