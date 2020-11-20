@@ -1,0 +1,5 @@
+NODEJS_VERSION:
+  - "12"
+TEST_LIBRARIES:
+  - playwright
+  - puppeteer

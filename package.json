@@ -18,6 +18,7 @@
     "lint:js": "eslint . --ext .js,.jsx,.ts",
     "lint:license": "node scripts/license-checker",
     "test": "npm run build && lerna run test --scope=$SCOPE --no-prefix  --concurrency=1",
+    "test:unit": "lerna run test:unit --scope=$SCOPE --no-prefix --concurrency=1",
     "build": "lerna run build",
     "bundlesize": "lerna run build:module && lerna run bundlesize",
     "serve": "node ./dev-utils/run-script.js startTestServers",

@@ -138,43 +138,16 @@ pipeline {
         stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
           agent { label 'linux && immutable' }
           environment {
-            SAUCELABS_SECRET = "${env.SAUCELABS_SECRET_CORE}"
+            SAUCELABS_SECRET = "${isPR() ? env.SAUCELABS_SECRET : env.SAUCELABS_SECRET_CORE}"
             STACK_VERSION = "8.0.0-SNAPSHOT"
             MODE = "saucelabs"
           }
           when {
             allOf {
-              branch 'master'
-              expression { return params.saucelab_test }
-              expression { return env.ONLY_DOCS == "false" }
-              // Releases from master should skip this particular stage.
-              not {
-                allOf {
-                  branch 'master'
-                  expression { return params.release }
-                }
+              anyOf {
+                branch 'master'
+                changeRequest()
               }
-            }
-          }
-          steps {
-            runAllScopes()
-          }
-          post {
-            cleanup {
-              wrappingUp()
-            }
-          }
-        }
-        stage('Stack 8.0.0-SNAPSHOT SauceLabs PR') {
-          agent { label 'linux && immutable' }
-          environment {
-            SAUCELABS_SECRET="${env.SAUCELABS_SECRET}"
-            STACK_VERSION="8.0.0-SNAPSHOT"
-            MODE = "saucelabs"
-          }
-          when {
-            allOf {
-              changeRequest()
               expression { return params.saucelab_test }
               expression { return env.ONLY_DOCS == "false" }
               // Releases from master should skip this particular stage.
@@ -458,10 +431,10 @@ def runScript(Map args = [:]){
           sleep randomNumber(min: 5, max: 10)
           if(env.MODE == 'saucelabs'){
             withSaucelabsEnv(){
-              sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
+              sh(label: "Run tests: Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
             }
           } else {
-            sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
+            sh(label: "Run tests: Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
           }
         }
       } catch(e) {
