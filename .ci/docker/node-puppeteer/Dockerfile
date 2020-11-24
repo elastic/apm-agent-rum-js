@@ -2,7 +2,7 @@
 # When changing Node version, please build the Docker image for RUM here:
 #   https://apm-ci.elastic.co/job/apm-shared/job/apm-docker-images-pipeline/build?delay=0sec
 # Remember checking the 'rum' parameter
-ARG NODEJS_VERSION=12
+ARG NODEJS_VERSION
 FROM node:${NODEJS_VERSION}
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)

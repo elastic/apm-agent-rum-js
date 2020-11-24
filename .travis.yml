@@ -60,5 +60,5 @@ addons:
       - libxml2-utils
 
 script:
-  - docker-compose -f ./dev-utils/docker-compose.yml up -d wait-for-apm-server
+  - NODEJS_VERSION=$(cat ./dev-utils/.node-version) docker-compose -f ./dev-utils/docker-compose.yml up -d wait-for-apm-server
   - npm run test
