@@ -10,7 +10,7 @@ if [ -x "$(command -v docker)" ]; then
   for flavour in ${FLAVOURS}
   do
   local di="docker.elastic.co/observability-ci/node-${flavour}:${NODEJS_VERSION}"
-  docker build --force-rm -t ${di} ./.ci/docker/node-${flavour}
   (retry 2 docker pull "${di}") || echo "Error pulling ${di} Docker image, we continue"
+  docker build --build-arg NODEJS_VERSION=${NODEJS_VERSION} -t ${di} ./.ci/docker/node-${flavour}
   done
 fi
