@@ -52,8 +52,7 @@
           "rum-angular",
           "rum-core",
           "rum-react",
-          "rum-vue",
-          "testing"
+          "rum-vue"
         ]
       ]
     }
