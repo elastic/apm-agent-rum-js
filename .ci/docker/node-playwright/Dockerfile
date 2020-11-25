@@ -1,5 +1,9 @@
+#Dockerfile for docker.elastic.co/observability-ci/node-playwright:12
+# When changing Node version, please build the Docker image for RUM here:
+#   https://apm-ci.elastic.co/job/apm-shared/job/apm-docker-images-pipeline/build?delay=0sec
+# Remember checking the 'rum' parameter
 # Little bit customized version of microsoft/playwright:bionic image
-ARG NODEJS_VERSION=12
+ARG NODEJS_VERSION
 FROM ubuntu:bionic
 # this second declaration is needed because ARG before FROM works differently. See https://docs.docker.com/compose/compose-file/#args
 ARG NODEJS_VERSION

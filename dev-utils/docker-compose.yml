@@ -128,9 +128,9 @@ services:
     build:
       context: ../.ci/docker/node-puppeteer
       args:
-        - NODEJS_VERSION=12
+        - NODEJS_VERSION=${NODEJS_VERSION}
     container_name: node-puppeteer
-    image: docker.elastic.co/observability-ci/node-puppeteer:12
+    image: docker.elastic.co/observability-ci/node-puppeteer:${NODEJS_VERSION}
     environment:
       - HOME=/app
       - SCOPE=${SCOPE}
@@ -163,9 +163,9 @@ services:
     build:
       context: ../.ci/docker/node-playwright
       args:
-        - NODEJS_VERSION=12
+        - NODEJS_VERSION=${NODEJS_VERSION}
     container_name: node-playwright
-    image: docker.elastic.co/observability-ci/node-playwright:12
+    image: docker.elastic.co/observability-ci/node-playwright:${NODEJS_VERSION}
     environment:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}
