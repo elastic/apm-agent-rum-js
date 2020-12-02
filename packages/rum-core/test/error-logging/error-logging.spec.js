@@ -401,6 +401,13 @@ describe('ErrorLogging', function() {
       'Unhandled promise rejection: <function>'
     )
 
+    errorLogging.logPromiseEvent({
+      reason: null
+    })
+    expect(getEvents()[9][ERRORS].exception.message).toBe(
+      'Unhandled promise rejection: <no reason specified>'
+    )
+
     const events = getEvents()
 
     clearQueue()

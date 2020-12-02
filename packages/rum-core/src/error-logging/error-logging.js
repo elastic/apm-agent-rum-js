@@ -172,7 +172,10 @@ class ErrorLogging {
 
   logPromiseEvent(promiseRejectionEvent) {
     const prefix = 'Unhandled promise rejection: '
-    let { reason = '<no reason specified>' } = promiseRejectionEvent
+    let { reason } = promiseRejectionEvent
+    if (reason == null) {
+      reason = '<no reason specified>'
+    }
     let errorEvent
 
     if (typeof reason.message === 'string') {
