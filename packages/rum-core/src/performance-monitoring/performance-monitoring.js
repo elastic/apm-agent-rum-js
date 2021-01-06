@@ -186,14 +186,21 @@ export default class PerformanceMonitoring {
         task.eventType === 'click'
       ) {
         const target = task.target
-        const name = target.getAttribute('name')
+        const name = target.getAttribute ? target.getAttribute('name') : ''
 
         let additionalInfo = ''
         if (name) {
           additionalInfo = `["${name}"]`
         }
 
-        const tagName = target.tagName.toLowerCase()
+        let tagName = ''
+        if (target === window) {
+          tagName = 'window'
+        } else if (target === document) {
+          tagName = 'document'
+        } else if (target.tagName) {
+          tagName = target.tagName.toLowerCase()
+        }
 
         /**
          * We reduce the reusability threshold to make sure

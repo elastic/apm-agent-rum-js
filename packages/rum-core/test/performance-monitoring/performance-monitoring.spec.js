@@ -719,6 +719,46 @@ describe('PerformanceMonitoring', function() {
       expect(newTr.name).toBe('Click - button["purchase"]')
     })
 
+    it('should create click transactions on window', () => {
+      let transactionService = performanceMonitoring._transactionService
+      let etsub = performanceMonitoring.getEventTargetSub()
+      patchEventHandler.observe(EVENT_TARGET, (event, task) => {
+        etsub(event, task)
+      })
+
+      const listener = e => {
+        expect(e.type).toBe('click')
+      }
+
+      window.addEventListener('click', listener)
+      document.body.click()
+
+      let tr = transactionService.getCurrentTransaction()
+      expect(tr).toBeDefined()
+      expect(tr.name).toBe('Click - html')
+      expect(tr.type).toBe('user-interaction')
+    })
+
+    it('should create click transactions on document', () => {
+      let transactionService = performanceMonitoring._transactionService
+      let etsub = performanceMonitoring.getEventTargetSub()
+      patchEventHandler.observe(EVENT_TARGET, (event, task) => {
+        etsub(event, task)
+      })
+
+      const listener = e => {
+        expect(e.type).toBe('click')
+      }
+
+      document.addEventListener('click', listener)
+      document.body.click()
+
+      let tr = transactionService.getCurrentTransaction()
+      expect(tr).toBeDefined()
+      expect(tr.name).toBe('Click - document')
+      expect(tr.type).toBe('user-interaction')
+    })
+
     it('should respect the transaction type priority order', function() {
       const historySubFn = performanceMonitoring.getHistorySub()
       const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)

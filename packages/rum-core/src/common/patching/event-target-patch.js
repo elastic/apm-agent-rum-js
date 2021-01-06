@@ -42,7 +42,7 @@ for (let i = 0; i < eventTypes.length; i++) {
 
 function shouldInstrumentEvent(target, eventType, listenerFn) {
   return (
-    target instanceof Element &&
+    (target instanceof Element || target === window || target === document) &&
     eventTypes.indexOf(eventType) >= 0 &&
     typeof listenerFn === 'function'
   )
