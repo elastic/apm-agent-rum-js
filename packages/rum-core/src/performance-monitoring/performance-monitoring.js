@@ -28,7 +28,9 @@ import {
   isDtHeaderValid,
   parseDtHeaderValue,
   getDtHeaderValue,
-  stripQueryStringFromUrl
+  getTSHeaderValue,
+  stripQueryStringFromUrl,
+  setRequestHeader
 } from '../common/utils'
 import { Url } from '../common/url'
 import { patchEventHandler } from '../common/patching'
@@ -277,16 +279,26 @@ export default class PerformanceMonitoring {
       const isDtEnabled = configService.get('distributedTracing')
       const dtOrigins = configService.get('distributedTracingOrigins')
       const currentUrl = new Url(window.location.href)
-      const isSameOrigin =
-        checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
-        checkSameOrigin(requestUrl.origin, dtOrigins)
       const target = data.target
-      if (isDtEnabled && isSameOrigin && target) {
-        this.injectDtHeader(span, target)
-      } else if (__DEV__) {
-        this._logginService.debug(
-          `Could not inject distributed tracing header to the request origin ('${requestUrl.origin}') from the current origin ('${currentUrl.origin}')`
-        )
+      /**
+       * Propagate distributed tracing information to the backend systems
+       * https://www.w3.org/TR/trace-context/
+       */
+      if (isDtEnabled && target) {
+        const isSameOrigin =
+          checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
+          checkSameOrigin(requestUrl.origin, dtOrigins)
+        if (isSameOrigin) {
+          this.injectDtHeader(span, target)
+        } else if (__DEV__) {
+          this._logginService.debug(
+            `Could not inject distributed tracing header to the request origin ('${requestUrl.origin}') from the current origin ('${currentUrl.origin}')`
+          )
+        }
+        const propagateTracestate = configService.get('propagateTracestate')
+        if (propagateTracestate) {
+          this.injectTSHeader(span, target)
+        }
       }
       /**
        * set sync flag only for synchronous API calls, setting the flag to
@@ -327,21 +339,24 @@ export default class PerformanceMonitoring {
   }
 
   injectDtHeader(span, target) {
-    var configService = this._configService
-    var headerName = configService.get('distributedTracingHeaderName')
-    var headerValue = getDtHeaderValue(span)
-    var isHeaderValid = isDtHeaderValid(headerValue)
-    if (headerName && headerValue && isHeaderValid) {
-      if (typeof target.setRequestHeader === 'function') {
-        target.setRequestHeader(headerName, headerValue)
-      } else if (
-        target.headers &&
-        typeof target.headers.append === 'function'
-      ) {
-        target.headers.append(headerName, headerValue)
-      } else {
-        target[headerName] = headerValue
-      }
+    const headerName = this._configService.get('distributedTracingHeaderName')
+    const headerValue = getDtHeaderValue(span)
+    const isHeaderValid = isDtHeaderValid(headerValue)
+    if (isHeaderValid && headerValue && headerName) {
+      setRequestHeader(target, headerName, headerValue)
+    }
+  }
+
+  injectTSHeader(span, target) {
+    /**
+     * As the root trace is started from the browser for API calls, we
+     * are not doing any validation and only propagating the header
+     * to backend systems
+     * https://www.w3.org/TR/trace-context/#tracestate-header
+     */
+    const headerValue = getTSHeaderValue(span)
+    if (headerValue) {
+      setRequestHeader(target, 'tracestate', headerValue)
     }
   }
 
@@ -427,6 +442,7 @@ export default class PerformanceMonitoring {
         started: spans.length
       },
       sampled: transaction.sampled,
+      sample_rate: transaction.sampleRate,
       experience: transaction.experience,
       outcome: transaction.outcome
     }

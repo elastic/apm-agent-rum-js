@@ -39,17 +39,17 @@ function startBackendAgentServer(port = 8003) {
     if (req.method === 'OPTIONS') {
       res.header(
         'Access-Control-Allow-Headers',
-        'Origin, traceparent, Content-Type, Accept'
+        'Origin, traceparent, tracestate, Content-Type, Accept'
       )
     }
     next()
   })
 
   function dTRespond(req, res) {
-    const header = req.headers['traceparent']
+    const dtHeader = req.headers['traceparent']
     let payload = { noHeader: true }
-    if (header) {
-      const splited = header.split('-')
+    if (dtHeader) {
+      const splited = dtHeader.split('-')
       payload = {
         version: splited[0],
         traceId: splited[1],

@@ -336,7 +336,7 @@ describe('ApmServer', function() {
     const expected = [
       '{"m":{"se":{"n":"test","a":{"n":"rum-js","ve":"N/A"},"la":{"n":"javascript"}}}}',
       '{"e":{"id":"error-id-0","cl":"(inline script)","ex":{"mg":"error #0","st":[]},"c":null}}',
-      '{"x":{"id":"transaction-id-0","tid":"trace-id-0","n":"transaction #0","t":"transaction","d":990,"c":null,"m":null,"me":[{"sa":{"xdc":{"v":1},"xds":{"v":990},"xbc":{"v":1}}},{"y":{"t":"app"},"sa":{"ysc":{"v":1},"yss":{"v":980}}},{"y":{"t":"type"},"sa":{"ysc":{"v":1},"yss":{"v":10}}}],"y":[{"id":"span-id-0-1","n":"name","t":"type","s":10,"d":10,"c":null,"su":"subtype"}],"yc":{"sd":1},"sm":true}}'
+      '{"x":{"id":"transaction-id-0","tid":"trace-id-0","n":"transaction #0","t":"transaction","d":990,"c":null,"m":null,"me":[{"sa":{"xdc":{"v":1},"xds":{"v":990},"xbc":{"v":1}}},{"y":{"t":"app"},"sa":{"ysc":{"v":1},"yss":{"v":980}}},{"y":{"t":"type"},"sa":{"ysc":{"v":1},"yss":{"v":10}}}],"y":[{"id":"span-id-0-1","n":"name","t":"type","s":10,"d":10,"c":null,"su":"subtype"}],"yc":{"sd":1},"sm":true,"sr":0.1}}'
     ]
     expect(payload.split('\n').filter(a => a)).toEqual(expected)
     clock.uninstall()
@@ -365,7 +365,7 @@ describe('ApmServer', function() {
     const result = apmServer.ndjsonTransactions(payload)
     /* eslint-disable max-len */
     const expected = [
-      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":true}}\n',
+      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":true,"sample_rate":0.1}}\n',
       '{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","subtype":"subtype","sync":false,"start":10,"duration":10}}\n',
       '{"metricset":{"transaction":{"name":"transaction #0","type":"transaction"},"samples":{"transaction.duration.count":{"value":1},"transaction.duration.sum.us":{"value":990},"transaction.breakdown.count":{"value":1}}}}\n',
       '{"metricset":{"transaction":{"name":"transaction #0","type":"transaction"},"span":{"type":"app"},"samples":{"span.self_time.count":{"value":1},"span.self_time.sum.us":{"value":980}}}}\n',

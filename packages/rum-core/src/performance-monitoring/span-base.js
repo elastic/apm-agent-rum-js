@@ -49,6 +49,7 @@ class SpanBase {
     this.id = options.id || generateRandomId(16)
     this.traceId = options.traceId
     this.sampled = options.sampled
+    this.sampleRate = options.sampleRate
     this.timestamp = options.timestamp
     this._start = getTime(options.startTime)
     this._end = undefined

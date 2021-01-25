@@ -32,7 +32,7 @@ import {
 } from '../../src/performance-monitoring/performance-monitoring'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { waitFor } from '../../../../dev-utils/jasmine'
-import { getDtHeaderValue } from '../../src/common/utils'
+import { getDtHeaderValue, getTSHeaderValue } from '../../src/common/utils'
 import { globalState } from '../../src/common/patching/patch-utils'
 import { patchEventHandler as originalPatchHandler } from '../../src/common/patching'
 import {
@@ -265,7 +265,38 @@ describe('PerformanceMonitoring', function() {
     expect(task.data.span.ended).toBeFalsy()
     var headerName = configService.get('distributedTracingHeaderName')
     var headerValue = getDtHeaderValue(task.data.span)
+    expect(req.setRequestHeader).toHaveBeenCalledTimes(1)
     expect(req.setRequestHeader).toHaveBeenCalledWith(headerName, headerValue)
+  })
+
+  it('should add tracestate header when propagateTracestate is set', done => {
+    const patchFn = performanceMonitoring.getXHRSub()
+    configService.setConfig({ propagateTracestate: true })
+    const req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+    spyOn(req, 'setRequestHeader').and.callThrough()
+    const task = {
+      source: XMLHTTPREQUEST,
+      data: {
+        target: req
+      }
+    }
+    req.addEventListener('readystatechange', function() {
+      if (req.readyState === req.DONE) {
+        patchFn('invoke', task)
+        expect(task.data.span.ended).toBeTruthy()
+        done()
+      }
+    })
+    patchFn('schedule', task)
+    req.send()
+    expect(task.data.span).toBeDefined()
+    const traceStateValue = getTSHeaderValue(task.data.span)
+    expect(req.setRequestHeader).toHaveBeenCalledTimes(2)
+    expect(req.setRequestHeader.calls.argsFor(1)).toEqual([
+      'tracestate',
+      traceStateValue
+    ])
   })
 
   it('should consider fetchInProgress to avoid duplicate spans', function(done) {

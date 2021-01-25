@@ -212,6 +212,17 @@ describe('lib/utils', function() {
     expect(result).toBe(undefined)
   })
 
+  it('should get correct tracestate value', function() {
+    const span = new Span('span1', 'span1', {
+      sampleRate: 0.115
+    })
+    expect(utils.getTSHeaderValue(span)).toBe('es=s:0.115')
+    span.sampleRate = 0
+    expect(utils.getTSHeaderValue(span)).toBe('es=s:0')
+    span.sampleRate = undefined
+    expect(utils.getTSHeaderValue(span)).toBeUndefined()
+  })
+
   it('should getTimeOrigin', function() {
     var now = Date.now()
     var result = utils.getTimeOrigin()
