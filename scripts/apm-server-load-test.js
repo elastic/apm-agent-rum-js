@@ -27,7 +27,11 @@ const faker = require('faker')
 const { merge } = require('lodash')
 const crypto = require('crypto')
 const fetch = require('node-fetch')
+const { join } = require('path')
 const { version } = require('../packages/rum/package.json')
+const { writeFile } = require('fs').promises
+
+const serverUrl = process.env.APM_SERVER_URL || 'http://localhost:8200'
 
 /**
  * To make the random id generation work.
@@ -45,7 +49,7 @@ const {
 const defaultMeta = {
   metadata: {
     service: {
-      name: 'benchmark-spike',
+      name: 'apm-server-load-test',
       agent: {
         name: 'rum-js',
         version
@@ -150,6 +154,7 @@ function getRandomInt(min, max) {
 }
 
 function generateTransaction(spanCount) {
+  let breakdown = []
   let tr = merge({}, defaultTransaction, {
     transaction: {
       id: generateRandomId(16),
@@ -160,6 +165,7 @@ function generateTransaction(spanCount) {
         started: spanCount
       },
       sampled: spanCount != 0,
+      breakdown,
       context: {
         page: {
           referer: faker.internet.url(),
@@ -168,6 +174,16 @@ function generateTransaction(spanCount) {
       }
     }
   })
+
+  breakdown.push({
+    transaction: { name: tr.transaction.name, type: tr.transaction.type },
+    samples: {
+      'transaction.duration.count': { value: 1 },
+      'transaction.duration.sum.us': { value: tr.transaction.duration },
+      'transaction.breakdown.count': { value: tr.transaction.sampled ? 1 : 0 }
+    }
+  })
+
   let payload = [tr]
   for (let i = 0; i < spanCount; i++) {
     const span = merge({}, defaultSpan, {
@@ -212,17 +228,40 @@ async function postPayload(url, payload) {
   return response.text()
 }
 
-async function generatePayloads(trCount) {
+async function generatePayloads(transactionCount) {
+  const spanPerTransaction = 50
   let promises = []
-  for (let i = 0; i < trCount; i++) {
-    let payload = generateTransaction(50)
+  for (let i = 0; i < transactionCount; i++) {
+    let payload = generateTransaction(spanPerTransaction)
     payload.unshift(merge({}, defaultMeta))
-    let p = postPayload('http://localhost:8200/intake/v2/rum/events', payload)
+    let p = postPayload(`${serverUrl}/intake/v2/rum/events`, payload)
     promises.push(p)
   }
   await Promise.all(promises)
-  let response = await fetch('http://localhost:8200/debug/vars')
-  console.log(await response.json())
+  let response = await fetch(`${serverUrl}/debug/vars`)
+  const apmServerResults = await response.json()
+
+  const result = {
+    transactionCount,
+    spanPerTransaction,
+    apmServer: apmServerResults
+  }
+  return result
 }
 
-generatePayloads(10)
+;(async function() {
+  const outputFile = process.argv[2]
+
+  const result = await generatePayloads(10)
+
+  if (outputFile) {
+    const outputPath = join(__dirname, '../', outputFile)
+    let ndJSONOutput =
+      '{"index": { "_index": "benchmarks-rum-load-test", "_type": "_doc"}}' +
+      '\n'
+    ndJSONOutput += JSON.stringify(result)
+    await writeFile(outputPath, ndJSONOutput)
+  } else {
+    console.log(result)
+  }
+})()
