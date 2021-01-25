@@ -90,7 +90,7 @@ class TransactionService {
 
   createOptions(options) {
     const config = this._config.config
-    let presetOptions = { sampleRate: config.transactionSampleRate }
+    let presetOptions = { transactionSampleRate: config.transactionSampleRate }
     let perfOptions = extend(presetOptions, options)
     if (perfOptions.managed) {
       perfOptions = extend(

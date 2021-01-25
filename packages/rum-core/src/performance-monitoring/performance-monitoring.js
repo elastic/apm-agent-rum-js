@@ -279,26 +279,24 @@ export default class PerformanceMonitoring {
       const isDtEnabled = configService.get('distributedTracing')
       const dtOrigins = configService.get('distributedTracingOrigins')
       const currentUrl = new Url(window.location.href)
+      const isSameOrigin =
+        checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
+        checkSameOrigin(requestUrl.origin, dtOrigins)
       const target = data.target
       /**
        * Propagate distributed tracing information to the backend systems
        * https://www.w3.org/TR/trace-context/
        */
-      if (isDtEnabled && target) {
-        const isSameOrigin =
-          checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
-          checkSameOrigin(requestUrl.origin, dtOrigins)
-        if (isSameOrigin) {
-          this.injectDtHeader(span, target)
-        } else if (__DEV__) {
-          this._logginService.debug(
-            `Could not inject distributed tracing header to the request origin ('${requestUrl.origin}') from the current origin ('${currentUrl.origin}')`
-          )
-        }
+      if (isDtEnabled && isSameOrigin && target) {
+        this.injectDtHeader(span, target)
         const propagateTracestate = configService.get('propagateTracestate')
         if (propagateTracestate) {
           this.injectTSHeader(span, target)
         }
+      } else if (__DEV__) {
+        this._logginService.debug(
+          `Could not inject distributed tracing header to the request origin ('${requestUrl.origin}') from the current origin ('${currentUrl.origin}')`
+        )
       }
       /**
        * set sync flag only for synchronous API calls, setting the flag to

@@ -212,7 +212,7 @@ export function compressTransaction(transaction) {
       sd: spans.length
     },
     sm: transaction.sampled,
-    sr: transaction.sampleRate,
+    sr: transaction.sample_rate,
     o: transaction.outcome
   }
 

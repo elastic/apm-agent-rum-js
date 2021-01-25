@@ -52,7 +52,7 @@ class Transaction extends SpanBase {
 
     this.breakdownTimings = []
 
-    this.sampleRate = this.options.sampleRate
+    this.sampleRate = this.options.transactionSampleRate
     this.sampled = Math.random() <= this.sampleRate
   }
 
