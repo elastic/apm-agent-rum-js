@@ -348,8 +348,8 @@ export default class PerformanceMonitoring {
   injectTSHeader(span, target) {
     /**
      * As the root trace is started from the browser for API calls, we
-     * are not doing any validation and only propagating the header
-     * to backend systems
+     * perform minimum validation only for the values and propagate the
+     * decision to the backend systems
      * https://www.w3.org/TR/trace-context/#tracestate-header
      */
     const headerValue = getTSHeaderValue(span)

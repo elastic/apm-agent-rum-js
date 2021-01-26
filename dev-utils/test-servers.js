@@ -46,10 +46,10 @@ function startBackendAgentServer(port = 8003) {
   })
 
   function dTRespond(req, res) {
-    const dtHeader = req.headers['traceparent']
+    const header = req.headers['traceparent']
     let payload = { noHeader: true }
-    if (dtHeader) {
-      const splited = dtHeader.split('-')
+    if (header) {
+      const splited = header.split('-')
       payload = {
         version: splited[0],
         traceId: splited[1],

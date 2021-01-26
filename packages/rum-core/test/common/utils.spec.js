@@ -213,14 +213,17 @@ describe('lib/utils', function() {
   })
 
   it('should get correct tracestate value', function() {
-    const span = new Span('span1', 'span1', {
-      sampleRate: 0.115
-    })
-    expect(utils.getTSHeaderValue(span)).toBe('es=s:0.115')
-    span.sampleRate = 0
-    expect(utils.getTSHeaderValue(span)).toBe('es=s:0')
-    span.sampleRate = undefined
-    expect(utils.getTSHeaderValue(span)).toBeUndefined()
+    const span = new Span()
+    const validValues = [0.11, 0, 0.21311]
+    for (const value of validValues) {
+      span.sampleRate = value
+      expect(utils.getTSHeaderValue(span)).toBe(`es=s:${value}`)
+    }
+    const invalidValues = [undefined, null, 'a'.repeat(257), '1.2;-', '=0.23']
+    for (const value of invalidValues) {
+      span.sampleRate = value
+      expect(utils.getTSHeaderValue(span)).toBeUndefined()
+    }
   })
 
   it('should getTimeOrigin', function() {
