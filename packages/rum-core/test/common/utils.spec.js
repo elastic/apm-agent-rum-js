@@ -219,7 +219,13 @@ describe('lib/utils', function() {
       span.sampleRate = value
       expect(utils.getTSHeaderValue(span)).toBe(`es=s:${value}`)
     }
-    const invalidValues = [undefined, null, 'a'.repeat(257), '1.2;-', '=0.23']
+    const invalidValues = [undefined, null, '1.2;-', '=0.23']
+    /**
+     * IE and Older browser versions does not support repeat function
+     */
+    if (typeof String.prototype.repeat === 'function') {
+      invalidValues.push('a'.repeat(257))
+    }
     for (const value of invalidValues) {
       span.sampleRate = value
       expect(utils.getTSHeaderValue(span)).toBeUndefined()
