@@ -242,6 +242,7 @@ async function generatePayloads(transactionCount) {
   const apmServerResults = await response.json()
 
   const result = {
+    '@timestamp': Date.now(),
     transactionCount,
     spanPerTransaction,
     apmServer: apmServerResults
