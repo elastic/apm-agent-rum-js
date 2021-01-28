@@ -108,7 +108,7 @@ export function groupSmallContinuouslySimilarSpans(
   return spans
 }
 
-export function adjustTransactionSpans(transaction) {
+export function adjustTransaction(transaction) {
   if (transaction.sampled) {
     const filterdSpans = transaction.spans.filter(span => {
       return (
@@ -133,10 +133,10 @@ export function adjustTransactionSpans(transaction) {
     }
   } else {
     /**
-     * In case of unsampled transaction, send only the transaction to apm server
-     *  without any spans to reduce the payload size
+     * For non-sampled transactions set the transaction attributes sampled: false and sample_rate: 0,
+     * and omit context. No spans should be captured.
      */
-    transaction.resetSpans()
+    transaction.resetFields()
   }
 
   return transaction
@@ -421,7 +421,8 @@ export default class PerformanceMonitoring {
         start: parseInt(span._start - transactionStart),
         duration: span.duration(),
         context: span.context,
-        outcome: span.outcome
+        outcome: span.outcome,
+        sample_rate: span.sampleRate
       }
       return truncateModel(SPAN_MODEL, spanData)
     })
@@ -448,7 +449,7 @@ export default class PerformanceMonitoring {
   }
 
   createTransactionPayload(transaction) {
-    const adjustedTransaction = adjustTransactionSpans(transaction)
+    const adjustedTransaction = adjustTransaction(transaction)
     const filtered = this.filterTransaction(adjustedTransaction)
     if (filtered) {
       return this.createTransactionDataModel(transaction)

@@ -28,11 +28,11 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 import {
   groupSmallContinuouslySimilarSpans,
-  adjustTransactionSpans
+  adjustTransaction
 } from '../../src/performance-monitoring/performance-monitoring'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { waitFor } from '../../../../dev-utils/jasmine'
-import { getDtHeaderValue, getTSHeaderValue } from '../../src/common/utils'
+import { getDtHeaderValue } from '../../src/common/utils'
 import { globalState } from '../../src/common/patching/patch-utils'
 import { patchEventHandler as originalPatchHandler } from '../../src/common/patching'
 import {
@@ -291,11 +291,10 @@ describe('PerformanceMonitoring', function() {
     patchFn('schedule', task)
     req.send()
     expect(task.data.span).toBeDefined()
-    const traceStateValue = getTSHeaderValue(task.data.span)
     expect(req.setRequestHeader).toHaveBeenCalledTimes(2)
     expect(req.setRequestHeader.calls.argsFor(1)).toEqual([
       'tracestate',
-      traceStateValue
+      'es=s:1'
     ])
   })
 
@@ -872,7 +871,7 @@ describe('PerformanceMonitoring', function() {
       expect(grouped[1].name).toBe('another-name')
     })
 
-    it('should reset spans for unsampled transactions', function() {
+    it('should reset fields for unsampled transactions', function() {
       const tr = new Transaction('unsampled', 'test', {
         transactionSampleRate: 0,
         startTime: 0
@@ -881,8 +880,11 @@ describe('PerformanceMonitoring', function() {
       span.end(20)
       tr.end(30)
       expect(tr.spans.length).toBe(1)
-      const adjustedTransaction = adjustTransactionSpans(tr)
+      expect(tr.sampled).toBe(false)
+      const adjustedTransaction = adjustTransaction(tr)
       expect(adjustedTransaction.spans.length).toBe(0)
+      expect(adjustedTransaction.context).toEqual(null)
+      expect(adjustedTransaction.sampleRate).toEqual(0)
     })
   })
 })

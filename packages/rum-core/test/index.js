@@ -74,6 +74,7 @@ export function generateTransaction(count, breakdown = false) {
     if (breakdown) {
       tr.sampled = true
       tr.sampleRate = 0.1
+      span.sampleRate = 0.1
       tr.selfTime = tr.duration() - span.duration()
       tr.breakdownTimings = captureBreakdown(tr)
     }

@@ -174,8 +174,10 @@ class Transaction extends SpanBase {
     deleted && this.detectFinish()
   }
 
-  resetSpans() {
+  resetFields() {
     this.spans = []
+    this.sampleRate = 0
+    this.context = null
   }
 
   _onSpanEnd(span) {
