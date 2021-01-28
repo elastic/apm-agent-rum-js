@@ -186,7 +186,10 @@ export default class PerformanceMonitoring {
         task.eventType === 'click'
       ) {
         const target = task.target
-        const name = target.getAttribute ? target.getAttribute('name') : ''
+        const name =
+          typeof target.getAttribute === 'function'
+            ? target.getAttribute('name')
+            : ''
 
         let additionalInfo = ''
         if (name) {
