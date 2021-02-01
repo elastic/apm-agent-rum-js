@@ -117,23 +117,8 @@ function isDtHeaderValid(header) {
   )
 }
 
-function getTSHeaderValue(span) {
-  if (span.sampleRate == null) {
-    return
-  }
-  const sampleRate = String(span.sampleRate)
-  /**
-   * Validate sampling rate value
-   * Value is opaque string up to 256 characters printable ASCII RFC0020
-   * characters (i.e., the range 0x20 to 0x7E) except comma , and =.
-   * es entry must not contain `:` and `;` characters.
-   */
-  const VALID_VALUE_REGEX = /^[ -~]{0,255}[!-~]$/
-  const INVALID_VALUE_REGEX = /,|=|:|;/
-  if (
-    !VALID_VALUE_REGEX.test(sampleRate) ||
-    INVALID_VALUE_REGEX.test(sampleRate)
-  ) {
+function getTSHeaderValue({ sampleRate }) {
+  if (typeof sampleRate !== 'number' || String(sampleRate).length > 256) {
     return
   }
   const NAMESPACE = 'es'

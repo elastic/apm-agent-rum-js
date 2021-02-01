@@ -883,7 +883,6 @@ describe('PerformanceMonitoring', function() {
       expect(tr.sampled).toBe(false)
       const adjustedTransaction = adjustTransaction(tr)
       expect(adjustedTransaction.spans.length).toBe(0)
-      expect(adjustedTransaction.context).toEqual(null)
       expect(adjustedTransaction.sampleRate).toEqual(0)
     })
   })
