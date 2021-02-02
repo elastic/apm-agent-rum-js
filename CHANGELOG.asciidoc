@@ -29,6 +29,20 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.6.3]]
+==== 5.6.3 (2021-02-02)
+
+[float]
+===== Features
+* Propagate sampling weight through tracestate header: {issue}845[#845]
+* Add necessary scripts to load test APM server with RUM payload: {issue}948[#948]
+
+
+[float]
+===== Bug fixes
+* Handle null reason in promise rejection event: {issue}940[#940]
+
+
 [[release-notes-5.6.2]]
 ==== 5.6.2 (2020-11-06)
 
