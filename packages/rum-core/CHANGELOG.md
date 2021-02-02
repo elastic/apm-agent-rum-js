@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.9.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.8.0...@elastic/apm-rum-core@5.9.0) (2021-02-02)
+
+
+### Bug Fixes
+
+* **rum-core:** handle null in promise rejection event ([e4e10d5](https://github.com/elastic/apm-agent-rum-js/commit/e4e10d5b7c451a950808d605a2db99cd275d20eb))
+
+
+### Features
+
+* **rum:** propagate sampling decision through tracestate ([#953](https://github.com/elastic/apm-agent-rum-js/issues/953)) ([6461364](https://github.com/elastic/apm-agent-rum-js/commit/6461364642e8879c613d7ce7e187e52bfb32ba54))
+
+
+
+
+
 # [5.8.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.7.0...@elastic/apm-rum-core@5.8.0) (2020-11-06)
 
 
