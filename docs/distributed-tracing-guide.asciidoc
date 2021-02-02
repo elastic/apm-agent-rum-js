@@ -29,7 +29,21 @@ var apm = initApm({
 This effectively tells the agent to add the distributed tracing HTTP header (`traceparent`)
 to requests made to `https://api.example.com`.
 
-Note that distributed tracing headers are only appended to API calls.
+
+[float]
+[[enable-tracestate]]
+==== Propagate Tracestate
+
+https://www.w3.org/TR/trace-context/#tracestate-header[Tracestate] can be used to provide additional vendor
+specific trace information across different tracing systems and is a companion header for the `traceparent` field.
+
+By default, the RUM agent does not propagate the `tracestate` HTTP header to the configured origins. However, 
+the user can change that behaviour by enabling the <<propagate-tracestate, propagateTracestate>> flag which 
+effectively adds `tracestate` HTTP header to the configured origins. As of today, only the sampling decision is 
+propagated through the tracestate header. This information is then used by the APM server and the UI to
+calculate the service metrics like distributions and throughput (Service Maps).
+
+NOTE: distributed tracing headers (traceparent and tracestate) are only appended to API calls.
 To view the full trace from a backend service, see <<dynamic-html-doc>>.
 To read more about cross-origin requests and why this process is necessary,
 please see the MDN page on https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing].
@@ -46,7 +60,7 @@ Specifically, `https://api.example.com` will receive an `OPTIONS` request with t
 
 [source,header]
 ----
-Access-Control-Request-Headers: traceparent
+Access-Control-Request-Headers: traceparent, tracestate
 Access-Control-Request-Method: [request-method]
 Origin: [request-origin]
 ----
@@ -55,12 +69,12 @@ And should respond to it with these headers:
 
 [source,header]
 ----
-Access-Control-Allow-Headers: traceparent
+Access-Control-Allow-Headers: traceparent, tracestate
 Access-Control-Allow-Methods: [allowed-methods]
 Access-Control-Allow-Origin: [request-origin]
 ----
 
-NOTE: `Access-Control-Request-Headers` might include more headers than just `traceparent`.
+NOTE: `Access-Control-Request-Headers` might include more headers than `traceparent` and `tracestate`.
 The response should include all headers if the server wishes to let the browser send the original request.
 
 NOTE: To make sure all components in a distributed trace are included,

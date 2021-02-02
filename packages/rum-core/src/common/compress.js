@@ -174,7 +174,8 @@ export function compressTransaction(transaction) {
       s: span.start,
       d: span.duration,
       c: compressContext(span.context),
-      o: span.outcome
+      o: span.outcome,
+      sr: span.sample_rate
     }
     /**
      * Set parentId only for spans that are child of other spans
@@ -212,6 +213,7 @@ export function compressTransaction(transaction) {
       sd: spans.length
     },
     sm: transaction.sampled,
+    sr: transaction.sample_rate,
     o: transaction.outcome
   }
 

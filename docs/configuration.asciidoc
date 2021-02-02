@@ -226,6 +226,17 @@ var options = {
 ----
 
 [float]
+[[propagate-tracestate]]
+=== `propagateTracestate`
+
+* *Type:* Boolean
+* *Default:* `false`
+
+When distributed tracing is enabled, this option can be used to propagate the https://www.w3.org/TR/trace-context/#tracestate-header[tracestate]
+HTTP header to the configured origins. Before enabling this flag, make sure to change your <<server-configuration, server configuration>> to avoid
+Cross-Origin Resource Sharing errors.
+
+[float]
 [[event-throttling]]
 === Event throttling
 

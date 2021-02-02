@@ -28,7 +28,7 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 import {
   groupSmallContinuouslySimilarSpans,
-  adjustTransactionSpans
+  adjustTransaction
 } from '../../src/performance-monitoring/performance-monitoring'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { waitFor } from '../../../../dev-utils/jasmine'
@@ -265,7 +265,37 @@ describe('PerformanceMonitoring', function() {
     expect(task.data.span.ended).toBeFalsy()
     var headerName = configService.get('distributedTracingHeaderName')
     var headerValue = getDtHeaderValue(task.data.span)
+    expect(req.setRequestHeader).toHaveBeenCalledTimes(1)
     expect(req.setRequestHeader).toHaveBeenCalledWith(headerName, headerValue)
+  })
+
+  it('should add tracestate header when propagateTracestate is set', done => {
+    const patchFn = performanceMonitoring.getXHRSub()
+    configService.setConfig({ propagateTracestate: true })
+    const req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+    spyOn(req, 'setRequestHeader').and.callThrough()
+    const task = {
+      source: XMLHTTPREQUEST,
+      data: {
+        target: req
+      }
+    }
+    req.addEventListener('readystatechange', function() {
+      if (req.readyState === req.DONE) {
+        patchFn('invoke', task)
+        expect(task.data.span.ended).toBeTruthy()
+        done()
+      }
+    })
+    patchFn('schedule', task)
+    req.send()
+    expect(task.data.span).toBeDefined()
+    expect(req.setRequestHeader).toHaveBeenCalledTimes(2)
+    expect(req.setRequestHeader.calls.argsFor(1)).toEqual([
+      'tracestate',
+      'es=s:1'
+    ])
   })
 
   it('should consider fetchInProgress to avoid duplicate spans', function(done) {
@@ -841,7 +871,7 @@ describe('PerformanceMonitoring', function() {
       expect(grouped[1].name).toBe('another-name')
     })
 
-    it('should reset spans for unsampled transactions', function() {
+    it('should reset fields for unsampled transactions', function() {
       const tr = new Transaction('unsampled', 'test', {
         transactionSampleRate: 0,
         startTime: 0
@@ -850,8 +880,10 @@ describe('PerformanceMonitoring', function() {
       span.end(20)
       tr.end(30)
       expect(tr.spans.length).toBe(1)
-      const adjustedTransaction = adjustTransactionSpans(tr)
+      expect(tr.sampled).toBe(false)
+      const adjustedTransaction = adjustTransaction(tr)
       expect(adjustedTransaction.spans.length).toBe(0)
+      expect(adjustedTransaction.sampleRate).toEqual(0)
     })
   })
 })
