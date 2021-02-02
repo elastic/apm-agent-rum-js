@@ -117,6 +117,34 @@ function isDtHeaderValid(header) {
   )
 }
 
+function getTSHeaderValue({ sampleRate }) {
+  if (typeof sampleRate !== 'number' || String(sampleRate).length > 256) {
+    return
+  }
+  const NAMESPACE = 'es'
+  const SEPARATOR = '='
+  /**
+   * We propagate the sampling decision through `es` tracestate key
+   * tracestate: es=s:0.1
+   * https://github.com/elastic/apm/blob/master/specs/agents/tracing-distributed-tracing.md#tracestate
+   */
+  return `${NAMESPACE}${SEPARATOR}s:${sampleRate}`
+}
+
+/**
+ * Appends request header to API calls depending on
+ * the call made through XHR, Fetch, etc.
+ */
+function setRequestHeader(target, name, value) {
+  if (typeof target.setRequestHeader === 'function') {
+    target.setRequestHeader(name, value)
+  } else if (target.headers && typeof target.headers.append === 'function') {
+    target.headers.append(name, value)
+  } else {
+    target[name] = value
+  }
+}
+
 function checkSameOrigin(source, target) {
   let isSame = false
   if (typeof target === 'string') {
@@ -377,6 +405,7 @@ export {
   parseDtHeaderValue,
   getServerTimingInfo,
   getDtHeaderValue,
+  getTSHeaderValue,
   getCurrentScript,
   getElasticScript,
   getTimeOrigin,
@@ -391,6 +420,7 @@ export {
   scheduleMacroTask,
   scheduleMicroTask,
   setLabel,
+  setRequestHeader,
   stripQueryStringFromUrl,
   find,
   removeInvalidChars,

@@ -28,7 +28,9 @@ import {
   isDtHeaderValid,
   parseDtHeaderValue,
   getDtHeaderValue,
-  stripQueryStringFromUrl
+  getTSHeaderValue,
+  stripQueryStringFromUrl,
+  setRequestHeader
 } from '../common/utils'
 import { Url } from '../common/url'
 import { patchEventHandler } from '../common/patching'
@@ -106,7 +108,7 @@ export function groupSmallContinuouslySimilarSpans(
   return spans
 }
 
-export function adjustTransactionSpans(transaction) {
+export function adjustTransaction(transaction) {
   if (transaction.sampled) {
     const filterdSpans = transaction.spans.filter(span => {
       return (
@@ -131,10 +133,10 @@ export function adjustTransactionSpans(transaction) {
     }
   } else {
     /**
-     * In case of unsampled transaction, send only the transaction to apm server
-     *  without any spans to reduce the payload size
+     * For non-sampled transactions set the transaction attributes sampled: false and sample_rate: 0,
+     * and omit context. No spans should be captured.
      */
-    transaction.resetSpans()
+    transaction.resetFields()
   }
 
   return transaction
@@ -281,8 +283,16 @@ export default class PerformanceMonitoring {
         checkSameOrigin(requestUrl.origin, currentUrl.origin) ||
         checkSameOrigin(requestUrl.origin, dtOrigins)
       const target = data.target
+      /**
+       * Propagate distributed tracing information to the backend systems
+       * https://www.w3.org/TR/trace-context/
+       */
       if (isDtEnabled && isSameOrigin && target) {
         this.injectDtHeader(span, target)
+        const propagateTracestate = configService.get('propagateTracestate')
+        if (propagateTracestate) {
+          this.injectTSHeader(span, target)
+        }
       } else if (__DEV__) {
         this._logginService.debug(
           `Could not inject distributed tracing header to the request origin ('${requestUrl.origin}') from the current origin ('${currentUrl.origin}')`
@@ -327,21 +337,24 @@ export default class PerformanceMonitoring {
   }
 
   injectDtHeader(span, target) {
-    var configService = this._configService
-    var headerName = configService.get('distributedTracingHeaderName')
-    var headerValue = getDtHeaderValue(span)
-    var isHeaderValid = isDtHeaderValid(headerValue)
-    if (headerName && headerValue && isHeaderValid) {
-      if (typeof target.setRequestHeader === 'function') {
-        target.setRequestHeader(headerName, headerValue)
-      } else if (
-        target.headers &&
-        typeof target.headers.append === 'function'
-      ) {
-        target.headers.append(headerName, headerValue)
-      } else {
-        target[headerName] = headerValue
-      }
+    const headerName = this._configService.get('distributedTracingHeaderName')
+    const headerValue = getDtHeaderValue(span)
+    const isHeaderValid = isDtHeaderValid(headerValue)
+    if (isHeaderValid && headerValue && headerName) {
+      setRequestHeader(target, headerName, headerValue)
+    }
+  }
+
+  injectTSHeader(span, target) {
+    /**
+     * As the root trace is started from the browser for API calls, we
+     * perform minimum validation only for the values and propagate the
+     * decision to the backend systems
+     * https://www.w3.org/TR/trace-context/#tracestate-header
+     */
+    const headerValue = getTSHeaderValue(span)
+    if (headerValue) {
+      setRequestHeader(target, 'tracestate', headerValue)
     }
   }
 
@@ -408,7 +421,8 @@ export default class PerformanceMonitoring {
         start: parseInt(span._start - transactionStart),
         duration: span.duration(),
         context: span.context,
-        outcome: span.outcome
+        outcome: span.outcome,
+        sample_rate: span.sampleRate
       }
       return truncateModel(SPAN_MODEL, spanData)
     })
@@ -427,6 +441,7 @@ export default class PerformanceMonitoring {
         started: spans.length
       },
       sampled: transaction.sampled,
+      sample_rate: transaction.sampleRate,
       experience: transaction.experience,
       outcome: transaction.outcome
     }
@@ -434,7 +449,7 @@ export default class PerformanceMonitoring {
   }
 
   createTransactionPayload(transaction) {
-    const adjustedTransaction = adjustTransactionSpans(transaction)
+    const adjustedTransaction = adjustTransaction(transaction)
     const filtered = this.filterTransaction(adjustedTransaction)
     if (filtered) {
       return this.createTransactionDataModel(transaction)

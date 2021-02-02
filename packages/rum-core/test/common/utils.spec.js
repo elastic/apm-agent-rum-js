@@ -212,6 +212,26 @@ describe('lib/utils', function() {
     expect(result).toBe(undefined)
   })
 
+  it('should get correct tracestate value', function() {
+    const span = new Span()
+    const validValues = [0.11, 0, 0.21311]
+    for (const value of validValues) {
+      span.sampleRate = value
+      expect(utils.getTSHeaderValue(span)).toBe(`es=s:${value}`)
+    }
+    const invalidValues = [undefined, null, '1.2;-', '=0.23']
+    /**
+     * IE and Older browser versions does not support repeat function
+     */
+    if (typeof String.prototype.repeat === 'function') {
+      invalidValues.push('a'.repeat(257))
+    }
+    for (const value of invalidValues) {
+      span.sampleRate = value
+      expect(utils.getTSHeaderValue(span)).toBeUndefined()
+    }
+  })
+
   it('should getTimeOrigin', function() {
     var now = Date.now()
     var result = utils.getTimeOrigin()
