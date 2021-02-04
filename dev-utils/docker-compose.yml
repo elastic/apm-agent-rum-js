@@ -194,5 +194,46 @@ services:
           - node-benchmark
     user: ${USER_ID}
 
+  load-testing:
+    build:
+      context: ../.ci/docker/node-playwright
+      args:
+        - NODEJS_VERSION=${NODEJS_VERSION}
+    container_name: node-playwright
+    image: docker.elastic.co/observability-ci/node-playwright:${NODEJS_VERSION}
+    environment:
+      - HOME=/app
+      - BUILD_NUMBER=${BUILD_NUMBER}
+      - BRANCH_NAME=${BRANCH_NAME}
+      - JENKINS_URL=${JENKINS_URL}
+      - REPORT_FILE=${REPORT_FILE}
+      - APM_SERVER_URL=http://apm-server:8200
+    command: >
+      /bin/bash -c "set -x
+        id
+        node --version
+        npm --version
+        npx --version
+        cd /app
+        export
+        npm install
+        npm install playwright --unsafe-perm=true --allow-root
+        set -eo pipefail
+        npx lerna run build:module
+        node ./scripts/apm-server-load-test.js ${REPORT_FILE}"
+    mem_limit: 2000m
+    volumes:
+      - ..:/app
+    networks:
+      apm:
+        aliases:
+          - load-testing
+    user: ${USER_ID}
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      apm-server:
+        condition: service_healthy
+
 networks:
   apm:
