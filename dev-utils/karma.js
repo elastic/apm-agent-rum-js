@@ -105,21 +105,10 @@ function prepareConfig(config, packageName) {
   console.log('Global test Configuration: ', globalConfig)
   const { agentConfig, testConfig } = globalConfig
 
-  const { isTravis, isJenkins, sauceLabs: isSauce } = testConfig
+  const { isJenkins, sauceLabs: isSauce } = testConfig
   let buildId = `ApmJs-${agentConfig.name}`
 
-  if (isTravis) {
-    console.log('prepareConfig: Run in Travis')
-    buildId =
-      buildId +
-      ' - TRAVIS #' +
-      process.env.TRAVIS_BUILD_NUMBER +
-      ' (' +
-      process.env.TRAVIS_BUILD_ID +
-      ')'
-    config.plugins.push('karma-chrome-launcher')
-    config.browsers = ['ChromeHeadless']
-  } else if (isJenkins) {
+  if (isJenkins) {
     console.log('prepareConfig: Run in Jenkins')
     buildId =
       buildId +
