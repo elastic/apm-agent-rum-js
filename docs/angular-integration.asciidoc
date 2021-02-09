@@ -3,6 +3,11 @@
 
 This document covers how to use Real User Monitoring JavaScript agent with Angular applications.
 
+[[angular-supported-versions]]
+==== Supported versions
+
+This integration supports Angular versions < 9.
+
 [[installing-angular-integration]]
 ==== Installing Elastic APM Angular package
 
@@ -16,11 +21,11 @@ npm install @elastic/apm-rum-angular --save
 [float]
 ==== Instrumenting your Angular application
 
-The Angular integration package comes with a `ApmService` which uses Angular Depedency injection pattern and 
-will start subscribing to https://angular.io/api/router/Event[Angular Router Events] once the service is initialized. 
+The Angular integration package comes with a `ApmService` which uses Angular Depedency injection pattern and
+will start subscribing to https://angular.io/api/router/Event[Angular Router Events] once the service is initialized.
 
-`ApmService` must be initialized from either the application module or application component since 
-the RUM agent has to start capturing all the resources and API calls as soon as possible. 
+`ApmService` must be initialized from either the application module or application component since
+the RUM agent has to start capturing all the resources and API calls as soon as possible.
 
 
 [source,js]
