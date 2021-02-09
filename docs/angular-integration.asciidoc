@@ -6,7 +6,7 @@ This document covers how to use Real User Monitoring JavaScript agent with Angul
 [[angular-supported-versions]]
 ==== Supported versions
 
-This integration supports Angular versions ≤ 8.2.2.
+This integration supports Angular versions < 9.
 
 [[installing-angular-integration]]
 ==== Installing Elastic APM Angular package
