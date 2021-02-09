@@ -143,7 +143,7 @@ describe('Metrics', () => {
       ])
     })
 
-    it('should pass buffered flag based on observed type', () => {
+    it('should start recorder with correct type', () => {
       const recorder = new PerfEntryRecorder(() => {})
       const onStartSpy = jasmine.createSpy()
       recorder.po = {
@@ -153,7 +153,7 @@ describe('Metrics', () => {
 
       expect(onStartSpy).toHaveBeenCalledWith({
         type: LONG_TASK,
-        buffered: false
+        buffered: true
       })
       onStartSpy.calls.reset()
 
