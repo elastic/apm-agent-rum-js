@@ -219,7 +219,7 @@ services:
         npm install
         npm install playwright --unsafe-perm=true --allow-root
         set -eo pipefail
-        npx lerna run build:module
+        npx lerna run build:main
         node ./scripts/apm-server-load-test.js ${REPORT_FILE}"
     mem_limit: 2000m
     volumes:

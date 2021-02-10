@@ -251,6 +251,9 @@ pipeline {
             }
             stage('Load testing') {
               agent { label 'metal' }
+              options {
+                warnError('load testing failed')
+              }
               steps {
                 withGithubNotify(context: 'Load testing') {
                   deleteDir()
