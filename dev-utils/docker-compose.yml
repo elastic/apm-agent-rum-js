@@ -50,6 +50,10 @@ services:
         -E apm-server.kibana.enabled=true
         -E apm-server.kibana.host=http://kibana:5601
         -E setup.template.settings.index.number_of_replicas=0
+        -E monitoring.enabled=true
+        -E apm-server.expvar.enabled=true
+        -E apm-server.ilm.enabled=false
+        -E apm-server.instrumentation.enabled=true
     cap_drop:
       - ALL
     cap_add:
