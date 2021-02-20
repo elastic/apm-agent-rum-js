@@ -52,7 +52,8 @@ class Transaction extends SpanBase {
 
     this.breakdownTimings = []
 
-    this.sampled = Math.random() <= this.options.transactionSampleRate
+    this.sampleRate = this.options.transactionSampleRate
+    this.sampled = Math.random() <= this.sampleRate
   }
 
   addMarks(obj) {
@@ -98,6 +99,7 @@ class Transaction extends SpanBase {
     }
     opts.traceId = this.traceId
     opts.sampled = this.sampled
+    opts.sampleRate = this.sampleRate
 
     if (!opts.parentId) {
       opts.parentId = this.id
@@ -172,8 +174,9 @@ class Transaction extends SpanBase {
     deleted && this.detectFinish()
   }
 
-  resetSpans() {
+  resetFields() {
     this.spans = []
+    this.sampleRate = 0
   }
 
   _onSpanEnd(span) {
