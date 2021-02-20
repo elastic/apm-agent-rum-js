@@ -221,7 +221,10 @@ export default class PerformanceMonitoring {
         )
 
         if (tr) {
-          let classes = target.getAttribute('class')
+          let classes =
+            typeof target.getAttribute === 'function'
+              ? target.getAttribute('class')
+              : ''
           if (classes) {
             tr.addContext({ custom: { classes } })
           }
