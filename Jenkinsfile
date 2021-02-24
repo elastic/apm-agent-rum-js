@@ -196,9 +196,6 @@ pipeline {
         Run Benchmarks and send the results to ES.
         */
         stage('Benchmarks') {
-          environment {
-            REPORT_FILE = 'apm-agent-benchmark-results.json'
-          }
           when {
             beforeAgent true
             allOf {
@@ -223,6 +220,9 @@ pipeline {
           parallel {
             stage('Benchmarks') {
               agent { label 'metal' }
+              environment {
+                REPORT_FILE = 'apm-agent-benchmark-results.json'
+              }
               steps {
                 withGithubNotify(context: 'Benchmarks') {
                   deleteDir()
@@ -253,6 +253,9 @@ pipeline {
               agent { label 'metal' }
               options {
                 warnError('load testing failed')
+              }
+              environment {
+                REPORT_FILE = 'apm-agent-load-testing-results.json'
               }
               steps {
                 withGithubNotify(context: 'Load testing') {
