@@ -23,13 +23,18 @@
  *
  */
 
-import { ErrorHandler } from '@angular/core'
+import { ErrorHandler, Inject, Injectable } from '@angular/core'
+import { ApmBase } from '@elastic/apm-rum'
+import { APM } from './apm.module'
 
+@Injectable()
 export class ApmErrorHandler extends ErrorHandler {
-  static apm: any
+  constructor(@Inject(APM) public apm: ApmBase) {
+    super()
+  }
 
   handleError(error) {
-    ApmErrorHandler.apm.captureError(error.originalError || error)
+    this.apm.captureError(error.originalError || error)
     super.handleError(error)
   }
 }

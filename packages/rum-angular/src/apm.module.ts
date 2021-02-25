@@ -23,6 +23,14 @@
  *
  */
 
-export * from './apm.module'
-export * from './apm.service'
-export * from './error-handler'
+import { InjectionToken, NgModule } from '@angular/core'
+import { RouterModule } from '@angular/router'
+import { apm, ApmBase } from '@elastic/apm-rum'
+
+export const APM = new InjectionToken<ApmBase>('APM Base Client')
+
+@NgModule({
+  imports: [RouterModule],
+  providers: [{ provide: APM, useValue: apm }]
+})
+export class ApmModule {}
