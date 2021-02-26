@@ -17,13 +17,15 @@
     "node": ">=12.0.0"
   },
   "scripts": {
-    "build": "ng build",
+    "build": "ng build --prod",
     "test:unit": "ng test",
-    "test": "npm run test:unit"
+    "test": "npm run test:unit",
+    "karma:dev": "ng test --watch"
   },
   "dependencies": {
     "@elastic/apm-rum": "file:../rum",
-    "@elastic/apm-rum-core": "file:../rum-core"
+    "@elastic/apm-rum-core": "file:../rum-core",
+    "tslib": "^1.10.0"
   },
   "peerDependencies": {
     "@angular/core": "^9.0.0",

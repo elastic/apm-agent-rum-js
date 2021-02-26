@@ -41,11 +41,11 @@ module.exports = function(config) {
       plugins: [
         ...baseConfig.plugins,
         require('@angular-devkit/build-angular/plugins/karma')
-      ]
-    },
-    ...(shouldWatch
-      ? { singleRun: false, restartOnFileChange: true }
-      : { singleRun: true })
+      ],
+      ...(shouldWatch
+        ? { autoWatch: true, singleRun: false, restartOnFileChange: true }
+        : { singleRun: true })
+    }
   }
   config.set(angularConfig)
   config.set(prepareConfig(config, 'rum-angular'))
