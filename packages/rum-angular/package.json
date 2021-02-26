@@ -20,7 +20,8 @@
     "build": "ng build --prod",
     "test:unit": "ng test",
     "test": "npm run test:unit",
-    "karma:dev": "ng test --watch"
+    "karma:dev": "ng test --watch",
+    "karma:coverage": "ng test --code-coverage"
   },
   "dependencies": {
     "@elastic/apm-rum": "file:../rum",

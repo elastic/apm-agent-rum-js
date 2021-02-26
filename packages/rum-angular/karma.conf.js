@@ -26,7 +26,7 @@
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
 
 module.exports = function(config) {
-  const shouldWatch = !!config.buildWebpack.options.watch
+  const { watch, codeCoverage } = config.buildWebpack.options
   const angularConfig = {
     ...baseConfig,
     ...{
@@ -42,7 +42,8 @@ module.exports = function(config) {
         ...baseConfig.plugins,
         require('@angular-devkit/build-angular/plugins/karma')
       ],
-      ...(shouldWatch
+      coverage: codeCoverage,
+      ...(Boolean(watch)
         ? { autoWatch: true, singleRun: false, restartOnFileChange: true }
         : { singleRun: true })
     }
