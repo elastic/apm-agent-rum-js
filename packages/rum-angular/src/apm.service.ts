@@ -24,7 +24,7 @@
  */
 
 import { Router, NavigationStart } from '@angular/router'
-import { Inject, Injectable } from '@angular/core'
+import { Inject, Injectable, NgZone } from '@angular/core'
 import { afterFrame } from '@elastic/apm-rum-core'
 import { ApmBase } from '@elastic/apm-rum'
 import { APM } from './apm.module'
@@ -33,10 +33,16 @@ import { APM } from './apm.module'
   providedIn: 'root'
 })
 export class ApmService {
-  constructor(@Inject(APM) public apm: ApmBase, public router: Router) {}
+  constructor(
+    @Inject(APM) public apm: ApmBase,
+    private router: Router,
+    private readonly ngZone: NgZone
+  ) {}
 
   init(config) {
-    const apmInstance = this.apm.init(config)
+    const apmInstance = this.ngZone.runOutsideAngular(() =>
+      this.apm.init(config)
+    )
 
     if (!apmInstance.isActive()) {
       return apmInstance
