@@ -109,6 +109,7 @@ describe('lib/utils', function() {
     const currentOrigin = new Url(window.location.href).origin
     const relOrigin = new Url('/test/new').origin
     const absOrigin = new Url('http://test.com/test/new').origin
+    const portOrigin = new Url('http://test.com:8088/api/test/new').origin
     expect(utils.checkSameOrigin(relOrigin, currentOrigin)).toBe(true)
     expect(utils.checkSameOrigin(absOrigin, currentOrigin)).toBe(false)
     expect(
@@ -132,6 +133,16 @@ describe('lib/utils', function() {
       false
     )
     expect(utils.checkSameOrigin(new Url(''), 'http://test.com/')).toBe(false)
+
+    expect(
+      utils.checkSameOrigin(portOrigin, [currentOrigin, relOrigin, absOrigin])
+    ).toBe(false)
+    expect(
+      utils.checkSameOrigin(portOrigin, /https?:\/\/test\.com(:\d+)?/)
+    ).toBe(true)
+    expect(
+      utils.checkSameOrigin(absOrigin, /https?:\/\/test\.com(:\d+)?/)
+    ).toBe(true)
   })
 
   it('should generate correct DT headers', function() {
