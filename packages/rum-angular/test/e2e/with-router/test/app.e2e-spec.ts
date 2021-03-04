@@ -23,20 +23,31 @@
  *
  */
 
-const path = require('path')
-const {
-  getWebpackConfig,
-  PACKAGE_TYPES,
-  BUNDLE_TYPES
-} = require('../../../../../dev-utils/build')
+import { AppPage } from './app.po'
+import { browser, logging } from 'protractor'
 
-module.exports = {
-  entry: {
-    app: path.join(__dirname, 'main.ts')
-  },
-  output: {
-    path: path.resolve(__dirname),
-    filename: '[name].e2e-bundle.js'
-  },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD, PACKAGE_TYPES.ANGULAR)
-}
+describe('workspace-project App', () => {
+  let page: AppPage
+
+  beforeEach(() => {
+    page = new AppPage()
+  })
+
+  it('should display welcome message', () => {
+    page.navigateTo()
+    expect(page.getTitleText()).toEqual('app app is running!')
+  })
+
+  afterEach(async () => {
+    // Assert that there are no errors emitted from the browser
+    const logs = await browser
+      .manage()
+      .logs()
+      .get(logging.Type.BROWSER)
+    expect(logs).not.toContain(
+      jasmine.objectContaining({
+        level: logging.Level.SEVERE
+      } as logging.Entry)
+    )
+  })
+})

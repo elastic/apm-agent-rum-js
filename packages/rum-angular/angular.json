@@ -31,6 +31,72 @@
           }
         }
       }
+    },
+    "app": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "test/e2e/with-router",
+      "sourceRoot": "test/e2e/with-router",
+      "prefix": "",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/app",
+            "index": "test/e2e/with-router/index.html",
+            "main": "test/e2e/with-router/main.ts",
+            "polyfills": "test/e2e/with-router/polyfills.ts",
+            "tsConfig": "test/e2e/with-router/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "test/e2e/with-router/assets"
+            ],
+            "styles": [],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "test/e2e/with-router/environments/environment.ts",
+                  "with": "test/e2e/with-router/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "app:build",
+            "baseHref": "/test/e2e/with-router/"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "app:build:production"
+            }
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/app/e2e/protractor.conf.js",
+            "devServerTarget": "app:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "app:serve:production"
+            }
+          }
+        }
+      }
     }
   },
   "defaultProject": "rum-angular"

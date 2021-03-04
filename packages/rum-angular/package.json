@@ -18,6 +18,7 @@
   },
   "scripts": {
     "build": "ng build --prod",
+    "build:e2e": "ng build app --prod",
     "test:unit": "ng test",
     "test": "MODE=none npm run test:unit",
     "karma:dev": "ng test --watch",

@@ -23,45 +23,19 @@
  *
  */
 
-import { BrowserModule } from '@angular/platform-browser'
-import { NgModule, ErrorHandler } from '@angular/core'
-import { HttpClientModule } from '@angular/common/http'
-import {
-  ApmModule,
-  ApmService,
-  ApmErrorHandler
-} from '@elastic/apm-rum-angular'
+// This file can be replaced during build by using the `fileReplacements` array.
+// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
+// The list of file replacements can be found in `angular.json`.
 
-import { AppRoutingModule } from './app-routing.module'
-import { AppComponent } from './app.component'
-import { HomeComponent } from './home.component'
-import { ContactListComponent } from './contact-list.component'
-import { ContactDetailComponent } from './contact-detail.component'
-import { PageNotFoundComponent } from './not-found.component'
-
-@NgModule({
-  imports: [ApmModule, BrowserModule, AppRoutingModule, HttpClientModule],
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    PageNotFoundComponent,
-    ContactListComponent,
-    ContactDetailComponent
-  ],
-  providers: [
-    ApmService,
-    {
-      provide: ErrorHandler,
-      useClass: ApmErrorHandler
-    }
-  ],
-  bootstrap: [AppComponent]
-})
-export class AppModule {
-  constructor(service: ApmService) {
-    service.init({
-      serviceName: 'e2e-angular-integration',
-      logLevel: 'debug'
-    })
-  }
+export const environment = {
+  production: false
 }
+
+/*
+ * For easier debugging in development mode, you can import the following file
+ * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
+ *
+ * This import should be commented out in production mode because it will have a negative impact
+ * on performance if an error is thrown.
+ */
+// import 'zone.js/dist/zone-error';  // Included with Angular CLI.

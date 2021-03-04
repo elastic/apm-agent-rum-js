@@ -23,45 +23,35 @@
  *
  */
 
-import { BrowserModule } from '@angular/platform-browser'
-import { NgModule, ErrorHandler } from '@angular/core'
-import { HttpClientModule } from '@angular/common/http'
-import {
-  ApmModule,
-  ApmService,
-  ApmErrorHandler
-} from '@elastic/apm-rum-angular'
+// @ts-check
+// Protractor configuration file, see link for more information
+// https://github.com/angular/protractor/blob/master/lib/config.ts
 
-import { AppRoutingModule } from './app-routing.module'
-import { AppComponent } from './app.component'
-import { HomeComponent } from './home.component'
-import { ContactListComponent } from './contact-list.component'
-import { ContactDetailComponent } from './contact-detail.component'
-import { PageNotFoundComponent } from './not-found.component'
+const { SpecReporter } = require('jasmine-spec-reporter')
 
-@NgModule({
-  imports: [ApmModule, BrowserModule, AppRoutingModule, HttpClientModule],
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    PageNotFoundComponent,
-    ContactListComponent,
-    ContactDetailComponent
-  ],
-  providers: [
-    ApmService,
-    {
-      provide: ErrorHandler,
-      useClass: ApmErrorHandler
-    }
-  ],
-  bootstrap: [AppComponent]
-})
-export class AppModule {
-  constructor(service: ApmService) {
-    service.init({
-      serviceName: 'e2e-angular-integration',
-      logLevel: 'debug'
+/**
+ * @type { import("protractor").Config }
+ */
+exports.config = {
+  allScriptsTimeout: 11000,
+  specs: ['./src/**/*.e2e-spec.ts'],
+  capabilities: {
+    browserName: 'chrome'
+  },
+  directConnect: true,
+  baseUrl: 'http://localhost:4200/',
+  framework: 'jasmine',
+  jasmineNodeOpts: {
+    showColors: true,
+    defaultTimeoutInterval: 30000,
+    print() {}
+  },
+  onPrepare() {
+    require('ts-node').register({
+      project: require('path').join(__dirname, './tsconfig.json')
     })
+    jasmine
+      .getEnv()
+      .addReporter(new SpecReporter({ spec: { displayStacktrace: true } }))
   }
 }

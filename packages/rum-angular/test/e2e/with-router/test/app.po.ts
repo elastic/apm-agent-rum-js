@@ -23,45 +23,16 @@
  *
  */
 
-import { BrowserModule } from '@angular/platform-browser'
-import { NgModule, ErrorHandler } from '@angular/core'
-import { HttpClientModule } from '@angular/common/http'
-import {
-  ApmModule,
-  ApmService,
-  ApmErrorHandler
-} from '@elastic/apm-rum-angular'
+import { browser, by, element } from 'protractor'
 
-import { AppRoutingModule } from './app-routing.module'
-import { AppComponent } from './app.component'
-import { HomeComponent } from './home.component'
-import { ContactListComponent } from './contact-list.component'
-import { ContactDetailComponent } from './contact-detail.component'
-import { PageNotFoundComponent } from './not-found.component'
+export class AppPage {
+  navigateTo(): Promise<unknown> {
+    return browser.get(browser.baseUrl) as Promise<unknown>
+  }
 
-@NgModule({
-  imports: [ApmModule, BrowserModule, AppRoutingModule, HttpClientModule],
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    PageNotFoundComponent,
-    ContactListComponent,
-    ContactDetailComponent
-  ],
-  providers: [
-    ApmService,
-    {
-      provide: ErrorHandler,
-      useClass: ApmErrorHandler
-    }
-  ],
-  bootstrap: [AppComponent]
-})
-export class AppModule {
-  constructor(service: ApmService) {
-    service.init({
-      serviceName: 'e2e-angular-integration',
-      logLevel: 'debug'
-    })
+  getTitleText(): Promise<string> {
+    return element(by.css('app-root .content span')).getText() as Promise<
+      string
+    >
   }
 }

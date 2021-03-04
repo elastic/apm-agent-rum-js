@@ -23,12 +23,6 @@
  *
  */
 
-/**
- * Polyfills required for Angular to work on all browsers
- * https://angular.io/guide/browser-support#polyfills-for-non-cli-users
- */
-
-/*
- * Zone JS is required by default for Angular itself.
- */
-import 'zone.js/dist/zone'
+export const environment = {
+  production: true
+}
