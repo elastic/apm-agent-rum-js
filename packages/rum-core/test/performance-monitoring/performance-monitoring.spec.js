@@ -725,12 +725,14 @@ describe('PerformanceMonitoring', function() {
       })
       let element = document.createElement('button')
       element.setAttribute('class', 'cool-button purchase-style')
+      document.body.appendChild(element)
 
       const listener = e => {
         expect(e.type).toBe('click')
       }
 
       element.addEventListener('click', listener)
+      element.focus()
       element.click()
 
       let tr = transactionService.getCurrentTransaction()
@@ -742,11 +744,14 @@ describe('PerformanceMonitoring', function() {
       expect(tr.type).toBe('user-interaction')
 
       element.setAttribute('name', 'purchase')
+      element.focus()
       element.click()
       let newTr = transactionService.getCurrentTransaction()
 
       expect(newTr).toBe(tr)
       expect(newTr.name).toBe('Click - button["purchase"]')
+
+      document.body.removeChild(element)
     })
 
     it('should create click transactions on window', () => {
@@ -755,18 +760,22 @@ describe('PerformanceMonitoring', function() {
       patchEventHandler.observe(EVENT_TARGET, (event, task) => {
         etsub(event, task)
       })
+      let element = document.createElement('button')
+      document.body.appendChild(element)
 
       const listener = e => {
         expect(e.type).toBe('click')
       }
 
       window.addEventListener('click', listener)
-      document.body.click()
+      element.focus()
+      element.click()
 
       let tr = transactionService.getCurrentTransaction()
       expect(tr).toBeDefined()
-      expect(tr.name).toBe('Click - html')
+      expect(tr.name).toBe('Click - button')
       expect(tr.type).toBe('user-interaction')
+      document.body.removeChild(element)
     })
 
     it('should create click transactions on document', () => {
@@ -775,18 +784,22 @@ describe('PerformanceMonitoring', function() {
       patchEventHandler.observe(EVENT_TARGET, (event, task) => {
         etsub(event, task)
       })
+      let element = document.createElement('button')
+      document.body.appendChild(element)
 
       const listener = e => {
         expect(e.type).toBe('click')
       }
 
       document.addEventListener('click', listener)
-      document.body.click()
+      element.focus()
+      element.click()
 
       let tr = transactionService.getCurrentTransaction()
       expect(tr).toBeDefined()
-      expect(tr.name).toBe('Click - document')
+      expect(tr.name).toBe('Click - button')
       expect(tr.type).toBe('user-interaction')
+      document.body.removeChild(element)
     })
 
     it('should respect the transaction type priority order', function() {

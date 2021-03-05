@@ -188,24 +188,17 @@ export default class PerformanceMonitoring {
         task.eventType === 'click'
       ) {
         const target = task.target
-        const name =
-          typeof target.getAttribute === 'function'
-            ? target.getAttribute('name')
-            : ''
+        if (target === window || target.contains(document.activeElement)) {
+          target = document.activeElement
+        }
+        const name = target.getAttribute('name')
 
         let additionalInfo = ''
         if (name) {
           additionalInfo = `["${name}"]`
         }
 
-        let tagName = ''
-        if (target === window) {
-          tagName = 'window'
-        } else if (target === document) {
-          tagName = 'document'
-        } else if (target.tagName) {
-          tagName = target.tagName.toLowerCase()
-        }
+        const tagName = target.tagName.toLowerCase()
 
         /**
          * We reduce the reusability threshold to make sure
@@ -223,10 +216,7 @@ export default class PerformanceMonitoring {
         )
 
         if (tr) {
-          let classes =
-            typeof target.getAttribute === 'function'
-              ? target.getAttribute('class')
-              : ''
+          let classes = target.getAttribute('class')
           if (classes) {
             tr.addContext({ custom: { classes } })
           }
