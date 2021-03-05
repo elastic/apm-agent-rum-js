@@ -42,7 +42,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/app",
+            "outputPath": "test/e2e/with-router/build",
             "index": "test/e2e/with-router/index.html",
             "main": "test/e2e/with-router/main.ts",
             "polyfills": "test/e2e/with-router/polyfills.ts",
@@ -50,9 +50,7 @@
             "aot": true,
             "assets": [
               "test/e2e/with-router/assets"
-            ],
-            "styles": [],
-            "scripts": []
+            ]
           },
           "configurations": {
             "production": {
@@ -75,24 +73,13 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
+            "port": 8000,
             "browserTarget": "app:build",
-            "baseHref": "/test/e2e/with-router/"
+            "baseHref": "/test/e2e/with-router/build/"
           },
           "configurations": {
             "production": {
               "browserTarget": "app:build:production"
-            }
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "projects/app/e2e/protractor.conf.js",
-            "devServerTarget": "app:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "app:serve:production"
             }
           }
         }
