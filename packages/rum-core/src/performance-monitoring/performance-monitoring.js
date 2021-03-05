@@ -188,7 +188,12 @@ export default class PerformanceMonitoring {
         task.eventType === 'click'
       ) {
         const target = task.target
-        if (target === window || target.contains(document.activeElement)) {
+        if (
+          target === window ||
+          target === document ||
+          (typeof target.contains === 'function' &&
+            target.contains(document.activeElement))
+        ) {
           target = document.activeElement
         }
         const name = target.getAttribute('name')
