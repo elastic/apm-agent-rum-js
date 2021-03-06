@@ -37,6 +37,7 @@ module.exports = {
   plugins: ['standard', 'rulesdir'],
   rules: {
     'no-unused-vars': 'error',
+    'no-const-assign': 'error',
     'prettier/prettier': ['error', { singleQuote: true, semi: false }],
     'object-shorthand': 'error',
     'rulesdir/require-license-header': [

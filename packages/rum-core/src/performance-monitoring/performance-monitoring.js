@@ -187,7 +187,7 @@ export default class PerformanceMonitoring {
         task.source === EVENT_TARGET &&
         task.eventType === 'click'
       ) {
-        const target = task.target
+        let target = task.target
         if (
           target === window ||
           target === document ||
