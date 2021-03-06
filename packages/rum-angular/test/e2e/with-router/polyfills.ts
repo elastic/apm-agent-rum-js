@@ -85,8 +85,3 @@ import 'zone.js/dist/zone' // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
-
-/**
- * Polyfill process in the browser env
- */
-window.process = require('process')

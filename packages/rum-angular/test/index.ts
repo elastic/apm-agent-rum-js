@@ -23,20 +23,12 @@
  *
  */
 
-import 'promise-polyfill/src/polyfill'
 import { apmBase } from '@elastic/apm-rum'
-import { getGlobalConfig } from '../../../dev-utils/test-config'
 import ApmServerMock from '../../rum-core/test/utils/apm-server-mock'
 
-const globalConfig = getGlobalConfig()
-
 export function initializeApmService(service, config) {
-  console.log('E2E Global Configs', JSON.stringify(globalConfig, null, 2))
   const apmServer = apmBase.serviceFactory.getService('ApmServer')
-  const { serverUrl } = globalConfig.agentConfig
-  config.serverUrl = serverUrl
-  const serverMock = new ApmServerMock(apmServer, globalConfig.useMocks)
+  const serverMock = new ApmServerMock(apmServer, false)
   apmBase.serviceFactory.instances['ApmServer'] = serverMock
-
   return service.init(config)
 }

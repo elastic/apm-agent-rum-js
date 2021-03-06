@@ -26,8 +26,7 @@
           "options": {
             "main": "test/specs/index.ts",
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
-            "polyfills": "test/polyfills.ts"
+            "karmaConfig": "karma.conf.js"
           }
         }
       }

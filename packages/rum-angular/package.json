@@ -21,6 +21,7 @@
     "build:e2e": "ng build app --prod",
     "test:unit": "ng test",
     "test:e2e": "npm run script runE2eTests packages/rum-angular/wdio.conf.js",
+    "test:sauce": "npm run script runSauceTests packages/rum-angular true test:unit build:e2e test:e2e",
     "test": "MODE=none npm run test:unit",
     "script": "node ../../dev-utils/run-script.js",
     "karma:dev": "ng test --watch",

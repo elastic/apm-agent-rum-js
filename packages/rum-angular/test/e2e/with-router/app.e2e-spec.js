@@ -26,29 +26,50 @@
 const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
 
 describe('Angular router integration', function() {
-  beforeAll(() => browser.url('/test/e2e/with-router/build/'))
+  /**
+   * Change ELEMENT_KEY to approprioate value when using `devtools`
+   * automation protocol
+   * https://github.com/webdriverio/webdriverio/blob/e942ce4d802161ac12579553889d9068dccf317c/packages/devtools/src/constants.ts#L8
+   */
+  const ELEMENT_KEY = 'ELEMENT'
+  beforeAll(async () => {
+    await browser.url('test/e2e/with-router/build/')
+  })
 
-  it('should run angular app and capture route-change', function() {
+  it('should run angular app and capture route-change', async () => {
     /**
      * Should render home page on load
      */
-    const notFoundElement = $('app-root app-home h2')
-    expect(notFoundElement.getText()).toEqual('Home page')
+    const result = await browser.findElement(
+      'css selector',
+      'app-root app-home h2'
+    )
+    expect(await browser.getElementText(result[ELEMENT_KEY])).toEqual(
+      'Home page'
+    )
 
-    browser.waitUntil(
-      () => {
+    await browser.waitUntil(
+      async () => {
         /**
          * route to /contacts
          */
-        $('#contacts').click()
-        const contactListElement = $('app-root app-contact-list')
-        return contactListElement.getText().indexOf('Name') !== -1
+        const result = await browser.findElement('css selector', '#contacts')
+        await browser.elementClick(result[ELEMENT_KEY])
+        const listResult = await browser.findElement(
+          'css selector',
+          'app-root app-contact-list'
+        )
+        const isDisplayed = await browser.isElementDisplayed(
+          listResult[ELEMENT_KEY]
+        )
+        return isDisplayed
       },
-      5000,
-      'expected contact list to be rendered'
+      10000,
+      'expected contact list to be rendered',
+      5000
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 2)
+    const { sendEvents } = await waitForApmServerCalls(0, 2)
     const { transactions } = sendEvents
     expect(transactions.length).toBe(2)
 
@@ -62,7 +83,7 @@ describe('Angular router integration', function() {
     expect(routeTransaction.type).toBe('route-change')
     expect(routeTransaction.spans.length).toBe(1)
     expect(routeTransaction.spans[0].name).toBe(
-      'GET /test/e2e/with-router/data.json'
+      'GET /test/e2e/with-router/build/assets/data.json'
     )
   })
 })

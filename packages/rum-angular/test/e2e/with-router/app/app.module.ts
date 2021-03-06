@@ -38,6 +38,7 @@ import { HomeComponent } from './home.component'
 import { ContactListComponent } from './contact-list.component'
 import { ContactDetailComponent } from './contact-detail.component'
 import { PageNotFoundComponent } from './not-found.component'
+import { environment } from '../environments/environment'
 import { initializeApmService } from '../../../'
 
 @NgModule({
@@ -61,6 +62,7 @@ import { initializeApmService } from '../../../'
 export class AppModule {
   constructor(service: ApmService) {
     initializeApmService(service, {
+      serverUrl: environment.serverUrl,
       serviceName: 'e2e-angular-integration',
       logLevel: 'debug'
     })
