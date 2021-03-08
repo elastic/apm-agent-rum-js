@@ -23,32 +23,19 @@
  *
  */
 
-import { ApmErrorHandler } from '../../src/error-handler'
-import { TestBed } from '@angular/core/testing'
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing'
 import { ErrorHandler } from '@angular/core'
+import { TestBed } from '@angular/core/testing'
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
+import { APM, ApmModule } from '../../src/apm.module'
+import { ApmErrorHandler } from '../../src/error-handler'
 
 describe('ApmErrorHandler', () => {
   let errorHandler: ApmErrorHandler
-  let apm
-
-  function setUpApm() {
-    apm = new ApmBase(createServiceFactory(), false)
-    ApmErrorHandler.apm = apm
-  }
 
   function setUpAppModule() {
-    TestBed.resetTestEnvironment()
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting()
-    )
     TestBed.configureTestingModule({
+      imports: [ApmModule],
       providers: [
         {
           provide: ErrorHandler,
@@ -56,17 +43,20 @@ describe('ApmErrorHandler', () => {
         }
       ]
     })
-    errorHandler = TestBed.get(ErrorHandler)
+    TestBed.overrideProvider(APM, {
+      useValue: new ApmBase(createServiceFactory(), false)
+    })
+
+    errorHandler = TestBed.inject(ErrorHandler) as ApmErrorHandler
   }
 
   beforeEach(() => {
-    setUpApm()
     setUpAppModule()
   })
 
   it('should capture errors on app', () => {
     expect(errorHandler).toBeInstanceOf(ApmErrorHandler)
-    spyOn(apm, 'captureError')
+    spyOn(errorHandler.apm, 'captureError')
     /**
      * We extend the angular default error handler which logs
      * the error to console, so we fake that in this test
@@ -76,7 +66,7 @@ describe('ApmErrorHandler', () => {
     const testError = new Error('Test')
     errorHandler.handleError(testError)
 
-    expect(apm.captureError).toHaveBeenCalledWith(testError)
+    expect(errorHandler.apm.captureError).toHaveBeenCalledWith(testError)
     expect(ErrorHandler.prototype.handleError).toHaveBeenCalled()
   })
 })
