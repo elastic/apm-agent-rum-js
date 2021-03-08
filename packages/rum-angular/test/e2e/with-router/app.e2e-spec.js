@@ -60,9 +60,10 @@ describe('Angular router integration', function() {
     const routeTransaction = transactions[1]
     expect(routeTransaction.name).toBe('/contacts')
     expect(routeTransaction.type).toBe('route-change')
-    expect(routeTransaction.spans.length).toBe(1)
-    expect(routeTransaction.spans[0].name).toBe(
-      'GET /test/e2e/with-router/data.json'
+    expect(routeTransaction.spans.length).toBeGreaterThan(0)
+    const extSpans = routeTransaction.spans.filter(
+      span => span.type === 'external'
     )
+    expect(extSpans[0].name).toBe('GET /test/e2e/with-router/data.json')
   })
 })
