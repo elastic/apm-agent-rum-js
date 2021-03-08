@@ -24,19 +24,25 @@
  */
 
 import { Router, NavigationStart } from '@angular/router'
-import { Injectable } from '@angular/core'
+import { Inject, Injectable, NgZone } from '@angular/core'
 import { afterFrame } from '@elastic/apm-rum-core'
+import { ApmBase } from '@elastic/apm-rum'
+import { APM } from './apm.module'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApmService {
-  static apm: any
-
-  constructor(public router: Router) {}
+  constructor(
+    @Inject(APM) public apm: ApmBase,
+    private router: Router,
+    private readonly ngZone: NgZone
+  ) {}
 
   init(config) {
-    const apmInstance = ApmService.apm.init(config)
+    const apmInstance = this.ngZone.runOutsideAngular(() =>
+      this.apm.init(config)
+    )
 
     if (!apmInstance.isActive()) {
       return apmInstance
@@ -56,7 +62,7 @@ export class ApmService {
       const eventName = event.toString()
       if (eventName.indexOf('NavigationStart') >= 0) {
         const name = (event as NavigationStart).url
-        transaction = ApmService.apm.startTransaction(name, 'route-change', {
+        transaction = this.apm.startTransaction(name, 'route-change', {
           managed: true,
           canReuse: true
         })

@@ -23,6 +23,14 @@
  *
  */
 
-const { getWebdriveBaseConfig } = require('../../dev-utils/webdriver')
+import { InjectionToken, NgModule } from '@angular/core'
+import { RouterModule } from '@angular/router'
+import { apm, ApmBase } from '@elastic/apm-rum'
 
-exports.config = getWebdriveBaseConfig(__dirname)
+export const APM = new InjectionToken<ApmBase>('APM Base Client')
+
+@NgModule({
+  imports: [RouterModule],
+  providers: [{ provide: APM, useValue: apm }]
+})
+export class ApmModule {}
