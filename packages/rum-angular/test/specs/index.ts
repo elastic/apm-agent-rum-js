@@ -23,12 +23,33 @@
  *
  */
 
-const { getBabelConfig, PACKAGE_TYPES } = require('../../dev-utils/build')
+// This file is required by karma.conf.js and loads recursively all the .spec and framework files
 
-module.exports = function(api) {
-  /**
-   * Reads BABEL_ENV to decide between CJS and ESM formats
-   */
-  const env = api.env()
-  return getBabelConfig(env, PACKAGE_TYPES.ANGULAR)
+import 'zone.js/dist/zone'
+import 'zone.js/dist/zone-testing'
+import { getTestBed } from '@angular/core/testing'
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from '@angular/platform-browser-dynamic/testing'
+
+declare const require: {
+  context(
+    path: string,
+    deep?: boolean,
+    filter?: RegExp
+  ): {
+    keys(): string[]
+    <T>(id: string): T
+  }
 }
+
+// First, initialize the Angular testing environment.
+getTestBed().initTestEnvironment(
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting()
+)
+// Then we find all the tests.
+const context = require.context('./', true, /\.spec\.ts$/)
+// And load the modules.
+context.keys().map(context)

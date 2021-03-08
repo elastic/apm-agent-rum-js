@@ -23,11 +23,6 @@
  *
  */
 
-import { apm } from '@elastic/apm-rum'
-import { ApmService } from './apm-service'
-import { ApmErrorHandler } from './error-handler'
-
-ApmService.apm = apm
-ApmErrorHandler.apm = apm
-
-export { ApmService, ApmErrorHandler }
+export * from './apm.module'
+export * from './apm.service'
+export * from './error-handler'

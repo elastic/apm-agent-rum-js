@@ -2,15 +2,16 @@ node_modules
 .config
 .npm
 .DS_Store
+.idea
 
 *.e2e-bundle.*
 *-e2e.html
 
 dist
 tmp
+out-tsc
 
 error-screenshot
-
 html_docs
 build
 reports

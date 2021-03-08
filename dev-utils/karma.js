@@ -151,11 +151,12 @@ function prepareConfig(config, packageName) {
    *  Add coverage reports and plugins required for all environments
    */
   if (config.coverage) {
-    config.plugins.push('karma-coverage')
+    config.plugins.push('karma-coverage', 'karma-coverage-istanbul-reporter')
     config.reporters.push('coverage')
-    const babelPlugins = config.webpack.module.rules[0].options.plugins
-    babelPlugins.push('istanbul')
-
+    if (config.webpack) {
+      const babelPlugins = config.webpack.module.rules[0].options.plugins
+      babelPlugins.push('istanbul')
+    }
     config.coverageReporter = {
       includeAllSources: true,
       reporters: [
