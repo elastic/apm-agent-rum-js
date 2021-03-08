@@ -17,7 +17,6 @@
     "node": ">=12.0.0"
   },
   "scripts": {
-    "prepublishOnly": "npm run build",
     "build": "ng build --prod",
     "build:e2e": "ng build app --prod",
     "test:unit": "ng test",
