@@ -303,18 +303,13 @@ export class PerfEntryRecorder {
     try {
       /**
        * Start observing for different entry types depending on the transaction type
-       * - Except longtasks other entries support buffered flag for performance entries
        * - `buffered`: true means we would be able to retrive all the events that happened
-       * before calling the observe method
+       *   before calling the observe method
        * - We are using type instead of entryTypes in the options since
        *   browsers would throw error when using entryTypes options along with
        *   buffered flag (https://w3c.github.io/performance-timeline/#observe-method)
        */
-      let buffered = true
-      if (type === LONG_TASK) {
-        buffered = false
-      }
-      this.po.observe({ type, buffered })
+      this.po.observe({ type, buffered: true })
     } catch (_) {}
   }
 
