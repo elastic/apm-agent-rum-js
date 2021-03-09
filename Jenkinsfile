@@ -94,47 +94,47 @@ pipeline {
             }
           }
         }
-        stage('Test Pupperteer') {
-          when {
-            beforeAgent true
-            expression { return env.ONLY_DOCS == "false" }
-          }
-          matrix {
-            agent { label 'linux && immutable' }
-            axes {
-                axis {
-                  name 'STACK_VERSION'
-                  values (
-                    '8.0.0-SNAPSHOT',
-                    '7.7.0',
-                    '7.0.0'
-                  )
-                }
-                axis {
-                  name 'SCOPE'
-                  values (
-                    '@elastic/apm-rum',
-                    '@elastic/apm-rum-core',
-                    '@elastic/apm-rum-react',
-                    '@elastic/apm-rum-angular',
-                    '@elastic/apm-rum-vue',
-                  )
-                }
-            }
-            stages {
-              stage('Scope Test') {
-                steps {
-                  runTest()
-                }
-              }
-            }
-            post {
-              cleanup {
-                wrappingUp()
-              }
-            }
-          }
-        }
+        // stage('Test Pupperteer') {
+        //   when {
+        //     beforeAgent true
+        //     expression { return env.ONLY_DOCS == "false" }
+        //   }
+        //   matrix {
+        //     agent { label 'linux && immutable' }
+        //     axes {
+        //         axis {
+        //           name 'STACK_VERSION'
+        //           values (
+        //             '8.0.0-SNAPSHOT',
+        //             '7.7.0',
+        //             '7.0.0'
+        //           )
+        //         }
+        //         axis {
+        //           name 'SCOPE'
+        //           values (
+        //             '@elastic/apm-rum',
+        //             '@elastic/apm-rum-core',
+        //             '@elastic/apm-rum-react',
+        //             '@elastic/apm-rum-angular',
+        //             '@elastic/apm-rum-vue',
+        //           )
+        //         }
+        //     }
+        //     stages {
+        //       stage('Scope Test') {
+        //         steps {
+        //           runTest()
+        //         }
+        //       }
+        //     }
+        //     post {
+        //       cleanup {
+        //         wrappingUp()
+        //       }
+        //     }
+        //   }
+        // }
         stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
           agent { label 'linux && immutable' }
           environment {
@@ -506,11 +506,11 @@ def prepareRelease(String nodeVersion='node:lts', Closure body){
 
 def runAllScopes(){
   def scopes = [
-    'SCOPE=@elastic/apm-rum-core',
-    'SCOPE=@elastic/apm-rum',
-    'SCOPE=@elastic/apm-rum-react',
-    'SCOPE=@elastic/apm-rum-angular',
-    'SCOPE=@elastic/apm-rum-vue'
+    // 'SCOPE=@elastic/apm-rum-core',
+    // 'SCOPE=@elastic/apm-rum',
+    // 'SCOPE=@elastic/apm-rum-react',
+    'SCOPE=@elastic/apm-rum-angular'
+    // 'SCOPE=@elastic/apm-rum-vue'
   ]
   scopes.each{ s ->
     withEnv([s]){
