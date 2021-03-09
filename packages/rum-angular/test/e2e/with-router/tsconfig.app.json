@@ -3,8 +3,9 @@
   "compilerOptions": {
     "outDir": "../../../out-tsc/app",
     "types": ["node"],
-    "target": "ES5"
+    "target": "ES5",
+    "allowJs": true
   },
   "files": ["main.ts", "polyfills.ts"],
-  "include": ["**/*.d.ts"]
+  "include": ["**/rum-core/**/*.js", "**/*.d.ts"]
 }
