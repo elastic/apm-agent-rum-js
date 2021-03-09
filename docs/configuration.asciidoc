@@ -214,14 +214,14 @@ Distributed tracing is enabled by default, however you can use this configuratio
 * *Type:* Array
 * *Default:* `[]`
 
-This option is an array of strings and determines which origins should be monitored as part of distributed tracing.
+This option is an array of strings or regexes and determines which origins should be monitored as part of distributed tracing.
 More specificly this option is consulted when the agent is about to add distributed tracing http header (`traceparent`) to a request.
-Please note that each item in the array should be a valid url and at least include the origin part (other parts of the url are ignored).
+Please note that this list testing the origin part of the url (other parts of the url are ignored), each item in the array should be a valid url or a regex to test the origin part.
 
 [source,js]
 ----
 var options = {
-  distributedTracingOrigins: ['https://example.com']
+  distributedTracingOrigins: ['https://example.com', /https?:\/\/example\.com:\d{4}/]
 }
 ----
 
