@@ -2,7 +2,8 @@
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../../out-tsc/app",
-    "types": ["node"]
+    "types": ["node"],
+    "target": "ES5"
   },
   "files": ["main.ts", "polyfills.ts"],
   "include": ["**/*.d.ts"]
