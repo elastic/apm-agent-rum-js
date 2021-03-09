@@ -25,5 +25,5 @@
 
 export const environment = {
   production: true,
-  serverUrl: 'http://localhost:8001'
+  serverUrl: 'http://apm-server:8200'
 }
