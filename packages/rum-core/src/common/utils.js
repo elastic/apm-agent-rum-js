@@ -149,6 +149,8 @@ function checkSameOrigin(source, target) {
   let isSame = false
   if (typeof target === 'string') {
     isSame = source === target
+  } else if (target && typeof target.test === 'function') {
+    isSame = target.test(source)
   } else if (Array.isArray(target)) {
     target.forEach(function(t) {
       if (!isSame) {
