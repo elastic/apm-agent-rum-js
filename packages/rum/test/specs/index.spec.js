@@ -28,12 +28,12 @@ import { apmBase } from '../../src/'
 import { isPlatformSupported } from '@elastic/apm-rum-core'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
-describe('index', function() {
+describe('index', function () {
   const globalConfig = getGlobalConfig()
   const { serverUrl, serviceName } = globalConfig.agentConfig
   var originalTimeout
 
-  beforeEach(function() {
+  beforeEach(function () {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000
     let cache = require.cache
@@ -42,14 +42,14 @@ describe('index', function() {
     }
   })
 
-  afterEach(function() {
+  afterEach(function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
-  it('should init ApmBase', function(done) {
+  it('should init ApmBase', function (done) {
     var apmServer = apmBase.serviceFactory.getService('ApmServer')
     if (globalConfig.useMocks) {
-      apmServer._makeHttpRequest = function() {
+      apmServer._makeHttpRequest = function () {
         return Promise.resolve()
       }
     }
@@ -117,7 +117,7 @@ describe('index', function() {
       delay: () => ++window.count
     }
     window.capturedTestErrors = []
-    window.onerror = function(err) {
+    window.onerror = function (err) {
       window.capturedTestErrors.push(err)
     }
 

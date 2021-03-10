@@ -34,7 +34,7 @@ const JasmineRunner = require('jasmine')
 function walkSync(dir, filter, filelist) {
   var files = fs.readdirSync(dir)
   filelist = filelist || []
-  files.forEach(function(file) {
+  files.forEach(function (file) {
     var filename = path.join(dir, file)
     var stat = fs.statSync(filename)
     if (stat.isDirectory()) {
@@ -55,14 +55,14 @@ function walkSync(dir, filter, filelist) {
 function buildE2eBundles(basePath, callback) {
   var cb =
     callback ||
-    function(err) {
+    function (err) {
       if (err) {
         process.exit(2)
       }
     }
 
   var fileList = walkSync(basePath, /webpack\.config\.js$/)
-  fileList = fileList.map(function(file) {
+  fileList = fileList.map(function (file) {
     return path.relative(__dirname, file)
   })
   var configs = fileList
@@ -127,11 +127,11 @@ function runKarma(configFile) {
 function runE2eTests(configFilePath) {
   const wdio = new Launcher(configFilePath, {})
   wdio.run().then(
-    function(code) {
+    function (code) {
       process.stdin.pause()
       process.nextTick(() => process.exit(code))
     },
-    function(error) {
+    function (error) {
       console.error('Launcher failed to start the test', error)
       process.stdin.pause()
       process.nextTick(() => process.exit())

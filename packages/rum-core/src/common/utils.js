@@ -150,7 +150,7 @@ function checkSameOrigin(source, target) {
   if (typeof target === 'string') {
     isSame = source === target
   } else if (Array.isArray(target)) {
-    target.forEach(function(t) {
+    target.forEach(function (t) {
       if (!isSame) {
         isSame = checkSameOrigin(source, t)
       }

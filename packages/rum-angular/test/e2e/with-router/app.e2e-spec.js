@@ -25,7 +25,7 @@
 
 const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
 
-describe('Angular router integration', function() {
+describe('Angular router integration', function () {
   /**
    * Change ELEMENT_KEY to approprioate value when using `devtools`
    * automation protocol

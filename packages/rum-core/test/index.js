@@ -31,7 +31,7 @@ export function createServiceFactory() {
   var serviceFactory = originalFactory()
   if (window.globalConfigs && window.globalConfigs.useMocks) {
     var apmServer = serviceFactory.getService('ApmServer')
-    apmServer._makeHttpRequest = function() {
+    apmServer._makeHttpRequest = function () {
       return Promise.resolve()
     }
   }

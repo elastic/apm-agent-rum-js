@@ -23,7 +23,8 @@
  *
  */
 
-import { Router, NavigationStart } from '@angular/router'
+import { Router } from '@angular/router'
+import type { NavigationStart } from '@angular/router'
 import { Inject, Injectable, NgZone } from '@angular/core'
 import { afterFrame } from '@elastic/apm-rum-core'
 import { ApmBase } from '@elastic/apm-rum'

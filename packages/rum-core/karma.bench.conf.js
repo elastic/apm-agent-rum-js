@@ -31,7 +31,7 @@ const { getWebpackConfig, BUNDLE_TYPES } = require('../../dev-utils/build')
 const BENCHMARKS_DIR = join(__dirname, 'test', 'benchmarks')
 const REPORTS_DIR = join(__dirname, 'reports')
 
-module.exports = function(config) {
+module.exports = function (config) {
   /**
    * create reports directory if it does not exist
    */

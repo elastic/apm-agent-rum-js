@@ -25,7 +25,7 @@
 
 const { getBabelConfig } = require('../../dev-utils/build')
 
-module.exports = function(api) {
+module.exports = function (api) {
   const env = api.env()
   return getBabelConfig(env)
 }

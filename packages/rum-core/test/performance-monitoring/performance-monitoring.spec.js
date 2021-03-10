@@ -53,14 +53,14 @@ import resourceEntries from '../fixtures/resource-entries'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
-describe('PerformanceMonitoring', function() {
+describe('PerformanceMonitoring', function () {
   var serviceFactory
   var apmServer
   var performanceMonitoring
   var configService
   var logger
 
-  beforeEach(function() {
+  beforeEach(function () {
     serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
     logger = serviceFactory.getService('LoggingService')
@@ -70,7 +70,7 @@ describe('PerformanceMonitoring', function() {
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   })
 
-  it('should send performance monitoring data to apm-server', function(done) {
+  it('should send performance monitoring data to apm-server', function (done) {
     var tr = new Transaction('tr-name', 'tr-type', configService.config)
     var span1 = new Span('span 1', 'test-span')
     span1.end()
@@ -146,7 +146,7 @@ describe('PerformanceMonitoring', function() {
     )
   })
 
-  it('should create correct payload', function() {
+  it('should create correct payload', function () {
     var tr = new Transaction('transaction1', 'transaction1type', {
       transactionSampleRate: 1
     })
@@ -168,11 +168,11 @@ describe('PerformanceMonitoring', function() {
     expect(payload.spans[0].duration).toBe(parseInt(span._end - span._start))
   })
 
-  it('should sendPageLoadMetrics', function(done) {
+  it('should sendPageLoadMetrics', function (done) {
     const unMock = mockGetEntriesByType()
     const transactionService = serviceFactory.getService('TransactionService')
 
-    configService.events.observe(TRANSACTION_END, function(tr) {
+    configService.events.observe(TRANSACTION_END, function (tr) {
       expect(tr.captureTimings).toBe(true)
       const payload = performanceMonitoring.createTransactionDataModel(tr)
       var promise = apmServer.sendEvents([
@@ -198,7 +198,7 @@ describe('PerformanceMonitoring', function() {
     tr.detectFinish()
   })
 
-  it('should filter out empty transactions', function() {
+  it('should filter out empty transactions', function () {
     var tr = new Transaction('test', 'test', {
       transactionSampleRate: 1,
       startTime: 0
@@ -221,7 +221,7 @@ describe('PerformanceMonitoring', function() {
     expect(result).toBe(true)
   })
 
-  it('should filter managed transactions with duration above threshold', function() {
+  it('should filter managed transactions with duration above threshold', function () {
     var tr = new Transaction('/test/outlier', 'page-load-slow', {
       startTime: 0,
       managed: true
@@ -240,7 +240,7 @@ describe('PerformanceMonitoring', function() {
     expect(promise).toBeUndefined()
   })
 
-  it('should correctly use xhr patch', function(done) {
+  it('should correctly use xhr patch', function (done) {
     var fn = performanceMonitoring.getXHRSub()
     expect(typeof fn).toBe('function')
     var req = new window.XMLHttpRequest()
@@ -252,7 +252,7 @@ describe('PerformanceMonitoring', function() {
         target: req
       }
     }
-    req.addEventListener('readystatechange', function() {
+    req.addEventListener('readystatechange', function () {
       if (req.readyState === req.DONE) {
         fn('invoke', task)
         expect(task.data.span.ended).toBeTruthy()
@@ -281,7 +281,7 @@ describe('PerformanceMonitoring', function() {
         target: req
       }
     }
-    req.addEventListener('readystatechange', function() {
+    req.addEventListener('readystatechange', function () {
       if (req.readyState === req.DONE) {
         patchFn('invoke', task)
         expect(task.data.span.ended).toBeTruthy()
@@ -298,7 +298,7 @@ describe('PerformanceMonitoring', function() {
     ])
   })
 
-  it('should consider fetchInProgress to avoid duplicate spans', function(done) {
+  it('should consider fetchInProgress to avoid duplicate spans', function (done) {
     var fn = performanceMonitoring.getXHRSub()
     expect(typeof fn).toBe('function')
     var req = new window.XMLHttpRequest()
@@ -310,7 +310,7 @@ describe('PerformanceMonitoring', function() {
       }
     }
 
-    req.addEventListener('readystatechange', function() {
+    req.addEventListener('readystatechange', function () {
       if (req.readyState === req.DONE) {
         fn('invoke', task)
         expect(task.data.span.ended).toBeTruthy()
@@ -330,23 +330,23 @@ describe('PerformanceMonitoring', function() {
   })
 
   if (window.fetch) {
-    it('should create fetch spans', function(done) {
+    it('should create fetch spans', function (done) {
       const origBootstrapTime = state.bootstrapTime
       // ignore capturing resource timing spans
       state.bootstrapTime = 0
       var fn = performanceMonitoring.getFetchSub()
       var dTHeaderValue
-      const cancelFetchSub = patchEventHandler.observe(FETCH, function(
-        event,
-        task
-      ) {
-        fn(event, task)
-        if (event === SCHEDULE) {
-          dTHeaderValue = task.data.target.headers.get(
-            configService.get('distributedTracingHeaderName')
-          )
+      const cancelFetchSub = patchEventHandler.observe(
+        FETCH,
+        function (event, task) {
+          fn(event, task)
+          if (event === SCHEDULE) {
+            dTHeaderValue = task.data.target.headers.get(
+              configService.get('distributedTracingHeaderName')
+            )
+          }
         }
-      })
+      )
       var transactionService = performanceMonitoring._transactionService
       var tr = transactionService.startTransaction(
         'fetch transaction',
@@ -355,7 +355,7 @@ describe('PerformanceMonitoring', function() {
       )
       spyOn(transactionService, 'startSpan').and.callThrough()
 
-      window.fetch('/?a=b&c=d').then(function() {
+      window.fetch('/?a=b&c=d').then(function () {
         setTimeout(() => {
           expect(tr.spans.length).toBe(1)
           expect(tr.spans[0].name).toBe('GET /')
@@ -410,7 +410,7 @@ describe('PerformanceMonitoring', function() {
       )
     })
 
-    it('should not duplicate xhr spans if fetch is a polyfill', function(done) {
+    it('should not duplicate xhr spans if fetch is a polyfill', function (done) {
       const origBootstrapTime = state.bootstrapTime
       // ignore capturing resource timing spans
       state.bootstrapTime = 0
@@ -418,23 +418,23 @@ describe('PerformanceMonitoring', function() {
       const fetchFn = performanceMonitoring.getFetchSub()
 
       const events = []
-      const cancelXHRSub = patchEventHandler.observe(XMLHTTPREQUEST, function(
-        event,
-        task
-      ) {
-        events.push({ event, source: task.source })
-        xhrFn(event, task)
-      })
-      const cancelFetchSub = patchEventHandler.observe(FETCH, function(
-        event,
-        task
-      ) {
-        events.push({ event, source: task.source })
-        fetchFn(event, task)
-      })
+      const cancelXHRSub = patchEventHandler.observe(
+        XMLHTTPREQUEST,
+        function (event, task) {
+          events.push({ event, source: task.source })
+          xhrFn(event, task)
+        }
+      )
+      const cancelFetchSub = patchEventHandler.observe(
+        FETCH,
+        function (event, task) {
+          events.push({ event, source: task.source })
+          fetchFn(event, task)
+        }
+      )
 
-      window['__fetchDelegate'] = function(request) {
-        return new Promise(function(resolve) {
+      window['__fetchDelegate'] = function (request) {
+        return new Promise(function (resolve) {
           var url
           if (typeof request === 'string') {
             url = request
@@ -443,7 +443,7 @@ describe('PerformanceMonitoring', function() {
           }
           var req = new window.XMLHttpRequest()
           req.open('GET', url, true)
-          req.addEventListener('readystatechange', function() {
+          req.addEventListener('readystatechange', function () {
             // to guarantee the order of event execution
             setTimeout(() => {
               if (req.readyState === req.DONE) {
@@ -467,7 +467,7 @@ describe('PerformanceMonitoring', function() {
 
       var promise = window.fetch('/')
       expect(promise).toBeDefined()
-      promise.then(function(response) {
+      promise.then(function (response) {
         setTimeout(() => {
           expect(response).toBeDefined()
           expect(tr.spans.length).toBe(1)
@@ -500,7 +500,7 @@ describe('PerformanceMonitoring', function() {
     })
   }
 
-  it('should add xhr tasks', function(done) {
+  it('should add xhr tasks', function (done) {
     var fn = performanceMonitoring.getXHRSub()
     var transactionService = performanceMonitoring._transactionService
     var tr = transactionService.startTransaction('task transaction', 'custom', {
@@ -516,7 +516,7 @@ describe('PerformanceMonitoring', function() {
         target: req
       }
     }
-    req.addEventListener('readystatechange', function() {
+    req.addEventListener('readystatechange', function () {
       if (req.readyState === req.DONE) {
         fn('invoke', task)
         expect(tr._activeTasks.size).toBe(0)
@@ -529,7 +529,7 @@ describe('PerformanceMonitoring', function() {
     req.send()
   })
 
-  it('should create Transactions on history.pushState', function() {
+  it('should create Transactions on history.pushState', function () {
     const historySubFn = performanceMonitoring.getHistorySub()
     const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)
     const transactionService = performanceMonitoring._transactionService
@@ -749,7 +749,7 @@ describe('PerformanceMonitoring', function() {
       expect(newTr.name).toBe('Click - button["purchase"]')
     })
 
-    it('should respect the transaction type priority order', function() {
+    it('should respect the transaction type priority order', function () {
       const historySubFn = performanceMonitoring.getHistorySub()
       const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)
       let etsub = performanceMonitoring.getEventTargetSub()
@@ -822,7 +822,7 @@ describe('PerformanceMonitoring', function() {
   })
 
   describe('PerformanceMonitoring Utils', () => {
-    it('should group small continuously similar spans up until the last one', function() {
+    it('should group small continuously similar spans up until the last one', function () {
       var tr = new Transaction('transaction', 'transaction', { startTime: 10 })
       var span1 = tr.startSpan('name', 'type', { startTime: 10 })
       span1.end(30)
@@ -847,7 +847,7 @@ describe('PerformanceMonitoring', function() {
       expect(grouped[2].name).toBe('2x name')
     })
 
-    it('should group small continuously similar spans', function() {
+    it('should group small continuously similar spans', function () {
       var tr = new Transaction('transaction', 'transaction', { startTime: 10 })
       var span1 = tr.startSpan('name', 'type', { startTime: 20 })
       span1.end(30)
@@ -871,7 +871,7 @@ describe('PerformanceMonitoring', function() {
       expect(grouped[1].name).toBe('another-name')
     })
 
-    it('should reset fields for unsampled transactions', function() {
+    it('should reset fields for unsampled transactions', function () {
       const tr = new Transaction('unsampled', 'test', {
         transactionSampleRate: 0,
         startTime: 0

@@ -25,8 +25,8 @@
 
 const { getBrowserInfo } = require('../../../../../dev-utils/webdriver')
 
-describe('async-tests', function() {
-  it('should run the usecase', function() {
+describe('async-tests', function () {
+  it('should run the usecase', function () {
     browser.url('/test/e2e/async-tests/async-e2e.html')
     browser.waitUntil(
       () => {
@@ -41,7 +41,7 @@ describe('async-tests', function() {
      * Its not possible to inject the ApmServerMock for standalone
      * tests as the application code is different from the APM Agent bundle code
      */
-    const transactionPayload = browser.execute(function() {
+    const transactionPayload = browser.execute(function () {
       return window.TRANSACTION_PAYLOAD
     })
     expect(transactionPayload.type).toBe('page-load')

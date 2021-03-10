@@ -25,10 +25,10 @@
 
 const { waitForApmServerCalls } = require('../../../../dev-utils/webdriver')
 
-describe('Vue router integration', function() {
+describe('Vue router integration', function () {
   beforeAll(() => browser.url('/test/e2e/'))
 
-  it('should run vue app and capture route-change events', function() {
+  it('should run vue app and capture route-change events', function () {
     browser.waitUntil(
       () => {
         /**

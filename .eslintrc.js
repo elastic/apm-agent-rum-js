@@ -30,14 +30,13 @@ module.exports = {
   extends: [
     'plugin:prettier/recommended',
     'plugin:react/recommended',
-    'prettier/@typescript-eslint',
-    'plugin:@typescript-eslint/recommended'
+    'prettier'
   ],
   parser: 'babel-eslint',
   plugins: ['standard', 'rulesdir'],
   rules: {
-    'no-unused-vars': 'error',
-    'prettier/prettier': ['error', { singleQuote: true, semi: false }],
+    'no-unused-vars': 0,
+    '@typescript-eslint/no-unused-vars': 'error',
     'object-shorthand': 'error',
     'rulesdir/require-license-header': [
       'error',
@@ -48,7 +47,8 @@ module.exports = {
     'react/prop-types': 0,
     '@typescript-eslint/explicit-function-return-type': 0,
     '@typescript-eslint/no-explicit-any': 0,
-    '@typescript-eslint/member-delimiter-style': 0
+    '@typescript-eslint/member-delimiter-style': 0,
+    
   },
   settings: {
     react: {
@@ -85,7 +85,8 @@ module.exports = {
         'no-var': 0,
         'prefer-const': 0,
         'prefer-rest-params': 0,
-        'prefer-spread': 0
+        'prefer-spread': 0,
+        'no-unused-vars': 'error',
       }
     }
   ]

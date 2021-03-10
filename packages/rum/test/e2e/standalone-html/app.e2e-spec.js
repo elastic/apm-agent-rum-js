@@ -25,8 +25,8 @@
 
 const { allowSomeBrowserErrors } = require('../../../../../dev-utils/webdriver')
 
-describe('standalone-html', function() {
-  it('should run the usecase', function() {
+describe('standalone-html', function () {
+  it('should run the usecase', function () {
     browser.url('/test/e2e/standalone-html/index.html')
     browser.waitUntil(
       () => {
@@ -39,7 +39,7 @@ describe('standalone-html', function() {
     return allowSomeBrowserErrors(['timeout test error with a secret'])
   })
 
-  it('should run the opentracing use-case', function() {
+  it('should run the opentracing use-case', function () {
     browser.url('/test/e2e/standalone-html/opentracing.html')
     browser.waitUntil(
       () => {
