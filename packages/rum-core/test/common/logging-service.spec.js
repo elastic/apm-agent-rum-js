@@ -32,7 +32,7 @@ describe('LoggingService', function () {
   })
   it('should log', function () {
     expect(loggingService.level).toBe('info')
-    // eslint-disable-next-line
+    /* eslint-disable no-unused-vars*/
     var hasTrace = false
     if (typeof console.trace === 'function') {
       spyOn(console, 'trace')
