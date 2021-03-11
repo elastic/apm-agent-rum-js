@@ -23,12 +23,6 @@
  *
  */
 
-import { apmBase } from '@elastic/apm-rum'
-import ApmServerMock from '../../rum-core/test/utils/apm-server-mock'
+const { getWebdriveBaseConfig } = require('../../dev-utils/webdriver')
 
-export function initializeApmService(service, config) {
-  const apmServer = apmBase.serviceFactory.getService('ApmServer')
-  const serverMock = new ApmServerMock(apmServer, false)
-  apmBase.serviceFactory.instances['ApmServer'] = serverMock
-  return service.init(config)
-}
+exports.config = getWebdriveBaseConfig(__dirname)

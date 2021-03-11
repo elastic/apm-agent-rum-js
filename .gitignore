@@ -4,6 +4,8 @@ node_modules
 .DS_Store
 .idea
 
+# Ignore all e2e related build files
+test/e2e/with-router/build
 *.e2e-bundle.*
 *-e2e.html
 
