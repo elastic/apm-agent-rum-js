@@ -41,7 +41,7 @@ function checkValidPackages(packages) {
  * We override the Lerna prepration command which takes of
  * building the package graph for publishing packages
  */
-Command.prototype.runPreparations = async function() {
+Command.prototype.runPreparations = async function () {
   /**
    * List of packages that are present under /packages/ folder
    */

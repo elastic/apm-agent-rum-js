@@ -25,12 +25,12 @@
 
 import patchEventHandler from './patch'
 import { HISTORY } from '../../src/common/constants'
-describe('historyPatch', function() {
+describe('historyPatch', function () {
   var events = []
   var cancelFn
 
-  beforeAll(function() {
-    cancelFn = patchEventHandler.observe(HISTORY, function(event, task) {
+  beforeAll(function () {
+    cancelFn = patchEventHandler.observe(HISTORY, function (event, task) {
       events.push({
         event,
         task
@@ -38,15 +38,15 @@ describe('historyPatch', function() {
     })
   })
 
-  afterAll(function() {
+  afterAll(function () {
     cancelFn()
   })
 
-  beforeEach(function() {
+  beforeEach(function () {
     events = []
   })
 
-  it('should patch history.pushState', function() {
+  it('should patch history.pushState', function () {
     history.pushState(undefined, 'test', 'test')
 
     expect(events).toEqual([

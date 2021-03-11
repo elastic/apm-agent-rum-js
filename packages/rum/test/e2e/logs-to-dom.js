@@ -23,11 +23,11 @@
  *
  */
 
-;(function() {
+;(function () {
   function _patchDebugMethods() {
     function patch(target, name) {
       var orig = target[name]
-      target[name] = function() {
+      target[name] = function () {
         var debugElement = document.createElement('li')
         var logs = [].slice.call(arguments)
         debugElement.innerHTML = name + ': ' + JSON.stringify(logs) //.slice(0, 1000)

@@ -35,17 +35,17 @@ import { XMLHTTPREQUEST } from '../../src/common/constants'
 function registerEventListener(target) {
   const events = []
 
-  const cancelFn = patchEventHandler.observe(XMLHTTPREQUEST, function(
-    event,
-    task
-  ) {
-    if (!target || target === task.data.target) {
-      events.push({
-        event,
-        task
-      })
+  const cancelFn = patchEventHandler.observe(
+    XMLHTTPREQUEST,
+    function (event, task) {
+      if (!target || target === task.data.target) {
+        events.push({
+          event,
+          task
+        })
+      }
     }
-  })
+  )
 
   return done => {
     if (done) {
@@ -58,13 +58,13 @@ function registerEventListener(target) {
   }
 }
 
-describe('xhrPatch', function() {
+describe('xhrPatch', function () {
   function mapEvent(event) {
     delete event.task.data.target
     return event
   }
 
-  it('should register symbols for url, sync and method', function() {
+  it('should register symbols for url, sync and method', function () {
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
     expect(req[XHR_URL]).toBe('/')
@@ -72,11 +72,11 @@ describe('xhrPatch', function() {
     expect(req[XHR_SYNC]).toBe(false)
   })
 
-  it('should produce events', function(done) {
+  it('should produce events', function (done) {
     var req = new window.XMLHttpRequest()
     let getEvents = registerEventListener(req)
     req.open('GET', '/', true)
-    req.addEventListener('load', function() {
+    req.addEventListener('load', function () {
       expect(getEvents(done).map(mapEvent)).toEqual([
         {
           event: 'schedule',
@@ -112,7 +112,7 @@ describe('xhrPatch', function() {
     req.send()
   })
 
-  it('should work with synchronous xhr', function() {
+  it('should work with synchronous xhr', function () {
     var req = new window.XMLHttpRequest()
     let getEvents = registerEventListener(req)
     req.open('GET', '/', false)
@@ -121,7 +121,7 @@ describe('xhrPatch', function() {
     expect(getEvents(true).map(e => e.event)).toEqual(['schedule', 'invoke'])
   })
 
-  it('should schedule events correctly for 404', function(done) {
+  it('should schedule events correctly for 404', function (done) {
     var req = new window.XMLHttpRequest()
     let getEvents = registerEventListener(req)
     req.open('GET', '/test.json', true)
@@ -132,7 +132,7 @@ describe('xhrPatch', function() {
     req.send()
   })
 
-  it('should correctly schedule events when sync xhr fails', function() {
+  it('should correctly schedule events when sync xhr fails', function () {
     const req = new window.XMLHttpRequest()
     const getEvents = registerEventListener(req)
     try {
@@ -151,7 +151,7 @@ describe('xhrPatch', function() {
     }
   })
 
-  it('should correctly schedule events when async xhr fails', function(done) {
+  it('should correctly schedule events when async xhr fails', function (done) {
     const req = new window.XMLHttpRequest()
     const getEvents = registerEventListener(req)
     req.open('GET', 'https://somewhere.org/i-dont-exist')
@@ -171,7 +171,7 @@ describe('xhrPatch', function() {
     req.send()
   })
 
-  it('should work with aborted xhr', function() {
+  it('should work with aborted xhr', function () {
     var req = new XMLHttpRequest()
     const getEvents = registerEventListener(req)
     req.open('GET', '/', true)
@@ -186,7 +186,7 @@ describe('xhrPatch', function() {
     ])
   })
 
-  it('should schedule events correctly for CORS requests', function(done) {
+  it('should schedule events correctly for CORS requests', function (done) {
     const req = new window.XMLHttpRequest()
     const getEvents = registerEventListener(req)
     req.open('GET', 'https://elastic.co/guide', true)
@@ -196,7 +196,7 @@ describe('xhrPatch', function() {
     req.send()
   })
 
-  it('should capture events correctly for timeouts', function(done) {
+  it('should capture events correctly for timeouts', function (done) {
     const req = new XMLHttpRequest()
     const getEvents = registerEventListener(req)
     req.open('GET', '/timeout', true)
@@ -215,15 +215,15 @@ describe('xhrPatch', function() {
     req.send()
   })
 
-  it('should work properly when send request multiple times on single xmlRequest instance', function(done) {
+  it('should work properly when send request multiple times on single xmlRequest instance', function (done) {
     const req = new XMLHttpRequest()
     const getEvents = registerEventListener(req)
     req.open('get', '/?multiple1', true)
     req.send()
-    req.onload = function() {
+    req.onload = function () {
       req.onload = null
       req.open('get', '/?multiple2', true)
-      req.onload = function() {
+      req.onload = function () {
         expect(getEvents(done).map(e => e.event)).toEqual([
           'schedule',
           'invoke',
@@ -237,7 +237,7 @@ describe('xhrPatch', function() {
     }
   })
 
-  it('should preserve static constants', function() {
+  it('should preserve static constants', function () {
     expect(XMLHttpRequest.UNSENT).toEqual(0)
     expect(XMLHttpRequest.OPENED).toEqual(1)
     expect(XMLHttpRequest.HEADERS_RECEIVED).toEqual(2)
@@ -245,12 +245,12 @@ describe('xhrPatch', function() {
     expect(XMLHttpRequest.DONE).toEqual(4)
   })
 
-  it('should work correctly when abort was called before request is completed', function(done) {
+  it('should work correctly when abort was called before request is completed', function (done) {
     const req = new XMLHttpRequest()
     const getEvents = registerEventListener(req)
     req.open('get', '/', true)
     req.send()
-    req.addEventListener('readystatechange', function() {
+    req.addEventListener('readystatechange', function () {
       if (req.readyState >= 2) {
         expect(() => {
           req.abort()
@@ -277,12 +277,12 @@ describe('xhrPatch', function() {
     }
   })
 
-  it('should not create events and pollute xhr when ignore flag is true', function(done) {
+  it('should not create events and pollute xhr when ignore flag is true', function (done) {
     var req = new window.XMLHttpRequest()
     let getEvents = registerEventListener(req)
     req[XHR_IGNORE] = true
     req.open('GET', '/?ignoretest')
-    req.addEventListener('load', function() {
+    req.addEventListener('load', function () {
       expect(req[XHR_METHOD]).toBeUndefined()
       expect(req[XHR_URL]).toBeUndefined()
       expect(getEvents(done).map(e => e.event)).toEqual([])
@@ -298,7 +298,7 @@ describe('xhrPatch', function() {
     req.open('GET', '/?loadtest')
 
     req.send()
-    req.addEventListener('load', function() {
+    req.addEventListener('load', function () {
       expect(getEvents(done).map(e => e.event)).toEqual(['schedule', 'invoke'])
     })
     expect(getEvents().map(e => e.event)).toEqual(['schedule'])

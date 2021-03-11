@@ -58,7 +58,7 @@ class ApmServerMock {
 
     function spyOn(service, methodName, mockFn) {
       var _orig = service[methodName]
-      return (service[methodName] = function() {
+      return (service[methodName] = function () {
         var args = Array.prototype.slice
           .call(arguments)
           .map(a => JSON.parse(JSON.stringify(a)))

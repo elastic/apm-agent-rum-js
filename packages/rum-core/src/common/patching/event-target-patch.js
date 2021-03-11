@@ -168,7 +168,7 @@ export function patchEventTarget(callback) {
     return listenerFn
   }
 
-  proto[ADD_EVENT_LISTENER_STR] = function(
+  proto[ADD_EVENT_LISTENER_STR] = function (
     eventType,
     listenerFn,
     optionsOrCapture
@@ -191,7 +191,7 @@ export function patchEventTarget(callback) {
     return nativeAddEventListener.apply(target, args)
   }
 
-  proto[REMOVE_EVENT_LISTENER_STR] = function(
+  proto[REMOVE_EVENT_LISTENER_STR] = function (
     eventType,
     listenerFn,
     optionsOrCapture

@@ -52,7 +52,7 @@ function TestComponent(apm, cb) {
   return wrapped
 }
 
-describe('withTransaction', function() {
+describe('withTransaction', function () {
   const { serverUrl, serviceName } = getGlobalConfig().agentConfig
   let apmBase, serviceFactory
 
@@ -67,12 +67,12 @@ describe('withTransaction', function() {
     })
   })
 
-  it('should work if apm is disabled or not initialized', function() {
+  it('should work if apm is disabled or not initialized', function () {
     TestComponent(new ApmBase(serviceFactory, true))
     TestComponent(apmBase)
   })
 
-  it('should not log warning or create transaction if apm is not active', function() {
+  it('should not log warning or create transaction if apm is not active', function () {
     const [loggingService, transactionService] = serviceFactory.getService([
       'LoggingService',
       'TransactionService'
@@ -89,7 +89,7 @@ describe('withTransaction', function() {
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
   })
 
-  it('should start transaction for components', function() {
+  it('should start transaction for components', function () {
     const transactionService = serviceFactory.getService('TransactionService')
     spyOn(transactionService, 'startTransaction')
 
@@ -104,7 +104,7 @@ describe('withTransaction', function() {
     )
   })
 
-  it('should return WrappedComponent on falsy value and log warning', function() {
+  it('should return WrappedComponent on falsy value and log warning', function () {
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(loggingService, 'warn')
 

@@ -33,7 +33,7 @@ import {
   EVENT_TARGET
 } from '../../src/common/constants'
 
-describe('Instrumentation', function() {
+describe('Instrumentation', function () {
   it('disable all instrumentations when instrument config is false', () => {
     const flags = getInstrumentationFlags(false, [])
 

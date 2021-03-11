@@ -25,12 +25,12 @@
 
 import { createStackTraces } from '../../src/error-logging/stack-trace'
 
-describe('StackTraceService', function() {
-  it('should produce correct number of frames', function(done) {
+describe('StackTraceService', function () {
+  it('should produce correct number of frames', function (done) {
     function generateError() {
       throw new Error('test error')
     }
-    setTimeout(function() {
+    setTimeout(function () {
       try {
         generateError()
       } catch (error) {

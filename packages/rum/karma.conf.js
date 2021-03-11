@@ -25,7 +25,7 @@
 
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set(baseConfig)
   const preparedConfig = prepareConfig(config, 'rum')
   config.set(preparedConfig)

@@ -111,7 +111,7 @@ export function patchXMLHttpRequest(callback) {
     XMLHttpRequestPrototype,
     'open',
     () =>
-      function(self, args) {
+      function (self, args) {
         if (!self[XHR_IGNORE]) {
           self[XHR_METHOD] = args[0]
           self[XHR_URL] = args[1]
@@ -125,7 +125,7 @@ export function patchXMLHttpRequest(callback) {
     XMLHttpRequestPrototype,
     'send',
     () =>
-      function(self, args) {
+      function (self, args) {
         if (self[XHR_IGNORE]) {
           return sendNative.apply(self, args)
         }

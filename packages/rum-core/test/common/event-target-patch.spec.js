@@ -28,12 +28,12 @@ import { EVENT_TARGET } from '../../src/common/constants'
 import { createCustomEvent } from '../'
 import { describeIf } from '../../../../dev-utils/jasmine'
 
-describe('EventTargetPatch', function() {
+describe('EventTargetPatch', function () {
   let events = []
   let cancelFn
 
-  beforeAll(function() {
-    cancelFn = patchEventHandler.observe(EVENT_TARGET, function(event, task) {
+  beforeAll(function () {
+    cancelFn = patchEventHandler.observe(EVENT_TARGET, function (event, task) {
       events.push({
         event,
         task
@@ -41,11 +41,11 @@ describe('EventTargetPatch', function() {
     })
   })
 
-  afterAll(function() {
+  afterAll(function () {
     cancelFn()
   })
 
-  beforeEach(function() {
+  beforeEach(function () {
     events = []
   })
 

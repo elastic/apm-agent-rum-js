@@ -32,7 +32,7 @@ export function patchHistory(callback) {
 
   const nativePushState = history.pushState
   if (typeof nativePushState === 'function') {
-    history.pushState = function(state, title, url) {
+    history.pushState = function (state, title, url) {
       const task = {
         source: HISTORY,
         data: {

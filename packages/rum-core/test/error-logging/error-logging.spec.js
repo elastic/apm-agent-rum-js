@@ -29,14 +29,14 @@ import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig('rum-core')
 
-describe('ErrorLogging', function() {
+describe('ErrorLogging', function () {
   var testErrorMessage = 'errorevent_test_error_message'
   var configService
   var apmServer
   var errorLogging
   var transactionService
 
-  beforeEach(function() {
+  beforeEach(function () {
     var serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
     configService.setConfig(agentConfig)
@@ -48,7 +48,7 @@ describe('ErrorLogging', function() {
   const getEvents = () => apmServer.queue.items
   const clearQueue = () => apmServer.queue._clear()
 
-  it('should send error', function(done) {
+  it('should send error', function (done) {
     var errorObject
     try {
       throw new Error('test error')
@@ -184,7 +184,7 @@ describe('ErrorLogging', function() {
     transaction.end()
   })
 
-  it('should support ErrorEvent', function(done) {
+  it('should support ErrorEvent', function (done) {
     apmServer.init()
     var errorEvent = createErrorEvent(testErrorMessage)
     errorLogging.logErrorEvent(errorEvent)
@@ -228,11 +228,11 @@ describe('ErrorLogging', function() {
       .catch(reason => fail(reason))
   })
 
-  it('should install global listener for error and accept ErrorEvents', function(done) {
+  it('should install global listener for error and accept ErrorEvents', function (done) {
     apmServer.init()
     const numberOfErrors = 4
     const original = window.addEventListener
-    spyOn(apmServer, 'sendEvents').and.callFake(function(errors) {
+    spyOn(apmServer, 'sendEvents').and.callFake(function (errors) {
       expect(errors.length).toBe(numberOfErrors)
       var errorData = errors[0][ERRORS]
       expect(errorData.exception.message).toContain(testErrorMessage)
@@ -241,7 +241,7 @@ describe('ErrorLogging', function() {
     })
 
     const addedListenerTypes = []
-    let listener = (window.addEventListener = function(type, event) {
+    let listener = (window.addEventListener = function (type, event) {
       addedListenerTypes.push(type)
       errorLogging.logErrorEvent(event)
     })
@@ -277,7 +277,7 @@ describe('ErrorLogging', function() {
     listener('error', createErrorEvent(testErrorMessage))
   })
 
-  it('should handle edge cases', function(done) {
+  it('should handle edge cases', function (done) {
     var resultPromises = []
     resultPromises.push(errorLogging.logErrorEvent(), true)
     resultPromises.push(errorLogging.logErrorEvent({}), true)
@@ -288,7 +288,7 @@ describe('ErrorLogging', function() {
       .catch(reason => fail(reason))
   })
 
-  it('should add error to queue', function() {
+  it('should add error to queue', function () {
     apmServer.init()
     configService.setConfig({
       serviceName: 'serviceName'
@@ -393,7 +393,7 @@ describe('ErrorLogging', function() {
       'Unhandled promise rejection: <object>'
     )
 
-    const noop = function() {}
+    const noop = function () {}
     errorLogging.logPromiseEvent({
       reason: noop
     })

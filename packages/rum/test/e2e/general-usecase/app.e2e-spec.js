@@ -28,8 +28,8 @@ const {
   getBrowserFeatures
 } = require('../../../../../dev-utils/webdriver')
 
-describe('general-usercase', function() {
-  it('should run the general usecase', function() {
+describe('general-usercase', function () {
+  it('should run the general usecase', function () {
     browser.url('/test/e2e/general-usecase/index.html')
     browser.waitUntil(
       () => {
@@ -82,7 +82,7 @@ describe('general-usercase', function() {
     return allowSomeBrowserErrors(['timeout test error with a secret'])
   })
 
-  it('should capture history.pushState', function() {
+  it('should capture history.pushState', function () {
     /**
      * The query string is only used to make url different to the previous test,
      * Otherwise, both tests will run in the same window.
@@ -108,7 +108,7 @@ describe('general-usercase', function() {
     expect(transactionPayload.spans.length).toBeGreaterThanOrEqual(3)
   })
 
-  it('should capture click user interaction', function() {
+  it('should capture click user interaction', function () {
     let features = getBrowserFeatures()
     if (features.EventTarget) {
       browser.url('/test/e2e/general-usecase/index.html')

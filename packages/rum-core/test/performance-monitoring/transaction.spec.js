@@ -26,8 +26,8 @@
 import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 
-describe('Transaction', function() {
-  it('should contain correct number of spans in the end', function(done) {
+describe('Transaction', function () {
+  it('should contain correct number of spans in the end', function (done) {
     var firstSpan = new Span('first-span-name', 'first-span')
     firstSpan.end()
 
@@ -44,9 +44,9 @@ describe('Transaction', function() {
     done()
   })
 
-  it('should not generate stacktrace if the option is not passed', function(done) {
+  it('should not generate stacktrace if the option is not passed', function (done) {
     var tr = new Transaction('/', 'transaction')
-    tr.onEnd = function() {
+    tr.onEnd = function () {
       expect(firstSpan.frames).toBeUndefined()
       expect(secondSpan.frames).toBeUndefined()
       done()
@@ -60,7 +60,7 @@ describe('Transaction', function() {
     tr.end()
   })
 
-  it('should redefine transaction', function() {
+  it('should redefine transaction', function () {
     var tr = new Transaction('/', 'transaction')
     tr.redefine('name', 'type', { test: 'test' })
     expect(tr.name).toBe('name')
@@ -68,7 +68,7 @@ describe('Transaction', function() {
     expect(tr.options).toEqual({ test: 'test' })
   })
 
-  it('should add and remove tasks', function() {
+  it('should add and remove tasks', function () {
     var tr = new Transaction('/', 'transaction')
     expect(tr._activeTasks.size).toEqual(0)
     const task1 = tr.addTask()
@@ -112,7 +112,7 @@ describe('Transaction', function() {
     expect(tr.end).toHaveBeenCalled()
   })
 
-  it('should mark events', function() {
+  it('should mark events', function () {
     var transaction = new Transaction('transaction', 'transaction')
     transaction.mark('new.mark')
     transaction.mark('mark')
@@ -120,14 +120,14 @@ describe('Transaction', function() {
     expect(typeof transaction.marks.custom.mark).toBe('number')
   })
 
-  it('should not start spans after end', function() {
+  it('should not start spans after end', function () {
     var transaction = new Transaction('transaction', 'transaction')
     transaction.end()
     var span = transaction.startSpan('test', 'test')
     expect(span).toBe(undefined)
   })
 
-  it('should always set span parentId', function() {
+  it('should always set span parentId', function () {
     var transaction = new Transaction('transaction', 'transaction')
 
     var span = transaction.startSpan('name', 'type')
@@ -136,7 +136,7 @@ describe('Transaction', function() {
     expect(span.parentId).toBe('test-parent-id')
   })
 
-  it('should calculate reusability', function() {
+  it('should calculate reusability', function () {
     var transaction = new Transaction('transaction', 'transaction')
     expect(transaction.canReuse()).toBe(false)
 

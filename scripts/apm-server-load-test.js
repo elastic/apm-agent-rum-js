@@ -250,7 +250,7 @@ async function generatePayloads(transactionCount) {
   return result
 }
 
-;(async function() {
+;(async function () {
   const outputFile = process.argv[2]
 
   const result = await generatePayloads(10)

@@ -25,13 +25,13 @@
 
 import Span from '../../src/performance-monitoring/span'
 
-describe('Span', function() {
-  it('should return null for duration if not ended', function() {
+describe('Span', function () {
+  it('should return null for duration if not ended', function () {
     var s = new Span('test', 'test')
     expect(s.duration()).toBe(null)
   })
 
-  it('should support dot delimiter in span types', function() {
+  it('should support dot delimiter in span types', function () {
     var s1 = new Span('test1', 'db.mysql.query')
     expect(s1.type).toBe('db')
     expect(s1.subtype).toBe('mysql')

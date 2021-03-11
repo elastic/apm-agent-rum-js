@@ -120,7 +120,7 @@ class ApmServer {
   }
 
   _makeHttpRequest(method, url, { timeout = 10000, payload, headers } = {}) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       var xhr = new window.XMLHttpRequest()
       xhr[XHR_IGNORE] = true
       xhr.open(method, url, true)
@@ -134,7 +134,7 @@ class ApmServer {
         }
       }
 
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
           const { status, responseText } = xhr
           // An http 4xx or 5xx error. Signal an error.

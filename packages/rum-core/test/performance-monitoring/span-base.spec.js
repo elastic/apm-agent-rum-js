@@ -25,7 +25,7 @@
 
 import SpanBase from '../../src/performance-monitoring/span-base'
 
-describe('SpanBase', function() {
+describe('SpanBase', function () {
   it('should add default name and type for span', () => {
     const span = new SpanBase('', undefined)
 
@@ -33,7 +33,7 @@ describe('SpanBase', function() {
     expect(span.type).toEqual('custom')
   })
 
-  it('should addLabels', function() {
+  it('should addLabels', function () {
     var span = new SpanBase()
     span.addLabels({ test: 'passed', 'test.new': 'new' })
     expect(span.context).toEqual({
@@ -41,7 +41,7 @@ describe('SpanBase', function() {
     })
   })
 
-  it('should addContext', function() {
+  it('should addContext', function () {
     var span = new SpanBase()
     span.addContext({ test: { ctx: 'hamid' } })
     expect(span.context).toEqual({ test: { ctx: 'hamid' } })
