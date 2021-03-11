@@ -23,12 +23,7 @@
  *
  */
 
-import { apmBase } from '@elastic/apm-rum'
-import ApmServerMock from '../../rum-core/test/utils/apm-server-mock'
-
-export function initializeApmService(service, config) {
-  const apmServer = apmBase.serviceFactory.getService('ApmServer')
-  const serverMock = new ApmServerMock(apmServer, false)
-  apmBase.serviceFactory.instances['ApmServer'] = serverMock
-  return service.init(config)
+export const environment = {
+  production: true,
+  serverUrl: 'http://apm-server:8200'
 }
