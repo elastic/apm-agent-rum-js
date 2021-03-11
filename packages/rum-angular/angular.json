@@ -26,8 +26,60 @@
           "options": {
             "main": "test/specs/index.ts",
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
-            "polyfills": "test/polyfills.ts"
+            "karmaConfig": "karma.conf.js"
+          }
+        }
+      }
+    },
+    "app": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "test/e2e/with-router",
+      "sourceRoot": "test/e2e/with-router",
+      "prefix": "",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "test/e2e/with-router/build",
+            "index": "test/e2e/with-router/index.html",
+            "main": "test/e2e/with-router/main.ts",
+            "polyfills": "test/e2e/with-router/polyfills.ts",
+            "tsConfig": "test/e2e/with-router/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "test/e2e/with-router/assets"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "test/e2e/with-router/environments/environment.ts",
+                  "with": "test/e2e/with-router/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "port": 8000,
+            "browserTarget": "app:build",
+            "baseHref": "/test/e2e/with-router/build/"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "app:build:production"
+            }
           }
         }
       }

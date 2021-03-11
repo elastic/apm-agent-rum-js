@@ -23,22 +23,26 @@
  *
  */
 
-import { NgModule, Inject, ErrorHandler } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
+import { NgModule, ErrorHandler } from '@angular/core'
 import { HttpClientModule } from '@angular/common/http'
-import { Router } from '@angular/router'
+import {
+  ApmModule,
+  ApmService,
+  ApmErrorHandler
+} from '@elastic/apm-rum-angular'
 
-import { AppRoutingModule } from './app.routing.module'
+import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { HomeComponent } from './home.component'
 import { ContactListComponent } from './contact-list.component'
 import { ContactDetailComponent } from './contact-detail.component'
 import { PageNotFoundComponent } from './not-found.component'
-import { ApmService, ApmErrorHandler } from '../../../../src'
-import { initializeApmService } from '../../../index'
+import { environment } from '../environments/environment'
+import { initializeApmService } from '../../../'
 
 @NgModule({
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule],
+  imports: [ApmModule, BrowserModule, AppRoutingModule, HttpClientModule],
   declarations: [
     AppComponent,
     HomeComponent,
@@ -47,11 +51,7 @@ import { initializeApmService } from '../../../index'
     ContactDetailComponent
   ],
   providers: [
-    {
-      provide: ApmService,
-      useClass: ApmService,
-      deps: [Router]
-    },
+    ApmService,
     {
       provide: ErrorHandler,
       useClass: ApmErrorHandler
@@ -60,8 +60,9 @@ import { initializeApmService } from '../../../index'
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(@Inject(ApmService) service: ApmService) {
+  constructor(service: ApmService) {
     initializeApmService(service, {
+      serverUrl: environment.serverUrl,
       serviceName: 'e2e-angular-integration',
       logLevel: 'debug'
     })
