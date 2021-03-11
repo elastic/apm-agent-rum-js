@@ -15,7 +15,7 @@
     "paths": {
       "@elastic/apm-rum-core": ["../rum-core/dist/es"],
       "@elastic/apm-rum": ["../rum/src/dist/es"],
-      "@elastic/apm-rum-angular": ["dist"]
+      "@elastic/apm-rum-angular": ["src"]
     }
   },
   "angularCompilerOptions": {
