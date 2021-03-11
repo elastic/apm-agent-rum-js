@@ -24,6 +24,36 @@
  */
 
 declare module '@elastic/apm-rum' {
+  export interface AgentConfigOptions {
+    apiVersion?: 2 | 3
+    serviceName?: string
+    serverUrl?: string
+    serviceVersion?: string
+    active?: boolean
+    instrument?: boolean
+    disableInstrumentations?: Array<InstrumentationTypes>
+    environment?: string
+    logLevel?: LogLevel
+    breakdownMetrics?: boolean
+    flushInterval?: number
+    pageLoadTraceId?: string
+    pageLoadSampled?: boolean
+    pageLoadSpanId?: string
+    pageLoadTransactionName?: string
+    distributedTracing?: boolean
+    distributedTracingOrigins?: Array<string | RegExp>
+    errorThrottleLimit?: number
+    errorThrottleInterval?: number
+    transactionThrottleLimit?: number
+    transactionThrottleInterval?: number
+    transactionSampleRate?: number
+    centralConfig?: boolean
+    ignoreTransactions?: Array<string | RegExp>
+    propagateTracestate?: boolean
+    eventsLimit?: number
+    queueLimit?: number
+  }
+
   type Init = (options?: AgentConfigOptions) => ApmBase
   const init: Init
 
@@ -106,32 +136,7 @@ declare class Span extends BaseSpan {
   sync: boolean
 }
 
-interface AgentConfigOptions {
-  apiVersion?: 2 | 3
-  serviceName?: string
-  serverUrl?: string
-  serviceVersion?: string
-  active?: boolean
-  instrument?: boolean
-  disableInstrumentations?: Array<InstrumentationTypes>
-  environment?: string
-  logLevel?: LogLevel
-  breakdownMetrics?: boolean
-  flushInterval?: number
-  pageLoadTraceId?: string
-  pageLoadSampled?: boolean
-  pageLoadSpanId?: string
-  pageLoadTransactionName?: string
-  distributedTracing?: boolean
-  distributedTracingOrigins?: Array<string>
-  errorThrottleLimit?: number
-  errorThrottleInterval?: number
-  transactionThrottleLimit?: number
-  transactionThrottleInterval?: number
-  transactionSampleRate?: number
-  centralConfig?: boolean
-  ignoreTransactions?: Array<string | RegExp>
-}
+
 
 interface TransactionOptions {
   managed?: boolean
