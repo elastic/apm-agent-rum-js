@@ -53,7 +53,10 @@
         timeout: '15'
         use-author: true
         wipe-workspace: 'True'
-    periodic-folder-trigger: 1d
+    # Webhook based rather than polling otherwise the GitHub API quota
+    # will be overkilled. For such, periodic-folder-trigger is not needed
+    # anymore, so we keep the comment below for clarity.
+    # periodic-folder-trigger: 1w
     prune-dead-branches: true
     publishers:
     - email:
