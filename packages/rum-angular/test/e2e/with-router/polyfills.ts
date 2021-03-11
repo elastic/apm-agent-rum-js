@@ -23,20 +23,13 @@
  *
  */
 
-const path = require('path')
-const {
-  getWebpackConfig,
-  PACKAGE_TYPES,
-  BUNDLE_TYPES
-} = require('../../../../../dev-utils/build')
+/**
+ * This file includes polyfills needed by Angular and is loaded before the app.
+ * You can add your own extra polyfills to this file.
+ * Learn more in https://angular.io/guide/browser-support
+ */
 
-module.exports = {
-  entry: {
-    app: path.join(__dirname, 'main.ts')
-  },
-  output: {
-    path: path.resolve(__dirname),
-    filename: '[name].e2e-bundle.js'
-  },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD, PACKAGE_TYPES.ANGULAR)
-}
+/**
+ * Zone JS is required by default for Angular itself.
+ */
+import 'zone.js/dist/zone'

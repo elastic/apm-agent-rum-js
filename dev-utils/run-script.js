@@ -123,24 +123,11 @@ function runSauceTests(packagePath, serve = 'true', ...scripts) {
    * Since there is no easy way to reuse the sauce connect tunnel even using same tunnel identifier,
    * we launch the sauce connect tunnel before starting all the saucelab tests
    */
-
   if (serve === 'true') {
     startServersWithCleanups(join(PROJECT_DIR, packagePath))
   }
 
   launchSauceConnect(async sauceConnectProcess => {
-    if (!sauceLabs) {
-      return runUnitTests(packagePath)
-    }
-
-    /**
-     * `console.logs` from the tests will be truncated when the process exits
-     * To avoid truncation, we flush the data from stdout before exiting the process
-     */
-    if (process.stdout.isTTY && process.stdout._handle) {
-      process.stdout._handle.setBlocking(true)
-    }
-
     /**
      * Decides the saucelabs test status
      */
@@ -149,18 +136,42 @@ function runSauceTests(packagePath, serve = 'true', ...scripts) {
       stdout: process.stdout,
       stderr: process.stderr
     }
+    const exitProcess = () => process.exit(exitCode)
 
-    try {
-      await runAll(scripts, loggerOpts)
-      console.log(`Ran all [${scripts.join(', ')}] scripts successfully!`)
-    } catch (err) {
-      console.log('Sauce Tests Failed', err)
-      exitCode = 1
-    } finally {
-      sauceConnectProcess.close(() => {
-        process.exit(exitCode)
-      })
+    const runAllAndExit = async commands => {
+      try {
+        await runAll(commands, loggerOpts)
+      } catch (err) {
+        console.log('runSauceTests failed', err)
+        exitCode = 1
+      } finally {
+        if (sauceConnectProcess) {
+          sauceConnectProcess.close(exitProcess)
+        } else {
+          exitProcess()
+        }
+      }
     }
+    /**
+     * `console.logs` from the tests will be truncated when the process exits
+     * To avoid truncation, we flush the data from stdout before exiting the process
+     */
+    if (process.stdout.isTTY && process.stdout._handle) {
+      process.stdout._handle.setBlocking(true)
+    }
+
+    if (!sauceLabs) {
+      /**
+       * For Angular package we use `ng` commands for running the test instead of
+       * using our custom karma runner
+       */
+      if (packagePath === 'packages/rum-angular') {
+        return await runAllAndExit(['test:unit'])
+      } else {
+        return runUnitTests(packagePath)
+      }
+    }
+    await runAllAndExit(scripts)
   })
 }
 
