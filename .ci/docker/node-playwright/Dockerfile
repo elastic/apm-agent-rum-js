@@ -42,7 +42,8 @@ RUN apt-get -qq install -y  --no-install-recommends \
     libharfbuzz-icu0 \
     libgstreamer-gl1.0-0 \
     libgstreamer-plugins-bad1.0-0 \
-    gstreamer1.0-plugins-good
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-libav
 
 # 4. Install Chromium dependencies
 RUN apt-get update --fix-missing && apt-get install -y --no-install-recommends \
