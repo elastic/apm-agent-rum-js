@@ -25,14 +25,14 @@
 
 import LoggingService from '../../src/common/logging-service'
 
-describe('LoggingService', function() {
+describe('LoggingService', function () {
   var loggingService
-  beforeEach(function() {
+  beforeEach(function () {
     loggingService = new LoggingService({ level: 'info' })
   })
-  it('should log', function() {
+  it('should log', function () {
     expect(loggingService.level).toBe('info')
-    // eslint-disable-next-line
+    /* eslint-disable no-unused-vars*/
     var hasTrace = false
     if (typeof console.trace === 'function') {
       spyOn(console, 'trace')
@@ -75,7 +75,7 @@ describe('LoggingService', function() {
     expect(console.info).toHaveBeenCalledWith('blah')
   })
 
-  it('should check if console is defined', function() {
+  it('should check if console is defined', function () {
     expect(loggingService.level).toBe('info')
     spyOn(console, 'log')
     var _info = console.info
@@ -95,7 +95,7 @@ describe('LoggingService', function() {
     window.console = _console
   })
 
-  it('should set prefix for logs', function() {
+  it('should set prefix for logs', function () {
     spyOn(console, 'info')
     loggingService = new LoggingService({
       prefix: 'APM: ',

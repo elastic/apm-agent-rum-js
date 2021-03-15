@@ -35,7 +35,7 @@ import { getGlobalConfig } from '../../../../dev-utils/test-config'
 const { agentConfig } = getGlobalConfig('rum-core')
 
 function getSendEvents(performanceMonitoring, apmServer) {
-  return function(transactions) {
+  return function (transactions) {
     const payload = transactions.map(tr => {
       return {
         [TRANSACTIONS]: performanceMonitoring.createTransactionPayload(tr)
@@ -63,22 +63,22 @@ suite('PerformanceMonitoring', () => {
   const unsampledTr = generateTestTransaction(10, false)
   const sendEvents = getSendEvents(performanceMonitoring, apmServer)
 
-  benchmark('createTransactionPayload Sampled', function() {
+  benchmark('createTransactionPayload Sampled', function () {
     performanceMonitoring.createTransactionPayload(sampledTr)
   })
 
-  benchmark('createTransactionPayload Unsampled', function() {
+  benchmark('createTransactionPayload Unsampled', function () {
     performanceMonitoring.createTransactionPayload(unsampledTr)
   })
 
-  benchmark('sendEvents-no-json', function() {
+  benchmark('sendEvents-no-json', function () {
     apmServer._postJson = ResolvedPromise
     sendEvents([sampledTr])
   })
 
   benchmark(
     'sendEvents',
-    function() {
+    function () {
       apmServer._postJson = _postJson
       sendEvents([sampledTr])
     },

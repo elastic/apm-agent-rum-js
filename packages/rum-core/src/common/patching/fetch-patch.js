@@ -44,7 +44,7 @@ export function patchFetch(callback) {
   }
 
   var nativeFetch = window.fetch
-  window.fetch = function(input, init) {
+  window.fetch = function (input, init) {
     var fetchSelf = this
     var args = arguments
     var request, url
@@ -70,7 +70,7 @@ export function patchFetch(callback) {
       }
     }
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       globalState.fetchInProgress = true
       scheduleTask(task)
       var promise

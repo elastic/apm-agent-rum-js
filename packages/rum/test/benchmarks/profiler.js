@@ -103,7 +103,7 @@ function gatherRawMetrics(browser, url) {
       resolve(metrics)
     })
 
-    page.on('load', async function() {
+    page.on('load', async function () {
       const timings = await page.evaluate(() => {
         // Serializing the outputs otherwise it will be undefined
         let entries = performance.getEntriesByType('navigation')
@@ -132,7 +132,7 @@ function gatherRawMetrics(browser, url) {
         )
         const original = apmServer._makeHttpRequest
 
-        apmServer._makeHttpRequest = function(method, url, options) {
+        apmServer._makeHttpRequest = function (method, url, options) {
           const { payload } = options
           window.PAYLOAD_SIZE =
             payload instanceof Blob ? payload.size : payload.length

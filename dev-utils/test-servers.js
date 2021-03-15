@@ -34,7 +34,7 @@ function startBackendAgentServer(port = 8003) {
   const express = require('express')
   const app = express()
 
-  app.use(function(req, res, next) {
+  app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
     if (req.method === 'OPTIONS') {
       res.header(
@@ -86,11 +86,11 @@ function startTestServers(path = join(__dirname, '../'), port = 8000) {
   const app = express()
   const staticPath = path
 
-  app.get('/healthcheck', function(req, res) {
+  app.get('/healthcheck', function (req, res) {
     res.send('OK')
   })
 
-  app.get('/run_integration_test', async function(req, res) {
+  app.get('/run_integration_test', async function (req, res) {
     const echo = req.query.echo
     try {
       const result = await runIntegrationTest(

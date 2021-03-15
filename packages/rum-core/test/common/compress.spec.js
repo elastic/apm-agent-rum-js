@@ -162,14 +162,14 @@ function flatten(obj) {
   return result
 }
 
-describe('Compress', function() {
+describe('Compress', function () {
   let serviceFactory
   let apmServer
   let configService
   let performanceMonitoring
   let errorLogging
 
-  beforeEach(function() {
+  beforeEach(function () {
     serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
     apmServer = serviceFactory.getService('ApmServer')

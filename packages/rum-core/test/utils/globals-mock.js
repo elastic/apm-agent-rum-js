@@ -61,7 +61,7 @@ export function mockObserverEntryNames(name) {
 export function mockGetEntriesByType() {
   const _getEntriesByType = window.performance.getEntriesByType
 
-  window.performance.getEntriesByType = function(type) {
+  window.performance.getEntriesByType = function (type) {
     expect([RESOURCE, MEASURE, NAVIGATION]).toContain(type)
     if (type === RESOURCE) {
       return resourceEntries

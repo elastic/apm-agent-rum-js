@@ -28,7 +28,7 @@ import express from 'express'
 const app = express()
 var port = 8201
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
   res.header(
     'Access-Control-Allow-Headers',
@@ -37,7 +37,7 @@ app.use(function(req, res, next) {
   next()
 })
 
-app.get('/healthcheck', function(req, res) {
+app.get('/healthcheck', function (req, res) {
   res.send('OK')
 })
 

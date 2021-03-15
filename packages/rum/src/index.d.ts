@@ -136,8 +136,6 @@ declare class Span extends BaseSpan {
   sync: boolean
 }
 
-
-
 interface TransactionOptions {
   managed?: boolean
   /**

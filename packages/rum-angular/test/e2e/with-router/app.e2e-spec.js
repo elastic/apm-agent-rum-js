@@ -25,10 +25,10 @@
 
 const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
 
-describe('Angular router integration', function() {
+describe('Angular router integration', function () {
   beforeAll(() => browser.url('/test/e2e/with-router/'))
 
-  it('should run angular app and capture route-change', function() {
+  it('should run angular app and capture route-change', function () {
     /**
      * Should render home page on load
      */

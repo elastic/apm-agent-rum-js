@@ -28,8 +28,8 @@ import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig()
 
-describe('ApmBase', function() {
-  it('should not init ApmBase', function() {
+describe('ApmBase', function () {
+  it('should not init ApmBase', function () {
     apmBase.init(agentConfig)
     try {
       throw new Error('ApmBase test error')
