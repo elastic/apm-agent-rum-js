@@ -25,7 +25,7 @@
 
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
 
-module.exports = function(config) {
+module.exports = function (config) {
   const { watch, codeCoverage } = config.buildWebpack.options
   const angularConfig = {
     ...baseConfig,
