@@ -64,8 +64,8 @@ apiCompatibilityChecks(
   { skipBaggageChecks: true }
 )
 
-describe('OpenTracing API', function() {
-  it('should create spans', function() {
+describe('OpenTracing API', function () {
+  it('should create spans', function () {
     var tracer = createTracer({
       active: true
     })

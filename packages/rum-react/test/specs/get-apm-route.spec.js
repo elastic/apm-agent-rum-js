@@ -44,7 +44,7 @@ function Component(props) {
   return <h1>Testing, {props.name}</h1>
 }
 
-describe('ApmRoute', function() {
+describe('ApmRoute', function () {
   const { serverUrl, serviceName } = getGlobalConfig().agentConfig
   let serviceFactory, apmBase
 
@@ -59,7 +59,7 @@ describe('ApmRoute', function() {
     })
   })
 
-  it('should work Route component', function() {
+  it('should work Route component', function () {
     const ApmRoute = getApmRoute(apmBase)
 
     const rendered = mount(
@@ -79,7 +79,7 @@ describe('ApmRoute', function() {
     expect(component.text()).toBe('Testing, ')
   })
 
-  it('should work with Route render and log warning', function() {
+  it('should work with Route render and log warning', function () {
     const loggingService = serviceFactory.getService('LoggingService')
     const ApmRoute = getApmRoute(apmBase)
 
@@ -105,7 +105,7 @@ describe('ApmRoute', function() {
     )
   })
 
-  it('should work correctly with path array in props', function() {
+  it('should work correctly with path array in props', function () {
     const ApmRoute = getApmRoute(apmBase)
 
     const transactionService = serviceFactory.getService('TransactionService')
@@ -142,7 +142,7 @@ describe('ApmRoute', function() {
     expect(transactionService.startTransaction).toHaveBeenCalledTimes(2)
   })
 
-  it('should not trigger full rerender on query change', function() {
+  it('should not trigger full rerender on query change', function () {
     const ApmRoute = getApmRoute(apmBase)
     const transactionService = serviceFactory.getService('TransactionService')
     spyOn(transactionService, 'startTransaction')

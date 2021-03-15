@@ -28,7 +28,7 @@ import 'core-js/features/array/map'
 
 Object.setPrototypeOf =
   Object.setPrototypeOf ||
-  function(obj, proto) {
+  function (obj, proto) {
     obj.__proto__ = proto
     return obj
   }

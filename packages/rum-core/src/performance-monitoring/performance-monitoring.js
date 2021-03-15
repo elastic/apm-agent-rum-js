@@ -74,7 +74,7 @@ export function groupSmallContinuouslySimilarSpans(
 
   var spans = []
   let lastCount = 1
-  originalSpans.forEach(function(span, index) {
+  originalSpans.forEach(function (span, index) {
     if (spans.length === 0) {
       spans.push(span)
     } else {
@@ -407,7 +407,7 @@ export default class PerformanceMonitoring {
   createTransactionDataModel(transaction) {
     const transactionStart = transaction._start
 
-    const spans = transaction.spans.map(function(span) {
+    const spans = transaction.spans.map(function (span) {
       const spanData = {
         id: span.id,
         transaction_id: transaction.id,

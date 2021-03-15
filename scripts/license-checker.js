@@ -87,7 +87,7 @@ function runLicenseChecker() {
   })
 }
 
-;(async function() {
+;(async function () {
   const packagesList = await runLicenseChecker()
   const errors = []
 

@@ -25,11 +25,11 @@
 
 import { ServiceFactory } from '../../src/common/service-factory'
 
-describe('ServiceFactory', function() {
+describe('ServiceFactory', function () {
   let configService
   let loggingService
   let serviceFactory
-  beforeEach(function() {
+  beforeEach(function () {
     serviceFactory = new ServiceFactory()
     serviceFactory.init()
     configService = serviceFactory.getService('ConfigService')
@@ -38,7 +38,7 @@ describe('ServiceFactory', function() {
     spyOn(loggingService, 'debug')
   })
 
-  it('should set correct log level', function() {
+  it('should set correct log level', function () {
     expect(configService.get('logLevel')).toBe('warn')
     expect(loggingService.level).toBe('warn')
 
@@ -49,7 +49,7 @@ describe('ServiceFactory', function() {
     expect(loggingService.level).toBe('debug')
   })
 
-  it('should get multiple services', function() {
+  it('should get multiple services', function () {
     let services = serviceFactory.getService([
       'ConfigService',
       'LoggingService'

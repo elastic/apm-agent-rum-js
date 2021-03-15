@@ -29,10 +29,10 @@ export default function throttle(fn, onThrottle, opts) {
   var interval = opts.interval
   var counter = 0
   var timeoutId
-  return function() {
+  return function () {
     counter++
     if (typeof timeoutId === 'undefined') {
-      timeoutId = setTimeout(function() {
+      timeoutId = setTimeout(function () {
         counter = 0
         timeoutId = undefined
       }, interval)

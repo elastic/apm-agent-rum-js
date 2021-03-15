@@ -265,7 +265,7 @@ function getNavigationTimingMarks(timing) {
     responseEnd >= responseStart
   ) {
     const marks = {}
-    NAVIGATION_TIMING_MARKS.forEach(function(timingKey) {
+    NAVIGATION_TIMING_MARKS.forEach(function (timingKey) {
       const m = timing[timingKey]
       if (m && m >= fetchStart) {
         marks[timingKey] = parseInt(m - fetchStart)

@@ -47,7 +47,7 @@ function isReactClassComponent(Component) {
  */
 function getWithTransaction(apm) {
   return function withTransaction(name, type, callback = () => {}) {
-    return function(Component) {
+    return function (Component) {
       if (!apm.isActive()) {
         return Component
       }
@@ -160,8 +160,9 @@ function getWithTransaction(apm) {
         }
       }
 
-      ApmComponent.displayName = `withTransaction(${Component.displayName ||
-        Component.name})`
+      ApmComponent.displayName = `withTransaction(${
+        Component.displayName || Component.name
+      })`
       ApmComponent.WrappedComponent = Component
 
       return hoistStatics(ApmComponent, Component)

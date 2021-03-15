@@ -36,10 +36,10 @@ import Promise from 'promise-polyfill'
 var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
 
-describe('ApmBase', function() {
+describe('ApmBase', function () {
   let serviceFactory
   let apmBase
-  beforeEach(function() {
+  beforeEach(function () {
     serviceFactory = createServiceFactory()
     apmBase = new ApmBase(serviceFactory, !enabled)
   })
@@ -143,7 +143,7 @@ describe('ApmBase', function() {
      */
     const req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener('load', function() {
+    req.addEventListener('load', function () {
       setTimeout(() => {
         const tr = apmBase.getCurrentTransaction()
         expect(tr).toBeUndefined()
@@ -180,7 +180,7 @@ describe('ApmBase', function() {
     expect(loggingService.warn.toString()).toBe('function noop() {}')
   })
 
-  it('should provide the public api', function() {
+  it('should provide the public api', function () {
     apmBase.init({ serviceName, serverUrl })
     apmBase.setInitialPageLoadName('test')
     var configService = serviceFactory.getService('ConfigService')
@@ -205,7 +205,7 @@ describe('ApmBase', function() {
 
     expect(apmBase.getCurrentTransaction()).toBe(tr)
 
-    var filter = function() {}
+    var filter = function () {}
     apmBase.addFilter(filter)
     expect(configService.filters.length).toBe(1)
     expect(configService.filters[0]).toBe(filter)
@@ -214,7 +214,7 @@ describe('ApmBase', function() {
     expect(configService.config.testConfig).toBe('test')
   })
 
-  it('should instrument xhr', function(done) {
+  it('should instrument xhr', function (done) {
     apmBase.init({ serviceName, serverUrl })
     var tr = apmBase.startTransaction('test-transaction', 'test-type', {
       managed: true
@@ -222,7 +222,7 @@ describe('ApmBase', function() {
     expect(tr).toBeDefined()
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener('load', function() {
+    req.addEventListener('load', function () {
       expect(tr.spans.length).toBe(1)
       expect(tr.spans[0].name).toBe('GET /')
       done()
@@ -231,7 +231,7 @@ describe('ApmBase', function() {
     req.send()
   })
 
-  it('should instrument xhr when no transaction was started', function(done) {
+  it('should instrument xhr when no transaction was started', function (done) {
     apmBase.init({
       disableInstrumentations: [PAGE_LOAD],
       serviceName,
@@ -242,7 +242,7 @@ describe('ApmBase', function() {
     var tr
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener('load', function() {
+    req.addEventListener('load', function () {
       expect(tr.spans.length).toBe(1)
       expect(tr.spans[0].name).toBe('GET /')
       done()
@@ -253,7 +253,7 @@ describe('ApmBase', function() {
     expect(tr.name).toBe('GET /')
   })
 
-  it('should patch xhr when not active', function(done) {
+  it('should patch xhr when not active', function (done) {
     const loggingService = serviceFactory.getService('LoggingService')
     spyOn(loggingService, 'warn')
 
@@ -261,7 +261,7 @@ describe('ApmBase', function() {
 
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', true)
-    req.addEventListener('load', function() {
+    req.addEventListener('load', function () {
       setTimeout(() => {
         /**
          * We patch and register symbols on the native XHR with
@@ -309,14 +309,14 @@ describe('ApmBase', function() {
     )
   })
 
-  it('should instrument sync xhr', function(done) {
+  it('should instrument sync xhr', function (done) {
     apmBase.init({ serviceName, serverUrl })
     var tr = apmBase.startTransaction('test-transaction', 'test-type', {
       managed: true
     })
     var req = new window.XMLHttpRequest()
     req.open('GET', '/', false)
-    req.addEventListener('load', function() {
+    req.addEventListener('load', function () {
       done()
     })
 
