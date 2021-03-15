@@ -29,6 +29,16 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+
+[[release-notes-5.7.0]]
+==== 5.7.0 (2021-03-15)
+
+[float]
+===== Features
+* Support regular expression for detecting distributed tracing origins (`distributedTracingOrigins`): {issue}943[#943]
+* Capture buffered longtask entries: {issue}964[#964]
+* Expose agent configuration TypeScript definition: {issue}979[#979]
+
 [[release-notes-5.6.3]]
 ==== 5.6.3 (2021-02-02)
 
