@@ -24,15 +24,4 @@ if [[ -n "${JENKINS_URL}" ]]; then
       exit ${titleResult}
     fi
   fi
-# Run if we're not on Travis
-elif [[ -z "$CI" ]]; then
-  GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
-  if [[ "$GIT_BRANCH" == "master" ]]; then
-    # If on master, just test the latest commit
-    commitlint --edit
-  else
-    # If on a branch, test all commits between this branch and master
-    commitlint --from=master
-  fi
 fi

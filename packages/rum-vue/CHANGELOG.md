@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.1.10...@elastic/apm-rum-vue@1.2.0) (2021-03-15)
+
+
+### Features
+
+* **rum-core:** capture buffered longtask entries ([#965](https://github.com/elastic/apm-agent-rum-js/issues/965)) ([ecb223c](https://github.com/elastic/apm-agent-rum-js/commit/ecb223c95453bd57d3fc17a392acb96f80c138f4))
+
+
+
+
+
+## [1.1.10](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.1.9...@elastic/apm-rum-vue@1.1.10) (2021-02-02)
+
+**Note:** Version bump only for package @elastic/apm-rum-vue
+
+
+
+
+
+## [1.1.9](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.1.8...@elastic/apm-rum-vue@1.1.9) (2020-11-06)
+
+**Note:** Version bump only for package @elastic/apm-rum-vue
+
+
+
+
+
+## [1.1.8](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.1.7...@elastic/apm-rum-vue@1.1.8) (2020-09-29)
+
+**Note:** Version bump only for package @elastic/apm-rum-vue
+
+
+
+
+
 ## [1.1.7](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.1.6...@elastic/apm-rum-vue@1.1.7) (2020-09-17)
 
 

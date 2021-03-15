@@ -28,7 +28,7 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 import {
   groupSmallContinuouslySimilarSpans,
-  adjustTransactionSpans
+  adjustTransaction
 } from '../../src/performance-monitoring/performance-monitoring'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { waitFor } from '../../../../dev-utils/jasmine'
@@ -265,7 +265,37 @@ describe('PerformanceMonitoring', function() {
     expect(task.data.span.ended).toBeFalsy()
     var headerName = configService.get('distributedTracingHeaderName')
     var headerValue = getDtHeaderValue(task.data.span)
+    expect(req.setRequestHeader).toHaveBeenCalledTimes(1)
     expect(req.setRequestHeader).toHaveBeenCalledWith(headerName, headerValue)
+  })
+
+  it('should add tracestate header when propagateTracestate is set', done => {
+    const patchFn = performanceMonitoring.getXHRSub()
+    configService.setConfig({ propagateTracestate: true })
+    const req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+    spyOn(req, 'setRequestHeader').and.callThrough()
+    const task = {
+      source: XMLHTTPREQUEST,
+      data: {
+        target: req
+      }
+    }
+    req.addEventListener('readystatechange', function() {
+      if (req.readyState === req.DONE) {
+        patchFn('invoke', task)
+        expect(task.data.span.ended).toBeTruthy()
+        done()
+      }
+    })
+    patchFn('schedule', task)
+    req.send()
+    expect(task.data.span).toBeDefined()
+    expect(req.setRequestHeader).toHaveBeenCalledTimes(2)
+    expect(req.setRequestHeader.calls.argsFor(1)).toEqual([
+      'tracestate',
+      'es=s:1'
+    ])
   })
 
   it('should consider fetchInProgress to avoid duplicate spans', function(done) {
@@ -327,9 +357,10 @@ describe('PerformanceMonitoring', function() {
 
       window.fetch('/?a=b&c=d').then(function() {
         setTimeout(() => {
-          expect(tr.spans.length).toBe(1)
-          expect(tr.spans[0].name).toBe('GET /')
-          expect(tr.spans[0].context).toEqual({
+          expect(tr.spans.length).toBeGreaterThan(0)
+          const fetchSpan = tr.spans.find(span => span.type === 'external')
+          expect(fetchSpan.name).toBe('GET /')
+          expect(fetchSpan.context).toEqual({
             http: {
               method: 'GET',
               url: 'http://localhost:9876/?a=b&c=d',
@@ -440,7 +471,7 @@ describe('PerformanceMonitoring', function() {
       promise.then(function(response) {
         setTimeout(() => {
           expect(response).toBeDefined()
-          expect(tr.spans.length).toBe(1)
+          expect(tr.spans.length).toBeGreaterThan(0)
           expect(events).toEqual([
             {
               event: 'schedule',
@@ -752,6 +783,45 @@ describe('PerformanceMonitoring', function() {
     })
   }
 
+  it('should set outcome on transaction and spans', done => {
+    let transactionService = performanceMonitoring._transactionService
+
+    let task = createXHRTask('GET', '/')
+
+    performanceMonitoring.processAPICalls('schedule', task)
+    let tr = transactionService.getCurrentTransaction()
+
+    let spanTask = createXHRTask('GET', '/span')
+    performanceMonitoring.processAPICalls('schedule', spanTask)
+
+    spanTask.data.target = { status: 200 }
+    performanceMonitoring.processAPICalls('invoke', spanTask)
+
+    expect(tr.type).toBe('http-request')
+    expect(task.data.target.status).toBe(0)
+    performanceMonitoring.processAPICalls('invoke', task)
+    expect(tr.ended).toBe(true)
+    expect(tr.outcome).toBe('failure')
+    expect(tr.spans.length).toBe(2)
+    expect(tr.spans[0].outcome).toBe('success')
+    expect(tr.spans[1].outcome).toBe('failure')
+
+    const payload = performanceMonitoring.createTransactionDataModel(tr)
+    expect(payload.outcome).toBe('failure')
+    expect(payload.spans[0].outcome).toBe('success')
+    const promise = apmServer.sendEvents([
+      {
+        [TRANSACTIONS]: payload
+      }
+    ])
+    expect(promise).toBeDefined()
+    promise
+      .catch(reason => {
+        fail('Failed sending transactions to the server, reason: ' + reason)
+      })
+      .then(() => done())
+  })
+
   describe('PerformanceMonitoring Utils', () => {
     it('should group small continuously similar spans up until the last one', function() {
       var tr = new Transaction('transaction', 'transaction', { startTime: 10 })
@@ -802,7 +872,7 @@ describe('PerformanceMonitoring', function() {
       expect(grouped[1].name).toBe('another-name')
     })
 
-    it('should reset spans for unsampled transactions', function() {
+    it('should reset fields for unsampled transactions', function() {
       const tr = new Transaction('unsampled', 'test', {
         transactionSampleRate: 0,
         startTime: 0
@@ -811,8 +881,10 @@ describe('PerformanceMonitoring', function() {
       span.end(20)
       tr.end(30)
       expect(tr.spans.length).toBe(1)
-      const adjustedTransaction = adjustTransactionSpans(tr)
+      expect(tr.sampled).toBe(false)
+      const adjustedTransaction = adjustTransaction(tr)
       expect(adjustedTransaction.spans.length).toBe(0)
+      expect(adjustedTransaction.sampleRate).toEqual(0)
     })
   })
 })

@@ -214,16 +214,27 @@ Distributed tracing is enabled by default, however you can use this configuratio
 * *Type:* Array
 * *Default:* `[]`
 
-This option is an array of strings and determines which origins should be monitored as part of distributed tracing.
-More specificly this option is consulted when the agent is about to add distributed tracing http header (`traceparent`) to a request.
-Please note that each item in the array should be a valid url and at least include the origin part (other parts of the url are ignored).
+This option can be set to an array containing one or more Strings or RegExp objects and determines which origins should be monitored as part of distributed tracing.
+More specifically, this option is consulted when the agent is about to add the distributed tracing HTTP header (`traceparent`) to a request.
+Please note that each item in the array should be a valid URL containing the origin (other parts of the url are ignored) or a RegExp object. If an item in the array is a String, an exact match will be performed. If it's a RegExp object, its test function will be called with the request origin. 
 
 [source,js]
 ----
 var options = {
-  distributedTracingOrigins: ['https://example.com']
+  distributedTracingOrigins: ['https://example.com', /https?:\/\/example\.com:\d{4}/]
 }
 ----
+
+[float]
+[[propagate-tracestate]]
+=== `propagateTracestate`
+
+* *Type:* Boolean
+* *Default:* `false`
+
+When distributed tracing is enabled, this option can be used to propagate the https://www.w3.org/TR/trace-context/#tracestate-header[tracestate]
+HTTP header to the configured origins. Before enabling this flag, make sure to change your <<server-configuration, server configuration>> to avoid
+Cross-Origin Resource Sharing errors.
 
 [float]
 [[event-throttling]]

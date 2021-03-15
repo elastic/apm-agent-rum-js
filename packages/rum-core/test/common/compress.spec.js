@@ -113,6 +113,7 @@ const V3_MAPPING = {
   responseStart: 'rs',
   runtime: 'ru',
   sampled: 'sm',
+  sample_rate: 'sr',
   samples: 'sa',
   'server-timing': 'set',
   service: 'se',

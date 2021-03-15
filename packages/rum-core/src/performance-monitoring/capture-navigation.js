@@ -251,25 +251,29 @@ const COMPRESSED_NAV_TIMING_MARKS = [
 ]
 
 function getNavigationTimingMarks(timing) {
-  const { fetchStart, navigationStart } = timing
+  const { fetchStart, navigationStart, responseStart, responseEnd } = timing
   /**
    * Detect if NavigationTiming data is buggy and discard
    * capturing navigation marks for the transaction
    *
-   * Webkit bug - https://bugs.webkit.org/show_bug.cgi?id=168057
+   * https://bugs.webkit.org/show_bug.cgi?id=168057
+   * https://bugs.webkit.org/show_bug.cgi?id=186919
    */
-  if (navigationStart && fetchStart < navigationStart) {
-    return null
+  if (
+    fetchStart >= navigationStart &&
+    responseStart >= fetchStart &&
+    responseEnd >= responseStart
+  ) {
+    const marks = {}
+    NAVIGATION_TIMING_MARKS.forEach(function(timingKey) {
+      const m = timing[timingKey]
+      if (m && m >= fetchStart) {
+        marks[timingKey] = parseInt(m - fetchStart)
+      }
+    })
+    return marks
   }
-
-  const marks = {}
-  NAVIGATION_TIMING_MARKS.forEach(function(timingKey) {
-    const m = timing[timingKey]
-    if (m && m >= fetchStart) {
-      marks[timingKey] = parseInt(m - fetchStart)
-    }
-  })
-  return marks
+  return null
 }
 
 function getPageLoadMarks(timing) {

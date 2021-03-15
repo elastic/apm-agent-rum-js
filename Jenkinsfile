@@ -38,9 +38,8 @@ pipeline {
   parameters {
     booleanParam(name: 'Run_As_Master_Branch', defaultValue: false, description: 'Allow to run any steps on a PR, some steps normally only run on master branch.')
     booleanParam(name: 'saucelab_test', defaultValue: "true", description: "Enable run a Sauce lab test")
-    booleanParam(name: 'parallel_test', defaultValue: "true", description: "Enable run tests in parallel")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
-    booleanParam(name: 'release', defaultValue: false, description: 'Release.')
+    booleanParam(name: 'release', defaultValue: false, description: 'Release. If so, all the other parameters will be ignored when releasing from master.')
   }
   stages {
     stage('Initializing'){
@@ -139,38 +138,25 @@ pipeline {
         stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
           agent { label 'linux && immutable' }
           environment {
-            SAUCELABS_SECRET = "${env.SAUCELABS_SECRET_CORE}"
+            SAUCELABS_SECRET = "${isPR() ? env.SAUCELABS_SECRET : env.SAUCELABS_SECRET_CORE}"
             STACK_VERSION = "8.0.0-SNAPSHOT"
             MODE = "saucelabs"
           }
           when {
             allOf {
-              branch 'master'
+              anyOf {
+                branch 'master'
+                changeRequest()
+              }
               expression { return params.saucelab_test }
               expression { return env.ONLY_DOCS == "false" }
-            }
-          }
-          steps {
-            runAllScopes()
-          }
-          post {
-            cleanup {
-              wrappingUp()
-            }
-          }
-        }
-        stage('Stack 8.0.0-SNAPSHOT SauceLabs PR') {
-          agent { label 'linux && immutable' }
-          environment {
-            SAUCELABS_SECRET="${env.SAUCELABS_SECRET}"
-            STACK_VERSION="8.0.0-SNAPSHOT"
-            MODE = "saucelabs"
-          }
-          when {
-            allOf {
-              changeRequest()
-              expression { return params.saucelab_test }
-              expression { return env.ONLY_DOCS == "false" }
+              // Releases from master should skip this particular stage.
+              not {
+                allOf {
+                  branch 'master'
+                  expression { return params.release }
+                }
+              }
             }
           }
           steps {
@@ -224,6 +210,13 @@ pipeline {
               }
               expression { return params.bench_ci }
               expression { return env.ONLY_DOCS == "false" }
+              // Releases from master should skip this particular stage.
+              not {
+                allOf {
+                  branch 'master'
+                  expression { return params.release }
+                }
+              }
             }
           }
           steps {
@@ -303,8 +296,8 @@ pipeline {
                       sh(label: 'Lerna version dry-run', script: 'npx lerna version --no-push --yes', returnStdout: true)
                       def releaseVersions = sh(label: 'Gather versions from last commit', script: 'git log -1 --format="%b"', returnStdout: true)
                       log(level: 'INFO', text: "Versions: ${releaseVersions}")
-                      emailext subject: "[${env.REPO}] Release ready to be pushed", to: "${NOTIFY_TO}",
-                               body: "Please go to ${env.BUILD_URL}input to approve or reject within 12 hours.\n Changes: ${releaseVersions}"
+                      notifyStatus(slackStatus: 'warning', subject: "[${env.REPO}] Release ready to be pushed",
+                                   body: "Please go to (<${env.BUILD_URL}input|here>) to approve or reject within 12 hours.\n Changes: ${releaseVersions}")
                       input(message: 'Should we release a new version?', ok: 'Yes, we should.',
                             parameters: [text(description: 'Look at the versions to be released. They cannot be edited here',
                                               defaultValue: "${releaseVersions}", name: 'versions')])
@@ -326,7 +319,7 @@ pipeline {
               }
               post {
                 success {
-                  emailext subject: "[${env.REPO}] Release published", to: "${env.NOTIFY_TO}", body: "Great news, the release has been done successfully."
+                  notifyStatus(slackStatus: 'good', subject: "[${env.REPO}] Release published", body: "Great news, the release has been done successfully. (<${env.RUN_DISPLAY_URL}|Open>). \n Release URL: (<https://github.com/elastic/apm-agent-rum-js/releases|Here>)")
                 }
                 always {
                   script {
@@ -343,6 +336,11 @@ pipeline {
                   uploadToCDN()
                 }
               }
+            }
+          }
+          post {
+            failure {
+              notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Release failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
             }
           }
         }
@@ -433,10 +431,10 @@ def runScript(Map args = [:]){
           sleep randomNumber(min: 5, max: 10)
           if(env.MODE == 'saucelabs'){
             withSaucelabsEnv(){
-              sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
+              sh(label: "Run tests: Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
             }
           } else {
-            sh(label: "Start Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
+            sh(label: "Run tests: Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
           }
         }
       } catch(e) {
@@ -531,4 +529,13 @@ def runTest(){
       goal: 'test'
     )
   }
+}
+
+def notifyStatus(def args = [:]) {
+  releaseNotification(slackChannel: '#apm-agent-js',
+                      slackColor: args.slackStatus,
+                      slackCredentialsId: 'jenkins-slack-integration-token',
+                      to: "${env.NOTIFY_TO}",
+                      subject: args.subject,
+                      body: args.body)
 }

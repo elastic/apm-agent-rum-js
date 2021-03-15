@@ -23,13 +23,14 @@
  *
  */
 
-import { ApmBase, init } from '@elastic/apm-rum'
+import { ApmBase, init, AgentConfigOptions } from '@elastic/apm-rum'
 
 const config: AgentConfigOptions = {
   active: true,
   logLevel: 'info',
   distributedTracing: true,
-  disableInstrumentations: ['xmlhttprequest', 'page-load']
+  disableInstrumentations: ['xmlhttprequest', 'page-load'],
+  distributedTracingOrigins: ['http://localhost:8080', /test/]
 }
 
 /** APM Base */

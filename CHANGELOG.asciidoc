@@ -29,6 +29,53 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+
+[[release-notes-5.7.0]]
+==== 5.7.0 (2021-03-15)
+
+[float]
+===== Features
+* Support regular expression for detecting distributed tracing origins (`distributedTracingOrigins`): {issue}943[#943]
+* Capture buffered longtask entries: {issue}964[#964]
+* Expose agent configuration TypeScript definition: {issue}979[#979]
+
+[[release-notes-5.6.3]]
+==== 5.6.3 (2021-02-02)
+
+[float]
+===== Features
+* Propagate sampling weight through tracestate header: {issue}845[#845]
+* Add necessary scripts to load test APM server with RUM payload: {issue}948[#948]
+
+
+[float]
+===== Bug fixes
+* Handle null reason in promise rejection event: {issue}940[#940]
+
+
+[[release-notes-5.6.2]]
+==== 5.6.2 (2020-11-06)
+
+[float]
+===== Features
+* Add transaction sampling rate precision which ensures `transaction_sample_rate` configuration option 
+has a maximum precision of 4 decimal places: {issue}927[#927]
+* Add `outcome` field to applicable transactions and spans that is used by the APM UI for displaying
+the error rate chart: {issue}904[#904]
+
+
+[[release-notes-5.6.1]]
+==== 5.6.1 (2020-09-29)
+
+[float]
+===== Features
+* Longtasks are now aggregated under the experience field to make querying faster: {issue}900[#900]
+
+[float]
+===== Bug fixes
+* Check for a Webkit Navigation timing API bug is added to avoid having incorrect navigation marks: {issue}903[#903]
+
+
 [[release-notes-5.6.0]]
 ==== 5.6.0 (2020-09-17)
 

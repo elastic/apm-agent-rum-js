@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.10.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.9.0...@elastic/apm-rum-core@5.10.0) (2021-03-15)
+
+
+### Features
+
+* **rum-core:** capture buffered longtask entries ([#965](https://github.com/elastic/apm-agent-rum-js/issues/965)) ([ecb223c](https://github.com/elastic/apm-agent-rum-js/commit/ecb223c95453bd57d3fc17a392acb96f80c138f4))
+* **rum-core:** support regex same origin ([#973](https://github.com/elastic/apm-agent-rum-js/issues/973)) ([9be5e6a](https://github.com/elastic/apm-agent-rum-js/commit/9be5e6a24ff25ff88c77711cbf00d84ce4f3968e))
+
+
+
+
+
+# [5.9.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.8.0...@elastic/apm-rum-core@5.9.0) (2021-02-02)
+
+
+### Bug Fixes
+
+* **rum-core:** handle null in promise rejection event ([e4e10d5](https://github.com/elastic/apm-agent-rum-js/commit/e4e10d5b7c451a950808d605a2db99cd275d20eb))
+
+
+### Features
+
+* **rum:** propagate sampling decision through tracestate ([#953](https://github.com/elastic/apm-agent-rum-js/issues/953)) ([6461364](https://github.com/elastic/apm-agent-rum-js/commit/6461364642e8879c613d7ce7e187e52bfb32ba54))
+
+
+
+
+
+# [5.8.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.7.0...@elastic/apm-rum-core@5.8.0) (2020-11-06)
+
+
+### Features
+
+* **rum-core:** transactionSampleRate precision ([#927](https://github.com/elastic/apm-agent-rum-js/issues/927)) ([bd3eb9b](https://github.com/elastic/apm-agent-rum-js/commit/bd3eb9be32f494a50170bde5a14206ef8eb1253a)), closes [#888](https://github.com/elastic/apm-agent-rum-js/issues/888)
+* add span and transaction outcome ([#904](https://github.com/elastic/apm-agent-rum-js/issues/904)) ([4de1490](https://github.com/elastic/apm-agent-rum-js/commit/4de1490c6a08260423d42176d999819408d158e5))
+
+
+
+
+
+# [5.7.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.6.1...@elastic/apm-rum-core@5.7.0) (2020-09-29)
+
+
+### Bug Fixes
+
+* **rum-core:** discard buggy navigation marks for page-load ([#903](https://github.com/elastic/apm-agent-rum-js/issues/903)) ([9ac74c6](https://github.com/elastic/apm-agent-rum-js/commit/9ac74c684c2c3343b6f15778c9f8a7f8f4834d4a))
+
+
+### Features
+
+* **rum-core:** add longtask to experience metrics ([#900](https://github.com/elastic/apm-agent-rum-js/issues/900)) ([e0e0464](https://github.com/elastic/apm-agent-rum-js/commit/e0e04642b688274c7a1b9e1c2f8db048d92343c7))
+
+
+
+
+
 ## [5.6.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.6.0...@elastic/apm-rum-core@5.6.1) (2020-09-17)
 
 
