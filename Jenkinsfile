@@ -21,6 +21,7 @@ pipeline {
     TOTP_SECRET = 'totp/code/npmjs-elasticmachine'
     PATH = "${env.PATH}:${env.WORKSPACE}/bin"
     MODE = "none"
+    STACK_VERSION = "${params.stack_version}"
   }
   options {
     //timeout(time: 3, unit: 'HOURS')
@@ -40,6 +41,7 @@ pipeline {
     booleanParam(name: 'saucelab_test', defaultValue: "true", description: "Enable run a Sauce lab test")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
     booleanParam(name: 'release', defaultValue: false, description: 'Release. If so, all the other parameters will be ignored when releasing from master.')
+    string(name: 'stack_version', defaultValue: '7.10.0', description: "What's the Stack Version to be used for the load testing?")
   }
   stages {
     stage('Initializing'){
@@ -194,10 +196,6 @@ pipeline {
         Run Benchmarks and send the results to ES.
         */
         stage('Benchmarks') {
-          agent { label 'metal' }
-          environment {
-            REPORT_FILE = 'apm-agent-benchmark-results.json'
-          }
           when {
             beforeAgent true
             allOf {
@@ -219,28 +217,70 @@ pipeline {
               }
             }
           }
-          steps {
-            withGithubNotify(context: 'Benchmarks') {
-              deleteDir()
-              unstash 'source'
-              unstash 'cache'
-              dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: 'docker.elastic.co')
-              dir("${BASE_DIR}") {
-                sh './.ci/scripts/benchmarks.sh'
+          parallel {
+            stage('Benchmarks') {
+              agent { label 'metal' }
+              environment {
+                REPORT_FILE = 'apm-agent-benchmark-results.json'
               }
-            }
-          }
-          post {
-            always {
-              archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
-              catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
-                log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
-                whenTrue(env.CHANGE_ID == null){
-                  sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+              steps {
+                withGithubNotify(context: 'Benchmarks') {
+                  deleteDir()
+                  unstash 'source'
+                  unstash 'cache'
+                  dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: 'docker.elastic.co')
+                  dir("${BASE_DIR}") {
+                    sh './.ci/scripts/benchmarks.sh'
+                  }
                 }
               }
-              catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                deleteDir()
+              post {
+                always {
+                  archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
+                  catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
+                    log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
+                    whenTrue(env.CHANGE_ID == null){
+                      sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+                    }
+                  }
+                  catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    deleteDir()
+                  }
+                }
+              }
+            }
+            stage('Load testing') {
+              agent { label 'metal' }
+              options {
+                warnError('load testing failed')
+              }
+              environment {
+                REPORT_FILE = 'apm-agent-load-testing-results.json'
+              }
+              steps {
+                withGithubNotify(context: 'Load testing') {
+                  deleteDir()
+                  unstash 'source'
+                  unstash 'cache'
+                  dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: 'docker.elastic.co')
+                  dir("${BASE_DIR}") {
+                    sh ".ci/scripts/load-testing.sh ${env.STACK_VERSION}"
+                  }
+                }
+              }
+              post {
+                always {
+                  archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
+                  catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
+                    log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
+                    whenTrue(env.CHANGE_ID == null){
+                      sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+                    }
+                  }
+                  catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    deleteDir()
+                  }
+                }
               }
             }
           }
