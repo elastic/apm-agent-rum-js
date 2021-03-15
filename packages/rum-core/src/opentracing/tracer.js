@@ -65,7 +65,7 @@ class Tracer extends otTracer {
           }
         }
 
-        var childRef = find(options.references, function(ref) {
+        var childRef = find(options.references, function (ref) {
           return ref.type() === REFERENCE_CHILD_OF
         })
         if (childRef) {

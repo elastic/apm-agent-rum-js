@@ -58,7 +58,7 @@ function testXHR(backendUrl, callback = () => {}, validateDT = true) {
   const req = new window.XMLHttpRequest()
   req.onerror = err => console.log('[XHR Error]', err)
   req.open('POST', backendUrl + '/data', false)
-  req.addEventListener('load', function() {
+  req.addEventListener('load', function () {
     if (validateDT) {
       const payload = JSON.parse(req.responseText)
       checkDtInfo(payload)
@@ -72,7 +72,7 @@ function testXHR(backendUrl, callback = () => {}, validateDT = true) {
 function testFetch(backendUrl, callback = () => {}) {
   if ('fetch' in window) {
     fetch(backendUrl + '/fetch', { method: 'POST' }).then(response => {
-      response.json().then(function(payload) {
+      response.json().then(function (payload) {
         checkDtInfo(payload)
         callback()
       })

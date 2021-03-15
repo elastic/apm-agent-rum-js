@@ -30,7 +30,7 @@ const {
   BUNDLE_TYPES
 } = require('../../dev-utils/build')
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set(baseConfig)
   config.set({
     webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.VUE)

@@ -39,7 +39,7 @@ const transaction = apm.startTransaction(
   { managed: true }
 )
 transaction.addTask('load-event')
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
   transaction.mark('load-event')
   setTimeout(() => {
     transaction.removeTask('load-event')
@@ -56,7 +56,7 @@ function generateError() {
   throw new Error('timeout test error with a secret')
 }
 
-setTimeout(function() {
+setTimeout(function () {
   try {
     generateError()
   } catch (e) {
@@ -83,7 +83,7 @@ if (isFetchSupported) {
 var tid = transaction.addTask()
 var req = new window.XMLHttpRequest()
 req.open('GET', url)
-req.addEventListener('load', function() {
+req.addEventListener('load', function () {
   console.log('got data!')
   transaction.removeTask(tid)
   !isFetchSupported && httpSpan.end()

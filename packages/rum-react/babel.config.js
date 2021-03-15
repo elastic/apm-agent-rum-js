@@ -25,7 +25,7 @@
 
 const { getBabelConfig, PACKAGE_TYPES } = require('../../dev-utils/build')
 
-module.exports = function(api) {
+module.exports = function (api) {
   /**
    * Reads BABEL_ENV to decide between CJS and ESM formats
    */

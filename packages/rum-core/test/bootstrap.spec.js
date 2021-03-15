@@ -25,7 +25,7 @@
 
 import { bootstrap } from '../src/bootstrap'
 
-describe('bootstrap', function() {
+describe('bootstrap', function () {
   it('should log warning on unsupported environments', () => {
     // Pass unsupported check
     const nowFn = window.performance.now

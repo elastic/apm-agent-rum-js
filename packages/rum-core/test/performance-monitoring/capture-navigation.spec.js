@@ -45,14 +45,14 @@ function mapSpan(s) {
   return { name: s.name, _end: s._end, _start: s._start }
 }
 
-describe('Capture hard navigation', function() {
+describe('Capture hard navigation', function () {
   /**
    * Arbitrary value considering the transcation end would be called
    * after load event has finished
    */
   const transactionEnd = timings.loadEventEnd + 100
   const transactionStart = 0
-  it('should createNavigationTimingSpans', function() {
+  it('should createNavigationTimingSpans', function () {
     let spans = createNavigationTimingSpans(
       timings,
       timings.fetchStart,
@@ -185,7 +185,7 @@ describe('Capture hard navigation', function() {
     ])
   })
 
-  it('should createResourceTimingSpans', function() {
+  it('should createResourceTimingSpans', function () {
     const spans = createResourceTimingSpans(
       resourceEntries,
       null,
@@ -209,7 +209,7 @@ describe('Capture hard navigation', function() {
     expect(spans.map(mapSpan)).toEqual(spanSnapshot)
   })
 
-  it('should filter intake API calls from resource timing', function() {
+  it('should filter intake API calls from resource timing', function () {
     const entries = [
       {
         name: 'http://localhost:8200/intake/v2/rum/events',
@@ -235,7 +235,7 @@ describe('Capture hard navigation', function() {
     expect(spans).toEqual([])
   })
 
-  it('should add/filter XHR/Fetch spans from RT data based on patch time', function() {
+  it('should add/filter XHR/Fetch spans from RT data based on patch time', function () {
     const entries = [
       {
         name: 'http://localhost:8000/fetch',
@@ -271,7 +271,7 @@ describe('Capture hard navigation', function() {
     expect(getCount(10)).toBe(0)
   })
 
-  it('should createUserTimingSpans', function() {
+  it('should createUserTimingSpans', function () {
     const spans = createUserTimingSpans(
       userTimingEntries,
       transactionStart,
@@ -303,7 +303,7 @@ describe('Capture hard navigation', function() {
     ])
   })
 
-  it('should capture spans for hard navigation', function() {
+  it('should capture spans for hard navigation', function () {
     const tr = new Transaction('test', PAGE_LOAD)
     tr.captureTimings = true
     tr.end()
@@ -311,7 +311,7 @@ describe('Capture hard navigation', function() {
     expect(tr.spans.length).toBeGreaterThan(1)
   })
 
-  it('should capture resource/user timing spans for soft navigation', function() {
+  it('should capture resource/user timing spans for soft navigation', function () {
     const unmock = mockGetEntriesByType()
     const tr = new Transaction('test', ROUTE_CHANGE)
     tr.captureTimings = true
@@ -331,7 +331,7 @@ describe('Capture hard navigation', function() {
     unmock()
   })
 
-  it('should capture resource/user timings when captureTimings flag is set', function() {
+  it('should capture resource/user timings when captureTimings flag is set', function () {
     const unmock = mockGetEntriesByType()
     const tr = new Transaction('test', 'test')
     tr.captureTimings = true
@@ -346,7 +346,7 @@ describe('Capture hard navigation', function() {
     unmock()
   })
 
-  it('should capture agent marks in page load transaction', function() {
+  it('should capture agent marks in page load transaction', function () {
     const unMock = mockGetEntriesByType()
     const tr = new Transaction('test', PAGE_LOAD)
     tr.captureTimings = true
@@ -368,7 +368,7 @@ describe('Capture hard navigation', function() {
     unMock()
   })
 
-  it('should not capture agent marks for route-change transaction', function() {
+  it('should not capture agent marks for route-change transaction', function () {
     const unMock = mockGetEntriesByType()
     const tr = new Transaction('test', ROUTE_CHANGE)
     tr.captureTimings = true
@@ -379,7 +379,7 @@ describe('Capture hard navigation', function() {
     unMock()
   })
 
-  it('should fix custom marks when changing transaction._start', function() {
+  it('should fix custom marks when changing transaction._start', function () {
     const tr = new Transaction('test', PAGE_LOAD)
     tr.captureTimings = true
     tr.mark('testMark')
@@ -392,7 +392,7 @@ describe('Capture hard navigation', function() {
     expect(tr.marks.custom.testMark).toEqual(start + markValue)
   })
 
-  it('should not add API calls as resource timing spans', function() {
+  it('should not add API calls as resource timing spans', function () {
     const unMock = mockGetEntriesByType()
     const tr = new Transaction('test', PAGE_LOAD, {
       startTime: transactionStart

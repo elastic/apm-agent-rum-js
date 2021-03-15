@@ -128,7 +128,7 @@ function verifyNoBrowserErrors(done) {
 }
 
 function handleError(done) {
-  return function(error) {
+  return function (error) {
     console.log(error, error.stack)
     if (error.message.indexOf('received Inspector.detached event') === -1) {
       done.fail(error)
@@ -247,7 +247,7 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
     version
   )
   const serverCalls = browser.executeAsync(
-    function(errorCount, transactionCount, done) {
+    function (errorCount, transactionCount, done) {
       var apmServerMock = window.elasticApm.serviceFactory.getService(
         'ApmServer'
       )
@@ -261,11 +261,11 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
           serverCalls.sendEvents && serverCalls.sendEvents.length > 0
 
         if (validCall) {
-          var promises = serverCalls.sendEvents.map(function(s) {
+          var promises = serverCalls.sendEvents.map(function (s) {
             return s.returnValue
           })
           Promise.all(promises)
-            .then(function() {
+            .then(function () {
               var transactions = []
               var errors = []
               var spyCalls = serverCalls.sendEvents
@@ -273,7 +273,7 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
                 var args = spyCalls[i].args
                 for (var j = 0; j < args.length; j++) {
                   var arg = args[j]
-                  arg.forEach(function(event) {
+                  arg.forEach(function (event) {
                     if (event['transactions']) {
                       transactions.push(event['transactions'])
                     } else if (event['errors']) {
@@ -297,7 +297,7 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
                 done(calls)
               }
             })
-            .catch(function(reason) {
+            .catch(function (reason) {
               console.log('reason', JSON.stringify(reason))
               try {
                 done({ error: reason.message || JSON.stringify(reason) })
@@ -341,7 +341,7 @@ function getBrowserInfo() {
 }
 
 function getBrowserFeatures() {
-  return browser.executeAsync(function(done) {
+  return browser.executeAsync(function (done) {
     done({
       EventTarget: !!window.EventTarget
     })

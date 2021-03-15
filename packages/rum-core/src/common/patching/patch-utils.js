@@ -69,7 +69,7 @@ export function patchMethod(target, name, patchFn) {
     const desc = proto && Object.getOwnPropertyDescriptor(proto, name)
     if (isPropertyWritable(desc)) {
       const patchDelegate = patchFn(delegate, delegateName, name)
-      proto[name] = function() {
+      proto[name] = function () {
         return patchDelegate(this, arguments)
       }
       attachOriginToPatched(proto[name], delegate)

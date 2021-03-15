@@ -40,7 +40,7 @@ function getErrorProperties(error) {
    */
   let propertyFound = false
   const properties = {}
-  Object.keys(error).forEach(function(key) {
+  Object.keys(error).forEach(function (key) {
     if (IGNORE_KEYS.indexOf(key) >= 0) {
       return
     }

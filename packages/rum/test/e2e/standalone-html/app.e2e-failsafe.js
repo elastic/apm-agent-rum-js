@@ -23,8 +23,8 @@
  *
  */
 
-describe('standalone-html', function() {
-  it('should run application without errors for base bundle', function() {
+describe('standalone-html', function () {
+  it('should run application without errors for base bundle', function () {
     browser.url('/test/e2e/standalone-html/index.html')
     browser.waitUntil(
       () => {
@@ -34,14 +34,14 @@ describe('standalone-html', function() {
       'expected element #test-element'
     )
 
-    const capturedErrors = browser.execute(function() {
+    const capturedErrors = browser.execute(function () {
       return window.capturedTestErrors
     })
     console.error('CapturedErrors', capturedErrors)
     expect(capturedErrors.length).toEqual(0)
   })
 
-  it('should run application without errors for opentracing bundle', function() {
+  it('should run application without errors for opentracing bundle', function () {
     browser.url('/test/e2e/standalone-html/opentracing.html')
     browser.waitUntil(
       () => {
@@ -51,7 +51,7 @@ describe('standalone-html', function() {
       'expected element #test-element'
     )
 
-    const capturedErrors = browser.execute(function() {
+    const capturedErrors = browser.execute(function () {
       return window.capturedTestErrors
     })
     console.error('CapturedErrors', capturedErrors)

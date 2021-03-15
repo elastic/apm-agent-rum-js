@@ -25,10 +25,10 @@
 
 const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
 
-describe('Using Switch component of react router', function() {
+describe('Using Switch component of react router', function () {
   beforeAll(() => browser.url('/test/e2e/with-router/switch.html'))
 
-  it('should render the react app on route change', function() {
+  it('should render the react app on route change', function () {
     browser.waitUntil(
       () => {
         /**

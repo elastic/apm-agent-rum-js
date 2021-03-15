@@ -56,9 +56,9 @@ elasticApm.setUserContext({
 elasticApm.setCustomContext({ testContext: 'testContext' })
 elasticApm.addLabels({ testTagKey: 'testTagValue' })
 
-elasticApm.addFilter(function(payload) {
+elasticApm.addFilter(function (payload) {
   if (payload.errors) {
-    payload.errors.forEach(function(error) {
+    payload.errors.forEach(function (error) {
       error.exception.message = error.exception.message.replace(
         'secret',
         '[REDACTED]'
@@ -73,8 +73,8 @@ elasticApm.addFilter(function(payload) {
     if (window.URL.toString().indexOf('native code') === -1) {
       return payload
     }
-    payload.transactions.forEach(function(tr) {
-      tr.spans.forEach(function(span) {
+    payload.transactions.forEach(function (tr) {
+      tr.spans.forEach(function (span) {
         if (span.context && span.context.http && span.context.http.url) {
           var url = new URL(span.context.http.url, window.location.origin)
           if (url.searchParams && url.searchParams.get('token')) {
@@ -93,14 +93,14 @@ function generateError() {
   throw new Error('timeout test error with a secret')
 }
 
-setTimeout(function() {
+setTimeout(function () {
   generateError()
 }, 100)
 
 const url = '/test/e2e/common/data.json?test=hamid'
 const req = new window.XMLHttpRequest()
 req.open('GET', url, false)
-req.addEventListener('load', function() {
+req.addEventListener('load', function () {
   console.log('got data!')
 })
 req.send()
@@ -112,7 +112,7 @@ generateError.tmp = 'tmp'
 testFetch(mockBackendUrl)
 
 let testAction = document.getElementsByName('test-action')[0]
-testAction.addEventListener('click', function() {
+testAction.addEventListener('click', function () {
   testXHR(mockBackendUrl)
 })
 
@@ -134,7 +134,7 @@ if (location.hash === '#test-state') {
    * if history.go(-1) is called before the load event.
    */
 
-  window.addEventListener('load', function() {
+  window.addEventListener('load', function () {
     history.go(-1)
   })
 }

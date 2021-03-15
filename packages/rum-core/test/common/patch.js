@@ -28,7 +28,7 @@ import { patchAll } from '../../src/common/patching/'
 if (!window['__patchEventHandler']) {
   var nativeFetch = window.fetch
   if (nativeFetch) {
-    window.fetch = function() {
+    window.fetch = function () {
       var delegate = window['__fetchDelegate']
       if (typeof delegate === 'function') {
         return delegate.apply(this, arguments)

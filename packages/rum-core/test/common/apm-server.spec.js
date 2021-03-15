@@ -36,7 +36,7 @@ import { createServiceFactory, generateTransaction, generateErrors } from '../'
 
 const { agentConfig, testConfig } = getGlobalConfig('rum-core')
 
-describe('ApmServer', function() {
+describe('ApmServer', function () {
   var serviceFactory
   var apmServer
   var configService
@@ -45,7 +45,7 @@ describe('ApmServer', function() {
   var performanceMonitoring
   var errorLogging
 
-  beforeEach(function() {
+  beforeEach(function () {
     /**
      * Setting longer timeout to mitigate if the connection
      * to APM server takes longer than the default timeout
@@ -61,18 +61,18 @@ describe('ApmServer', function() {
     errorLogging = serviceFactory.getService('ErrorLogging')
   })
 
-  afterEach(function() {
+  afterEach(function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
-  it('should not send events when there are no events', function() {
+  it('should not send events when there are no events', function () {
     spyOn(apmServer, '_postJson')
     var result = apmServer.sendEvents([])
     expect(result).toBeUndefined()
     expect(apmServer._postJson).not.toHaveBeenCalled()
   })
 
-  it('should report http errors when server is down', function(done) {
+  it('should report http errors when server is down', function (done) {
     configService.setConfig({
       serverUrl: 'http://localhost:54321',
       serviceName: 'test-service'
@@ -92,7 +92,7 @@ describe('ApmServer', function() {
     )
   })
 
-  it('should queue items before sending', function() {
+  it('should queue items before sending', function () {
     configService.setConfig({
       serviceName: 'serviceName'
     })
@@ -109,7 +109,7 @@ describe('ApmServer', function() {
     expect(apmServer.queue.items.length).toBe(0)
   })
 
-  it('should not add any items to queue when not initialized', function() {
+  it('should not add any items to queue when not initialized', function () {
     const clock = jasmine.clock()
     clock.install()
     configService.setConfig({ flushInterval: 200 })
@@ -146,11 +146,11 @@ describe('ApmServer', function() {
     expect(error.message).toEqual('http://localhost:54321 HTTP status: 0')
   })
 
-  it('should report http errors for queued events', function(done) {
+  it('should report http errors for queued events', function (done) {
     apmServer.init()
     spyOn(loggingService, 'warn')
     var _sendEvents = apmServer.sendEvents
-    apmServer.sendEvents = function() {
+    apmServer.sendEvents = function () {
       var result = _sendEvents.apply(apmServer, arguments)
       result.then(
         () => fail('Request should have failed!'),
@@ -219,12 +219,12 @@ describe('ApmServer', function() {
     clock.uninstall()
   })
 
-  it('should ignore undefined filtered payload', function() {
+  it('should ignore undefined filtered payload', function () {
     spyOn(loggingService, 'warn')
     configService.setConfig({
       serviceName: 'serviceName'
     })
-    configService.addFilter(function() {})
+    configService.addFilter(function () {})
     spyOn(apmServer, '_postJson')
 
     const result = apmServer.sendEvents([
@@ -342,7 +342,7 @@ describe('ApmServer', function() {
     clock.uninstall()
   })
 
-  it('should ndjson transactions', function() {
+  it('should ndjson transactions', function () {
     var trs = generateTransaction(3)
     const payload = trs.map(tr =>
       performanceMonitoring.createTransactionDataModel(tr)
@@ -357,7 +357,7 @@ describe('ApmServer', function() {
     expect(result).toEqual(expected)
   })
 
-  it('should ndjson metricsets along with transactions', function() {
+  it('should ndjson metricsets along with transactions', function () {
     const trs = generateTransaction(1, true)
     const payload = trs.map(tr =>
       performanceMonitoring.createTransactionDataModel(tr)
@@ -384,7 +384,7 @@ describe('ApmServer', function() {
      */
     spyOn(apmServer, '_postJson')
     let type = ''
-    configService.addFilter(function(payload) {
+    configService.addFilter(function (payload) {
       expect(payload[type]).toEqual([{ test: type }])
       return payload
     })
@@ -422,7 +422,7 @@ describe('ApmServer', function() {
 
       function mockCompressionStream() {
         const original = window.CompressionStream
-        window.CompressionStream = function() {
+        window.CompressionStream = function () {
           throw new Error('Compression Failed')
         }
         return function unMock() {
