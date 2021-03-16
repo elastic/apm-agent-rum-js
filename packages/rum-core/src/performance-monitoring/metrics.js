@@ -67,9 +67,7 @@ export function createLongTaskSpans(longtasks, agg) {
     const span = new Span(`Longtask(${name})`, LONG_TASK, { startTime })
     agg.count++
     agg.duration += duration
-    if (duration > agg.max) {
-      agg.max = duration
-    }
+    agg.max = Math.max(duration, agg.max)
 
     /**
      * use attribution data to figure out the culprits of the longtask
@@ -197,8 +195,10 @@ export function calculateCumulativeLayoutShift(clsEntries) {
  *   marks: {}
  * }
  */
-export function captureObserverEntries(list, { capturePaint }) {
-  const longtaskEntries = list.getEntriesByType(LONG_TASK)
+export function captureObserverEntries(list, { capturePaint, trStart }) {
+  const longtaskEntries = list.getEntriesByType(LONG_TASK).filter(entry => {
+    return entry.startTime >= trStart
+  })
   const longTaskSpans = createLongTaskSpans(longtaskEntries, metrics.longtask)
 
   const result = {
@@ -287,7 +287,8 @@ export class PerfEntryRecorder {
   constructor(callback) {
     this.po = {
       observe: noop,
-      disconnect: noop
+      disconnect: noop,
+      takeRecords: noop
     }
     if (window.PerformanceObserver) {
       this.po = new PerformanceObserver(callback)
@@ -314,6 +315,11 @@ export class PerfEntryRecorder {
   }
 
   stop() {
+    /**
+     * Empties out the performance entries from the
+     * current observer
+     */
+    this.po.takeRecords()
     this.po.disconnect()
   }
 }
