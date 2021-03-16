@@ -1,6 +1,13 @@
 # shellcheck disable=SC1091
 source /usr/local/bin/bash_standard_lib.sh
 
+ARCH=$(uname -m| tr '[:upper:]' '[:lower:]')
+
+if [ "${ARCH}" != "x86_64" ] ; then
+  echo "The existing docker images on ARM are not supported yet."
+  exit 0
+fi
+
 readonly NODEJS_VERSION="$(cat ./dev-utils/.node-version)"
 
 FLAVOURS="playwright
