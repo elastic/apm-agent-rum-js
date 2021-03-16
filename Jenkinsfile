@@ -274,7 +274,7 @@ pipeline {
                   catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE') {
                     log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
                     whenTrue(env.CHANGE_ID == null){
-                      sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
+                      sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmarks-rum-load-test')
                     }
                   }
                   catchError(message: 'deleteDir failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
