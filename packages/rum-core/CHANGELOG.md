@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.10.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.10.0...@elastic/apm-rum-core@5.10.1) (2021-03-17)
+
+
+### Bug Fixes
+
+* **rum:** discard longtask spans from prev transaction ([#989](https://github.com/elastic/apm-agent-rum-js/issues/989)) ([6b75589](https://github.com/elastic/apm-agent-rum-js/commit/6b75589f0ed2c7fa90462396e256a9bc0e9ac33c))
+
+
+
+
+
 # [5.10.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.9.0...@elastic/apm-rum-core@5.10.0) (2021-03-15)
 
 

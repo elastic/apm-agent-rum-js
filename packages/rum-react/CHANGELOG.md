@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.9](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.2.8...@elastic/apm-rum-react@1.2.9) (2021-03-17)
+
+**Note:** Version bump only for package @elastic/apm-rum-react
+
+
+
+
+
 ## [1.2.8](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.2.7...@elastic/apm-rum-react@1.2.8) (2021-03-15)
 
 **Note:** Version bump only for package @elastic/apm-rum-react
