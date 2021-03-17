@@ -62,45 +62,45 @@ describe('Metrics', () => {
 
     it('should not create long tasks spans if entries are not present', () => {
       const { spans } = captureObserverEntries(list, {
-        capturePaint: false
+        isHardNavigation: false
       })
       expect(spans).toEqual([])
     })
 
     it('should not mark LCP & FCP if entries are not preset ', () => {
       const { marks } = captureObserverEntries(list, {
-        capturePaint: true
+        isHardNavigation: true
       })
       expect(marks).toEqual({})
     })
 
-    it('should return largest contentful paint if capturePaint is true', () => {
+    it('should return largest contentful paint if isHardNavigation is true', () => {
       list.getEntriesByType.and.callFake(mockObserverEntryTypes)
-      const { marks: paintFalse } = captureObserverEntries(list, {
-        capturePaint: false
+      const { marks: notHardNavigation } = captureObserverEntries(list, {
+        isHardNavigation: false
       })
-      expect(paintFalse).toEqual({})
+      expect(notHardNavigation).toEqual({})
 
-      const { marks: paintTrue } = captureObserverEntries(list, {
-        capturePaint: true
+      const { marks: hardNavigation } = captureObserverEntries(list, {
+        isHardNavigation: true
       })
 
-      expect(paintTrue).toEqual({
+      expect(hardNavigation).toEqual({
         largestContentfulPaint: 1040
       })
     })
 
-    it('should set firstContentfulPaint if capturePaint is true ', () => {
+    it('should set firstContentfulPaint if isHardNavigation is true ', () => {
       list.getEntriesByName.and.callFake(mockObserverEntryNames)
-      const { marks: paintFalse } = captureObserverEntries(list, {
-        capturePaint: false
+      const { marks: notHardNavigation } = captureObserverEntries(list, {
+        isHardNavigation: false
       })
-      expect(paintFalse).toEqual({})
+      expect(notHardNavigation).toEqual({})
 
-      const { marks: paintTrue } = captureObserverEntries(list, {
-        capturePaint: true
+      const { marks: hardNavigation } = captureObserverEntries(list, {
+        isHardNavigation: true
       })
-      expect(paintTrue).toEqual({
+      expect(hardNavigation).toEqual({
         firstContentfulPaint: jasmine.any(Number)
       })
     })
@@ -108,7 +108,7 @@ describe('Metrics', () => {
     it('should create long tasks attribution data in span context', () => {
       list.getEntriesByType.and.callFake(mockObserverEntryTypes)
       const { spans } = captureObserverEntries(list, {
-        capturePaint: false,
+        isHardNavigation: false,
         trStart: 0
       })
       expect(spans.length).toBe(3)
@@ -147,7 +147,7 @@ describe('Metrics', () => {
     it('should consider transaction startTime while creating longtask spans', () => {
       list.getEntriesByType.and.callFake(mockObserverEntryTypes)
       const { spans } = captureObserverEntries(list, {
-        capturePaint: false,
+        isHardNavigation: false,
         trStart: 1200
       })
       expect(spans.length).toBe(1)
@@ -211,7 +211,7 @@ describe('Metrics', () => {
       it('should update tbt when longtasks are dispatched at different times', () => {
         list.getEntriesByType.and.callFake(mockObserverEntryTypes)
         captureObserverEntries(list, {
-          capturePaint: true,
+          isHardNavigation: true,
           trStart: 0
         })
         expect(metrics.tbt).toEqual({
@@ -221,7 +221,7 @@ describe('Metrics', () => {
 
         // simulating second longtask entry list
         captureObserverEntries(list, {
-          capturePaint: true,
+          isHardNavigation: true,
           trStart: 0
         })
         expect(metrics.tbt).toEqual({
@@ -233,7 +233,7 @@ describe('Metrics', () => {
       it('should consider transaction startTime while updating TBT', () => {
         list.getEntriesByType.and.callFake(mockObserverEntryTypes)
         captureObserverEntries(list, {
-          capturePaint: true,
+          isHardNavigation: true,
           trStart: 800
         })
         expect(metrics.tbt).toEqual({
@@ -273,7 +273,7 @@ describe('Metrics', () => {
       it('should capture fid experience metric on input entries', () => {
         list.getEntriesByType.and.callFake(mockObserverEntryTypes)
         captureObserverEntries(list, {
-          capturePaint: true
+          isHardNavigation: true
         })
         expect(metrics.fid).toBe(6)
       })
