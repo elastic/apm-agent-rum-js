@@ -52,6 +52,7 @@ pipeline {
         */
         stage('Checkout') {
           steps {
+            setEnvVar('PRE_RELEASE_STAGE', 'true')
             pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
             deleteDir()
             gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
@@ -328,6 +329,7 @@ pipeline {
             stage('Notify') {
               options { skipDefaultCheckout() }
               steps {
+                setEnvVar('PRE_RELEASE_STAGE', 'false')
                 deleteDir()
                 unstash 'source'
                 dir("${BASE_DIR}") {
@@ -413,6 +415,11 @@ pipeline {
     cleanup {
       // bundlesize id was generated previously with the generateReport step in the lint stage.
       notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize': 'bundlesize.md' ])
+    }
+    failure {
+      whenTrue(params.release && env.PRE_RELEASE_STAGE == 'true') {
+        notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Pre release steps failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
+      }
     }
   }
 }
