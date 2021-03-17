@@ -287,8 +287,7 @@ export class PerfEntryRecorder {
   constructor(callback) {
     this.po = {
       observe: noop,
-      disconnect: noop,
-      takeRecords: noop
+      disconnect: noop
     }
     if (window.PerformanceObserver) {
       this.po = new PerformanceObserver(callback)
@@ -315,11 +314,6 @@ export class PerfEntryRecorder {
   }
 
   stop() {
-    /**
-     * Empties out the performance entries from the
-     * current observer
-     */
-    this.po.takeRecords()
     this.po.disconnect()
   }
 }
