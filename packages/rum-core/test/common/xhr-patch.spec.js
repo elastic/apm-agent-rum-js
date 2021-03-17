@@ -136,7 +136,7 @@ describe('xhrPatch', function () {
     const req = new window.XMLHttpRequest()
     const getEvents = registerEventListener(req)
     try {
-      req.open('GET', 'http://localhost:1234/doesnotexist', false)
+      req.open('GET', 'https://localhost:1234/doesnotexist', false)
       req.send()
     } catch (e) {
       expect(
@@ -154,7 +154,7 @@ describe('xhrPatch', function () {
   it('should correctly schedule events when async xhr fails', function (done) {
     const req = new window.XMLHttpRequest()
     const getEvents = registerEventListener(req)
-    req.open('GET', 'http://localhost:1234/doesnotexist')
+    req.open('GET', 'https://localhost:1234/doesnotexist')
 
     req.addEventListener('loadend', () => {
       expect(
