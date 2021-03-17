@@ -139,7 +139,6 @@ describe('xhrPatch', function () {
       req.open('GET', 'http://localhost:1234/doesnotexist', false)
       req.send()
     } catch (e) {
-      console.log(JSON.stringify(getEvents(true), null, 2))
       expect(
         getEvents(true).map(e => ({
           event: e.event,
