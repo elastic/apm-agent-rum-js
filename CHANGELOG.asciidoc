@@ -29,6 +29,13 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.7.1]]
+==== 5.7.1 (2021-03-17)
+
+[float]
+===== Bug fixes
+* Discard buffered longtasks spans from page load transactions getting added to subsequent route change and other auto auto-instrumented transactions resulting in incorrect start time for those transactions: {issue}989[#989]
+
 
 [[release-notes-5.7.0]]
 ==== 5.7.0 (2021-03-15)
