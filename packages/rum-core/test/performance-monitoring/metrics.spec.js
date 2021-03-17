@@ -108,7 +108,8 @@ describe('Metrics', () => {
     it('should create long tasks attribution data in span context', () => {
       list.getEntriesByType.and.callFake(mockObserverEntryTypes)
       const { spans } = captureObserverEntries(list, {
-        capturePaint: false
+        capturePaint: false,
+        trStart: 0
       })
       expect(spans.length).toBe(3)
       expect(spans).toEqual([
@@ -133,6 +134,27 @@ describe('Metrics', () => {
         }),
         jasmine.objectContaining({
           name: 'Longtask(same-origin-ancestor)',
+          context: {
+            custom: {
+              attribution: 'unknown',
+              type: 'window'
+            }
+          }
+        })
+      ])
+    })
+
+    it('should consider transaction startTime while creating longtask spans', () => {
+      list.getEntriesByType.and.callFake(mockObserverEntryTypes)
+      const { spans } = captureObserverEntries(list, {
+        capturePaint: false,
+        trStart: 1200
+      })
+      expect(spans.length).toBe(1)
+      expect(spans).toEqual([
+        jasmine.objectContaining({
+          name: 'Longtask(same-origin-ancestor)',
+          _start: 1923.40999995591,
           context: {
             custom: {
               attribution: 'unknown',
@@ -189,7 +211,8 @@ describe('Metrics', () => {
       it('should update tbt when longtasks are dispatched at different times', () => {
         list.getEntriesByType.and.callFake(mockObserverEntryTypes)
         captureObserverEntries(list, {
-          capturePaint: true
+          capturePaint: true,
+          trStart: 0
         })
         expect(metrics.tbt).toEqual({
           start: 745.4100000031758,
@@ -198,11 +221,24 @@ describe('Metrics', () => {
 
         // simulating second longtask entry list
         captureObserverEntries(list, {
-          capturePaint: true
+          capturePaint: true,
+          trStart: 0
         })
         expect(metrics.tbt).toEqual({
           start: 745.4100000031758,
           duration: 499.85999991185963
+        })
+      })
+
+      it('should consider transaction startTime while updating TBT', () => {
+        list.getEntriesByType.and.callFake(mockObserverEntryTypes)
+        captureObserverEntries(list, {
+          capturePaint: true,
+          trStart: 800
+        })
+        expect(metrics.tbt).toEqual({
+          start: 1023.40999995591,
+          duration: 245.35999997751787
         })
       })
 
