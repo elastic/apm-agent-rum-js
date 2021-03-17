@@ -181,7 +181,8 @@ export function calculateTotalBlockingTime(longtaskEntries) {
  */
 export function calculateCumulativeLayoutShift(clsEntries) {
   clsEntries.forEach(entry => {
-    if (!entry.hadRecentInput) {
+    // Only add the layout shift events without recent user input
+    if (!entry.hadRecentInput && entry.value) {
       metrics.cls += entry.value
     }
   })
@@ -195,7 +196,7 @@ export function calculateCumulativeLayoutShift(clsEntries) {
  *   marks: {}
  * }
  */
-export function captureObserverEntries(list, { capturePaint, trStart }) {
+export function captureObserverEntries(list, { isHardNavigation, trStart }) {
   const longtaskEntries = list.getEntriesByType(LONG_TASK).filter(entry => {
     return entry.startTime >= trStart
   })
@@ -206,9 +207,10 @@ export function captureObserverEntries(list, { capturePaint, trStart }) {
     marks: {}
   }
   /**
-   * Paint timings like FCP and LCP are available only for page-load navigation
+   * Web vitals including CLS, FID, LCP and other paint metrics are only
+   * available for hard navigation
    */
-  if (!capturePaint) {
+  if (!isHardNavigation) {
     return result
   }
   /**
@@ -265,6 +267,7 @@ export function captureObserverEntries(list, { capturePaint, trStart }) {
   }
 
   calculateTotalBlockingTime(longtaskEntries)
+
   const clsEntries = list.getEntriesByType(LAYOUT_SHIFT)
   calculateCumulativeLayoutShift(clsEntries)
 
