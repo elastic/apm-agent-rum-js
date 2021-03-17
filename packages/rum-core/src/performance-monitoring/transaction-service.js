@@ -65,19 +65,16 @@ class TransactionService {
     this.recorder = new PerfEntryRecorder(list => {
       const tr = this.getCurrentTransaction()
       if (tr && tr.captureTimings) {
-        let capturePaint = false
         /**
          * For page load transactions, we capture all web vitals
          * metrics including paint timings data and also the
          * relative start time of transaction is set to zero
          * to include all the buffered events
          */
-        if (tr.type === PAGE_LOAD) {
-          capturePaint = true
-        }
+        const isHardNavigation = tr.type === PAGE_LOAD
         const { spans, marks } = captureObserverEntries(list, {
-          capturePaint,
-          trStart: capturePaint ? 0 : tr._start
+          isHardNavigation,
+          trStart: isHardNavigation ? 0 : tr._start
         })
         tr.spans.push(...spans)
         tr.addMarks({ agent: marks })
