@@ -52,7 +52,6 @@ pipeline {
         */
         stage('Checkout') {
           steps {
-            setEnvVar('PRE_RELEASE_STAGE', 'true')
             pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
             deleteDir()
             gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
@@ -70,6 +69,12 @@ pipeline {
                 // Skip all the stages except docs for PR's with asciidoc/md changes only
                 env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true)
               }
+            }
+
+            whenTrue(params.release) {
+              setEnvVar('PRE_RELEASE_STAGE', 'true')
+              notifyStatus(slackStatus: 'warning', subject: "[${env.REPO}] Release build just started",
+                           body: "Please go to (<${env.BUILD_URL}|here>) to see the build status or wait for further notifications.")
             }
           }
         }
