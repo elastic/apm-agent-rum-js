@@ -423,7 +423,7 @@ pipeline {
     }
     failure {
       whenTrue(params.release && env.PRE_RELEASE_STAGE == 'true') {
-        notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Pre release steps failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
+        notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Pre-release steps failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
       }
     }
   }
