@@ -182,7 +182,7 @@ class ApmServer {
           const etag = xhr.getResponseHeader('etag')
           if (etag) {
             remoteConfig.etag = etag.replace(/["]/g, '')
-            this._configService.setLocalConfig(remoteConfig)
+            this._configService.setLocalConfig(remoteConfig, true)
           }
           return remoteConfig
         }

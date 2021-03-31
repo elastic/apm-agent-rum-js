@@ -50,11 +50,13 @@ import {
   PAINT,
   TRUNCATED_TYPE,
   FIRST_INPUT,
-  LAYOUT_SHIFT
+  LAYOUT_SHIFT,
+  SESSION_TIMEOUT
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__, state } from '../state'
 import { slugifyUrl } from '../common/url'
+import { generateRandomId } from '../../dist/lib/common/utils'
 
 class TransactionService {
   constructor(logger, config) {
@@ -308,6 +310,7 @@ class TransactionService {
               }
             }
           }
+          this.setSession(tr)
         }
         /**
          * Categorize the transaction based on the current location
@@ -350,6 +353,43 @@ class TransactionService {
         }
       }
     )
+  }
+
+  setSession(tr) {
+    let session = this._config.get('session')
+    if (session) {
+      if (typeof session == 'boolean') {
+        tr.session = {
+          id: generateRandomId(16),
+          sequence: 1
+        }
+      } else {
+        if (
+          session.timestamp &&
+          Date.now() - session.timestamp > SESSION_TIMEOUT
+        ) {
+          tr.session = {
+            id: generateRandomId(16),
+            sequence: 1
+          }
+        }
+
+        tr.session = {
+          id: session.id,
+          sequence: session.sequence ? session.sequence + 1 : 1
+        }
+      }
+
+      const sessionConfig = {
+        session: {
+          id: tr.session.id,
+          sequence: tr.session.sequence,
+          timestamp: Date.now()
+        }
+      }
+      this._config.setConfig(sessionConfig)
+      this._config.setLocalConfig(sessionConfig, true)
+    }
   }
 
   adjustTransactionTime(transaction) {

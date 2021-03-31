@@ -37,10 +37,12 @@ import {
   PAINT,
   TRUNCATED_TYPE,
   FIRST_INPUT,
-  LAYOUT_SHIFT
+  LAYOUT_SHIFT,
+  LOCAL_CONFIG_KEY
 } from '../../src/common/constants'
 import { state } from '../../src/state'
 import { isPerfTypeSupported } from '../../src/common/utils'
+import Transaction from '../../src/performance-monitoring/transaction'
 
 describe('TransactionService', function () {
   var transactionService
@@ -633,6 +635,20 @@ describe('TransactionService', function () {
       `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
     )
     state.lastHiddenStart = lastHiddenStart
+  })
+
+  it('should set session information on transaction', () => {
+    config.setConfig({ session: true })
+    const tr = new Transaction('test', 'test')
+    transactionService.setSession(tr)
+    expect(tr.session.id).toBeDefined()
+    let localConfig = config.getLocalConfig()
+    expect(localConfig.session).toEqual({
+      id: tr.session.id,
+      sequence: 1,
+      timestamp: jasmine.any(Number)
+    })
+    localStorage.removeItem(LOCAL_CONFIG_KEY)
   })
 
   describe('performance entry recorder', () => {

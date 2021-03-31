@@ -222,6 +222,11 @@ export function compressTransaction(transaction) {
     tr.exp = { cls, fid, tbt, lt: longtask }
   }
 
+  if (transaction.session) {
+    let { id, sequence } = transaction.session
+    tr.ses = { id, seq: sequence }
+  }
+
   return tr
 }
 

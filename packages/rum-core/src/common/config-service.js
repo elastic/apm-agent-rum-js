@@ -90,7 +90,8 @@ class Config {
       centralConfig: false,
       monitorLongtasks: true,
       apiVersion: 2,
-      context: {}
+      context: {},
+      session: false
     }
 
     this.events = new EventHandler()
@@ -240,15 +241,19 @@ class Config {
   }
 
   getLocalConfig() {
-    let config = sessionStorage.getItem(LOCAL_CONFIG_KEY)
+    let config = localStorage.getItem(LOCAL_CONFIG_KEY)
     if (config) {
       return JSON.parse(config)
     }
   }
 
-  setLocalConfig(config) {
+  setLocalConfig(config, merge) {
     if (config) {
-      sessionStorage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
+      if (merge) {
+        const prevConfig = this.getLocalConfig()
+        config = { ...prevConfig, ...config }
+      }
+      localStorage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
     }
   }
 }
