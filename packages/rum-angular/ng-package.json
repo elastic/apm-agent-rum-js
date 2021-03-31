@@ -9,7 +9,7 @@
     },
     "umdId": "elastic.apmRumAngular"
   },
-  "whitelistedNonPeerDependencies": [
+  "allowedNonPeerDependencies": [
     "@elastic/*"
   ]
 }
