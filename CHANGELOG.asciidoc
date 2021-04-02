@@ -29,6 +29,16 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.7.2]]
+==== 5.7.2 (2021-04-02)
+
+[float]
+===== Bug fixes
+* Transaction marks for the APM server V3 spec was mapped to incorrect field which resulted in Kibana
+User Expererience App missing some of the core data. This only affects users who had set config
+`apiVersion` > 2: {issue}1007[#1007]
+
+
 [[release-notes-5.7.1]]
 ==== 5.7.1 (2021-03-17)
 
