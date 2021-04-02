@@ -29,7 +29,7 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
-[[release-notes-5.7.1]]
+[[release-notes-5.7.2]]
 ==== 5.7.2 (2021-04-02)
 
 [float]
