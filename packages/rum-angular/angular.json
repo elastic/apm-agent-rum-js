@@ -46,9 +46,14 @@
             "main": "test/e2e/with-router/main.ts",
             "polyfills": "test/e2e/with-router/polyfills.ts",
             "tsConfig": "test/e2e/with-router/tsconfig.app.json",
+            "baseHref": "/test/e2e/with-router/build/",
             "aot": true,
             "assets": [
               "test/e2e/with-router/assets"
+            ],
+            "allowedCommonJsDependencies": [
+              "error-stack-parser",
+              "opentracing"
             ]
           },
           "configurations": {
@@ -60,9 +65,7 @@
                 }
               ],
               "optimization": true,
-              "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "vendorChunk": false,
               "buildOptimizer": true
@@ -73,8 +76,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "port": 8000,
-            "browserTarget": "app:build",
-            "baseHref": "/test/e2e/with-router/build/"
+            "browserTarget": "app:build"
           },
           "configurations": {
             "production": {
