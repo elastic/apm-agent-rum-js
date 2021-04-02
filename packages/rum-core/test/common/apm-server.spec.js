@@ -336,7 +336,7 @@ describe('ApmServer', function () {
     const expected = [
       '{"m":{"se":{"n":"test","a":{"n":"rum-js","ve":"N/A"},"la":{"n":"javascript"}}}}',
       '{"e":{"id":"error-id-0","cl":"(inline script)","ex":{"mg":"error #0","st":[]},"c":null}}',
-      '{"x":{"id":"transaction-id-0","tid":"trace-id-0","n":"transaction #0","t":"transaction","d":990,"c":null,"m":null,"me":[{"sa":{"xdc":{"v":1},"xds":{"v":990},"xbc":{"v":1}}},{"y":{"t":"app"},"sa":{"ysc":{"v":1},"yss":{"v":980}}},{"y":{"t":"type"},"sa":{"ysc":{"v":1},"yss":{"v":10}}}],"y":[{"id":"span-id-0-1","n":"name","t":"type","s":10,"d":10,"c":null,"sr":0.1,"su":"subtype"}],"yc":{"sd":1},"sm":true,"sr":0.1}}'
+      '{"x":{"id":"transaction-id-0","tid":"trace-id-0","n":"transaction #0","t":"transaction","d":990,"c":null,"k":null,"me":[{"sa":{"xdc":{"v":1},"xds":{"v":990},"xbc":{"v":1}}},{"y":{"t":"app"},"sa":{"ysc":{"v":1},"yss":{"v":980}}},{"y":{"t":"type"},"sa":{"ysc":{"v":1},"yss":{"v":10}}}],"y":[{"id":"span-id-0-1","n":"name","t":"type","s":10,"d":10,"c":null,"sr":0.1,"su":"subtype"}],"yc":{"sd":1},"sm":true,"sr":0.1}}'
     ]
     expect(payload.split('\n').filter(a => a)).toEqual(expected)
     clock.uninstall()
