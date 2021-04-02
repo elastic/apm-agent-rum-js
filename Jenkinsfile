@@ -70,6 +70,12 @@ pipeline {
                 env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true)
               }
             }
+
+            whenTrue(params.release) {
+              setEnvVar('PRE_RELEASE_STAGE', 'true')
+              notifyStatus(slackStatus: 'warning', subject: "[${env.REPO}] Release build just started",
+                           body: "Please go to (<${env.BUILD_URL}|here>) to see the build status or wait for further notifications.")
+            }
           }
         }
         /**
@@ -328,6 +334,7 @@ pipeline {
             stage('Notify') {
               options { skipDefaultCheckout() }
               steps {
+                setEnvVar('PRE_RELEASE_STAGE', 'false')
                 deleteDir()
                 unstash 'source'
                 dir("${BASE_DIR}") {
@@ -413,6 +420,11 @@ pipeline {
     cleanup {
       // bundlesize id was generated previously with the generateReport step in the lint stage.
       notifyBuildResult(prComment: true, newPRComment: [ 'bundlesize': 'bundlesize.md' ])
+    }
+    failure {
+      whenTrue(params.release && env.PRE_RELEASE_STAGE == 'true') {
+        notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Pre-release steps failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
+      }
     }
   }
 }

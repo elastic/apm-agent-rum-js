@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.10.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.10.1...@elastic/apm-rum-core@5.10.2) (2021-04-02)
+
+
+### Bug Fixes
+
+* **rum-core:** mapping for marks were incorrect ([#1008](https://github.com/elastic/apm-agent-rum-js/issues/1008)) ([dbd6096](https://github.com/elastic/apm-agent-rum-js/commit/dbd6096bbbbb0811e7b3d3e3e9be6f7723135838))
+
+
+
+
+
 ## [5.10.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.10.0...@elastic/apm-rum-core@5.10.1) (2021-03-17)
 
 
