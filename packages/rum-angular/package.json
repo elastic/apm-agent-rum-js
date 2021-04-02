@@ -31,11 +31,11 @@
   "dependencies": {
     "@elastic/apm-rum": "file:../rum",
     "@elastic/apm-rum-core": "file:../rum-core",
-    "tslib": "^1.10.0"
+    "tslib": "^2.1.0"
   },
   "peerDependencies": {
-    "@angular/core": "^9.0.0",
-    "@angular/router": "^9.0.0"
+    "@angular/core": ">=9.0.0 <12.0.0",
+    "@angular/router": ">=9.0.0 <12.0.0"
   },
   "browserslist": [
     "ie 11"
