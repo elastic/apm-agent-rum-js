@@ -206,7 +206,7 @@ export function compressTransaction(transaction) {
     t: transaction.type,
     d: transaction.duration,
     c: compressContext(transaction.context),
-    m: compressMarks(transaction.marks),
+    k: compressMarks(transaction.marks),
     me: compressMetricsets(transaction.breakdown),
     y: spans,
     yc: {
