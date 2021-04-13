@@ -35,7 +35,8 @@ import {
   extend,
   getEarliestSpan,
   getLatestNonXHRSpan,
-  isPerfTypeSupported
+  isPerfTypeSupported,
+  generateRandomId
 } from '../common/utils'
 import { captureNavigation } from './capture-navigation'
 import {
@@ -56,7 +57,6 @@ import {
 import { addTransactionContext } from '../common/context'
 import { __DEV__, state } from '../state'
 import { slugifyUrl } from '../common/url'
-import { generateRandomId } from '../../dist/lib/common/utils'
 
 class TransactionService {
   constructor(logger, config) {

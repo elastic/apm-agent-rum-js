@@ -495,7 +495,7 @@ describe('ApmServer', function () {
           transaction_sample_rate: '0.5',
           etag: 'test'
         })
-        localStorage.removeItem(LOCAL_CONFIG_KEY)
+        sessionStorage.removeItem(LOCAL_CONFIG_KEY)
       })
     },
     testConfig.stackVersion &&

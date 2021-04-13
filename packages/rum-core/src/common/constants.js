@@ -160,7 +160,7 @@ const TRUNCATED_TYPE = '.truncated'
 const KEYWORD_LIMIT = 1024
 
 /**
- * Session timeout is set to 30 minutes.
+ * Session timeout is set to 30 minutes (in milliseconds).
  */
 const SESSION_TIMEOUT = 30 * 60000
 

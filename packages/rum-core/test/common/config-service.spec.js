@@ -257,7 +257,7 @@ describe('ConfigService', function () {
 
     config = configService.getLocalConfig()
     expect(config).toEqual({ key: 'value' })
-    localStorage.removeItem(LOCAL_CONFIG_KEY)
+    sessionStorage.removeItem(LOCAL_CONFIG_KEY)
   })
 
   it('should consider transactionSampleRate precision', () => {

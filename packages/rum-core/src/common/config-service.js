@@ -240,8 +240,18 @@ class Config {
     return errors
   }
 
+  /**
+   * The localStorage is needed for session feature
+   * but since this is a breaking change for central config,
+   * we're using the session flag until the next major version
+   * which should remove the use of sessionStorage.
+   */
   getLocalConfig() {
-    let config = localStorage.getItem(LOCAL_CONFIG_KEY)
+    let storage = sessionStorage
+    if (this.config.session) {
+      storage = localStorage
+    }
+    let config = storage.getItem(LOCAL_CONFIG_KEY)
     if (config) {
       return JSON.parse(config)
     }
@@ -253,7 +263,11 @@ class Config {
         const prevConfig = this.getLocalConfig()
         config = { ...prevConfig, ...config }
       }
-      localStorage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
+      let storage = sessionStorage
+      if (this.config.session) {
+        storage = localStorage
+      }
+      storage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
     }
   }
 }
