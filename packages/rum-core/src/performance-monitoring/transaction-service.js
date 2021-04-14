@@ -357,6 +357,7 @@ class TransactionService {
 
   setSession(tr) {
     let session = this._config.get('session')
+
     if (session) {
       if (typeof session == 'boolean') {
         tr.session = {
@@ -372,11 +373,11 @@ class TransactionService {
             id: generateRandomId(16),
             sequence: 1
           }
-        }
-
-        tr.session = {
-          id: session.id,
-          sequence: session.sequence ? session.sequence + 1 : 1
+        } else {
+          tr.session = {
+            id: session.id,
+            sequence: session.sequence ? session.sequence + 1 : 1
+          }
         }
       }
 

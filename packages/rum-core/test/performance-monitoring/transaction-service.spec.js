@@ -651,6 +651,66 @@ describe('TransactionService', function () {
     localStorage.removeItem(LOCAL_CONFIG_KEY)
   })
 
+  it('should create a new session after the session timeout', () => {
+    const clock = jasmine.clock()
+    clock.install()
+    clock.mockDate()
+    config.setConfig({ session: true })
+    const tr = new Transaction('test', 'test')
+    transactionService.setSession(tr)
+    expect(tr.session.id).toBeDefined()
+    const firstConfig = config.getLocalConfig()
+    const firstTime = firstConfig.session.timestamp
+    console.log(firstConfig)
+    expect(firstConfig.session).toEqual({
+      id: tr.session.id,
+      sequence: 1,
+      timestamp: jasmine.any(Number)
+    })
+
+    clock.tick(500)
+    const tr2 = new Transaction('tr2', 'test')
+    transactionService.setSession(tr2)
+
+    expect(tr2.session).toEqual({ id: tr.session.id, sequence: 2 })
+    const secondConfig = config.getLocalConfig()
+    console.log(secondConfig)
+    expect(secondConfig.session.timestamp).toEqual(firstTime + 500)
+
+    clock.tick(31 * 60000)
+    console.log(secondConfig.session.timestamp - Date.now())
+
+    const tr3 = new Transaction('tr3', 'test')
+    transactionService.setSession(tr3)
+    console.log(tr3.session)
+    const thirdConfig = config.getLocalConfig()
+    expect(tr3.session.id).not.toEqual(tr.session.id)
+    expect(thirdConfig.session).toEqual({
+      id: tr3.session.id,
+      sequence: 1,
+      timestamp: firstTime + 31 * 60000 + 500
+    })
+
+    localStorage.removeItem(LOCAL_CONFIG_KEY)
+    clock.uninstall()
+  })
+
+  it('should allow setting session id through configuration', () => {
+    config.setConfig({ session: { id: 123 } })
+    const tr = new Transaction('test', 'test')
+    transactionService.setSession(tr)
+    expect(tr.session).toEqual({ id: 123, sequence: 1 })
+    const tr2 = new Transaction('tr2', 'test')
+    transactionService.setSession(tr2)
+    expect(tr2.session).toEqual({ id: 123, sequence: 2 })
+    const localConfig = config.getLocalConfig()
+    expect(localConfig.session).toEqual({
+      id: 123,
+      sequence: 2,
+      timestamp: jasmine.any(Number)
+    })
+  })
+
   describe('performance entry recorder', () => {
     const logger = new LoggingService()
     const config = new Config()
