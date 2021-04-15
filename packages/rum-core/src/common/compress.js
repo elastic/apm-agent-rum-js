@@ -223,7 +223,7 @@ export function compressTransaction(transaction) {
   }
 
   if (transaction.session) {
-    let { id, sequence } = transaction.session
+    const { id, sequence } = transaction.session
     tr.ses = { id, seq: sequence }
   }
 

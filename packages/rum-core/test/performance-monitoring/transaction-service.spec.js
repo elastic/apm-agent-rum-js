@@ -661,11 +661,10 @@ describe('TransactionService', function () {
     expect(tr.session.id).toBeDefined()
     const firstConfig = config.getLocalConfig()
     const firstTime = firstConfig.session.timestamp
-    console.log(firstConfig)
     expect(firstConfig.session).toEqual({
       id: tr.session.id,
       sequence: 1,
-      timestamp: jasmine.any(Number)
+      timestamp: firstTime
     })
 
     clock.tick(500)
@@ -674,15 +673,12 @@ describe('TransactionService', function () {
 
     expect(tr2.session).toEqual({ id: tr.session.id, sequence: 2 })
     const secondConfig = config.getLocalConfig()
-    console.log(secondConfig)
     expect(secondConfig.session.timestamp).toEqual(firstTime + 500)
 
     clock.tick(31 * 60000)
-    console.log(secondConfig.session.timestamp - Date.now())
 
     const tr3 = new Transaction('tr3', 'test')
     transactionService.setSession(tr3)
-    console.log(tr3.session)
     const thirdConfig = config.getLocalConfig()
     expect(tr3.session.id).not.toEqual(tr.session.id)
     expect(thirdConfig.session).toEqual({
