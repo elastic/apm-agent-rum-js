@@ -87,6 +87,15 @@ export default class ApmBase {
           errorLogging.registerListeners()
         }
 
+        if (configService.get('session')) {
+          let localConfig = configService.getLocalConfig()
+          if (localConfig && localConfig.session) {
+            configService.setConfig({
+              session: localConfig.session
+            })
+          }
+        }
+
         const sendPageLoad = () =>
           flags[PAGE_LOAD] && this._sendPageLoadMetrics()
 

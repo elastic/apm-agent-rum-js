@@ -37,10 +37,12 @@ import {
   PAINT,
   TRUNCATED_TYPE,
   FIRST_INPUT,
-  LAYOUT_SHIFT
+  LAYOUT_SHIFT,
+  LOCAL_CONFIG_KEY
 } from '../../src/common/constants'
 import { state } from '../../src/state'
 import { isPerfTypeSupported } from '../../src/common/utils'
+import Transaction from '../../src/performance-monitoring/transaction'
 
 describe('TransactionService', function () {
   var transactionService
@@ -633,6 +635,76 @@ describe('TransactionService', function () {
       `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
     )
     state.lastHiddenStart = lastHiddenStart
+  })
+
+  it('should set session information on transaction', () => {
+    config.setConfig({ session: true })
+    const tr = new Transaction('test', 'test')
+    transactionService.setSession(tr)
+    expect(tr.session.id).toBeDefined()
+    let localConfig = config.getLocalConfig()
+    expect(localConfig.session).toEqual({
+      id: tr.session.id,
+      sequence: 1,
+      timestamp: jasmine.any(Number)
+    })
+    localStorage.removeItem(LOCAL_CONFIG_KEY)
+  })
+
+  it('should create a new session after the session timeout', () => {
+    const clock = jasmine.clock()
+    clock.install()
+    clock.mockDate()
+    config.setConfig({ session: true })
+    const tr = new Transaction('test', 'test')
+    transactionService.setSession(tr)
+    expect(tr.session.id).toBeDefined()
+    const firstConfig = config.getLocalConfig()
+    const firstTime = firstConfig.session.timestamp
+    expect(firstConfig.session).toEqual({
+      id: tr.session.id,
+      sequence: 1,
+      timestamp: firstTime
+    })
+
+    clock.tick(500)
+    const tr2 = new Transaction('tr2', 'test')
+    transactionService.setSession(tr2)
+
+    expect(tr2.session).toEqual({ id: tr.session.id, sequence: 2 })
+    const secondConfig = config.getLocalConfig()
+    expect(secondConfig.session.timestamp).toEqual(firstTime + 500)
+
+    clock.tick(31 * 60000)
+
+    const tr3 = new Transaction('tr3', 'test')
+    transactionService.setSession(tr3)
+    const thirdConfig = config.getLocalConfig()
+    expect(tr3.session.id).not.toEqual(tr.session.id)
+    expect(thirdConfig.session).toEqual({
+      id: tr3.session.id,
+      sequence: 1,
+      timestamp: firstTime + 31 * 60000 + 500
+    })
+
+    localStorage.removeItem(LOCAL_CONFIG_KEY)
+    clock.uninstall()
+  })
+
+  it('should allow setting session id through configuration', () => {
+    config.setConfig({ session: { id: 123 } })
+    const tr = new Transaction('test', 'test')
+    transactionService.setSession(tr)
+    expect(tr.session).toEqual({ id: 123, sequence: 1 })
+    const tr2 = new Transaction('tr2', 'test')
+    transactionService.setSession(tr2)
+    expect(tr2.session).toEqual({ id: 123, sequence: 2 })
+    const localConfig = config.getLocalConfig()
+    expect(localConfig.session).toEqual({
+      id: 123,
+      sequence: 2,
+      timestamp: jasmine.any(Number)
+    })
   })
 
   describe('performance entry recorder', () => {

@@ -90,7 +90,8 @@ class Config {
       centralConfig: false,
       monitorLongtasks: true,
       apiVersion: 2,
-      context: {}
+      context: {},
+      session: false
     }
 
     this.events = new EventHandler()
@@ -239,16 +240,34 @@ class Config {
     return errors
   }
 
+  /**
+   * The localStorage is needed for session feature
+   * but since this is a breaking change for central config,
+   * we're using the session flag until the next major version
+   * which should remove the use of sessionStorage.
+   */
   getLocalConfig() {
-    let config = sessionStorage.getItem(LOCAL_CONFIG_KEY)
+    let storage = sessionStorage
+    if (this.config.session) {
+      storage = localStorage
+    }
+    let config = storage.getItem(LOCAL_CONFIG_KEY)
     if (config) {
       return JSON.parse(config)
     }
   }
 
-  setLocalConfig(config) {
+  setLocalConfig(config, merge) {
     if (config) {
-      sessionStorage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
+      if (merge) {
+        const prevConfig = this.getLocalConfig()
+        config = { ...prevConfig, ...config }
+      }
+      let storage = sessionStorage
+      if (this.config.session) {
+        storage = localStorage
+      }
+      storage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
     }
   }
 }
