@@ -159,6 +159,11 @@ const TRUNCATED_TYPE = '.truncated'
  */
 const KEYWORD_LIMIT = 1024
 
+/**
+ * Session timeout is set to 30 minutes (in milliseconds).
+ */
+const SESSION_TIMEOUT = 30 * 60000
+
 export {
   SCHEDULE,
   INVOKE,
@@ -204,5 +209,6 @@ export {
   FIRST_INPUT,
   LAYOUT_SHIFT,
   OUTCOME_SUCCESS,
-  OUTCOME_FAILURE
+  OUTCOME_FAILURE,
+  SESSION_TIMEOUT
 }

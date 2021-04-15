@@ -430,6 +430,7 @@ export default class PerformanceMonitoring {
     const transactionData = {
       id: transaction.id,
       trace_id: transaction.traceId,
+      session: transaction.session,
       name: transaction.name,
       type: transaction.type,
       duration: transaction.duration(),
