@@ -58,7 +58,7 @@ export default class ApmBase {
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
-      configService.setVersion('5.7.2')
+      configService.setVersion('5.8.0')
       this.config(config)
       /**
        * Set level here to account for both active and inactive cases
@@ -85,6 +85,15 @@ export default class ApmBase {
         if (flags[ERROR]) {
           const errorLogging = this.serviceFactory.getService('ErrorLogging')
           errorLogging.registerListeners()
+        }
+
+        if (configService.get('session')) {
+          let localConfig = configService.getLocalConfig()
+          if (localConfig && localConfig.session) {
+            configService.setConfig({
+              session: localConfig.session
+            })
+          }
         }
 
         const sendPageLoad = () =>

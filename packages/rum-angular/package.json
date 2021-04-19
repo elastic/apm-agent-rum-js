@@ -1,19 +1,12 @@
 {
   "name": "@elastic/apm-rum-angular",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "description": "Elastic APM Real User Monitoring for Angular applications",
   "homepage": "https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html",
   "license": "MIT",
-  "main": "dist/lib/index.js",
-  "module": "dist/es/index.js",
-  "es2015": "dist/es2015/index.js",
-  "source": "src/index.ts",
-  "files": [
-    "dist",
-    "src"
-  ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "directory": "dist"
   },
   "repository": {
     "type": "git",
@@ -21,29 +14,30 @@
     "directory": "packages/rum-angular"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=12.0.0"
   },
   "scripts": {
-    "prepublishOnly": "npm run build",
-    "build": "run-p build:main build:module build:es2015",
-    "build:main": "BABEL_ENV=BROWSER_PROD npx babel -x '.ts' src -d dist/lib ",
-    "build:module": "BABEL_ENV=BROWSER_ESM_PROD npx babel -x '.ts' src -d dist/es",
-    "build:es2015": "BABEL_ENV=BROWSER_ESM_ES2015 npx babel -x '.ts' src -d dist/es2015",
-    "build:e2e": "npm run script buildE2eBundles packages/rum-angular/test/e2e",
-    "test:unit": "npm run script runUnitTests packages/rum-angular",
+    "prepublishOnly": "npm run build && cd dist",
+    "build": "ng build --prod",
+    "build:e2e": "ng build app --prod",
+    "test:unit": "ng test",
     "test:e2e": "npm run script runE2eTests packages/rum-angular/wdio.conf.js",
     "test:sauce": "npm run script runSauceTests packages/rum-angular true test:unit build:e2e test:e2e",
     "test": "npm run test:sauce",
     "script": "node ../../dev-utils/run-script.js",
-    "karma:dev": "karma start --auto-watch --restartOnFileChange",
-    "karma:coverage": "karma start --coverage --singleRun"
+    "karma:dev": "ng test --watch",
+    "karma:coverage": "ng test --code-coverage"
   },
   "dependencies": {
     "@elastic/apm-rum": "file:../rum",
-    "@elastic/apm-rum-core": "file:../rum-core"
+    "@elastic/apm-rum-core": "file:../rum-core",
+    "tslib": "^2.1.0"
   },
   "peerDependencies": {
-    "@angular/core": "^8.0.0",
-    "@angular/router": "^8.0.0"
-  }
+    "@angular/core": ">=9.0.0 <12.0.0",
+    "@angular/router": ">=9.0.0 <12.0.0"
+  },
+  "browserslist": [
+    "ie 11"
+  ]
 }
