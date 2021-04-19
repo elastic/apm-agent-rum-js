@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.8.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.7.2...@elastic/apm-rum@5.8.0) (2021-04-19)
+
+
+### Features
+
+* **rum:** add session to transactions ([#1005](https://github.com/elastic/apm-agent-rum-js/issues/1005)) ([a426c5b](https://github.com/elastic/apm-agent-rum-js/commit/a426c5b3a93db3f144e71103d8cc31283590e46d))
+
+
+
+
+
 ## [5.7.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.7.1...@elastic/apm-rum@5.7.2) (2021-04-02)
 
 **Note:** Version bump only for package @elastic/apm-rum
