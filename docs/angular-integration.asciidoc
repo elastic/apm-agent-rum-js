@@ -15,7 +15,7 @@ Install the `@elastic/apm-rum-angular` package as a dependency to your applicati
 
 [source,bash]
 ----
-npm install @elastic/apm-rum-angular@alpha --save
+npm install @elastic/apm-rum-angular --save
 ----
 
 NOTE: If you are using an Angular version < 9.0, use @elastic/apm-rum-angular 1.x to instrument your application. Details are available in a https://www.elastic.co/guide/en/apm/agent/rum-js/4.x/angular-integration.html[prior release].
