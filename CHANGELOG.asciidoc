@@ -29,6 +29,14 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+
+[[release-notes-5.8.0]]
+==== 5.8.0 (2021-04-19)
+
+[float]
+===== Features
+* First draft of session information is added for `page-load` Transactions (disabled by default): {issue}634[#634]
+
 [[release-notes-5.7.2]]
 ==== 5.7.2 (2021-04-02)
 
