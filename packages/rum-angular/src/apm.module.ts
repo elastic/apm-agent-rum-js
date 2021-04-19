@@ -23,12 +23,14 @@
  *
  */
 
-const { getBabelConfig, PACKAGE_TYPES } = require('../../dev-utils/build')
+import { InjectionToken, NgModule } from '@angular/core'
+import { RouterModule } from '@angular/router'
+import { apm, ApmBase } from '@elastic/apm-rum'
 
-module.exports = function (api) {
-  /**
-   * Reads BABEL_ENV to decide between CJS and ESM formats
-   */
-  const env = api.env()
-  return getBabelConfig(env, PACKAGE_TYPES.ANGULAR)
-}
+export const APM = new InjectionToken<ApmBase>('APM Base Client')
+
+@NgModule({
+  imports: [RouterModule],
+  providers: [{ provide: APM, useValue: apm }]
+})
+export class ApmModule {}

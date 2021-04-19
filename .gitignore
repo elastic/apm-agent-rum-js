@@ -2,15 +2,18 @@ node_modules
 .config
 .npm
 .DS_Store
+.idea
 
+# Ignore all e2e related build files
+test/e2e/with-router/build
 *.e2e-bundle.*
 *-e2e.html
 
 dist
 tmp
+out-tsc
 
 error-screenshot
-
 html_docs
 build
 reports

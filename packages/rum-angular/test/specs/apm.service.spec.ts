@@ -23,18 +23,15 @@
  *
  */
 
-import { ApmService } from '../../src/apm-service'
 import { TestBed, ComponentFixture } from '@angular/core/testing'
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing'
 import { NgModule, Component } from '@angular/core'
 import { Routes, Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Location } from '@angular/common'
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
+import { APM, ApmModule } from '../../src/apm.module'
+import { ApmService } from '../../src/apm.service'
 
 @Component({
   template: 'LazyHome'
@@ -93,31 +90,21 @@ describe('ApmService', () => {
   let location: Location
   let fixture: ComponentFixture<AppComponent>
   let compiled: HTMLElement
-  let apm
-
-  function setUpApm() {
-    apm = new ApmBase(createServiceFactory(), false)
-    ApmService.apm = apm
-  }
 
   function setUpAppModule() {
-    TestBed.resetTestEnvironment()
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting()
-    )
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes(routes)],
+      imports: [ApmModule, RouterTestingModule.withRoutes(routes)],
       declarations: [HomeComponent, AppComponent, SlugComponent],
       providers: [ApmService]
+    }).compileComponents()
+
+    TestBed.overrideProvider(APM, {
+      useValue: new ApmBase(createServiceFactory(), false)
     })
+
     service = TestBed.get(ApmService)
     router = TestBed.get(Router)
     location = TestBed.get(Location)
-    /**
-     * Inject router manually
-     */
-    service.router = router
 
     fixture = TestBed.createComponent(AppComponent)
     compiled = fixture.debugElement.nativeElement
@@ -129,7 +116,6 @@ describe('ApmService', () => {
 
   describe('testing init', () => {
     beforeEach(() => {
-      setUpApm()
       setUpAppModule()
       setUpRouteNavigation()
     })
@@ -144,7 +130,7 @@ describe('ApmService', () => {
     })
 
     it('should not instrument route changes when agent is inactive', done => {
-      spyOn(apm, 'startTransaction')
+      spyOn(service.apm, 'startTransaction')
       service.init({
         active: false
       })
@@ -155,7 +141,7 @@ describe('ApmService', () => {
           expect(compiled.querySelector('ng-component').textContent).toBe(
             'Home'
           )
-          expect(apm.startTransaction).not.toHaveBeenCalled()
+          expect(service.apm.startTransaction).not.toHaveBeenCalled()
           done()
         })
       })
@@ -164,21 +150,21 @@ describe('ApmService', () => {
 
   describe('testing observe', () => {
     beforeEach(() => {
-      setUpApm()
       setUpAppModule()
       service.observe()
       setUpRouteNavigation()
     })
 
     it('navigate to "/home" should create /home transaction', done => {
-      spyOn(apm, 'startTransaction')
+      spyOn(service.apm, 'startTransaction')
       fixture.ngZone.run(() => {
         router.navigate(['/home']).then(() => {
           expect(location.path()).toBe('/home')
           expect(compiled.querySelector('ng-component').textContent).toBe(
             'Home'
           )
-          expect(apm.startTransaction).toHaveBeenCalledWith(
+
+          expect(service.apm.startTransaction).toHaveBeenCalledWith(
             '/home',
             'route-change',
             {
@@ -192,15 +178,15 @@ describe('ApmService', () => {
     })
 
     it('should set transaction name properly on redirects', done => {
-      spyOn(apm, 'startTransaction').and.callThrough()
-      const tr = apm.getCurrentTransaction()
+      spyOn(service.apm, 'startTransaction').and.callThrough()
+      const tr = service.apm.getCurrentTransaction()
       fixture.ngZone.run(() => {
         router.navigate(['/']).then(() => {
           expect(location.path()).toBe('/home')
           expect(compiled.querySelector('ng-component').textContent).toBe(
             'Home'
           )
-          expect(apm.startTransaction).toHaveBeenCalledWith(
+          expect(service.apm.startTransaction).toHaveBeenCalledWith(
             '/',
             'route-change',
             {
@@ -216,15 +202,15 @@ describe('ApmService', () => {
     })
 
     it('should set transaction name properly on parameterised urls', done => {
-      spyOn(apm, 'startTransaction').and.callThrough()
-      const tr = apm.getCurrentTransaction()
+      spyOn(service.apm, 'startTransaction').and.callThrough()
+      const tr = service.apm.getCurrentTransaction()
       fixture.ngZone.run(() => {
         router.navigate(['/slug/2']).then(() => {
           expect(location.path()).toBe('/slug/2')
           expect(compiled.querySelector('ng-component').textContent).toBe(
             'Slug'
           )
-          expect(apm.startTransaction).toHaveBeenCalledWith(
+          expect(service.apm.startTransaction).toHaveBeenCalledWith(
             '/slug/2',
             'route-change',
             {
@@ -240,15 +226,15 @@ describe('ApmService', () => {
     })
 
     it('should set transaction name properly for lazy loaded modules', done => {
-      spyOn(apm, 'startTransaction').and.callThrough()
-      const tr = apm.getCurrentTransaction()
+      spyOn(service.apm, 'startTransaction').and.callThrough()
+      const tr = service.apm.getCurrentTransaction()
       fixture.ngZone.run(() => {
         router.navigate(['/lazy/2']).then(() => {
           expect(location.path()).toBe('/lazy/2')
           expect(compiled.querySelector('ng-component').textContent).toBe(
             'LazyHome'
           )
-          expect(apm.startTransaction).toHaveBeenCalledWith(
+          expect(service.apm.startTransaction).toHaveBeenCalledWith(
             '/lazy/2',
             'route-change',
             {

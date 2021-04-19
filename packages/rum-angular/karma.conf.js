@@ -24,17 +24,30 @@
  */
 
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
-const {
-  getWebpackConfig,
-  PACKAGE_TYPES,
-  BUNDLE_TYPES
-} = require('../../dev-utils/build')
 
 module.exports = function (config) {
-  config.set(baseConfig)
-  config.set({
-    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.ANGULAR)
-  })
-  const preparedConfig = prepareConfig(config, 'rum-angular')
-  config.set(preparedConfig)
+  const { watch, codeCoverage } = config.buildWebpack.options
+  const angularConfig = {
+    ...baseConfig,
+    ...{
+      basePath: '',
+      files: [],
+      /**
+       * Disable our custom build system for Angular
+       */
+      preprocessors: null,
+      webpack: null,
+      frameworks: [...baseConfig.frameworks, '@angular-devkit/build-angular'],
+      plugins: [
+        ...baseConfig.plugins,
+        require('@angular-devkit/build-angular/plugins/karma')
+      ],
+      coverage: codeCoverage,
+      ...(Boolean(watch)
+        ? { autoWatch: true, singleRun: false, restartOnFileChange: true }
+        : { singleRun: true })
+    }
+  }
+  config.set(angularConfig)
+  config.set(prepareConfig(config, 'rum-angular'))
 }
