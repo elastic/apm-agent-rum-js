@@ -23,12 +23,11 @@
  *
  */
 
-import { apmBase } from '@elastic/apm-rum'
-import ApmServerMock from '../../rum-core/test/utils/apm-server-mock'
+// This file can be replaced during build by using the `fileReplacements` array.
+// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
+// The list of file replacements can be found in `angular.json`.
 
-export function initializeApmService(service, config) {
-  const apmServer = apmBase.serviceFactory.getService('ApmServer')
-  const serverMock = new ApmServerMock(apmServer, false)
-  apmBase.serviceFactory.instances['ApmServer'] = serverMock
-  return service.init(config)
+export const environment = {
+  production: false,
+  serverUrl: 'http://localhost:8001'
 }
