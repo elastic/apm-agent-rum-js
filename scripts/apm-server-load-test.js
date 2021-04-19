@@ -32,6 +32,9 @@ const { version } = require('../packages/rum/package.json')
 const { writeFile } = require('fs').promises
 
 const serverUrl = process.env.APM_SERVER_URL || 'http://localhost:8200'
+const esUrl = process.env.ES_URL || 'http://localhost:9200'
+const esAuth = process.env.ES_AUTH
+const debug = process.env.DEBUG
 
 /**
  * To make the random id generation work.
@@ -153,7 +156,14 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-function generateTransaction(spanCount) {
+function generateTransaction(spanCount, sessionId, sequence, baseUrl) {
+  if (!baseUrl) {
+    baseUrl = faker.internet.url()
+  }
+  const url =
+    baseUrl +
+    '/' +
+    faker.random.words(3).split(' ').join('/').toLocaleLowerCase()
   let breakdown = []
   let tr = merge({}, defaultTransaction, {
     transaction: {
@@ -167,9 +177,13 @@ function generateTransaction(spanCount) {
       sampled: spanCount != 0,
       breakdown,
       context: {
+        tags: {
+          session_id: sessionId,
+          session_seq: sequence
+        },
         page: {
           referer: faker.internet.url(),
-          url: faker.internet.url()
+          url
         }
       }
     }
@@ -215,52 +229,119 @@ async function postPayload(url, payload) {
   let data = payload.map(p => {
     return ndJsonStringify(p)
   })
-  let response = await fetch(url, {
-    method: 'POST',
-    cache: 'no-cache',
-    headers: {
-      'Content-Type': 'application/x-ndjson',
-      'X-Forwarded-For': faker.internet.ip(),
-      'User-Agent': faker.internet.userAgent()
-    },
-    body: data.join('')
-  })
-  return response.text()
+
+  try {
+    let response = await fetch(url, {
+      method: 'POST',
+      cache: 'no-cache',
+      headers: {
+        'Content-Type': 'application/x-ndjson',
+        'X-Forwarded-For': faker.internet.ip(),
+        'User-Agent': faker.internet.userAgent()
+      },
+      body: data.join('')
+    })
+    return response.text()
+  } catch (error) {
+    return error
+  }
 }
 
-async function generatePayloads(transactionCount) {
+function asyncTimeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+async function generatePayloads(transactionCount, trPerSession = 10) {
   const spanPerTransaction = 50
   let promises = []
+  let sessionId
+  let baseUrl
+  let payloads = []
   for (let i = 0; i < transactionCount; i++) {
-    let payload = generateTransaction(spanPerTransaction)
+    const sequence = i % trPerSession
+    if (sequence == 0) {
+      sessionId = generateRandomId(16)
+      baseUrl = faker.internet.url()
+    }
+
+    let payload = generateTransaction(
+      spanPerTransaction,
+      sessionId,
+      sequence + 1,
+      baseUrl
+    )
     payload.unshift(merge({}, defaultMeta))
+    payloads.push(payload)
     let p = postPayload(`${serverUrl}/intake/v2/rum/events`, payload)
     promises.push(p)
   }
-  await Promise.all(promises)
-  let response = await fetch(`${serverUrl}/debug/vars`)
-  const apmServerResults = await response.json()
+  let transactionResponses = await Promise.all(promises)
+  const responses = {}
+  transactionResponses.forEach(tr => {
+    if (!responses[tr]) {
+      responses[tr] = 1
+    } else {
+      responses[tr]++
+    }
+  })
 
   const result = {
     '@timestamp': Date.now(),
     transactionCount,
     spanPerTransaction,
-    apmServer: apmServerResults
+    apmServer: null,
+    transformStats: null,
+    responses
   }
+
+  try {
+    let response = await fetch(`${serverUrl}/debug/vars`)
+    const apmServerResults = await response.json()
+    result.apmServer = apmServerResults
+  } catch (error) {
+    result.apmServer = error
+  }
+
+  if (debug) {
+    console.log(responses)
+    result.payloads = payloads
+    try {
+      let transformStats = await fetch(
+        `${esUrl}/_transform/transform_rum_sessions/_stats`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: esAuth
+          }
+        }
+      )
+      result.transformStats = await transformStats.json()
+    } catch (error) {
+      result.transformStats = error
+    }
+  }
+
   return result
 }
+const iterations = 10
 
 ;(async function () {
   const outputFile = process.argv[2]
-
-  const result = await generatePayloads(10)
+  const results = []
+  for (let iteration = 0; iteration < iterations; iteration++) {
+    if (debug) {
+      console.log(`Iteration: ${iteration}`)
+    }
+    const result = await generatePayloads(100)
+    results.push(result)
+    await asyncTimeout(1000)
+  }
 
   if (outputFile) {
     const outputPath = join(__dirname, '../', outputFile)
     let ndJSONOutput =
       '{"index": { "_index": "benchmarks-rum-load-test", "_type": "_doc"}}' +
       '\n'
-    ndJSONOutput += JSON.stringify(result)
+    ndJSONOutput += JSON.stringify(results)
     await writeFile(outputPath, ndJSONOutput)
   } else {
     console.log(result)
