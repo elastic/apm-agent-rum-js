@@ -130,4 +130,27 @@ describe('general-usercase', function () {
       expect(clickTransaction.spans.length).toBeGreaterThanOrEqual(1)
     }
   })
+
+  it('should capture session', function () {
+    browser.url('/test/e2e/general-usecase/index.html')
+    browser.waitUntil(
+      () => {
+        return $('#test-element').getText() === 'Passed'
+      },
+      5000,
+      'expected element #test-element'
+    )
+
+    const { sendEvents } = waitForApmServerCalls(0, 1)
+    const { transactions } = sendEvents
+
+    expect(transactions.length).toBe(1)
+    const transactionPayload = transactions[0]
+    expect(transactionPayload.type).toBe('page-load')
+    expect(transactionPayload.session.id).toBeDefined()
+    expect(transactionPayload.session.sequence).toBeGreaterThan(0)
+    expect(transactionPayload.context.tags.session_id).toBeDefined()
+
+    return allowSomeBrowserErrors(['timeout test error with a secret'])
+  })
 })
