@@ -176,6 +176,10 @@ function generateTransaction(spanCount, sessionId, sequence, baseUrl) {
       },
       sampled: spanCount != 0,
       breakdown,
+      session: {
+        id: sessionId,
+        sequence
+      },
       context: {
         tags: {
           session_id: sessionId,
@@ -333,6 +337,10 @@ const iterations = 10
     }
     const result = await generatePayloads(100)
     results.push(result)
+    /**
+     * This timeout is added to avoid hitting
+     * the rate limit on APM server
+     */
     await asyncTimeout(1000)
   }
 

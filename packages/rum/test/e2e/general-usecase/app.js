@@ -44,8 +44,10 @@ const elasticApm = createApmBase({
 
 elasticApm.observe('transaction:end', function (transaction) {
   if (transaction.session) {
-    transaction.addLabels({ session_id: transaction.session.id })
-    transaction.addLabels({ session_seq: transaction.session.sequence })
+    transaction.addLabels({
+      session_id: transaction.session.id,
+      session_seq: transaction.session.sequence
+    })
   }
 })
 
