@@ -114,7 +114,7 @@ You must use the query bar to filter for a specific environment in versions prio
 
 
 Set the verbosity level for the agent.
-This does not have any influence on the types of errors that are sent to the APM Server. Use this option to report an issue with the agent to us.
+This does not have any influence on the types of errors that are sent to the APM Server. This option is useful when you want to report an issue with the agent to us.
 
 
 Possible levels are: `trace`, `debug`, `info`, `warn`, and `error`.
@@ -203,7 +203,7 @@ documentation for more details.
 * *Type:* Boolean
 * *Default:* `true`
 
-The distributed tracing is enabled by default, but this configuration can be used to disable it.
+Distributed tracing is enabled by default. Use this option to disable it.
 
 
 [float]
@@ -245,7 +245,7 @@ Throttle the number of events sent to APM Server.
 [[events-limit]]
 ==== `eventsLimit`
 
-The agent can only send up to `80` events every `60000` milliseconds (one minute) by default.
+By default, the agent can only send up to `80` events every `60000` milliseconds (one minute).
 
 * *Type:* Number
 * *Default:* `80`
@@ -257,7 +257,7 @@ The agent can only send up to `80` events every `60000` milliseconds (one minute
 * *Type:* Number
 * *Default:* `1.0`
 
-A number between `0.0` and `1.0` that specifies the sample rate of transactions. By default all transactions are sampled.
+A number between `0.0` and `1.0` that specifies the sample rate of transactions. By default, all transactions are sampled.
 
 
 [float]
