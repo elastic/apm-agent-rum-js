@@ -179,7 +179,7 @@ type FilterFn = (payload: Payload) => Payload | boolean | void
 type Payload = { [key: string]: any }
 
 type TaskId = string | number
-type LabelValue = string
+type LabelValue = string | number | boolean
 type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error'
 type TransactionEvents = 'transaction:start' | 'transaction:end'
 type InstrumentationTypes =
