@@ -404,6 +404,40 @@ describe('ApmServer', function () {
     ])
   })
 
+  it('should call beforeSend in _makeHttpRequest', async () => {
+    await apmServer._makeHttpRequest('GET', '/', {
+      payload: 'test',
+      beforeSend: (xhr, url, method, headers, payload) => {
+        expect(typeof xhr.setRequestHeader).toBe('function')
+        xhr.setRequestHeader('custom', 'value')
+        expect(url).toBe('/')
+        expect(method).toBe('GET')
+        expect(payload).toBe('test')
+        expect(headers).toBeUndefined()
+        return true
+      }
+    })
+  })
+
+  it('should reject the request if beforeSend returns falsy', async () => {
+    let promise = apmServer._makeHttpRequest('POST', '/test', {
+      payload: 'test',
+      beforeSend: (xhr, url, method, headers, payload) => {
+        expect(xhr).toBeDefined()
+        expect(url).toBe('/test')
+        expect(method).toBe('POST')
+        expect(payload).toBe('test')
+        expect(headers).toBeUndefined()
+        return false
+      }
+    })
+    await expectAsync(promise).toBeRejectedWith({
+      url: '/test',
+      status: 0,
+      responseText: 'Request rejected by user configuration.'
+    })
+  })
+
   /**
    * Stream API in blob is only supported on few browsers
    */
