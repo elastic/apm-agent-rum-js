@@ -311,3 +311,69 @@ NOTE: Spans that are captured as part of the ignored transactions would also be 
 Instructs the agent to start monitoring for browser tasks that block the UI
 thread and might delay other user inputs by affecting the overall page
 responsiveness. Learn more about <<longtasks, long task spans>> and how to interpret them.
+
+
+[float]
+[[apm-request]]
+==== `apmRequest`
+
+* *Type:* Function
+* *Default:* `null`
+
+[source,js]
+----
+apm.init({ apmRequest: (requestSpec) => true})
+----
+
+Arguments:
+
+* `requestSpec` - This is an object that contains the APM http request details:
+
+** `url` - The full url of the APM server
+
+** `method` - Method of the http request
+
+** `headers` - Headers of the http request
+
+** `payload` - Body of the http request
+
+** `xhr` - The `XMLHttpRequest` instance used by the agent to send the request
+
+`apmRequest` can be used to change or reject requests that are made to the
+APM Server. This config can be set to a function, which is called whenever the agent
+needs to make a request to the APM Server. 
+
+The callback function is called with a single argument and is expected to return 
+an output synchronously. If the return value is `true` then the agent continues 
+with making the (potentially modified) request to the APM server. 
+ 
+If this function returns a falsy value the request is discarded.
+
+The following example adds a header to the http request:
+
+[source,js]
+----
+apm.init({
+  apmRequest({ xhr }) {
+    xhr.setRequestHeader('custom', 'header')
+    return true
+  }
+})
+----
+
+This example instructs the agent to discard the request, since it's handled by the user:
+
+[source,js]
+----
+apm.init({
+  apmRequest({ url, method, headers, payload }) {
+    // Handle the APM request here or at some later point.
+    fetch(url, {
+      method,
+      headers,
+      body: payload
+    });
+    return false
+  }
+})
+----
