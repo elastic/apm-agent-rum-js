@@ -92,7 +92,7 @@ class Config {
       apiVersion: 2,
       context: {},
       session: false,
-      apmServerRequest: null
+      apmRequest: null
     }
 
     this.events = new EventHandler()

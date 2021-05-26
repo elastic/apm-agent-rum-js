@@ -81,7 +81,7 @@ class ApmServer {
     const headers = {
       'Content-Type': 'application/x-ndjson'
     }
-    const apmServerRequest = this._configService.get('apmServerRequest')
+    const apmRequest = this._configService.get('apmRequest')
     return compressPayload(payload, headers)
       .catch(error => {
         if (__DEV__) {
@@ -90,7 +90,7 @@ class ApmServer {
             error.message
           )
         }
-        return { payload, headers, beforeSend: apmServerRequest }
+        return { payload, headers, beforeSend: apmRequest }
       })
       .then(result => this._makeHttpRequest('POST', endPoint, result))
       .then(({ responseText }) => responseText)
@@ -158,7 +158,7 @@ class ApmServer {
 
       let canSend = true
       if (typeof beforeSend === 'function') {
-        canSend = beforeSend(xhr, url, method, headers, payload)
+        canSend = beforeSend({ url, method, headers, payload, xhr })
       }
       if (canSend) {
         xhr.send(payload)
@@ -190,11 +190,11 @@ class ApmServer {
       configEndpoint += `&ifnonematch=${localConfig.etag}`
     }
 
-    const apmServerRequest = this._configService.get('apmServerRequest')
+    const apmRequest = this._configService.get('apmRequest')
 
     return this._makeHttpRequest('GET', configEndpoint, {
       timeout: 5000,
-      beforeSend: apmServerRequest
+      beforeSend: apmRequest
     })
       .then(xhr => {
         const { status, responseText } = xhr

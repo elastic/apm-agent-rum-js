@@ -407,7 +407,7 @@ describe('ApmServer', function () {
   it('should call beforeSend in _makeHttpRequest', async () => {
     await apmServer._makeHttpRequest('GET', '/', {
       payload: 'test',
-      beforeSend: (xhr, url, method, headers, payload) => {
+      beforeSend: ({ xhr, url, method, headers, payload }) => {
         expect(typeof xhr.setRequestHeader).toBe('function')
         xhr.setRequestHeader('custom', 'value')
         expect(url).toBe('/')
@@ -422,7 +422,7 @@ describe('ApmServer', function () {
   it('should reject the request if beforeSend returns falsy', async () => {
     let promise = apmServer._makeHttpRequest('POST', '/test', {
       payload: 'test',
-      beforeSend: (xhr, url, method, headers, payload) => {
+      beforeSend: ({ xhr, url, method, headers, payload }) => {
         expect(xhr).toBeDefined()
         expect(url).toBe('/test')
         expect(method).toBe('POST')
@@ -477,7 +477,8 @@ describe('ApmServer', function () {
       }
       expect(apmServer._makeHttpRequest).toHaveBeenCalledWith('POST', '/test', {
         payload,
-        headers: { 'Content-Type': 'application/x-ndjson' }
+        headers: { 'Content-Type': 'application/x-ndjson' },
+        beforeSend: null
       })
       unMock()
     })
