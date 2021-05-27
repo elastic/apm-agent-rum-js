@@ -81,6 +81,7 @@ class ApmServer {
     const headers = {
       'Content-Type': 'application/x-ndjson'
     }
+    const apmRequest = this._configService.get('apmRequest')
     return compressPayload(payload, headers)
       .catch(error => {
         if (__DEV__) {
@@ -89,7 +90,7 @@ class ApmServer {
             error.message
           )
         }
-        return { payload, headers }
+        return { payload, headers, beforeSend: apmRequest }
       })
       .then(result => this._makeHttpRequest('POST', endPoint, result))
       .then(({ responseText }) => responseText)
@@ -119,7 +120,11 @@ class ApmServer {
     return new Error(message)
   }
 
-  _makeHttpRequest(method, url, { timeout = 10000, payload, headers } = {}) {
+  _makeHttpRequest(
+    method,
+    url,
+    { timeout = 10000, payload, headers, beforeSend } = {}
+  ) {
     return new Promise(function (resolve, reject) {
       var xhr = new window.XMLHttpRequest()
       xhr[XHR_IGNORE] = true
@@ -150,7 +155,20 @@ class ApmServer {
         const { status, responseText } = xhr
         reject({ url, status, responseText })
       }
-      xhr.send(payload)
+
+      let canSend = true
+      if (typeof beforeSend === 'function') {
+        canSend = beforeSend({ url, method, headers, payload, xhr })
+      }
+      if (canSend) {
+        xhr.send(payload)
+      } else {
+        reject({
+          url,
+          status: 0,
+          responseText: 'Request rejected by user configuration.'
+        })
+      }
     })
   }
 
@@ -172,7 +190,12 @@ class ApmServer {
       configEndpoint += `&ifnonematch=${localConfig.etag}`
     }
 
-    return this._makeHttpRequest('GET', configEndpoint, { timeout: 5000 })
+    const apmRequest = this._configService.get('apmRequest')
+
+    return this._makeHttpRequest('GET', configEndpoint, {
+      timeout: 5000,
+      beforeSend: apmRequest
+    })
       .then(xhr => {
         const { status, responseText } = xhr
         if (status === 304) {
