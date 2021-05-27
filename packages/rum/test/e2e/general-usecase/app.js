@@ -39,7 +39,11 @@ const elasticApm = createApmBase({
   pageLoadTraceId: '286ac3ad697892c406528f13c82e0ce1',
   pageLoadSpanId: 'bbd8bcc3be14d814',
   pageLoadSampled: true,
-  session: true
+  session: true,
+  apmRequest(xhr) {
+    xhr.setRequestHeader('custom', 'value')
+    return true
+  }
 })
 
 elasticApm.observe('transaction:end', function (transaction) {
