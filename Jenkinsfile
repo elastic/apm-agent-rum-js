@@ -41,7 +41,7 @@ pipeline {
     booleanParam(name: 'saucelab_test', defaultValue: "true", description: "Enable run a Sauce lab test")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
     booleanParam(name: 'release', defaultValue: false, description: 'Release. If so, all the other parameters will be ignored when releasing from master.')
-    string(name: 'stack_version', defaultValue: '7.10.0', description: "What's the Stack Version to be used for the load testing?")
+    string(name: 'stack_version', defaultValue: '7.13.1', description: "What's the Stack Version to be used for the load testing?")
   }
   stages {
     stage('Initializing'){
@@ -111,12 +111,11 @@ pipeline {
             agent { label 'linux && immutable' }
             axes {
                 axis {
-                  name 'STACK_VERSION'
-                  values (
-                    '8.0.0-SNAPSHOT',
-                    '7.7.0',
-                    '7.0.0'
-                  )
+                  name 'ELASTIC_STACK_VERSION'
+                  // The below line is part of the bump release automation
+                  // if you change anything please modifies the file
+                  // .ci/bump-stack-release-version.sh
+                  values '8.0.0-SNAPSHOT', '7.x', '7.13.1'
                 }
                 axis {
                   name 'SCOPE'
@@ -132,7 +131,7 @@ pipeline {
             stages {
               stage('Scope Test') {
                 steps {
-                  runTest()
+                  runTest(stack: env.ELASTIC_STACK_VERSION, scope: env.SCOPE)
                 }
               }
             }
@@ -564,20 +563,21 @@ def runAllScopes(){
     'SCOPE=@elastic/apm-rum-angular',
     'SCOPE=@elastic/apm-rum-vue'
   ]
-  scopes.each{ s ->
-    withEnv([s]){
-      runTest()
-    }
+  scopes.each{ scope ->
+    runTest(stack: env.STACK_VERSION, scope: scope)
   }
 }
 
-def runTest(){
+def runTest(Map args = [:]){
+  def stack = args.stack
+  def scope = args.scope
   def mode = env.MODE == 'none' ? 'Puppeteer' : env.MODE
-  withGithubNotify(context: "Test ${SCOPE} - ${STACK_VERSION} - ${mode}", tab: 'tests') {
+  def stackVersion = (stack == '7.x') ? artifactsApi(action: '7.x-version') : stack
+  withGithubNotify(context: "Test ${scope} - ${stack} - ${mode}", tab: 'tests') {
     runScript(
-      label: "${SCOPE}",
-      stack: "${STACK_VERSION}",
-      scope: "${SCOPE}",
+      label: "${scope}",
+      stack: "${stackVersion}",
+      scope: "${scope}",
       goal: 'test'
     )
   }
