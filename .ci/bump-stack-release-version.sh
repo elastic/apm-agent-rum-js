@@ -31,7 +31,7 @@ for FILE in .ci/scripts/load-testing.sh .ci/scripts/pull_and_build.sh .ci/script
   git add $FILE
 done
 
-git diff --staged --quiet || git commit -m "[Automation] Update elastic stack release version to ${VERSION_RELEASE} and ${VERSION_DEV}"
+git diff --staged --quiet || git commit -m "chore: update elastic stack release ${VERSION_RELEASE} and ${VERSION_DEV}"
 git --no-pager log -1
 
 echo "You can now push and create a Pull Request"
