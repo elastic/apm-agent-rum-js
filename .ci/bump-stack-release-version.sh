@@ -23,15 +23,14 @@ else
 fi
 
 echo "Update stack with versions ${VERSION_RELEASE} and ${VERSION_DEV}"
-${SED} -E -e "s#(values '8.0.0-SNAPSHOT', '7.x',) '[0-9]+\.[0-9]+\.[0-9]+'#\1 '${VERSION_DEV}'#g" .ci/Jenkinsfile
-${SED} -E -e "s#(defaultValue:) '[0-9]+\.[0-9]+\.[0-9]+'#\1 '${VERSION_RELEASE}'#g" .ci/Jenkinsfile
-git add .ci/Jenkinsfile
+${SED} -E -e "s#(values '8.0.0-SNAPSHOT', '7.x',) '[0-9]+\.[0-9]+\.[0-9]+'#\1 '${VERSION_DEV}'#g" Jenkinsfile
+${SED} -E -e "s#(defaultValue:) '[0-9]+\.[0-9]+\.[0-9]+'#\1 '${VERSION_RELEASE}'#g" Jenkinsfile
+git add Jenkinsfile
 for FILE in .ci/scripts/load-testing.sh .ci/scripts/pull_and_build.sh .ci/scripts/test.sh dev-utils/docker-compose.yml ; do
   ${SED} -E -e "s#:-[0-9]+\.[0-9]+\.[0-9]+#:-${VERSION_RELEASE}#g" $FILE
   git add $FILE
 done
 
-git add .ci/Jenkinsfile
 git diff --staged --quiet || git commit -m "[Automation] Update elastic stack release version to ${VERSION_RELEASE} and ${VERSION_DEV}"
 git --no-pager log -1
 
