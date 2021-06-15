@@ -168,7 +168,10 @@ function getWebpackEnv(env = 'development') {
   return {
     APM_SERVER_URL: serverUrl,
     STACK_VERSION: stackVersion,
-    NODE_ENV: env
+    NODE_ENV: env,
+    BRANCH_NAME: '',
+    MODE: 'none',
+    JENKINS_URL: ''
   }
 }
 
@@ -234,7 +237,10 @@ function getWebpackConfig(bundleType, packageType) {
     ...{
       resolve: {
         mainFields: ['source', 'browser', 'module', 'main'],
-        extensions: ['.js', '.jsx', '.ts']
+        extensions: ['.js', '.jsx', '.ts'],
+        fallback: {
+          stream: require.resolve('stream-browserify')
+        }
       }
     }
   }
@@ -261,8 +267,7 @@ function getWebpackReleaseConfig(bundleType, name) {
   const REPORTS_DIR = join(__dirname, '..', 'packages', 'rum', 'reports')
 
   const config = {
-    ...getCommonWebpackConfig(bundleType),
-    node: false
+    ...getCommonWebpackConfig(bundleType)
   }
 
   if (isEnvProduction) {

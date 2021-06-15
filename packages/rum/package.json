@@ -19,7 +19,7 @@
     "build": "run-p build:main build:module build:umd",
     "build:main": "BABEL_ENV=BROWSER_PROD npx babel src -d dist/lib",
     "build:module": "BABEL_ENV=BROWSER_ESM_PROD npx babel src -d dist/es",
-    "build:umd": "webpack --colors",
+    "build:umd": "webpack --color",
     "build:e2e": "npm run script buildE2eBundles packages/rum/test/e2e",
     "bundlesize": "npm run build:umd && bundlesize",
     "karma:dev": "karma start --auto-watch --restartOnFileChange",
