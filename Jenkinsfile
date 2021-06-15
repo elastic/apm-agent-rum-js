@@ -557,11 +557,11 @@ def prepareRelease(String nodeVersion='node:lts', Closure body){
 
 def runAllScopes(){
   def scopes = [
-    'SCOPE=@elastic/apm-rum-core',
-    'SCOPE=@elastic/apm-rum',
-    'SCOPE=@elastic/apm-rum-react',
-    'SCOPE=@elastic/apm-rum-angular',
-    'SCOPE=@elastic/apm-rum-vue'
+    '@elastic/apm-rum-core',
+    '@elastic/apm-rum',
+    '@elastic/apm-rum-react',
+    '@elastic/apm-rum-angular',
+    '@elastic/apm-rum-vue'
   ]
   scopes.each{ scope ->
     runTest(stack: env.STACK_VERSION, scope: scope)
