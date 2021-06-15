@@ -18,8 +18,8 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "ng build --prod",
-    "build:e2e": "ng build app --prod",
+    "build": "ng build",
+    "build:e2e": "ng build app",
     "test:unit": "ng test",
     "test:e2e": "npm run script runE2eTests packages/rum-angular/wdio.conf.js",
     "test:sauce": "npm run script runSauceTests packages/rum-angular true test:unit build:e2e test:e2e",
