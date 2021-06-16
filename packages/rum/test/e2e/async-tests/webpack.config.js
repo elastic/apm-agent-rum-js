@@ -33,14 +33,16 @@ const {
 
 const { serverUrl, mockBackendUrl } = getGlobalConfig().testConfig
 
+const commonConfig = getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV)
 module.exports = {
   entry: path.join(__dirname, 'app.js'),
   output: {
     path: path.resolve(__dirname),
     filename: 'app.e2e-bundle.min.js'
   },
-  ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV),
+  ...commonConfig,
   plugins: [
+    ...commonConfig.plugins,
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'index.ejs'),
       filename: path.resolve(__dirname, 'async-e2e.html'),
