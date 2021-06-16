@@ -237,6 +237,7 @@ function getWebpackConfig(bundleType, packageType) {
   const config = {
     ...getCommonWebpackConfig(bundleType, packageType),
     ...{
+      target: ['web', 'es5'],
       resolve: {
         mainFields: ['source', 'browser', 'module', 'main'],
         extensions: ['.js', '.jsx', '.ts'],
