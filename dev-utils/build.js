@@ -24,7 +24,7 @@
  */
 
 const { join } = require('path')
-const { EnvironmentPlugin } = require('webpack')
+const { EnvironmentPlugin, ProvidePlugin } = require('webpack')
 const TerserPlugin = require('terser-webpack-plugin')
 const VuePlugin = require('vue-loader/lib/plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
@@ -168,10 +168,7 @@ function getWebpackEnv(env = 'development') {
   return {
     APM_SERVER_URL: serverUrl,
     STACK_VERSION: stackVersion,
-    NODE_ENV: env,
-    BRANCH_NAME: '',
-    MODE: 'none',
-    JENKINS_URL: ''
+    NODE_ENV: env
   }
 }
 
@@ -211,7 +208,12 @@ function getCommonWebpackConfig(bundleType, packageType) {
         }
       ]
     },
-    plugins: [new EnvironmentPlugin(getWebpackEnv(mode))],
+    plugins: [
+      new EnvironmentPlugin(getWebpackEnv(mode)),
+      new ProvidePlugin({
+        process: 'process/browser'
+      })
+    ],
     ...(isEnvProduction
       ? {
           optimization: {
@@ -239,7 +241,8 @@ function getWebpackConfig(bundleType, packageType) {
         mainFields: ['source', 'browser', 'module', 'main'],
         extensions: ['.js', '.jsx', '.ts'],
         fallback: {
-          stream: require.resolve('stream-browserify')
+          stream: require.resolve('stream-browserify'),
+          util: require.resolve('util/')
         }
       }
     }
