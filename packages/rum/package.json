@@ -57,5 +57,6 @@
       "path": "./dist/bundles/elastic-apm-opentracing*.min.js",
       "maxSize": "20.5 kB"
     }
-  ]
+  ],
+  "browserslist": ["ie 11"]
 }
