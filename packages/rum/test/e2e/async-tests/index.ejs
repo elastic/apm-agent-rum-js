@@ -21,6 +21,7 @@
           /**
            * Make payload available globally so we can test
            */
+          window.TRANSACTION_PAYLOAD = {}
           var apmServer = elasticApm.serviceFactory.getService('ApmServer')
           apmServer.addTransaction = function(payload) {
             window.TRANSACTION_PAYLOAD = payload
@@ -38,7 +39,7 @@
   </head>
 
   <body>
-    <div id="app">Loading RUM agent Asynchronously</div>
+    <div id="app">Async test for RUM</div>
     <script src="/test/e2e/async-tests/app.e2e-bundle.min.js"></script>
   </body>
 </html>
