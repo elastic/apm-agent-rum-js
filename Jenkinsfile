@@ -242,7 +242,7 @@ pipeline {
               post {
                 always {
                   archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
-                  catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                  catchError(message: 'sendBenchmarks failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
                     whenTrue(env.CHANGE_ID == null){
                       sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmark-rum-js')
@@ -276,7 +276,7 @@ pipeline {
               post {
                 always {
                   archiveArtifacts(allowEmptyArchive: true, artifacts: "${BASE_DIR}/${env.REPORT_FILE}", onlyIfSuccessful: false)
-                  catchError(message: 'sendBenchmarks failed', buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                  catchError(message: 'sendBenchmarks failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     log(level: 'INFO', text: "sendBenchmarks is ${env.CHANGE_ID?.trim() ? 'not enabled for PRs' : 'enabled for branches'}")
                     whenTrue(env.CHANGE_ID == null){
                       sendBenchmarks(file: "${BASE_DIR}/${env.REPORT_FILE}", index: 'benchmarks-rum-load-test')
