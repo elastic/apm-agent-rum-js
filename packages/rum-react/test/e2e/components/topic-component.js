@@ -26,26 +26,18 @@
 import React from 'react'
 
 class TopicComponent extends React.Component {
-  constructor(props, state) {
-    super(props, state)
+  constructor(props) {
+    super(props)
     this.state = {
       userName: ''
     }
   }
 
   componentDidMount() {
-    this.fetchData()
-  }
-
-  fetchData() {
     var url = '/test/e2e/data.json'
     fetch(url)
-      .then(resp => {
-        return resp.json()
-      })
-      .then(data => {
-        this.setState({ userName: data.userName })
-      })
+      .then(resp => resp.json())
+      .then(data => this.setState({ userName: data.userName }))
   }
 
   render() {
