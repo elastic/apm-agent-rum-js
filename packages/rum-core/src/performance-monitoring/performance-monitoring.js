@@ -208,7 +208,7 @@ export default class PerformanceMonitoring {
           {
             managed: true,
             canReuse: true,
-            reuseThreshold: 100
+            reuseThreshold: 300
           }
         )
 

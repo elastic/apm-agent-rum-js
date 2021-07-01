@@ -26,8 +26,8 @@
 import React from 'react'
 
 class MainComponent extends React.Component {
-  constructor(props, state) {
-    super(props, state)
+  constructor(props) {
+    super(props)
     var path = this.props.match.path
     this.state = {
       userName: '',
@@ -36,10 +36,6 @@ class MainComponent extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchData()
-  }
-
-  fetchData() {
     var url = '/test/e2e/data.json'
     const transaction = this.props.transaction
 
@@ -53,9 +49,7 @@ class MainComponent extends React.Component {
         }, 500)
         return resp.json()
       })
-      .then(data => {
-        this.setState({ userName: data.userName })
-      })
+      .then(data => this.setState({ userName: data.userName }))
   }
 
   render() {

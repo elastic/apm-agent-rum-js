@@ -45,8 +45,8 @@
     "hoist-non-react-statics": "^3.3.0"
   },
   "peerDependencies": {
-    "react": "^16.0.0",
-    "react-router-dom": "^4.0.0"
+    "react": ">16.0.0",
+    "react-router-dom": ">4.0.0"
   },
   "browserslist": ["ie 11"]
 }

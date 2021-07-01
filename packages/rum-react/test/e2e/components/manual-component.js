@@ -27,29 +27,22 @@ import React from 'react'
 import { withTransaction } from '../../../src'
 
 class ManualComponent extends React.Component {
-  constructor(props, state) {
-    super(props, state)
+  constructor(props) {
+    super(props)
     this.state = {
       userName: ''
     }
   }
 
   componentDidMount() {
-    this.fetchData()
+    const url = '/test/e2e/data.json'
+    fetch(url)
+      .then(resp => resp.json())
+      .then(data => this.setState({ userName: data.userName }))
+
     if (typeof performance.measure === 'function') {
       performance.measure('manual-component-mounted', 'manual-component-start')
     }
-  }
-
-  fetchData() {
-    const url = '/test/e2e/data.json'
-    fetch(url)
-      .then(resp => {
-        return resp.json()
-      })
-      .then(data => {
-        this.setState({ userName: data.userName })
-      })
   }
 
   render() {
