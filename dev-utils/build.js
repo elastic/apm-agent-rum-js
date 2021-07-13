@@ -24,7 +24,7 @@
  */
 
 const { join } = require('path')
-const { EnvironmentPlugin } = require('webpack')
+const { EnvironmentPlugin, ProvidePlugin } = require('webpack')
 const TerserPlugin = require('terser-webpack-plugin')
 const VuePlugin = require('vue-loader/lib/plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
@@ -208,7 +208,12 @@ function getCommonWebpackConfig(bundleType, packageType) {
         }
       ]
     },
-    plugins: [new EnvironmentPlugin(getWebpackEnv(mode))],
+    plugins: [
+      new EnvironmentPlugin(getWebpackEnv(mode)),
+      new ProvidePlugin({
+        process: 'process/browser'
+      })
+    ],
     ...(isEnvProduction
       ? {
           optimization: {
@@ -234,7 +239,11 @@ function getWebpackConfig(bundleType, packageType) {
     ...{
       resolve: {
         mainFields: ['source', 'browser', 'module', 'main'],
-        extensions: ['.js', '.jsx', '.ts']
+        extensions: ['.js', '.jsx', '.ts'],
+        fallback: {
+          stream: require.resolve('stream-browserify'),
+          util: require.resolve('util/')
+        }
       }
     }
   }
@@ -261,8 +270,7 @@ function getWebpackReleaseConfig(bundleType, name) {
   const REPORTS_DIR = join(__dirname, '..', 'packages', 'rum', 'reports')
 
   const config = {
-    ...getCommonWebpackConfig(bundleType),
-    node: false
+    ...getCommonWebpackConfig(bundleType)
   }
 
   if (isEnvProduction) {

@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.9.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.8.0...@elastic/apm-rum@5.9.0) (2021-07-13)
+
+
+### Bug Fixes
+
+* **rum:** add number, boolean types to addLabels ([#1017](https://github.com/elastic/apm-agent-rum-js/issues/1017)) ([e40f5a0](https://github.com/elastic/apm-agent-rum-js/commit/e40f5a00123bbae641cd9525f963be04851a9718))
+
+
+### Features
+
+* **rum-angular:** add support for angular 12 ([#1039](https://github.com/elastic/apm-agent-rum-js/issues/1039)) ([db7df0a](https://github.com/elastic/apm-agent-rum-js/commit/db7df0a574eb18926e16721452600a36fece5026))
+* **rum-core:** add apmServerRequest config ([#1019](https://github.com/elastic/apm-agent-rum-js/issues/1019)) ([6c44e48](https://github.com/elastic/apm-agent-rum-js/commit/6c44e48974640933a976a6dba52f0e8f8096043a))
+
+
+
+
+
 # [5.8.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.7.2...@elastic/apm-rum@5.8.0) (2021-04-19)
 
 

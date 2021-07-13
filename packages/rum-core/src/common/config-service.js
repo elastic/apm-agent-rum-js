@@ -91,7 +91,8 @@ class Config {
       monitorLongtasks: true,
       apiVersion: 2,
       context: {},
-      session: false
+      session: false,
+      apmRequest: null
     }
 
     this.events = new EventHandler()

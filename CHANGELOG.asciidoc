@@ -29,6 +29,18 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.9.0]]
+==== 5.9.0 (2021-07-13)
+
+[float]
+===== Features
+* Add support for <<apm-request,apmRequest configuration>> that allows users to pass a custom
+function that can be used to modify the request sent to the APM server: {issue}1018[#1018]
+* Support for React 17 is made available via `@elastic/apm-rum-react` package: {issue}1031[#1031]
+* Support for Angular 12 is made available via `@elastic/apm-rum-angular` package: {issue}1028[#1028]
+
+===== Bug fixes
+* Update incorrect typings for adding labels to transaction and spans: {issue}1017[#1017]
 
 [[release-notes-5.8.0]]
 ==== 5.8.0 (2021-04-19)

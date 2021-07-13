@@ -38,7 +38,21 @@ const elasticApm = createApmBase({
   distributedTracingOrigins: [mockBackendUrl],
   pageLoadTraceId: '286ac3ad697892c406528f13c82e0ce1',
   pageLoadSpanId: 'bbd8bcc3be14d814',
-  pageLoadSampled: true
+  pageLoadSampled: true,
+  session: true,
+  apmRequest(xhr) {
+    xhr.setRequestHeader('custom', 'value')
+    return true
+  }
+})
+
+elasticApm.observe('transaction:end', function (transaction) {
+  if (transaction.session) {
+    transaction.addLabels({
+      session_id: transaction.session.id,
+      session_seq: transaction.session.sequence
+    })
+  }
 })
 
 const tracer = createTracer(elasticApm)

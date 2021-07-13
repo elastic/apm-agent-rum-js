@@ -1,6 +1,6 @@
 {
   "name": "@elastic/apm-rum-vue",
-  "version": "1.2.3",
+  "version": "1.3.0",
   "description": "Elastic APM Real User Monitoring for Vue applications",
   "keywords": [
     "elastic",
@@ -48,5 +48,8 @@
   "dependencies": {
     "@elastic/apm-rum": "file:../rum",
     "@elastic/apm-rum-core": "file:../rum-core"
-  }
+  },
+  "browserslist": [
+    "ie 11"
+  ]
 }
