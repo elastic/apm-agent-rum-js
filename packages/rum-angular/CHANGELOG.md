@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@1.2.3...@elastic/apm-rum-angular@2.1.0) (2021-07-13)
+
+
+### Features
+
+* **rum-angular:** add support for angular 12 ([#1039](https://github.com/elastic/apm-agent-rum-js/issues/1039)) ([db7df0a](https://github.com/elastic/apm-agent-rum-js/commit/db7df0a574eb18926e16721452600a36fece5026))
+
+
+
+
+
 ## [2.0.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@1.2.3...@elastic/apm-rum-angular@2.0.1) (2021-04-19)
 
  * Please use version `2.0.1` for Angular 9-11 support. Version `2.0.0` has broken modules published, As a result it was marked as deprecated. 
