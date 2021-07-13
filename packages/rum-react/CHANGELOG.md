@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.2.11...@elastic/apm-rum-react@1.3.0) (2021-07-13)
+
+
+### Features
+
+* **rum-angular:** add support for angular 12 ([#1039](https://github.com/elastic/apm-agent-rum-js/issues/1039)) ([db7df0a](https://github.com/elastic/apm-agent-rum-js/commit/db7df0a574eb18926e16721452600a36fece5026))
+* **rum-react:** add official support for react 17 ([#1047](https://github.com/elastic/apm-agent-rum-js/issues/1047)) ([cb0fada](https://github.com/elastic/apm-agent-rum-js/commit/cb0fada417d815eccac018e3d9c495bb3bcadbe2))
+
+
+
+
+
 ## [1.2.11](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.2.10...@elastic/apm-rum-react@1.2.11) (2021-04-19)
 
 **Note:** Version bump only for package @elastic/apm-rum-react
