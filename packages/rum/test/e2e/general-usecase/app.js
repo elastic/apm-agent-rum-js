@@ -40,7 +40,7 @@ const elasticApm = createApmBase({
   pageLoadSpanId: 'bbd8bcc3be14d814',
   pageLoadSampled: true,
   session: true,
-  apmRequest(xhr) {
+  apmRequest: ({ xhr }) => {
     xhr.setRequestHeader('custom', 'value')
     return true
   }
