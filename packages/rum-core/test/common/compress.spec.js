@@ -297,10 +297,10 @@ describe('Compress', function () {
       .join('')
     const isCompressionStreamSupported = typeof CompressionStream === 'function'
     const originalHeaders = { 'Content-Type': 'application/x-ndjson' }
-    let { payload, headers } = await compressPayload(
-      ndjsonPayload,
-      originalHeaders
-    )
+    let { payload, headers } = await compressPayload({
+      payload: ndjsonPayload,
+      headers: originalHeaders
+    })
     if (isCompressionStreamSupported) {
       const decompressedBlob = await decompressPayload(payload)
       payload = await view(decompressedBlob)
