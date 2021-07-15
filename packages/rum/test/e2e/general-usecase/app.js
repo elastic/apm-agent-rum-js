@@ -41,7 +41,7 @@ const elasticApm = createApmBase({
   pageLoadSampled: true,
   session: true,
   apmRequest: ({ xhr }) => {
-    xhr.setRequestHeader('custom', 'value')
+    xhr.setRequestHeader('x-custom-header', 'foo')
     return true
   }
 })

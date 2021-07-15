@@ -43,8 +43,9 @@ suite('Compress', () => {
     .join('')
 
   benchmark('compress payload', async () => {
-    await compressPayload(ndjsonPayload, {
-      'Content-Type': 'application/x-ndjson'
+    await compressPayload({
+      payload: ndjsonPayload,
+      headers: { 'Content-Type': 'application/x-ndjson' }
     })
   })
 })

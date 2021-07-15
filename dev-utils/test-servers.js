@@ -39,7 +39,7 @@ function startBackendAgentServer(port = 8003) {
     if (req.method === 'OPTIONS') {
       res.header(
         'Access-Control-Allow-Headers',
-        'Origin, traceparent, tracestate, Content-Type, Accept'
+        'Origin, traceparent, tracestate, Content-Type, Accept, x-custom-header'
       )
     }
     next()
