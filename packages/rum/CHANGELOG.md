@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.9.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.9.0...@elastic/apm-rum@5.9.1) (2021-07-15)
+
+
+### Bug Fixes
+
+* **rum-core:** ensure apmRequest is called for events ([#1055](https://github.com/elastic/apm-agent-rum-js/issues/1055)) ([7ae7e39](https://github.com/elastic/apm-agent-rum-js/commit/7ae7e395fc5cb45252b1fa92c6ef8675e98e0249))
+
+
+
+
+
 # [5.9.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.8.0...@elastic/apm-rum@5.9.0) (2021-07-13)
 
 
