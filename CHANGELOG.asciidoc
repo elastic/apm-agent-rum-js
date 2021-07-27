@@ -29,6 +29,13 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.9.1]]
+==== 5.9.1 (2021-07-15)
+
+===== Bug fixes
+* Validate `apmRequest` function is called for every request sent to the APM server
+  when compression is enabled: {issue}1055[#1055]
+
 [[release-notes-5.9.0]]
 ==== 5.9.0 (2021-07-13)
 
