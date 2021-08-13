@@ -172,9 +172,10 @@ This option overrides the page load transactions trace ID.
 [[page-load-sampled]]
 === `pageLoadSampled`
 
-* *Type:* String
+* *Type:* Boolean
 
 This option overrides the page load transactions sampled property.
+It is only applicable to `page-load` transactions.
 
 
 [float]
