@@ -69,6 +69,7 @@ class Config {
       serviceVersion: '',
       environment: '',
       serverUrl: 'http://localhost:8200',
+      serverUrlPrefix: '',
       active: true,
       instrument: true,
       disableInstrumentations: [],

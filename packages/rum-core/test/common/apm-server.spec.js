@@ -258,7 +258,9 @@ describe('ApmServer', function () {
         },
         language: { name: 'javascript' }
       },
-      labels: { test: 'testlabel' }
+      labels: {
+        test: 'testlabel'
+      }
     })
 
     const tr = new Transaction('test-meta-tr', 'test-type', {
@@ -618,4 +620,28 @@ describe('ApmServer', function () {
     testConfig.stackVersion &&
       compareVersions(testConfig.stackVersion, '7.10.0') >= 0
   )
+
+  it('should update serverUrlPrefix', async () => {
+    const serverUrl = 'http://example.com:1234'
+    const serverUrlPrefix = '/example/url/prefix'
+    configService.setConfig({
+      serviceName: 'test-service',
+      serverUrlPrefix,
+      serverUrl
+    })
+    const clock = jasmine.clock()
+    clock.install()
+    apmServer.init()
+    spyOn(apmServer, '_postJson')
+    const trs = generateTransaction(2).map(tr =>
+      performanceMonitoring.createTransactionDataModel(tr)
+    )
+    trs.forEach(apmServer.addTransaction.bind(apmServer))
+    clock.tick(600)
+
+    expect(apmServer._postJson).toHaveBeenCalled()
+    const finalServerUrl = apmServer._postJson.calls.argsFor(0)[0]
+    expect(finalServerUrl).toEqual(serverUrl + serverUrlPrefix)
+    clock.uninstall()
+  })
 })
