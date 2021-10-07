@@ -132,7 +132,7 @@ apm.addFilter(function (payload) {
 })
 ----
 
-NOTE: The payload will be dropped if one of the filters return a falsy value.
+NOTE: The payload will be dropped if one of the filters return a false value.
 
 
 [float]
