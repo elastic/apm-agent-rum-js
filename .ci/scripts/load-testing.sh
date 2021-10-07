@@ -16,7 +16,5 @@ NODEJS_VERSION="${NODEJS_VERSION}" \
 STACK_VERSION=${STACK_VERSION} \
 docker-compose -f ./dev-utils/docker-compose.yml up \
   --build \
-  --abort-on-container-exit \
   --exit-code-from load-testing \
-  --remove-orphans \
   load-testing
