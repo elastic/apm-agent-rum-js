@@ -17,7 +17,7 @@ npm install --save @elastic/apm-rum-vue
 ==== Using APM Plugin
 [source,js]
 ----
-Vue.use(ApmVuePlugin, options)
+app.use(ApmVuePlugin, options)
 ----
 
 ===== Options
@@ -35,30 +35,31 @@ The package exposes `ApmVuePlugin` which is a Vue Plugin and can be installed in
 
 [source,js]
 ----
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import { ApmVuePlugin } from '@elastic/apm-rum-vue'
+import { createApp, h } from 'vue';
+import { createRouter, createWebHashHistory } from 'vue-router';
+import { ApmVuePlugin } from '@elastic/apm-rum-vue';
+import App from './App.vue';
 
-const Home = { template: '<div>home</div>' }
+const Home = () => h('div', {}, 'home');
 
-Vue.use(VueRouter)
-
-const router = VueRouter({
-  mode: 'history',
+const router = createRouter({
+  history: createWebHashHistory(),
   routes: [
     { path: '/', component: Home }
   ]
-})
+});
 
-Vue.use(ApmVuePlugin, {
-  router,
-  config: {
-    serviceName: 'app-name',
-    // agent configuration
-  }
-})
-
-// app specific code
+createApp(App)
+  .use(router)
+  .use(ApmVuePlugin, {
+    router,
+    config: {
+      serviceName: 'app-name',
+      // agent configuration
+    }
+  })
+  // app specific code
+  .mount('#app');
 ----
 
 
