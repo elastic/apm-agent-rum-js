@@ -35,19 +35,21 @@ The package exposes `ApmVuePlugin` which is a Vue Plugin and can be installed in
 
 [source,js]
 ----
-import { createApp, h } from 'vue';
-import { createRouter, createWebHashHistory } from 'vue-router';
-import { ApmVuePlugin } from '@elastic/apm-rum-vue';
-import App from './App.vue';
+import { createApp, defineComponent, h } from 'vue'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { ApmVuePlugin } from '@elastic/apm-rum-vue'
+import App from './App.vue'
 
-const Home = () => h('div', {}, 'home');
+const Home = defineComponent({
+  render: () => h("div", {}, "home")
+})
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     { path: '/', component: Home }
   ]
-});
+})
 
 createApp(App)
   .use(router)
@@ -59,7 +61,7 @@ createApp(App)
     }
   })
   // app specific code
-  .mount('#app');
+  .mount('#app')
 ----
 
 
