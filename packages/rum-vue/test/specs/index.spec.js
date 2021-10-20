@@ -23,8 +23,8 @@
  *
  */
 
-import { createLocalVue, mount } from '@vue/test-utils'
-import VueRouter from 'vue-router'
+import { mount } from '@vue/test-utils'
+import { createRouter, createWebHistory } from 'vue-router'
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory, afterFrame } from '@elastic/apm-rum-core'
 import { ApmVuePlugin } from '../../src'
@@ -52,31 +52,47 @@ describe('APM route hooks', () => {
     `
   }
   const Foo = { template: '<div>foo</div>' }
+  const CatchAll = {
+    template: `-`
+  }
 
   function mountApp(routes, options = {}) {
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
-    const { mode = 'history', passRouter = true } = options
+    const { history = createWebHistory(), passRouter = true } = options
 
-    const router = new VueRouter({
-      mode,
-      routes
+    const router = createRouter({
+      history,
+      routes: [
+        ...routes,
+        /**
+         * Suppress router warnings
+         * https://github.com/vuejs/vue-router-next/issues/359
+         */
+        {
+          path: '/:pathMatch(.*)*',
+          component: CatchAll
+        }
+      ]
     })
-    localVue.use(ApmVuePlugin, {
-      router: passRouter ? router : undefined,
-      apm,
-      config: {
-        serviceName: 'test'
+
+    const apmPlugin = [
+      ApmVuePlugin,
+      {
+        router: passRouter ? router : undefined,
+        apm,
+        config: {
+          serviceName: 'test'
+        }
       }
-    })
+    ]
     const wrapper = mount(App, {
-      router,
-      localVue
+      global: {
+        plugins: [router, apmPlugin]
+      }
     })
     return { router, wrapper }
   }
 
-  it('should start the transaction with correct name on navigation', () => {
+  it('should start the transaction with correct name on navigation', async () => {
     const { router, wrapper } = mountApp([
       {
         path: '/',
@@ -88,17 +104,17 @@ describe('APM route hooks', () => {
       }
     ])
     spyOn(apm, 'startTransaction').and.callThrough()
-    router.push('/')
+    await router.push('/')
 
     expect(apm.startTransaction).toHaveBeenCalledWith('/home', 'route-change', {
       managed: true,
       canReuse: true
     })
-    expect(wrapper.find(Home).exists()).toBe(true)
-    wrapper.destroy()
+    expect(wrapper.findComponent(Home).exists()).toBe(true)
+    wrapper.unmount()
   })
 
-  it('should use the slug id for transaction name', () => {
+  it('should use the slug id for transaction name', async () => {
     const { router, wrapper } = mountApp([
       {
         path: '/foo/:id',
@@ -106,7 +122,7 @@ describe('APM route hooks', () => {
       }
     ])
     spyOn(apm, 'startTransaction').and.callThrough()
-    router.push('/foo/1')
+    await router.push('/foo/1')
 
     expect(apm.startTransaction).toHaveBeenCalledWith(
       '/foo/:id',
@@ -116,11 +132,11 @@ describe('APM route hooks', () => {
         canReuse: true
       }
     )
-    expect(wrapper.find(Foo).exists()).toBe(true)
-    wrapper.destroy()
+    expect(wrapper.findComponent(Foo).exists()).toBe(true)
+    wrapper.unmount()
   })
 
-  it('should use the slug id for nested child routes', done => {
+  it('should use the slug id for nested child routes', async done => {
     const { router, wrapper } = mountApp([
       {
         path: '/parent',
@@ -137,7 +153,7 @@ describe('APM route hooks', () => {
     spyOn(apm, 'startTransaction').and.returnValue({
       detectFinish: detectFinishSpy
     })
-    router.push('/parent/foo/1')
+    await router.push('/parent/foo/1')
 
     expect(apm.startTransaction).toHaveBeenCalledWith(
       '/parent/foo/:fooId',
@@ -147,10 +163,10 @@ describe('APM route hooks', () => {
         canReuse: true
       }
     )
-    expect(wrapper.find(Foo).exists()).toBe(true)
+    expect(wrapper.findComponent(Foo).exists()).toBe(true)
     afterFrame(() => {
       expect(detectFinishSpy).toHaveBeenCalled()
-      wrapper.destroy()
+      wrapper.unmount()
       done()
     })
   })
@@ -160,7 +176,7 @@ describe('APM route hooks', () => {
     expect(wrapper.vm.$apm).toEqual(apm)
   })
 
-  it('should capture spans inside component route guard', done => {
+  it('should capture spans inside component route guard', async () => {
     const Span = {
       template: `<div>Span</div>`,
       beforeRouteEnter(to, from, next) {
@@ -177,8 +193,13 @@ describe('APM route hooks', () => {
         component: Span
       }
     ])
+    await router.isReady()
+    router.afterEach(() => {
+      const tr = apm.getCurrentTransaction()
+      expect(tr.spans[0].name).toBe('before-route-enter')
+    })
     spyOn(apm, 'startTransaction')
-    router.push('/spans/1')
+    await router.push('/spans/1')
 
     expect(apm.startTransaction).toHaveBeenCalledWith(
       '/spans/:id',
@@ -188,16 +209,12 @@ describe('APM route hooks', () => {
         canReuse: true
       }
     )
-    router.afterEach(() => {
-      const tr = apm.getCurrentTransaction()
-      expect(tr.spans[0].name).toBe('before-route-enter')
-      expect(wrapper.find(Span).exists()).toBe(true)
-      wrapper.destroy()
-      done()
-    })
+    expect(wrapper.findComponent(Span).exists()).toBe(true)
+
+    wrapper.unmount()
   })
 
-  it('should consider router as optional', () => {
+  it('should consider router as optional', async () => {
     const { router, wrapper } = mountApp(
       [
         {
@@ -209,15 +226,15 @@ describe('APM route hooks', () => {
     )
 
     spyOn(apm, 'startTransaction')
-    router.push('/home')
+    await router.push('/home')
 
     expect(apm.startTransaction).not.toHaveBeenCalled()
 
-    expect(wrapper.find(Home).exists()).toBe(true)
-    wrapper.destroy()
+    expect(wrapper.findComponent(Home).exists()).toBe(true)
+    wrapper.unmount()
   })
 
-  it('should end transaction on navigation error', done => {
+  it('should end transaction on navigation error', async done => {
     const endSpy = jasmine.createSpy('endSpy')
     const detectFinishSpy = jasmine.createSpy('detectFinishSpy')
     const ErrorSpan = {
@@ -235,7 +252,7 @@ describe('APM route hooks', () => {
 
     router.onError(() => {
       expect(endSpy).toHaveBeenCalled()
-      wrapper.destroy()
+      wrapper.unmount()
       done()
     })
 
@@ -243,7 +260,7 @@ describe('APM route hooks', () => {
       end: endSpy,
       detectFinish: detectFinishSpy
     })
-    router.push('/error')
+    await router.push('/error')
 
     expect(apm.startTransaction).toHaveBeenCalledWith(
       '/error',
@@ -253,11 +270,11 @@ describe('APM route hooks', () => {
         canReuse: true
       }
     )
-    expect(wrapper.find(ErrorSpan).exists()).toBe(false)
+    expect(wrapper.findComponent(ErrorSpan).exists()).toBe(false)
   })
 
-  describe('vue router hash mode', () => {
-    it('should use the slug id for transaction name', () => {
+  describe('vue router hash mode', async () => {
+    it('should use the slug id for transaction name', async () => {
       const { router, wrapper } = mountApp(
         [
           {
@@ -270,7 +287,7 @@ describe('APM route hooks', () => {
         }
       )
       spyOn(apm, 'startTransaction')
-      router.push('/foo/1')
+      await router.push('/foo/1')
 
       expect(apm.startTransaction).toHaveBeenCalledWith(
         '/foo/:id',
@@ -280,8 +297,8 @@ describe('APM route hooks', () => {
           canReuse: true
         }
       )
-      expect(wrapper.find(Foo).exists()).toBe(true)
-      wrapper.destroy()
+      expect(wrapper.findComponent(Foo).exists()).toBe(true)
+      wrapper.unmount()
     })
   })
 })

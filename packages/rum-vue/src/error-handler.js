@@ -23,12 +23,12 @@
  *
  */
 
-export function getErrorHandler(Vue, apm) {
+export function getErrorHandler(app, apm) {
   /**
    * If the user already installed a global error handler
    * we should call them after capturing it internally
    */
-  const previousErrorHandler = Vue.config.errorHandler
+  const previousErrorHandler = app.config.errorHandler
 
   return (error, vm, info) => {
     if (vm && vm.$options) {

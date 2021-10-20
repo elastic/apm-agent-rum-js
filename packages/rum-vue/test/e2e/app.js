@@ -39,7 +39,7 @@ const Home = defineComponent({
 
 const Lazy = defineAsyncComponent(
   () => import(/* webpackChunkName: "lazy" */ './components/Lazy.vue')
-);
+)
 
 const router = new createRouter({
   history:  createWebHistory('test/e2e/'),

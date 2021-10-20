@@ -30,7 +30,7 @@ import { getErrorHandler } from './error-handler'
 export const ApmVuePlugin = {
   install: (app, options) => {
     const { router, apm = apmBase, config, captureErrors = true } = options
-    const majorVersion = app.version.split(".").shift();
+    const majorVersion = app.version.split('.').shift()
 
     /**
      * Initialize the APM with the config
@@ -56,12 +56,9 @@ export const ApmVuePlugin = {
     /**
      * Provide the APM instance via $apm to be accessed in all Vue Components
      */
-    if (majorVersion >= 3)
-        app.config.globalProperties.$apm = apm
-    else
-        /**
-         * Backward compatibility with Vue 2
-         */
-        app.prototype.$apm = apm
+    if (majorVersion >= 3) app.config.globalProperties.$apm = apm
+    /**
+     * Backward compatibility with Vue 2
+     */ else app.prototype.$apm = apm
   }
 }
