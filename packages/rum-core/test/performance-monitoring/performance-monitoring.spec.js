@@ -783,6 +783,38 @@ describe('PerformanceMonitoring', function () {
     })
   }
 
+  it('should respect the custom transaction name', function () {
+    const historySubFn = performanceMonitoring.getHistorySub()
+    const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)
+    let etsub = performanceMonitoring.getEventTargetSub()
+    const cancelEventTargetSub = patchEventHandler.observe(
+      EVENT_TARGET,
+      (event, task) => {
+        etsub(event, task)
+      }
+    )
+    const transactionService = performanceMonitoring._transactionService
+
+    let element = document.createElement('button')
+    element.setAttribute('data-transaction-name', 'purchase-transaction')
+
+    const listener = () => {
+      let tr = transactionService.getCurrentTransaction()
+      expect(tr.type).toBe('user-interaction')
+      history.pushState(undefined, undefined, 'test')
+    }
+
+    element.addEventListener('click', listener)
+    element.click()
+
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr.name).toBe('Click - purchase-transaction')
+    expect(tr.type).toBe('route-change')
+
+    cancelHistorySub()
+    cancelEventTargetSub()
+  })
+
   it('should set outcome on transaction and spans', done => {
     let transactionService = performanceMonitoring._transactionService
 
