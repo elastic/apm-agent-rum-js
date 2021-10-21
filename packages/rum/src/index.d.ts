@@ -28,6 +28,7 @@ declare module '@elastic/apm-rum' {
     apiVersion?: 2 | 3
     serviceName?: string
     serverUrl?: string
+    serverUrlPrefix?: string
     serviceVersion?: string
     active?: boolean
     instrument?: boolean

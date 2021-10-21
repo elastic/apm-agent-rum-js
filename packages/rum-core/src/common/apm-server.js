@@ -336,7 +336,9 @@ class ApmServer {
       this.ndjsonTransactions(filteredPayload[TRANSACTIONS], compress)
     )
     const ndjsonPayload = ndjson.join('')
-    const endPoint = cfg.get('serverUrl') + `/intake/v${apiVersion}/rum/events`
+    const serverUrlPrefix =
+      cfg.get('serverUrlPrefix') || `/intake/v${apiVersion}/rum/events`
+    const endPoint = cfg.get('serverUrl') + serverUrlPrefix
     return this._postJson(endPoint, ndjsonPayload)
   }
 }
