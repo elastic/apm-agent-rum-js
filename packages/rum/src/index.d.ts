@@ -64,14 +64,6 @@ declare module '@elastic/apm-rum' {
      */
     canReuse?: boolean
   }
-
-  export interface SpanOptions {
-    /**
-     * undocumented, might be removed in future versions
-     */
-    startTime?: number
-    sync: boolean
-  }
   export interface AgentConfigOptions {
     apiVersion?: 2 | 3
     serviceName?: string
@@ -141,6 +133,14 @@ declare module '@elastic/apm-rum' {
   const apmBase: ApmBase
   export default init
   export { init, apmBase, ApmBase, apmBase as apm }
+}
+
+export interface SpanOptions {
+  /**
+   * undocumented, might be removed in future versions
+   */
+  startTime?: number
+  sync: boolean
 }
 
 declare class BaseSpan {
