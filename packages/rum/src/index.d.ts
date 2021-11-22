@@ -27,7 +27,6 @@ declare module '@elastic/apm-rum' {
   export class Span extends BaseSpan {
     sync: boolean
   }
-
   export class Transaction extends BaseSpan {
     startSpan(
       name?: string | null,
@@ -52,7 +51,13 @@ declare module '@elastic/apm-rum' {
      */
     isFinished(): boolean
   }
-
+  export interface SpanOptions {
+    /**
+     * undocumented, might be removed in future versions
+     */
+    startTime?: number
+    sync: boolean
+  }
   export interface TransactionOptions {
     managed?: boolean
     /**
@@ -135,14 +140,6 @@ declare module '@elastic/apm-rum' {
   export { init, apmBase, ApmBase, apmBase as apm }
 }
 
-export interface SpanOptions {
-  /**
-   * undocumented, might be removed in future versions
-   */
-  startTime?: number
-  sync: boolean
-}
-
 declare class BaseSpan {
   name: string
   type: string
@@ -154,35 +151,6 @@ declare class BaseSpan {
   addContext(context: object): void
   end(endTime?: number): void
   duration(): number | null
-}
-
-declare class Transaction extends BaseSpan {
-  startSpan(
-    name?: string | null,
-    type?: string | null,
-    options?: SpanOptions
-  ): Span | undefined
-  mark(key: string): void
-  /**
-   * undocumented, might be removed in future versions
-   */
-  addTask(taskId: TaskId): TaskId
-  /**
-   * undocumented, might be removed in future versions
-   */
-  removeTask(taskId: TaskId): void
-  /**
-   * undocumented, might be removed in future versions
-   */
-  captureBreakdown(): void
-  /**
-   * undocumented, might be removed in future versions
-   */
-  isFinished(): boolean
-}
-
-declare class Span extends BaseSpan {
-  sync: boolean
 }
 
 interface UserObject {
