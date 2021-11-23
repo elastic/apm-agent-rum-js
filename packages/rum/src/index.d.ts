@@ -25,7 +25,7 @@
 
 declare module '@elastic/apm-rum' {
   export class Span extends BaseSpan {
-    sync: boolean
+    sync?: boolean
   }
   export class Transaction extends BaseSpan {
     startSpan(
@@ -56,7 +56,7 @@ declare module '@elastic/apm-rum' {
      * undocumented, might be removed in future versions
      */
     startTime?: number
-    sync: boolean
+    sync?: boolean
   }
   export interface TransactionOptions {
     managed?: boolean
