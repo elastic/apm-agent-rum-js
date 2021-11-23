@@ -23,7 +23,15 @@
  *
  */
 
-import { ApmBase, init, AgentConfigOptions } from '@elastic/apm-rum'
+import {
+  ApmBase,
+  init,
+  AgentConfigOptions,
+  Transaction,
+  Span,
+  TransactionOptions,
+  SpanOptions
+} from '@elastic/apm-rum'
 
 const config: AgentConfigOptions = {
   active: true,
@@ -89,26 +97,30 @@ apm.addFilter(filter1)
 apm.addFilter(filter2)
 apm.addFilter(filter3)
 
-apm.startTransaction('test', 'page-load', {
+const testTransactionOptions: TransactionOptions = {
   startTime: 0
-})
+}
+apm.startTransaction('test', 'page-load', testTransactionOptions)
 apm.startTransaction(null, null)
-apm.startTransaction(undefined, undefined, {
-  startTime: 1
-})
 
-apm.startSpan('test', 'custom', {
+const undefinedTransactionOptions: TransactionOptions = {
+  startTime: 1
+}
+apm.startTransaction(undefined, undefined, undefinedTransactionOptions)
+
+const testSpanOptions: SpanOptions = {
   sync: false
-})
+}
+apm.startSpan('test', 'custom', testSpanOptions)
 apm.startSpan(null, null)
-apm.startSpan(undefined, undefined, {
+
+const undefinedSpanOptions: SpanOptions = {
   sync: true
-})
+}
+apm.startSpan(undefined, undefined, undefinedSpanOptions)
 
 /** Transaction */
-const transaction = apm.getCurrentTransaction()
-
-if (transaction) {
+function checkTransactionType(transaction: Transaction) {
   transaction.addLabels({})
   const taskId = transaction.addTask('test')
   transaction.removeTask(taskId)
@@ -118,10 +130,13 @@ if (transaction) {
   transaction.isFinished()
 }
 
-/** Span */
-const span = apm.startSpan('span', 'span')
+const transaction = apm.getCurrentTransaction()
+if (transaction) {
+  checkTransactionType(transaction)
+}
 
-if (span) {
+/** Span */
+function checkSpanType(span: Span) {
   span.name
   span.type
   span.addLabels({
@@ -135,4 +150,9 @@ if (span) {
   })
   span.end()
   span.duration()
+}
+
+const span = apm.startSpan('span', 'span')
+if (span) {
+  checkSpanType(span)
 }
