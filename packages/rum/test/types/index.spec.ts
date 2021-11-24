@@ -109,7 +109,9 @@ const undefinedTransactionOptions: TransactionOptions = {
 apm.startTransaction(undefined, undefined, undefinedTransactionOptions)
 
 const testSpanOptions: SpanOptions = {
-  sync: false
+  sync: false,
+  blocking: false,
+  parentId: 'custom-parent-id'
 }
 apm.startSpan('test', 'custom', testSpanOptions)
 apm.startSpan(null, null)
