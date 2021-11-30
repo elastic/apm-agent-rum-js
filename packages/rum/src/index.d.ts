@@ -56,6 +56,8 @@ declare module '@elastic/apm-rum' {
      * undocumented, might be removed in future versions
      */
     startTime?: number
+    blocking?: boolean
+    parentId?: string | number
     sync?: boolean
   }
   export interface TransactionOptions {
