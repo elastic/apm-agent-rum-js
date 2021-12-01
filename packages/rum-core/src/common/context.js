@@ -70,8 +70,8 @@ function getResponseContext(perfTimingEntry) {
   return respContext
 }
 
-function getDestination(parsedUrl, type) {
-  const { port, protocol, hostname, host } = parsedUrl
+function getDestination(parsedUrl) {
+  const { port, protocol, hostname } = parsedUrl
 
   const portNumber = getPortNumber(port, protocol)
 
@@ -95,9 +95,9 @@ function getDestination(parsedUrl, type) {
 
   return {
     service: {
-      name: protocol + '//' + host,
       resource: hostname + ':' + portNumber,
-      type
+      name: '', // @deprecated: remove it in 6.x release
+      type: '' // @deprecated: remove it in 6.x release
     },
     address,
     port: Number(portNumber)
@@ -108,7 +108,7 @@ function getResourceContext(data) {
   const { entry, url } = data
   const parsedUrl = new Url(url)
 
-  const destination = getDestination(parsedUrl, RESOURCE)
+  const destination = getDestination(parsedUrl)
   return {
     http: {
       url,
@@ -122,7 +122,7 @@ function getExternalContext(data) {
   const { url, method, target, response } = data
   const parsedUrl = new Url(url)
 
-  const destination = getDestination(parsedUrl, EXTERNAL)
+  const destination = getDestination(parsedUrl)
 
   const context = {
     http: {
@@ -146,7 +146,7 @@ function getNavigationContext(data) {
   const { url } = data
   const parsedUrl = new Url(url)
 
-  const destination = getDestination(parsedUrl, HARD_NAVIGATION)
+  const destination = getDestination(parsedUrl)
   return { destination }
 }
 
