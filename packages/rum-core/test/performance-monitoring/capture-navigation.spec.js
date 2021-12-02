@@ -167,9 +167,9 @@ describe('Capture hard navigation', function () {
         context: {
           destination: {
             service: {
-              name: 'http://localhost:9876',
+              name: '',
               resource: 'localhost:9876',
-              type: 'hard-navigation'
+              type: ''
             },
             address: 'localhost',
             port: 9876
