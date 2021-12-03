@@ -368,9 +368,9 @@ describe('PerformanceMonitoring', function () {
             },
             destination: {
               service: {
-                name: 'http://localhost:9876',
+                name: '',
                 resource: 'localhost:9876',
-                type: 'external'
+                type: ''
               },
               address: 'localhost',
               port: 9876

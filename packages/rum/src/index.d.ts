@@ -24,10 +24,58 @@
  */
 
 declare module '@elastic/apm-rum' {
+  export class Span extends BaseSpan {
+    sync?: boolean
+  }
+  export class Transaction extends BaseSpan {
+    startSpan(
+      name?: string | null,
+      type?: string | null,
+      options?: SpanOptions
+    ): Span | undefined
+    mark(key: string): void
+    /**
+     * undocumented, might be removed in future versions
+     */
+    addTask(taskId: TaskId): TaskId
+    /**
+     * undocumented, might be removed in future versions
+     */
+    removeTask(taskId: TaskId): void
+    /**
+     * undocumented, might be removed in future versions
+     */
+    captureBreakdown(): void
+    /**
+     * undocumented, might be removed in future versions
+     */
+    isFinished(): boolean
+  }
+  export interface SpanOptions {
+    /**
+     * undocumented, might be removed in future versions
+     */
+    startTime?: number
+    blocking?: boolean
+    parentId?: string | number
+    sync?: boolean
+  }
+  export interface TransactionOptions {
+    managed?: boolean
+    /**
+     * undocumented, might be removed in future versions
+     */
+    startTime?: number
+    /**
+     * undocumented, might be removed in future versions
+     */
+    canReuse?: boolean
+  }
   export interface AgentConfigOptions {
     apiVersion?: 2 | 3
     serviceName?: string
     serverUrl?: string
+    serverUrlPrefix?: string
     serviceVersion?: string
     active?: boolean
     instrument?: boolean
@@ -105,55 +153,6 @@ declare class BaseSpan {
   addContext(context: object): void
   end(endTime?: number): void
   duration(): number | null
-}
-
-declare class Transaction extends BaseSpan {
-  startSpan(
-    name?: string | null,
-    type?: string | null,
-    options?: SpanOptions
-  ): Span | undefined
-  mark(key: string): void
-  /**
-   * undocumented, might be removed in future versions
-   */
-  addTask(taskId: TaskId): TaskId
-  /**
-   * undocumented, might be removed in future versions
-   */
-  removeTask(taskId: TaskId): void
-  /**
-   * undocumented, might be removed in future versions
-   */
-  captureBreakdown(): void
-  /**
-   * undocumented, might be removed in future versions
-   */
-  isFinished(): boolean
-}
-
-declare class Span extends BaseSpan {
-  sync: boolean
-}
-
-interface TransactionOptions {
-  managed?: boolean
-  /**
-   * undocumented, might be removed in future versions
-   */
-  startTime?: number
-  /**
-   * undocumented, might be removed in future versions
-   */
-  canReuse?: boolean
-}
-
-interface SpanOptions {
-  /**
-   * undocumented, might be removed in future versions
-   */
-  startTime?: number
-  sync: boolean
 }
 
 interface UserObject {
