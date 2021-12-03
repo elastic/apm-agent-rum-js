@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable rulesdir/require-license-header */
 /**
  * MIT License
  *
@@ -26,7 +24,7 @@
  */
 import 'core-js'
 import 'whatwg-fetch'
-import { createApp, defineComponent, defineAsyncComponent, h } from 'vue/dist/vue.esm-bundler'
+import { createApp, defineComponent, defineAsyncComponent, h } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 import FetchComponent from './components/Fetch.vue'
@@ -34,15 +32,15 @@ import { getApmBase, getServerUrl } from './'
 import { ApmVuePlugin } from '../../src'
 
 const Home = defineComponent({
-  render: () => h("div", {}, "home")
+  render: () => h('div', {}, 'home')
 })
 
-const Lazy = defineAsyncComponent(
-  () => import(/* webpackChunkName: "lazy" */ './components/Lazy.vue')
+const Lazy = defineAsyncComponent(() =>
+  import(/* webpackChunkName: "lazy" */ './components/Lazy.vue')
 )
 
 const router = new createRouter({
-  history:  createWebHistory('test/e2e/'),
+  history: createWebHistory('test/e2e/'),
   routes: [
     { path: '/', component: Home },
     { path: '/lazy', component: Lazy },
