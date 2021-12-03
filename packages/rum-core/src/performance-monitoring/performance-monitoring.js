@@ -191,15 +191,13 @@ export default class PerformanceMonitoring {
         const tagName = target.tagName.toLowerCase()
 
         // use custom html attribute 'data-transaction-name' - otherwise fall back to "tagname" + "name"-Attribute
-        let transactionName = ''
+        let transactionName = tagName
         if (!!target.dataset.transactionName) {
           transactionName = target.dataset.transactionName
         } else {
           const name = target.getAttribute('name')
           if (!!name) {
             transactionName = `${tagName}["${name}"]`
-          } else {
-            transactionName = tagName
           }
         }
 
