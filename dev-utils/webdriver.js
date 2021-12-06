@@ -28,7 +28,8 @@ const { join } = require('path')
 const glob = require('glob')
 const {
   getSauceConnectOptions,
-  getTestEnvironmentVariables
+  getTestEnvironmentVariables,
+  getBrowserList
 } = require('./test-config')
 
 const logLevels = {
@@ -146,7 +147,7 @@ function getWebdriveBaseConfig(
    * Skip the ios platform on E2E tests because of script
    * timeout issue in Appium
    */
-  capabilities = capabilities
+  capabilities = (capabilities || getBrowserList())
     .map(c => ({
       ...c,
       tunnelIdentifier
