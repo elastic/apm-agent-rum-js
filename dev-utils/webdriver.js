@@ -28,7 +28,6 @@ const { join } = require('path')
 const glob = require('glob')
 const {
   getSauceConnectOptions,
-  getBrowserList,
   getTestEnvironmentVariables
 } = require('./test-config')
 
@@ -143,21 +142,16 @@ function getWebdriveBaseConfig(
   capabilities
 ) {
   const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
-
-  if (!capabilities) {
-    /**
-     * Skip the ios platform on E2E tests because of script
-     * timeout issue in Appium
-     */
-    capabilities = getBrowserList().filter(
-      ({ platformName }) => platformName !== 'iOS'
-    )
-  }
-
-  capabilities = capabilities.map(capability => ({
-    tunnelIdentifier,
-    ...capability
-  }))
+  /**
+   * Skip the ios platform on E2E tests because of script
+   * timeout issue in Appium
+   */
+  capabilities = capabilities
+    .map(c => ({
+      ...c,
+      tunnelIdentifier
+    }))
+    .filter(({ platformName }) => platformName !== 'iOS')
 
   const baseConfig = {
     runner: 'local',

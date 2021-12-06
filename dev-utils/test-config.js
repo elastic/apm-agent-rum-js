@@ -66,7 +66,7 @@ function getGlobalConfig(packageName = 'rum') {
  *
  * The list below is based purely on the market share distribution.
  */
-function getBrowserList() {
+function getDefaultBrowsers() {
   return [
     {
       browserName: 'chrome',
@@ -115,13 +115,36 @@ function getBrowserList() {
       platformName: 'iOS',
       browserName: 'Safari'
     }
-  ].map(c => ({
-    ...c,
-    loggingPrefs: {
-      browser: 'INFO'
-    }
-  }))
+  ]
 }
+
+function getBrowserList(pkg = 'default') {
+  let browsers = []
+  if (pkg === 'default') {
+    browsers = getDefaultBrowsers()
+  } else if (pkg === 'vue') {
+    // Vue 3 dropped support for IE 11 and older browsers,
+    // so we use modern browsers ro run the tests
+    browsers = [
+      {
+        browserName: 'chrome',
+        browserVersion: '96'
+      },
+      {
+        browserName: 'firefox',
+        browserVersion: '94'
+      },
+      {
+        browserName: 'safari',
+        browserVersion: '13',
+        platformName: 'macOS 10.15'
+      }
+    ]
+  }
+
+  return browsers
+}
+
 function parseVersion(version) {
   const parts = version.split('.')
   return {
