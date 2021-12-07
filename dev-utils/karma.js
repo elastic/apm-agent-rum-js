@@ -50,7 +50,7 @@ const baseConfig = {
     require.resolve('regenerator-runtime/runtime'),
     specPattern
   ],
-  frameworks: ['jasmine'],
+  frameworks: ['jasmine', 'webpack'],
   preprocessors: {
     [specPattern]: ['webpack', 'sourcemap'],
     [polyfills]: ['webpack']

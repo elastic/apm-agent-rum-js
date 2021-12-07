@@ -504,7 +504,7 @@ def withSaucelabsEnv(Closure body){
     [var: 'SAUCE_ACCESS_KEY', password: "${jsonValue.data.SAUCE_ACCESS_KEY}"],
   ]){
     try { //https://issues.jenkins-ci.org/browse/JENKINS-61034
-      timeout(activity: true, time: 300, unit: 'SECONDS') { //SauceLab uncatch exceptions
+      timeout(activity: true, time: 600, unit: 'SECONDS') { //SauceLab uncatch exceptions
         body()
       }
     } catch(err){
