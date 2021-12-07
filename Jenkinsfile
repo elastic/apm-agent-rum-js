@@ -115,15 +115,11 @@ pipeline {
                   // The below line is part of the bump release automation
                   // if you change anything please modifies the file
                   // .ci/bump-stack-release-version.sh
-                  values '8.0.0-SNAPSHOT', '7.x', '7.16.0'
+                  values '8.0.0-SNAPSHOT'
                 }
                 axis {
                   name 'SCOPE'
                   values (
-                    '@elastic/apm-rum',
-                    '@elastic/apm-rum-core',
-                    '@elastic/apm-rum-react',
-                    '@elastic/apm-rum-angular',
                     '@elastic/apm-rum-vue',
                   )
                 }
@@ -557,10 +553,6 @@ def prepareRelease(String nodeVersion='node:lts', Closure body){
 
 def runAllScopes(){
   def scopes = [
-    '@elastic/apm-rum-core',
-    '@elastic/apm-rum',
-    '@elastic/apm-rum-react',
-    '@elastic/apm-rum-angular',
     '@elastic/apm-rum-vue'
   ]
   scopes.each{ scope ->
