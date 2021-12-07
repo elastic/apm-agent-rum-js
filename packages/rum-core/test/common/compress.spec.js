@@ -262,6 +262,116 @@ describe('Compress', function () {
     testMappedObject(transaction, compressed)
   })
 
+  it('should include provided navigation timing marks when compressing transaction model', () => {
+    const expectedNtMarks = {
+      [V3_MAPPING.fetchStart]: 1,
+      [V3_MAPPING.domainLookupStart]: 2,
+      [V3_MAPPING.domainLookupEnd]: 3,
+      [V3_MAPPING.connectStart]: 4,
+      [V3_MAPPING.connectEnd]: 5,
+      [V3_MAPPING.requestStart]: 6,
+      [V3_MAPPING.responseStart]: 7,
+      [V3_MAPPING.responseEnd]: 8,
+      [V3_MAPPING.domLoading]: 9,
+      [V3_MAPPING.domInteractive]: 10,
+      [V3_MAPPING.domContentLoadedEventStart]: 11,
+      [V3_MAPPING.domContentLoadedEventEnd]: 12,
+      [V3_MAPPING.domComplete]: 13,
+      [V3_MAPPING.loadEventStart]: 14,
+      [V3_MAPPING.loadEventEnd]: 15
+    }
+
+    const transaction = generateTransaction(1, true).map(tr => {
+      tr.addMarks({
+        navigationTiming: {
+          fetchStart: 1,
+          domainLookupStart: 2,
+          domainLookupEnd: 3,
+          connectStart: 4,
+          connectEnd: 5,
+          requestStart: 6,
+          responseStart: 7,
+          responseEnd: 8,
+          domLoading: 9,
+          domInteractive: 10,
+          domContentLoadedEventStart: 11,
+          domContentLoadedEventEnd: 12,
+          domComplete: 13,
+          loadEventStart: 14,
+          loadEventEnd: 15
+        }
+      })
+      addTransactionContext(tr, { custom: { foo: 'bar' } })
+      const model = performanceMonitoring.createTransactionDataModel(tr)
+      return model
+    })[0]
+
+    const compressed = compressTransaction(transaction)
+    const compressedNtMarks =
+      compressed[V3_MAPPING.marks][V3_MAPPING.navigationTiming]
+
+    expect(compressedNtMarks).toEqual(expectedNtMarks)
+  })
+
+  it('should handle the absence of timing marks when compressing transaction model', () => {
+    const transaction = generateTransaction(1, true).map(tr => {
+      tr.addMarks({ navigationTiming: null })
+      addTransactionContext(tr, { custom: { foo: 'bar' } })
+      const model = performanceMonitoring.createTransactionDataModel(tr)
+      return model
+    })[0]
+
+    const { marks, navigationTiming } = V3_MAPPING
+    const compressed = compressTransaction(transaction)
+
+    expect(compressed[marks][navigationTiming]).toBe(null)
+  })
+
+  it('should include provided agent timing marks when compressing transaction model', () => {
+    const expectedAgentMarks = {
+      [V3_MAPPING.timeToFirstByte]: 1,
+      [V3_MAPPING.domInteractive]: 2,
+      [V3_MAPPING.domComplete]: 3,
+      [V3_MAPPING.firstContentfulPaint]: 4,
+      [V3_MAPPING.largestContentfulPaint]: 5
+    }
+    const transaction = generateTransaction(1, true).map(tr => {
+      tr.addMarks({
+        navigationTiming: {
+          responseStart: 1,
+          domInteractive: 2,
+          domComplete: 3
+        },
+        agent: {
+          firstContentfulPaint: 4,
+          largestContentfulPaint: 5
+        }
+      })
+
+      addTransactionContext(tr, { custom: { foo: 'bar' } })
+      const model = performanceMonitoring.createTransactionDataModel(tr)
+      return model
+    })[0]
+
+    const compressed = compressTransaction(transaction)
+    const compressedNtMarks = compressed[V3_MAPPING.marks][V3_MAPPING.agent]
+
+    expect(compressedNtMarks).toEqual(expectedAgentMarks)
+  })
+
+  it('should handle the absence of agent marks when compressing transaction model', () => {
+    const transaction = generateTransaction(1, true).map(tr => {
+      tr.addMarks({ agent: null })
+      addTransactionContext(tr, { custom: { foo: 'bar' } })
+      const model = performanceMonitoring.createTransactionDataModel(tr)
+      return model
+    })[0]
+    const { marks, agent } = V3_MAPPING
+    const compressed = compressTransaction(transaction)
+
+    expect(compressed[marks][agent]).toBe(null)
+  })
+
   it('should compress error model', () => {
     const error = generateErrors(1).map((err, i) => {
       let model = errorLogging.createErrorDataModel(err)
