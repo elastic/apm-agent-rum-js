@@ -168,6 +168,10 @@ function compressAgentMarks(compressedNtMarks, agentMarks) {
     }
   }
 
+  if (Object.keys(compressed).length === 0) {
+    return null
+  }
+
   return compressed
 }
 
