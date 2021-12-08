@@ -128,16 +128,17 @@ function getBrowserList(pkg = 'default') {
     browsers = [
       {
         browserName: 'chrome',
-        version: '96'
+        version: 'latest'
       },
       {
         browserName: 'firefox',
-        version: '94'
+        version: 'latest',
+        platform: 'Windows 10'
       },
       {
         browserName: 'safari',
         version: '13',
-        platformName: 'macOS 10.15'
+        platform: 'macOS 10.15'
       }
     ]
   }

@@ -91,7 +91,7 @@ const baseConfig = {
     recordScreenshots: true,
     tunnelIdentifier,
     options: {
-      seleniumVersion: '2.48.2',
+      // seleniumVersion: '2.48.2',
       commandTimeout: 600,
       idleTimeout: 600,
       maxDuration: 5400
