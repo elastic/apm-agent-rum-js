@@ -134,11 +134,6 @@ function getBrowserList(pkg = 'default') {
         browserName: 'firefox',
         version: 'latest',
         platform: 'Windows 10'
-      },
-      {
-        browserName: 'safari',
-        version: '13',
-        platform: 'macOS 10.15'
       }
     ]
   }
