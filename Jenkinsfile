@@ -41,7 +41,7 @@ pipeline {
     booleanParam(name: 'saucelab_test', defaultValue: "true", description: "Enable run a Sauce lab test")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
     booleanParam(name: 'release', defaultValue: false, description: 'Release. If so, all the other parameters will be ignored when releasing from master.')
-    string(name: 'stack_version', defaultValue: '7.15.2', description: "What's the Stack Version to be used for the load testing?")
+    string(name: 'stack_version', defaultValue: '7.16.0', description: "What's the Stack Version to be used for the load testing?")
   }
   stages {
     stage('Initializing'){
@@ -115,7 +115,7 @@ pipeline {
                   // The below line is part of the bump release automation
                   // if you change anything please modifies the file
                   // .ci/bump-stack-release-version.sh
-                  values '8.0.0-SNAPSHOT', '7.x', '7.16.0'
+                  values '8.1.0-SNAPSHOT', '8.1.0-SNAPSHOT', '7.16.0'
                 }
                 axis {
                   name 'SCOPE'
@@ -142,11 +142,10 @@ pipeline {
             }
           }
         }
-        stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
+        stage('Stack 8.1.0-SNAPSHOT SauceLabs') {
           agent { label 'linux && immutable' }
           environment {
             SAUCELABS_SECRET = "${isPR() ? env.SAUCELABS_SECRET : env.SAUCELABS_SECRET_CORE}"
-            STACK_VERSION = "8.0.0-SNAPSHOT"
             MODE = "saucelabs"
           }
           when {
@@ -167,7 +166,7 @@ pipeline {
             }
           }
           steps {
-            runAllScopes()
+            runAllScopes(stack: "8.1.0-SNAPSHOT")
           }
           post {
             cleanup {
@@ -556,6 +555,7 @@ def prepareRelease(String nodeVersion='node:lts', Closure body){
 }
 
 def runAllScopes(){
+  def stack = args.stack
   def scopes = [
     '@elastic/apm-rum-core',
     '@elastic/apm-rum',
@@ -564,7 +564,7 @@ def runAllScopes(){
     '@elastic/apm-rum-vue'
   ]
   scopes.each{ scope ->
-    runTest(stack: env.STACK_VERSION, scope: scope)
+    runTest(stack: stack, scope: scope)
   }
 }
 
