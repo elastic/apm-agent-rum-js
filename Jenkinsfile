@@ -554,7 +554,7 @@ def prepareRelease(String nodeVersion='node:lts', Closure body){
   }
 }
 
-def runAllScopes(){
+def runAllScopes(Map args = [:]) {
   def stack = args.stack
   def scopes = [
     '@elastic/apm-rum-core',
