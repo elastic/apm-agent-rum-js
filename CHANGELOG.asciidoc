@@ -33,7 +33,7 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 ==== 5.10.0 (2021-12-07)
 [float]
 ===== Features
-* Make server prefix URL used to make requests to the APM Server configurable: {issue}1078[#1078]
+* Introduce new config option `serverUrlPrefix` to make the APM server URL configurable: {issue}1078[#1078]
 * Expose Transaction, Span, TransactionOptions and SpanOptions types definition: {issue}1045[#1045] and {issue}995[#995]
 * Set the values to empty string for deprecated span destination metrics: {issue}1098[#1098]
 
