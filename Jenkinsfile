@@ -11,7 +11,6 @@ pipeline {
     JOB_GCS_BUCKET = credentials('gcs-bucket')
     PIPELINE_LOG_LEVEL = 'INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
-    SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
     DOCKER_ELASTIC_SECRET = 'secret/apm-team/ci/docker-registry/prod'
     GITHUB_CHECK_ITS_NAME = 'Integration Tests'
@@ -145,7 +144,6 @@ pipeline {
         stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
           agent { label 'linux && immutable' }
           environment {
-            SAUCELABS_SECRET = "${isPR() ? env.SAUCELABS_SECRET : env.SAUCELABS_SECRET_CORE}"
             MODE = "saucelabs"
           }
           when {
