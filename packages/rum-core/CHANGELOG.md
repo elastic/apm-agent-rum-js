@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.13.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.12.1...@elastic/apm-rum-core@5.13.0) (2021-12-07)
+
+
+### Bug Fixes
+
+* **rum-core:** handle empty marks when compressing ([#1107](https://github.com/elastic/apm-agent-rum-js/issues/1107)) ([c27e7ce](https://github.com/elastic/apm-agent-rum-js/commit/c27e7cee4c73ee1b066053067381f9260c62ac90)), closes [#1104](https://github.com/elastic/apm-agent-rum-js/issues/1104)
+
+
+### Features
+
+* **rum-core:** add serverUrlPrefix config option ([#1081](https://github.com/elastic/apm-agent-rum-js/issues/1081)) ([cf407b4](https://github.com/elastic/apm-agent-rum-js/commit/cf407b4e5d225b9588c51e9762e1471474f711ad))
+* **rum-core:** custom transaction name for user-interactions ([#1096](https://github.com/elastic/apm-agent-rum-js/issues/1096)) ([d7ef88f](https://github.com/elastic/apm-agent-rum-js/commit/d7ef88fb1d1542a54f9011df5e8ddfd5cfe2a914))
+* **rum-core:** set empty string for deprecated destination fields ([#1105](https://github.com/elastic/apm-agent-rum-js/issues/1105)) ([573d3b9](https://github.com/elastic/apm-agent-rum-js/commit/573d3b961e8ed1fbe425d132a00145cd6719c6e3))
+
+
+
+
+
 ## [5.12.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.12.0...@elastic/apm-rum-core@5.12.1) (2021-07-15)
 
 

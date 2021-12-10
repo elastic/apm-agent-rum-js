@@ -120,26 +120,56 @@ function compressMarks(marks) {
   if (!marks) {
     return null
   }
-  const { navigationTiming, agent } = marks
-  const compressed = { nt: {} }
 
+  const compressedNtMarks = compressNavigationTimingMarks(
+    marks.navigationTiming
+  )
+  const compressed = {
+    nt: compressedNtMarks,
+    a: compressAgentMarks(compressedNtMarks, marks.agent)
+  }
+
+  return compressed
+}
+
+function compressNavigationTimingMarks(ntMarks) {
+  if (!ntMarks) {
+    return null
+  }
+
+  const compressed = {}
   COMPRESSED_NAV_TIMING_MARKS.forEach((mark, index) => {
     const mapping = NAVIGATION_TIMING_MARKS[index]
-    compressed.nt[mark] = navigationTiming[mapping]
+    compressed[mark] = ntMarks[mapping]
   })
 
-  compressed.a = {
-    fb: compressed.nt.rs,
-    di: compressed.nt.di,
-    dc: compressed.nt.dc
+  return compressed
+}
+
+function compressAgentMarks(compressedNtMarks, agentMarks) {
+  let compressed = {}
+
+  if (compressedNtMarks) {
+    compressed = {
+      fb: compressedNtMarks.rs,
+      di: compressedNtMarks.di,
+      dc: compressedNtMarks.dc
+    }
   }
-  const fp = agent.firstContentfulPaint
-  const lp = agent.largestContentfulPaint
-  if (fp) {
-    compressed.a.fp = fp
+
+  if (agentMarks) {
+    const fp = agentMarks.firstContentfulPaint
+    const lp = agentMarks.largestContentfulPaint
+    if (fp) {
+      compressed.fp = fp
+    }
+    if (lp) {
+      compressed.lp = lp
+    }
   }
-  if (lp) {
-    compressed.a.lp = lp
+
+  if (Object.keys(compressed).length === 0) {
+    return null
   }
 
   return compressed

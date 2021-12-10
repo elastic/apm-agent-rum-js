@@ -29,6 +29,17 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.10.0]]
+==== 5.10.0 (2021-12-07)
+[float]
+===== Features
+* Introduce new config option `serverUrlPrefix` to make the APM server URL configurable: {issue}1078[#1078]
+* Expose Transaction, Span, TransactionOptions and SpanOptions types definition: {issue}1045[#1045] and {issue}995[#995]
+* Set the values to empty string for deprecated span destination metrics: {issue}1098[#1098]
+
+===== Bug fixes
+* Check the existence of navigation timing data when compressing transaction marks: {issue}1104[#1104]
+
 [[release-notes-5.9.1]]
 ==== 5.9.1 (2021-07-15)
 

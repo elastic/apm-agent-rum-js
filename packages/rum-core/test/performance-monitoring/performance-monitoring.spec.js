@@ -719,19 +719,20 @@ describe('PerformanceMonitoring', function () {
 
   if (window.EventTarget) {
     it('should create click transactions', () => {
-      let transactionService = performanceMonitoring._transactionService
+      const transactionService = performanceMonitoring._transactionService
       let etsub = performanceMonitoring.getEventTargetSub()
-      patchEventHandler.observe(EVENT_TARGET, (event, task) => {
-        etsub(event, task)
-      })
+      const cancelEventTargetSub = patchEventHandler.observe(
+        EVENT_TARGET,
+        (event, task) => {
+          etsub(event, task)
+        }
+      )
       let element = document.createElement('button')
       element.setAttribute('class', 'cool-button purchase-style')
 
-      const listener = e => {
+      element.addEventListener('click', e => {
         expect(e.type).toBe('click')
-      }
-
-      element.addEventListener('click', listener)
+      })
       element.click()
 
       let tr = transactionService.getCurrentTransaction()
@@ -748,6 +749,7 @@ describe('PerformanceMonitoring', function () {
 
       expect(newTr).toBe(tr)
       expect(newTr.name).toBe('Click - button["purchase"]')
+      cancelEventTargetSub()
     })
 
     it('should respect the transaction type priority order', function () {
@@ -776,6 +778,38 @@ describe('PerformanceMonitoring', function () {
 
       let tr = transactionService.getCurrentTransaction()
       expect(tr.name).toBe('Click - button["purchase"]')
+      expect(tr.type).toBe('route-change')
+
+      cancelHistorySub()
+      cancelEventTargetSub()
+    })
+
+    it('should respect the custom transaction name', function () {
+      const historySubFn = performanceMonitoring.getHistorySub()
+      const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)
+      let etsub = performanceMonitoring.getEventTargetSub()
+      const cancelEventTargetSub = patchEventHandler.observe(
+        EVENT_TARGET,
+        (event, task) => {
+          etsub(event, task)
+        }
+      )
+      const transactionService = performanceMonitoring._transactionService
+
+      let element = document.createElement('button')
+      element.setAttribute('data-transaction-name', 'purchase-transaction')
+
+      const listener = () => {
+        let tr = transactionService.getCurrentTransaction()
+        expect(tr.type).toBe('user-interaction')
+        history.pushState(undefined, undefined, 'test')
+      }
+
+      element.addEventListener('click', listener)
+      element.click()
+
+      let tr = transactionService.getCurrentTransaction()
+      expect(tr.name).toBe('Click - purchase-transaction')
       expect(tr.type).toBe('route-change')
 
       cancelHistorySub()
