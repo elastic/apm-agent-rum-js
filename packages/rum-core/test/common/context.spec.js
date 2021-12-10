@@ -65,9 +65,9 @@ describe('Context', () => {
       },
       destination: {
         service: {
-          name: 'http://testing.local:1234',
+          name: '',
           resource: 'testing.local:1234',
-          type: 'external'
+          type: ''
         },
         address: 'testing.local',
         port: 1234
@@ -84,9 +84,9 @@ describe('Context', () => {
       },
       destination: {
         service: {
-          name: 'https://www.elastic.co',
+          name: '',
           resource: 'www.elastic.co:443',
-          type: 'external'
+          type: ''
         },
         address: 'www.elastic.co',
         port: 443
@@ -103,9 +103,9 @@ describe('Context', () => {
       },
       destination: {
         service: {
-          name: 'http://[::1]',
+          name: '',
           resource: '[::1]:80',
-          type: 'external'
+          type: ''
         },
         address: '::1',
         port: 80
@@ -126,9 +126,9 @@ describe('Context', () => {
       },
       destination: {
         service: {
-          name: 'https://[::1]:80',
+          name: '',
           resource: '[::1]:80',
-          type: 'external'
+          type: ''
         },
         address: '::1',
         port: 80
@@ -155,9 +155,9 @@ describe('Context', () => {
       },
       destination: {
         service: {
-          name: 'http://example.com',
+          name: '',
           resource: 'example.com:80',
-          type: 'resource'
+          type: ''
         },
         address: 'example.com',
         port: 80
@@ -174,9 +174,9 @@ describe('Context', () => {
     expect(span.context).toEqual({
       destination: {
         service: {
-          name: 'https://example.com',
+          name: '',
           resource: 'example.com:443',
-          type: 'hard-navigation'
+          type: ''
         },
         address: 'example.com',
         port: 443

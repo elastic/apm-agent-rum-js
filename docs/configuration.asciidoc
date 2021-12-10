@@ -10,7 +10,8 @@ While initializing the agent you can provide the following configuration options
 * *Type:* String
 * *Required*
 
-Your Elastic APM service name.
+The Elastic APM service name is used to differentiate data from each of your services. 
+Can only contain alphanumeric characters, spaces, underscores, and dashes (must match ^[a-zA-Z0-9 _-]+$).
 
 [float]
 [[server-url]]
@@ -20,6 +21,21 @@ Your Elastic APM service name.
 * *Default:* `http://localhost:8200`
 
 The URL used to make requests to the APM Server.
+
+[float]
+[[server-url-prefix]]
+=== `serverUrlPrefix`
+
+* *Type:* String
+* *Default* `/intake/v${apiVersion}/rum/events`
+
+The server prefix URL used to make requests to the APM Server. Some ad blockers block outgoing requests
+from the browser if the default server prefix URL is being used. Using a custom server prefix URL can be used to
+evade the ad blocker.
+
+NOTE: If the default server prefix URL is overwritten, the reverse proxy that sits between the 
+APM Server and the rum agent must reroute traffic to `/intake/v${apiVersion}/rum/events`
+so the APM Server knows what intake API to use.
 
 [float]
 [[service-version]]
@@ -172,9 +188,10 @@ This option overrides the page load transactions trace ID.
 [[page-load-sampled]]
 === `pageLoadSampled`
 
-* *Type:* String
+* *Type:* Boolean
 
 This option overrides the page load transactions sampled property.
+It is only applicable to `page-load` transactions.
 
 
 [float]

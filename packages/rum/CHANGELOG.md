@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.10.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.9.1...@elastic/apm-rum@5.10.0) (2021-12-07)
+
+
+### Features
+
+* **rum:** export rum types ([#1100](https://github.com/elastic/apm-agent-rum-js/issues/1100)) ([f141c0f](https://github.com/elastic/apm-agent-rum-js/commit/f141c0f504ef8ea2e703d32239344e309f5e38d6)), closes [#1045](https://github.com/elastic/apm-agent-rum-js/issues/1045) [#1045](https://github.com/elastic/apm-agent-rum-js/issues/1045)
+* **rum:** extend spanOptions type ([#1101](https://github.com/elastic/apm-agent-rum-js/issues/1101)) ([07544e8](https://github.com/elastic/apm-agent-rum-js/commit/07544e8fd1585430b192bd127c9c70cc1237ee52))
+* **rum-core:** add serverUrlPrefix config option ([#1081](https://github.com/elastic/apm-agent-rum-js/issues/1081)) ([cf407b4](https://github.com/elastic/apm-agent-rum-js/commit/cf407b4e5d225b9588c51e9762e1471474f711ad))
+
+
+
+
+
+## [5.9.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.9.0...@elastic/apm-rum@5.9.1) (2021-07-15)
+
+
+### Bug Fixes
+
+* **rum-core:** ensure apmRequest is called for events ([#1055](https://github.com/elastic/apm-agent-rum-js/issues/1055)) ([7ae7e39](https://github.com/elastic/apm-agent-rum-js/commit/7ae7e395fc5cb45252b1fa92c6ef8675e98e0249))
+
+
+
+
+
 # [5.9.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.8.0...@elastic/apm-rum@5.9.0) (2021-07-13)
 
 

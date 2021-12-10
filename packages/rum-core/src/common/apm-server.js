@@ -82,7 +82,8 @@ class ApmServer {
       'Content-Type': 'application/x-ndjson'
     }
     const apmRequest = this._configService.get('apmRequest')
-    return compressPayload(payload, headers)
+    const params = { payload, headers, beforeSend: apmRequest }
+    return compressPayload(params)
       .catch(error => {
         if (__DEV__) {
           this._loggingService.debug(
@@ -90,7 +91,7 @@ class ApmServer {
             error.message
           )
         }
-        return { payload, headers, beforeSend: apmRequest }
+        return params
       })
       .then(result => this._makeHttpRequest('POST', endPoint, result))
       .then(({ responseText }) => responseText)
@@ -335,7 +336,9 @@ class ApmServer {
       this.ndjsonTransactions(filteredPayload[TRANSACTIONS], compress)
     )
     const ndjsonPayload = ndjson.join('')
-    const endPoint = cfg.get('serverUrl') + `/intake/v${apiVersion}/rum/events`
+    const serverUrlPrefix =
+      cfg.get('serverUrlPrefix') || `/intake/v${apiVersion}/rum/events`
+    const endPoint = cfg.get('serverUrl') + serverUrlPrefix
     return this._postJson(endPoint, ndjsonPayload)
   }
 }

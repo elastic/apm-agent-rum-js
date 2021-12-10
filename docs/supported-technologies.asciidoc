@@ -88,6 +88,15 @@ to the server, the agent discards transactions with no spans (e.g. no network ac
 if the click interaction results in route change, then a `route-change`
 transaction would be captured instead.
 
+The transaction name can be influenced either by using the `name` or preferably the `data-transaction-name` HTML attribute. 
+Examples of transaction names based on the html attributes present: 
+
+* `<button></button>`: `Click - button`
+
+* `<button name="purchase"></button>`: `Click - button["purchase"]`
+
+* `<button data-transaction-name="purchase"></button>`: `Click - purchase`
+
 
 [float]
 [[spa]]

@@ -120,26 +120,56 @@ function compressMarks(marks) {
   if (!marks) {
     return null
   }
-  const { navigationTiming, agent } = marks
-  const compressed = { nt: {} }
 
+  const compressedNtMarks = compressNavigationTimingMarks(
+    marks.navigationTiming
+  )
+  const compressed = {
+    nt: compressedNtMarks,
+    a: compressAgentMarks(compressedNtMarks, marks.agent)
+  }
+
+  return compressed
+}
+
+function compressNavigationTimingMarks(ntMarks) {
+  if (!ntMarks) {
+    return null
+  }
+
+  const compressed = {}
   COMPRESSED_NAV_TIMING_MARKS.forEach((mark, index) => {
     const mapping = NAVIGATION_TIMING_MARKS[index]
-    compressed.nt[mark] = navigationTiming[mapping]
+    compressed[mark] = ntMarks[mapping]
   })
 
-  compressed.a = {
-    fb: compressed.nt.rs,
-    di: compressed.nt.di,
-    dc: compressed.nt.dc
+  return compressed
+}
+
+function compressAgentMarks(compressedNtMarks, agentMarks) {
+  let compressed = {}
+
+  if (compressedNtMarks) {
+    compressed = {
+      fb: compressedNtMarks.rs,
+      di: compressedNtMarks.di,
+      dc: compressedNtMarks.dc
+    }
   }
-  const fp = agent.firstContentfulPaint
-  const lp = agent.largestContentfulPaint
-  if (fp) {
-    compressed.a.fp = fp
+
+  if (agentMarks) {
+    const fp = agentMarks.firstContentfulPaint
+    const lp = agentMarks.largestContentfulPaint
+    if (fp) {
+      compressed.fp = fp
+    }
+    if (lp) {
+      compressed.lp = lp
+    }
   }
-  if (lp) {
-    compressed.a.lp = lp
+
+  if (Object.keys(compressed).length === 0) {
+    return null
   }
 
   return compressed
@@ -294,7 +324,7 @@ export function compressMetricsets(breakdowns) {
  * CompressionStream spec supported only in Chromium browsers
  * Spec : https://wicg.github.io/compression/
  */
-export function compressPayload(payload, headers, type = 'gzip') {
+export function compressPayload(params, type = 'gzip') {
   const isCompressionStreamSupported = typeof CompressionStream === 'function'
   return new Promise(resolve => {
     /**
@@ -302,9 +332,9 @@ export function compressPayload(payload, headers, type = 'gzip') {
      * is not supported in browser
      */
     if (!isCompressionStreamSupported) {
-      return resolve({ payload, headers })
+      return resolve(params)
     }
-
+    const { payload, headers, beforeSend } = params
     /**
      * create a blob with the original payload data and convert it
      * as readable stream
@@ -323,7 +353,7 @@ export function compressPayload(payload, headers, type = 'gzip') {
      */
     return new Response(compressedStream).blob().then(payload => {
       headers['Content-Encoding'] = type
-      return resolve({ payload, headers })
+      return resolve({ payload, headers, beforeSend })
     })
   })
 }

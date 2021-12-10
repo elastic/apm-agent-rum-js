@@ -188,14 +188,18 @@ export default class PerformanceMonitoring {
         task.eventType === 'click'
       ) {
         const target = task.target
-        const name = target.getAttribute('name')
-
-        let additionalInfo = ''
-        if (name) {
-          additionalInfo = `["${name}"]`
-        }
-
         const tagName = target.tagName.toLowerCase()
+
+        // use custom html attribute 'data-transaction-name' - otherwise fall back to "tagname" + "name"-Attribute
+        let transactionName = tagName
+        if (!!target.dataset.transactionName) {
+          transactionName = target.dataset.transactionName
+        } else {
+          const name = target.getAttribute('name')
+          if (!!name) {
+            transactionName = `${tagName}["${name}"]`
+          }
+        }
 
         /**
          * We reduce the reusability threshold to make sure
@@ -203,7 +207,7 @@ export default class PerformanceMonitoring {
          * related to this interaction.
          */
         const tr = transactionService.startTransaction(
-          `Click - ${tagName}${additionalInfo}`,
+          `Click - ${transactionName}`,
           USER_INTERACTION,
           {
             managed: true,
