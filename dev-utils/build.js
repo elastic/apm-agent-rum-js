@@ -24,9 +24,9 @@
  */
 
 const { join } = require('path')
-const { EnvironmentPlugin, ProvidePlugin } = require('webpack')
+const { DefinePlugin, EnvironmentPlugin, ProvidePlugin } = require('webpack')
 const TerserPlugin = require('terser-webpack-plugin')
-const VuePlugin = require('vue-loader/lib/plugin')
+const { VueLoaderPlugin } = require('vue-loader')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const { getTestEnvironmentVariables } = require('./test-config')
 
@@ -253,9 +253,15 @@ function getWebpackConfig(bundleType, packageType) {
       test: /\.vue$/,
       use: 'vue-loader'
     })
-    config.plugins.push(new VuePlugin())
+    config.plugins.push(new VueLoaderPlugin())
+    config.plugins.push(
+      new DefinePlugin({
+        __VUE_OPTIONS_API__: true,
+        __VUE_PROD_DEVTOOLS__: false
+      })
+    )
     config.resolve.alias = {
-      vue$: 'vue/dist/vue.esm.js'
+      vue$: 'vue/dist/vue.esm-bundler.js'
     }
   }
   return config

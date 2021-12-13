@@ -28,8 +28,10 @@ import { routeHooks } from './route-hooks'
 import { getErrorHandler } from './error-handler'
 
 export const ApmVuePlugin = {
-  install: (Vue, options) => {
+  install: (app, options) => {
     const { router, apm = apmBase, config, captureErrors = true } = options
+    const majorVersion = app.version.split('.').shift()
+
     /**
      * Initialize the APM with the config
      */
@@ -48,12 +50,15 @@ export const ApmVuePlugin = {
          * Global error handler for capturing errors during
          * component renders
          */
-        Vue.config.errorHandler = getErrorHandler(Vue, apm)
+        app.config.errorHandler = getErrorHandler(app, apm)
       }
     }
     /**
      * Provide the APM instance via $apm to be accessed in all Vue Components
      */
-    Vue.prototype.$apm = apm
+    if (majorVersion >= 3) app.config.globalProperties.$apm = apm
+    /**
+     * Backward compatibility with Vue 2
+     */ else app.prototype.$apm = apm
   }
 }

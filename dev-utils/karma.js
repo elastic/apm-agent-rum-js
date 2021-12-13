@@ -30,10 +30,6 @@ const {
 } = require('./test-config')
 const { getWebpackConfig, BUNDLE_TYPES } = require('./build')
 
-const baseLaunchers = getBrowserList().map(launcher => ({
-  base: 'SauceLabs',
-  ...launcher
-}))
 /**
  * Polyfills file that are required for the browser tests
  *
@@ -81,7 +77,10 @@ const baseConfig = {
   },
   autoWatch: false,
   browserNoActivityTimeout: 120000,
-  customLaunchers: baseLaunchers,
+  customLaunchers: getBrowserList().map(launcher => ({
+    ...launcher,
+    base: 'SauceLabs'
+  })),
   browsers: [],
   captureTimeout: 120000, // on saucelabs it takes some time to capture browser
   reporters: ['spec', 'failed'],
@@ -92,7 +91,7 @@ const baseConfig = {
     recordScreenshots: true,
     tunnelIdentifier,
     options: {
-      seleniumVersion: '2.48.2',
+      // seleniumVersion: '2.48.2',
       commandTimeout: 600,
       idleTimeout: 600,
       maxDuration: 5400
@@ -187,6 +186,5 @@ function prepareConfig(config, packageName) {
 
 module.exports = {
   prepareConfig,
-  baseConfig,
-  baseLaunchers
+  baseConfig
 }

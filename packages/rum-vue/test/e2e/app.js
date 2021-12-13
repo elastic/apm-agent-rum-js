@@ -24,21 +24,23 @@
  */
 import 'core-js'
 import 'whatwg-fetch'
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import { createApp, defineComponent, defineAsyncComponent, h } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import App from './App.vue'
 import FetchComponent from './components/Fetch.vue'
 import { getApmBase, getServerUrl } from './'
 import { ApmVuePlugin } from '../../src'
 
-Vue.use(VueRouter)
+const Home = defineComponent({
+  render: () => h('div', {}, 'home')
+})
 
-const Home = { template: '<div>home</div>' }
-const Lazy = () =>
+const Lazy = defineAsyncComponent(() =>
   import(/* webpackChunkName: "lazy" */ './components/Lazy.vue')
+)
 
-const router = new VueRouter({
-  mode: 'history',
-  base: 'test/e2e/',
+const router = new createRouter({
+  history: createWebHistory('test/e2e/'),
   routes: [
     { path: '/', component: Home },
     { path: '/lazy', component: Lazy },
@@ -65,28 +67,15 @@ const router = new VueRouter({
   ]
 })
 
-Vue.use(ApmVuePlugin, {
-  router,
-  apm: getApmBase(),
-  config: {
-    serviceName: 'rum-e2e-vue',
-    serverUrl: getServerUrl(),
-    logLevel: 'debug'
-  }
-})
-
-new Vue({
-  router,
-  template: `
-    <div id="app">
-      <h1>Vue E2E Test with Lazy loaded routes</h1>
-      <ul>
-        <li><router-link to="/">Home</router-link></li>
-        <li><router-link to="/lazy">Lazy</router-link></li>
-        <li><router-link id="fetch" to="/fetch">Fetch</router-link></li>
-        <li><router-link to="/lazy/b/c">Lazy with params</router-link></li>
-      </ul>
-      <router-view class="view"></router-view>
-    </div>
-  `
-}).$mount('#app')
+createApp(App)
+  .use(router)
+  .use(ApmVuePlugin, {
+    router,
+    apm: getApmBase(),
+    config: {
+      serviceName: 'rum-e2e-vue',
+      serverUrl: getServerUrl(),
+      logLevel: 'debug'
+    }
+  })
+  .mount('#app')

@@ -24,6 +24,7 @@
  */
 
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma')
+const { getBrowserList } = require('../../dev-utils/test-config')
 const {
   getWebpackConfig,
   PACKAGE_TYPES,
@@ -33,7 +34,11 @@ const {
 module.exports = function (config) {
   config.set(baseConfig)
   config.set({
-    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.VUE)
+    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.VUE),
+    customLaunchers: getBrowserList('vue').map(launcher => ({
+      ...launcher,
+      base: 'SauceLabs'
+    }))
   })
   const preparedConfig = prepareConfig(config, 'rum-vue')
   config.set(preparedConfig)
