@@ -30,7 +30,7 @@ function getSauceConnectOptions() {
     accessKey: process.env.SAUCE_ACCESS_KEY,
     logger: console.log,
     noSslBumpDomains: 'all',
-    tunnelIdentifier: process.env.BUILD_NUMBER,
+    tunnelName: process.env.BUILD_NUMBER,
     connectRetries: 3
   }
 }
@@ -70,50 +70,49 @@ function getDefaultBrowsers() {
   return [
     {
       browserName: 'chrome',
-      version: '49',
-      extendedDebugging: true
+      browserVersion: '76'
     },
     {
       browserName: 'chrome',
-      version: '76'
+      browserVersion: '84'
     },
     {
       browserName: 'chrome',
-      version: '84'
+      browserVersion: 'latest'
     },
     {
       browserName: 'firefox',
-      version: '52'
+      browserVersion: '60'
     },
     {
       browserName: 'safari',
-      platform: 'OS X 10.11',
-      version: '9.0'
+      platformName: 'macOS 10.13',
+      browserVersion: '13.0'
     },
     {
       browserName: 'internet explorer',
-      platform: 'Windows 8.1',
-      version: '11'
+      platformName: 'Windows 8.1',
+      browserVersion: '11'
     },
     {
-      browserName: 'microsoftedge',
-      platform: 'Windows 10',
-      version: '17'
+      browserName: 'MicrosoftEdge',
+      platformName: 'Windows 10',
+      browserVersion: '17'
     },
     {
+      platformName: 'Android',
+      browserName: 'Browser',
       appiumVersion: '1.9.1',
-      deviceName: 'android emulator',
-      browserName: 'browser',
-      platformVersion: '5.1',
-      platformName: 'android'
+      deviceName: 'Android Emulator',
+      platformVersion: '5.1'
     },
     {
+      platformName: 'iOS',
+      browserName: 'safari',
       appiumVersion: '1.13.0',
       deviceName: 'iPhone Simulator',
       deviceOrientation: 'portrait',
-      platformVersion: '12.2',
-      platformName: 'iOS',
-      browserName: 'Safari'
+      platformVersion: '12.2'
     }
   ]
 }
@@ -128,12 +127,12 @@ function getBrowserList(pkg = 'default') {
     browsers = [
       {
         browserName: 'chrome',
-        version: 'latest'
+        browserVersion: 'latest'
       },
       {
         browserName: 'firefox',
-        version: 'latest',
-        platform: 'Windows 10'
+        browserVersion: 'latest',
+        platformName: 'Windows 10'
       }
     ]
   }

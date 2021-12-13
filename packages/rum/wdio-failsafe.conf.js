@@ -28,14 +28,14 @@ const glob = require('glob')
 const { config } = require('./wdio.conf')
 const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 
-const { tunnelIdentifier } = getSauceConnectOptions()
+const { tunnelName } = getSauceConnectOptions()
 const browserList = [
   {
     browserName: 'internet explorer',
-    platform: 'Windows 7',
-    version: '10'
+    platformName: 'Windows 7',
+    browserVersion: '10'
   }
-].map(capability => ({ tunnelIdentifier, ...capability }))
+].map(capability => ({ tunnelName, ...capability }))
 
 exports.config = Object.assign({}, config, {
   specs: glob.sync(join(__dirname, '/test/e2e/**/*failsafe.js')),

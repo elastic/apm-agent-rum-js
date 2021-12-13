@@ -142,7 +142,7 @@ function getWebdriveBaseConfig(
   specs = './test/e2e/**/*.e2e-spec.js',
   capabilities
 ) {
-  const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
+  const { tunnelName, username, accessKey } = getSauceConnectOptions()
   /**
    * Skip the ios platform on E2E tests because of script
    * timeout issue in Appium
@@ -150,7 +150,7 @@ function getWebdriveBaseConfig(
   capabilities = (capabilities || getBrowserList())
     .map(c => ({
       ...c,
-      tunnelIdentifier
+      tunnelName
     }))
     .filter(({ platformName }) => platformName !== 'iOS')
 
