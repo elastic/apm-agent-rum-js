@@ -102,7 +102,7 @@ pipeline {
             }
           }
         }
-        stage('Test Pupperteer') {
+        stage('Unit tests') {
           when {
             beforeAgent true
             expression { return env.ONLY_DOCS == "false" }
