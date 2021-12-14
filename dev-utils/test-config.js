@@ -30,7 +30,7 @@ function getSauceConnectOptions() {
     accessKey: process.env.SAUCE_ACCESS_KEY,
     logger: console.log,
     noSslBumpDomains: 'all',
-    tunnelName: process.env.BUILD_NUMBER,
+    tunnelIdentifier: process.env.BUILD_NUMBER,
     connectRetries: 3
   }
 }

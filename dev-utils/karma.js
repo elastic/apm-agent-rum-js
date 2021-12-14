@@ -39,7 +39,7 @@ const polyfills = 'test/polyfills.+(js|ts)'
 
 const specPattern =
   'test/{*.spec.+(js|ts),!(e2e|integration|node|bundle|types)/*.spec.+(js|ts)}'
-const { tunnelName } = getSauceConnectOptions()
+const { tunnelIdentifier } = getSauceConnectOptions()
 
 /**
  * Common base config for all the mono repo packages
@@ -89,7 +89,7 @@ const baseConfig = {
     startConnect: false,
     recordVideo: false,
     recordScreenshots: true,
-    tunnelIdentifier: tunnelName,
+    tunnelIdentifier,
     options: {
       commandTimeout: 600,
       idleTimeout: 600,
