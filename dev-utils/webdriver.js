@@ -150,7 +150,9 @@ function getWebdriveBaseConfig(
   capabilities = (capabilities || getBrowserList())
     .map(c => ({
       ...c,
-      tunnelIdentifier
+      'sauce:options': {
+        tunnelIdentifier
+      }
     }))
     .filter(({ platformName }) => platformName !== 'iOS')
 
@@ -170,7 +172,7 @@ function getWebdriveBaseConfig(
     waitforTimeout: 30000,
     framework: 'jasmine',
     reporters: ['dot', 'spec'],
-    jasmineNodeOpts: {
+    jasmineOpts: {
       defaultTimeoutInterval: 90000
     },
     async before() {
@@ -328,10 +330,10 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
 }
 
 function getBrowserInfo() {
-  const { version, browserName } = browser.capabilities
+  const { browserVersion, browserName } = browser.capabilities
   return {
     name: browserName.toLowerCase(),
-    version
+    version: browserVersion
   }
 }
 

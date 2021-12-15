@@ -33,9 +33,12 @@ const browserList = [
   {
     browserName: 'internet explorer',
     platformName: 'Windows 7',
-    browserVersion: '10'
+    browserVersion: '10',
+    'sauce:options': {
+      tunnelIdentifier
+    }
   }
-].map(capability => ({ tunnelIdentifier, ...capability }))
+]
 
 exports.config = Object.assign({}, config, {
   specs: glob.sync(join(__dirname, '/test/e2e/**/*failsafe.js')),
