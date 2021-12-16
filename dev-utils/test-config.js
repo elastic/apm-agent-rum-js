@@ -86,8 +86,8 @@ function getDefaultBrowsers() {
     },
     {
       browserName: 'safari',
-      platformName: 'macOS 10.13',
-      browserVersion: '13.0'
+      platformName: 'macOS 10.15',
+      browserVersion: '13'
     },
     {
       browserName: 'internet explorer',
