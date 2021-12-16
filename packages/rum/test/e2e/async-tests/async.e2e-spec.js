@@ -50,13 +50,19 @@ describe('async-tests', function () {
      * Check for all types of spans that would be captured by
      * loading script async
      */
-    const spanTypes = ['hard-navigation', 'external']
+    const spanTypes = [
+      'hard-navigation',
+      'external',
+      'longtask',
+      'app',
+      'resource'
+    ]
     /**
-     * Safari does not support Resource & User Timing API
+     * Safari version configured in the test report span type browser-timing
      */
     const { name } = getBrowserInfo()
-    if (name.indexOf('safari') === -1) {
-      spanTypes.push('resource', 'app')
+    if (name.indexOf('safari') !== -1) {
+      spanTypes.push('browser-timing')
     }
 
     const captured = transactionPayload.spans.every(({ type }) => {
