@@ -44,6 +44,11 @@ async function runIntegrationTest(pageUrl) {
     })
 
     await page.goto(pageUrl, { timeout: 30000 })
+    await page.evaluate(() => {
+      // From puppeteer 2.0 onwards the Chromium included with it supports the CompressionStream api.
+      // Because of that, the postData property is set to undefined causing the test to fail
+      CompressionStream = void 0
+    })
     const transactionResponse = await page.waitForResponse(response => {
       console.log(
         `${response.request().method()} ${response.url()} ${response.status()}`
