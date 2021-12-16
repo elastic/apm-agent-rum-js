@@ -78,7 +78,7 @@ function getDefaultBrowsers() {
     },
     {
       browserName: 'chrome',
-      browserVersion: 'latest'
+      browserVersion: '95'
     },
     {
       browserName: 'firefox',
@@ -87,7 +87,7 @@ function getDefaultBrowsers() {
     {
       browserName: 'safari',
       platformName: 'macOS 10.13',
-      browserVersion: '13.0'
+      browserVersion: '12'
     },
     {
       browserName: 'internet explorer',
