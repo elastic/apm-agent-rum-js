@@ -29,7 +29,8 @@ const glob = require('glob')
 const {
   getSauceConnectOptions,
   getTestEnvironmentVariables,
-  getBrowserList
+  getBrowserList,
+  getAppiumBrowsersForWebdriver
 } = require('./test-config')
 
 const logLevels = {
@@ -147,13 +148,17 @@ function getWebdriveBaseConfig(
    * Skip the ios platform on E2E tests because of script
    * timeout issue in Appium
    */
-  capabilities = (capabilities || getBrowserList())
-    .map(c => ({
-      ...c,
-      'sauce:options': {
-        tunnelIdentifier
+  const browsers = [...getBrowserList(), ...getAppiumBrowsersForWebdriver()]
+  capabilities = (capabilities || browsers)
+    .map(c => {
+      const sauceOptions = c['sauce:options'] || {}
+      sauceOptions.tunnelIdentifier = tunnelIdentifier
+
+      return {
+        ...c,
+        'sauce:options': sauceOptions
       }
-    }))
+    })
     .filter(({ platformName }) => platformName !== 'iOS')
 
   const baseConfig = {

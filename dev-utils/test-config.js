@@ -98,7 +98,15 @@ function getDefaultBrowsers() {
       browserName: 'MicrosoftEdge',
       platformName: 'Windows 10',
       browserVersion: '17'
-    },
+    }
+  ]
+}
+
+/**
+ * It returns the appium configuration compatible with karma-sauce-launcher
+ */
+function getAppiumBrowsersForKarma() {
+  return [
     {
       platformName: 'Android',
       browserName: 'Browser',
@@ -113,6 +121,33 @@ function getDefaultBrowsers() {
       deviceName: 'iPhone Simulator',
       deviceOrientation: 'portrait',
       platformVersion: '12.2'
+    }
+  ]
+}
+
+/**
+ * It returns the appium configuration compatible with @wdio/sauce-service
+ */
+function getAppiumBrowsersForWebdriver() {
+  return [
+    {
+      platformName: 'Android',
+      browserName: 'Browser',
+      'appium:deviceName': 'Android Emulator',
+      'appium:platformVersion': '5.1',
+      'sauce:options': {
+        appiumVersion: '1.9.1'
+      }
+    },
+    {
+      platformName: 'iOS',
+      browserName: 'Safari',
+      'appium:deviceName': 'iPad Simulator',
+      'appium:platformVersion': '12.2',
+      'sauce:options': {
+        appiumVersion: '1.13.0',
+        deviceOrientation: 'portrait'
+      }
     }
   ]
 }
@@ -171,6 +206,8 @@ module.exports = {
   getTestEnvironmentVariables,
   getGlobalConfig,
   getBrowserList,
+  getAppiumBrowsersForKarma,
+  getAppiumBrowsersForWebdriver,
   parseVersion,
   isVersionInRange,
   DEFAULT_APM_SERVER_URL
