@@ -15,7 +15,7 @@ pipeline {
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
     DOCKER_ELASTIC_SECRET = 'secret/apm-team/ci/docker-registry/prod'
     GITHUB_CHECK_ITS_NAME = 'Integration Tests'
-    ITS_PIPELINE = 'apm-integration-tests-selector-mbp/master'
+    ITS_PIPELINE = 'apm-integration-tests-selector-mbp/main'
     OPBEANS_REPO = 'opbeans-frontend'
     NPMRC_SECRET = 'secret/jenkins-ci/npmjs/elasticmachine'
     TOTP_SECRET = 'totp/code/npmjs-elasticmachine'
