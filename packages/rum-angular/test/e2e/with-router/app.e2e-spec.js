@@ -31,7 +31,16 @@ describe('Angular router integration', function () {
    * automation protocol
    * https://github.com/webdriverio/webdriverio/blob/e942ce4d802161ac12579553889d9068dccf317c/packages/devtools/src/constants.ts#L8
    */
-  const ELEMENT_KEY = 'ELEMENT'
+  const ELEMENT_KEY_SELENIUM_LEGACY = 'ELEMENT' // Selenium 2.x specification
+  const ELEMENT_KEY_SELENIUM = 'element-6066-11e4-a52e-4f735466cecf' // Selenium 3.x specification
+
+  function getElementReference(browserElement) {
+    return (
+      browserElement[ELEMENT_KEY_SELENIUM] ||
+      browserElement[ELEMENT_KEY_SELENIUM_LEGACY]
+    )
+  }
+
   beforeAll(async () => {
     await browser.url('test/e2e/with-router/build/')
   })
@@ -44,7 +53,7 @@ describe('Angular router integration', function () {
       'css selector',
       'app-root app-home h2'
     )
-    expect(await browser.getElementText(result[ELEMENT_KEY])).toEqual(
+    expect(await browser.getElementText(getElementReference(result))).toEqual(
       'Home page'
     )
 
@@ -54,18 +63,32 @@ describe('Angular router integration', function () {
          * route to /contacts
          */
         const result = await browser.findElement('css selector', '#contacts')
-        await browser.elementClick(result[ELEMENT_KEY])
+        await browser.elementClick(getElementReference(result))
         const listResult = await browser.findElement(
           'css selector',
           'app-root app-contact-list'
         )
-        const isDisplayed = await browser.isElementDisplayed(
-          listResult[ELEMENT_KEY]
-        )
-        return isDisplayed
+
+        try {
+          // In browsers such as Safari 12 the endpoint /session/{session id}/displayed is not longer available
+          // Causing an exception and making the test fail.
+          // https://developer.apple.com/documentation/webkit/macos_webdriver_commands_for_safari_12_and_later
+
+          const isDisplayed = await browser.isElementDisplayed(
+            getElementReference(listResult)
+          )
+
+          return isDisplayed
+        } catch (error) {
+          // In browsers where isElementDisplayed is not supported we check if the expected element is available in the dom
+          console.log(
+            'an error happening trying to verify if element is displayed, checking if exists in the DOM instead'
+          )
+          return !!getElementReference(listResult)
+        }
       },
       10000,
-      'expected contact list to be rendered',
+      'expected contact list to be available',
       5000
     )
 
