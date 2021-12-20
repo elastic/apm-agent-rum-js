@@ -110,7 +110,7 @@ function getAppiumBrowsersForKarma() {
     {
       platformName: 'Android',
       browserName: 'Browser',
-      appiumVersion: '1.9.1',
+      appiumVersion: '1.20.2',
       deviceName: 'Android Emulator',
       platformVersion: '5.1'
     },
@@ -136,7 +136,7 @@ function getAppiumBrowsersForWebdriver() {
       'appium:deviceName': 'Android Emulator',
       'appium:platformVersion': '5.1',
       'sauce:options': {
-        appiumVersion: '1.9.1'
+        appiumVersion: '1.20.2'
       }
     },
     {

@@ -153,6 +153,7 @@ function getWebdriveBaseConfig(
     .map(c => {
       const sauceOptions = c['sauce:options'] || {}
       sauceOptions.tunnelIdentifier = tunnelIdentifier
+      sauceOptions.seleniumVersion = '3.141.59'
 
       return {
         ...c,
