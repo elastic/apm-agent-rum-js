@@ -23,8 +23,6 @@
  *
  */
 
-const { getBrowserInfo } = require('../../../../../dev-utils/webdriver')
-
 describe('async-tests', function () {
   it('should run the usecase', function () {
     browser.url('/test/e2e/async-tests/async-e2e.html')
@@ -57,13 +55,6 @@ describe('async-tests', function () {
       'app',
       'resource'
     ]
-    /**
-     * Safari version configured in the test report span type browser-timing
-     */
-    const { name } = getBrowserInfo()
-    if (name.indexOf('safari') !== -1) {
-      spanTypes.push('browser-timing')
-    }
 
     const captured = transactionPayload.spans.every(({ type }) => {
       return spanTypes.indexOf(type) !== -1
