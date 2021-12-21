@@ -27,11 +27,12 @@ const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
 
 describe('Angular router integration', function () {
   /**
-   * Change ELEMENT_KEY to approprioate value when using `devtools`
+   * Change ELEMENT_KEY to appropriate value when using `devtools`
    * automation protocol
    * https://github.com/webdriverio/webdriverio/blob/e942ce4d802161ac12579553889d9068dccf317c/packages/devtools/src/constants.ts#L8
    */
-  const ELEMENT_KEY = 'ELEMENT'
+  const ELEMENT_KEY = 'element-6066-11e4-a52e-4f735466cecf'
+
   beforeAll(async () => {
     await browser.url('test/e2e/with-router/build/')
   })
@@ -59,13 +60,27 @@ describe('Angular router integration', function () {
           'css selector',
           'app-root app-contact-list'
         )
-        const isDisplayed = await browser.isElementDisplayed(
-          listResult[ELEMENT_KEY]
-        )
-        return isDisplayed
+
+        try {
+          // In browsers such as Safari 12 the endpoint /session/{session id}/displayed is not longer available
+          // Causing an exception and making the test fail.
+          // https://developer.apple.com/documentation/webkit/macos_webdriver_commands_for_safari_12_and_later
+
+          const isDisplayed = await browser.isElementDisplayed(
+            listResult[ELEMENT_KEY]
+          )
+
+          return isDisplayed
+        } catch (error) {
+          // In browsers where isElementDisplayed is not supported we check if the expected element is available in the dom
+          console.log(
+            'an error happening trying to verify if element is displayed, checking if exists in the DOM instead'
+          )
+          return !!listResult[ELEMENT_KEY]
+        }
       },
       10000,
-      'expected contact list to be rendered',
+      'expected contact list to be available',
       5000
     )
 

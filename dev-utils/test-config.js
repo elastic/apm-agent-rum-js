@@ -70,50 +70,84 @@ function getDefaultBrowsers() {
   return [
     {
       browserName: 'chrome',
-      version: '49',
-      extendedDebugging: true
+      browserVersion: '76'
     },
     {
       browserName: 'chrome',
-      version: '76'
+      browserVersion: '84'
     },
     {
       browserName: 'chrome',
-      version: '84'
+      browserVersion: 'latest'
     },
     {
       browserName: 'firefox',
-      version: '52'
+      browserVersion: '60'
     },
     {
       browserName: 'safari',
-      platform: 'OS X 10.11',
-      version: '9.0'
+      platformName: 'macOS 10.15',
+      browserVersion: '13'
     },
     {
       browserName: 'internet explorer',
-      platform: 'Windows 8.1',
-      version: '11'
+      platformName: 'Windows 8.1',
+      browserVersion: '11'
     },
     {
-      browserName: 'microsoftedge',
-      platform: 'Windows 10',
-      version: '17'
+      browserName: 'MicrosoftEdge',
+      platformName: 'Windows 10',
+      browserVersion: '17'
+    }
+  ]
+}
+
+/**
+ * It returns the appium configuration compatible with karma-sauce-launcher
+ */
+function getAppiumBrowsersForKarma() {
+  return [
+    {
+      platformName: 'Android',
+      browserName: 'Browser',
+      appiumVersion: '1.20.2',
+      deviceName: 'Android Emulator',
+      platformVersion: '5.1'
     },
     {
-      appiumVersion: '1.9.1',
-      deviceName: 'android emulator',
-      browserName: 'browser',
-      platformVersion: '5.1',
-      platformName: 'android'
-    },
-    {
+      platformName: 'iOS',
+      browserName: 'safari',
       appiumVersion: '1.13.0',
       deviceName: 'iPhone Simulator',
       deviceOrientation: 'portrait',
-      platformVersion: '12.2',
+      platformVersion: '12.2'
+    }
+  ]
+}
+
+/**
+ * It returns the appium configuration compatible with @wdio/sauce-service
+ */
+function getAppiumBrowsersForWebdriver() {
+  return [
+    {
+      platformName: 'Android',
+      browserName: 'Browser',
+      'appium:deviceName': 'Android Emulator',
+      'appium:platformVersion': '5.1',
+      'sauce:options': {
+        appiumVersion: '1.20.2'
+      }
+    },
+    {
       platformName: 'iOS',
-      browserName: 'Safari'
+      browserName: 'Safari',
+      'appium:deviceName': 'iPad Simulator',
+      'appium:platformVersion': '12.2',
+      'sauce:options': {
+        appiumVersion: '1.13.0',
+        deviceOrientation: 'portrait'
+      }
     }
   ]
 }
@@ -128,12 +162,12 @@ function getBrowserList(pkg = 'default') {
     browsers = [
       {
         browserName: 'chrome',
-        version: 'latest'
+        browserVersion: 'latest'
       },
       {
         browserName: 'firefox',
-        version: 'latest',
-        platform: 'Windows 10'
+        browserVersion: 'latest',
+        platformName: 'Windows 10'
       }
     ]
   }
@@ -172,6 +206,8 @@ module.exports = {
   getTestEnvironmentVariables,
   getGlobalConfig,
   getBrowserList,
+  getAppiumBrowsersForKarma,
+  getAppiumBrowsersForWebdriver,
   parseVersion,
   isVersionInRange,
   DEFAULT_APM_SERVER_URL
