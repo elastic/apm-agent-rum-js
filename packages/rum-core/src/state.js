@@ -28,7 +28,14 @@ const state = {
   //  Time when agent is bootstrapped and patching of modules happens
   bootstrapTime: null,
   // Time when the document is last backgrounded
-  lastHiddenStart: Number.MIN_SAFE_INTEGER
+  lastHiddenStart: Number.MIN_SAFE_INTEGER,
+  // Tracking info of cumulative layout shift calculation
+  cls: {
+    maxScore: 0,
+    currentSessionScore: 0,
+    firstEventTime: Number.NEGATIVE_INFINITY,
+    previousEventTime: Number.NEGATIVE_INFINITY
+  }
 }
 
 export { __DEV__, state }

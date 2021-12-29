@@ -32,6 +32,7 @@ import {
 } from '../common/constants'
 import { noop, PERF } from '../common/utils'
 import Span from './span'
+import { state } from '../state'
 
 export const metrics = {
   fid: 0,
@@ -178,31 +179,32 @@ export function calculateTotalBlockingTime(longtaskEntries) {
  * 'layout-shift' entries captured through PerformanceObserver.
  * https://developer.mozilla.org/en-US/docs/Web/API/LayoutShift
  * https://web.dev/evolving-cls/
+ *
+ * We use clsState to keep track of previous layout shift events since the used technique requires
+ * to have them into account to perform the proper calculation
  */
-export function calculateCumulativeLayoutShift(clsEntries) {
-  let maxScore = 0
-  let currentSessionScore = 0
-  let firstEventTime = Number.NEGATIVE_INFINITY
-  let previousEventTime = Number.NEGATIVE_INFINITY
-
+export function calculateCumulativeLayoutShift(clsState, clsEntries) {
   clsEntries.forEach(entry => {
     // Only add the layout shift events without recent user input
     if (!entry.hadRecentInput && entry.value) {
       const shouldCreateNewSession =
-        entry.startTime - firstEventTime > 5000 ||
-        entry.startTime - previousEventTime > 1000
+        entry.startTime - clsState.firstEventTime > 5000 ||
+        entry.startTime - clsState.previousEventTime > 1000
       if (shouldCreateNewSession) {
-        firstEventTime = entry.startTime
-        currentSessionScore = 0
+        clsState.firstEventTime = entry.startTime
+        clsState.currentSessionScore = 0
       }
 
-      previousEventTime = entry.startTime
-      currentSessionScore += entry.value
-      maxScore = Math.max(maxScore, currentSessionScore)
+      clsState.previousEventTime = entry.startTime
+      clsState.currentSessionScore += entry.value
+      clsState.maxScore = Math.max(
+        clsState.maxScore,
+        clsState.currentSessionScore
+      )
     }
   })
 
-  metrics.cls = maxScore
+  return clsState.maxScore
 }
 
 /**
@@ -286,7 +288,7 @@ export function captureObserverEntries(list, { isHardNavigation, trStart }) {
   calculateTotalBlockingTime(longtaskEntries)
 
   const clsEntries = list.getEntriesByType(LAYOUT_SHIFT)
-  calculateCumulativeLayoutShift(clsEntries)
+  metrics.cls = calculateCumulativeLayoutShift(state.cls, clsEntries)
 
   return result
 }
