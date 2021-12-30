@@ -32,7 +32,6 @@ import {
 } from '../common/constants'
 import { noop, PERF } from '../common/utils'
 import Span from './span'
-import { state } from '../state'
 
 export const metrics = {
   fid: 0,
@@ -41,7 +40,12 @@ export const metrics = {
     start: Infinity,
     duration: 0
   },
-  cls: 0,
+  cls: {
+    score: 0,
+    firstEntryTime: Number.NEGATIVE_INFINITY,
+    prevEntryTime: Number.NEGATIVE_INFINITY,
+    currentSessionScore: 0
+  },
   longtask: {
     count: 0,
     duration: 0,
@@ -180,31 +184,27 @@ export function calculateTotalBlockingTime(longtaskEntries) {
  * https://developer.mozilla.org/en-US/docs/Web/API/LayoutShift
  * https://web.dev/evolving-cls/
  *
- * We use clsState to keep track of previous layout shift events since the used technique requires
- * to have them into account to perform the proper calculation
  */
-export function calculateCumulativeLayoutShift(clsState, clsEntries) {
+export function calculateCumulativeLayoutShift(clsEntries) {
   clsEntries.forEach(entry => {
     // Only add the layout shift events without recent user input
     if (!entry.hadRecentInput && entry.value) {
       const shouldCreateNewSession =
-        entry.startTime - clsState.firstEventTime > 5000 ||
-        entry.startTime - clsState.previousEventTime > 1000
+        entry.startTime - metrics.cls.firstEntryTime > 5000 ||
+        entry.startTime - metrics.cls.prevEntryTime > 1000
       if (shouldCreateNewSession) {
-        clsState.firstEventTime = entry.startTime
-        clsState.currentSessionScore = 0
+        metrics.cls.firstEntryTime = entry.startTime
+        metrics.cls.currentSessionScore = 0
       }
 
-      clsState.previousEventTime = entry.startTime
-      clsState.currentSessionScore += entry.value
-      clsState.maxScore = Math.max(
-        clsState.maxScore,
-        clsState.currentSessionScore
+      metrics.cls.prevEntryTime = entry.startTime
+      metrics.cls.currentSessionScore += entry.value
+      metrics.cls.score = Math.max(
+        metrics.cls.score,
+        metrics.cls.currentSessionScore
       )
     }
   })
-
-  return clsState.maxScore
 }
 
 /**
@@ -288,7 +288,7 @@ export function captureObserverEntries(list, { isHardNavigation, trStart }) {
   calculateTotalBlockingTime(longtaskEntries)
 
   const clsEntries = list.getEntriesByType(LAYOUT_SHIFT)
-  metrics.cls = calculateCumulativeLayoutShift(state.cls, clsEntries)
+  calculateCumulativeLayoutShift(clsEntries)
 
   return result
 }

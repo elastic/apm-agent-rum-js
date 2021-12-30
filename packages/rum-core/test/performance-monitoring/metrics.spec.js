@@ -39,7 +39,6 @@ import {
 } from '../utils/globals-mock'
 import longtaskEntries from '../fixtures/longtask-entries'
 import fidEntries from '../fixtures/fid-entries'
-import { state } from '../../src/state'
 
 describe('Metrics', () => {
   describe('PerfEntryRecorder', () => {
@@ -52,7 +51,12 @@ describe('Metrics', () => {
       list.getEntriesByType.and.returnValue([])
       list.getEntriesByName.and.returnValue([])
       metrics.tbt = { start: Infinity, duration: 0 }
-      metrics.cls = 0
+      metrics.cls = {
+        score: 0,
+        firstEntryTime: Number.NEGATIVE_INFINITY,
+        prevEntryTime: Number.NEGATIVE_INFINITY,
+        currentSessionScore: 0
+      }
       metrics.fid = 0
       metrics.longtask = {
         count: 0,
@@ -294,14 +298,8 @@ describe('Metrics', () => {
     })
 
     describe('Cumulative Layout Shift', () => {
-      let clsState = state.cls
-
-      beforeEach(() => {
-        clsState = { ...state.cls }
-      })
-
       it('should calculate cls of one session window', () => {
-        const clsScore = calculateCumulativeLayoutShift(clsState, [
+        calculateCumulativeLayoutShift([
           {
             duration: 0,
             entryType: 'layout-shift',
@@ -322,11 +320,11 @@ describe('Metrics', () => {
           }
         ])
 
-        expect(clsScore.toFixed(3)).toEqual('0.040')
+        expect(metrics.cls.score.toFixed(3)).toEqual('0.040')
       })
 
       it('should calculate cls considering the extra session window created because of the one second gap between events', () => {
-        const clsScore = calculateCumulativeLayoutShift(clsState, [
+        calculateCumulativeLayoutShift([
           // First session start here
           {
             duration: 0,
@@ -367,11 +365,11 @@ describe('Metrics', () => {
           }
         ])
 
-        expect(clsScore.toFixed(3)).toEqual('0.050')
+        expect(metrics.cls.score.toFixed(3)).toEqual('0.050')
       })
 
       it('should calculate cls considering the extra session window created since the first one lasted more than 5 seconds', () => {
-        const clsScore = calculateCumulativeLayoutShift(clsState, [
+        calculateCumulativeLayoutShift([
           // First session start here
           {
             duration: 0,
@@ -439,11 +437,11 @@ describe('Metrics', () => {
           }
         ])
 
-        expect(clsScore.toFixed(3)).toEqual('0.340')
+        expect(metrics.cls.score.toFixed(3)).toEqual('0.340')
       })
 
       it('should calculate cls without considering layout shift events with recent user input', () => {
-        const clsScore = calculateCumulativeLayoutShift(clsState, [
+        calculateCumulativeLayoutShift([
           {
             duration: 0,
             entryType: 'layout-shift',
@@ -464,7 +462,7 @@ describe('Metrics', () => {
           }
         ])
 
-        expect(clsScore.toFixed(3)).toEqual('0.140')
+        expect(metrics.cls.score.toFixed(3)).toEqual('0.140')
       })
     })
 
