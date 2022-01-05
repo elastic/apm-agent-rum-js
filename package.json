@@ -197,6 +197,7 @@
     "npm": "6"
   },
   "resolutions": {
-    "semver-regex": "4.0.2"
+    "semver-regex": "4.0.2",
+    "lodash": "4.17.21"
   }
 }
