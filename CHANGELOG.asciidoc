@@ -29,6 +29,15 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.10.1]]
+==== 5.10.1 (2022-01-10)
+[float]
+===== Features
+* **rum-core:** update Cumulative layout shift(CLS) calculation following the new guidelines from Google: `maximum session window with 1 second gap, capped at 5 seconds.`: {issue}1033[#1033]
+
+===== Bug fixes
+* **rum-angular:** recover compatibility with Angular 9.0.x: {issue}1115[#1115]
+
 [[release-notes-5.10.0]]
 ==== 5.10.0 (2021-12-07)
 [float]
