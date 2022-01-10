@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.14.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.13.0...@elastic/apm-rum-core@5.14.0) (2022-01-10)
+
+
+### Features
+
+* **rum-core:** update cls definition ([#1128](https://github.com/elastic/apm-agent-rum-js/issues/1128)) ([670bb6f](https://github.com/elastic/apm-agent-rum-js/commit/670bb6f102762d2484af01da5d6a8a5b31b4dd1b))
+
+
+
+
+
 # [5.13.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.12.1...@elastic/apm-rum-core@5.13.0) (2021-12-07)
 
 

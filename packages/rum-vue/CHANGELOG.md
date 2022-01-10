@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.3.2...@elastic/apm-rum-vue@1.4.0) (2022-01-10)
+
+
+### Features
+
+* **rum-vue:** vue 3 support ([#1092](https://github.com/elastic/apm-agent-rum-js/issues/1092)) ([33ef2e4](https://github.com/elastic/apm-agent-rum-js/commit/33ef2e433227b660547962e41afd4693e9166699))
+
+
+
+
+
 ## [1.3.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.3.1...@elastic/apm-rum-vue@1.3.2) (2021-12-07)
 
 **Note:** Version bump only for package @elastic/apm-rum-vue
