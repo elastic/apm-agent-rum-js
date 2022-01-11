@@ -191,5 +191,9 @@
     "@elastic/apm-rum-core": "file:packages/rum-core",
     "@elastic/apm-rum-react": "file:packages/rum-react",
     "@elastic/apm-rum-vue": "file:packages/rum-vue"
+  },
+  "engines": {
+    "node": ">=12 <=16",
+    "npm": "6"
   }
 }
