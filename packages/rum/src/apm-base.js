@@ -29,6 +29,7 @@ import {
   ERROR,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
+  TRANSACTION_SERVICE,
   APM_SERVER
 } from '@elastic/apm-rum-core'
 
@@ -257,7 +258,7 @@ export default class ApmBase {
   startTransaction(name, type, options) {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
-        'TransactionService'
+        TRANSACTION_SERVICE
       )
       return transactionService.startTransaction(name, type, options)
     }
@@ -266,7 +267,7 @@ export default class ApmBase {
   startSpan(name, type, options) {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
-        'TransactionService'
+        TRANSACTION_SERVICE
       )
       return transactionService.startSpan(name, type, options)
     }
@@ -275,7 +276,7 @@ export default class ApmBase {
   getCurrentTransaction() {
     if (this.isEnabled()) {
       var transactionService = this.serviceFactory.getService(
-        'TransactionService'
+        TRANSACTION_SERVICE
       )
       return transactionService.getCurrentTransaction()
     }

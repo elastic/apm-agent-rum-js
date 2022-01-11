@@ -28,13 +28,14 @@ import TransactionService from './transaction-service'
 import {
   APM_SERVER,
   CONFIG_SERVICE,
-  LOGGING_SERVICE
+  LOGGING_SERVICE,
+  TRANSACTION_SERVICE
 } from '../common/constants'
 
 import { serviceCreators } from '../common/service-factory'
 
 function registerServices() {
-  serviceCreators['TransactionService'] = serviceFactory => {
+  serviceCreators[TRANSACTION_SERVICE] = serviceFactory => {
     const [loggingService, configService] = serviceFactory.getService([
       LOGGING_SERVICE,
       CONFIG_SERVICE
@@ -52,7 +53,7 @@ function registerServices() {
       APM_SERVER,
       CONFIG_SERVICE,
       LOGGING_SERVICE,
-      'TransactionService'
+      TRANSACTION_SERVICE
     ])
     return new PerformanceMonitoring(
       apmServer,

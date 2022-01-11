@@ -24,7 +24,7 @@
  */
 
 import { createServiceFactory, createCustomEvent } from '../'
-import { ERRORS } from '../../src/common/constants'
+import { ERRORS, TRANSACTION_SERVICE } from '../../src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 const { agentConfig } = getGlobalConfig('rum-core')
@@ -42,7 +42,7 @@ describe('ErrorLogging', function () {
     configService.setConfig(agentConfig)
     apmServer = serviceFactory.getService('ApmServer')
     errorLogging = serviceFactory.getService('ErrorLogging')
-    transactionService = serviceFactory.getService('TransactionService')
+    transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
   })
 
   const getEvents = () => apmServer.queue.items

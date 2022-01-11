@@ -25,28 +25,87 @@
 
 import { bootstrap } from '../src/bootstrap'
 import * as patcher from '../src/common/patching'
+import * as pageVisibility from '../src/common/page-visibility'
+import * as utils from '../src/common/utils'
+import { initializeState, state } from '../src/state'
+import { createServiceFactory } from '../src'
+import { TRANSACTION_SERVICE, CONFIG_SERVICE } from '../src/common/constants'
 import { spyOnFunction } from '../../../dev-utils/jasmine'
 
 describe('bootstrap', function () {
-  it('should log warning on unsupported environments', () => {
-    // Pass unsupported check
-    const nowFn = window.performance.now
-    window.performance.now = undefined
+  let serviceFactory
+  let configService
+  let transactionService
 
-    spyOn(console, 'log')
-    bootstrap()
-
-    expect(console.log).toHaveBeenCalledWith(
-      '[Elastic APM] platform is not supported!'
-    )
-    window.performance.now = nowFn
+  beforeEach(() => {
+    serviceFactory = createServiceFactory()
+    configService = serviceFactory.getService(CONFIG_SERVICE)
+    transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
   })
 
-  it('should call patchAll', () => {
-    const patchAllSpy = spyOnFunction(patcher, 'patchAll')
+  describe('on unsupported environments', () => {
+    let nowFn
 
-    bootstrap()
+    beforeEach(() => {
+      nowFn = window.performance.now
+      window.performance.now = undefined
+    })
 
-    expect(patchAllSpy).toHaveBeenCalledTimes(1)
+    afterEach(() => {
+      window.performance.now = nowFn
+    })
+
+    it('should log warning', () => {
+      spyOn(console, 'log')
+      bootstrap(configService, transactionService)
+
+      expect(console.log).toHaveBeenCalledWith(
+        '[Elastic APM] platform is not supported!'
+      )
+    })
+
+    it('should return false', () => {
+      expect(bootstrap(configService, transactionService)).toBe(false)
+    })
+  })
+
+  describe('on supported environments', () => {
+    afterEach(() => {
+      // Since the flow of bootstrap mutates the global state
+      // it should be restored
+      initializeState()
+      // Remove the added listener when bootstraping since window object is shared among all tests
+      pageVisibility.unobservePageVisibility()
+    })
+
+    it('should return true', () => {
+      expect(bootstrap(configService, transactionService)).toBe(true)
+    })
+
+    it('should call patchAll', () => {
+      const patchAllSpy = spyOnFunction(patcher, 'patchAll')
+      console.log(patchAllSpy)
+
+      bootstrap(configService, transactionService)
+
+      expect(patchAllSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should call observePageVisibility', () => {
+      const observeSpy = spyOnFunction(pageVisibility, 'observePageVisibility')
+
+      bootstrap(configService, transactionService)
+
+      expect(observeSpy).toHaveBeenCalledTimes(1)
+      expect(observeSpy).toHaveBeenCalledWith(configService, transactionService)
+    })
+
+    it('should set a bootstrap time', () => {
+      const anyTime = 123456789
+      spyOnFunction(utils, 'now').and.returnValue(anyTime)
+
+      bootstrap(configService, transactionService)
+      expect(state.bootstrapTime).toBe(anyTime)
+    })
   })
 })

@@ -44,16 +44,21 @@ const logLevels = {
 const debugMode = false
 const debugLevel = logLevels.INFO.value
 
-function isLogEntryATestFailure(entry, whitelist) {
+function isLogEntryATestFailure(entry, whitelist = []) {
   var result = false
   if (logLevels[entry.level].value > logLevels.WARNING.value) {
     result = true
-    if (whitelist) {
-      for (var i = 0, l = whitelist.length; i < l; i++) {
-        if (entry.message.indexOf(whitelist[i]) !== -1) {
-          result = false
-          break
-        }
+
+    // Chrome's versions lower than 81 had a bug where a preflight request with keepalive specified was not supported
+    // Bug info: https://bugs.chromium.org/p/chromium/issues/detail?id=835821
+    whitelist.push(
+      'Preflight request for request with keepalive specified is currently not supported'
+    )
+
+    for (var i = 0, l = whitelist.length; i < l; i++) {
+      if (entry.message.indexOf(whitelist[i]) !== -1) {
+        result = false
+        break
       }
     }
   }

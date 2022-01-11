@@ -40,6 +40,7 @@ import {
   ERROR,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
+  TRANSACTION_SERVICE,
   APM_SERVER
 } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
@@ -70,6 +71,7 @@ export {
   PAGE_LOAD,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
+  TRANSACTION_SERVICE,
   APM_SERVER,
   bootstrap
 }

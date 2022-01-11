@@ -272,6 +272,14 @@ class Config {
       storage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(config))
     }
   }
+
+  dispatchEvent(name, args) {
+    this.events.send(name, args)
+  }
+
+  observeEvent(name, fn) {
+    return this.events.observe(name, fn)
+  }
 }
 
 export default Config

@@ -24,11 +24,11 @@
  */
 
 import { createServiceFactory } from '../../src/index'
-import { PAGE_LOAD } from '../../src/common/constants'
+import { PAGE_LOAD, TRANSACTION_SERVICE } from '../../src/common/constants'
 
 suite('TransactionService', () => {
   const serviceFactory = createServiceFactory()
-  const transactionService = serviceFactory.getService('TransactionService')
+  const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
 
   benchmark('managed sampled transaction overhead', async () => {
     const tr = transactionService.startTransaction('/index', PAGE_LOAD, {

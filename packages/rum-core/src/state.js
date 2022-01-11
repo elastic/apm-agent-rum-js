@@ -24,11 +24,17 @@
  */
 
 const __DEV__ = process.env.NODE_ENV !== 'production'
-const state = {
-  //  Time when agent is bootstrapped and patching of modules happens
-  bootstrapTime: null,
-  // Time when the document is last backgrounded
-  lastHiddenStart: Number.MIN_SAFE_INTEGER
+
+let state
+function initializeState() {
+  state = {
+    //  Time when agent is bootstrapped and patching of modules happens
+    bootstrapTime: null,
+    // Time when the document is last backgrounded
+    lastHiddenStart: Number.MIN_SAFE_INTEGER
+  }
 }
 
-export { __DEV__, state }
+initializeState()
+
+export { __DEV__, state, initializeState }

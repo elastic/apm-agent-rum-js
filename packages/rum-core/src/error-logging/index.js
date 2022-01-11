@@ -24,7 +24,11 @@
  */
 
 import ErrorLogging from './error-logging'
-import { CONFIG_SERVICE, APM_SERVER } from '../common/constants'
+import {
+  CONFIG_SERVICE,
+  TRANSACTION_SERVICE,
+  APM_SERVER
+} from '../common/constants'
 import { serviceCreators } from '../common/service-factory'
 
 function registerServices() {
@@ -36,7 +40,7 @@ function registerServices() {
     ] = serviceFactory.getService([
       APM_SERVER,
       CONFIG_SERVICE,
-      'TransactionService'
+      TRANSACTION_SERVICE
     ])
     return new ErrorLogging(apmServer, configService, transactionService)
   }

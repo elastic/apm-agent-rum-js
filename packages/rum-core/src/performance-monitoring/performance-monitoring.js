@@ -47,7 +47,8 @@ import {
   HTTP_REQUEST_TYPE,
   USER_INTERACTION,
   OUTCOME_FAILURE,
-  OUTCOME_SUCCESS
+  OUTCOME_SUCCESS,
+  QUEUE_ADD_TRANSACTION
 } from '../common/constants'
 import {
   truncateModel,
@@ -159,6 +160,7 @@ export default class PerformanceMonitoring {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
         this._apmServer.addTransaction(payload)
+        this._configService.dispatchEvent(QUEUE_ADD_TRANSACTION)
       }
     })
 

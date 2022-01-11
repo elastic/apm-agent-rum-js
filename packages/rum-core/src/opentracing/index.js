@@ -25,10 +25,11 @@
 
 import Tracer from './tracer'
 import Span from './span'
+import { TRANSACTION_SERVICE } from '../common/constants'
 
 function createTracer(serviceFactory) {
   var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
-  var transactionService = serviceFactory.getService('TransactionService')
+  var transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
   var errorLogging = serviceFactory.getService('ErrorLogging')
   var loggingService = serviceFactory.getService('LoggingService')
   return new Tracer(

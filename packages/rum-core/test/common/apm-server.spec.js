@@ -28,11 +28,15 @@ import Transaction from '../../src/performance-monitoring/transaction'
 import {
   LOCAL_CONFIG_KEY,
   ERRORS,
-  TRANSACTIONS
+  TRANSACTIONS,
+  QUEUE_FLUSH,
+  HTTP_REQUEST_TIMEOUT
 } from '../../src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
-import { describeIf } from '../../../../dev-utils/jasmine'
+import { describeIf, spyOnFunction } from '../../../../dev-utils/jasmine'
 import { createServiceFactory, generateTransaction, generateErrors } from '../'
+import * as fetchSender from '../../src/common/http/fetch'
+import * as xhrSender from '../../src/common/http/xhr'
 
 const { agentConfig, testConfig } = getGlobalConfig('rum-core')
 
@@ -107,6 +111,15 @@ describe('ApmServer', function () {
     apmServer.queue.flush()
     expect(apmServer._postJson).toHaveBeenCalled()
     expect(apmServer.queue.items.length).toBe(0)
+  })
+
+  it('should call sendEvents queue when QUEUE_FLUSH event is dispatched', function () {
+    apmServer.init()
+    spyOn(apmServer, 'sendEvents')
+
+    configService.dispatchEvent(QUEUE_FLUSH)
+
+    expect(apmServer.sendEvents).toHaveBeenCalledTimes(1)
   })
 
   it('should not add any items to queue when not initialized', function () {
@@ -422,12 +435,12 @@ describe('ApmServer', function () {
   })
 
   it('should reject the request if beforeSend returns falsy', async () => {
-    let promise = apmServer._makeHttpRequest('POST', '/test', {
+    let promise = apmServer._makeHttpRequest('GET', '/test', {
       payload: 'test',
       beforeSend: ({ xhr, url, method, headers, payload }) => {
         expect(xhr).toBeDefined()
         expect(url).toBe('/test')
-        expect(method).toBe('POST')
+        expect(method).toBe('GET')
         expect(payload).toBe('test')
         expect(headers).toBeUndefined()
         return false
@@ -437,6 +450,111 @@ describe('ApmServer', function () {
       url: '/test',
       status: 0,
       responseText: 'Request rejected by user configuration.'
+    })
+  })
+
+  describe('http strategies', () => {
+    let originalCompressionStream = window.CompressionStream
+
+    beforeEach(() => {
+      window.CompressionStream = void 0
+    })
+
+    afterEach(() => {
+      window.CompressionStream = originalCompressionStream
+    })
+
+    it('should use fetch when keep alive is the choice', async () => {
+      spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
+        true
+      )
+      spyOnFunction(fetchSender, 'sendFetchRequest').and.resolveTo({})
+      spyOnFunction(xhrSender, 'sendXHR')
+      const serverUrl = 'http://localhost'
+      const serverUrlPrefix = '/prefix'
+      configService.setConfig({
+        serverUrl,
+        serverUrlPrefix
+      })
+
+      await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
+
+      expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(1)
+      expect(fetchSender.sendFetchRequest).toHaveBeenCalledWith(
+        'POST',
+        'http://localhost/prefix',
+        {
+          keepalive: true,
+          timeout: HTTP_REQUEST_TIMEOUT,
+          payload:
+            '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}\n{"transaction":{"test":"test"}}\n',
+          headers: {
+            'Content-Type': 'application/x-ndjson'
+          }
+        }
+      )
+      expect(xhrSender.sendXHR).toHaveBeenCalledTimes(0)
+    })
+
+    it('should use xhr as a fallback when fetch fails due to an exception', async () => {
+      spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
+        true
+      )
+      spyOnFunction(fetchSender, 'sendFetchRequest').and.rejectWith(
+        new TypeError('network error')
+      )
+      spyOnFunction(xhrSender, 'sendXHR').and.resolveTo({})
+      const serverUrl = 'http://localhost'
+      const serverUrlPrefix = '/prefix'
+      configService.setConfig({
+        serverUrl,
+        serverUrlPrefix
+      })
+
+      await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
+
+      expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(1)
+
+      // fallback expected
+      expect(xhrSender.sendXHR).toHaveBeenCalledTimes(1)
+      expect(xhrSender.sendXHR).toHaveBeenCalledWith(
+        'POST',
+        'http://localhost/prefix',
+        {
+          timeout: HTTP_REQUEST_TIMEOUT,
+          payload:
+            '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}\n{"transaction":{"test":"test"}}\n',
+          headers: {
+            'Content-Type': 'application/x-ndjson'
+          },
+          beforeSend: null
+        }
+      )
+    })
+
+    it('should not use xhr as a fallback when fetch failure reason is not an exception', async () => {
+      spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
+        true
+      )
+      spyOnFunction(fetchSender, 'sendFetchRequest').and.rejectWith({
+        url: '/test',
+        status: 400,
+        responseText: 'bad input'
+      })
+      spyOnFunction(xhrSender, 'sendXHR').and.resolveTo({})
+
+      const promise = apmServer.sendEvents([
+        { [TRANSACTIONS]: { test: 'test' } }
+      ])
+
+      await expectAsync(promise).toBeRejectedWith({
+        url: '/test',
+        status: 400,
+        responseText: 'bad input'
+      })
+
+      expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(1)
+      expect(xhrSender.sendXHR).toHaveBeenCalledTimes(0)
     })
   })
 

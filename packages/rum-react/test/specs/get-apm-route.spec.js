@@ -36,7 +36,10 @@ Enzyme.configure({ adapter: new Adapter() })
 
 import { MemoryRouter as Router, Route } from 'react-router-dom'
 import { ApmBase } from '@elastic/apm-rum'
-import { createServiceFactory } from '@elastic/apm-rum-core'
+import {
+  createServiceFactory,
+  TRANSACTION_SERVICE
+} from '@elastic/apm-rum-core'
 import { getApmRoute } from '../../src/get-apm-route'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
@@ -108,7 +111,7 @@ describe('ApmRoute', function () {
   it('should work correctly with path array in props', function () {
     const ApmRoute = getApmRoute(apmBase)
 
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     const dummyTr = {
       name: 'test',
       detectFinish: () => {}
@@ -144,7 +147,7 @@ describe('ApmRoute', function () {
 
   it('should not trigger full rerender on query change', function () {
     const ApmRoute = getApmRoute(apmBase)
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     spyOn(transactionService, 'startTransaction')
 
     const rendered = mount(

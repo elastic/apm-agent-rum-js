@@ -44,7 +44,9 @@ import {
   PAGE_LOAD,
   ROUTE_CHANGE,
   TRANSACTION_END,
-  TRANSACTIONS
+  TRANSACTIONS,
+  QUEUE_ADD_TRANSACTION,
+  TRANSACTION_SERVICE
 } from '../../src/common/constants'
 import { state } from '../../src/state'
 import patchEventHandler from '../common/patch'
@@ -146,6 +148,28 @@ describe('PerformanceMonitoring', function () {
     )
   })
 
+  it('should initialize and notify the transaction has been added to the queue', async () => {
+    performanceMonitoring.init()
+    spyOn(configService, 'dispatchEvent')
+
+    const tr = performanceMonitoring._transactionService.startTransaction(
+      'transaction',
+      'transaction',
+      { startTime: 0 }
+    )
+    let span = tr.startSpan('test span', 'test span type', { startTime: 0 })
+    span.end(100)
+    span = tr.startSpan('test span 2', 'test span type', { startTime: 20 })
+    span.end(300)
+    tr.end(400)
+
+    await waitFor(() => configService.dispatchEvent.calls.any())
+
+    expect(configService.dispatchEvent).toHaveBeenCalledWith(
+      QUEUE_ADD_TRANSACTION
+    )
+  })
+
   it('should create correct payload', function () {
     var tr = new Transaction('transaction1', 'transaction1type', {
       transactionSampleRate: 1
@@ -170,7 +194,7 @@ describe('PerformanceMonitoring', function () {
 
   it('should sendPageLoadMetrics', function (done) {
     const unMock = mockGetEntriesByType()
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
 
     configService.events.observe(TRANSACTION_END, function (tr) {
       expect(tr.captureTimings).toBe(true)
@@ -582,7 +606,7 @@ describe('PerformanceMonitoring', function () {
   }
 
   it('should create http-request transaction if no current transaction exist', done => {
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     spyOn(transactionService, 'startTransaction').and.callThrough()
 
     let task = createXHRTask('GET', '/')
@@ -616,7 +640,7 @@ describe('PerformanceMonitoring', function () {
   })
 
   it('should include multiple XHRs in the same transaction', () => {
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     spyOn(transactionService, 'startTransaction').and.callThrough()
 
     let task1 = createXHRTask('GET', '/first')
@@ -643,7 +667,7 @@ describe('PerformanceMonitoring', function () {
   })
 
   it('should send span context destination details to apm-server', done => {
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
 
     const tr = transactionService.startTransaction('with-context', 'custom')
     const data = {

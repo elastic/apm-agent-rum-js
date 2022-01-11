@@ -23,25 +23,18 @@
  *
  */
 
-import { isPlatformSupported, isBrowser, now } from './common/utils'
-import { patchAll } from './common/patching'
-import { observePageVisibility } from './common/page-visibility'
-import { state } from './state'
+import { isResponseSuccessful } from '../../../src/common/http/response-status'
 
-let enabled = false
-export function bootstrap(configService, transactionService) {
-  if (isPlatformSupported()) {
-    patchAll()
-    observePageVisibility(configService, transactionService)
-    state.bootstrapTime = now()
-    enabled = true
-  } else if (isBrowser) {
-    /**
-     * Print this error message only on the browser console
-     * on unsupported browser versions
-     */
-    console.log('[Elastic APM] platform is not supported!')
-  }
+describe('isResponseSuccessful', () => {
+  it('should return true if response status is 204', () => {
+    expect(isResponseSuccessful(204)).toBe(true)
+  })
 
-  return enabled
-}
+  it('should return false if response status is 500', () => {
+    expect(isResponseSuccessful(500)).toBe(false)
+  })
+
+  it('should return false if response status is 400', () => {
+    expect(isResponseSuccessful(400)).toBe(false)
+  })
+})

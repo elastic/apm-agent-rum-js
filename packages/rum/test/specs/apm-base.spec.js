@@ -27,20 +27,29 @@ import ApmBase from '../../src/apm-base'
 import {
   createServiceFactory,
   bootstrap,
-  PAGE_LOAD
+  PAGE_LOAD,
+  TRANSACTION_SERVICE,
+  CONFIG_SERVICE
 } from '@elastic/apm-rum-core'
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import Promise from 'promise-polyfill'
 
-var enabled = bootstrap()
-const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
-
 describe('ApmBase', function () {
+  let enabled
+  let serviceName
+  let serverUrl
   let serviceFactory
   let apmBase
+
   beforeEach(function () {
     serviceFactory = createServiceFactory()
+    enabled = bootstrap(
+      ...serviceFactory.getService([CONFIG_SERVICE, TRANSACTION_SERVICE])
+    )
+    const config = getGlobalConfig('rum').agentConfig
+    serviceName = config.serviceName
+    serverUrl = config.serverUrl
     apmBase = new ApmBase(serviceFactory, !enabled)
   })
 
@@ -79,7 +88,7 @@ describe('ApmBase', function () {
   })
 
   it('should disable all auto instrumentations when instrument is false', () => {
-    const trService = serviceFactory.getService('TransactionService')
+    const trService = serviceFactory.getService(TRANSACTION_SERVICE)
     const ErrorLogging = serviceFactory.getService('ErrorLogging')
     const loggingInstane = ErrorLogging['__proto__']
     spyOn(loggingInstane, 'registerListeners')
@@ -97,7 +106,7 @@ describe('ApmBase', function () {
   })
 
   it('should selectively enable/disable instrumentations based on config', () => {
-    const trService = serviceFactory.getService('TransactionService')
+    const trService = serviceFactory.getService(TRANSACTION_SERVICE)
     const ErrorLogging = serviceFactory.getService('ErrorLogging')
     const loggingInstane = ErrorLogging['__proto__']
     spyOn(loggingInstane, 'registerListeners')
@@ -237,7 +246,7 @@ describe('ApmBase', function () {
       serviceName,
       serverUrl
     })
-    var transactionService = serviceFactory.getService('TransactionService')
+    var transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     transactionService.currentTransaction = undefined
     var tr
     var req = new window.XMLHttpRequest()
