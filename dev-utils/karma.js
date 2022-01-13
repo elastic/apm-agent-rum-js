@@ -47,6 +47,7 @@ const { tunnelIdentifier } = getSauceConnectOptions()
  */
 const baseConfig = {
   files: [
+    '../../dev-utils/object-configurable.js', // makes all object properties configurable by default which is essential to spy on functions exported from modules
     polyfills,
     require.resolve('regenerator-runtime/runtime'),
     specPattern

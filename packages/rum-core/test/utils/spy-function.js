@@ -23,30 +23,9 @@
  *
  */
 
-import { bootstrap } from '../src/bootstrap'
-import * as patcher from '../src/common/patching'
-import { spyOnFunction } from './utils/spy-function'
+// Combined with the addition object-configurable.js in karma.js
+// This function allows us to spy on functions individually exported from modules
 
-describe('bootstrap', function () {
-  it('should log warning on unsupported environments', () => {
-    // Pass unsupported check
-    const nowFn = window.performance.now
-    window.performance.now = undefined
-
-    spyOn(console, 'log')
-    bootstrap()
-
-    expect(console.log).toHaveBeenCalledWith(
-      '[Elastic APM] platform is not supported!'
-    )
-    window.performance.now = nowFn
-  })
-
-  it('should call patchAll', () => {
-    const patchAllSpy = spyOnFunction(patcher, 'patchAll')
-
-    bootstrap()
-
-    expect(patchAllSpy).toHaveBeenCalledTimes(1)
-  })
-})
+export function spyOnFunction(obj, fn, spy = jasmine.createSpy(fn)) {
+  return spyOnProperty(obj, fn, 'get').and.returnValue(spy)
+}
