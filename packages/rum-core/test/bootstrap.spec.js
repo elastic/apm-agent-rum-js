@@ -23,9 +23,9 @@
  *
  */
 
-import { spyOnFunction } from '../../../dev-utils/jasmine'
 import { bootstrap } from '../src/bootstrap'
 import * as patcher from '../src/common/patching'
+import { spyOnFunction } from '../../../dev-utils/jasmine'
 
 describe('bootstrap', function () {
   it('should log warning on unsupported environments', () => {
