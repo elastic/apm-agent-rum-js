@@ -66,3 +66,9 @@ export function describeIf(description, specDefinitions, condition) {
 
   return describeFn.apply(this, [description, specDefinitions])
 }
+
+// Combined with the object-configurable.js addition in karma.js
+// This function allows jasmine the possibility to add a spy on a function exported from a module
+export function spyOnFunction(obj, fn, spy = jasmine.createSpy(fn)) {
+  return spyOnProperty(obj, fn, 'get').and.returnValue(spy)
+}
