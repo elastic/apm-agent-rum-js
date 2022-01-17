@@ -68,7 +68,11 @@ const LICENSE_WHITELIST = [
 /**
  * Packages that must be ignored during license check
  */
-const IGNORE_LIST = ['colors@0.6.2', 'elastic-apm-rum@0.0.0-monorepo']
+const IGNORE_LIST = [
+  'colors@0.6.2',
+  'elastic-apm-rum@0.0.0-monorepo',
+  'json-schema@0.4.0'
+]
 
 function generateInvalidMessage(name, path, licenses) {
   return `
