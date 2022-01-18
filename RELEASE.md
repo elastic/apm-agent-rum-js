@@ -40,10 +40,10 @@ Before releasing, be sure to update the following documentation:
 
 ## CI based
 
-The release process is also automated in the way any specific commit from the master branch can be potentially released, for such it's required the below steps:
+The release process is also automated in the way any specific commit from the main branch can be potentially released, for such it's required the below steps:
 
 1. Login to apm-ci.elastic.co
-1. Go to the [master](https://apm-ci.elastic.co/job/apm-agent-rum/job/apm-agent-rum-mbp/job/master/) pipeline.
+1. Go to the [main](https://apm-ci.elastic.co/job/apm-agent-rum/job/apm-agent-rum-mbp/job/main/) pipeline.
 1. Click on `Build with parameters` with the below checkbox:
   * `release` to be selected.
   * other checkboxes should be left as default.

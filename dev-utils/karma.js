@@ -180,7 +180,7 @@ function prepareConfig(config, packageName) {
     console.log('saucelabs.build:', buildId)
     if (isJenkins) {
       config.sauceLabs.tags = [testConfig.branch, process.env.STACK_VERSION]
-    } else if (testConfig.branch === 'master') {
+    } else if (testConfig.branch === 'main') {
       config.sauceLabs.tags = [testConfig.branch]
     }
     config.reporters.push('dots', 'saucelabs')
