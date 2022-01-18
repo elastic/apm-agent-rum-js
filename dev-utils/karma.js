@@ -42,11 +42,16 @@ const specPattern =
   'test/{*.spec.+(js|ts),!(e2e|integration|node|bundle|types)/*.spec.+(js|ts)}'
 const { tunnelIdentifier } = getSauceConnectOptions()
 
+// makes all object properties configurable by default
+// which in jasmine is essential to spy on functions exported from modules
+const objectConfigurable = '../../dev-utils/object-configurable.js'
+
 /**
  * Common base config for all the mono repo packages
  */
 const baseConfig = {
   files: [
+    objectConfigurable,
     polyfills,
     require.resolve('regenerator-runtime/runtime'),
     specPattern

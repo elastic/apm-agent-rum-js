@@ -23,30 +23,9 @@
  *
  */
 
-import { bootstrap } from '../src/bootstrap'
-import * as patcher from '../src/common/patching'
-import { spyOnFunction } from '../../../dev-utils/jasmine'
-
-describe('bootstrap', function () {
-  it('should log warning on unsupported environments', () => {
-    // Pass unsupported check
-    const nowFn = window.performance.now
-    window.performance.now = undefined
-
-    spyOn(console, 'log')
-    bootstrap()
-
-    expect(console.log).toHaveBeenCalledWith(
-      '[Elastic APM] platform is not supported!'
-    )
-    window.performance.now = nowFn
-  })
-
-  it('should call patchAll', () => {
-    const patchAllSpy = spyOnFunction(patcher, 'patchAll')
-
-    bootstrap()
-
-    expect(patchAllSpy).toHaveBeenCalledTimes(1)
-  })
-})
+;(function (defineProperty) {
+  Object.defineProperty = function (obj, prop, desc) {
+    desc.configurable = true
+    return defineProperty.call(obj, obj, prop, desc)
+  }
+})(Object.defineProperty)
