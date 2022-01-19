@@ -155,6 +155,7 @@
     "npm-run-all": "^4.1.5",
     "npmlog": "^4.1.2",
     "playwright": "^1.14.0",
+    "postcss": "^8.4.5",
     "prettier": "^2.2.1",
     "process": "^0.11.10",
     "promise-polyfill": "^8.1.3",
