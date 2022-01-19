@@ -152,7 +152,10 @@ function getBabelConfig(bundleType, packageType) {
   let options = {
     comments: false,
     babelrc: false,
-    exclude: '/**/node_modules/**',
+    // We must exclude `parse5` from the packages we ignore
+    // because otherwise it would not be transplied. Therefore,
+    // it would break IE11.
+    exclude: /node_modules\/(?!parse5).+/,
     presets: getBabelPresetEnv(bundleType),
     plugins: []
   }
@@ -202,7 +205,10 @@ function getCommonWebpackConfig(bundleType, packageType) {
       rules: [
         {
           test: /\.(js|jsx|ts)$/,
-          exclude: /node_modules/,
+          // We must exclude `parse5` from the packages we ignore
+          // because otherwise it would not be transplied. Therefore,
+          // it would break IE11.
+          exclude: /node_modules\/(?!parse5).+/,
           loader: 'babel-loader',
           options: getBabelConfig(bundleType, packageType)
         }
