@@ -403,9 +403,9 @@ pipeline {
                   url: "git@github.com:elastic/${OPBEANS_REPO}.git",
                   branch: 'main')
               sh script: ".ci/bump-version.sh '${env.BRANCH_NAME}'", label: 'Bump version'
-              // The opbeans pipeline will trigger a release for the main branch
+              // The opbeans pipeline will trigger a release for the main branch.
               gitPush()
-              // The opbeans pipeline will trigger a release for the release tag
+              // The opbeans pipeline will trigger a release for the release tag.
               gitCreateTag(tag: "${env.BRANCH_NAME}")
             }
           }
