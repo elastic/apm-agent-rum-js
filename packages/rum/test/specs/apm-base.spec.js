@@ -42,7 +42,7 @@ describe('ApmBase', function () {
   let serviceFactory
   let apmBase
 
-  beforeEach(function () {
+  beforeAll(() => {
     serviceFactory = createServiceFactory()
     enabled = bootstrap(
       ...serviceFactory.getService([CONFIG_SERVICE, TRANSACTION_SERVICE])
@@ -50,6 +50,10 @@ describe('ApmBase', function () {
     const config = getGlobalConfig('rum').agentConfig
     serviceName = config.serviceName
     serverUrl = config.serverUrl
+  })
+
+  beforeEach(function () {
+    serviceFactory = createServiceFactory()
     apmBase = new ApmBase(serviceFactory, !enabled)
   })
 
