@@ -2,7 +2,7 @@
 == Set up the Agent
 
 To start reporting your web page performance to Elastic APM,
-you must first {apm-server-ref-v}/configuration-rum.html[enable the RUM endpoint] in your `apm-server` configuration. 
+you must first {apm-guide-ref}/configuration-rum.html[enable the RUM endpoint] in your `apm-server` configuration. 
 
 Once the APM Server endpoint has been configured, you can:
 
@@ -117,7 +117,7 @@ If APM Server is deployed in an origin different than the page's origin,
 you will need to configure Cross-Origin Resource Sharing (CORS).
 
 A list of permitted origins can be supplied to the
-{apm-server-ref-v}/configuration-rum.html#rum-allow-origins[`apm-server.rum.allow_origins`]
+{apm-guide-ref}/configuration-rum.html#rum-allow-origins[`apm-server.rum.allow_origins`]
 configuration option.
 By default, APM Server allows all origins.
 
