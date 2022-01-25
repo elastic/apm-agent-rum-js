@@ -25,9 +25,11 @@
 
 import {
   BYTE_LIMIT,
+  sendFetchRequest,
   shouldUseFetchWithKeepAlive
 } from '../../../src/common/http/fetch'
-import { describeIf } from '../../../../../dev-utils/jasmine'
+import { describeIf, spyOnFunction } from '../../../../../dev-utils/jasmine'
+import * as fetchPatcher from '../../../src/common/patching/fetch-patch'
 
 describe('shouldUseFetchWithKeepAlive', () => {
   function generatePayload(payloadSize) {
@@ -79,4 +81,83 @@ describe('shouldUseFetchWithKeepAlive', () => {
   )
 })
 
-describe('sendFetchRequest', () => {})
+describeIf(
+  'sendFetchRequest',
+  () => {
+    it('should call fetchApi', async () => {
+      const response = {
+        status: 200,
+        text() {
+          return Promise.resolve({})
+        }
+      }
+      const fetchSpy = jasmine.createSpy('fetch').and.resolveTo(response)
+      spyOnFunction(fetchPatcher, 'getNativeFetch').and.returnValue(fetchSpy)
+
+      await sendFetchRequest('POST', 'anyUrl', {
+        payload: 'anyPayload',
+        keepalive: true,
+        headers: {}
+      })
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1)
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'anyUrl',
+        jasmine.objectContaining({
+          keepalive: true,
+          headers: {},
+          body: 'anyPayload',
+          method: 'POST',
+          credentials: 'omit'
+        })
+      )
+    })
+
+    it('should get response if response is successful', async () => {
+      const response = {
+        status: 200,
+        text() {
+          return Promise.resolve({})
+        }
+      }
+      const fetchSpy = jasmine.createSpy('fetch').and.resolveTo(response)
+      spyOnFunction(fetchPatcher, 'getNativeFetch').and.returnValue(fetchSpy)
+
+      const result = await sendFetchRequest('POST', 'anyUrl', {
+        payload: 'anyPayload',
+        keepalive: true,
+        headers: {}
+      })
+
+      expect(result).toEqual({
+        url: 'anyUrl',
+        status: response.status,
+        responseText: {}
+      })
+    })
+
+    it('should throw if response is not successful', async () => {
+      const response = {
+        status: 403,
+        text() {
+          return Promise.resolve({})
+        }
+      }
+      const fetchSpy = jasmine.createSpy('fetch').and.resolveTo(response)
+      spyOnFunction(fetchPatcher, 'getNativeFetch').and.returnValue(fetchSpy)
+
+      await expectAsync(
+        sendFetchRequest('POST', 'anyUrl', {
+          payload: 'anyPayload',
+          keepalive: true,
+          headers: {}
+        })
+      ).toBeRejectedWith({
+        status: response.status,
+        url: 'anyUrl',
+        responseText: {}
+      })
+    })
+  },
+  window.fetch
+)
