@@ -30,7 +30,7 @@ import { isResponseSuccessful } from './response-status'
 // keepalive flag tends to limit the payload size to 64 KB
 // although this size if set, will be up to the user agent
 // in order to be conservative we set a limit a little lower than that
-export const BYTE_LIMIT = 60000
+export const BYTE_LIMIT = 60 * 1000
 
 export function shouldUseFetchWithKeepAlive(method, payload) {
   const size = calculateSize(payload)
