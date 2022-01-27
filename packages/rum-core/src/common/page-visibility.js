@@ -83,7 +83,11 @@ function onPageHidden(configService, transactionService) {
     const unobserve = configService.observeEvent(QUEUE_ADD_TRANSACTION, () => {
       configService.dispatchEvent(QUEUE_FLUSH)
       state.lastHiddenStart = now()
-      unobserve() // Remove listener after invoking it
+
+      // unsubscribe listener to execute it only once.
+      // otherwise in SPAs we might be finding situations where we would be executing
+      // this logic as many times as we observed to this event
+      unobserve()
     })
 
     tr.end()
