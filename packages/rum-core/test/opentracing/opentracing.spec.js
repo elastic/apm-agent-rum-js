@@ -29,15 +29,19 @@ import ElasticTracer from '../../src/opentracing/tracer'
 import Transaction from '../../src/performance-monitoring/transaction'
 import Span from '../../src/performance-monitoring/span'
 import { Reference, REFERENCE_CHILD_OF } from 'opentracing'
-import { TRANSACTION_SERVICE } from '../../src/common/constants'
+import {
+  TRANSACTION_SERVICE,
+  LOGGING_SERVICE,
+  CONFIG_SERVICE
+} from '../../src/common/constants'
 
 function createTracer(config) {
   var serviceFactory = createServiceFactory()
   var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   var transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
   var errorLogging = serviceFactory.getService('ErrorLogging')
-  var loggingService = serviceFactory.getService('LoggingService')
-  var configService = serviceFactory.getService('ConfigService')
+  var loggingService = serviceFactory.getService(LOGGING_SERVICE)
+  var configService = serviceFactory.getService(CONFIG_SERVICE)
   configService.setConfig(config)
   return new ElasticTracer(
     performanceMonitoring,

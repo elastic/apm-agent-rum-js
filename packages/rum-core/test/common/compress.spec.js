@@ -30,6 +30,7 @@ import {
   compressError,
   compressPayload
 } from '../../src/common/compress'
+import { CONFIG_SERVICE, APM_SERVER } from '../../src/common/constants'
 import { addTransactionContext } from '../../src/common/context'
 
 /**
@@ -171,8 +172,8 @@ describe('Compress', function () {
 
   beforeEach(function () {
     serviceFactory = createServiceFactory()
-    configService = serviceFactory.getService('ConfigService')
-    apmServer = serviceFactory.getService('ApmServer')
+    configService = serviceFactory.getService(CONFIG_SERVICE)
+    apmServer = serviceFactory.getService(APM_SERVER)
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
     errorLogging = serviceFactory.getService('ErrorLogging')
     configService.setConfig({

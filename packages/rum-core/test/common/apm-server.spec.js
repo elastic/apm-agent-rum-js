@@ -30,7 +30,10 @@ import {
   ERRORS,
   TRANSACTIONS,
   QUEUE_FLUSH,
-  HTTP_REQUEST_TIMEOUT
+  HTTP_REQUEST_TIMEOUT,
+  LOGGING_SERVICE,
+  CONFIG_SERVICE,
+  APM_SERVER
 } from '../../src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { describeIf, spyOnFunction } from '../../../../dev-utils/jasmine'
@@ -57,10 +60,10 @@ describe('ApmServer', function () {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
     serviceFactory = createServiceFactory()
-    configService = serviceFactory.getService('ConfigService')
+    configService = serviceFactory.getService(CONFIG_SERVICE)
     configService.setConfig(agentConfig)
-    loggingService = serviceFactory.getService('LoggingService')
-    apmServer = serviceFactory.getService('ApmServer')
+    loggingService = serviceFactory.getService(LOGGING_SERVICE)
+    apmServer = serviceFactory.getService(APM_SERVER)
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
     errorLogging = serviceFactory.getService('ErrorLogging')
   })

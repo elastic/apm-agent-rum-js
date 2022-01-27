@@ -34,7 +34,8 @@ import { ApmBase } from '@elastic/apm-rum'
 import {
   createServiceFactory,
   afterFrame,
-  TRANSACTION_SERVICE
+  TRANSACTION_SERVICE,
+  LOGGING_SERVICE
 } from '@elastic/apm-rum-core'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
@@ -78,7 +79,7 @@ describe('withTransaction', function () {
 
   it('should not log warning or create transaction if apm is not active', function () {
     const [loggingService, transactionService] = serviceFactory.getService([
-      'LoggingService',
+      LOGGING_SERVICE,
       TRANSACTION_SERVICE
     ])
     spyOn(loggingService, 'warn')
@@ -109,7 +110,7 @@ describe('withTransaction', function () {
   })
 
   it('should return WrappedComponent on falsy value and log warning', function () {
-    const loggingService = serviceFactory.getService('LoggingService')
+    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
     spyOn(loggingService, 'warn')
 
     const withTransaction = getWithTransaction(apmBase)

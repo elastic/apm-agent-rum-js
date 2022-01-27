@@ -23,6 +23,7 @@
  *
  */
 
+import { LOGGING_SERVICE, CONFIG_SERVICE } from '../../src/common/constants'
 import { ServiceFactory } from '../../src/common/service-factory'
 
 describe('ServiceFactory', function () {
@@ -32,9 +33,9 @@ describe('ServiceFactory', function () {
   beforeEach(function () {
     serviceFactory = new ServiceFactory()
     serviceFactory.init()
-    configService = serviceFactory.getService('ConfigService')
+    configService = serviceFactory.getService(CONFIG_SERVICE)
 
-    loggingService = serviceFactory.getService('LoggingService')
+    loggingService = serviceFactory.getService(LOGGING_SERVICE)
     spyOn(loggingService, 'debug')
   })
 
@@ -50,10 +51,7 @@ describe('ServiceFactory', function () {
   })
 
   it('should get multiple services', function () {
-    let services = serviceFactory.getService([
-      'ConfigService',
-      'LoggingService'
-    ])
+    let services = serviceFactory.getService([CONFIG_SERVICE, LOGGING_SERVICE])
     expect(services).toEqual([configService, loggingService])
   })
 })

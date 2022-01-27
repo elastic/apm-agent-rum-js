@@ -38,7 +38,8 @@ import { MemoryRouter as Router, Route } from 'react-router-dom'
 import { ApmBase } from '@elastic/apm-rum'
 import {
   createServiceFactory,
-  TRANSACTION_SERVICE
+  TRANSACTION_SERVICE,
+  LOGGING_SERVICE
 } from '@elastic/apm-rum-core'
 import { getApmRoute } from '../../src/get-apm-route'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
@@ -83,7 +84,7 @@ describe('ApmRoute', function () {
   })
 
   it('should work with Route render and log warning', function () {
-    const loggingService = serviceFactory.getService('LoggingService')
+    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
     const ApmRoute = getApmRoute(apmBase)
 
     spyOn(loggingService, 'warn')

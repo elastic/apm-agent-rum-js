@@ -46,7 +46,10 @@ import {
   TRANSACTION_END,
   TRANSACTIONS,
   QUEUE_ADD_TRANSACTION,
-  TRANSACTION_SERVICE
+  TRANSACTION_SERVICE,
+  LOGGING_SERVICE,
+  CONFIG_SERVICE,
+  APM_SERVER
 } from '../../src/common/constants'
 import { state } from '../../src/state'
 import patchEventHandler from '../common/patch'
@@ -64,11 +67,11 @@ describe('PerformanceMonitoring', function () {
 
   beforeEach(function () {
     serviceFactory = createServiceFactory()
-    configService = serviceFactory.getService('ConfigService')
-    logger = serviceFactory.getService('LoggingService')
+    configService = serviceFactory.getService(CONFIG_SERVICE)
+    logger = serviceFactory.getService(LOGGING_SERVICE)
     configService.setConfig(agentConfig)
 
-    apmServer = serviceFactory.getService('ApmServer')
+    apmServer = serviceFactory.getService(APM_SERVER)
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   })
 

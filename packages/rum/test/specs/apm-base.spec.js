@@ -28,7 +28,10 @@ import {
   createServiceFactory,
   bootstrap,
   PAGE_LOAD,
-  TRANSACTION_SERVICE
+  TRANSACTION_SERVICE,
+  LOGGING_SERVICE,
+  CONFIG_SERVICE,
+  APM_SERVER
 } from '@elastic/apm-rum-core'
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
@@ -136,7 +139,7 @@ describe('ApmBase', function () {
   })
 
   it('should be noop for auto instrumentaion when agent is not active', done => {
-    const loggingService = serviceFactory.getService('LoggingService')
+    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
     spyOn(loggingService, 'warn')
 
     apmBase.init({ active: false })
@@ -160,7 +163,7 @@ describe('ApmBase', function () {
   })
 
   it('should be noop when API methods are used and agent is not active', () => {
-    const loggingService = serviceFactory.getService('LoggingService')
+    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
     spyOn(loggingService, 'warn')
 
     apmBase.init({ active: false })
@@ -174,7 +177,7 @@ describe('ApmBase', function () {
   })
 
   it('should use user provided logLevel when agent is inactive', () => {
-    const loggingService = serviceFactory.getService('LoggingService')
+    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
     apmBase.init({
       active: false,
       logLevel: 'error'
@@ -185,7 +188,7 @@ describe('ApmBase', function () {
   it('should provide the public api', function () {
     apmBase.init({ serviceName, serverUrl })
     apmBase.setInitialPageLoadName('test')
-    var configService = serviceFactory.getService('ConfigService')
+    var configService = serviceFactory.getService(CONFIG_SERVICE)
 
     expect(configService.get('pageLoadTransactionName')).toBe('test')
 
@@ -256,7 +259,7 @@ describe('ApmBase', function () {
   })
 
   it('should patch xhr when not active', function (done) {
-    const loggingService = serviceFactory.getService('LoggingService')
+    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
     spyOn(loggingService, 'warn')
 
     apmBase.init({ active: false })
@@ -280,7 +283,7 @@ describe('ApmBase', function () {
   })
 
   it('should log errors when config is invalid', () => {
-    const loggingService = serviceFactory.getService('LoggingService')
+    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
     spyOn(loggingService, 'warn')
     const logErrorSpy = spyOn(loggingService, 'error')
     apmBase.init({
@@ -290,7 +293,7 @@ describe('ApmBase', function () {
     expect(loggingService.error).toHaveBeenCalledWith(
       `RUM agent isn't correctly configured. serverUrl, serviceName is missing`
     )
-    const configService = serviceFactory.getService('ConfigService')
+    const configService = serviceFactory.getService(CONFIG_SERVICE)
     expect(configService.get('active')).toEqual(false)
 
     logErrorSpy.calls.reset()
@@ -339,7 +342,7 @@ describe('ApmBase', function () {
       serverUrl,
       disableInstrumentations: [PAGE_LOAD]
     })
-    const configService = serviceFactory.getService('ConfigService')
+    const configService = serviceFactory.getService(CONFIG_SERVICE)
     expect(configService.get('context.tags')).toEqual(labels)
   })
 
@@ -363,8 +366,8 @@ describe('ApmBase', function () {
   })
 
   it('should fetch central config', done => {
-    const apmServer = serviceFactory.getService('ApmServer')
-    const configService = serviceFactory.getService('ConfigService')
+    const apmServer = serviceFactory.getService(APM_SERVER)
+    const configService = serviceFactory.getService(CONFIG_SERVICE)
 
     spyOn(configService, 'setLocalConfig')
     spyOn(configService, 'getLocalConfig')
@@ -395,7 +398,7 @@ describe('ApmBase', function () {
       }
     }
 
-    const loggingService = serviceFactory.getService('LoggingService')
+    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
     spyOn(loggingService, 'warn')
     apmServer._makeHttpRequest = createPayloadCallback('test')
     apmBase
@@ -419,7 +422,7 @@ describe('ApmBase', function () {
   })
 
   it('should wait for remote config before sending the page load', done => {
-    const loggingService = serviceFactory.getService('LoggingService')
+    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
     spyOn(apmBase, 'fetchCentralConfig').and.callThrough()
     spyOn(apmBase, '_sendPageLoadMetrics').and.callFake(() => {
       done()
