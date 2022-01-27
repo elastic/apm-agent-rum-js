@@ -3,16 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [1.4.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.3.2...@elastic/apm-rum-vue@1.4.0) (2022-01-10)
+# [2.0.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.4.0...@elastic/apm-rum-vue@2.0.0) (2022-01-26)
 
 
 ### Features
 
-* **rum-vue:** vue 3 support ([#1092](https://github.com/elastic/apm-agent-rum-js/issues/1092)) ([33ef2e4](https://github.com/elastic/apm-agent-rum-js/commit/33ef2e433227b660547962e41afd4693e9166699))
+* **rum-vue:** Add vue 3 support ([#1092](https://github.com/elastic/apm-agent-rum-js/issues/1092)) ([33ef2e4](https://github.com/elastic/apm-agent-rum-js/commit/33ef2e433227b660547962e41afd4693e9166699))
+
+
+### BREAKING CHANGES
+
+* **rum-vue:** Drop support for Vue < 3 versions ([#1092](https://github.com/elastic/apm-agent-rum-js/issues/1092)) ([33ef2e4](https://github.com/elastic/apm-agent-rum-js/commit/33ef2e433227b660547962e41afd4693e9166699))
 
 
 
 
+# [1.4.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.3.2...@elastic/apm-rum-vue@1.4.0) (2022-01-10)
+
+Deprecated - * Please use version `2.0.0` for Vue 3 support *
+
+**Note:** Version bump only for package @elastic/apm-rum-vue
 
 ## [1.3.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.3.1...@elastic/apm-rum-vue@1.3.2) (2021-12-07)
 
@@ -33,11 +43,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 # [1.3.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.2.3...@elastic/apm-rum-vue@1.3.0) (2021-07-13)
 
 
-### Features
-
-* **rum-angular:** add support for angular 12 ([#1039](https://github.com/elastic/apm-agent-rum-js/issues/1039)) ([db7df0a](https://github.com/elastic/apm-agent-rum-js/commit/db7df0a574eb18926e16721452600a36fece5026))
-
-
+**Note:** Version bump only for package @elastic/apm-rum-vue
 
 
 
