@@ -23,10 +23,7 @@
  *
  */
 
-import {
-  observePageVisibility,
-  unobservePageVisibility
-} from '../../src/common/page-visibility'
+import { observePageVisibility } from '../../src/common/page-visibility'
 import { createServiceFactory } from '../../src'
 import { state, initializeState } from '../../src/state'
 import {
@@ -41,6 +38,7 @@ describe('observePageVisibility', () => {
   let serviceFactory
   let configService
   let transactionService
+  let unobservePageVisibility
 
   function hidePageSynthetically(eventName) {
     if (eventName === 'visibilitychange') {
@@ -92,7 +90,10 @@ describe('observePageVisibility', () => {
     const anyTime = 1234567810
     state.lastHiddenStart = anyTime
 
-    observePageVisibility(configService, transactionService)
+    unobservePageVisibility = observePageVisibility(
+      configService,
+      transactionService
+    )
 
     expect(state.lastHiddenStart).toBe(0)
   })
@@ -102,7 +103,10 @@ describe('observePageVisibility', () => {
     // Set an arbitrary value
     state.lastHiddenStart = anyTime
 
-    observePageVisibility(configService, transactionService)
+    unobservePageVisibility = observePageVisibility(
+      configService,
+      transactionService
+    )
 
     expect(state.lastHiddenStart).toBe(anyTime)
   })
@@ -114,7 +118,10 @@ describe('observePageVisibility', () => {
         it('should dispatch the QUEUE_FLUSH event', () => {
           const dispatchEventSpy = spyOn(configService, 'dispatchEvent')
 
-          observePageVisibility(configService, transactionService)
+          unobservePageVisibility = observePageVisibility(
+            configService,
+            transactionService
+          )
           hidePageSynthetically(eventName)
 
           expect(dispatchEventSpy).toHaveBeenCalledTimes(1)
@@ -125,7 +132,10 @@ describe('observePageVisibility', () => {
           const anyTime = 1234567834
           spyOnFunction(utils, 'now').and.returnValue(anyTime)
 
-          observePageVisibility(configService, transactionService)
+          unobservePageVisibility = observePageVisibility(
+            configService,
+            transactionService
+          )
           hidePageSynthetically(eventName)
 
           expect(state.lastHiddenStart).toBe(anyTime)
@@ -162,7 +172,10 @@ describe('observePageVisibility', () => {
             transaction
           )
 
-          observePageVisibility(configService, transactionService)
+          unobservePageVisibility = observePageVisibility(
+            configService,
+            transactionService
+          )
           hidePageSynthetically(eventName)
 
           expect(endTransactionSpy).toHaveBeenCalledTimes(1)
@@ -182,7 +195,10 @@ describe('observePageVisibility', () => {
           startsPerformanceMonitoring()
 
           // Act
-          observePageVisibility(configService, transactionService)
+          unobservePageVisibility = observePageVisibility(
+            configService,
+            transactionService
+          )
           hidePageSynthetically(eventName)
           await waitFor(() => dispatchEventSpy.calls.any())
 
@@ -210,7 +226,10 @@ describe('observePageVisibility', () => {
           startsPerformanceMonitoring()
 
           // Act
-          observePageVisibility(configService, transactionService)
+          unobservePageVisibility = observePageVisibility(
+            configService,
+            transactionService
+          )
           hidePageSynthetically(eventName)
           await waitFor(() => dispatchEventSpy.calls.any())
 
@@ -234,7 +253,10 @@ describe('observePageVisibility', () => {
           startsPerformanceMonitoring()
 
           // Act
-          observePageVisibility(configService, transactionService)
+          unobservePageVisibility = observePageVisibility(
+            configService,
+            transactionService
+          )
           hidePageSynthetically(eventName)
           await waitFor(() => dispatchEventSpy.calls.any())
 
@@ -249,7 +271,10 @@ describe('observePageVisibility', () => {
     it('should not dispatch the QUEUE_FLUSH event', () => {
       const dispatchEventSpy = spyOn(configService, 'dispatchEvent')
 
-      observePageVisibility(configService, transactionService)
+      unobservePageVisibility = observePageVisibility(
+        configService,
+        transactionService
+      )
       dispatchBrowserEvent('visibilitychange')
 
       expect(dispatchEventSpy).toHaveBeenCalledTimes(0)
@@ -259,7 +284,10 @@ describe('observePageVisibility', () => {
       const anyTime = 1234567834
       spyOnFunction(utils, 'now').and.returnValue(anyTime)
 
-      observePageVisibility(configService, transactionService)
+      unobservePageVisibility = observePageVisibility(
+        configService,
+        transactionService
+      )
 
       state.lastHiddenStart = 111
       dispatchBrowserEvent('visibilitychange')

@@ -30,7 +30,8 @@ import {
   CONFIG_SERVICE,
   LOGGING_SERVICE,
   TRANSACTION_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  observePageVisibility
 } from '@elastic/apm-rum-core'
 
 export default class ApmBase {
@@ -52,9 +53,14 @@ export default class ApmBase {
   init(config) {
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
-      const [configService, loggingService] = this.serviceFactory.getService([
+      const [
+        configService,
+        loggingService,
+        transactionService
+      ] = this.serviceFactory.getService([
         CONFIG_SERVICE,
-        LOGGING_SERVICE
+        LOGGING_SERVICE,
+        TRANSACTION_SERVICE
       ])
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
@@ -108,6 +114,8 @@ export default class ApmBase {
         } else {
           sendPageLoad()
         }
+
+        observePageVisibility(configService, transactionService)
       } else {
         this._disable = true
         loggingService.warn('RUM agent is inactive')

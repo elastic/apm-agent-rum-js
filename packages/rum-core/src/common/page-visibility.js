@@ -51,24 +51,25 @@ export function observePageVisibility(configService, transactionService) {
   // so adding listeners there helps ensure they run before other code can cancel them.
   // More info: https://developers.google.com/web/updates/2018/07/page-lifecycle-api
 
-  window.addEventListener('visibilitychange', visibilityChangeHandler, {
-    capture: true
-  })
+  const useCapture = true
+  window.addEventListener(
+    'visibilitychange',
+    visibilityChangeHandler,
+    useCapture
+  )
 
   // Safari 13 does not trigger visibilityChange event when reloading page
   // due to that fact pagehide listener is also added
-  window.addEventListener('pagehide', pageHideHandler, {
-    capture: true
-  })
-}
+  window.addEventListener('pagehide', pageHideHandler, useCapture)
 
-export function unobservePageVisibility() {
-  window.removeEventListener('visibilitychange', visibilityChangeHandler, {
-    capture: true
-  })
-  window.removeEventListener('pagehide', pageHideHandler, {
-    capture: true
-  })
+  return () => {
+    window.removeEventListener(
+      'visibilitychange',
+      visibilityChangeHandler,
+      useCapture
+    )
+    window.removeEventListener('pagehide', pageHideHandler, useCapture)
+  }
 }
 
 /**

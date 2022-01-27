@@ -25,14 +25,12 @@
 
 import { isPlatformSupported, isBrowser, now } from './common/utils'
 import { patchAll } from './common/patching'
-import { observePageVisibility } from './common/page-visibility'
 import { state } from './state'
 
 let enabled = false
-export function bootstrap(configService, transactionService) {
+export function bootstrap() {
   if (isPlatformSupported()) {
     patchAll()
-    observePageVisibility(configService, transactionService)
     state.bootstrapTime = now()
     enabled = true
   } else if (isBrowser) {

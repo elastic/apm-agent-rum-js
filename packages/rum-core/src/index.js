@@ -35,6 +35,7 @@ import {
   isBrowser
 } from './common/utils'
 import { patchAll, patchEventHandler } from './common/patching'
+import { observePageVisibility } from './common/page-visibility'
 import {
   PAGE_LOAD,
   ERROR,
@@ -73,5 +74,6 @@ export {
   LOGGING_SERVICE,
   TRANSACTION_SERVICE,
   APM_SERVER,
-  bootstrap
+  bootstrap,
+  observePageVisibility
 }

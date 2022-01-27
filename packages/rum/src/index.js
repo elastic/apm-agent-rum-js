@@ -26,9 +26,7 @@
 import {
   createServiceFactory,
   bootstrap,
-  isBrowser,
-  CONFIG_SERVICE,
-  TRANSACTION_SERVICE
+  isBrowser
 } from '@elastic/apm-rum-core'
 import ApmBase from './apm-base'
 
@@ -40,13 +38,8 @@ function getApmBase() {
   if (isBrowser && window.elasticApm) {
     return window.elasticApm
   }
+  const enabled = bootstrap()
   const serviceFactory = createServiceFactory()
-  const [configService, transactionService] = serviceFactory.getService([
-    CONFIG_SERVICE,
-    TRANSACTION_SERVICE
-  ])
-
-  const enabled = bootstrap(configService, transactionService)
   const apmBase = new ApmBase(serviceFactory, !enabled)
 
   if (isBrowser) {

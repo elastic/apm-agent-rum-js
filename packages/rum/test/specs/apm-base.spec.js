@@ -28,29 +28,18 @@ import {
   createServiceFactory,
   bootstrap,
   PAGE_LOAD,
-  TRANSACTION_SERVICE,
-  CONFIG_SERVICE
+  TRANSACTION_SERVICE
 } from '@elastic/apm-rum-core'
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import Promise from 'promise-polyfill'
 
+var enabled = bootstrap()
+const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
+
 describe('ApmBase', function () {
-  let enabled
-  let serviceName
-  let serverUrl
   let serviceFactory
   let apmBase
-
-  beforeAll(() => {
-    serviceFactory = createServiceFactory()
-    enabled = bootstrap(
-      ...serviceFactory.getService([CONFIG_SERVICE, TRANSACTION_SERVICE])
-    )
-    const config = getGlobalConfig('rum').agentConfig
-    serviceName = config.serviceName
-    serverUrl = config.serverUrl
-  })
 
   beforeEach(function () {
     serviceFactory = createServiceFactory()

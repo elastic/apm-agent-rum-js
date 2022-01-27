@@ -311,7 +311,7 @@ export class PerfEntryRecorder {
       observe: noop,
       disconnect: noop
     }
-    if (typeof window !== 'undefined' && window.PerformanceObserver) {
+    if (window.PerformanceObserver) {
       this.po = new PerformanceObserver(callback)
     }
   }

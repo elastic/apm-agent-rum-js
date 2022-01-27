@@ -25,24 +25,11 @@
 
 import { bootstrap } from '../src/bootstrap'
 import * as patcher from '../src/common/patching'
-import * as pageVisibility from '../src/common/page-visibility'
 import * as utils from '../src/common/utils'
 import { initializeState, state } from '../src/state'
-import { createServiceFactory } from '../src'
-import { TRANSACTION_SERVICE, CONFIG_SERVICE } from '../src/common/constants'
 import { spyOnFunction } from '../../../dev-utils/jasmine'
 
 describe('bootstrap', function () {
-  let serviceFactory
-  let configService
-  let transactionService
-
-  beforeEach(() => {
-    serviceFactory = createServiceFactory()
-    configService = serviceFactory.getService(CONFIG_SERVICE)
-    transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
-  })
-
   describe('on unsupported environments', () => {
     let nowFn
 
@@ -57,7 +44,8 @@ describe('bootstrap', function () {
 
     it('should log warning', () => {
       spyOn(console, 'log')
-      bootstrap(configService, transactionService)
+
+      bootstrap()
 
       expect(console.log).toHaveBeenCalledWith(
         '[Elastic APM] platform is not supported!'
@@ -65,7 +53,7 @@ describe('bootstrap', function () {
     })
 
     it('should return false', () => {
-      expect(bootstrap(configService, transactionService)).toBe(false)
+      expect(bootstrap()).toBe(false)
     })
   })
 
@@ -74,37 +62,26 @@ describe('bootstrap', function () {
       // Since the flow of bootstrap mutates the global state
       // it should be restored
       initializeState()
-      // Remove the added listener when bootstraping since window object is shared among all tests
-      pageVisibility.unobservePageVisibility()
     })
 
     it('should return true', () => {
-      expect(bootstrap(configService, transactionService)).toBe(true)
+      expect(bootstrap()).toBe(true)
     })
 
     it('should call patchAll', () => {
       const patchAllSpy = spyOnFunction(patcher, 'patchAll')
-      console.log(patchAllSpy)
 
-      bootstrap(configService, transactionService)
+      bootstrap()
 
       expect(patchAllSpy).toHaveBeenCalledTimes(1)
-    })
-
-    it('should call observePageVisibility', () => {
-      const observeSpy = spyOnFunction(pageVisibility, 'observePageVisibility')
-
-      bootstrap(configService, transactionService)
-
-      expect(observeSpy).toHaveBeenCalledTimes(1)
-      expect(observeSpy).toHaveBeenCalledWith(configService, transactionService)
     })
 
     it('should set a bootstrap time', () => {
       const anyTime = 123456789
       spyOnFunction(utils, 'now').and.returnValue(anyTime)
 
-      bootstrap(configService, transactionService)
+      bootstrap()
+
       expect(state.bootstrapTime).toBe(anyTime)
     })
   })
