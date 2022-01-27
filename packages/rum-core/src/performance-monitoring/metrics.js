@@ -40,7 +40,12 @@ export const metrics = {
     start: Infinity,
     duration: 0
   },
-  cls: 0,
+  cls: {
+    score: 0,
+    firstEntryTime: Number.NEGATIVE_INFINITY,
+    prevEntryTime: Number.NEGATIVE_INFINITY,
+    currentSessionScore: 0
+  },
   longtask: {
     count: 0,
     duration: 0,
@@ -174,16 +179,30 @@ export function calculateTotalBlockingTime(longtaskEntries) {
 }
 
 /**
- * Calculates Cumulative Layout Shift using
+ * Calculates Cumulative Layout Shift through the max-session-gap1s-limit5s technique using
  * 'layout-shift' entries captured through PerformanceObserver.
  * https://developer.mozilla.org/en-US/docs/Web/API/LayoutShift
- * https://web.dev/cls/
+ * https://web.dev/evolving-cls/
+ *
  */
 export function calculateCumulativeLayoutShift(clsEntries) {
   clsEntries.forEach(entry => {
     // Only add the layout shift events without recent user input
     if (!entry.hadRecentInput && entry.value) {
-      metrics.cls += entry.value
+      const shouldCreateNewSession =
+        entry.startTime - metrics.cls.firstEntryTime > 5000 ||
+        entry.startTime - metrics.cls.prevEntryTime > 1000
+      if (shouldCreateNewSession) {
+        metrics.cls.firstEntryTime = entry.startTime
+        metrics.cls.currentSessionScore = 0
+      }
+
+      metrics.cls.prevEntryTime = entry.startTime
+      metrics.cls.currentSessionScore += entry.value
+      metrics.cls.score = Math.max(
+        metrics.cls.score,
+        metrics.cls.currentSessionScore
+      )
     }
   })
 }

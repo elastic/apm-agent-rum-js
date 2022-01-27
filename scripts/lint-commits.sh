@@ -6,10 +6,10 @@ if [[ -n "${JENKINS_URL}" ]]; then
   export PATH=$(npm bin):${PATH}
   export HOME=$(pwd)
   if [[ -z "${CHANGE_ID}" ]]; then
-    # If on master, just test the latest commit
+    # If on main, just test the latest commit
     commitlint --from="${GIT_SHA}~1"
   else
-    # If on a branch, test all commits between this branch and master
+    # If on a branch, test all commits between this branch and main
     commitlint --from="origin/${CHANGE_TARGET}" --to="${GIT_BASE_COMMIT}"
 
     # Lint PR title

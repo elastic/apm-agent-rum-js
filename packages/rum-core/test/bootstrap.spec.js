@@ -24,6 +24,8 @@
  */
 
 import { bootstrap } from '../src/bootstrap'
+import * as patcher from '../src/common/patching'
+import { spyOnFunction } from '../../../dev-utils/jasmine'
 
 describe('bootstrap', function () {
   it('should log warning on unsupported environments', () => {
@@ -38,5 +40,13 @@ describe('bootstrap', function () {
       '[Elastic APM] platform is not supported!'
     )
     window.performance.now = nowFn
+  })
+
+  it('should call patchAll', () => {
+    const patchAllSpy = spyOnFunction(patcher, 'patchAll')
+
+    bootstrap()
+
+    expect(patchAllSpy).toHaveBeenCalledTimes(1)
   })
 })

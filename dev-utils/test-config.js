@@ -66,62 +66,115 @@ function getGlobalConfig(packageName = 'rum') {
  *
  * The list below is based purely on the market share distribution.
  */
-function getBrowserList() {
+function getDefaultBrowsers() {
   return [
     {
       browserName: 'chrome',
-      version: '49',
-      extendedDebugging: true
+      browserVersion: '76'
     },
     {
       browserName: 'chrome',
-      version: '76'
+      browserVersion: '84'
     },
     {
       browserName: 'chrome',
-      version: '84'
+      browserVersion: 'latest'
     },
     {
       browserName: 'firefox',
-      version: '52'
+      browserVersion: '60'
     },
     {
       browserName: 'safari',
-      platform: 'OS X 10.11',
-      version: '9.0'
+      platformName: 'macOS 10.15',
+      browserVersion: '13'
     },
     {
       browserName: 'internet explorer',
-      platform: 'Windows 8.1',
-      version: '11'
+      platformName: 'Windows 8.1',
+      browserVersion: '11'
     },
     {
-      browserName: 'microsoftedge',
-      platform: 'Windows 10',
-      version: '17'
+      browserName: 'MicrosoftEdge',
+      platformName: 'Windows 10',
+      browserVersion: '17'
+    }
+  ]
+}
+
+/**
+ * It returns the appium configuration compatible with karma-sauce-launcher
+ */
+function getAppiumBrowsersForKarma() {
+  return [
+    {
+      platformName: 'Android',
+      browserName: 'Browser',
+      appiumVersion: '1.20.2',
+      deviceName: 'Android Emulator',
+      platformVersion: '5.1'
     },
     {
-      appiumVersion: '1.9.1',
-      deviceName: 'android emulator',
-      browserName: 'browser',
-      platformVersion: '5.1',
-      platformName: 'android'
-    },
-    {
+      platformName: 'iOS',
+      browserName: 'safari',
       appiumVersion: '1.13.0',
       deviceName: 'iPhone Simulator',
       deviceOrientation: 'portrait',
-      platformVersion: '12.2',
-      platformName: 'iOS',
-      browserName: 'Safari'
+      platformVersion: '12.2'
     }
-  ].map(c => ({
-    ...c,
-    loggingPrefs: {
-      browser: 'INFO'
-    }
-  }))
+  ]
 }
+
+/**
+ * It returns the appium configuration compatible with @wdio/sauce-service
+ */
+function getAppiumBrowsersForWebdriver() {
+  return [
+    {
+      platformName: 'Android',
+      browserName: 'Browser',
+      'appium:deviceName': 'Android Emulator',
+      'appium:platformVersion': '5.1',
+      'sauce:options': {
+        appiumVersion: '1.20.2'
+      }
+    },
+    {
+      platformName: 'iOS',
+      browserName: 'Safari',
+      'appium:deviceName': 'iPad Simulator',
+      'appium:platformVersion': '12.2',
+      'sauce:options': {
+        appiumVersion: '1.13.0',
+        deviceOrientation: 'portrait'
+      }
+    }
+  ]
+}
+
+function getBrowserList(pkg = 'default') {
+  let browsers = []
+  if (pkg === 'default') {
+    browsers = getDefaultBrowsers()
+  } else if (pkg === 'vue') {
+    // Vue 3 dropped support for IE 11 and older browsers,
+    // so we use modern browsers ro run the tests
+    browsers = [
+      {
+        browserName: 'chrome',
+        browserVersion: 'latest'
+      },
+      {
+        browserName: 'firefox',
+        browserVersion: 'latest',
+        platformName: 'Windows 10'
+      }
+    ]
+  }
+
+  return browsers
+}
+
 function parseVersion(version) {
   const parts = version.split('.')
   return {
@@ -153,6 +206,8 @@ module.exports = {
   getTestEnvironmentVariables,
   getGlobalConfig,
   getBrowserList,
+  getAppiumBrowsersForKarma,
+  getAppiumBrowsersForWebdriver,
   parseVersion,
   isVersionInRange,
   DEFAULT_APM_SERVER_URL

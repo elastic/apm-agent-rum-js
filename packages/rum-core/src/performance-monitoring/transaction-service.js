@@ -295,7 +295,7 @@ class TransactionService {
             }
 
             if (isPerfTypeSupported(LAYOUT_SHIFT)) {
-              tr.experience.cls = cls
+              tr.experience.cls = cls.score
             }
 
             if (fid > 0) {

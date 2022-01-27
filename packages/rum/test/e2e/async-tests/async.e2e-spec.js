@@ -23,8 +23,6 @@
  *
  */
 
-const { getBrowserInfo } = require('../../../../../dev-utils/webdriver')
-
 describe('async-tests', function () {
   it('should run the usecase', function () {
     browser.url('/test/e2e/async-tests/async-e2e.html')
@@ -50,14 +48,13 @@ describe('async-tests', function () {
      * Check for all types of spans that would be captured by
      * loading script async
      */
-    const spanTypes = ['hard-navigation', 'external']
-    /**
-     * Safari does not support Resource & User Timing API
-     */
-    const { name } = getBrowserInfo()
-    if (name.indexOf('safari') === -1) {
-      spanTypes.push('resource', 'app')
-    }
+    const spanTypes = [
+      'hard-navigation',
+      'external',
+      'longtask',
+      'app',
+      'resource'
+    ]
 
     const captured = transactionPayload.spans.every(({ type }) => {
       return spanTypes.indexOf(type) !== -1

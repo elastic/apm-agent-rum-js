@@ -23,8 +23,7 @@
  *
  */
 
-import Vue from 'vue'
-import { mount } from '@vue/test-utils'
+import { mount, config } from '@vue/test-utils'
 import { ApmBase } from '@elastic/apm-rum'
 import { createServiceFactory } from '@elastic/apm-rum-core'
 import { getErrorHandler } from '../../src/error-handler'
@@ -38,8 +37,13 @@ describe('Error handler', () => {
      */
     spyOn(window.console, 'error')
 
-    const original = Vue.config.errorHandler
-    Vue.config.errorHandler = getErrorHandler(Vue, apm)
+    const mockApp = {
+      config: {
+        errorHandler: config.global.config.errorHandler
+      }
+    }
+
+    config.global.config.errorHandler = getErrorHandler(mockApp, apm)
 
     const ErrorComponent = {
       name: 'Error',
@@ -59,8 +63,8 @@ describe('Error handler', () => {
 
     const wrapper = mount(ErrorComponent)
 
-    Vue.config.errorHandler = original
+    config.global.config.errorHandler = mockApp.config.errorHandler
 
-    wrapper.destroy()
+    wrapper.unmount()
   })
 })

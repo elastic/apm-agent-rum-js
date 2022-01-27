@@ -11,11 +11,10 @@ pipeline {
     JOB_GCS_BUCKET = credentials('gcs-bucket')
     PIPELINE_LOG_LEVEL = 'INFO'
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
-    SAUCELABS_SECRET_CORE = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum-core'
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
     DOCKER_ELASTIC_SECRET = 'secret/apm-team/ci/docker-registry/prod'
     GITHUB_CHECK_ITS_NAME = 'Integration Tests'
-    ITS_PIPELINE = 'apm-integration-tests-selector-mbp/master'
+    ITS_PIPELINE = 'apm-integration-tests-selector-mbp/main'
     OPBEANS_REPO = 'opbeans-frontend'
     NPMRC_SECRET = 'secret/jenkins-ci/npmjs/elasticmachine'
     TOTP_SECRET = 'totp/code/npmjs-elasticmachine'
@@ -37,11 +36,11 @@ pipeline {
     issueCommentTrigger("(${obltGitHubComments()}|^run benchmark tests)")
   }
   parameters {
-    booleanParam(name: 'Run_As_Master_Branch', defaultValue: false, description: 'Allow to run any steps on a PR, some steps normally only run on master branch.')
+    booleanParam(name: 'Run_As_Main_Branch', defaultValue: false, description: 'Allow to run any steps on a PR, some steps normally only run on main branch.')
     booleanParam(name: 'saucelab_test', defaultValue: "true", description: "Enable run a Sauce lab test")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
-    booleanParam(name: 'release', defaultValue: false, description: 'Release. If so, all the other parameters will be ignored when releasing from master.')
-    string(name: 'stack_version', defaultValue: '7.16.0', description: "What's the Stack Version to be used for the load testing?")
+    booleanParam(name: 'release', defaultValue: false, description: 'Release. If so, all the other parameters will be ignored when releasing from main.')
+    string(name: 'stack_version', defaultValue: '7.16.3', description: "What's the Stack Version to be used for the load testing?")
   }
   stages {
     stage('Initializing'){
@@ -87,7 +86,7 @@ pipeline {
               deleteDir()
               unstash 'source'
               script{
-                docker.image('node:10').inside(){
+                docker.image('node:12').inside(){
                   dir("${BASE_DIR}"){
                     sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
                     bundlesize()
@@ -102,7 +101,7 @@ pipeline {
             }
           }
         }
-        stage('Test Pupperteer') {
+        stage('Test Puppeteer') {
           when {
             beforeAgent true
             expression { return env.ONLY_DOCS == "false" }
@@ -145,21 +144,20 @@ pipeline {
         stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
           agent { label 'linux && immutable' }
           environment {
-            SAUCELABS_SECRET = "${isPR() ? env.SAUCELABS_SECRET : env.SAUCELABS_SECRET_CORE}"
             MODE = "saucelabs"
           }
           when {
             allOf {
               anyOf {
-                branch 'master'
+                branch 'main'
                 changeRequest()
               }
               expression { return params.saucelab_test }
               expression { return env.ONLY_DOCS == "false" }
-              // Releases from master should skip this particular stage.
+              // Releases from main should skip this particular stage.
               not {
                 allOf {
-                  branch 'master'
+                  branch 'main'
                   expression { return params.release }
                 }
               }
@@ -181,7 +179,7 @@ pipeline {
             allOf {
               anyOf {
                 changeRequest()
-                expression { return !params.Run_As_Master_Branch }
+                expression { return !params.Run_As_Main_Branch }
               }
               expression { return env.ONLY_DOCS == "false" }
             }
@@ -204,18 +202,18 @@ pipeline {
             beforeAgent true
             allOf {
               anyOf {
-                branch 'master'
+                branch 'main'
                 tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
-                expression { return params.Run_As_Master_Branch }
+                expression { return params.Run_As_Main_Branch }
                 expression { return env.BENCHMARK_UPDATED != "false" }
                 expression { return env.GITHUB_COMMENT?.contains('benchmark tests') }
               }
               expression { return params.bench_ci }
               expression { return env.ONLY_DOCS == "false" }
-              // Releases from master should skip this particular stage.
+              // Releases from main should skip this particular stage.
               not {
                 allOf {
-                  branch 'master'
+                  branch 'main'
                   expression { return params.release }
                 }
               }
@@ -324,7 +322,7 @@ pipeline {
           when {
             beforeAgent true
             allOf {
-              branch 'master'
+              branch 'main'
               expression { return params.release }
             }
           }
@@ -401,12 +399,13 @@ pipeline {
           steps {
             deleteDir()
             dir("${OPBEANS_REPO}"){
-              git credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
-                  url: "git@github.com:elastic/${OPBEANS_REPO}.git"
+              git(credentialsId: 'f6c7695a-671e-4f4f-a331-acdce44ff9ba',
+                  url: "git@github.com:elastic/${OPBEANS_REPO}.git",
+                  branch: 'main')
               sh script: ".ci/bump-version.sh '${env.BRANCH_NAME}'", label: 'Bump version'
-              // The opbeans pipeline will trigger a release for the master branch
+              // The opbeans pipeline will trigger a release for the main branch.
               gitPush()
-              // The opbeans pipeline will trigger a release for the release tag
+              // The opbeans pipeline will trigger a release for the release tag.
               gitCreateTag(tag: "${env.BRANCH_NAME}")
             }
           }

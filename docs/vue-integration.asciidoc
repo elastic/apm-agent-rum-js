@@ -3,6 +3,15 @@
 
 This document covers how to use Real User Monitoring JavaScript agent with Vue applications.
 
+[[vue-supported-versions]]
+==== Supported versions
+
+This integration supports Vue.js versions ≥ 3.0
+
+
+NOTE: If you are using an Vuejs version < 3.0, use @elastic/apm-rum-vue 1.x to instrument your application. Details are available in a https://www.elastic.co/guide/en/apm/agent/rum-js/4.x/vue-integration.html[prior release].
+
+
 [[installing-vue-integration]]
 ==== Installing Elastic APM Vue package
 
@@ -17,7 +26,7 @@ npm install --save @elastic/apm-rum-vue
 ==== Using APM Plugin
 [source,js]
 ----
-Vue.use(ApmVuePlugin, options)
+app.use(ApmVuePlugin, options)
 ----
 
 ===== Options
@@ -35,30 +44,33 @@ The package exposes `ApmVuePlugin` which is a Vue Plugin and can be installed in
 
 [source,js]
 ----
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import { createApp, defineComponent, h } from 'vue'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { ApmVuePlugin } from '@elastic/apm-rum-vue'
+import App from './App.vue'
 
-const Home = { template: '<div>home</div>' }
+const Home = defineComponent({
+  render: () => h("div", {}, "home")
+})
 
-Vue.use(VueRouter)
-
-const router = VueRouter({
-  mode: 'history',
+const router = createRouter({
+  history: createWebHashHistory(),
   routes: [
     { path: '/', component: Home }
   ]
 })
 
-Vue.use(ApmVuePlugin, {
-  router,
-  config: {
-    serviceName: 'app-name',
-    // agent configuration
-  }
-})
-
-// app specific code
+createApp(App)
+  .use(router)
+  .use(ApmVuePlugin, {
+    router,
+    config: {
+      serviceName: 'app-name',
+      // agent configuration
+    }
+  })
+  // app specific code
+  .mount('#app')
 ----
 
 
@@ -92,7 +104,7 @@ export default {
 
 
 `ApmVuePlugin` expects the router option to be an instance of VueRouter since it uses the 
-navigation guards functionality.
+https://next.router.vuejs.org/guide/advanced/navigation-guards.html[navigation guards] functionality.
 
 Once the plugin is initialized, both page load and SPA navigation events will be captured
 as transactions with the `path` of the route as its name and `page-load` or `route-change` as type.

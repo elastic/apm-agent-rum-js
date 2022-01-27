@@ -23,23 +23,9 @@
  *
  */
 
-const { baseConfig, prepareConfig } = require('../../dev-utils/karma')
-const { getBrowserList } = require('../../dev-utils/test-config')
-const {
-  getWebpackConfig,
-  PACKAGE_TYPES,
-  BUNDLE_TYPES
-} = require('../../dev-utils/build')
-
-module.exports = function (config) {
-  config.set(baseConfig)
-  config.set({
-    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.VUE),
-    customLaunchers: getBrowserList('vue').map(launcher => ({
-      ...launcher,
-      base: 'SauceLabs'
-    }))
-  })
-  const preparedConfig = prepareConfig(config, 'rum-vue')
-  config.set(preparedConfig)
-}
+;(function (defineProperty) {
+  Object.defineProperty = function (obj, prop, desc) {
+    desc.configurable = true
+    return defineProperty.call(obj, obj, prop, desc)
+  }
+})(Object.defineProperty)

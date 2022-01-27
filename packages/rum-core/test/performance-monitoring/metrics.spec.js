@@ -51,7 +51,12 @@ describe('Metrics', () => {
       list.getEntriesByType.and.returnValue([])
       list.getEntriesByName.and.returnValue([])
       metrics.tbt = { start: Infinity, duration: 0 }
-      metrics.cls = 0
+      metrics.cls = {
+        score: 0,
+        firstEntryTime: Number.NEGATIVE_INFINITY,
+        prevEntryTime: Number.NEGATIVE_INFINITY,
+        currentSessionScore: 0
+      }
       metrics.fid = 0
       metrics.longtask = {
         count: 0,
@@ -292,46 +297,173 @@ describe('Metrics', () => {
       })
     })
 
-    it('should calculate Cumulative Layout Shift', () => {
-      calculateCumulativeLayoutShift([
-        {
-          duration: 0,
-          entryType: 'layout-shift',
-          hadRecentInput: true,
-          lastInputTime: 28846.710000012536,
-          name: '',
-          startTime: 28932.589999982156,
-          value: 0.04
-        },
-        {
-          duration: 0,
-          entryType: 'layout-shift',
-          hadRecentInput: false,
-          lastInputTime: 28846.710000012536,
-          name: '',
-          startTime: 28932.589999982156,
-          value: 0.02
-        },
-        {
-          duration: 0,
-          entryType: 'layout-shift',
-          hadRecentInput: false,
-          lastInputTime: 28846.710000012536,
-          name: '',
-          startTime: 28932.589999982156,
-          value: 0.03
-        },
-        {
-          duration: 0,
-          entryType: 'layout-shift',
-          hadRecentInput: false,
-          lastInputTime: 28846.710000012536,
-          name: '',
-          startTime: 28932.589999982156,
-          value: 0.01
-        }
-      ])
-      expect(metrics.cls.toFixed(3)).toEqual('0.060')
+    describe('Cumulative Layout Shift', () => {
+      it('should calculate cls of one session window', () => {
+        calculateCumulativeLayoutShift([
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 1500.589999982156,
+            value: 0.01
+          },
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 2300.589999982156,
+            value: 0.03
+          }
+        ])
+
+        expect(metrics.cls.score.toFixed(3)).toEqual('0.040')
+      })
+
+      it('should calculate cls considering the extra session window created because of the one second gap between events', () => {
+        calculateCumulativeLayoutShift([
+          // First session start here
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 1000.589999982156,
+            value: 0.04
+          },
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 1500.589999982156,
+            value: 0.01
+          },
+          // Second session starts here given there is a gap of more than 1 second between layout shift events
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 3005.589999982156,
+            value: 0.01
+          },
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 3900.589999982156,
+            value: 0.02
+          }
+        ])
+
+        expect(metrics.cls.score.toFixed(3)).toEqual('0.050')
+      })
+
+      it('should calculate cls considering the extra session window created since the first one lasted more than 5 seconds', () => {
+        calculateCumulativeLayoutShift([
+          // First session start here
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 800.589999982156,
+            value: 0.04
+          },
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 1750.589999982156,
+            value: 0.01
+          },
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 2600.589999982156,
+            value: 0.04
+          },
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 3550.589999982156,
+            value: 0.02
+          },
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 4500.589999982156,
+            value: 0.02
+          },
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 5300.589999982156,
+            value: 0.01
+          },
+          // Second session starts because more than 5 seconds have passed since the beginning of the first session
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 5900.589999982156,
+            value: 0.34
+          }
+        ])
+
+        expect(metrics.cls.score.toFixed(3)).toEqual('0.340')
+      })
+
+      it('should calculate cls without considering layout shift events with recent user input', () => {
+        calculateCumulativeLayoutShift([
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: true,
+            lastInputTime: 0,
+            name: '',
+            startTime: 1500.589999982156,
+            value: 0.12
+          },
+          {
+            duration: 0,
+            entryType: 'layout-shift',
+            hadRecentInput: false,
+            lastInputTime: 0,
+            name: '',
+            startTime: 2300.589999982156,
+            value: 0.14
+          }
+        ])
+
+        expect(metrics.cls.score.toFixed(3)).toEqual('0.140')
+      })
     })
 
     it('should aggregate longtasks in metrics', () => {

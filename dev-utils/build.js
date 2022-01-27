@@ -24,9 +24,9 @@
  */
 
 const { join } = require('path')
-const { EnvironmentPlugin, ProvidePlugin } = require('webpack')
+const { DefinePlugin, EnvironmentPlugin, ProvidePlugin } = require('webpack')
 const TerserPlugin = require('terser-webpack-plugin')
-const VuePlugin = require('vue-loader/lib/plugin')
+const { VueLoaderPlugin } = require('vue-loader')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const { getTestEnvironmentVariables } = require('./test-config')
 
@@ -55,6 +55,11 @@ const PACKAGE_TYPES = {
   ANGULAR: 'ANGULAR',
   VUE: 'VUE'
 }
+
+// We must exclude `parse5` from the packages we ignore
+// because otherwise it would not be transpiled. Therefore,
+// it would break IE11.
+const babelExclusionRule = /node_modules\/(?!parse5).+/
 
 function getBabelPresetEnv(bundleType) {
   const isBrowser = [
@@ -152,7 +157,7 @@ function getBabelConfig(bundleType, packageType) {
   let options = {
     comments: false,
     babelrc: false,
-    exclude: '/**/node_modules/**',
+    exclude: babelExclusionRule,
     presets: getBabelPresetEnv(bundleType),
     plugins: []
   }
@@ -202,7 +207,7 @@ function getCommonWebpackConfig(bundleType, packageType) {
       rules: [
         {
           test: /\.(js|jsx|ts)$/,
-          exclude: /node_modules/,
+          exclude: babelExclusionRule,
           loader: 'babel-loader',
           options: getBabelConfig(bundleType, packageType)
         }
@@ -253,9 +258,15 @@ function getWebpackConfig(bundleType, packageType) {
       test: /\.vue$/,
       use: 'vue-loader'
     })
-    config.plugins.push(new VuePlugin())
+    config.plugins.push(new VueLoaderPlugin())
+    config.plugins.push(
+      new DefinePlugin({
+        __VUE_OPTIONS_API__: true,
+        __VUE_PROD_DEVTOOLS__: false
+      })
+    )
     config.resolve.alias = {
-      vue$: 'vue/dist/vue.esm.js'
+      vue$: 'vue/dist/vue.esm-bundler.js'
     }
   }
   return config

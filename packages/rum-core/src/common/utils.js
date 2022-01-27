@@ -126,7 +126,7 @@ function getTSHeaderValue({ sampleRate }) {
   /**
    * We propagate the sampling decision through `es` tracestate key
    * tracestate: es=s:0.1
-   * https://github.com/elastic/apm/blob/master/specs/agents/tracing-distributed-tracing.md#tracestate
+   * https://github.com/elastic/apm/blob/main/specs/agents/tracing-distributed-tracing.md#tracestate
    */
   return `${NAMESPACE}${SEPARATOR}s:${sampleRate}`
 }

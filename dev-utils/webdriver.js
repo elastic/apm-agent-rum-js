@@ -28,8 +28,9 @@ const { join } = require('path')
 const glob = require('glob')
 const {
   getSauceConnectOptions,
+  getTestEnvironmentVariables,
   getBrowserList,
-  getTestEnvironmentVariables
+  getAppiumBrowsersForWebdriver
 } = require('./test-config')
 
 const logLevels = {
@@ -143,21 +144,23 @@ function getWebdriveBaseConfig(
   capabilities
 ) {
   const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
+  /**
+   * Skip the ios platform on E2E tests because of script
+   * timeout issue in Appium
+   */
+  const browsers = [...getBrowserList(), ...getAppiumBrowsersForWebdriver()]
+  capabilities = (capabilities || browsers)
+    .map(c => {
+      const sauceOptions = c['sauce:options'] || {}
+      sauceOptions.tunnelIdentifier = tunnelIdentifier
+      sauceOptions.seleniumVersion = '3.141.59'
 
-  if (!capabilities) {
-    /**
-     * Skip the ios platform on E2E tests because of script
-     * timeout issue in Appium
-     */
-    capabilities = getBrowserList().filter(
-      ({ platformName }) => platformName !== 'iOS'
-    )
-  }
-
-  capabilities = capabilities.map(capability => ({
-    tunnelIdentifier,
-    ...capability
-  }))
+      return {
+        ...c,
+        'sauce:options': sauceOptions
+      }
+    })
+    .filter(({ platformName }) => platformName !== 'iOS')
 
   const baseConfig = {
     runner: 'local',
@@ -175,7 +178,7 @@ function getWebdriveBaseConfig(
     waitforTimeout: 30000,
     framework: 'jasmine',
     reporters: ['dot', 'spec'],
-    jasmineNodeOpts: {
+    jasmineOpts: {
       defaultTimeoutInterval: 90000
     },
     async before() {
@@ -333,10 +336,10 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
 }
 
 function getBrowserInfo() {
-  const { version, browserName } = browser.capabilities
+  const { browserVersion, browserName } = browser.capabilities
   return {
     name: browserName.toLowerCase(),
-    version
+    version: browserVersion
   }
 }
 

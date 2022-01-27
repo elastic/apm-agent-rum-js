@@ -24,11 +24,11 @@
  */
 
 import { Router } from '@angular/router'
-import type { NavigationStart } from '@angular/router'
+import { NavigationStart } from '@angular/router'
 import { Inject, Injectable, NgZone } from '@angular/core'
 import { afterFrame } from '@elastic/apm-rum-core'
 import { ApmBase } from '@elastic/apm-rum'
-import type { AgentConfigOptions } from '@elastic/apm-rum'
+import { AgentConfigOptions } from '@elastic/apm-rum'
 import { APM } from './apm.module'
 
 @Injectable({

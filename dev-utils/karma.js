@@ -26,14 +26,11 @@
 const {
   getSauceConnectOptions,
   getBrowserList,
-  getGlobalConfig
+  getGlobalConfig,
+  getAppiumBrowsersForKarma
 } = require('./test-config')
 const { getWebpackConfig, BUNDLE_TYPES } = require('./build')
 
-const baseLaunchers = getBrowserList().map(launcher => ({
-  base: 'SauceLabs',
-  ...launcher
-}))
 /**
  * Polyfills file that are required for the browser tests
  *
@@ -45,11 +42,16 @@ const specPattern =
   'test/{*.spec.+(js|ts),!(e2e|integration|node|bundle|types)/*.spec.+(js|ts)}'
 const { tunnelIdentifier } = getSauceConnectOptions()
 
+// makes all object properties configurable by default
+// which in jasmine is essential to spy on functions exported from modules
+const objectConfigurable = '../../dev-utils/object-configurable.js'
+
 /**
  * Common base config for all the mono repo packages
  */
 const baseConfig = {
   files: [
+    objectConfigurable,
     polyfills,
     require.resolve('regenerator-runtime/runtime'),
     specPattern
@@ -81,7 +83,12 @@ const baseConfig = {
   },
   autoWatch: false,
   browserNoActivityTimeout: 120000,
-  customLaunchers: baseLaunchers,
+  customLaunchers: [...getBrowserList(), ...getAppiumBrowsersForKarma()].map(
+    launcher => ({
+      ...launcher,
+      base: 'SauceLabs'
+    })
+  ),
   browsers: [],
   captureTimeout: 120000, // on saucelabs it takes some time to capture browser
   reporters: ['spec', 'failed'],
@@ -92,7 +99,6 @@ const baseConfig = {
     recordScreenshots: true,
     tunnelIdentifier,
     options: {
-      seleniumVersion: '2.48.2',
       commandTimeout: 600,
       idleTimeout: 600,
       maxDuration: 5400
@@ -174,7 +180,7 @@ function prepareConfig(config, packageName) {
     console.log('saucelabs.build:', buildId)
     if (isJenkins) {
       config.sauceLabs.tags = [testConfig.branch, process.env.STACK_VERSION]
-    } else if (testConfig.branch === 'master') {
+    } else if (testConfig.branch === 'main') {
       config.sauceLabs.tags = [testConfig.branch]
     }
     config.reporters.push('dots', 'saucelabs')
@@ -187,6 +193,5 @@ function prepareConfig(config, packageName) {
 
 module.exports = {
   prepareConfig,
-  baseConfig,
-  baseLaunchers
+  baseConfig
 }
