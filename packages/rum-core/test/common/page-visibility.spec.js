@@ -25,7 +25,7 @@
 
 import { observePageVisibility } from '../../src/common/page-visibility'
 import { createServiceFactory } from '../../src'
-import { state, initializeState } from '../../src/state'
+import { state } from '../../src/state'
 import {
   QUEUE_FLUSH,
   TRANSACTION_SERVICE,
@@ -39,6 +39,7 @@ describe('observePageVisibility', () => {
   let configService
   let transactionService
   let unobservePageVisibility
+  let originalLastHiddenStart
 
   function hidePageSynthetically(eventName) {
     if (eventName === 'visibilitychange') {
@@ -79,7 +80,7 @@ describe('observePageVisibility', () => {
   afterEach(() => {
     // Since the flow page visibility mutates the global state
     // it should be restored
-    initializeState()
+    state.lastHiddenStart = originalLastHiddenStart
 
     // Remove the added listener since window object is shared among all tests
     unobservePageVisibility()

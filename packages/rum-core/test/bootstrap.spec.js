@@ -26,7 +26,7 @@
 import { bootstrap } from '../src/bootstrap'
 import * as patcher from '../src/common/patching'
 import * as utils from '../src/common/utils'
-import { initializeState, state } from '../src/state'
+import { state } from '../src/state'
 import { spyOnFunction } from '../../../dev-utils/jasmine'
 
 describe('bootstrap', function () {
@@ -58,10 +58,15 @@ describe('bootstrap', function () {
   })
 
   describe('on supported environments', () => {
+    let originalBootstrapTime
+    beforeEach(() => {
+      originalBootstrapTime = state.bootstrapTime
+    })
+
     afterEach(() => {
       // Since the flow of bootstrap mutates the global state
       // it should be restored
-      initializeState()
+      state.bootstrapTime = originalBootstrapTime
     })
 
     it('should return true', () => {
