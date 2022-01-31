@@ -24,7 +24,6 @@
  */
 
 import { HTTP_REQUEST_TIMEOUT } from '../constants'
-import { getNativeFetch } from '../patching/fetch-patch'
 import { isResponseSuccessful } from './response-status'
 
 // keepalive flag tends to limit the payload size to 64 KB
@@ -50,14 +49,15 @@ export function sendFetchRequest(
   }
 
   let fetchResponse
-  return getNativeFetch()(url, {
-    body: payload,
-    headers,
-    method,
-    keepalive, // used to allow the request to outlive the page.
-    credentials: 'omit',
-    ...timeoutConfig
-  })
+  return window
+    .fetch(url, {
+      body: payload,
+      headers,
+      method,
+      keepalive, // used to allow the request to outlive the page.
+      credentials: 'omit',
+      ...timeoutConfig
+    })
     .then(response => {
       fetchResponse = response
       return fetchResponse.text()
@@ -78,7 +78,7 @@ export function sendFetchRequest(
 }
 
 export function shouldUseFetch() {
-  return typeof getNativeFetch() === 'function'
+  return typeof window.fetch === 'function'
 }
 
 function calculateSize(payload) {

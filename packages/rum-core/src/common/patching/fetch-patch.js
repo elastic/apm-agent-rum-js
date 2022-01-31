@@ -28,7 +28,6 @@ import { globalState } from './patch-utils'
 import { SCHEDULE, INVOKE, FETCH } from '../constants'
 import { scheduleMicroTask } from '../utils'
 
-let nativeFetch
 export function patchFetch(callback) {
   if (!window.fetch || !window.Request) {
     return
@@ -44,7 +43,7 @@ export function patchFetch(callback) {
     callback(INVOKE, task)
   }
 
-  nativeFetch = window.fetch
+  var nativeFetch = window.fetch
   window.fetch = function (input, init) {
     var fetchSelf = this
     var args = arguments
@@ -105,8 +104,4 @@ export function patchFetch(callback) {
       globalState.fetchInProgress = false
     })
   }
-}
-
-export function getNativeFetch() {
-  return nativeFetch
 }

@@ -85,6 +85,7 @@ class ApmServerMock {
     this.addError = _apmServer.addError.bind(_apmServer)
     this.addTransaction = _apmServer.addTransaction.bind(_apmServer)
     this.init = _apmServer.init.bind(_apmServer)
+    this.getEndpoints = _apmServer.getEndpoints.bind(_apmServer)
   }
 }
 

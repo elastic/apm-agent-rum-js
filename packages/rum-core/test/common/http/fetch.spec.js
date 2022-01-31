@@ -28,8 +28,7 @@ import {
   sendFetchRequest,
   shouldUseFetchWithKeepAlive
 } from '../../../src/common/http/fetch'
-import { describeIf, spyOnFunction } from '../../../../../dev-utils/jasmine'
-import * as fetchPatcher from '../../../src/common/patching/fetch-patch'
+import { describeIf } from '../../../../../dev-utils/jasmine'
 
 describe('shouldUseFetchWithKeepAlive', () => {
   function generatePayload(payloadSize) {
@@ -91,8 +90,7 @@ describeIf(
           return Promise.resolve({})
         }
       }
-      const fetchSpy = jasmine.createSpy('fetch').and.resolveTo(response)
-      spyOnFunction(fetchPatcher, 'getNativeFetch').and.returnValue(fetchSpy)
+      const fetchSpy = spyOn(window, 'fetch').and.resolveTo(response)
 
       await sendFetchRequest('POST', 'anyUrl', {
         payload: 'anyPayload',
@@ -120,8 +118,7 @@ describeIf(
           return Promise.resolve({})
         }
       }
-      const fetchSpy = jasmine.createSpy('fetch').and.resolveTo(response)
-      spyOnFunction(fetchPatcher, 'getNativeFetch').and.returnValue(fetchSpy)
+      spyOn(window, 'fetch').and.resolveTo(response)
 
       const result = await sendFetchRequest('POST', 'anyUrl', {
         payload: 'anyPayload',
@@ -143,8 +140,7 @@ describeIf(
           return Promise.resolve({})
         }
       }
-      const fetchSpy = jasmine.createSpy('fetch').and.resolveTo(response)
-      spyOnFunction(fetchPatcher, 'getNativeFetch').and.returnValue(fetchSpy)
+      spyOn(window, 'fetch').and.resolveTo(response)
 
       await expectAsync(
         sendFetchRequest('POST', 'anyUrl', {

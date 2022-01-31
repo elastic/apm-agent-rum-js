@@ -642,6 +642,34 @@ describe('PerformanceMonitoring', function () {
     }, 100)
   })
 
+  it('should not create http-request transaction if task url is intake endpoint', () => {
+    const { intakeEndpoint } = apmServer.getEndpoints()
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
+    spyOn(transactionService, 'startTransaction').and.callThrough()
+
+    let task = createXHRTask('GET', intakeEndpoint)
+
+    performanceMonitoring.processAPICalls('schedule', task)
+    expect(transactionService.startTransaction).not.toHaveBeenCalled()
+
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr).toBeUndefined()
+  })
+
+  it('should not create http-request transaction if task url is config endpoint', () => {
+    const { intakeEndpoint } = apmServer.getEndpoints()
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
+    spyOn(transactionService, 'startTransaction').and.callThrough()
+
+    let task = createXHRTask('GET', intakeEndpoint)
+
+    performanceMonitoring.processAPICalls('schedule', task)
+    expect(transactionService.startTransaction).not.toHaveBeenCalled()
+
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr).toBeUndefined()
+  })
+
   it('should include multiple XHRs in the same transaction', () => {
     const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     spyOn(transactionService, 'startTransaction').and.callThrough()

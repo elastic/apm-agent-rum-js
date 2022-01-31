@@ -160,8 +160,7 @@ class ApmServer {
   }
 
   fetchConfig(serviceName, environment) {
-    const serverUrl = this._configService.get('serverUrl')
-    var configEndpoint = `${serverUrl}/config/v1/rum/agents`
+    var { configEndpoint } = this.getEndpoints()
     if (!serviceName) {
       return Promise.reject(
         'serviceName is required for fetching central config.'
@@ -322,10 +321,24 @@ class ApmServer {
       this.ndjsonTransactions(filteredPayload[TRANSACTIONS], compress)
     )
     const ndjsonPayload = ndjson.join('')
+    const { intakeEndpoint } = this.getEndpoints()
+    return this._postJson(intakeEndpoint, ndjsonPayload)
+  }
+
+  getEndpoints() {
+    const serverUrl = this._configService.get('serverUrl')
+    const apiVersion = this._configService.get('apiVersion')
     const serverUrlPrefix =
-      cfg.get('serverUrlPrefix') || `/intake/v${apiVersion}/rum/events`
-    const endPoint = cfg.get('serverUrl') + serverUrlPrefix
-    return this._postJson(endPoint, ndjsonPayload)
+      this._configService.get('serverUrlPrefix') ||
+      `/intake/v${apiVersion}/rum/events`
+
+    const intakeEndpoint = serverUrl + serverUrlPrefix
+    const configEndpoint = `${serverUrl}/config/v1/rum/agents`
+
+    return {
+      intakeEndpoint,
+      configEndpoint
+    }
   }
 }
 

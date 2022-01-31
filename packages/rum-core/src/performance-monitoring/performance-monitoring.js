@@ -260,6 +260,18 @@ export default class PerformanceMonitoring {
     const configService = this._configService
     const transactionService = this._transactionService
 
+    // do not process calls to our own endpoints
+    if (task.data && task.data.url) {
+      const endpoints = this._apmServer.getEndpoints()
+      const isOwnEndpoint = Object.keys(endpoints).some(
+        endpoint => task.data.url.indexOf(endpoints[endpoint]) !== -1
+      )
+
+      if (isOwnEndpoint) {
+        return
+      }
+    }
+
     if (event === SCHEDULE && task.data) {
       const data = task.data
       const requestUrl = new Url(data.url)
