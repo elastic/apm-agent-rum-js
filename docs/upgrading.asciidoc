@@ -100,7 +100,7 @@ Added option:
 ==== Upgrade APM Server
 
 Version `5.x` of the RUM Agent requires APM Server version >= `7.0`.
-The {apm-guide-ref}/upgrading-to-70.html[APM Server `7.0` upgrade guide] can help with the upgrade process.
+The {apm-guide-7x}/upgrading-to-70.html[APM Server `7.0` upgrade guide] can help with the upgrade process.
 
 NOTE: APM Server version >= `7.0` requires Elasticsearch and Kibana versions >= `7.0` as well.
 
