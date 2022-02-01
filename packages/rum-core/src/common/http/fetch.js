@@ -32,8 +32,17 @@ import { isResponseSuccessful } from './response-status'
 export const BYTE_LIMIT = 60 * 1000
 
 export function shouldUseFetchWithKeepAlive(method, payload) {
+  if (!isFetchSupported()) {
+    return false
+  }
+
+  const isKeepAliveSupported = 'keepalive' in new Request('')
+  if (!isKeepAliveSupported) {
+    return false
+  }
+
   const size = calculateSize(payload)
-  return shouldUseFetch() && method === 'POST' && size < BYTE_LIMIT
+  return method === 'POST' && size < BYTE_LIMIT
 }
 
 export function sendFetchRequest(
@@ -77,8 +86,10 @@ export function sendFetchRequest(
     })
 }
 
-export function shouldUseFetch() {
-  return typeof window.fetch === 'function'
+export function isFetchSupported() {
+  return (
+    typeof window.fetch === 'function' && typeof window.Request === 'function'
+  )
 }
 
 function calculateSize(payload) {

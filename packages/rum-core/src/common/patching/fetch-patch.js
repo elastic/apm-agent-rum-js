@@ -27,9 +27,10 @@ import { Promise } from '../polyfills'
 import { globalState } from './patch-utils'
 import { SCHEDULE, INVOKE, FETCH } from '../constants'
 import { scheduleMicroTask } from '../utils'
+import { isFetchSupported } from '../http/fetch'
 
 export function patchFetch(callback) {
-  if (!window.fetch || !window.Request) {
+  if (!isFetchSupported()) {
     return
   }
 

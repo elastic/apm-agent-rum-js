@@ -51,6 +51,36 @@ describe('shouldUseFetchWithKeepAlive', () => {
   describeIf(
     'browsers supporting fetch API',
     () => {
+      function setRequestWithKeepAliveSupport() {
+        Object.defineProperty(window, 'Request', {
+          value: class Request {
+            constructor() {
+              this.keepalive = true
+            }
+          }
+        })
+      }
+
+      function setRequestWithoutKeepAliveSupport() {
+        Object.defineProperty(window, 'Request', {
+          value: class Request {
+            constructor() {
+              // browsers that do not support keepalive don't have the property defined in the request object
+            }
+          }
+        })
+      }
+
+      let originalRequest
+      beforeEach(() => {
+        originalRequest = window.Request
+        setRequestWithKeepAliveSupport()
+      })
+
+      afterEach(() => {
+        window.Request = originalRequest
+      })
+
       it('should return true for a POST request whose payload size is lower than BYTE_LIMIT', () => {
         const payloadSize = BYTE_LIMIT - 1
         const payload = generatePayload(payloadSize)
@@ -74,6 +104,15 @@ describe('shouldUseFetchWithKeepAlive', () => {
 
       it('should return false for a GET request', () => {
         expect(shouldUseFetchWithKeepAlive('GET')).toBe(false)
+      })
+
+      it('should return false if browser does not support keepalive', () => {
+        setRequestWithoutKeepAliveSupport()
+
+        const payloadSize = BYTE_LIMIT - 1
+        const payload = generatePayload(payloadSize)
+
+        expect(shouldUseFetchWithKeepAlive('POST', payload)).toBe(false)
       })
     },
     window.fetch
