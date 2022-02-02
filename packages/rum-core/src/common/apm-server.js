@@ -137,7 +137,7 @@ class ApmServer {
     { timeout = HTTP_REQUEST_TIMEOUT, payload, headers, beforeSend } = {}
   ) {
     // This bring the possibility of sending requests that outlive the page.
-    if (shouldUseFetchWithKeepAlive(method, payload)) {
+    if (!beforeSend && shouldUseFetchWithKeepAlive(method, payload)) {
       return sendFetchRequest(method, url, {
         keepalive: true,
         timeout,

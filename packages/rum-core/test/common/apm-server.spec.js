@@ -499,6 +499,43 @@ describe('ApmServer', function () {
       expect(xhrSender.sendXHR).toHaveBeenCalledTimes(0)
     })
 
+    it('should use xhr as a fallback if beforeSend function is defined', async () => {
+      spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
+        true
+      )
+      spyOnFunction(fetchSender, 'sendFetchRequest')
+      spyOnFunction(xhrSender, 'sendXHR').and.resolveTo({})
+      const beforeSend = () => {}
+
+      const serverUrl = 'http://localhost'
+      const serverUrlPrefix = '/prefix'
+      configService.setConfig({
+        serverUrl,
+        serverUrlPrefix,
+        apmRequest: beforeSend
+      })
+
+      await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
+
+      expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(0)
+
+      // fallback expected
+      expect(xhrSender.sendXHR).toHaveBeenCalledTimes(1)
+      expect(xhrSender.sendXHR).toHaveBeenCalledWith(
+        'POST',
+        'http://localhost/prefix',
+        {
+          timeout: HTTP_REQUEST_TIMEOUT,
+          payload:
+            '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}\n{"transaction":{"test":"test"}}\n',
+          headers: {
+            'Content-Type': 'application/x-ndjson'
+          },
+          beforeSend
+        }
+      )
+    })
+
     it('should use xhr as a fallback when fetch fails due to an exception', async () => {
       spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
         true
