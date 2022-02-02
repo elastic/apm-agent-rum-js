@@ -41,7 +41,7 @@ for (let i = 0; i < eventTypes.length; i++) {
 }
 
 function shouldInstrumentEvent(target, eventType, listenerFn) {
-  // EventTarget has many children. E.g. Element, Document and Window
+  // EventTarget has multiple children. E.g. Element, Document and Window
   // and since we are only handling clicks is not necessary to exclude others
   // such as XMLHttpRequest or AudioContext. Hence, we can rely on EventTarget being enough
   return (
