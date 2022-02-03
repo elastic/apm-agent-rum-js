@@ -752,6 +752,64 @@ describe('PerformanceMonitoring', function () {
       cancelEventTargetSub()
     })
 
+    it('should create click transactions on window', () => {
+      const transactionService = performanceMonitoring._transactionService
+      let etsub = performanceMonitoring.getEventTargetSub()
+      const cancelEventTargetSub = patchEventHandler.observe(
+        EVENT_TARGET,
+        (event, task) => {
+          etsub(event, task)
+        }
+      )
+
+      const listener = e => {
+        expect(e.type).toBe('click')
+      }
+      window.addEventListener('click', listener)
+
+      let element = document.createElement('button')
+      element.setAttribute('name', 'window-listener-will-handle-me')
+      document.body.appendChild(element)
+
+      element.click()
+
+      let tr = transactionService.getCurrentTransaction()
+      expect(tr).toBeDefined()
+      expect(tr.name).toBe('Click - button["window-listener-will-handle-me"]')
+      expect(tr.type).toBe('user-interaction')
+      cancelEventTargetSub()
+      document.body.removeChild(element)
+    })
+
+    it('should create click transactions on document', () => {
+      const transactionService = performanceMonitoring._transactionService
+      let etsub = performanceMonitoring.getEventTargetSub()
+      const cancelEventTargetSub = patchEventHandler.observe(
+        EVENT_TARGET,
+        (event, task) => {
+          etsub(event, task)
+        }
+      )
+
+      const listener = e => {
+        expect(e.type).toBe('click')
+      }
+      document.addEventListener('click', listener)
+
+      let element = document.createElement('button')
+      element.setAttribute('name', 'document-listener-will-handle-me')
+      document.body.appendChild(element)
+
+      element.click()
+
+      let tr = transactionService.getCurrentTransaction()
+      expect(tr).toBeDefined()
+      expect(tr.name).toBe('Click - button["document-listener-will-handle-me"]')
+      expect(tr.type).toBe('user-interaction')
+      cancelEventTargetSub()
+      document.body.removeChild(element)
+    })
+
     it('should respect the transaction type priority order', function () {
       const historySubFn = performanceMonitoring.getHistorySub()
       const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)

@@ -41,8 +41,11 @@ for (let i = 0; i < eventTypes.length; i++) {
 }
 
 function shouldInstrumentEvent(target, eventType, listenerFn) {
+  // EventTarget has multiple children. E.g. Element, Document and Window
+  // and since we are only handling clicks is not necessary to exclude others
+  // such as XMLHttpRequest or AudioContext. Hence, we can rely on EventTarget being enough
   return (
-    target instanceof Element &&
+    target instanceof EventTarget &&
     eventTypes.indexOf(eventType) >= 0 &&
     typeof listenerFn === 'function'
   )
@@ -121,7 +124,6 @@ export function patchEventTarget(callback) {
 
     let task = {
       source: EVENT_TARGET,
-      target,
       eventType,
       listenerFn,
       capture,
@@ -131,6 +133,13 @@ export function patchEventTarget(callback) {
     existingTasks.push(task)
 
     function wrappingFn() {
+      // To identify properly the element on which the event occurred we need to make sure
+      // we distinguish between currentTarget and target
+      // currentTarget always refers to the element to which the event handler has been attached
+      // target identifies the element on which the event occurred
+      const [event] = arguments
+      task.target = event.target
+
       callback(SCHEDULE, task)
       let result
       try {
