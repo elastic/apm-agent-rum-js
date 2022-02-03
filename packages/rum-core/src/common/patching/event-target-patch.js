@@ -136,7 +136,7 @@ export function patchEventTarget(callback) {
       // To identify properly the element on which the event occurred we need to make sure
       // we distinguish between currentTarget and target
       // currentTarget always refers to the element to which the event handler has been attached
-      // target identifies the element on which the element occurred
+      // target identifies the element on which the event occurred
       const [event] = arguments
       task.target = event.target
 
