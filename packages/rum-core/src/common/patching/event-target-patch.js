@@ -133,11 +133,11 @@ export function patchEventTarget(callback) {
     existingTasks.push(task)
 
     function wrappingFn() {
-      // To identify properly the element on which the event occurred we need to make sure we distinguish between currentTarget and target
+      // To identify properly the element on which the event occurred we need to make sure
+      // we distinguish between currentTarget and target
       // currentTarget always refers to the element to which the event handler has been attached
       // target identifies the element on which the element occurred
       const [event] = arguments
-      task.currentTarget = event.currentTarget
       task.target = event.target
 
       callback(SCHEDULE, task)
