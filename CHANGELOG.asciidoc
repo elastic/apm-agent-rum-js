@@ -29,6 +29,13 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.10.2]]
+==== 5.10.2 (2022-02-03)
+[float]
+===== Bug fixes
+* create user-interaction transactions based on the element on which the event occurred rather than the element on which the event handler has been attached.
+All web applications that rely on event delegation will benefit from this: {issue}969[#969]
+
 [[release-notes-5.10.1]]
 ==== 5.10.1 (2022-01-10)
 [float]
