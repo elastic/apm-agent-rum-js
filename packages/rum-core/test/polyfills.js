@@ -25,6 +25,7 @@
 
 import 'promise-polyfill/src/polyfill'
 import 'core-js/features/array/map'
+import 'core-js/features/string/pad-end'
 
 Object.setPrototypeOf =
   Object.setPrototypeOf ||

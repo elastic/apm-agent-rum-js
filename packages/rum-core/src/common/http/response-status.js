@@ -23,23 +23,11 @@
  *
  */
 
-import { isPlatformSupported, isBrowser, now } from './common/utils'
-import { patchAll } from './common/patching'
-import { state } from './state'
-
-let enabled = false
-export function bootstrap() {
-  if (isPlatformSupported()) {
-    patchAll()
-    state.bootstrapTime = now()
-    enabled = true
-  } else if (isBrowser) {
-    /**
-     * Print this error message only on the browser console
-     * on unsupported browser versions
-     */
-    console.log('[Elastic APM] platform is not supported!')
+export function isResponseSuccessful(status) {
+  // An http 4xx or 5xx error. Signal an error.
+  if (status === 0 || (status > 399 && status < 600)) {
+    return false
   }
 
-  return enabled
+  return true
 }

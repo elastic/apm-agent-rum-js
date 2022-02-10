@@ -25,7 +25,7 @@
 
 import Promise from 'promise-polyfill'
 import { apmBase } from '../../src/'
-import { isPlatformSupported } from '@elastic/apm-rum-core'
+import { isPlatformSupported, APM_SERVER } from '@elastic/apm-rum-core'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 describe('index', function () {
@@ -47,7 +47,7 @@ describe('index', function () {
   })
 
   it('should init ApmBase', function (done) {
-    var apmServer = apmBase.serviceFactory.getService('ApmServer')
+    var apmServer = apmBase.serviceFactory.getService(APM_SERVER)
     if (globalConfig.useMocks) {
       apmServer._makeHttpRequest = function () {
         return Promise.resolve()

@@ -24,6 +24,7 @@
  */
 
 const __DEV__ = process.env.NODE_ENV !== 'production'
+
 const state = {
   //  Time when agent is bootstrapped and patching of modules happens
   bootstrapTime: null,

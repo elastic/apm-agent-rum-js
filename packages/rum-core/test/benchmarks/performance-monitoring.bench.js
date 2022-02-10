@@ -28,7 +28,11 @@ import {
   generateTransactionWithGroupedSpans
 } from './'
 import { createServiceFactory } from '../../src'
-import { TRANSACTIONS } from '../../src/common/constants'
+import {
+  TRANSACTIONS,
+  CONFIG_SERVICE,
+  APM_SERVER
+} from '../../src/common/constants'
 import { groupSmallContinuouslySimilarSpans } from '../../src/performance-monitoring/performance-monitoring'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
@@ -50,9 +54,9 @@ suite('PerformanceMonitoring', () => {
   const performanceMonitoring = serviceFactory.getService(
     'PerformanceMonitoring'
   )
-  const apmServer = serviceFactory.getService('ApmServer')
+  const apmServer = serviceFactory.getService(APM_SERVER)
   const _postJson = apmServer._postJson
-  const configService = serviceFactory.getService('ConfigService')
+  const configService = serviceFactory.getService(CONFIG_SERVICE)
   configService.setConfig({ serviceName: 'benchmark-performance-monitoring' })
   configService.setConfig(agentConfig)
 

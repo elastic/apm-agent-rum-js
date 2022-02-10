@@ -39,7 +39,7 @@ const { getWebpackConfig, BUNDLE_TYPES } = require('./build')
 const polyfills = 'test/polyfills.+(js|ts)'
 
 const specPattern =
-  'test/{*.spec.+(js|ts),!(e2e|integration|node|bundle|types)/*.spec.+(js|ts)}'
+  'test/{*.spec.+(js|ts),!(e2e|integration|node|bundle|types)/**/*.spec.+(js|ts)}'
 const { tunnelIdentifier } = getSauceConnectOptions()
 
 // makes all object properties configurable by default

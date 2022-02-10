@@ -35,11 +35,13 @@ import {
   isBrowser
 } from './common/utils'
 import { patchAll, patchEventHandler } from './common/patching'
+import { observePageVisibility } from './common/page-visibility'
 import {
   PAGE_LOAD,
   ERROR,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
+  TRANSACTION_SERVICE,
   APM_SERVER
 } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
@@ -70,6 +72,8 @@ export {
   PAGE_LOAD,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
+  TRANSACTION_SERVICE,
   APM_SERVER,
-  bootstrap
+  bootstrap,
+  observePageVisibility
 }

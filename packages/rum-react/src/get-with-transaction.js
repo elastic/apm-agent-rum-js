@@ -25,7 +25,7 @@
 
 import React from 'react'
 import hoistStatics from 'hoist-non-react-statics'
-import { afterFrame } from '@elastic/apm-rum-core'
+import { afterFrame, LOGGING_SERVICE } from '@elastic/apm-rum-core'
 
 /**
  * Check if the given component is class based component
@@ -53,7 +53,7 @@ function getWithTransaction(apm) {
       }
 
       if (!Component) {
-        const loggingService = apm.serviceFactory.getService('LoggingService')
+        const loggingService = apm.serviceFactory.getService(LOGGING_SERVICE)
         loggingService.warn(
           `${name} is not instrumented since component property is not provided`
         )

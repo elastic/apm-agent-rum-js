@@ -31,7 +31,12 @@ Enzyme.configure({ adapter: new Adapter() })
 
 import { getWithTransaction } from '../../src/get-with-transaction'
 import { ApmBase } from '@elastic/apm-rum'
-import { createServiceFactory, afterFrame } from '@elastic/apm-rum-core'
+import {
+  createServiceFactory,
+  afterFrame,
+  TRANSACTION_SERVICE,
+  LOGGING_SERVICE
+} from '@elastic/apm-rum-core'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
 function TestComponent(apm, cb) {
@@ -74,8 +79,8 @@ describe('withTransaction', function () {
 
   it('should not log warning or create transaction if apm is not active', function () {
     const [loggingService, transactionService] = serviceFactory.getService([
-      'LoggingService',
-      'TransactionService'
+      LOGGING_SERVICE,
+      TRANSACTION_SERVICE
     ])
     spyOn(loggingService, 'warn')
     spyOn(transactionService, 'startTransaction')
@@ -90,7 +95,7 @@ describe('withTransaction', function () {
   })
 
   it('should start transaction for components', function () {
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     spyOn(transactionService, 'startTransaction')
 
     TestComponent(apmBase)
@@ -105,7 +110,7 @@ describe('withTransaction', function () {
   })
 
   it('should return WrappedComponent on falsy value and log warning', function () {
-    const loggingService = serviceFactory.getService('LoggingService')
+    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
     spyOn(loggingService, 'warn')
 
     const withTransaction = getWithTransaction(apmBase)
@@ -117,7 +122,7 @@ describe('withTransaction', function () {
   })
 
   it('should not instrument the route when rum is inactive', () => {
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     spyOn(transactionService, 'startTransaction')
 
     apmBase.config({ active: false })
@@ -137,7 +142,7 @@ describe('withTransaction', function () {
   })
 
   it('should not create new transaction on every render', () => {
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     spyOn(transactionService, 'startTransaction')
 
     const wrapper = TestComponent(apmBase)
@@ -164,7 +169,7 @@ describe('withTransaction', function () {
   })
 
   it('should accept callback function for withTransaction', () => {
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     const labels = {
       foo: 'bar'
     }
@@ -178,7 +183,7 @@ describe('withTransaction', function () {
   })
 
   it('should end transaction when component unmounts', done => {
-    const transactionService = serviceFactory.getService('TransactionService')
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     const detectFinishSpy = jasmine.createSpy('detectFinish')
     spyOn(transactionService, 'startTransaction').and.returnValue({
       detectFinish: detectFinishSpy

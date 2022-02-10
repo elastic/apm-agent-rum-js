@@ -25,28 +25,69 @@
 
 import { bootstrap } from '../src/bootstrap'
 import * as patcher from '../src/common/patching'
+import * as utils from '../src/common/utils'
+import { state } from '../src/state'
 import { spyOnFunction } from '../../../dev-utils/jasmine'
 
 describe('bootstrap', function () {
-  it('should log warning on unsupported environments', () => {
-    // Pass unsupported check
-    const nowFn = window.performance.now
-    window.performance.now = undefined
+  describe('on unsupported environments', () => {
+    let nowFn
 
-    spyOn(console, 'log')
-    bootstrap()
+    beforeEach(() => {
+      nowFn = window.performance.now
+      window.performance.now = undefined
+    })
 
-    expect(console.log).toHaveBeenCalledWith(
-      '[Elastic APM] platform is not supported!'
-    )
-    window.performance.now = nowFn
+    afterEach(() => {
+      window.performance.now = nowFn
+    })
+
+    it('should log warning', () => {
+      spyOn(console, 'log')
+
+      bootstrap()
+
+      expect(console.log).toHaveBeenCalledWith(
+        '[Elastic APM] platform is not supported!'
+      )
+    })
+
+    it('should return false', () => {
+      expect(bootstrap()).toBe(false)
+    })
   })
 
-  it('should call patchAll', () => {
-    const patchAllSpy = spyOnFunction(patcher, 'patchAll')
+  describe('on supported environments', () => {
+    let originalBootstrapTime
+    beforeEach(() => {
+      originalBootstrapTime = state.bootstrapTime
+    })
 
-    bootstrap()
+    afterEach(() => {
+      // Since the flow of bootstrap mutates the global state
+      // it should be restored
+      state.bootstrapTime = originalBootstrapTime
+    })
 
-    expect(patchAllSpy).toHaveBeenCalledTimes(1)
+    it('should return true', () => {
+      expect(bootstrap()).toBe(true)
+    })
+
+    it('should call patchAll', () => {
+      const patchAllSpy = spyOnFunction(patcher, 'patchAll')
+
+      bootstrap()
+
+      expect(patchAllSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should set a bootstrap time', () => {
+      const anyTime = 123456789
+      spyOnFunction(utils, 'now').and.returnValue(anyTime)
+
+      bootstrap()
+
+      expect(state.bootstrapTime).toBe(anyTime)
+    })
   })
 })

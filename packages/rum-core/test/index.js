@@ -26,11 +26,12 @@
 import { createServiceFactory as originalFactory } from '../src'
 import Transaction from '../src/performance-monitoring/transaction'
 import { captureBreakdown } from '../src/performance-monitoring/breakdown'
+import { APM_SERVER } from '@elastic/apm-rum-core'
 
 export function createServiceFactory() {
   var serviceFactory = originalFactory()
   if (window.globalConfigs && window.globalConfigs.useMocks) {
-    var apmServer = serviceFactory.getService('ApmServer')
+    var apmServer = serviceFactory.getService(APM_SERVER)
     apmServer._makeHttpRequest = function () {
       return Promise.resolve()
     }

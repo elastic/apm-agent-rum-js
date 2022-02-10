@@ -47,7 +47,8 @@ import {
   HTTP_REQUEST_TYPE,
   USER_INTERACTION,
   OUTCOME_FAILURE,
-  OUTCOME_SUCCESS
+  OUTCOME_SUCCESS,
+  QUEUE_ADD_TRANSACTION
 } from '../common/constants'
 import {
   truncateModel,
@@ -159,6 +160,7 @@ export default class PerformanceMonitoring {
       const payload = this.createTransactionPayload(tr)
       if (payload) {
         this._apmServer.addTransaction(payload)
+        this._configService.dispatchEvent(QUEUE_ADD_TRANSACTION)
       }
     })
 
@@ -257,6 +259,18 @@ export default class PerformanceMonitoring {
   processAPICalls(event, task) {
     const configService = this._configService
     const transactionService = this._transactionService
+
+    // do not process calls to our own endpoints
+    if (task.data && task.data.url) {
+      const endpoints = this._apmServer.getEndpoints()
+      const isOwnEndpoint = Object.keys(endpoints).some(
+        endpoint => task.data.url.indexOf(endpoints[endpoint]) !== -1
+      )
+
+      if (isOwnEndpoint) {
+        return
+      }
+    }
 
     if (event === SCHEDULE && task.data) {
       const data = task.data

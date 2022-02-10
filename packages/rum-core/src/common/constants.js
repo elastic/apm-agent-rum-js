@@ -101,6 +101,8 @@ const TRANSACTION_END = 'transaction:end'
  * Internal Events
  */
 const CONFIG_CHANGE = 'config:change'
+const QUEUE_FLUSH = 'queue:flush'
+const QUEUE_ADD_TRANSACTION = 'queue:add_transaction'
 
 /**
  * Events types that are used to toggle auto instrumentations
@@ -147,6 +149,7 @@ const TRANSACTIONS = 'transactions'
  */
 const CONFIG_SERVICE = 'ConfigService'
 const LOGGING_SERVICE = 'LoggingService'
+const TRANSACTION_SERVICE = 'TransactionService'
 const APM_SERVER = 'ApmServer'
 
 /**
@@ -164,6 +167,11 @@ const KEYWORD_LIMIT = 1024
  */
 const SESSION_TIMEOUT = 30 * 60000
 
+/**
+ * Default http request is set to 10 seconds (in milliseconds)
+ */
+const HTTP_REQUEST_TIMEOUT = 10000
+
 export {
   SCHEDULE,
   INVOKE,
@@ -180,6 +188,8 @@ export {
   TRANSACTION_START,
   TRANSACTION_END,
   CONFIG_CHANGE,
+  QUEUE_FLUSH,
+  QUEUE_ADD_TRANSACTION,
   XMLHTTPREQUEST,
   FETCH,
   HISTORY,
@@ -204,11 +214,13 @@ export {
   TRANSACTIONS,
   CONFIG_SERVICE,
   LOGGING_SERVICE,
+  TRANSACTION_SERVICE,
   APM_SERVER,
   TRUNCATED_TYPE,
   FIRST_INPUT,
   LAYOUT_SHIFT,
   OUTCOME_SUCCESS,
   OUTCOME_FAILURE,
-  SESSION_TIMEOUT
+  SESSION_TIMEOUT,
+  HTTP_REQUEST_TIMEOUT
 }

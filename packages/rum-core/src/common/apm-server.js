@@ -26,9 +26,13 @@
 import Queue from './queue'
 import throttle from './throttle'
 import NDJSON from './ndjson'
-import { XHR_IGNORE } from './patching/patch-utils'
 import { truncateModel, METADATA_MODEL } from './truncate'
-import { ERRORS, TRANSACTIONS } from './constants'
+import {
+  ERRORS,
+  HTTP_REQUEST_TIMEOUT,
+  QUEUE_FLUSH,
+  TRANSACTIONS
+} from './constants'
 import { noop } from './utils'
 import { Promise } from './polyfills'
 import {
@@ -38,6 +42,8 @@ import {
   compressPayload
 } from './compress'
 import { __DEV__ } from '../state'
+import { sendFetchRequest, shouldUseFetchWithKeepAlive } from './http/fetch'
+import { sendXHR } from './http/xhr'
 
 /**
  * Throttling interval defaults to 60 seconds
@@ -75,6 +81,10 @@ class ApmServer {
       () => this._loggingService.warn('Dropped events due to throttling!'),
       { limit, interval: THROTTLE_INTERVAL }
     )
+
+    this._configService.observeEvent(QUEUE_FLUSH, () => {
+      this.queue.flush()
+    })
   }
 
   _postJson(endPoint, payload) {
@@ -124,58 +134,33 @@ class ApmServer {
   _makeHttpRequest(
     method,
     url,
-    { timeout = 10000, payload, headers, beforeSend } = {}
+    { timeout = HTTP_REQUEST_TIMEOUT, payload, headers, beforeSend } = {}
   ) {
-    return new Promise(function (resolve, reject) {
-      var xhr = new window.XMLHttpRequest()
-      xhr[XHR_IGNORE] = true
-      xhr.open(method, url, true)
-      xhr.timeout = timeout
-
-      if (headers) {
-        for (var header in headers) {
-          if (headers.hasOwnProperty(header)) {
-            xhr.setRequestHeader(header, headers[header])
-          }
+    // This bring the possibility of sending requests that outlive the page.
+    if (!beforeSend && shouldUseFetchWithKeepAlive(method, payload)) {
+      return sendFetchRequest(method, url, {
+        keepalive: true,
+        timeout,
+        payload,
+        headers
+      }).catch(reason => {
+        // Chrome, before the version 81 had a bug where a preflight request with keepalive specified was not supported
+        // xhr will be used as a fallback to cover fetch network errors, more info: https://fetch.spec.whatwg.org/#concept-network-error
+        // Bug info: https://bugs.chromium.org/p/chromium/issues/detail?id=835821
+        if (reason instanceof TypeError) {
+          return sendXHR(method, url, { timeout, payload, headers, beforeSend })
         }
-      }
 
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-          const { status, responseText } = xhr
-          // An http 4xx or 5xx error. Signal an error.
-          if (status === 0 || (status > 399 && status < 600)) {
-            reject({ url, status, responseText })
-          } else {
-            resolve(xhr)
-          }
-        }
-      }
+        // bubble other kind of reasons to keep handling the failure
+        throw reason
+      })
+    }
 
-      xhr.onerror = () => {
-        const { status, responseText } = xhr
-        reject({ url, status, responseText })
-      }
-
-      let canSend = true
-      if (typeof beforeSend === 'function') {
-        canSend = beforeSend({ url, method, headers, payload, xhr })
-      }
-      if (canSend) {
-        xhr.send(payload)
-      } else {
-        reject({
-          url,
-          status: 0,
-          responseText: 'Request rejected by user configuration.'
-        })
-      }
-    })
+    return sendXHR(method, url, { timeout, payload, headers, beforeSend })
   }
 
   fetchConfig(serviceName, environment) {
-    const serverUrl = this._configService.get('serverUrl')
-    var configEndpoint = `${serverUrl}/config/v1/rum/agents`
+    var { configEndpoint } = this.getEndpoints()
     if (!serviceName) {
       return Promise.reject(
         'serviceName is required for fetching central config.'
@@ -336,10 +321,24 @@ class ApmServer {
       this.ndjsonTransactions(filteredPayload[TRANSACTIONS], compress)
     )
     const ndjsonPayload = ndjson.join('')
+    const { intakeEndpoint } = this.getEndpoints()
+    return this._postJson(intakeEndpoint, ndjsonPayload)
+  }
+
+  getEndpoints() {
+    const serverUrl = this._configService.get('serverUrl')
+    const apiVersion = this._configService.get('apiVersion')
     const serverUrlPrefix =
-      cfg.get('serverUrlPrefix') || `/intake/v${apiVersion}/rum/events`
-    const endPoint = cfg.get('serverUrl') + serverUrlPrefix
-    return this._postJson(endPoint, ndjsonPayload)
+      this._configService.get('serverUrlPrefix') ||
+      `/intake/v${apiVersion}/rum/events`
+
+    const intakeEndpoint = serverUrl + serverUrlPrefix
+    const configEndpoint = `${serverUrl}/config/v1/rum/agents`
+
+    return {
+      intakeEndpoint,
+      configEndpoint
+    }
   }
 }
 

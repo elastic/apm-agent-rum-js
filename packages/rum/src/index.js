@@ -32,7 +32,7 @@ import ApmBase from './apm-base'
 
 /**
  * Use a single instance of ApmBase across all instance of the agent
- * including the instanes used in framework specific integrations
+ * including the instances used in framework specific integrations
  */
 function getApmBase() {
   if (isBrowser && window.elasticApm) {
