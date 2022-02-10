@@ -27,9 +27,6 @@ import { QUEUE_ADD_TRANSACTION, QUEUE_FLUSH } from './constants'
 import { state } from '../state'
 import { now } from './utils'
 
-let visibilityChangeHandler
-let pageHideHandler
-
 /**
  * @param configService
  * @param transactionService
@@ -39,12 +36,12 @@ export function observePageVisibility(configService, transactionService) {
     state.lastHiddenStart = 0
   }
 
-  visibilityChangeHandler = () => {
+  const visibilityChangeHandler = () => {
     if (document.visibilityState === 'hidden') {
       onPageHidden(configService, transactionService)
     }
   }
-  pageHideHandler = () => onPageHidden(configService, transactionService)
+  const pageHideHandler = () => onPageHidden(configService, transactionService)
 
   // visibilitychange and pagehide listeners are added to window and in the
   // capture phase because it executes before the target or bubble phases,
