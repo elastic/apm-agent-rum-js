@@ -32,6 +32,7 @@ import {
   CONFIG_SERVICE
 } from '../../src/common/constants'
 import * as utils from '../../src/common/utils'
+import { createCustomEvent } from '../../test/'
 import { spyOnFunction, waitFor } from '../../../../dev-utils/jasmine'
 
 describe('observePageVisibility', () => {
@@ -50,16 +51,7 @@ describe('observePageVisibility', () => {
   }
 
   function dispatchBrowserEvent(eventName) {
-    let event
-    if (typeof Event === 'function') {
-      event = new Event(eventName)
-    } else {
-      // for IE 11
-      event = document.createEvent('Event')
-      event.initEvent(eventName, true, true)
-    }
-
-    document.dispatchEvent(event)
+    document.dispatchEvent(createCustomEvent(eventName))
   }
 
   function setDocumentVisibilityState(visibilityState) {
