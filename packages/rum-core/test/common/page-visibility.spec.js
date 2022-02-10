@@ -181,7 +181,6 @@ describe('observePageVisibility', () => {
             configService,
             'dispatchEvent'
           ).and.callThrough()
-          spyOn(transaction, 'end').and.callThrough()
           spyOn(transactionService, 'getCurrentTransaction').and.returnValue(
             transaction
           )
@@ -212,7 +211,6 @@ describe('observePageVisibility', () => {
             configService,
             'dispatchEvent'
           ).and.callThrough()
-          spyOn(transaction, 'end').and.callThrough()
           spyOn(transactionService, 'getCurrentTransaction').and.returnValue(
             transaction
           )
@@ -239,7 +237,6 @@ describe('observePageVisibility', () => {
             configService,
             'dispatchEvent'
           ).and.callThrough()
-          spyOn(transaction, 'end').and.callThrough()
           spyOn(transactionService, 'getCurrentTransaction').and.returnValue(
             transaction
           )
