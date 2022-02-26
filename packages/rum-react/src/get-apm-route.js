@@ -23,9 +23,10 @@
  *
  */
 
-import React from 'react'
 import { Route } from 'react-router-dom'
 import { getWithTransaction } from './get-with-transaction'
+
+const apmComponentSymbol = Symbol('apmComponent')
 
 /**
  * If the path/name is given as array, use the computed path
@@ -43,16 +44,18 @@ function getTransactionName(name, props) {
 function getApmRoute(apm) {
   const withTransaction = getWithTransaction(apm)
 
-  return class ApmRoute extends React.Component {
-    constructor(props) {
-      super(props)
-      this.state = {}
-    }
+  return class ApmRoute extends Route {
+    // constructor(props) {
+    //   super(props)
+    //   // this.state = {}
+    // }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-      const initial = prevState.apmComponent == null
-      const { path, component } = nextProps
-      const pathChanged = path != prevState.path
+      const initial = !prevState || prevState[apmComponentSymbol] == null
+      // v5 uses component, v5.1 uses children, v6 uses element
+      // Refer to https://reactrouter.com/docs/en/v6/upgrading/v5
+      const { path, component, children, element } = nextProps
+      const pathChanged = prevState && path != prevState.path
 
       /**
        * Should update the apmComponent state and re-render the component only on
@@ -62,7 +65,7 @@ function getApmRoute(apm) {
       if (initial || pathChanged) {
         return {
           path,
-          apmComponent: withTransaction(
+          [apmComponentSymbol]: withTransaction(
             path,
             'route-change',
             (transaction, props) => {
@@ -71,14 +74,21 @@ function getApmRoute(apm) {
                 name && (transaction.name = name)
               }
             }
-          )(component)
+          )(component || children || element)
         }
       }
       return null
     }
 
     render() {
-      return <Route {...this.props} component={this.state.apmComponent} />
+      if (this.props.component) {
+        this.props.component = this.state[apmComponentSymbol]
+      } else if (this.props.children) {
+        this.props.children = this.state[apmComponentSymbol]
+      } else if (this.props.element) {
+        this.props.element = this.state[apmComponentSymbol]
+      }
+      return super.render()
     }
   }
 }
