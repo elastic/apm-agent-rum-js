@@ -40,7 +40,7 @@ pipeline {
     booleanParam(name: 'saucelab_test', defaultValue: "true", description: "Enable run a Sauce lab test")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
     booleanParam(name: 'release', defaultValue: false, description: 'Release. If so, all the other parameters will be ignored when releasing from main.')
-    string(name: 'stack_version', defaultValue: '7.17.0', description: "What's the Stack Version to be used for the load testing?")
+    string(name: 'stack_version', defaultValue: '8.1.0', description: "What's the Stack Version to be used for the load testing?")
   }
   stages {
     stage('Initializing'){
