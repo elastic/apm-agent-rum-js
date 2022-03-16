@@ -106,7 +106,8 @@ class TransactionService {
           pageLoadTraceId: config.pageLoadTraceId,
           pageLoadSampled: config.pageLoadSampled,
           pageLoadSpanId: config.pageLoadSpanId,
-          pageLoadTransactionName: config.pageLoadTransactionName
+          pageLoadTransactionName: config.pageLoadTransactionName,
+          pageLoadParentId: config.pageLoadParentId
         },
         perfOptions
       )
@@ -279,6 +280,9 @@ class TransactionService {
           if (name === NAME_UNKNOWN && pageLoadTransactionName) {
             tr.name = pageLoadTransactionName
           }
+
+          tr.parentId = tr.options.pageLoadParentId
+
           /**
            * Capture the TBT as span after observing for all long task entries
            * and once performance observer is disconnected

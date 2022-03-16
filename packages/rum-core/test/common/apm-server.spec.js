@@ -298,9 +298,10 @@ describe('ApmServer', function () {
     clock.install()
     apmServer.init()
     spyOn(apmServer, '_postJson')
-    const trs = generateTransaction(2).map(tr =>
-      performanceMonitoring.createTransactionDataModel(tr)
-    )
+    const trs = generateTransaction(2).map((tr, i) => {
+      tr.parentId = 'parent-transaction-id-' + i
+      return performanceMonitoring.createTransactionDataModel(tr)
+    })
     const errors = generateErrors(2).map(err => ({
       name: err.name,
       message: err.message
@@ -318,9 +319,9 @@ describe('ApmServer', function () {
       '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}',
       '{"error":{"name":"Error","message":"error #0"}}',
       '{"error":{"name":"Error","message":"error #1"}}',
-      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}',
+      '{"transaction":{"id":"transaction-id-0","parent_id":"parent-transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}',
       '{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","subtype":"subtype","sync":false,"start":10,"duration":10}}',
-      '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}',
+      '{"transaction":{"id":"transaction-id-1","parent_id":"parent-transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"span_count":{"started":1},"sampled":false}}',
       '{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","subtype":"subtype","sync":false,"start":10,"duration":10}}'
     ]
 
@@ -334,9 +335,10 @@ describe('ApmServer', function () {
     configService.setConfig({ apiVersion: 3 })
     apmServer.init()
     spyOn(apmServer, '_postJson')
-    const trs = generateTransaction(1, true).map(tr =>
-      performanceMonitoring.createTransactionDataModel(tr)
-    )
+    const trs = generateTransaction(1, true).map((tr, i) => {
+      tr.parentId = 'parent-transaction-id-' + i
+      return performanceMonitoring.createTransactionDataModel(tr)
+    })
     const errors = generateErrors(1).map((err, i) => {
       let model = errorLogging.createErrorDataModel(err)
       model.id = 'error-id-' + i
@@ -354,7 +356,7 @@ describe('ApmServer', function () {
     const expected = [
       '{"m":{"se":{"n":"test","a":{"n":"rum-js","ve":"N/A"},"la":{"n":"javascript"}}}}',
       '{"e":{"id":"error-id-0","cl":"(inline script)","ex":{"mg":"error #0","st":[]},"c":null}}',
-      '{"x":{"id":"transaction-id-0","tid":"trace-id-0","n":"transaction #0","t":"transaction","d":990,"c":null,"k":null,"me":[{"sa":{"xdc":{"v":1},"xds":{"v":990},"xbc":{"v":1}}},{"y":{"t":"app"},"sa":{"ysc":{"v":1},"yss":{"v":980}}},{"y":{"t":"type"},"sa":{"ysc":{"v":1},"yss":{"v":10}}}],"y":[{"id":"span-id-0-1","n":"name","t":"type","s":10,"d":10,"c":null,"sr":0.1,"su":"subtype"}],"yc":{"sd":1},"sm":true,"sr":0.1}}'
+      '{"x":{"id":"transaction-id-0","pid":"parent-transaction-id-0","tid":"trace-id-0","n":"transaction #0","t":"transaction","d":990,"c":null,"k":null,"me":[{"sa":{"xdc":{"v":1},"xds":{"v":990},"xbc":{"v":1}}},{"y":{"t":"app"},"sa":{"ysc":{"v":1},"yss":{"v":980}}},{"y":{"t":"type"},"sa":{"ysc":{"v":1},"yss":{"v":10}}}],"y":[{"id":"span-id-0-1","n":"name","t":"type","s":10,"d":10,"c":null,"sr":0.1,"su":"subtype"}],"yc":{"sd":1},"sm":true,"sr":0.1}}'
     ]
     expect(payload.split('\n').filter(a => a)).toEqual(expected)
     clock.uninstall()
