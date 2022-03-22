@@ -32,7 +32,11 @@ import {
   CONFIG_SERVICE
 } from '../../src/common/constants'
 import * as utils from '../../src/common/utils'
-import { createCustomEvent } from '../../test/'
+import {
+  hidePageSynthetically,
+  dispatchBrowserEvent,
+  setDocumentVisibilityState
+} from '../../test/'
 import { spyOnFunction, waitFor } from '../../../../dev-utils/jasmine'
 
 describe('observePageVisibility', () => {
@@ -41,26 +45,6 @@ describe('observePageVisibility', () => {
   let transactionService
   let unobservePageVisibility
   let originalLastHiddenStart
-
-  function hidePageSynthetically(eventName) {
-    if (eventName === 'visibilitychange') {
-      setDocumentVisibilityState('hidden')
-    }
-
-    dispatchBrowserEvent(eventName)
-  }
-
-  function dispatchBrowserEvent(eventName) {
-    document.dispatchEvent(createCustomEvent(eventName))
-  }
-
-  function setDocumentVisibilityState(visibilityState) {
-    Object.defineProperty(document, 'visibilityState', {
-      get() {
-        return visibilityState
-      }
-    })
-  }
 
   beforeEach(() => {
     serviceFactory = createServiceFactory()
