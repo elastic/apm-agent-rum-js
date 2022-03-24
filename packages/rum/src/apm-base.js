@@ -183,8 +183,13 @@ export default class ApmBase {
 
     tr.addTask(PAGE_LOAD)
     const sendPageLoadMetrics = () => {
-      // to make sure PerformanceTiming.loadEventEnd has a value
-      setTimeout(() => tr.removeTask(PAGE_LOAD))
+      // The reasons of this timeout are:
+      // 1. to make sure PerformanceTiming.loadEventEnd has a value.
+      // 2. to make sure the agent intercepts all the LCP entries triggered by the browser (adding a delay in the timeout).
+      // The browser might need more time after the pageload event to render other elements (e.g. images).
+      // That's important because a LCP is only triggered when the related element is completely rendered.
+      // https://w3c.github.io/largest-contentful-paint/#sec-add-lcp-entry
+      setTimeout(() => tr.removeTask(PAGE_LOAD), 1000)
     }
 
     if (document.readyState === 'complete') {
