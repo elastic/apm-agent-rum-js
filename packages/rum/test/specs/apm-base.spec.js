@@ -36,6 +36,10 @@ import {
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import Promise from 'promise-polyfill'
+import {
+  hidePageSynthetically,
+  setDocumentVisibilityState
+} from '@elastic/apm-rum-core/test'
 
 var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
@@ -43,10 +47,30 @@ const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
 describe('ApmBase', function () {
   let serviceFactory
   let apmBase
+  let originalAddEventListener
+  let unobserveVisibilitychange = function noop() {}
 
   beforeEach(function () {
     serviceFactory = createServiceFactory()
     apmBase = new ApmBase(serviceFactory, !enabled)
+
+    // Each time apmBase is initialized the visibilitychange event is attached to window
+    // To avoid side effects when testing we should detach it after each execution
+    originalAddEventListener = window.addEventListener
+    window.addEventListener = (type, listener, options) => {
+      if (type === 'visibilitychange') {
+        unobserveVisibilitychange = () => {
+          window.removeEventListener(type, listener, options)
+        }
+      }
+
+      originalAddEventListener(type, listener, options)
+    }
+  })
+
+  afterEach(() => {
+    window.addEventListener = originalAddEventListener
+    unobserveVisibilitychange()
   })
 
   it('should report whether agent is active or inactive', () => {
@@ -79,6 +103,43 @@ describe('ApmBase', function () {
       expect(tr.detectFinish).toHaveBeenCalled()
       expect(tr.name).toBe('new page load')
       expect(tr.type).toBe(PAGE_LOAD)
+      done()
+    })
+  })
+
+  it('should send page load metrics if page is backgrounded before load event is triggered', done => {
+    // Make sure page load event logic is not executed when initializing the agent.
+    // It's important to realize that when this test is executed Karma setup is already loaded in the browser.
+    // Hence, the page load event would be already executed.
+    // Faking the document.readyState makes possible to test the expected scenario
+    function setDocumentReadyState(state) {
+      Object.defineProperty(document, 'readyState', {
+        get() {
+          return state
+        }
+      })
+    }
+    const originalState = document.readyState
+    setDocumentReadyState('loading')
+
+    apmBase.init({ serviceName, serverUrl })
+
+    var tr = apmBase.getCurrentTransaction()
+
+    expect(tr.name).toBe('Unknown')
+    expect(tr.type).toBe(PAGE_LOAD)
+
+    hidePageSynthetically('visibilitychange')
+
+    apmBase.setInitialPageLoadName('partial page load')
+    apmBase.observe(TRANSACTION_END, endedTr => {
+      expect(endedTr).toEqual(tr)
+      expect(document.readyState).toBe('loading')
+      expect(tr.name).toBe('partial page load')
+      expect(tr.type).toBe(PAGE_LOAD)
+
+      setDocumentReadyState(originalState)
+      setDocumentVisibilityState('visible')
       done()
     })
   })

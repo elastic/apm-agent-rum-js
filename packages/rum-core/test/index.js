@@ -57,6 +57,27 @@ export function createCustomEvent(
   return evt
 }
 
+export function dispatchBrowserEvent(eventName) {
+  document.dispatchEvent(createCustomEvent(eventName))
+}
+
+// Possible eventName values: visibilitychange, pagehide
+export function hidePageSynthetically(eventName = 'visibilitychange') {
+  if (eventName === 'visibilitychange') {
+    setDocumentVisibilityState('hidden')
+  }
+
+  dispatchBrowserEvent(eventName)
+}
+
+export function setDocumentVisibilityState(visibilityState) {
+  Object.defineProperty(document, 'visibilityState', {
+    get() {
+      return visibilityState
+    }
+  })
+}
+
 export function generateTransaction(count, breakdown = false) {
   const result = []
   for (var i = 0; i < count; i++) {
