@@ -498,12 +498,13 @@ describe('TransactionService', function () {
     const lastSpan = transaction.startSpan('last-span-name', 'last-span')
     lastSpan.end()
     longSpan.end()
-    longSpan.end += 500
+    longSpan._end += 500
 
+    const expectedTransactionEnd = longSpan._end
     transaction.onEnd = () => {
       transactionService.adjustTransactionTime(transaction)
       expect(transaction._start).toBe(transactionStart)
-      expect(transaction._end).toBeGreaterThanOrEqual(longSpan._end)
+      expect(transaction._end).toBe(expectedTransactionEnd)
       done()
     }
     transaction.detectFinish()
