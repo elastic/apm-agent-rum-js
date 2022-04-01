@@ -40,7 +40,6 @@ import {
   hidePageSynthetically,
   setDocumentVisibilityState
 } from '@elastic/apm-rum-core/test'
-import { PAGE_LOAD_DELAY } from '../../src/constants'
 
 var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
