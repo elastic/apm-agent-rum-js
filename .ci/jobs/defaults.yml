@@ -34,7 +34,7 @@
         build-strategies:
         - tags:
             ignore-tags-older-than: -1
-            ignore-tags-newer-than: -1
+            ignore-tags-newer-than: 30
         - regular-branches: true
         ## This will avoid building the PRs when the target branch has changed
         ## when the MBP index scan happens. Since periodic-folder-trigger is disabled
