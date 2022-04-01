@@ -82,6 +82,16 @@ class ApmServerMock {
       useMocks ? () => Promise.resolve() : undefined
     )
 
+    this.resetMock = function () {
+      events = this.events = new EventHandler()
+      calls = this.calls = {}
+
+      spyOn(
+        _apmServer,
+        'sendEvents',
+        useMocks ? () => Promise.resolve() : undefined
+      )
+    }
     this.addError = _apmServer.addError.bind(_apmServer)
     this.addTransaction = _apmServer.addTransaction.bind(_apmServer)
     this.init = _apmServer.init.bind(_apmServer)

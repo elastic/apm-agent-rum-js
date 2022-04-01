@@ -26,22 +26,27 @@
 describe('async-tests', function () {
   it('should run the usecase', function () {
     browser.url('/test/e2e/async-tests/async-e2e.html')
+
+    // Since the page-load transaction ends after a delay
+    // we need to make sure we have the payload before doing the assertions
+    let transactionPayload
     browser.waitUntil(
       () => {
-        return $('#test-element').getText() === 'Passed'
+        /**
+         * Payload is set in the EJS template.
+         * Its not possible to inject the ApmServerMock for standalone
+         * tests as the application code is different from the APM Agent bundle code
+         */
+        transactionPayload = browser.execute(
+          'return window.TRANSACTION_PAYLOAD'
+        )
+
+        return $('#test-element').getText() === 'Passed' && !!transactionPayload
       },
       5000,
-      'expected element #test-element'
+      'expected element #test-element and transaction payload'
     )
 
-    /**
-     * Payload is set in the EJS template.
-     * Its not possible to inject the ApmServerMock for standalone
-     * tests as the application code is different from the APM Agent bundle code
-     */
-    const transactionPayload = browser.execute(function () {
-      return window.TRANSACTION_PAYLOAD
-    })
     expect(transactionPayload.type).toBe('page-load')
     expect(transactionPayload.name).toBe('/async')
     /**

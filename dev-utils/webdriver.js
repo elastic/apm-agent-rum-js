@@ -302,14 +302,17 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
                     errors: errors
                   }
                 }
+                apmServerMock.resetMock()
                 done(calls)
               }
             })
             .catch(function (reason) {
               console.log('reason', JSON.stringify(reason))
               try {
+                apmServerMock.resetMock()
                 done({ error: reason.message || JSON.stringify(reason) })
               } catch (e) {
+                apmServerMock.resetMock()
                 done({
                   error: 'Failed serializing rejection reason: ' + e.message
                 })
