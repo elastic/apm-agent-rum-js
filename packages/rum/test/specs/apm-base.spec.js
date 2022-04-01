@@ -40,6 +40,7 @@ import {
   hidePageSynthetically,
   setDocumentVisibilityState
 } from '@elastic/apm-rum-core/test'
+import { PAGE_LOAD_DELAY } from '../../src/constants'
 
 var enabled = bootstrap()
 const { serviceName, serverUrl } = getGlobalConfig('rum').agentConfig
@@ -89,6 +90,7 @@ describe('ApmBase', function () {
   })
 
   it('should send page load metrics after load event', done => {
+    spyOn(window, 'setTimeout').and.callThrough()
     apmBase.config({ serviceName, serverUrl })
     apmBase._sendPageLoadMetrics()
     var tr = apmBase.getCurrentTransaction()
@@ -101,6 +103,10 @@ describe('ApmBase', function () {
       expect(endedTr).toEqual(tr)
       expect(document.readyState).toBe('complete')
       expect(tr.detectFinish).toHaveBeenCalled()
+      expect(window.setTimeout).toHaveBeenCalledWith(
+        jasmine.any(Function),
+        1000
+      )
       expect(tr.name).toBe('new page load')
       expect(tr.type).toBe(PAGE_LOAD)
       done()

@@ -33,6 +33,7 @@ import {
   APM_SERVER,
   observePageVisibility
 } from '@elastic/apm-rum-core'
+import { PAGE_LOAD_DELAY } from './constants'
 
 export default class ApmBase {
   constructor(serviceFactory, disable) {
@@ -189,7 +190,7 @@ export default class ApmBase {
       // The browser might need more time after the pageload event to render other elements (e.g. images).
       // That's important because a LCP is only triggered when the related element is completely rendered.
       // https://w3c.github.io/largest-contentful-paint/#sec-add-lcp-entry
-      setTimeout(() => tr.removeTask(PAGE_LOAD), 0)
+      setTimeout(() => tr.removeTask(PAGE_LOAD), PAGE_LOAD_DELAY)
     }
 
     if (document.readyState === 'complete') {
