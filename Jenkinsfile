@@ -83,8 +83,8 @@ pipeline {
         stage('Lint') {
           when {
             beforeAgent true
-            allOf {
-              not { tag pattern: '.*@\\d+\\.\\d+.*', comparator: 'REGEXP' }
+            not {
+              expression { return isTag() }
             }
           }
           steps {
@@ -112,7 +112,9 @@ pipeline {
             beforeAgent true
             allOf {
               expression { return env.ONLY_DOCS == "false" }
-              not { tag pattern: '.*@\\d+\\.\\d+.*', comparator: 'REGEXP' }
+              not {
+                expression { return isTag() }
+              }
             }
           }
           matrix {
@@ -304,7 +306,9 @@ pipeline {
             beforeAgent true
             allOf {
               expression { return env.ONLY_DOCS == "false" }
-              not { tag pattern: '.*@\\d+\\.\\d+.*', comparator: 'REGEXP' }
+              not {
+                expression { return isTag() }
+              }
             }
           }
           steps {
