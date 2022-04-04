@@ -212,7 +212,7 @@ services:
       - BRANCH_NAME=${BRANCH_NAME}
       - JENKINS_URL=${JENKINS_URL}
       - REPORT_FILE=${REPORT_FILE}
-      - APM_SERVER_URL=http://apm-server:8200
+      - APM_SERVER_URL=https://apm-server:8200
     command: >
       /bin/bash -c "set -x
         id
