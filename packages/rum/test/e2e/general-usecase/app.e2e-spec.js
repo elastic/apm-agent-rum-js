@@ -120,15 +120,19 @@ describe('general-usercase', function () {
         'expected element #test-element'
       )
 
+      let sendEvents = waitForApmServerCalls(0, 1).sendEvents
+      const [pageLoadTransaction] = sendEvents.transactions
+
+      expect(pageLoadTransaction.type).toBe('page-load')
+
       // we should wait until load transaction finishes before
       // triggering the user interaction logic
-      waitForApmServerCalls(0, 1)
-
       const actionButton = $('#test-action')
       actionButton.click()
-      const { sendEvents } = waitForApmServerCalls(0, 1)
-      const { transactions } = sendEvents
-      const clickTransaction = transactions[0]
+
+      sendEvents = waitForApmServerCalls(0, 1).sendEvents
+      const [clickTransaction] = sendEvents.transactions
+
       expect(clickTransaction.type).toBe('user-interaction')
       expect(clickTransaction.name).toBe('Click - button["test-action"]')
       expect(clickTransaction.spans.length).toBeGreaterThanOrEqual(1)

@@ -29,6 +29,11 @@ describe('Using Switch component of react router', function () {
   beforeAll(() => browser.url('/test/e2e/with-router/switch.html'))
 
   it('should render the react app on route change', function () {
+    let sendEvents = waitForApmServerCalls(0, 1).sendEvents
+    let [pageLoadTransaction] = sendEvents.transactions
+
+    expect(pageLoadTransaction.type).toBe('page-load')
+    expect(pageLoadTransaction.name).toBe('/notfound')
     browser.waitUntil(
       () => {
         /**
@@ -42,15 +47,9 @@ describe('Using Switch component of react router', function () {
       'expected functional component to be rendered'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 2)
-    const { transactions } = sendEvents
-    expect(transactions.length).toBe(2)
+    sendEvents = waitForApmServerCalls(0, 1).sendEvents
+    let [routeTransaction] = sendEvents.transactions
 
-    const pageLoadTransaction = transactions[0]
-    expect(pageLoadTransaction.type).toBe('page-load')
-    expect(pageLoadTransaction.name).toBe('/notfound')
-
-    const routeTransaction = transactions[1]
     expect(routeTransaction.name).toBe('/func')
     expect(routeTransaction.type).toBe('route-change')
     /**
