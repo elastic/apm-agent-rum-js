@@ -101,6 +101,28 @@ pipeline {
             }
           }
         }
+        stage('Integration Tests Pre') {
+          agent none
+          when {
+            beforeAgent true
+            allOf {
+              anyOf {
+                changeRequest()
+                expression { return !params.Run_As_Main_Branch }
+              }
+              expression { return env.ONLY_DOCS == "false" }
+            }
+          }
+          steps {
+            build(job: env.ITS_PIPELINE, propagate: false, wait: false,
+                  parameters: [string(name: 'INTEGRATION_TEST', value: 'RUM'),
+                               string(name: 'BUILD_OPTS', value: "--rum-agent-branch ${env.GIT_BASE_COMMIT}"),
+                               string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_ITS_NAME),
+                               string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+                               string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
+            githubNotify(context: "${env.GITHUB_CHECK_ITS_NAME}", description: "${env.GITHUB_CHECK_ITS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.ITS_PIPELINE.replaceAll('/','+')}")
+          }
+        }
         stage('Test Puppeteer') {
           when {
             beforeAgent true
