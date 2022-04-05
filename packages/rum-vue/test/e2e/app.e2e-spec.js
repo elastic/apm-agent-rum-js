@@ -29,6 +29,13 @@ describe('Vue router integration', function () {
   beforeAll(() => browser.url('/test/e2e/'))
 
   it('should run vue app and capture route-change events', function () {
+    let sendEvents = waitForApmServerCalls(0, 1).sendEvents
+    const [pageLoadTransaction] = sendEvents.transactions
+
+    expect(pageLoadTransaction.type).toBe('page-load')
+    expect(pageLoadTransaction.name).toBe('/')
+    expect(pageLoadTransaction.spans.length).toBeGreaterThan(1)
+
     browser.waitUntil(
       () => {
         /**
@@ -42,16 +49,9 @@ describe('Vue router integration', function () {
       'expected data.json to be loaded'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 2)
-    const { transactions } = sendEvents
-    expect(transactions.length).toBe(2)
+    sendEvents = waitForApmServerCalls(0, 1).sendEvents
+    const [routeTransaction] = sendEvents.transactions
 
-    const pageLoadTransaction = transactions[0]
-    expect(pageLoadTransaction.type).toBe('page-load')
-    expect(pageLoadTransaction.name).toBe('/')
-    expect(pageLoadTransaction.spans.length).toBeGreaterThan(1)
-
-    const routeTransaction = transactions[1]
     expect(routeTransaction.name).toBe('/fetch')
     expect(routeTransaction.type).toBe('route-change')
     expect(routeTransaction.spans.length).toBeGreaterThan(0)
