@@ -81,6 +81,12 @@ pipeline {
         Lint the code.
         */
         stage('Lint') {
+          when {
+            beforeAgent true
+            not {
+              expression { return isTag() }
+            }
+          }
           steps {
             withGithubNotify(context: 'Lint') {
               deleteDir()
@@ -104,7 +110,12 @@ pipeline {
         stage('Test Puppeteer') {
           when {
             beforeAgent true
-            expression { return env.ONLY_DOCS == "false" }
+            allOf {
+              expression { return env.ONLY_DOCS == "false" }
+              not {
+                expression { return isTag() }
+              }
+            }
           }
           matrix {
             agent { label 'linux && immutable' }
@@ -203,7 +214,6 @@ pipeline {
             allOf {
               anyOf {
                 branch 'main'
-                tag pattern: 'v\\d+\\.\\d+\\.\\d+.*', comparator: 'REGEXP'
                 expression { return params.Run_As_Main_Branch }
                 expression { return env.BENCHMARK_UPDATED != "false" }
                 expression { return env.GITHUB_COMMENT?.contains('benchmark tests') }
@@ -294,7 +304,12 @@ pipeline {
           options { skipDefaultCheckout() }
           when {
             beforeAgent true
-            expression { return env.ONLY_DOCS == "false" }
+            allOf {
+              expression { return env.ONLY_DOCS == "false" }
+              not {
+                expression { return isTag() }
+              }
+            }
           }
           steps {
             withGithubNotify(context: 'Coverage') {
