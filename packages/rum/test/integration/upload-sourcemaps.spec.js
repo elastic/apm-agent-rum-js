@@ -28,7 +28,8 @@ import request from 'request'
 import fs from 'fs'
 
 const basePath = path.join(__dirname, '../e2e')
-const esAuth = process.env.ES_AUTH
+const defaultAUth = `Basic ${Buffer.from('admin:changeme').toString('base64')}`
+const esAuth = process.env.ES_AUTH || defaultAUth
 const kibanaUrl = process.env.KIBANA_URL || 'http://localhost:5601'
 
 describe('Sourcemaps', function () {
