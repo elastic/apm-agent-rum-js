@@ -196,7 +196,10 @@ describe('APM route hooks', () => {
     await router.isReady()
     router.afterEach(() => {
       const tr = apm.getCurrentTransaction()
-      expect(tr.spans[0].name).toBe('before-route-enter')
+      const expectedSpan = 'before-route-enter'
+      const filteredSpans = tr.spans.filter(span => span.name === expectedSpan)
+
+      expect(filteredSpans.length).toBe(1)
     })
     spyOn(apm, 'startTransaction')
     await router.push('/spans/1')
