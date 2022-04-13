@@ -455,16 +455,19 @@ describe('TransactionService', function () {
   it('should not produce negative durations while adjusting to the spans', () => {
     const transaction = transactionService.startTransaction(
       'transaction',
-      'transaction'
+      'transaction',
+      {
+        startTime: 10
+      }
     )
     let span = transaction.startSpan('test', 'test')
-    span.end()
-    span._end += 100
-    span = transaction.startSpan('test', 'external.http')
+    span.end(100)
+    span = transaction.startSpan('test', 'external.http', {
+      startTime: 10000000
+    })
 
-    span.end()
-    span._start = 10000000
-    span._end = 11000000
+    span.end(11000000)
+
     transaction.end()
     transactionService.adjustTransactionTime(transaction)
     expect(span.duration()).toBe(0)
@@ -490,25 +493,29 @@ describe('TransactionService', function () {
   })
 
   it('should adjust transaction end based on latest span end', done => {
-    const transaction = transactionService.startTransaction('/', 'transaction')
-    const transactionStart = transaction._start
+    const transaction = transactionService.startTransaction(
+      '/',
+      'transaction',
+      { startTime: 10 }
+    )
 
-    const firstSpan = transaction.startSpan('first-span-name', 'first-span')
-    firstSpan.end()
-    const longSpan = transaction.startSpan('long-span-name', 'long-span')
-    const lastSpan = transaction.startSpan('last-span-name', 'last-span')
-    lastSpan.end()
-    longSpan.end()
-    longSpan._end += 500
+    const longSpan = transaction.startSpan('long-span-name', 'long-span', {
+      startTime: 15
+    })
+    const lastSpan = transaction.startSpan('last-span-name', 'last-span', {
+      startTime: 20
+    })
+    lastSpan.end(45)
+    longSpan.end(60)
 
-    const expectedTransactionEnd = longSpan._end
     transaction.onEnd = () => {
       transactionService.adjustTransactionTime(transaction)
-      expect(transaction._start).toBe(transactionStart)
-      expect(transaction._end).toBe(expectedTransactionEnd)
+      expect(transaction._start).toBe(10)
+      expect(transaction._end).toBe(60)
       done()
     }
-    transaction.detectFinish()
+
+    transaction.end(50)
   })
 
   describe('page load transactions', () => {
@@ -517,20 +524,21 @@ describe('TransactionService', function () {
     })
 
     it('should have its end time adjusted to match with LCP if it is the event that have lasted the most', done => {
-      const transaction = transactionService.startTransaction('/', PAGE_LOAD)
-      const transactionStart = transaction._start
+      const transaction = transactionService.startTransaction('/', PAGE_LOAD, {
+        startTime: 10
+      })
 
       const span = transaction.startSpan('span-name', 'span')
-      span.end()
+      span.end(15)
 
       const externalSpan = transaction.startSpan('span-name', 'external')
-      externalSpan.end()
+      externalSpan.end(20)
 
-      metrics.lcp = externalSpan._end + 25
+      metrics.lcp = 25
 
       transaction.onEnd = () => {
         transactionService.adjustTransactionTime(transaction)
-        expect(transaction._start).toBe(transactionStart)
+        expect(transaction._start).toBe(10)
         expect(transaction._end).toBe(metrics.lcp)
         done()
       }
@@ -539,23 +547,22 @@ describe('TransactionService', function () {
     })
 
     it('should have its end time adjusted to match with network request span it is the event that have lasted the most', done => {
-      const transaction = transactionService.startTransaction('/', PAGE_LOAD)
-      const transactionStart = transaction._start
+      const transaction = transactionService.startTransaction('/', PAGE_LOAD, {
+        startTime: 10
+      })
 
       const span = transaction.startSpan('span-name', 'span')
-      span.end()
+      span.end(15)
 
       const externalSpan = transaction.startSpan('span-name', 'external')
-      externalSpan.end()
-      externalSpan._end += 15
+      externalSpan.end(30)
 
-      metrics.lcp = 10
+      metrics.lcp = 20
 
-      const expectedTransactionEnd = externalSpan._end
       transaction.onEnd = () => {
         transactionService.adjustTransactionTime(transaction)
-        expect(transaction._start).toBe(transactionStart)
-        expect(transaction._end).toBe(expectedTransactionEnd)
+        expect(transaction._start).toBe(10)
+        expect(transaction._end).toBe(30)
         done()
       }
 
@@ -563,28 +570,22 @@ describe('TransactionService', function () {
     })
 
     it('should have its end time adjusted to match with non-network request span it is the event that have lasted the most', done => {
-      const transaction = transactionService.startTransaction('/', PAGE_LOAD)
-      const transactionStart = transaction._start
-
-      const span = transaction.startSpan('span-name', 'span')
-      span.end()
-      span._end += 20
-
-      const externalSpan = transaction.startSpan('span-name', 'external')
-      externalSpan.end()
-
-      const lcp = 10
-      transaction.addMarks({
-        agent: {
-          largestContentfulPaint: lcp
-        }
+      const transaction = transactionService.startTransaction('/', PAGE_LOAD, {
+        startTime: 10
       })
 
-      const expectedTransactionEnd = span._end
+      const span = transaction.startSpan('span-name', 'span')
+      span.end(50)
+
+      const externalSpan = transaction.startSpan('span-name', 'external')
+      externalSpan.end(30)
+
+      metrics.lcp = 20
+
       transaction.onEnd = () => {
         transactionService.adjustTransactionTime(transaction)
-        expect(transaction._start).toBe(transactionStart)
-        expect(transaction._end).toBe(expectedTransactionEnd)
+        expect(transaction._start).toBe(10)
+        expect(transaction._end).toBe(50)
         done()
       }
 
