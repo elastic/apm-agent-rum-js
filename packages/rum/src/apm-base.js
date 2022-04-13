@@ -25,6 +25,7 @@
 
 import {
   getInstrumentationFlags,
+  PAGE_LOAD_DELAY,
   PAGE_LOAD,
   ERROR,
   CONFIG_SERVICE,
@@ -33,7 +34,6 @@ import {
   APM_SERVER,
   observePageVisibility
 } from '@elastic/apm-rum-core'
-import { PAGE_LOAD_DELAY } from './constants'
 
 export default class ApmBase {
   constructor(serviceFactory, disable) {

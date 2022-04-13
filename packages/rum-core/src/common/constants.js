@@ -60,6 +60,11 @@ const REUSABILITY_THRESHOLD = 5000
 const MAX_SPAN_DURATION = 5 * 60 * 1000
 
 /**
+ * The amount of time that should pass by before sending page load metrics
+ */
+const PAGE_LOAD_DELAY = 1000
+
+/**
  * Transaction & Span - Name & Types
  */
 const PAGE_LOAD = 'page-load'
@@ -180,6 +185,7 @@ export {
   RESOURCE_INITIATOR_TYPES,
   REUSABILITY_THRESHOLD,
   MAX_SPAN_DURATION,
+  PAGE_LOAD_DELAY,
   PAGE_LOAD,
   ROUTE_CHANGE,
   NAME_UNKNOWN,
