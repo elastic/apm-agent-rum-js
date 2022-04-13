@@ -247,7 +247,7 @@ function isPageLoaded() {
   })
 }
 
-function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
+function getLastServerCall(errorCount = 0, transactionCount = 0) {
   const { name = '', version = '' } = getBrowserInfo()
   console.log(
     `Waiting for minimum ${errorCount} Errors and ${transactionCount} Transactions in`,
@@ -308,11 +308,10 @@ function waitForApmServerCalls(errorCount = 0, transactionCount = 0) {
             })
             .catch(function (reason) {
               console.log('reason', JSON.stringify(reason))
+              apmServerMock.resetMock()
               try {
-                apmServerMock.resetMock()
                 done({ error: reason.message || JSON.stringify(reason) })
               } catch (e) {
-                apmServerMock.resetMock()
                 done({
                   error: 'Failed serializing rejection reason: ' + e.message
                 })
@@ -374,7 +373,7 @@ module.exports = {
   isChromeLatest,
   getWebdriveBaseConfig,
   getBrowserInfo,
-  waitForApmServerCalls,
+  getLastServerCall,
   getBrowserFeatures,
   isPageLoaded
 }

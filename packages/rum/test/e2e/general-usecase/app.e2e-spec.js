@@ -24,7 +24,7 @@
  */
 const {
   allowSomeBrowserErrors,
-  waitForApmServerCalls,
+  getLastServerCall,
   getBrowserFeatures
 } = require('../../../../../dev-utils/webdriver')
 
@@ -39,7 +39,7 @@ describe('general-usercase', function () {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(1, 1)
+    const { sendEvents } = getLastServerCall(1, 1)
     const { transactions, errors } = sendEvents
 
     expect(errors.length).toBe(1)
@@ -97,7 +97,7 @@ describe('general-usercase', function () {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 1)
+    const { sendEvents } = getLastServerCall(0, 1)
     const { transactions } = sendEvents
     expect(transactions.length).toBe(1)
     const transactionPayload = transactions[0]
@@ -120,7 +120,7 @@ describe('general-usercase', function () {
         'expected element #test-element'
       )
 
-      let sendEvents = waitForApmServerCalls(0, 1).sendEvents
+      let sendEvents = getLastServerCall(0, 1).sendEvents
       const [pageLoadTransaction] = sendEvents.transactions
 
       expect(pageLoadTransaction.type).toBe('page-load')
@@ -130,7 +130,7 @@ describe('general-usercase', function () {
       const actionButton = $('#test-action')
       actionButton.click()
 
-      sendEvents = waitForApmServerCalls(0, 1).sendEvents
+      sendEvents = getLastServerCall(0, 1).sendEvents
       const [clickTransaction] = sendEvents.transactions
 
       expect(clickTransaction.type).toBe('user-interaction')
@@ -149,7 +149,7 @@ describe('general-usercase', function () {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 1)
+    const { sendEvents } = getLastServerCall(0, 1)
     const { transactions } = sendEvents
 
     expect(transactions.length).toBe(1)

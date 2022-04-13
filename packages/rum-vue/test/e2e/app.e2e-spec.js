@@ -23,13 +23,13 @@
  *
  */
 
-const { waitForApmServerCalls } = require('../../../../dev-utils/webdriver')
+const { getLastServerCall } = require('../../../../dev-utils/webdriver')
 
 describe('Vue router integration', function () {
   beforeAll(() => browser.url('/test/e2e/'))
 
   it('should run vue app and capture route-change events', function () {
-    let sendEvents = waitForApmServerCalls(0, 1).sendEvents
+    let sendEvents = getLastServerCall(0, 1).sendEvents
     const [pageLoadTransaction] = sendEvents.transactions
 
     expect(pageLoadTransaction.type).toBe('page-load')
@@ -49,7 +49,7 @@ describe('Vue router integration', function () {
       'expected data.json to be loaded'
     )
 
-    sendEvents = waitForApmServerCalls(0, 1).sendEvents
+    sendEvents = getLastServerCall(0, 1).sendEvents
     const [routeTransaction] = sendEvents.transactions
 
     expect(routeTransaction.name).toBe('/fetch')

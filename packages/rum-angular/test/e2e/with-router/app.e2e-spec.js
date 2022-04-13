@@ -23,7 +23,7 @@
  *
  */
 
-const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
+const { getLastServerCall } = require('../../../../../dev-utils/webdriver')
 
 describe('Angular router integration', function () {
   /**
@@ -49,7 +49,7 @@ describe('Angular router integration', function () {
       'Home page'
     )
 
-    let sendEvents = (await waitForApmServerCalls(0, 1)).sendEvents
+    let sendEvents = (await getLastServerCall(0, 1)).sendEvents
     const [pageLoadTransaction] = sendEvents.transactions
 
     expect(pageLoadTransaction.type).toBe('page-load')
@@ -91,7 +91,7 @@ describe('Angular router integration', function () {
       5000
     )
 
-    sendEvents = (await waitForApmServerCalls(0, 1)).sendEvents
+    sendEvents = (await getLastServerCall(0, 1)).sendEvents
     const [routeTransaction] = sendEvents.transactions
 
     expect(routeTransaction.name).toBe('/contacts')

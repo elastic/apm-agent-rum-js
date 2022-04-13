@@ -25,7 +25,7 @@
 
 const {
   allowSomeBrowserErrors,
-  waitForApmServerCalls,
+  getLastServerCall,
   getBrowserInfo
 } = require('../../../../../dev-utils/webdriver')
 
@@ -41,7 +41,7 @@ describe('General usecase with react-router', function () {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 1)
+    const { sendEvents } = getLastServerCall(0, 1)
     const { transactions } = sendEvents
 
     expect(transactions.length).toBe(1)
@@ -79,7 +79,7 @@ describe('General usecase with react-router', function () {
       'expected manual component to be rendered'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 1)
+    const { sendEvents } = getLastServerCall(0, 1)
     const { transactions } = sendEvents
 
     const routeTransaction = transactions[0]

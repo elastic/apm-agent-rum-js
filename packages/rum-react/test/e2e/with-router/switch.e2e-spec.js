@@ -23,13 +23,13 @@
  *
  */
 
-const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
+const { getLastServerCall } = require('../../../../../dev-utils/webdriver')
 
 describe('Using Switch component of react router', function () {
   beforeAll(() => browser.url('/test/e2e/with-router/switch.html'))
 
   it('should render the react app on route change', function () {
-    let sendEvents = waitForApmServerCalls(0, 1).sendEvents
+    let sendEvents = getLastServerCall(0, 1).sendEvents
     let [pageLoadTransaction] = sendEvents.transactions
 
     expect(pageLoadTransaction.type).toBe('page-load')
@@ -47,7 +47,7 @@ describe('Using Switch component of react router', function () {
       'expected functional component to be rendered'
     )
 
-    sendEvents = waitForApmServerCalls(0, 1).sendEvents
+    sendEvents = getLastServerCall(0, 1).sendEvents
     let [routeTransaction] = sendEvents.transactions
 
     expect(routeTransaction.name).toBe('/func')
