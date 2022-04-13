@@ -19,7 +19,7 @@ Install the `@elastic/apm-rum-vue` package as a dependency to your application:
 
 [source,bash]
 ----
-npm install --save @elastic/apm-rum-vue 
+npm install --save @elastic/apm-rum-vue
 ----
 
 [float]
@@ -40,7 +40,7 @@ app.use(ApmVuePlugin, options)
 [float]
 ==== Instrumenting your Vue application
 
-The package exposes `ApmVuePlugin` which is a Vue Plugin and can be installed in your application using `Vue.use` method. 
+The package exposes `ApmVuePlugin` which is a Vue Plugin and can be installed in your application using `Vue.use` method.
 
 [source,js]
 ----
@@ -102,8 +102,31 @@ export default {
 </script>
 ----
 
+or via the recommended `<script setup>` syntax
 
-`ApmVuePlugin` expects the router option to be an instance of VueRouter since it uses the 
+[source,html]
+----
+<template>
+  <div>Component timings as span</div>
+</template>
+
+<script setup>
+import { inject, onMounted, onUnmounted, ref } from 'vue'
+
+const $apm = inject('$apm')
+const span = ref(null)
+
+onMounted(() =>
+  span.value = $apm.startSpan('mount-unmount-duration', 'custom')
+)
+
+onUnmounted(() =>
+  span.value.end()
+)
+</script>
+----
+
+`ApmVuePlugin` expects the router option to be an instance of VueRouter since it uses the
 https://next.router.vuejs.org/guide/advanced/navigation-guards.html[navigation guards] functionality.
 
 Once the plugin is initialized, both page load and SPA navigation events will be captured

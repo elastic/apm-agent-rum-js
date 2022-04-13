@@ -56,7 +56,10 @@ export const ApmVuePlugin = {
     /**
      * Provide the APM instance via $apm to be accessed in all Vue Components
      */
-    if (majorVersion >= 3) app.config.globalProperties.$apm = apm
+    if (majorVersion >= 3) {
+      app.config.globalProperties.$apm = apm
+      app.provide("$apm", apm)
+    }
     /**
      * Backward compatibility with Vue 2
      */ else app.prototype.$apm = apm
