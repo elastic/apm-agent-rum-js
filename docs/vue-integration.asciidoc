@@ -102,7 +102,7 @@ export default {
 </script>
 ----
 
-or via the recommended `<script setup>` syntax
+In case of both SFC and Composition API usage via the recommended `<script setup>` syntax the access of the instance is supported by the vue https://vuejs.org/guide/components/provide-inject.html#inject[plugin injection]
 
 [source,html]
 ----
