@@ -58,10 +58,7 @@ export const ApmVuePlugin = {
      */
     if (majorVersion >= 3) {
       app.config.globalProperties.$apm = apm
-      app.provide("$apm", apm)
-    }
-    /**
-     * Backward compatibility with Vue 2
-     */ else app.prototype.$apm = apm
+      app.provide('$apm', apm)
+    } /** Backward compatibility with Vue 2 */ else app.prototype.$apm = apm
   }
 }
