@@ -118,7 +118,6 @@ pipeline {
             }
           }
           matrix {
-            agent { label 'linux && immutable' }
             axes {
               axis {
                 name 'ELASTIC_STACK_VERSION'
@@ -141,7 +140,7 @@ pipeline {
             stages {
               stage('Scope Test') {
                 steps {
-                  runTest(stack: env.ELASTIC_STACK_VERSION, scope: env.SCOPE)
+                  runTest(stack: env.ELASTIC_STACK_VERSION, scope: env.SCOPE, allocateNode: true)
                 }
               }
             }
@@ -581,15 +580,18 @@ def runAllScopes(Map args = [:]) {
 def runTest(Map args = [:]){
   def stack = args.stack
   def scope = args.scope
+  def allocateNode = args.get('allocateNode', false)
   def mode = env.MODE == 'none' ? 'Puppeteer' : env.MODE
   def stackVersion = (stack == '7.x') ? artifactsApi(action: '7.x-version') : stack
+
   withGithubNotify(context: "Test ${scope} - ${stack} - ${mode}", tab: 'tests') {
-    runScript(
-      label: "${scope}",
-      stack: "${stackVersion}",
-      scope: "${scope}",
-      goal: 'test'
-    )
+    if (allocateNode) {
+      withNode(labels: 'linux && immutable', sleepMax: 5, forceWorspace: true, forceWorker: true){
+        runScript(label: "${scope}", stack: "${stackVersion}", scope: "${scope}", goal: 'test')
+      }
+    } else {
+      runScript(label: "${scope}", stack: "${stackVersion}", scope: "${scope}", goal: 'test')
+    }
   }
 }
 
