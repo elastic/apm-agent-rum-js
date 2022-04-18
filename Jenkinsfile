@@ -485,14 +485,12 @@ def runScript(Map args = [:]){
       "APM_SERVER_URL=http://apm-server:8200",
       "APM_SERVER_PORT=8200",
       "GOAL=${goal}"]) {
-      retry(2) {
-        sleep randomNumber(min: 5, max: 10)
+      retryWithSleep(retries: 2, seconds: 5, sleepFirst: true) {
         sh(label: 'Pull and build docker infra', script: '.ci/scripts/pull_and_build.sh')
       }
       try {
         // Another retry in case there are any environmental issues
-        retry(3) {
-          sleep randomNumber(min: 5, max: 10)
+        retryWithSleep(retries: 3, seconds: 5, sleepFirst: true) {
           if(env.MODE == 'saucelabs'){
             withSaucelabsEnv(){
               sh(label: "Run tests: Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
@@ -501,8 +499,6 @@ def runScript(Map args = [:]){
             sh(label: "Run tests: Elastic Stack ${stack} - ${scope} - ${env.MODE}", script: '.ci/scripts/test.sh')
           }
         }
-      } catch(e) {
-        throw e
       } finally {
         dockerLogs(step: "${label}-${stack}", failNever: true)
       }
