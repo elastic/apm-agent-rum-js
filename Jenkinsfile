@@ -120,23 +120,23 @@ pipeline {
           matrix {
             agent { label 'linux && immutable' }
             axes {
-                axis {
-                  name 'ELASTIC_STACK_VERSION'
-                  // The below line is part of the bump release automation
-                  // if you change anything please modifies the file
-                  // .ci/bump-stack-release-version.sh
-                  values '8.1.0-SNAPSHOT', '7.16.0'
-                }
-                axis {
-                  name 'SCOPE'
-                  values (
-                    '@elastic/apm-rum',
-                    '@elastic/apm-rum-core',
-                    '@elastic/apm-rum-react',
-                    '@elastic/apm-rum-angular',
-                    '@elastic/apm-rum-vue',
-                  )
-                }
+              axis {
+                name 'ELASTIC_STACK_VERSION'
+                // The below line is part of the bump release automation
+                // if you change anything please modifies the file
+                // .ci/bump-stack-release-version.sh
+                values '8.1.0-SNAPSHOT', '7.16.0'
+              }
+              axis {
+                name 'SCOPE'
+                values (
+                  '@elastic/apm-rum',
+                  '@elastic/apm-rum-core',
+                  '@elastic/apm-rum-react',
+                  '@elastic/apm-rum-angular',
+                  '@elastic/apm-rum-vue',
+                )
+              }
             }
             stages {
               stage('Scope Test') {
