@@ -84,7 +84,9 @@ pipeline {
         stage('Lint') {
           when {
             beforeAgent true
-            expression { return false }
+            not {
+              expression { return isTag() }
+            }
           }
           steps {
             withGithubNotify(context: 'Lint') {
@@ -94,14 +96,14 @@ pipeline {
                 docker.image('node:12').inside(){
                   dir("${BASE_DIR}"){
                     sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
-                    bundlesize()
+                    //bundlesize()
                   }
                   stash allowEmpty: true, name: 'cache', includes: "${BASE_DIR}/.npm/**", useDefaultExcludes: false
                 }
-                dir("${BASE_DIR}"){
+                //dir("${BASE_DIR}"){
                   // To run in the worker otherwise some tools won't be in place when using the above docker container
-                  generateReport(id: 'bundlesize', input: 'packages/rum/reports/apm-*-report.html', template: true, compare: true, templateFormat: 'md')
-                }
+                //  generateReport(id: 'bundlesize', input: 'packages/rum/reports/apm-*-report.html', template: true, compare: true, templateFormat: 'md')
+                //}
               }
             }
           }
