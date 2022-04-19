@@ -53,7 +53,8 @@ import {
   TRUNCATED_TYPE,
   FIRST_INPUT,
   LAYOUT_SHIFT,
-  SESSION_TIMEOUT
+  SESSION_TIMEOUT,
+  PAGE_LOAD_DELAY
 } from '../common/constants'
 import { addTransactionContext } from '../common/context'
 import { __DEV__, state } from '../state'
@@ -412,9 +413,8 @@ class TransactionService {
     // We need to make sure that we are not adding that extra time to the transaction end time
     // if nothing has been monitored or if the last monitored event end time is less than the delay.
     if (transaction.type === PAGE_LOAD) {
+      const transactionEndWithoutDelay = transaction._end - PAGE_LOAD_DELAY
       const lcp = metrics.lcp || 0
-      const agentMarks = transaction.getAgentMarks() || {}
-      const domComplete = agentMarks.domComplete || 0
       const latestXHRSpan = getLatestXHRSpan(spans) || {}
       const latestXHRSpanEnd = latestXHRSpan._end || 0
 
@@ -422,7 +422,7 @@ class TransactionService {
         latestSpanEnd,
         latestXHRSpanEnd,
         lcp,
-        domComplete
+        transactionEndWithoutDelay
       )
     } else if (latestSpanEnd > transaction._end) {
       /**

@@ -60,14 +60,6 @@ class Transaction extends SpanBase {
     this.marks = merge(this.marks || {}, obj)
   }
 
-  getAgentMarks() {
-    if (!this.marks) {
-      return
-    }
-
-    return this.marks.agent
-  }
-
   mark(key) {
     const skey = removeInvalidChars(key)
     const markTime = now() - this._start

@@ -592,7 +592,7 @@ describe('TransactionService', function () {
       transaction.end(1000)
     })
 
-    it('should have its end time adjusted to match with domComplete if it is the event that have lasted the most', done => {
+    it('should subtract the page load delay from its end time if no event has occurred after page load', done => {
       const transaction = transactionService.startTransaction('/', PAGE_LOAD, {
         startTime: 10
       })
@@ -603,18 +603,18 @@ describe('TransactionService', function () {
       const externalSpan = transaction.startSpan('span-name', 'external')
       externalSpan.end(20)
 
-      metrics.lcp = 25
-
-      transaction.addMarks({ agent: { domComplete: 30 } })
-
       transaction.onEnd = () => {
+        const endBeforeAdjusting = transaction._end
         transactionService.adjustTransactionTime(transaction)
         expect(transaction._start).toBe(10)
-        expect(transaction._end).toBe(30)
+        expect(transaction._end).toBe(endBeforeAdjusting - 1000)
         done()
       }
 
-      transaction.end(1000)
+      // This represents the time when the page load has been triggered
+      const pageLoadTime = 30
+
+      transaction.end(pageLoadTime + 1000)
     })
   })
 
