@@ -2,13 +2,22 @@ version: "2.1"
 services:
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION:-7.17.0}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION:-8.1.2}
     environment:
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-XX:UseAVX=2 -Xms1g -Xmx1g"
       - "cluster.routing.allocation.disk.threshold_enabled=false"
       - "discovery.type=single-node"
+      - "xpack.security.authc.anonymous.roles=remote_monitoring_collector"
+      - "xpack.security.authc.realms.file.file1.order=0"
+      - "xpack.security.authc.realms.native.native1.order=1"
+      - "xpack.security.enabled=true"
+      - "xpack.license.self_generated.type=trial"
+      - "xpack.security.authc.token.enabled=true"
+      - "xpack.security.authc.api_key.enabled=true"
+      - "logger.org.elasticsearch=${ES_LOG_LEVEL:-error}"
+      - "action.destructive_requires_name=false"
       - "path.data=/usr/share/elasticsearch/data/${STACK_VERSION}"
     ulimits:
       memlock:
@@ -27,68 +36,59 @@ services:
       test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -vq '\"status\":\"red\"'"]
       retries: 10
       interval: 20s
+    volumes:
+        - "./elasticsearch/roles.yml:/usr/share/elasticsearch/config/roles.yml"
+        - "./elasticsearch/users:/usr/share/elasticsearch/config/users"
+        - "./elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles"
+        - "./elasticsearch/service_tokens:/usr/share/elasticsearch/config/service_tokens"
     networks:
       apm:
         aliases:
           - elasticsearch
 
-  apm-server:
+  fleet-server:
     container_name: apm-server
-    image: docker.elastic.co/apm/apm-server:${STACK_VERSION:-7.17.0}
+    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION:-8.1.2}
+    entrypoint: "/bin/bash"
+    command:
+        - "-l"
+        - "-c"
+        - "export && elastic-agent container -d *"
     ports:
-      - "127.0.0.1:${APM_SERVER_PORT:-8200}:8200"
-    environment:
-      BEAT_STRICT_PERMS: "false"
-    command: >
-      apm-server -e
-        -E apm-server.rum.enabled=true
-        -E apm-server.rum.event_rate.limit=100000
-        -E apm-server.rum.allow_headers=["x-custom-header"]
-        -E apm-server.host=0.0.0.0:8200
-        -E apm-server.read_timeout=1m
-        -E apm-server.shutdown_timeout=2m
-        -E apm-server.write_timeout=1m
-        -E apm-server.kibana.enabled=true
-        -E apm-server.kibana.host=http://kibana:5601
-        -E setup.template.settings.index.number_of_replicas=0
-        -E monitoring.enabled=true
-        -E apm-server.expvar.enabled=true
-        -E apm-server.ilm.enabled=false
-        -E apm-server.instrumentation.enabled=true
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - DAC_OVERRIDE
-      - SETGID
-      - SETUID
-    logging:
-      driver: 'json-file'
-      options:
-          max-size: '2m'
-          max-file: '5'
-    mem_limit: 1000m
-#    cpus: 0.5
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      kibana:
-        condition: service_healthy
+        - "8220:8220"
+        - "8200:8200"
     healthcheck:
-      test: ["CMD", "curl", "--write-out", "'HTTP %{http_code}'", "--silent", "--output", "/dev/null", "http://apm-server:8200/"]
-      retries: 10
-      interval: 10s
+        test: ["CMD-SHELL", "curl -s -k http://localhost:8220/api/status | grep -q 'HEALTHY'"]
+        retries: 300
+        interval: 1s
+    environment:
+        FLEET_ELASTICSEARCH_HOST: "http://elasticsearch:9200"
+        FLEET_SERVER_ENABLE: "1"
+        FLEET_SERVER_HOST: "0.0.0.0"
+        FLEET_SERVER_POLICY_ID: "${FLEET_SERVER_POLICY_ID:-fleet-server-apm-policy}"
+        FLEET_SERVER_PORT: "8220"
+        KIBANA_FLEET_HOST: "http://kibana:5601"
+        KIBANA_FLEET_SETUP: "1"
+        FLEET_SERVER_INSECURE_HTTP: "1"
+        FLEET_SERVER_ELASTICSEARCH_INSECURE: "1"
+        FLEET_SERVER_SERVICE_TOKEN: AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL2VsYXN0aWMtcGFja2FnZS1mbGVldC1zZXJ2ZXItdG9rZW46bmgtcFhoQzRRQ2FXbms2U0JySGlWQQ
+        KIBANA_FLEET_SERVICE_TOKEN: AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL2VsYXN0aWMtcGFja2FnZS1mbGVldC1zZXJ2ZXItdG9rZW46bmgtcFhoQzRRQ2FXbms2U0JySGlWQQ
+    depends_on:
+        elasticsearch: {condition: service_healthy}
+        kibana: {condition: service_healthy}
     networks:
       apm:
         aliases:
-          - apm-server
+          - fleet-server
 
   kibana:
     container_name: kibana
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION:-7.17.0}
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION:-8.1.2}
     environment:
-      SERVER_NAME: kibana.example.org
-      ELASTICSEARCH_URL: http://elasticsearch:9200
+        ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+        ELASTICSEARCH_USERNAME: "${KIBANA_ES_USER:-kibana_system_user}"
+        ELASTICSEARCH_PASSWORD: "${KIBANA_ES_PASS:-changeme}"
+        STATUS_ALLOWANONYMOUS: 'true'
     ports:
       - "127.0.0.1:${KIBANA_PORT:-5601}:5601"
     logging:
@@ -100,6 +100,8 @@ services:
       test: ["CMD", "curl", "--write-out", "'HTTP %{http_code}'", "--silent", "--output", "/dev/null", "http://kibana:5601/"]
       retries: 10
       interval: 10s
+    volumes:
+        - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     mem_limit: 2000m
 #    cpus: 0.5
     depends_on:
@@ -122,7 +124,7 @@ services:
       retries: 10
       interval: 10s
     depends_on:
-      apm-server:
+      fleet-server:
         condition: service_healthy
     networks:
       apm:
@@ -141,6 +143,7 @@ services:
       - SCOPE=${SCOPE}
       - STACK_VERSION=${STACK_VERSION}
       - APM_SERVER_URL=${APM_SERVER_URL}
+      - KIBANA_URL=${KIBANA_URL}
       - BUILD_NUMBER=${BUILD_NUMBER}
       - BRANCH_NAME=${BRANCH_NAME}
       - JENKINS_URL=${JENKINS_URL}
@@ -154,7 +157,7 @@ services:
     mem_limit: 2000m
 #    cpus: 0.5
     depends_on:
-      apm-server:
+      fleet-server:
         condition: service_healthy
     volumes:
       - ..:/app
@@ -236,7 +239,7 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
-      apm-server:
+      fleet-server:
         condition: service_healthy
 
 networks:

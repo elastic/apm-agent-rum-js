@@ -26,20 +26,33 @@
 import path from 'path'
 import request from 'request'
 import fs from 'fs'
-import { getTestEnvironmentVariables } from '../../../../dev-utils/test-config'
 
 const basePath = path.join(__dirname, '../e2e')
-const { serverUrl } = getTestEnvironmentVariables()
+const defaultAUth = `Basic ${Buffer.from('admin:changeme').toString('base64')}`
+const esAuth = process.env.ES_AUTH || defaultAUth
+const kibanaUrl = process.env.KIBANA_URL || 'http://localhost:5601'
 
 describe('Sourcemaps', function () {
-  it('should upload sourcemaps', function (done) {
-    // curl http://localhost:8200/assets/v1/sourcemaps -X POST -F sourcemap=@app.e2e-bundle.js.map -F service_version=0.0.1 -F bundle_filepath="/test/e2e/general-usecase/app.e2e-bundle.js" -F service_name="apm-agent-rum-test-e2e-general-usecase"
+  it('should upload sourcemaps', async function (done) {
+    // curl http://localhost:5601/api/apm/sourcemaps -X POST -F sourcemap=@app.e2e-bundle.js.map -F service_version=0.0.1 -F bundle_filepath="/test/e2e/general-usecase/app.e2e-bundle.js" -F service_name="apm-agent-rum-test-e2e-general-usecase"
     var filepath = path.join(
       basePath,
       'general-usecase/app.e2e-bundle.min.js.map'
     )
+
+    var headers = {
+      'kbn-xsrf': 'true',
+      Authorization: esAuth
+    }
+
+    var readStream = fs.createReadStream(filepath)
+    var sourcemap = ''
+    for await (const chunk of readStream) {
+      sourcemap += chunk
+    }
+
     var formData = {
-      sourcemap: fs.createReadStream(filepath),
+      sourcemap,
       service_version: '0.0.1',
       bundle_filepath:
         'http://localhost:8000/test/e2e/general-usecase/app.e2e-bundle.min.js',
@@ -48,8 +61,9 @@ describe('Sourcemaps', function () {
 
     request.post(
       {
-        url: serverUrl + '/assets/v1/sourcemaps',
-        formData
+        url: kibanaUrl + '/api/apm/sourcemaps',
+        formData,
+        headers
       },
       function (err, resp, body) {
         if (err || (resp.statusCode !== 200 && resp.statusCode !== 202)) {

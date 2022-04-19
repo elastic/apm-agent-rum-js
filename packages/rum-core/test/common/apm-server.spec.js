@@ -286,6 +286,7 @@ describe('ApmServer', function () {
     sp.end(50)
     tr.end(100)
     const payload = performanceMonitoring.createTransactionDataModel(tr)
+
     await apmServer.sendEvents([
       {
         [TRANSACTIONS]: payload
