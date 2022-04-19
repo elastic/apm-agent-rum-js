@@ -23,7 +23,7 @@ else
 fi
 
 echo "Update stack with versions ${VERSION_RELEASE} and ${VERSION_DEV}"
-${SED} -E -e "s#(values '8.0.0-SNAPSHOT', '7.x',) '[0-9]+\.[0-9]+\.[0-9]+'#\1 '${VERSION_DEV}'#g" Jenkinsfile
+${SED} -E -e "s#(values '.+-SNAPSHOT',) '[0-9]+\.[0-9]+\.[0-9]+'#\1 '${VERSION_DEV}'#g" Jenkinsfile
 ${SED} -E -e "s#(defaultValue:) '[0-9]+\.[0-9]+\.[0-9]+'#\1 '${VERSION_RELEASE}'#g" Jenkinsfile
 git add Jenkinsfile
 for FILE in .ci/scripts/load-testing.sh .ci/scripts/pull_and_build.sh .ci/scripts/test.sh dev-utils/docker-compose.yml ; do
