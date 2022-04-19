@@ -413,10 +413,17 @@ class TransactionService {
     // if nothing has been monitored or if the last monitored event end time is less than the delay.
     if (transaction.type === PAGE_LOAD) {
       const lcp = metrics.lcp || 0
+      const agentMarks = transaction.getAgentMarks() || {}
+      const domComplete = agentMarks.domComplete || 0
       const latestXHRSpan = getLatestXHRSpan(spans) || {}
       const latestXHRSpanEnd = latestXHRSpan._end || 0
 
-      transaction._end = Math.max(latestSpanEnd, latestXHRSpanEnd, lcp)
+      transaction._end = Math.max(
+        latestSpanEnd,
+        latestXHRSpanEnd,
+        lcp,
+        domComplete
+      )
     } else if (latestSpanEnd > transaction._end) {
       /**
        * Adjust end time of the transaction to match the span end value
