@@ -28,6 +28,7 @@ import { createApp, defineComponent, defineAsyncComponent, h } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 import FetchComponent from './components/Fetch.vue'
+import SyntaxComponent from './components/Syntax.vue'
 import { getApmBase, getServerUrl } from './'
 import { ApmVuePlugin } from '../../src'
 
@@ -44,6 +45,7 @@ const router = new createRouter({
   routes: [
     { path: '/', component: Home },
     { path: '/lazy', component: Lazy },
+    { path: '/syntax', component: SyntaxComponent },
     {
       path: '/lazy/:params*',
       name: 'lazy params',
