@@ -61,3 +61,22 @@ describe('Vue router integration', function () {
     expect(extSpans[0].name).toBe('GET /test/e2e/data.json')
   })
 })
+
+describe('Script setup syntax', function () {
+  beforeAll(() => browser.url('/test/e2e/'))
+
+  it('should be supported', function () {
+    browser.waitUntil(
+      () => {
+        /**
+         * route to /syntax
+         */
+        $('#syntax').click()
+        const supportResult = $('#script-setup-syntax-support')
+        return supportResult.getText() === 'true'
+      },
+      5000,
+      'expected script setup syntax to be supported'
+    )
+  })
+})
