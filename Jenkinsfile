@@ -34,6 +34,7 @@ pipeline {
   }
   triggers {
     issueCommentTrigger("(${obltGitHubComments()}|^run benchmark tests)")
+    cron('H */4 * * 1-5')
   }
   parameters {
     booleanParam(name: 'Run_As_Main_Branch', defaultValue: false, description: 'Allow to run any steps on a PR, some steps normally only run on main branch.')
@@ -51,7 +52,7 @@ pipeline {
         */
         stage('Checkout') {
           steps {
-            pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
+            //pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
             deleteDir()
             gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
             stash allowEmpty: true, name: 'source', useDefaultExcludes: false
@@ -83,9 +84,7 @@ pipeline {
         stage('Lint') {
           when {
             beforeAgent true
-            not {
-              expression { return isTag() }
-            }
+            expression { return false }
           }
           steps {
             withGithubNotify(context: 'Lint') {
@@ -158,6 +157,7 @@ pipeline {
           }
           when {
             allOf {
+              expression { return false }
               anyOf {
                 branch 'main'
                 changeRequest()
@@ -187,6 +187,7 @@ pipeline {
           when {
             beforeAgent true
             allOf {
+              expression { return false }
               anyOf {
                 changeRequest()
                 expression { return !params.Run_As_Main_Branch }
@@ -217,6 +218,7 @@ pipeline {
                 expression { return env.BENCHMARK_UPDATED != "false" }
                 expression { return env.GITHUB_COMMENT?.contains('benchmark tests') }
               }
+              expression { return false }
               expression { return params.bench_ci }
               expression { return env.ONLY_DOCS == "false" }
               // Releases from main should skip this particular stage.
