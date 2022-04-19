@@ -68,7 +68,7 @@ describe('Transaction', function () {
     expect(tr.options).toEqual({ test: 'test', reuseThreshold: 400 })
   })
 
-  it('should redefine transaction threshold to undefined even when it is not explicitly defined', function () {
+  it('should redefine transaction threshold to undefined when it is not explicitly defined', function () {
     var tr = new Transaction('/', 'transaction', { reuseThreshold: 300 })
     tr.redefine('name', 'type', { test: 'test' })
     expect(tr.name).toBe('name')
