@@ -51,11 +51,11 @@
   "bundlesize": [
     {
       "path": "./dist/bundles/elastic-apm-rum*.min.js",
-      "maxSize": "19 kB"
+      "maxSize": "19.6 kB"
     },
     {
       "path": "./dist/bundles/elastic-apm-opentracing*.min.js",
-      "maxSize": "20.5 kB"
+      "maxSize": "21 kB"
     }
   ],
   "browserslist": [
