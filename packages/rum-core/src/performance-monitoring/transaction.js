@@ -84,6 +84,10 @@ class Transaction extends SpanBase {
     }
 
     if (options) {
+      // Makes sure the reuseThreshold is overridden too. This covers the case where the transaction
+      // is not setting explicitly the threshold and instead expecting to rely on the one by default.
+      this.options.reuseThreshold = options.reuseThreshold
+
       extend(this.options, options)
     }
   }

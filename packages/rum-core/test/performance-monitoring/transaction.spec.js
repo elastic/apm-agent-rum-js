@@ -62,10 +62,18 @@ describe('Transaction', function () {
 
   it('should redefine transaction', function () {
     var tr = new Transaction('/', 'transaction')
+    tr.redefine('name', 'type', { test: 'test', reuseThreshold: 400 })
+    expect(tr.name).toBe('name')
+    expect(tr.type).toBe('type')
+    expect(tr.options).toEqual({ test: 'test', reuseThreshold: 400 })
+  })
+
+  it('should redefine transaction threshold to undefined when it is not explicitly defined', function () {
+    var tr = new Transaction('/', 'transaction', { reuseThreshold: 300 })
     tr.redefine('name', 'type', { test: 'test' })
     expect(tr.name).toBe('name')
     expect(tr.type).toBe('type')
-    expect(tr.options).toEqual({ test: 'test' })
+    expect(tr.options).toEqual({ test: 'test', reuseThreshold: undefined })
   })
 
   it('should add and remove tasks', function () {
