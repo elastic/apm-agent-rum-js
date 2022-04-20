@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@2.0.1...@elastic/apm-rum-vue@2.1.0) (2022-04-20)
+
+
+### Bug Fixes
+
+* report LCP score properly ([#1190](https://github.com/elastic/apm-agent-rum-js/issues/1190)) ([9ff2dd0](https://github.com/elastic/apm-agent-rum-js/commit/9ff2dd0a74e7d1398491dc021d4b96b9ccbeebe8))
+
+
+### Features
+
+* **rum-vue:** vue 3 script setup syntax support ([#1200](https://github.com/elastic/apm-agent-rum-js/issues/1200)) ([88df9d0](https://github.com/elastic/apm-agent-rum-js/commit/88df9d0dd6e6a2629bf090efcd9c65ff339dc3ab))
+* send events when user leaves the page  ([#1146](https://github.com/elastic/apm-agent-rum-js/issues/1146)) ([2429814](https://github.com/elastic/apm-agent-rum-js/commit/242981446a6a03ffe3b9bb8c1de34a4b1f9195e9))
+
+
+
+
+
 ## [2.0.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-vue@1.4.0...@elastic/apm-rum-vue@2.0.1) (2022-02-03)
 
 **Note:** Version bump only for package @elastic/apm-rum-vue

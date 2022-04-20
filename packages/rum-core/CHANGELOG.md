@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.15.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.14.1...@elastic/apm-rum-core@5.15.0) (2022-04-20)
+
+
+### Bug Fixes
+
+* report LCP score properly ([#1190](https://github.com/elastic/apm-agent-rum-js/issues/1190)) ([9ff2dd0](https://github.com/elastic/apm-agent-rum-js/commit/9ff2dd0a74e7d1398491dc021d4b96b9ccbeebe8))
+
+
+### Features
+
+* **rum:** override threshold when redefining transaction ([#1204](https://github.com/elastic/apm-agent-rum-js/issues/1204)) ([7dba7cf](https://github.com/elastic/apm-agent-rum-js/commit/7dba7cfc2e508f59c1669a20d552405678caff22))
+* send events when user leaves the page  ([#1146](https://github.com/elastic/apm-agent-rum-js/issues/1146)) ([2429814](https://github.com/elastic/apm-agent-rum-js/commit/242981446a6a03ffe3b9bb8c1de34a4b1f9195e9))
+
+
+
+
+
 ## [5.14.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.14.0...@elastic/apm-rum-core@5.14.1) (2022-02-03)
 
 
