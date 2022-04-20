@@ -23,7 +23,7 @@
  *
  */
 
-const { waitForApmServerCalls } = require('../../../../../dev-utils/webdriver')
+const { getLastServerCall } = require('../../../../../dev-utils/webdriver')
 
 describe('Angular router integration', function () {
   /**
@@ -48,6 +48,13 @@ describe('Angular router integration', function () {
     expect(await browser.getElementText(result[ELEMENT_KEY])).toEqual(
       'Home page'
     )
+
+    let sendEvents = (await getLastServerCall(0, 1)).sendEvents
+    const [pageLoadTransaction] = sendEvents.transactions
+
+    expect(pageLoadTransaction.type).toBe('page-load')
+    expect(pageLoadTransaction.name).toBe('/home')
+    expect(pageLoadTransaction.spans.length).toBeGreaterThan(1)
 
     await browser.waitUntil(
       async () => {
@@ -84,16 +91,9 @@ describe('Angular router integration', function () {
       5000
     )
 
-    const { sendEvents } = await waitForApmServerCalls(0, 2)
-    const { transactions } = sendEvents
-    expect(transactions.length).toBe(2)
+    sendEvents = (await getLastServerCall(0, 1)).sendEvents
+    const [routeTransaction] = sendEvents.transactions
 
-    const pageLoadTransaction = transactions[0]
-    expect(pageLoadTransaction.type).toBe('page-load')
-    expect(pageLoadTransaction.name).toBe('/home')
-    expect(pageLoadTransaction.spans.length).toBeGreaterThan(1)
-
-    const routeTransaction = transactions[1]
     expect(routeTransaction.name).toBe('/contacts')
     expect(routeTransaction.type).toBe('route-change')
     expect(routeTransaction.spans.length).toBeGreaterThan(0)

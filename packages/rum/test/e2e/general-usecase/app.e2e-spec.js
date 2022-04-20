@@ -24,7 +24,7 @@
  */
 const {
   allowSomeBrowserErrors,
-  waitForApmServerCalls,
+  getLastServerCall,
   getBrowserFeatures
 } = require('../../../../../dev-utils/webdriver')
 
@@ -39,7 +39,7 @@ describe('general-usercase', function () {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(1, 1)
+    const { sendEvents } = getLastServerCall(1, 1)
     const { transactions, errors } = sendEvents
 
     expect(errors.length).toBe(1)
@@ -97,7 +97,7 @@ describe('general-usercase', function () {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 1)
+    const { sendEvents } = getLastServerCall(0, 1)
     const { transactions } = sendEvents
     expect(transactions.length).toBe(1)
     const transactionPayload = transactions[0]
@@ -119,12 +119,20 @@ describe('general-usercase', function () {
         5000,
         'expected element #test-element'
       )
+
+      let sendEvents = getLastServerCall(0, 1).sendEvents
+      const [pageLoadTransaction] = sendEvents.transactions
+
+      expect(pageLoadTransaction.type).toBe('page-load')
+
+      // we should wait until load transaction finishes before
+      // triggering the user interaction logic
       const actionButton = $('#test-action')
       actionButton.click()
-      const { sendEvents } = waitForApmServerCalls(0, 2)
-      const { transactions } = sendEvents
-      expect(transactions.length).toEqual(2)
-      const clickTransaction = transactions[1]
+
+      sendEvents = getLastServerCall(0, 1).sendEvents
+      const [clickTransaction] = sendEvents.transactions
+
       expect(clickTransaction.type).toBe('user-interaction')
       expect(clickTransaction.name).toBe('Click - button["test-action"]')
       expect(clickTransaction.spans.length).toBeGreaterThanOrEqual(1)
@@ -141,7 +149,7 @@ describe('general-usercase', function () {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 1)
+    const { sendEvents } = getLastServerCall(0, 1)
     const { transactions } = sendEvents
 
     expect(transactions.length).toBe(1)

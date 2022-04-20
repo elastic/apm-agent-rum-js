@@ -37,6 +37,7 @@ import {
 import { patchAll, patchEventHandler } from './common/patching'
 import { observePageVisibility } from './common/page-visibility'
 import {
+  PAGE_LOAD_DELAY,
   PAGE_LOAD,
   ERROR,
   CONFIG_SERVICE,
@@ -69,6 +70,7 @@ export {
   scheduleMacroTask,
   afterFrame,
   ERROR,
+  PAGE_LOAD_DELAY,
   PAGE_LOAD,
   CONFIG_SERVICE,
   LOGGING_SERVICE,

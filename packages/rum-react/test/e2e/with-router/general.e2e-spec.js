@@ -25,7 +25,7 @@
 
 const {
   allowSomeBrowserErrors,
-  waitForApmServerCalls,
+  getLastServerCall,
   getBrowserInfo
 } = require('../../../../../dev-utils/webdriver')
 
@@ -41,7 +41,7 @@ describe('General usecase with react-router', function () {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 1)
+    const { sendEvents } = getLastServerCall(0, 1)
     const { transactions } = sendEvents
 
     expect(transactions.length).toBe(1)
@@ -65,7 +65,7 @@ describe('General usecase with react-router', function () {
     return allowSomeBrowserErrors()
   })
 
-  it('should capture resoure and user timing spans for soft navigation', () => {
+  it('should capture resource and user timing spans for soft navigation', () => {
     browser.waitUntil(
       () => {
         /**
@@ -79,14 +79,10 @@ describe('General usecase with react-router', function () {
       'expected manual component to be rendered'
     )
 
-    const { sendEvents } = waitForApmServerCalls(0, 2)
+    const { sendEvents } = getLastServerCall(0, 1)
     const { transactions } = sendEvents
 
-    const pageLoadTransaction = transactions[0]
-    expect(pageLoadTransaction.type).toBe('page-load')
-    expect(pageLoadTransaction.name).toBe('/home')
-
-    const routeTransaction = transactions[1]
+    const routeTransaction = transactions[0]
     expect(routeTransaction.name).toBe('ManualComponent')
     expect(routeTransaction.type).toBe('component')
 

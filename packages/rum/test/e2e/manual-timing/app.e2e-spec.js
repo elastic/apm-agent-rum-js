@@ -25,7 +25,7 @@
 
 const {
   verifyNoBrowserErrors,
-  waitForApmServerCalls
+  getLastServerCall
 } = require('../../../../../dev-utils/webdriver')
 
 describe('manual-timing', function () {
@@ -39,7 +39,7 @@ describe('manual-timing', function () {
       'expected element #test-element'
     )
 
-    const { sendEvents } = waitForApmServerCalls(1, 1)
+    const { sendEvents } = getLastServerCall(1, 1)
     const { transactions, errors } = sendEvents
 
     expect(errors.length).toBe(1)

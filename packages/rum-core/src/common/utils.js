@@ -328,18 +328,27 @@ function removeInvalidChars(key) {
   return key.replace(/[.*"]/g, '_')
 }
 
-function getLatestNonXHRSpan(spans) {
+function getLatestSpan(spans, typeFilter) {
   let latestSpan = null
   for (let i = 0; i < spans.length; i++) {
     const span = spans[i]
     if (
-      String(span.type).indexOf('external') === -1 &&
+      typeFilter &&
+      typeFilter(span.type) &&
       (!latestSpan || latestSpan._end < span._end)
     ) {
       latestSpan = span
     }
   }
   return latestSpan
+}
+
+function getLatestNonXHRSpan(spans) {
+  return getLatestSpan(spans, type => String(type).indexOf('external') === -1)
+}
+
+function getLatestXHRSpan(spans) {
+  return getLatestSpan(spans, type => String(type).indexOf('external') !== -1)
 }
 
 function getEarliestSpan(spans) {
@@ -414,6 +423,7 @@ export {
   generateRandomId,
   getEarliestSpan,
   getLatestNonXHRSpan,
+  getLatestXHRSpan,
   getDuration,
   getTime,
   now,
