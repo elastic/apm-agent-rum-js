@@ -29,6 +29,17 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.11.0]]
+==== 5.11.0 (2022-04-20)
+[float]
+===== Features
+* Events are now beaconed when the user abandons or backgrounds the page, this makes sure the agent never miss an event. Before this change it was only sending them every interval configurable via `flushInterval`. Unsupported browsers: Firefox, IE11: {pull}1146[#1146]
+* **rum-vue:** Introduce script setup syntax support: {issue}1194[#1194]
+* Override reuse threshold when redefining a transaction. This will permit the agent not to miss data on slow network connections: {issue}1196[#1196]
+
+===== Bug fixes
+* Report Largest Contentful Paint (LCP) properly. Before this fix the agent was not giving the browser enough time to capture LCP entries that are post on-load: {pull}1190[#1190]
+
 [[release-notes-5.10.2]]
 ==== 5.10.2 (2022-02-03)
 [float]
