@@ -92,7 +92,6 @@ const OUTCOME_SUCCESS = 'success'
 const OUTCOME_FAILURE = 'failure'
 const OUTCOME_UNKNOWN = 'unknown'
 
-
 /**
  * Check only for long tasks that are more than 60ms
  */
