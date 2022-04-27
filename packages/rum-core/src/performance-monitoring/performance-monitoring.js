@@ -48,6 +48,7 @@ import {
   USER_INTERACTION,
   OUTCOME_FAILURE,
   OUTCOME_SUCCESS,
+  OUTCOME_UNKNOWN,
   QUEUE_ADD_TRANSACTION
 } from '../common/constants'
 import {
@@ -337,12 +338,14 @@ export default class PerformanceMonitoring {
         }
 
         let outcome
-        if (data.status != 'abort') {
+        if (data.status != 'abort' && !data.aborted) {
           if (status >= 400 || status == 0) {
             outcome = OUTCOME_FAILURE
           } else {
             outcome = OUTCOME_SUCCESS
           }
+        } else {
+          outcome = OUTCOME_UNKNOWN
         }
         span.outcome = outcome
         const tr = transactionService.getCurrentTransaction()

@@ -97,6 +97,7 @@ export function patchFetch(callback) {
         error => {
           reject(error)
           scheduleMicroTask(() => {
+            task.data.aborted = isAbortError(error)
             task.data.error = error
             invokeTask(task)
           })
@@ -105,4 +106,8 @@ export function patchFetch(callback) {
       globalState.fetchInProgress = false
     })
   }
+}
+
+function isAbortError(error) {
+  return error && error.name === 'AbortError'
 }

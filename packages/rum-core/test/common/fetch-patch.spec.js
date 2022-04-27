@@ -116,6 +116,23 @@ describe('fetchPatch', function () {
         })
       })
     })
+
+    it('should set invoke task as aborted when fetch request aborts', function (done) {
+      const abortController = new AbortController()
+      var promise = window.fetch('/', { signal: abortController.signal })
+      abortController.abort()
+
+      promise.catch(function (resp) {
+        expect(resp).toBeDefined()
+        Promise.resolve().then(function () {
+          expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+          const invokeTask = events[1].task
+          expect(invokeTask.data.aborted).toBe(true)
+          done()
+        })
+      })
+    })
+
     it('should reset fetchInProgress global state', function (done) {
       expect(globalState.fetchInProgress).toBe(false)
       window.fetch('http://localhost:54321/').then(done, () => done())
