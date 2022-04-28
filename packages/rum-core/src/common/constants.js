@@ -90,6 +90,7 @@ const TRANSACTION_TYPE_ORDER = [
 
 const OUTCOME_SUCCESS = 'success'
 const OUTCOME_FAILURE = 'failure'
+const OUTCOME_UNKNOWN = 'unknown'
 
 /**
  * Check only for long tasks that are more than 60ms
@@ -227,6 +228,7 @@ export {
   LAYOUT_SHIFT,
   OUTCOME_SUCCESS,
   OUTCOME_FAILURE,
+  OUTCOME_UNKNOWN,
   SESSION_TIMEOUT,
   HTTP_REQUEST_TIMEOUT
 }

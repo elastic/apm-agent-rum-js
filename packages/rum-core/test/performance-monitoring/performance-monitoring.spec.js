@@ -608,6 +608,18 @@ describe('PerformanceMonitoring', function () {
     return task
   }
 
+  function createFetchTask(method, url) {
+    let task = {
+      source: FETCH,
+      data: {
+        target: new Request(url),
+        method,
+        url
+      }
+    }
+    return task
+  }
+
   it('should create http-request transaction if no current transaction exist', done => {
     const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     spyOn(transactionService, 'startTransaction').and.callThrough()
@@ -968,6 +980,42 @@ describe('PerformanceMonitoring', function () {
       })
       .then(() => done())
   })
+
+  it('should set unknown outcome if xhr request is aborted', () => {
+    let transactionService = performanceMonitoring._transactionService
+    let task = createXHRTask('GET', '/')
+
+    performanceMonitoring.processAPICalls('schedule', task)
+    let tr = transactionService.getCurrentTransaction()
+
+    let spanTask = createXHRTask('GET', '/span')
+    performanceMonitoring.processAPICalls('schedule', spanTask)
+
+    spanTask.data.status = 'abort'
+    performanceMonitoring.processAPICalls('invoke', spanTask)
+
+    expect(tr.outcome).toBe('unknown')
+    expect(tr.spans[0].outcome).toBe('unknown')
+  })
+
+  if (window.Request) {
+    it('should set unknown outcome if fetch request is aborted', () => {
+      let transactionService = performanceMonitoring._transactionService
+      let task = createFetchTask('GET', '/')
+
+      performanceMonitoring.processAPICalls('schedule', task)
+      let tr = transactionService.getCurrentTransaction()
+
+      let spanTask = createFetchTask('GET', '/span')
+      performanceMonitoring.processAPICalls('schedule', spanTask)
+
+      spanTask.data.aborted = true
+      performanceMonitoring.processAPICalls('invoke', spanTask)
+
+      expect(tr.outcome).toBe('unknown')
+      expect(tr.spans[0].outcome).toBe('unknown')
+    })
+  }
 
   describe('PerformanceMonitoring Utils', () => {
     it('should group small continuously similar spans up until the last one', function () {
