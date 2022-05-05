@@ -401,6 +401,36 @@ function isPerfTypeSupported(type) {
   )
 }
 
+/**
+ * The goal of this is to make sure that HAR files
+ * can be created containing beacons with the payload readable
+ */
+function isBeaconInspectionEnabled() {
+  const flagName = '_elastic_inspect_beacon_'
+
+  if (sessionStorage.getItem(flagName) !== null) {
+    return true
+  }
+
+  if (!window.URL || !window.URLSearchParams) {
+    return false
+  }
+
+  try {
+    const parsedUrl = new URL(window.location.href)
+    const isFlagSet = parsedUrl.searchParams.has(flagName)
+    if (isFlagSet) {
+      sessionStorage.setItem(flagName, '')
+    }
+
+    return isFlagSet
+  } catch (e) {
+    // Ignore error since this is not intended to be used by users
+  }
+
+  return false
+}
+
 export {
   extend,
   merge,
@@ -439,5 +469,6 @@ export {
   PERF,
   isPerfTimelineSupported,
   isBrowser,
-  isPerfTypeSupported
+  isPerfTypeSupported,
+  isBeaconInspectionEnabled
 }
