@@ -339,4 +339,50 @@ describe('lib/utils', function () {
       'cache;desc=Origin cache;dur=200, edge;desc=Edge cache;dur=20, miss, app;dur=50'
     )
   })
+
+  describe('isBeaconInspectionEnabled', () => {
+    beforeEach(() => {
+      sessionStorage.removeItem('_elastic_inspect_beacon_')
+    })
+
+    it('should return true if flag exists in session storage', () => {
+      sessionStorage.setItem('_elastic_inspect_beacon_', '')
+
+      expect(utils.isBeaconInspectionEnabled()).toBe(true)
+    })
+
+    it('should return false if flag does not exist in session storage', () => {
+      expect(utils.isBeaconInspectionEnabled()).toBe(false)
+    })
+
+    it('should return false if URL api not available', () => {
+      const originalURL = window.URL
+      window.URL = undefined
+      expect(utils.isBeaconInspectionEnabled()).toBe(false)
+      window.URL = originalURL
+    })
+
+    it('should return false if URLSearchParams api not available', () => {
+      const originalURLSearchParams = window.URLSearchParams
+      window.URLSearchParams = undefined
+      expect(utils.isBeaconInspectionEnabled()).toBe(false)
+      window.URLSearchParams = originalURLSearchParams
+    })
+
+    if (window.URL && window.URLSearchParams) {
+      it('should return false if href does not include the flag as a query param', () => {
+        window.history.pushState({}, 'elastic', '/')
+        expect(utils.isBeaconInspectionEnabled()).toBe(false)
+      })
+
+      it('should return true if href includes the flag as a query param', () => {
+        window.history.pushState({}, 'elastic', '/?_elastic_inspect_beacon_')
+
+        expect(utils.isBeaconInspectionEnabled()).toBe(true)
+        expect(sessionStorage.getItem('_elastic_inspect_beacon_')).not.toBe(
+          null
+        )
+      })
+    }
+  })
 })

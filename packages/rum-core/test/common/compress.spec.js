@@ -24,6 +24,7 @@
  */
 
 import { createServiceFactory, generateTransaction, generateErrors } from '..'
+import { spyOnFunction } from '../../../../dev-utils/jasmine'
 import {
   compressTransaction,
   compressMetadata,
@@ -32,6 +33,7 @@ import {
 } from '../../src/common/compress'
 import { CONFIG_SERVICE, APM_SERVER } from '../../src/common/constants'
 import { addTransactionContext } from '../../src/common/context'
+import * as utils from '../../src/common/utils'
 
 /**
  * Mapping of existing fields with the new v3 RUM specification
@@ -422,6 +424,27 @@ describe('Compress', function () {
     } else {
       expect(headers).toEqual(originalHeaders)
     }
+    expect(payload).toEqual(ndjsonPayload)
+  })
+
+  it('should not compress payload if beacon inspection is enabled', async () => {
+    spyOnFunction(utils, 'isBeaconInspectionEnabled').and.returnValue(true)
+
+    const transactions = generateTransaction(1, true).map(tr => {
+      const model = performanceMonitoring.createTransactionDataModel(tr)
+      return model
+    })
+    const ndjsonPayload = apmServer
+      .ndjsonTransactions(transactions, true)
+      .join('')
+
+    const originalHeaders = { 'Content-Type': 'application/x-ndjson' }
+    let { payload, headers } = await compressPayload({
+      payload: ndjsonPayload,
+      headers: originalHeaders
+    })
+
+    expect(headers).toEqual(originalHeaders)
     expect(payload).toEqual(ndjsonPayload)
   })
 })
