@@ -44,6 +44,12 @@ export function patchFetch(callback) {
     callback(INVOKE, task)
   }
 
+  function handleResponseError(task, error) {
+    task.data.aborted = isAbortError(error)
+    task.data.error = error
+    invokeTask(task)
+  }
+
   function readStream(stream, task) {
     const reader = stream.getReader()
     const read = () => {
@@ -56,9 +62,7 @@ export function patchFetch(callback) {
           }
         },
         error => {
-          task.data.aborted = isAbortError(error)
-          task.data.error = error
-          invokeTask(task)
+          handleResponseError(task, error)
         }
       )
     }
@@ -124,9 +128,7 @@ export function patchFetch(callback) {
         error => {
           reject(error)
           scheduleMicroTask(() => {
-            task.data.aborted = isAbortError(error)
-            task.data.error = error
-            invokeTask(task)
+            handleResponseError(task, error)
           })
         }
       )
