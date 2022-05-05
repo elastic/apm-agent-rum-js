@@ -40,7 +40,7 @@ pipeline {
     booleanParam(name: 'saucelab_test', defaultValue: "true", description: "Enable run a Sauce lab test")
     booleanParam(name: 'bench_ci', defaultValue: true, description: 'Enable benchmarks')
     booleanParam(name: 'release', defaultValue: false, description: 'Release. If so, all the other parameters will be ignored when releasing from main.')
-    string(name: 'stack_version', defaultValue: '8.1.2', description: "What's the Stack Version to be used for the load testing?")
+    string(name: 'stack_version', defaultValue: '8.2.0', description: "What's the Stack Version to be used for the load testing?")
   }
   stages {
     stage('Initializing'){
@@ -124,7 +124,7 @@ pipeline {
                 // The below line is part of the bump release automation
                 // if you change anything please modifies the file
                 // .ci/bump-stack-release-version.sh
-                values '8.0.0-SNAPSHOT', '7.16.0'
+                values '8.0.0-SNAPSHOT', '8.2.0'
               }
               axis {
                 name 'SCOPE'
@@ -313,7 +313,7 @@ pipeline {
           steps {
             withGithubNotify(context: 'Coverage') {
               // No scope is required as the coverage should run for all of them
-              runScript(label: 'coverage', stack: '7.0.0', scope: '', goal: 'coverage')
+              runScript(label: 'coverage', stack: "${env.STACK_VERSION}", scope: '', goal: 'coverage')
               codecov(repo: env.REPO, basedir: "${env.BASE_DIR}", secret: "${env.CODECOV_SECRET}")
             }
           }
