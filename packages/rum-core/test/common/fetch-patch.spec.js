@@ -49,22 +49,58 @@ describe('fetchPatch', function () {
   })
 
   if (window.fetch) {
-    it('should fetch correctly when response cannot be read from a stream', function (done) {
-      let originalCloneFn = window.Response.prototype.clone
-      window.Response.prototype.clone = function () {
-        return {}
-      }
+    describe('when response cannot be read from a stream', () => {
+      let originalCloneFn
 
-      var promise = window.fetch('/')
-      expect(promise).toBeDefined()
-      expect(typeof promise.then).toBe('function')
-      expect(events.map(e => e.event)).toEqual(['schedule'])
-      promise.then(function (resp) {
-        expect(resp).toBeDefined()
-        Promise.resolve().then(function () {
-          expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-          window.Response.prototype.clone = originalCloneFn
-          done()
+      beforeEach(() => {
+        originalCloneFn = window.Response.prototype.clone
+        window.Response.prototype.clone = function () {
+          return {}
+        }
+      })
+
+      afterEach(() => {
+        window.Response.prototype.clone = originalCloneFn
+      })
+
+      it('should fetch correctly', function (done) {
+        var promise = window.fetch('/')
+        expect(promise).toBeDefined()
+        expect(typeof promise.then).toBe('function')
+        expect(events.map(e => e.event)).toEqual(['schedule'])
+        promise.then(function (resp) {
+          expect(resp).toBeDefined()
+          Promise.resolve().then(function () {
+            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+            done()
+          })
+        })
+      })
+
+      it('should produce task events when fetch fails', function (done) {
+        var promise = window.fetch('http://localhost:54321/')
+        promise.catch(function (error) {
+          expect(error).toBeDefined()
+          Promise.resolve().then(function () {
+            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+            done()
+          })
+        })
+      })
+
+      it('should set invoke task as aborted when fetch request aborts', function (done) {
+        const abortController = new AbortController()
+        var promise = window.fetch('/', { signal: abortController.signal })
+        abortController.abort()
+
+        promise.catch(function (resp) {
+          expect(resp).toBeDefined()
+          Promise.resolve().then(function () {
+            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+            const invokeTask = events[1].task
+            expect(invokeTask.data.aborted).toBe(true)
+            done()
+          })
         })
       })
     })
@@ -194,33 +230,6 @@ describe('fetchPatch', function () {
         .catch(function (error) {
           fail(error)
         })
-    })
-
-    it('should produce task events when fetch fails', function (done) {
-      var promise = window.fetch('http://localhost:54321/')
-      promise.catch(function (error) {
-        expect(error).toBeDefined()
-        Promise.resolve().then(function () {
-          expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-          done()
-        })
-      })
-    })
-
-    it('should set invoke task as aborted when fetch request aborts', function (done) {
-      const abortController = new AbortController()
-      var promise = window.fetch('/', { signal: abortController.signal })
-      abortController.abort()
-
-      promise.catch(function (resp) {
-        expect(resp).toBeDefined()
-        Promise.resolve().then(function () {
-          expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-          const invokeTask = events[1].task
-          expect(invokeTask.data.aborted).toBe(true)
-          done()
-        })
-      })
     })
 
     it('should reset fetchInProgress global state', function (done) {
