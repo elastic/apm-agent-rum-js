@@ -408,7 +408,7 @@ function isPerfTypeSupported(type) {
 function isBeaconInspectionEnabled() {
   const flagName = '_elastic_inspect_beacon_'
 
-  if (sessionStorage.getItem(flagName) !== null) {
+  if (sessionStorage.getItem(flagName) != null) {
     return true
   }
 
@@ -420,7 +420,7 @@ function isBeaconInspectionEnabled() {
     const parsedUrl = new URL(window.location.href)
     const isFlagSet = parsedUrl.searchParams.has(flagName)
     if (isFlagSet) {
-      sessionStorage.setItem(flagName, '')
+      sessionStorage.setItem(flagName, true)
     }
 
     return isFlagSet
