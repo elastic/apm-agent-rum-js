@@ -144,11 +144,6 @@ pipeline {
                 }
               }
             }
-            post {
-              cleanup {
-                wrappingUp()
-              }
-            }
           }
         }
         stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
@@ -178,7 +173,9 @@ pipeline {
           }
           post {
             cleanup {
-              wrappingUp()
+              dir("${BASE_DIR}") {
+                wrappingUp()
+              }
             }
           }
         }
@@ -501,6 +498,7 @@ def runScript(Map args = [:]){
         }
       } finally {
         dockerLogs(step: "${label}-${stack}", failNever: true)
+        wrappingUp()
       }
     }
   }
@@ -545,8 +543,8 @@ def bundlesize(){
 def wrappingUp(){
   junit(allowEmptyResults: true,
     keepLongStdio: true,
-    testResults: "${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
-  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/.npm/_logs,${env.BASE_DIR}/packages/**/reports/TESTS-*.xml")
+    testResults: "packages/**/reports/TESTS-*.xml")
+  archiveArtifacts(allowEmptyArchive: true, artifacts: ".npm/_logs,packages/**/reports/TESTS-*.xml")
 }
 
 def prepareRelease(String nodeVersion='node:lts', Closure body){
