@@ -44,6 +44,31 @@ export function patchFetch(callback) {
     callback(INVOKE, task)
   }
 
+  function handleResponseError(task, error) {
+    task.data.aborted = isAbortError(error)
+    task.data.error = error
+    invokeTask(task)
+  }
+
+  function readStream(stream, task) {
+    const reader = stream.getReader()
+    const read = () => {
+      reader.read().then(
+        ({ done }) => {
+          if (done) {
+            invokeTask(task)
+          } else {
+            read()
+          }
+        },
+        error => {
+          handleResponseError(task, error)
+        }
+      )
+    }
+    read()
+  }
+
   var nativeFetch = window.fetch
   window.fetch = function (input, init) {
     var fetchSelf = this
@@ -87,19 +112,23 @@ export function patchFetch(callback) {
 
       promise.then(
         response => {
+          let clonedResponse = response.clone ? response.clone() : {}
           resolve(response)
           // invokeTask in the next execution cycle to let the promise resolution complete
           scheduleMicroTask(() => {
             task.data.response = response
-            invokeTask(task)
+            const { body } = clonedResponse
+            if (body) {
+              readStream(body, task)
+            } else {
+              invokeTask(task)
+            }
           })
         },
         error => {
           reject(error)
           scheduleMicroTask(() => {
-            task.data.aborted = isAbortError(error)
-            task.data.error = error
-            invokeTask(task)
+            handleResponseError(task, error)
           })
         }
       )
