@@ -23,29 +23,7 @@
  *
  */
 
-import { patchXMLHttpRequest } from './xhr-patch'
-import { patchFetch } from './fetch-patch'
-import { patchHistory } from './history-patch'
-import EventHandler from '../event-handler'
-import { HISTORY, FETCH, XMLHTTPREQUEST } from '../constants'
+import { observePageVisibility } from './page-visibility'
+import { observePageClicks } from './page-clicks'
 
-const patchEventHandler = new EventHandler()
-let alreadyPatched = false
-
-function patchAll() {
-  if (!alreadyPatched) {
-    alreadyPatched = true
-    patchXMLHttpRequest(function (event, task) {
-      patchEventHandler.send(XMLHTTPREQUEST, [event, task])
-    })
-    patchFetch(function (event, task) {
-      patchEventHandler.send(FETCH, [event, task])
-    })
-    patchHistory(function (event, task) {
-      patchEventHandler.send(HISTORY, [event, task])
-    })
-  }
-  return patchEventHandler
-}
-
-export { patchAll, patchEventHandler }
+export { observePageVisibility, observePageClicks }

@@ -31,7 +31,8 @@ import {
   TRANSACTION_SERVICE,
   LOGGING_SERVICE,
   CONFIG_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  EVENT_TARGET
 } from '@elastic/apm-rum-core'
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
@@ -147,6 +148,28 @@ describe('ApmBase', function () {
       setDocumentVisibilityState('visible')
       done()
     })
+  })
+
+  it('should observe click event if eventtarget instrumentation is not disabled', () => {
+    apmBase.init({ serviceName, serverUrl })
+
+    document.body.click()
+
+    const tr = apmBase.getCurrentTransaction()
+    expect(tr.name).toBe('Click - body')
+  })
+
+  it('should not observe click event if eventtarget instrumentation is disabled', () => {
+    apmBase.init({
+      serviceName,
+      serverUrl,
+      disableInstrumentations: [EVENT_TARGET]
+    })
+
+    document.body.click()
+
+    const tr = apmBase.getCurrentTransaction()
+    expect(tr.name).toBe('Unknown')
   })
 
   it('should disable all auto instrumentations when instrument is false', () => {

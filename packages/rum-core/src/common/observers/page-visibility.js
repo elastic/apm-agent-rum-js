@@ -23,9 +23,9 @@
  *
  */
 
-import { QUEUE_ADD_TRANSACTION, QUEUE_FLUSH } from './constants'
-import { state } from '../state'
-import { now } from './utils'
+import { QUEUE_ADD_TRANSACTION, QUEUE_FLUSH } from '../constants'
+import { state } from '../../state'
+import { now } from '../utils'
 
 /**
  * @param configService

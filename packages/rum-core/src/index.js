@@ -35,7 +35,7 @@ import {
   isBrowser
 } from './common/utils'
 import { patchAll, patchEventHandler } from './common/patching'
-import { observePageVisibility } from './common/page-visibility'
+import { observePageVisibility, observePageClicks } from './common/observers'
 import {
   PAGE_LOAD_DELAY,
   PAGE_LOAD,
@@ -43,7 +43,8 @@ import {
   CONFIG_SERVICE,
   LOGGING_SERVICE,
   TRANSACTION_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  EVENT_TARGET
 } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
 import afterFrame from './common/after-frame'
@@ -76,6 +77,8 @@ export {
   LOGGING_SERVICE,
   TRANSACTION_SERVICE,
   APM_SERVER,
+  EVENT_TARGET,
   bootstrap,
-  observePageVisibility
+  observePageVisibility,
+  observePageClicks
 }

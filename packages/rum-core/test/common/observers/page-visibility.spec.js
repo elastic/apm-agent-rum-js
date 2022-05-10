@@ -23,21 +23,21 @@
  *
  */
 
-import { observePageVisibility } from '../../src/common/page-visibility'
-import { createServiceFactory } from '../../src'
-import { state } from '../../src/state'
+import { observePageVisibility } from '../../../src/common/observers'
+import { createServiceFactory } from '../../../src'
+import { state } from '../../../src/state'
 import {
   QUEUE_FLUSH,
   TRANSACTION_SERVICE,
   CONFIG_SERVICE
-} from '../../src/common/constants'
-import * as utils from '../../src/common/utils'
+} from '../../../src/common/constants'
+import * as utils from '../../../src/common/utils'
 import {
   hidePageSynthetically,
   dispatchBrowserEvent,
   setDocumentVisibilityState
-} from '../../test/'
-import { spyOnFunction, waitFor } from '../../../../dev-utils/jasmine'
+} from '../..'
+import { spyOnFunction, waitFor } from '../../../../../dev-utils/jasmine'
 
 describe('observePageVisibility', () => {
   let serviceFactory

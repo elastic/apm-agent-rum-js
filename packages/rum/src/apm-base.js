@@ -32,7 +32,9 @@ import {
   LOGGING_SERVICE,
   TRANSACTION_SERVICE,
   APM_SERVER,
-  observePageVisibility
+  EVENT_TARGET,
+  observePageVisibility,
+  observePageClicks
 } from '@elastic/apm-rum-core'
 
 export default class ApmBase {
@@ -117,6 +119,9 @@ export default class ApmBase {
         }
 
         observePageVisibility(configService, transactionService)
+        if (flags[EVENT_TARGET]) {
+          observePageClicks(transactionService)
+        }
       } else {
         this._disable = true
         loggingService.warn('RUM agent is inactive')
