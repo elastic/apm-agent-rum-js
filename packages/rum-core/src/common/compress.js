@@ -28,6 +28,7 @@ import {
   NAVIGATION_TIMING_MARKS,
   COMPRESSED_NAV_TIMING_MARKS
 } from '../performance-monitoring/capture-navigation'
+import { isBeaconInspectionEnabled } from './utils'
 
 /**
  * Compression of all the below schema is based on the v3 RUM Specification
@@ -334,6 +335,15 @@ export function compressPayload(params, type = 'gzip') {
     if (!isCompressionStreamSupported) {
       return resolve(params)
     }
+
+    /**
+     * Resolve with unmodified payload if the flag
+     * for inspecting beacons is enabled
+     */
+    if (isBeaconInspectionEnabled()) {
+      return resolve(params)
+    }
+
     const { payload, headers, beforeSend } = params
     /**
      * create a blob with the original payload data and convert it
