@@ -31,6 +31,8 @@ import {
   CONFIG_SERVICE,
   LOGGING_SERVICE,
   TRANSACTION_SERVICE,
+  PERFORMANCE_MONITORING,
+  ERROR_LOGGING,
   APM_SERVER,
   EVENT_TARGET,
   observePageVisibility,
@@ -88,12 +90,12 @@ export default class ApmBase {
         )
 
         const performanceMonitoring = this.serviceFactory.getService(
-          'PerformanceMonitoring'
+          PERFORMANCE_MONITORING
         )
         performanceMonitoring.init(flags)
 
         if (flags[ERROR]) {
-          const errorLogging = this.serviceFactory.getService('ErrorLogging')
+          const errorLogging = this.serviceFactory.getService(ERROR_LOGGING)
           errorLogging.registerListeners()
         }
 
@@ -303,7 +305,7 @@ export default class ApmBase {
 
   captureError(error) {
     if (this.isEnabled()) {
-      var errorLogging = this.serviceFactory.getService('ErrorLogging')
+      var errorLogging = this.serviceFactory.getService(ERROR_LOGGING)
       return errorLogging.logError(error)
     }
   }

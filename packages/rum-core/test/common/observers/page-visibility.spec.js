@@ -29,7 +29,8 @@ import { state } from '../../../src/state'
 import {
   QUEUE_FLUSH,
   TRANSACTION_SERVICE,
-  CONFIG_SERVICE
+  CONFIG_SERVICE,
+  PERFORMANCE_MONITORING
 } from '../../../src/common/constants'
 import * as utils from '../../../src/common/utils'
 import {
@@ -123,7 +124,7 @@ describe('observePageVisibility', () => {
         // Starts performanceMonitoring to observe how transaction ends
         function startsPerformanceMonitoring() {
           const performanceMonitoring = serviceFactory.getService(
-            'PerformanceMonitoring'
+            PERFORMANCE_MONITORING
           )
           performanceMonitoring.init()
         }

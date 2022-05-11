@@ -24,12 +24,12 @@
  */
 
 import { createCustomEvent } from '../..'
+import { createServiceFactory, patchEventHandler } from '../../../src'
 import {
-  createServiceFactory,
-  patchEventHandler,
-  TRANSACTION_SERVICE
-} from '../../../src'
-import { HISTORY } from '../../../src/common/constants'
+  HISTORY,
+  TRANSACTION_SERVICE,
+  PERFORMANCE_MONITORING
+} from '../../../src/common/constants'
 import { observePageClicks } from '../../../src/common/observers'
 
 describe('observePageClicks', () => {
@@ -42,7 +42,7 @@ describe('observePageClicks', () => {
   beforeEach(() => {
     serviceFactory = createServiceFactory()
     transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
-    performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    performanceMonitoring = serviceFactory.getService(PERFORMANCE_MONITORING)
     containerElement = document.createElement('div')
     document.body.appendChild(containerElement)
   })

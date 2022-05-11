@@ -32,14 +32,16 @@ import { Reference, REFERENCE_CHILD_OF } from 'opentracing'
 import {
   TRANSACTION_SERVICE,
   LOGGING_SERVICE,
-  CONFIG_SERVICE
+  CONFIG_SERVICE,
+  PERFORMANCE_MONITORING,
+  ERROR_LOGGING
 } from '../../src/common/constants'
 
 function createTracer(config) {
   var serviceFactory = createServiceFactory()
-  var performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+  var performanceMonitoring = serviceFactory.getService(PERFORMANCE_MONITORING)
   var transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
-  var errorLogging = serviceFactory.getService('ErrorLogging')
+  var errorLogging = serviceFactory.getService(ERROR_LOGGING)
   var loggingService = serviceFactory.getService(LOGGING_SERVICE)
   var configService = serviceFactory.getService(CONFIG_SERVICE)
   configService.setConfig(config)

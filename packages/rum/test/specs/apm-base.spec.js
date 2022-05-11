@@ -32,6 +32,7 @@ import {
   LOGGING_SERVICE,
   CONFIG_SERVICE,
   APM_SERVER,
+  ERROR_LOGGING,
   EVENT_TARGET
 } from '@elastic/apm-rum-core'
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
@@ -174,7 +175,7 @@ describe('ApmBase', function () {
 
   it('should disable all auto instrumentations when instrument is false', () => {
     const trService = serviceFactory.getService(TRANSACTION_SERVICE)
-    const ErrorLogging = serviceFactory.getService('ErrorLogging')
+    const ErrorLogging = serviceFactory.getService(ERROR_LOGGING)
     const loggingInstane = ErrorLogging['__proto__']
     spyOn(loggingInstane, 'registerListeners')
 
@@ -192,7 +193,7 @@ describe('ApmBase', function () {
 
   it('should selectively enable/disable instrumentations based on config', () => {
     const trService = serviceFactory.getService(TRANSACTION_SERVICE)
-    const ErrorLogging = serviceFactory.getService('ErrorLogging')
+    const ErrorLogging = serviceFactory.getService(ERROR_LOGGING)
     const loggingInstane = ErrorLogging['__proto__']
     spyOn(loggingInstane, 'registerListeners')
 

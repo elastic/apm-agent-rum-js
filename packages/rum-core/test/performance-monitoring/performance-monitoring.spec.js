@@ -48,7 +48,8 @@ import {
   TRANSACTION_SERVICE,
   LOGGING_SERVICE,
   CONFIG_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  PERFORMANCE_MONITORING
 } from '../../src/common/constants'
 import { state } from '../../src/state'
 import patchEventHandler from '../common/patch'
@@ -71,7 +72,7 @@ describe('PerformanceMonitoring', function () {
     configService.setConfig(agentConfig)
 
     apmServer = serviceFactory.getService(APM_SERVER)
-    performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
+    performanceMonitoring = serviceFactory.getService(PERFORMANCE_MONITORING)
   })
 
   it('should send performance monitoring data to apm-server', function (done) {

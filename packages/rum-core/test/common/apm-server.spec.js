@@ -33,7 +33,9 @@ import {
   HTTP_REQUEST_TIMEOUT,
   LOGGING_SERVICE,
   CONFIG_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  PERFORMANCE_MONITORING,
+  ERROR_LOGGING
 } from '../../src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 import { describeIf, spyOnFunction } from '../../../../dev-utils/jasmine'
@@ -64,8 +66,8 @@ describe('ApmServer', function () {
     configService.setConfig(agentConfig)
     loggingService = serviceFactory.getService(LOGGING_SERVICE)
     apmServer = serviceFactory.getService(APM_SERVER)
-    performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
-    errorLogging = serviceFactory.getService('ErrorLogging')
+    performanceMonitoring = serviceFactory.getService(PERFORMANCE_MONITORING)
+    errorLogging = serviceFactory.getService(ERROR_LOGGING)
   })
 
   afterEach(function () {

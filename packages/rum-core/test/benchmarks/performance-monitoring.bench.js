@@ -31,7 +31,8 @@ import { createServiceFactory } from '../../src'
 import {
   TRANSACTIONS,
   CONFIG_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  PERFORMANCE_MONITORING
 } from '../../src/common/constants'
 import { groupSmallContinuouslySimilarSpans } from '../../src/performance-monitoring/performance-monitoring'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
@@ -52,7 +53,7 @@ function getSendEvents(performanceMonitoring, apmServer) {
 suite('PerformanceMonitoring', () => {
   const serviceFactory = createServiceFactory()
   const performanceMonitoring = serviceFactory.getService(
-    'PerformanceMonitoring'
+    PERFORMANCE_MONITORING
   )
   const apmServer = serviceFactory.getService(APM_SERVER)
   const _postJson = apmServer._postJson

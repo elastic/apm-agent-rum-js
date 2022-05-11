@@ -44,6 +44,8 @@ import {
   LOGGING_SERVICE,
   TRANSACTION_SERVICE,
   APM_SERVER,
+  PERFORMANCE_MONITORING,
+  ERROR_LOGGING,
   EVENT_TARGET
 } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
@@ -77,6 +79,8 @@ export {
   LOGGING_SERVICE,
   TRANSACTION_SERVICE,
   APM_SERVER,
+  PERFORMANCE_MONITORING,
+  ERROR_LOGGING,
   EVENT_TARGET,
   bootstrap,
   observePageVisibility,
