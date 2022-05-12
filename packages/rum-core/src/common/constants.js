@@ -116,7 +116,8 @@ const QUEUE_ADD_TRANSACTION = 'queue:add_transaction'
 const XMLHTTPREQUEST = 'xmlhttprequest'
 const FETCH = 'fetch'
 const HISTORY = 'history'
-const EVENT_TARGET = 'eventtarget'
+const EVENT_TARGET = 'eventtarget' //@deprecated, it will be removed in the first 6.x release
+const CLICK = 'click'
 const ERROR = 'error'
 
 /**
@@ -203,6 +204,7 @@ export {
   FETCH,
   HISTORY,
   EVENT_TARGET,
+  CLICK,
   ERROR,
   BEFORE_EVENT,
   AFTER_EVENT,

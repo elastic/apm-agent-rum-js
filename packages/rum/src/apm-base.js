@@ -35,6 +35,7 @@ import {
   ERROR_LOGGING,
   APM_SERVER,
   EVENT_TARGET,
+  CLICK,
   observePageVisibility,
   observePageClicks
 } from '@elastic/apm-rum-core'
@@ -121,7 +122,7 @@ export default class ApmBase {
         }
 
         observePageVisibility(configService, transactionService)
-        if (flags[EVENT_TARGET]) {
+        if (flags[EVENT_TARGET] && flags[CLICK]) {
           observePageClicks(transactionService)
         }
       } else {

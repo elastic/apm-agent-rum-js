@@ -96,6 +96,7 @@ The valid options are:
 * `page-load`
 * `history`
 * `eventtarget`
+* `click`
 * `xmlhttprequest`
 * `fetch`
 * `error`
@@ -103,7 +104,8 @@ The valid options are:
 NOTE: To disable all `http-request` transactions, add both `fetch` and `xmlhttprequest`.
 to this config.
 
-NOTE: To disable `user-interaction` transactions,  add `eventtarget` to this config.
+NOTE: To disable `user-interaction` transactions,  add `eventtarget` or `click` to this config.
+The option `eventtarget` is deprecated and it might be removed in a future release.
 
 [float]
 [[environment]]

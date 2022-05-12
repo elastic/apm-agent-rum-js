@@ -33,7 +33,8 @@ import {
   CONFIG_SERVICE,
   APM_SERVER,
   ERROR_LOGGING,
-  EVENT_TARGET
+  EVENT_TARGET,
+  CLICK
 } from '@elastic/apm-rum-core'
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
@@ -160,11 +161,24 @@ describe('ApmBase', function () {
     expect(tr.name).toBe('Click - body')
   })
 
-  it('should not observe click event if eventtarget instrumentation is disabled', () => {
+  it('should not observe click event if EVENT_TARGET instrumentation is disabled', () => {
     apmBase.init({
       serviceName,
       serverUrl,
       disableInstrumentations: [EVENT_TARGET]
+    })
+
+    document.body.click()
+
+    const tr = apmBase.getCurrentTransaction()
+    expect(tr.name).toBe('Unknown')
+  })
+
+  it('should not observe click event if CLICK instrumentation is disabled', () => {
+    apmBase.init({
+      serviceName,
+      serverUrl,
+      disableInstrumentations: [CLICK]
     })
 
     document.body.click()

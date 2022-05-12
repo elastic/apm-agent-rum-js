@@ -46,7 +46,8 @@ import {
   APM_SERVER,
   PERFORMANCE_MONITORING,
   ERROR_LOGGING,
-  EVENT_TARGET
+  EVENT_TARGET,
+  CLICK
 } from './common/constants'
 import { getInstrumentationFlags } from './common/instrument'
 import afterFrame from './common/after-frame'
@@ -82,6 +83,7 @@ export {
   PERFORMANCE_MONITORING,
   ERROR_LOGGING,
   EVENT_TARGET,
+  CLICK,
   bootstrap,
   observePageVisibility,
   observePageClicks
