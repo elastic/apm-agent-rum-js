@@ -43,9 +43,7 @@ import {
   FETCH,
   HISTORY,
   XMLHTTPREQUEST,
-  EVENT_TARGET,
   HTTP_REQUEST_TYPE,
-  USER_INTERACTION,
   OUTCOME_FAILURE,
   OUTCOME_SUCCESS,
   OUTCOME_UNKNOWN,
@@ -175,57 +173,6 @@ export default class PerformanceMonitoring {
 
     if (flags[FETCH]) {
       patchEventHandler.observe(FETCH, this.getFetchSub())
-    }
-
-    if (flags[EVENT_TARGET]) {
-      patchEventHandler.observe(EVENT_TARGET, this.getEventTargetSub())
-    }
-  }
-
-  getEventTargetSub() {
-    const transactionService = this._transactionService
-    return (event, task) => {
-      if (
-        event === SCHEDULE &&
-        task.source === EVENT_TARGET &&
-        task.eventType === 'click'
-      ) {
-        const target = task.target
-        const tagName = target.tagName.toLowerCase()
-
-        // use custom html attribute 'data-transaction-name' - otherwise fall back to "tagname" + "name"-Attribute
-        let transactionName = tagName
-        if (!!target.dataset.transactionName) {
-          transactionName = target.dataset.transactionName
-        } else {
-          const name = target.getAttribute('name')
-          if (!!name) {
-            transactionName = `${tagName}["${name}"]`
-          }
-        }
-
-        /**
-         * We reduce the reusability threshold to make sure
-         * we only capture async activities (e.g. network)
-         * related to this interaction.
-         */
-        const tr = transactionService.startTransaction(
-          `Click - ${transactionName}`,
-          USER_INTERACTION,
-          {
-            managed: true,
-            canReuse: true,
-            reuseThreshold: 300
-          }
-        )
-
-        if (tr) {
-          let classes = target.getAttribute('class')
-          if (classes) {
-            tr.addContext({ custom: { classes } })
-          }
-        }
-      }
     }
   }
 

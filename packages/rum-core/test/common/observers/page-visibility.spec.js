@@ -23,21 +23,22 @@
  *
  */
 
-import { observePageVisibility } from '../../src/common/page-visibility'
-import { createServiceFactory } from '../../src'
-import { state } from '../../src/state'
+import { observePageVisibility } from '../../../src/common/observers'
+import { createServiceFactory } from '../../../src'
+import { state } from '../../../src/state'
 import {
   QUEUE_FLUSH,
   TRANSACTION_SERVICE,
-  CONFIG_SERVICE
-} from '../../src/common/constants'
-import * as utils from '../../src/common/utils'
+  CONFIG_SERVICE,
+  PERFORMANCE_MONITORING
+} from '../../../src/common/constants'
+import * as utils from '../../../src/common/utils'
 import {
   hidePageSynthetically,
   dispatchBrowserEvent,
   setDocumentVisibilityState
-} from '../../test/'
-import { spyOnFunction, waitFor } from '../../../../dev-utils/jasmine'
+} from '../..'
+import { spyOnFunction, waitFor } from '../../../../../dev-utils/jasmine'
 
 describe('observePageVisibility', () => {
   let serviceFactory
@@ -123,7 +124,7 @@ describe('observePageVisibility', () => {
         // Starts performanceMonitoring to observe how transaction ends
         function startsPerformanceMonitoring() {
           const performanceMonitoring = serviceFactory.getService(
-            'PerformanceMonitoring'
+            PERFORMANCE_MONITORING
           )
           performanceMonitoring.init()
         }

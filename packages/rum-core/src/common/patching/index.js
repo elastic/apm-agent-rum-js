@@ -26,9 +26,8 @@
 import { patchXMLHttpRequest } from './xhr-patch'
 import { patchFetch } from './fetch-patch'
 import { patchHistory } from './history-patch'
-import { patchEventTarget } from './event-target-patch'
 import EventHandler from '../event-handler'
-import { HISTORY, FETCH, XMLHTTPREQUEST, EVENT_TARGET } from '../constants'
+import { HISTORY, FETCH, XMLHTTPREQUEST } from '../constants'
 
 const patchEventHandler = new EventHandler()
 let alreadyPatched = false
@@ -44,9 +43,6 @@ function patchAll() {
     })
     patchHistory(function (event, task) {
       patchEventHandler.send(HISTORY, [event, task])
-    })
-    patchEventTarget(function (event, task) {
-      patchEventHandler.send(EVENT_TARGET, [event, task])
     })
   }
   return patchEventHandler

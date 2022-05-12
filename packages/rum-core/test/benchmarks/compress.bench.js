@@ -25,12 +25,12 @@
 import { compressPayload } from '../../src/common/compress'
 import { createServiceFactory } from '../../src'
 import { generateTestTransaction } from './'
-import { APM_SERVER } from '@elastic/apm-rum-core'
+import { APM_SERVER, PERFORMANCE_MONITORING } from '@elastic/apm-rum-core'
 
 suite('Compress', () => {
   const serviceFactory = createServiceFactory()
   const performanceMonitoring = serviceFactory.getService(
-    'PerformanceMonitoring'
+    PERFORMANCE_MONITORING
   )
   const apmServer = serviceFactory.getService(APM_SERVER)
   const sampledTransactions = Array(10).fill(generateTestTransaction(10, true))

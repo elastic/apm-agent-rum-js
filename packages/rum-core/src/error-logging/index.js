@@ -27,12 +27,13 @@ import ErrorLogging from './error-logging'
 import {
   CONFIG_SERVICE,
   TRANSACTION_SERVICE,
+  ERROR_LOGGING,
   APM_SERVER
 } from '../common/constants'
 import { serviceCreators } from '../common/service-factory'
 
 function registerServices() {
-  serviceCreators['ErrorLogging'] = serviceFactory => {
+  serviceCreators[ERROR_LOGGING] = serviceFactory => {
     const [
       apmServer,
       configService,

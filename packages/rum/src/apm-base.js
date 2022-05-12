@@ -31,8 +31,13 @@ import {
   CONFIG_SERVICE,
   LOGGING_SERVICE,
   TRANSACTION_SERVICE,
+  PERFORMANCE_MONITORING,
+  ERROR_LOGGING,
   APM_SERVER,
-  observePageVisibility
+  EVENT_TARGET,
+  CLICK,
+  observePageVisibility,
+  observePageClicks
 } from '@elastic/apm-rum-core'
 
 export default class ApmBase {
@@ -86,12 +91,12 @@ export default class ApmBase {
         )
 
         const performanceMonitoring = this.serviceFactory.getService(
-          'PerformanceMonitoring'
+          PERFORMANCE_MONITORING
         )
         performanceMonitoring.init(flags)
 
         if (flags[ERROR]) {
-          const errorLogging = this.serviceFactory.getService('ErrorLogging')
+          const errorLogging = this.serviceFactory.getService(ERROR_LOGGING)
           errorLogging.registerListeners()
         }
 
@@ -117,6 +122,9 @@ export default class ApmBase {
         }
 
         observePageVisibility(configService, transactionService)
+        if (flags[EVENT_TARGET] && flags[CLICK]) {
+          observePageClicks(transactionService)
+        }
       } else {
         this._disable = true
         loggingService.warn('RUM agent is inactive')
@@ -298,7 +306,7 @@ export default class ApmBase {
 
   captureError(error) {
     if (this.isEnabled()) {
-      var errorLogging = this.serviceFactory.getService('ErrorLogging')
+      var errorLogging = this.serviceFactory.getService(ERROR_LOGGING)
       return errorLogging.logError(error)
     }
   }

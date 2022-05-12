@@ -23,46 +23,7 @@
  *
  */
 
-import PerformanceMonitoring from './performance-monitoring'
-import TransactionService from './transaction-service'
-import {
-  APM_SERVER,
-  CONFIG_SERVICE,
-  LOGGING_SERVICE,
-  TRANSACTION_SERVICE,
-  PERFORMANCE_MONITORING
-} from '../common/constants'
+import { observePageVisibility } from './page-visibility'
+import { observePageClicks } from './page-clicks'
 
-import { serviceCreators } from '../common/service-factory'
-
-function registerServices() {
-  serviceCreators[TRANSACTION_SERVICE] = serviceFactory => {
-    const [loggingService, configService] = serviceFactory.getService([
-      LOGGING_SERVICE,
-      CONFIG_SERVICE
-    ])
-    return new TransactionService(loggingService, configService)
-  }
-
-  serviceCreators[PERFORMANCE_MONITORING] = serviceFactory => {
-    const [
-      apmServer,
-      configService,
-      loggingService,
-      transactionService
-    ] = serviceFactory.getService([
-      APM_SERVER,
-      CONFIG_SERVICE,
-      LOGGING_SERVICE,
-      TRANSACTION_SERVICE
-    ])
-    return new PerformanceMonitoring(
-      apmServer,
-      configService,
-      loggingService,
-      transactionService
-    )
-  }
-}
-
-export { registerServices }
+export { observePageVisibility, observePageClicks }

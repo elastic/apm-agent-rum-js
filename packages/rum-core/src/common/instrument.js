@@ -29,7 +29,8 @@ import {
   HISTORY,
   PAGE_LOAD,
   ERROR,
-  EVENT_TARGET
+  EVENT_TARGET,
+  CLICK
 } from './constants'
 
 export function getInstrumentationFlags(instrument, disabledInstrumentations) {
@@ -42,7 +43,8 @@ export function getInstrumentationFlags(instrument, disabledInstrumentations) {
     [HISTORY]: false,
     [PAGE_LOAD]: false,
     [ERROR]: false,
-    [EVENT_TARGET]: false
+    [EVENT_TARGET]: false,
+    [CLICK]: false
   }
 
   if (!instrument) {

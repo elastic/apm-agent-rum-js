@@ -28,7 +28,8 @@ import {
   ERRORS,
   TRANSACTION_SERVICE,
   CONFIG_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  ERROR_LOGGING
 } from '../../src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
 
@@ -46,7 +47,7 @@ describe('ErrorLogging', function () {
     configService = serviceFactory.getService(CONFIG_SERVICE)
     configService.setConfig(agentConfig)
     apmServer = serviceFactory.getService(APM_SERVER)
-    errorLogging = serviceFactory.getService('ErrorLogging')
+    errorLogging = serviceFactory.getService(ERROR_LOGGING)
     transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
   })
 

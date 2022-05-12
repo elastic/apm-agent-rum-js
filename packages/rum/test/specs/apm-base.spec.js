@@ -31,7 +31,10 @@ import {
   TRANSACTION_SERVICE,
   LOGGING_SERVICE,
   CONFIG_SERVICE,
-  APM_SERVER
+  APM_SERVER,
+  ERROR_LOGGING,
+  EVENT_TARGET,
+  CLICK
 } from '@elastic/apm-rum-core'
 import { TRANSACTION_END } from '@elastic/apm-rum-core/src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
@@ -149,9 +152,44 @@ describe('ApmBase', function () {
     })
   })
 
+  it('should observe click event if eventtarget instrumentation is not disabled', () => {
+    apmBase.init({ serviceName, serverUrl })
+
+    document.body.click()
+
+    const tr = apmBase.getCurrentTransaction()
+    expect(tr.name).toBe('Click - body')
+  })
+
+  it('should not observe click event if EVENT_TARGET instrumentation is disabled', () => {
+    apmBase.init({
+      serviceName,
+      serverUrl,
+      disableInstrumentations: [EVENT_TARGET]
+    })
+
+    document.body.click()
+
+    const tr = apmBase.getCurrentTransaction()
+    expect(tr.name).toBe('Unknown')
+  })
+
+  it('should not observe click event if CLICK instrumentation is disabled', () => {
+    apmBase.init({
+      serviceName,
+      serverUrl,
+      disableInstrumentations: [CLICK]
+    })
+
+    document.body.click()
+
+    const tr = apmBase.getCurrentTransaction()
+    expect(tr.name).toBe('Unknown')
+  })
+
   it('should disable all auto instrumentations when instrument is false', () => {
     const trService = serviceFactory.getService(TRANSACTION_SERVICE)
-    const ErrorLogging = serviceFactory.getService('ErrorLogging')
+    const ErrorLogging = serviceFactory.getService(ERROR_LOGGING)
     const loggingInstane = ErrorLogging['__proto__']
     spyOn(loggingInstane, 'registerListeners')
 
@@ -169,7 +207,7 @@ describe('ApmBase', function () {
 
   it('should selectively enable/disable instrumentations based on config', () => {
     const trService = serviceFactory.getService(TRANSACTION_SERVICE)
-    const ErrorLogging = serviceFactory.getService('ErrorLogging')
+    const ErrorLogging = serviceFactory.getService(ERROR_LOGGING)
     const loggingInstane = ErrorLogging['__proto__']
     spyOn(loggingInstane, 'registerListeners')
 

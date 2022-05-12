@@ -116,7 +116,8 @@ const QUEUE_ADD_TRANSACTION = 'queue:add_transaction'
 const XMLHTTPREQUEST = 'xmlhttprequest'
 const FETCH = 'fetch'
 const HISTORY = 'history'
-const EVENT_TARGET = 'eventtarget'
+const EVENT_TARGET = 'eventtarget' //@deprecated, it will be removed in the first 6.x release
+const CLICK = 'click'
 const ERROR = 'error'
 
 /**
@@ -157,6 +158,8 @@ const CONFIG_SERVICE = 'ConfigService'
 const LOGGING_SERVICE = 'LoggingService'
 const TRANSACTION_SERVICE = 'TransactionService'
 const APM_SERVER = 'ApmServer'
+const PERFORMANCE_MONITORING = 'PerformanceMonitoring'
+const ERROR_LOGGING = 'ErrorLogging'
 
 /**
  * Truncated spans are associated with this type information
@@ -201,6 +204,7 @@ export {
   FETCH,
   HISTORY,
   EVENT_TARGET,
+  CLICK,
   ERROR,
   BEFORE_EVENT,
   AFTER_EVENT,
@@ -223,6 +227,8 @@ export {
   LOGGING_SERVICE,
   TRANSACTION_SERVICE,
   APM_SERVER,
+  PERFORMANCE_MONITORING,
+  ERROR_LOGGING,
   TRUNCATED_TYPE,
   FIRST_INPUT,
   LAYOUT_SHIFT,

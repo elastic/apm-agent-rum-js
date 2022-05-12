@@ -30,7 +30,8 @@ import {
   FETCH,
   HISTORY,
   ERROR,
-  EVENT_TARGET
+  EVENT_TARGET,
+  CLICK
 } from '../../src/common/constants'
 
 describe('Instrumentation', function () {
@@ -43,7 +44,8 @@ describe('Instrumentation', function () {
       [FETCH]: false,
       [HISTORY]: false,
       [ERROR]: false,
-      [EVENT_TARGET]: false
+      [EVENT_TARGET]: false,
+      [CLICK]: false
     })
   })
 
@@ -56,7 +58,8 @@ describe('Instrumentation', function () {
       [FETCH]: true,
       [HISTORY]: false,
       [ERROR]: true,
-      [EVENT_TARGET]: true
+      [EVENT_TARGET]: true,
+      [CLICK]: true
     })
   })
 })
