@@ -27,6 +27,10 @@ import { USER_INTERACTION } from '../constants'
 
 export function observePageClicks(transactionService) {
   const clickHandler = event => {
+    // Real user clicks interactions will always be related to an Element.
+    // And since the goal is to maximise the capture of such interactions
+    // events synthetically dispatched through Window (window.dispatch) and Document (document.dispatch)
+    // will not be handled.
     if (event.target instanceof Element) {
       createUserInteractionTransaction(transactionService, event.target)
     }
