@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.11.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.11.0...@elastic/apm-rum@5.11.1) (2022-05-16)
+
+
+### Bug Fixes
+
+* **rum:** listen to all page clicks ([#1219](https://github.com/elastic/apm-agent-rum-js/issues/1219)) ([6746baf](https://github.com/elastic/apm-agent-rum-js/commit/6746baf5ddcc33a399156e615ea436dd4ceeff02))
+
+
+
+
+
 # [5.11.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.10.2...@elastic/apm-rum@5.11.0) (2022-04-20)
 
 

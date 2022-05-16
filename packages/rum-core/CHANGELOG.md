@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.16.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.15.0...@elastic/apm-rum-core@5.16.0) (2022-05-16)
+
+
+### Bug Fixes
+
+* **rum:** end fetch span when response stream ends ([#1213](https://github.com/elastic/apm-agent-rum-js/issues/1213)) ([9f96a49](https://github.com/elastic/apm-agent-rum-js/commit/9f96a491940e8b6f6473ef017013e837d7b49af3))
+* **rum:** listen to all page clicks ([#1219](https://github.com/elastic/apm-agent-rum-js/issues/1219)) ([6746baf](https://github.com/elastic/apm-agent-rum-js/commit/6746baf5ddcc33a399156e615ea436dd4ceeff02))
+
+
+### Features
+
+* **rum:** disable beacon compression when flag is set ([#1214](https://github.com/elastic/apm-agent-rum-js/issues/1214)) ([a1a708a](https://github.com/elastic/apm-agent-rum-js/commit/a1a708a18f1d2742d503d54aa40e3fd21839944e))
+* **rum:** set unknown outcome for aborted http requests ([#1211](https://github.com/elastic/apm-agent-rum-js/issues/1211)) ([7e29eea](https://github.com/elastic/apm-agent-rum-js/commit/7e29eea92e2e35609b1ac969eddfbf63ef66cc16))
+
+
+
+
+
 # [5.15.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.14.1...@elastic/apm-rum-core@5.15.0) (2022-04-20)
 
 
