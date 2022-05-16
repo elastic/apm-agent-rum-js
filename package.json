@@ -116,7 +116,7 @@
     "core-js": "^3.5.0",
     "cpuprofile-filter": "^1.1.0",
     "devtools": "^7.16.12",
-    "ejs": "^2.7.4",
+    "ejs": "^3.1.7",
     "enzyme": "^3.10.0",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^6.7.0",
