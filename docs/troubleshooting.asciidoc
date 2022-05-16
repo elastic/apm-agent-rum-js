@@ -32,6 +32,23 @@ In order to debug the agent consider performing the following steps:
 4. Monitor the Console and Network panel in your browsers developer tools
 
 [float]
+[[disable-events-payload-compression]]
+=== Disable events payload compression
+
+In browsers such as Chrome, the RUM agent event payload is compressed with gzip.
+Because of this compression, you will not see readable content when inspecting the event with the Network panel of your browser developer tools.
+
+There are situations where that can be an issue. For instance, HAR files will not show readable information. Therefore, inspecting events
+for debugging purposes will not be possible.
+
+There are two ways to disable the payload compression:
+
+1. Create an item named `_elastic_inspect_beacon_` using the sessionStorage browser API.
+2. Load the webpage with the query param `_elastic_inspect_beacon_` in the URL. For example, `https://elastic.co?_elastic_inspect_beacon_=true`
+
+The effect of this will remain until the tab or browser is closed.
+
+[float]
 [[disable-agent]]
 === Disable the Agent
 
