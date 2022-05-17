@@ -29,6 +29,18 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.11.1]]
+==== 5.11.1 (2022-05-16)
+[float]
+===== Features
+* Span's outcome is now set to ```Unknown``` when a Fetch/XHR request is aborted. The outcome can be found in the metadata information of the span details in APM UI: {pull}1211[#1211]
+* Allow users the ability to [disable compression](https://www.elastic.co/guide/en/apm/agent/rum-js/current/troubleshooting.html#disable-events-payload-compression) for the events sent to APM server. This is helpful for debugging purposes while inspecting via
+Devtools and also for generating HAR file: {pull}1214[#1214]
+
+===== Bug fixes
+* The instrumentation of fetch API consumes a response as a readable stream properly. Before this fix the related span was being ended on the start of the response rather than on the end of it: {pull}1213[#1213]
+* Agent now can listen to all click events on the page. Users can enable/disable click instrumentation via `disableInstrumentation: ["click"]`. ```eventtarget``` instrumentation flag will be deprecated in favor of ```click``` and will be removed in the future releases: {pull}1219[#1219]
+
 [[release-notes-5.11.0]]
 ==== 5.11.0 (2022-04-20)
 [float]
