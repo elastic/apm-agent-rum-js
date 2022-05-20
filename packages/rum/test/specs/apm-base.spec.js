@@ -416,6 +416,16 @@ describe('ApmBase', function () {
     expect(loggingService.error).toHaveBeenCalledWith(
       `RUM agent isn't correctly configured. serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
     )
+
+    logErrorSpy.calls.reset()
+    apmBase.config({
+      serviceName: 'abc',
+      serverUrl: 'http://localhost:8000',
+      randomKey: 'boo'
+    })
+    expect(loggingService.warn).toHaveBeenCalledWith(
+      `Unknown config options are specified for RUM agent: randomKey`
+    )
   })
 
   it('should instrument sync xhr', function (done) {

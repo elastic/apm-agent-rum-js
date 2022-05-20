@@ -138,14 +138,16 @@ describe('ConfigService', function () {
     const errors1 = configService.validate({ serviceName: 'name' })
     expect(errors1).toEqual({
       missing: [],
-      invalid: []
+      invalid: [],
+      unknown: []
     })
 
     // missing required key serviceName
     const errors2 = configService.validate({ serviceName: undefined })
     expect(errors2).toEqual({
       missing: ['serviceName'],
-      invalid: []
+      invalid: [],
+      unknown: []
     })
 
     // missing required key serviceName & serverUrl
@@ -155,7 +157,8 @@ describe('ConfigService', function () {
     })
     expect(errors3).toEqual({
       missing: ['serviceName', 'serverUrl'],
-      invalid: []
+      invalid: [],
+      unknown: []
     })
 
     // Invalid characters in serviceName
@@ -168,7 +171,8 @@ describe('ConfigService', function () {
           value: 'abc.def',
           allowed: 'a-z, A-Z, 0-9, _, -, <space>'
         }
-      ]
+      ],
+      unknown: []
     })
 
     // transactionSampleRate validation
@@ -207,6 +211,18 @@ describe('ConfigService', function () {
         allowed: 'Number between 0 and 1'
       }
     ])
+  })
+
+  it('should check unknown config options', () => {
+    const errors1 = configService.validate({
+      serviceName: 'name',
+      unknownOption: 'hello'
+    })
+    expect(errors1).toEqual({
+      missing: [],
+      invalid: [],
+      unknown: ['unknownOption']
+    })
   })
 
   it('should addLabels', function () {
