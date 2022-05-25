@@ -386,36 +386,56 @@ describe('ApmBase', function () {
     expect(loggingService.warn).toHaveBeenCalledWith('RUM agent is inactive')
   })
 
-  it('should log errors when config is invalid', () => {
-    const loggingService = serviceFactory.getService(LOGGING_SERVICE)
-    spyOn(loggingService, 'warn')
-    const logErrorSpy = spyOn(loggingService, 'error')
-    apmBase.init({
-      serverUrl: undefined,
-      serviceName: ''
-    })
-    expect(loggingService.error).toHaveBeenCalledWith(
-      `RUM agent isn't correctly configured. serverUrl, serviceName is missing`
-    )
-    const configService = serviceFactory.getService(CONFIG_SERVICE)
-    expect(configService.get('active')).toEqual(false)
+  describe('invalid config', () => {
+    let loggingService
 
-    logErrorSpy.calls.reset()
-    apmBase.config({
-      serverUrl: '',
-      serviceName: 'abc.def'
+    beforeEach(() => {
+      loggingService = serviceFactory.getService(LOGGING_SERVICE)
+      spyOn(loggingService, 'warn')
+      spyOn(loggingService, 'error')
     })
-    expect(loggingService.error).toHaveBeenCalledWith(
-      `RUM agent isn't correctly configured. serverUrl is missing, serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
-    )
 
-    logErrorSpy.calls.reset()
-    apmBase.config({
-      serviceName: 'abc.def'
+    it('should log errors when config is invalid', () => {
+      apmBase.init({
+        serverUrl: undefined,
+        serviceName: ''
+      })
+      expect(loggingService.error).toHaveBeenCalledWith(
+        `RUM agent isn't correctly configured. serverUrl, serviceName is missing`
+      )
+      const configService = serviceFactory.getService(CONFIG_SERVICE)
+      expect(configService.get('active')).toEqual(false)
     })
-    expect(loggingService.error).toHaveBeenCalledWith(
-      `RUM agent isn't correctly configured. serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
-    )
+
+    it('should log missing required key and invalid config', () => {
+      apmBase.config({
+        serverUrl: '',
+        serviceName: 'abc.def'
+      })
+      expect(loggingService.error).toHaveBeenCalledWith(
+        `RUM agent isn't correctly configured. serverUrl is missing, serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
+      )
+    })
+
+    it('should log errors when invalid chars in serviceName', () => {
+      apmBase.config({
+        serviceName: 'abc.def'
+      })
+      expect(loggingService.error).toHaveBeenCalledWith(
+        `RUM agent isn't correctly configured. serviceName "abc.def" contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)`
+      )
+    })
+
+    it('should warn users unknown config keys', () => {
+      apmBase.config({
+        serviceName: 'abc',
+        serverUrl: 'http://localhost:8000',
+        randomKey: 'boo'
+      })
+      expect(loggingService.warn).toHaveBeenCalledWith(
+        `Unknown config options are specified for RUM agent: randomKey`
+      )
+    })
   })
 
   it('should instrument sync xhr', function (done) {

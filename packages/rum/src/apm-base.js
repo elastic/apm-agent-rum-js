@@ -219,21 +219,31 @@ export default class ApmBase {
    *
    * validation error format
    * {
-   *  missing: [ 'key1', 'key2']
+   *  missing: [ 'key1', 'key2'],
    *  invalid: [{
    *    key: 'a',
    *    value: 'abcd',
    *    allowed: 'string'
-   *  }]
+   *  }],
+   *  unknown: ['key3', 'key4']
    * }
    */
   config(config) {
-    const configService = this.serviceFactory.getService(CONFIG_SERVICE)
-    const { missing, invalid } = configService.validate(config)
+    const [configService, loggingService] = this.serviceFactory.getService([
+      CONFIG_SERVICE,
+      LOGGING_SERVICE
+    ])
+    const { missing, invalid, unknown } = configService.validate(config)
+    if (unknown.length > 0) {
+      const message =
+        'Unknown config options are specified for RUM agent: ' +
+        unknown.join(', ')
+      loggingService.warn(message)
+    }
+
     if (missing.length === 0 && invalid.length === 0) {
       configService.setConfig(config)
     } else {
-      const loggingService = this.serviceFactory.getService(LOGGING_SERVICE)
       const separator = ', '
       let message = "RUM agent isn't correctly configured. "
 
