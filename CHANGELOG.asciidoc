@@ -45,6 +45,9 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [float]
 ===== Features
 * Events are now beaconed when the user abandons or backgrounds the page, this makes sure the agent never miss an event. Before this change it was only sending them every interval configurable via `flushInterval`. Unsupported browsers: Firefox, IE11: {pull}1146[#1146]
+
+NOTE: Transactions based on the <<supported-technologies,supported technologies>> and <<custom-managed-transactions, custom managed transactions>> are the only ones taken into account.
+
 * **rum-vue:** Introduce script setup syntax support: {issue}1194[#1194]
 * Override reuse threshold when redefining a transaction. This will permit the agent not to miss data on slow network connections: {issue}1196[#1196]
 
