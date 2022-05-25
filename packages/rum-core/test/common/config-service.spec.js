@@ -133,95 +133,104 @@ describe('ConfigService', function () {
     })
   })
 
-  it('should validate required config options', () => {
-    // Valid
-    const errors1 = configService.validate({ serviceName: 'name' })
-    expect(errors1).toEqual({
-      missing: [],
-      invalid: [],
-      unknown: []
+  describe('config options', () => {
+    it('should validate required config options', () => {
+      const errors = configService.validate({ serviceName: 'name' })
+      expect(errors).toEqual({
+        missing: [],
+        invalid: [],
+        unknown: []
+      })
     })
 
-    // missing required key serviceName
-    const errors2 = configService.validate({ serviceName: undefined })
-    expect(errors2).toEqual({
-      missing: ['serviceName'],
-      invalid: [],
-      unknown: []
+    it('should report missing required key serviceName', () => {
+      const errors = configService.validate({ serviceName: undefined })
+      expect(errors).toEqual({
+        missing: ['serviceName'],
+        invalid: [],
+        unknown: []
+      })
     })
 
-    // missing required key serviceName & serverUrl
-    const errors3 = configService.validate({
-      serviceName: undefined,
-      serverUrl: ''
-    })
-    expect(errors3).toEqual({
-      missing: ['serviceName', 'serverUrl'],
-      invalid: [],
-      unknown: []
+    it('should report missing required key serviceName & serverUrl', () => {
+      const errors = configService.validate({
+        serviceName: undefined,
+        serverUrl: ''
+      })
+      expect(errors).toEqual({
+        missing: ['serviceName', 'serverUrl'],
+        invalid: [],
+        unknown: []
+      })
     })
 
-    // Invalid characters in serviceName
-    const errors4 = configService.validate({ serviceName: 'abc.def' })
-    expect(errors4).toEqual({
-      missing: [],
-      invalid: [
+    it('should report invalid characters in serviceName', () => {
+      const errors = configService.validate({ serviceName: 'abc.def' })
+      expect(errors).toEqual({
+        missing: [],
+        invalid: [
+          {
+            key: 'serviceName',
+            value: 'abc.def',
+            allowed: 'a-z, A-Z, 0-9, _, -, <space>'
+          }
+        ],
+        unknown: []
+      })
+    })
+
+    it('should validate transactionSampleRate', () => {
+      var sampleRateErrors = configService.validate({
+        transactionSampleRate: 2
+      })
+      expect(sampleRateErrors.invalid).toEqual([
         {
-          key: 'serviceName',
-          value: 'abc.def',
-          allowed: 'a-z, A-Z, 0-9, _, -, <space>'
+          key: 'transactionSampleRate',
+          value: 2,
+          allowed: 'Number between 0 and 1'
         }
-      ],
-      unknown: []
+      ])
+
+      sampleRateErrors = configService.validate({
+        transactionSampleRate: 'test'
+      })
+      expect(sampleRateErrors.invalid).toEqual([
+        {
+          key: 'transactionSampleRate',
+          value: 'test',
+          allowed: 'Number between 0 and 1'
+        }
+      ])
+
+      sampleRateErrors = configService.validate({ transactionSampleRate: -1 })
+      expect(sampleRateErrors.invalid).toEqual([
+        {
+          key: 'transactionSampleRate',
+          value: -1,
+          allowed: 'Number between 0 and 1'
+        }
+      ])
+
+      sampleRateErrors = configService.validate({ transactionSampleRate: NaN })
+      expect(sampleRateErrors.invalid).toEqual([
+        {
+          key: 'transactionSampleRate',
+          value: NaN,
+          allowed: 'Number between 0 and 1'
+        }
+      ])
     })
 
-    // transactionSampleRate validation
-    var sampleRateErrors = configService.validate({ transactionSampleRate: 2 })
-    expect(sampleRateErrors.invalid).toEqual([
-      {
-        key: 'transactionSampleRate',
-        value: 2,
-        allowed: 'Number between 0 and 1'
-      }
-    ])
-
-    sampleRateErrors = configService.validate({ transactionSampleRate: 'test' })
-    expect(sampleRateErrors.invalid).toEqual([
-      {
-        key: 'transactionSampleRate',
-        value: 'test',
-        allowed: 'Number between 0 and 1'
-      }
-    ])
-
-    sampleRateErrors = configService.validate({ transactionSampleRate: -1 })
-    expect(sampleRateErrors.invalid).toEqual([
-      {
-        key: 'transactionSampleRate',
-        value: -1,
-        allowed: 'Number between 0 and 1'
-      }
-    ])
-
-    sampleRateErrors = configService.validate({ transactionSampleRate: NaN })
-    expect(sampleRateErrors.invalid).toEqual([
-      {
-        key: 'transactionSampleRate',
-        value: NaN,
-        allowed: 'Number between 0 and 1'
-      }
-    ])
-  })
-
-  it('should check unknown config options', () => {
-    const errors1 = configService.validate({
-      serviceName: 'name',
-      unknownOption: 'hello'
-    })
-    expect(errors1).toEqual({
-      missing: [],
-      invalid: [],
-      unknown: ['unknownOption']
+    it('should report unknown config options', () => {
+      const errors = configService.validate({
+        serviceName: 'name',
+        unknownOption: 'hello'
+      })
+      expect(errors).toEqual({
+        missing: [],
+        invalid: [],
+        unknown: ['unknownOption']
+      })
     })
   })
 

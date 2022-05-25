@@ -211,7 +211,7 @@ class Config {
         errors.missing.push(key)
       }
 
-      if (allKeys.indexOf(key) < 0) {
+      if (allKeys.indexOf(key) === -1) {
         errors.unknown.push(key)
       }
     })
