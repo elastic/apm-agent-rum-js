@@ -387,15 +387,15 @@ describe('ApmBase', function () {
   })
 
   describe('invalid config', () => {
-    const logErrorSpy = spyOn(loggingService, 'error')
+    let loggingService
 
     beforeEach(() => {
-      logErrorSpy.calls.reset()
+      loggingService = serviceFactory.getService(LOGGING_SERVICE)
+      spyOn(loggingService, 'warn')
+      spyOn(loggingService, 'error')
     })
 
     it('should log errors when config is invalid', () => {
-      const loggingService = serviceFactory.getService(LOGGING_SERVICE)
-      spyOn(loggingService, 'warn')
       apmBase.init({
         serverUrl: undefined,
         serviceName: ''

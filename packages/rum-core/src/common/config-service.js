@@ -95,6 +95,7 @@ class Config {
       session: false,
       apmRequest: null
     }
+
     this.events = new EventHandler()
     this.filters = []
     /**
