@@ -30,13 +30,20 @@ import { Promise } from '../polyfills'
 export function sendXHR(
   method,
   url,
-  { timeout = HTTP_REQUEST_TIMEOUT, payload, headers, beforeSend }
+  {
+    timeout = HTTP_REQUEST_TIMEOUT,
+    payload,
+    headers,
+    beforeSend,
+    sendCredentials
+  }
 ) {
   return new Promise(function (resolve, reject) {
     var xhr = new window.XMLHttpRequest()
     xhr[XHR_IGNORE] = true
     xhr.open(method, url, true)
     xhr.timeout = timeout
+    xhr.withCredentials = sendCredentials
 
     if (headers) {
       for (var header in headers) {
