@@ -396,3 +396,13 @@ apm.init({
   }
 })
 ----
+
+
+[float]
+[[send-credentials]]
+==== `sendCredentials`
+
+* *Type:* Boolean
+* *Default:* `false`
+
+Instructs the agent to send credentials when making requests to the APM server.
