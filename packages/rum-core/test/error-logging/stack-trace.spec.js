@@ -24,6 +24,7 @@
  */
 
 import { createStackTraces } from '../../src/error-logging/stack-trace'
+import stackParser from 'error-stack-parser'
 
 describe('StackTraceService', function () {
   it('should produce correct number of frames', function (done) {
@@ -34,10 +35,56 @@ describe('StackTraceService', function () {
       try {
         generateError()
       } catch (error) {
-        var stackTraces = createStackTraces({ error })
+        var stackTraces = createStackTraces(stackParser, { error })
         expect(stackTraces.length).toBeGreaterThan(1)
         done()
       }
     }, 1)
+  })
+
+  describe('integration error-stack-parser library', () => {
+    it('should generate stack trace from errorEvent when stackParser throws an error parsing it', () => {
+      const stackParserFake = {
+        parse: () => {
+          throw new Error()
+        }
+      }
+
+      const testErrorEvent = new Error()
+      testErrorEvent.error = 'error event'
+      testErrorEvent.lineno = 1
+      testErrorEvent.colno = 30
+      testErrorEvent.filename = '(inline script)'
+
+      const [stackTrace] = createStackTraces(stackParserFake, testErrorEvent)
+
+      expect(stackTrace.lineno).toBe(testErrorEvent.lineno)
+      expect(stackTrace.colno).toBe(testErrorEvent.colno)
+      expect(stackTrace.filename).toBe(testErrorEvent.filename)
+    })
+
+    it('should generate stack trace from errorEvent when the one returned from stackParser does not contain lineNumber', () => {
+      const stackParserFake = {
+        parse: () => {
+          return [
+            {
+              filename: 'malformed parsing filename'
+            }
+          ]
+        }
+      }
+
+      const testErrorEvent = new Error()
+      testErrorEvent.error = 'error event'
+      testErrorEvent.lineno = 4
+      testErrorEvent.colno = 23
+      testErrorEvent.filename = '(inline script)'
+
+      const [stackTrace] = createStackTraces(stackParserFake, testErrorEvent)
+
+      expect(stackTrace.lineno).toBe(testErrorEvent.lineno)
+      expect(stackTrace.colno).toBe(testErrorEvent.colno)
+      expect(stackTrace.filename).toBe(testErrorEvent.filename)
+    })
   })
 })

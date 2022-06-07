@@ -23,8 +23,6 @@
  *
  */
 
-import stackParser from 'error-stack-parser'
-
 function filePathToFileName(fileUrl) {
   const origin =
     window.location.origin ||
@@ -91,7 +89,21 @@ function normalizeFunctionName(fnName) {
   return fnName
 }
 
-export function createStackTraces(errorEvent) {
+function isValidStackTrace(stackTraces) {
+  if (stackTraces.length === 0) {
+    return false
+  }
+
+  if (stackTraces.length === 1) {
+    const stackTrace = stackTraces[0]
+
+    return 'lineNumber' in stackTrace
+  }
+
+  return true
+}
+
+export function createStackTraces(stackParser, errorEvent) {
   const { error, filename, lineno, colno } = errorEvent
 
   let stackTraces = []
@@ -106,7 +118,11 @@ export function createStackTraces(errorEvent) {
     }
   }
 
-  if (stackTraces.length === 0) {
+  // error-stack-parser library doesn't generate proper stack traces from Syntax Errors
+  // thrown during the browser document parsing process. The outcome of the library depends on the browser:
+  // 1. on non-chromium browsers it throws an exception.
+  // 2. on chromium browsers it returns a malformed single stack trace element not containing the lineNumber property
+  if (!isValidStackTrace(stackTraces)) {
     stackTraces = [
       {
         fileName: filename,

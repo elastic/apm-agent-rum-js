@@ -27,6 +27,7 @@ import { createStackTraces, filterInvalidFrames } from './stack-trace'
 import { generateRandomId, merge, extend } from '../common/utils'
 import { getPageContext } from '../common/context'
 import { truncateModel, ERROR_MODEL } from '../common/truncate'
+import stackParser from 'error-stack-parser'
 
 /**
  * List of keys to be ignored from getting added to custom error properties
@@ -76,7 +77,7 @@ class ErrorLogging {
    * errorEvent = { message, filename, lineno, colno, error }
    */
   createErrorDataModel(errorEvent) {
-    const frames = createStackTraces(errorEvent)
+    const frames = createStackTraces(stackParser, errorEvent)
     const filteredFrames = filterInvalidFrames(frames)
 
     // If filename empty, assume inline script
