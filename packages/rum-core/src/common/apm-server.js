@@ -136,19 +136,28 @@ class ApmServer {
     url,
     { timeout = HTTP_REQUEST_TIMEOUT, payload, headers, beforeSend } = {}
   ) {
+    const sendCredentials = this._configService.get('sendCredentials')
+
     // This bring the possibility of sending requests that outlive the page.
     if (!beforeSend && shouldUseFetchWithKeepAlive(method, payload)) {
       return sendFetchRequest(method, url, {
         keepalive: true,
         timeout,
         payload,
-        headers
+        headers,
+        sendCredentials
       }).catch(reason => {
         // Chrome, before the version 81 had a bug where a preflight request with keepalive specified was not supported
         // xhr will be used as a fallback to cover fetch network errors, more info: https://fetch.spec.whatwg.org/#concept-network-error
         // Bug info: https://bugs.chromium.org/p/chromium/issues/detail?id=835821
         if (reason instanceof TypeError) {
-          return sendXHR(method, url, { timeout, payload, headers, beforeSend })
+          return sendXHR(method, url, {
+            timeout,
+            payload,
+            headers,
+            beforeSend,
+            sendCredentials
+          })
         }
 
         // bubble other kind of reasons to keep handling the failure
@@ -156,7 +165,13 @@ class ApmServer {
       })
     }
 
-    return sendXHR(method, url, { timeout, payload, headers, beforeSend })
+    return sendXHR(method, url, {
+      timeout,
+      payload,
+      headers,
+      beforeSend,
+      sendCredentials
+    })
   }
 
   fetchConfig(serviceName, environment) {

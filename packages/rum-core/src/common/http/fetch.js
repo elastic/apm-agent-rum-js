@@ -48,7 +48,13 @@ export function shouldUseFetchWithKeepAlive(method, payload) {
 export function sendFetchRequest(
   method,
   url,
-  { keepalive = false, timeout = HTTP_REQUEST_TIMEOUT, payload, headers }
+  {
+    keepalive = false,
+    timeout = HTTP_REQUEST_TIMEOUT,
+    payload,
+    headers,
+    sendCredentials
+  }
 ) {
   let timeoutConfig = {}
   if (typeof AbortController === 'function') {
@@ -64,7 +70,7 @@ export function sendFetchRequest(
       headers,
       method,
       keepalive, // used to allow the request to outlive the page.
-      credentials: 'omit',
+      credentials: sendCredentials ? 'include' : 'omit',
       ...timeoutConfig
     })
     .then(response => {

@@ -478,9 +478,11 @@ describe('ApmServer', function () {
       spyOnFunction(xhrSender, 'sendXHR')
       const serverUrl = 'http://localhost'
       const serverUrlPrefix = '/prefix'
+      const sendCredentials = true
       configService.setConfig({
         serverUrl,
-        serverUrlPrefix
+        serverUrlPrefix,
+        sendCredentials
       })
 
       await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
@@ -496,7 +498,8 @@ describe('ApmServer', function () {
             '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}\n{"transaction":{"test":"test"}}\n',
           headers: {
             'Content-Type': 'application/x-ndjson'
-          }
+          },
+          sendCredentials: true
         }
       )
       expect(xhrSender.sendXHR).toHaveBeenCalledTimes(0)
@@ -512,10 +515,12 @@ describe('ApmServer', function () {
 
       const serverUrl = 'http://localhost'
       const serverUrlPrefix = '/prefix'
+      const sendCredentials = true
       configService.setConfig({
         serverUrl,
         serverUrlPrefix,
-        apmRequest: beforeSend
+        apmRequest: beforeSend,
+        sendCredentials
       })
 
       await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
@@ -534,7 +539,8 @@ describe('ApmServer', function () {
           headers: {
             'Content-Type': 'application/x-ndjson'
           },
-          beforeSend
+          beforeSend,
+          sendCredentials
         }
       )
     })
@@ -549,9 +555,11 @@ describe('ApmServer', function () {
       spyOnFunction(xhrSender, 'sendXHR').and.resolveTo({})
       const serverUrl = 'http://localhost'
       const serverUrlPrefix = '/prefix'
+      const sendCredentials = true
       configService.setConfig({
         serverUrl,
-        serverUrlPrefix
+        serverUrlPrefix,
+        sendCredentials
       })
 
       await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
@@ -570,7 +578,8 @@ describe('ApmServer', function () {
           headers: {
             'Content-Type': 'application/x-ndjson'
           },
-          beforeSend: null
+          beforeSend: null,
+          sendCredentials: true
         }
       )
     })

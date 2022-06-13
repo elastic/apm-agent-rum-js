@@ -134,7 +134,8 @@ describeIf(
       await sendFetchRequest('POST', 'anyUrl', {
         payload: 'anyPayload',
         keepalive: true,
-        headers: {}
+        headers: {},
+        sendCredentials: false
       })
 
       expect(fetchSpy).toHaveBeenCalledTimes(1)
@@ -146,6 +147,35 @@ describeIf(
           body: 'anyPayload',
           method: 'POST',
           credentials: 'omit'
+        })
+      )
+    })
+
+    it('should send credentials if requested', async () => {
+      const response = {
+        status: 200,
+        text() {
+          return Promise.resolve({})
+        }
+      }
+      const fetchSpy = spyOn(window, 'fetch').and.resolveTo(response)
+
+      await sendFetchRequest('POST', 'anyUrl', {
+        payload: 'anyPayload',
+        keepalive: true,
+        headers: {},
+        sendCredentials: true
+      })
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1)
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'anyUrl',
+        jasmine.objectContaining({
+          keepalive: true,
+          headers: {},
+          body: 'anyPayload',
+          method: 'POST',
+          credentials: 'include'
         })
       )
     })
