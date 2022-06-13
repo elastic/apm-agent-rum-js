@@ -405,4 +405,8 @@ apm.init({
 * *Type:* Boolean
 * *Default:* `false`
 
-Instructs the agent to send credentials when making requests to the APM server.
+This allows the agent to send cookies when making requests to the APM server.
+This is useful on scenarios where the APM server is behind a reverse proxy that requires requests to be authenticated.
+
+NOTE: If APM Server is deployed in an origin different than the page’s origin, you will need to
+<<configuring-cors, configure Cross-Origin Resource Sharing (CORS)>>.
