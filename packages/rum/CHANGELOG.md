@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.12.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.11.1...@elastic/apm-rum@5.12.0) (2022-06-14)
+
+
+### Features
+
+* warn users when invalid config options provided when init ([#1230](https://github.com/elastic/apm-agent-rum-js/issues/1230)) ([9bb158c](https://github.com/elastic/apm-agent-rum-js/commit/9bb158c22d0ae1f6ef6ea1679930c79814b60dcf))
+
+
+
+
+
 ## [5.11.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.11.0...@elastic/apm-rum@5.11.1) (2022-05-16)
 
 

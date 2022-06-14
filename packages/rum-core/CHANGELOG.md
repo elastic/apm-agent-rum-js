@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.17.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.16.0...@elastic/apm-rum-core@5.17.0) (2022-06-14)
+
+
+### Bug Fixes
+
+* **rum-core:** capture stack trace from syntax errors properly ([#1239](https://github.com/elastic/apm-agent-rum-js/issues/1239)) ([4081941](https://github.com/elastic/apm-agent-rum-js/commit/40819415c09e69bac91e8a1f03f1016eae9bbfd1))
+
+
+### Features
+
+* allow requests to be sent with credentials ([#1238](https://github.com/elastic/apm-agent-rum-js/issues/1238)) ([d8d3b8c](https://github.com/elastic/apm-agent-rum-js/commit/d8d3b8cad64de9420f4d238e3535bb16d8e79286))
+* warn users when invalid config options provided when init ([#1230](https://github.com/elastic/apm-agent-rum-js/issues/1230)) ([9bb158c](https://github.com/elastic/apm-agent-rum-js/commit/9bb158c22d0ae1f6ef6ea1679930c79814b60dcf))
+
+
+
+
+
 # [5.16.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.15.0...@elastic/apm-rum-core@5.16.0) (2022-05-16)
 
 
