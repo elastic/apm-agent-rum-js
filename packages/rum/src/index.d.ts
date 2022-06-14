@@ -100,6 +100,7 @@ declare module '@elastic/apm-rum' {
     propagateTracestate?: boolean
     eventsLimit?: number
     queueLimit?: number
+    sendCredentials?: boolean
   }
 
   type Init = (options?: AgentConfigOptions) => ApmBase
