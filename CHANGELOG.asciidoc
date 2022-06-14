@@ -29,6 +29,17 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.12.0]]
+==== 5.12.0 (2022-06-14)
+[float]
+===== Features
+* Introduce new config option <<send-credentials, `sendCredentials`>>. This allows the agent to send cookies to APM servers
+that are behind reverse proxies that need requests to be authenticated: {pull}1238[#1238]
+* Agent now warns users if they provide non-existent config options when initializing it: {pull}1230[#1230]
+
+===== Bug fixes
+* Capture the stacktrace of a SyntaxError triggered because of a malformed JavaScript code. Before this fix the agent was capturing an empty stacktrace: {pull}1239[#1239]
+
 [[release-notes-5.11.1]]
 ==== 5.11.1 (2022-05-16)
 [float]
