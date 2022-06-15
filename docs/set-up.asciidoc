@@ -182,5 +182,12 @@ Access-Control-Allow-Methods: POST, OPTIONS
 Access-Control-Allow-Origin: [request-origin]
 ----
 
+If you enable the <<send-credentials, `sendCredentials`>> configuration option, your proxy's response must include the header `Access-Control-Allow-Origin` with the page's origin as a value, and the following header:
+
+[source,js]
+----
+Access-Control-Allow-Credentials: true
+----
+
 TIP: To learn more about CORS, see the MDN page on
 https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS[Cross-Origin Resource Sharing].
