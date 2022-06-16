@@ -30,7 +30,7 @@ import {
   FIRST_INPUT,
   LAYOUT_SHIFT
 } from '../common/constants'
-import { noop, PERF } from '../common/utils'
+import { noop, PERF, isPerfTypeSupported } from '../common/utils'
 import Span from './span'
 
 export const metrics = {
@@ -318,9 +318,7 @@ export class PerfEntryRecorder {
 
   start(type) {
     try {
-      const supportedEntryTypes =
-        window.PerformanceObserver?.supportedEntryTypes || []
-      if (supportedEntryTypes.indexOf(type) === -1) {
+      if (!isPerfTypeSupported(type)) {
         return
       }
       /**
