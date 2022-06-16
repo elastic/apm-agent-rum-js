@@ -317,12 +317,9 @@ export class PerfEntryRecorder {
   }
 
   start(type) {
-    /**
-     * Safari throws an error when PerformanceObserver is
-     * observed for unknown entry types as longtasks and lcp is
-     * not supported at the moment
-     */
-    try {
+    const supportedEntryTypes =
+      window.PerformanceObserver?.supportedEntryTypes || []
+    if (supportedEntryTypes.indexOf(type) !== -1) {
       /**
        * Start observing for different entry types depending on the transaction type
        * - `buffered`: true means we would be able to retrive all the events that happened
@@ -332,7 +329,7 @@ export class PerfEntryRecorder {
        *   buffered flag (https://w3c.github.io/performance-timeline/#observe-method)
        */
       this.po.observe({ type, buffered: true })
-    } catch (_) {}
+    }
   }
 
   stop() {

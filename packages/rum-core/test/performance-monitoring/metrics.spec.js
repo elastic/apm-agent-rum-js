@@ -191,6 +191,16 @@ describe('Metrics', () => {
       })
     })
 
+    it('should not start observer with unsupported type', () => {
+      const recorder = new PerfEntryRecorder(() => {})
+      const onStartSpy = jasmine.createSpy()
+      recorder.po = {
+        observe: onStartSpy
+      }
+      recorder.start('unknown_entry_type')
+      expect(onStartSpy).not.toHaveBeenCalled()
+    })
+
     describe('Total Blocking Time', () => {
       it('should create total blocking time as span', () => {
         calculateTotalBlockingTime(longtaskEntries)
