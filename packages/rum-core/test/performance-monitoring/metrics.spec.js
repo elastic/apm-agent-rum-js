@@ -33,6 +33,7 @@ import {
   createLongTaskSpans
 } from '../../src/performance-monitoring/metrics'
 import { LARGEST_CONTENTFUL_PAINT, LONG_TASK } from '../../src/common/constants'
+import { isPerfTypeSupported } from '../../src/common/utils'
 import {
   mockObserverEntryTypes,
   mockObserverEntryNames
@@ -170,35 +171,32 @@ describe('Metrics', () => {
       ])
     })
 
-    it('should start recorder with correct type', () => {
+    it('should start recorder only when the type is supported', () => {
       const recorder = new PerfEntryRecorder(() => {})
       const onStartSpy = jasmine.createSpy()
       recorder.po = {
         observe: onStartSpy
       }
       recorder.start(LONG_TASK)
-
-      expect(onStartSpy).toHaveBeenCalledWith({
-        type: LONG_TASK,
-        buffered: true
-      })
+      if (isPerfTypeSupported(LONG_TASK)) {
+        expect(onStartSpy).toHaveBeenCalledWith({
+          type: LONG_TASK,
+          buffered: true
+        })
+      } else {
+        expect(onStartSpy).not.toHaveBeenCalled()
+      }
       onStartSpy.calls.reset()
 
       recorder.start(LARGEST_CONTENTFUL_PAINT)
-      expect(onStartSpy).toHaveBeenCalledWith({
-        type: LARGEST_CONTENTFUL_PAINT,
-        buffered: true
-      })
-    })
-
-    it('should not start observer with unsupported type', () => {
-      const recorder = new PerfEntryRecorder(() => {})
-      const onStartSpy = jasmine.createSpy()
-      recorder.po = {
-        observe: onStartSpy
+      if (isPerfTypeSupported(LARGEST_CONTENTFUL_PAINT)) {
+        expect(onStartSpy).toHaveBeenCalledWith({
+          type: LARGEST_CONTENTFUL_PAINT,
+          buffered: true
+        })
+      } else {
+        expect(onStartSpy).not.toHaveBeenCalled()
       }
-      recorder.start('unknown_entry_type')
-      expect(onStartSpy).not.toHaveBeenCalled()
     })
 
     describe('Total Blocking Time', () => {
