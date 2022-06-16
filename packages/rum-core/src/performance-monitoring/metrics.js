@@ -317,9 +317,12 @@ export class PerfEntryRecorder {
   }
 
   start(type) {
-    const supportedEntryTypes =
-      window.PerformanceObserver?.supportedEntryTypes || []
-    if (supportedEntryTypes.indexOf(type) !== -1) {
+    try {
+      const supportedEntryTypes =
+        window.PerformanceObserver?.supportedEntryTypes || []
+      if (supportedEntryTypes.indexOf(type) === -1) {
+        return
+      }
       /**
        * Start observing for different entry types depending on the transaction type
        * - `buffered`: true means we would be able to retrive all the events that happened
@@ -329,6 +332,12 @@ export class PerfEntryRecorder {
        *   buffered flag (https://w3c.github.io/performance-timeline/#observe-method)
        */
       this.po.observe({ type, buffered: true })
+    } catch (_) {
+      /**
+       * Even though we check supportedEntryTypes before starting the observer,
+       * there are risks of exceptions according to the [spec](https://www.w3.org/TR/performance-timeline/#observe-method)
+       * But we ignore error since this is not intended to be seen by users
+       */
     }
   }
 
