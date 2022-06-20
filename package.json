@@ -9,7 +9,6 @@
   },
   "scripts": {
     "version": "node scripts/prompt-release",
-    "lock-dependencies": "npx npm-force-resolutions@0.0.10",
     "prerelease": "npm test && npm run clean",
     "release": "lerna publish && npm run github-release",
     "release-package": "node scripts/publish-package",
@@ -59,7 +58,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lock-dependencies && lint-staged",
+      "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
@@ -196,9 +195,5 @@
   "engines": {
     "node": ">=12 <=16",
     "npm": "6"
-  },
-  "resolutions": {
-    "semver-regex": "4.0.2",
-    "lodash": "4.17.21"
   }
 }
