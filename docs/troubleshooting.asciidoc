@@ -14,6 +14,33 @@ further to identify the offending code.
 Of course, there are errors that might have been caused by the agent itself and we appreciate it if
 you <<get-in-touch, report them back to us>>.
 
+[float]
+[[cross-origin-script-error]]
+=== Some errors in the application only show `script error`
+In some cases when you look at the details of an error, the only information you can see is the message `Script error`.
+This happens when an error originates from a JavaScript file served from a different origin than the page's origin.
+
+In order to get visibility of the error's detail, you must do two things.
+
+1. Add the attribute `crossorigin` to the `<script>` element:
++
+[source,js]
+----
+<script src="https://example.com/example.js" crossorigin>
+----
+
+2. Make sure that the server response includes the `Access-Control-Allow-Origin` header when serving the JavaScript file.
++
+[source,js]
+----
+// Either of the two values is valid:
+
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Origin: your page's origin
+----
+
+TIP: To learn more about how browsers handle script errors, see the MDN page on the https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror#notes[onerror] event.
+
 
 [float]
 [[no-stack-trace-available]]
