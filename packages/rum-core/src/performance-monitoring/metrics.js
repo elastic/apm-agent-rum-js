@@ -30,7 +30,7 @@ import {
   FIRST_INPUT,
   LAYOUT_SHIFT
 } from '../common/constants'
-import { noop, PERF } from '../common/utils'
+import { noop, PERF, isPerfTypeSupported } from '../common/utils'
 import Span from './span'
 
 export const metrics = {
@@ -317,12 +317,10 @@ export class PerfEntryRecorder {
   }
 
   start(type) {
-    /**
-     * Safari throws an error when PerformanceObserver is
-     * observed for unknown entry types as longtasks and lcp is
-     * not supported at the moment
-     */
     try {
+      if (!isPerfTypeSupported(type)) {
+        return
+      }
       /**
        * Start observing for different entry types depending on the transaction type
        * - `buffered`: true means we would be able to retrive all the events that happened
@@ -332,7 +330,13 @@ export class PerfEntryRecorder {
        *   buffered flag (https://w3c.github.io/performance-timeline/#observe-method)
        */
       this.po.observe({ type, buffered: true })
-    } catch (_) {}
+    } catch (_) {
+      /**
+       * Even though we check supportedEntryTypes before starting the observer,
+       * there are risks of exceptions according to the [spec](https://www.w3.org/TR/performance-timeline/#observe-method)
+       * But we ignore error since this is not intended to be seen by users
+       */
+    }
   }
 
   stop() {
