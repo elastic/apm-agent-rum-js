@@ -101,6 +101,15 @@ declare module '@elastic/apm-rum' {
     eventsLimit?: number
     queueLimit?: number
     sendCredentials?: boolean
+    apmRequest?: (
+      requestParams: {
+        xhr: XMLHttpRequest
+        url: string
+        method: string
+        payload?: string
+        headers?: Record<string, string>
+      },
+    ) => boolean
   }
 
   type Init = (options?: AgentConfigOptions) => ApmBase
