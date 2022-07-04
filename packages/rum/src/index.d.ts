@@ -101,13 +101,13 @@ declare module '@elastic/apm-rum' {
     eventsLimit?: number
     queueLimit?: number
     sendCredentials?: boolean
-    apmRequest: (
+    apmRequest?: (
       requestParams: {
         xhr: XMLHttpRequest
         url: string
         method: string
-        payload: BodyInit
-        headers: HeadersInit
+        payload?: string
+        headers?: Record<string, string>
       },
     ) => boolean
   }
