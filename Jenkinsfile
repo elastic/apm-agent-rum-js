@@ -227,7 +227,7 @@ pipeline {
           }
           parallel {
             stage('Benchmarks') {
-              agent { label 'metal' }
+              agent { label 'microbenchmarks-pool' }
               environment {
                 REPORT_FILE = 'apm-agent-benchmark-results.json'
               }
@@ -258,7 +258,7 @@ pipeline {
               }
             }
             stage('Load testing') {
-              agent { label 'metal' }
+              agent { label 'microbenchmarks-pool' }
               options {
                 warnError('load testing failed')
               }
