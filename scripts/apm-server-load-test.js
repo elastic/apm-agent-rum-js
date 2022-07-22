@@ -347,8 +347,7 @@ const iterations = 10
   if (outputFile) {
     const outputPath = join(__dirname, '../', outputFile)
     let ndJSONOutput =
-      '{"index": { "_index": "benchmarks-rum-load-test", "_type": "_doc"}}' +
-      '\n'
+      '{"index": { "_index": "benchmarks-rum-load-test" }}' + '\n'
     ndJSONOutput += JSON.stringify(results)
     await writeFile(outputPath, ndJSONOutput)
   } else {

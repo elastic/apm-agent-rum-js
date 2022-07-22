@@ -154,8 +154,7 @@ function runBenchmarks() {
       /**
        * NDJSON format for uploading to ES
        */
-      let ndJSONOutput =
-        '{"index": { "_index": "benchmarks-rum-js", "_type": "_doc"}}' + '\n'
+      let ndJSONOutput = '{"index": { "_index": "benchmarks-rum-js" }}' + '\n'
       ndJSONOutput += JSON.stringify(output)
 
       const outputPath = join(PKG_DIR, outputFile)
