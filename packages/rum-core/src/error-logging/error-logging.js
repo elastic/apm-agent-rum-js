@@ -165,7 +165,7 @@ class ErrorLogging {
   registerListeners() {
     window.addEventListener('error', errorEvent =>
       this.logErrorEvent(errorEvent)
-    )
+    , true)
     window.addEventListener('unhandledrejection', promiseRejectionEvent =>
       this.logPromiseEvent(promiseRejectionEvent)
     )
