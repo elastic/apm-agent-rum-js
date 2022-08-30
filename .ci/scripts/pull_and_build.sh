@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 export NODEJS_VERSION=$(cat ./dev-utils/.node-version)
-export STACK_VERSION=${STACK_VERSION:-8.3.3}
+export STACK_VERSION=${STACK_VERSION:-8.4.1}
 
 STACK_VERSION=${STACK_VERSION} \
 docker-compose -f ./dev-utils/docker-compose.yml --log-level INFO pull --quiet --ignore-pull-failures
