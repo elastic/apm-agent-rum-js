@@ -38,7 +38,7 @@ import {
   CLICK,
   observePageVisibility,
   observePageClicks
-} from '@elastic/apm-rum-core'
+} from '../../rum-core/src/index'
 
 export default class ApmBase {
   constructor(serviceFactory, disable) {

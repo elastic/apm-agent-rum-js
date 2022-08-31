@@ -26,24 +26,27 @@
 import Queue from './queue'
 import throttle from './throttle'
 import NDJSON from './ndjson'
-import { truncateModel, METADATA_MODEL } from './truncate'
+import {truncateModel, METADATA_MODEL} from './truncate'
 import {
   ERRORS,
   HTTP_REQUEST_TIMEOUT,
   QUEUE_FLUSH,
   TRANSACTIONS
 } from './constants'
-import { noop } from './utils'
-import { Promise } from './polyfills'
+import {
+  noop,
+  isTopWindow
+} from './utils'
+import {Promise} from './polyfills'
 import {
   compressMetadata,
   compressTransaction,
   compressError,
   compressPayload
 } from './compress'
-import { __DEV__ } from '../state'
-import { sendFetchRequest, shouldUseFetchWithKeepAlive } from './http/fetch'
-import { sendXHR } from './http/xhr'
+import {__DEV__} from '../state'
+import {sendFetchRequest, shouldUseFetchWithKeepAlive} from './http/fetch'
+import {sendXHR} from './http/xhr'
 
 /**
  * Throttling interval defaults to 60 seconds
@@ -59,6 +62,21 @@ class ApmServer {
   }
 
   init() {
+    if (isTopWindow()) {
+      const _this = this
+      window.addEventListener('message', function (e) {
+        const data = e.data;
+        if (data && typeof data === 'object') {
+          if (data.method === 'postJSON') {
+            data.filteredPayload[TRANSACTIONS].map(tr => {
+              tr.session = _this._configService.get('session')
+            })
+            _this.sendEventsNext(data.filteredPayload);
+          }
+        }
+      });
+    }
+
     const queueLimit = this._configService.get('queueLimit')
     const flushInterval = this._configService.get('flushInterval')
     const limit = this._configService.get('eventsLimit')
@@ -74,12 +92,12 @@ class ApmServer {
         })
       }
     }
-    this.queue = new Queue(onFlush, { queueLimit, flushInterval })
+    this.queue = new Queue(onFlush, {queueLimit, flushInterval})
 
     this.throttleEvents = throttle(
       this.queue.add.bind(this.queue),
       () => this._loggingService.warn('Dropped events due to throttling!'),
-      { limit, interval: THROTTLE_INTERVAL }
+      {limit, interval: THROTTLE_INTERVAL}
     )
 
     this._configService.observeEvent(QUEUE_FLUSH, () => {
@@ -92,7 +110,7 @@ class ApmServer {
       'Content-Type': 'application/x-ndjson'
     }
     const apmRequest = this._configService.get('apmRequest')
-    const params = { payload, headers, beforeSend: apmRequest }
+    const params = {payload, headers, beforeSend: apmRequest}
     return compressPayload(params)
       .catch(error => {
         if (__DEV__) {
@@ -104,11 +122,11 @@ class ApmServer {
         return params
       })
       .then(result => this._makeHttpRequest('POST', endPoint, result))
-      .then(({ responseText }) => responseText)
+      .then(({responseText}) => responseText)
   }
 
   _constructError(reason) {
-    const { url, status, responseText } = reason
+    const {url, status, responseText} = reason
     /**
      * The `reason` could be a different type, e.g. an Error
      */
@@ -134,7 +152,7 @@ class ApmServer {
   _makeHttpRequest(
     method,
     url,
-    { timeout = HTTP_REQUEST_TIMEOUT, payload, headers, beforeSend } = {}
+    {timeout = HTTP_REQUEST_TIMEOUT, payload, headers, beforeSend} = {}
   ) {
     const sendCredentials = this._configService.get('sendCredentials')
 
@@ -175,7 +193,7 @@ class ApmServer {
   }
 
   fetchConfig(serviceName, environment) {
-    var { configEndpoint } = this.getEndpoints()
+    var {configEndpoint} = this.getEndpoints()
     if (!serviceName) {
       return Promise.reject(
         'serviceName is required for fetching central config.'
@@ -198,7 +216,7 @@ class ApmServer {
       beforeSend: apmRequest
     })
       .then(xhr => {
-        const { status, responseText } = xhr
+        const {status, responseText} = xhr
         if (status === 304) {
           return localConfig
         } else {
@@ -238,11 +256,11 @@ class ApmServer {
   }
 
   addError(error) {
-    this.throttleEvents({ [ERRORS]: error })
+    this.throttleEvents({[ERRORS]: error})
   }
 
   addTransaction(transaction) {
-    this.throttleEvents({ [TRANSACTIONS]: transaction })
+    this.throttleEvents({[TRANSACTIONS]: transaction})
   }
 
   ndjsonErrors(errors, compress) {
@@ -255,7 +273,7 @@ class ApmServer {
   }
 
   ndjsonMetricsets(metricsets) {
-    return metricsets.map(metricset => NDJSON.stringify({ metricset })).join('')
+    return metricsets.map(metricset => NDJSON.stringify({metricset})).join('')
   }
 
   ndjsonTransactions(transactions, compress) {
@@ -267,7 +285,7 @@ class ApmServer {
 
       if (!compress) {
         if (tr.spans) {
-          spans = tr.spans.map(span => NDJSON.stringify({ span })).join('')
+          spans = tr.spans.map(span => NDJSON.stringify({span})).join('')
           delete tr.spans
         }
         if (tr.breakdown) {
@@ -277,7 +295,7 @@ class ApmServer {
       }
 
       return (
-        NDJSON.stringify({ [key]: compress ? compressTransaction(tr) : tr }) +
+        NDJSON.stringify({[key]: compress ? compressTransaction(tr) : tr}) +
         spans +
         breakdowns
       )
@@ -315,29 +333,44 @@ class ApmServer {
       return
     }
 
-    const apiVersion = cfg.get('apiVersion')
-    /**
-     * Enable payload compression only when API version is > 2
-     */
-    const compress = apiVersion > 2
+    /*    const apiVersion = cfg.get('apiVersion')
+        /!**
+         * Enable payload compression only when API version is > 2
+         *!/
+        const compress = apiVersion > 2
 
-    let ndjson = []
-    const metadata = this.createMetaData()
-    const metadataKey = compress ? 'm' : 'metadata'
+        let ndjson = []
+        const metadata = this.createMetaData()
+        const metadataKey = compress ? 'm' : 'metadata'
 
-    ndjson.push(
-      NDJSON.stringify({
-        [metadataKey]: compress ? compressMetadata(metadata) : metadata
-      })
-    )
+        ndjson.push(
+          NDJSON.stringify({
+            [metadataKey]: compress ? compressMetadata(metadata) : metadata
+          })
+        )
 
-    ndjson = ndjson.concat(
-      this.ndjsonErrors(filteredPayload[ERRORS], compress),
-      this.ndjsonTransactions(filteredPayload[TRANSACTIONS], compress)
-    )
-    const ndjsonPayload = ndjson.join('')
-    const { intakeEndpoint } = this.getEndpoints()
-    return this._postJson(intakeEndpoint, ndjsonPayload)
+        ndjson = ndjson.concat(
+          this.ndjsonErrors(filteredPayload[ERRORS], compress),
+          this.ndjsonTransactions(filteredPayload[TRANSACTIONS], compress)
+        )
+        const ndjsonPayload = ndjson.join('')
+        const {intakeEndpoint} = this.getEndpoints()
+
+        return this._postJson(intakeEndpoint, ndjsonPayload)*/
+
+    const isTop = isTopWindow()
+    if(this._configService.get('session')){
+      if (isTop) {
+        return this.sendEventsNext(filteredPayload)
+      } else {
+        top.postMessage({
+          method: 'postJSON',
+          filteredPayload: filteredPayload,
+        }, '*')
+      }
+    }else {
+      return this.sendEventsNext(filteredPayload)
+    }
   }
 
   getEndpoints() {
@@ -355,6 +388,35 @@ class ApmServer {
       configEndpoint
     }
   }
+
+  sendEventsNext(filteredPayload) {
+    const apiVersion = cfg.get('apiVersion')
+    /**
+     * Enable payload compression only when API version is > 2
+     */
+    const compress = apiVersion > 2
+
+    let ndjson = []
+    const metadata = this.createMetaData()
+    const metadataKey = compress ? 'm' : 'metadata'
+
+    ndjson.push(
+      NDJSON.stringify({
+        [metadataKey]: compress ? compressMetadata(metadata) : metadata
+      })
+    )
+
+
+    ndjson = ndjson.concat(
+      this.ndjsonErrors(filteredPayload[ERRORS], compress),
+      this.ndjsonTransactions(filteredPayload[TRANSACTIONS], compress)
+    )
+    const ndjsonPayload = ndjson.join('')
+    const {intakeEndpoint} = this.getEndpoints()
+
+    return this._postJson(intakeEndpoint, ndjsonPayload)
+  }
 }
+
 
 export default ApmServer

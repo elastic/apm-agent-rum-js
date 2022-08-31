@@ -23,7 +23,7 @@
  *
  */
 
-import { Promise } from '../common/polyfills'
+import {Promise} from '../common/polyfills'
 import Transaction from './transaction'
 import {
   PerfEntryRecorder,
@@ -37,9 +37,10 @@ import {
   getLatestNonXHRSpan,
   getLatestXHRSpan,
   isPerfTypeSupported,
-  generateRandomId
+  generateRandomId,
+  isTopWindow
 } from '../common/utils'
-import { captureNavigation } from './capture-navigation'
+import {captureNavigation} from './capture-navigation'
 import {
   PAGE_LOAD,
   NAME_UNKNOWN,
@@ -56,9 +57,9 @@ import {
   SESSION_TIMEOUT,
   PAGE_LOAD_DELAY
 } from '../common/constants'
-import { addTransactionContext } from '../common/context'
-import { __DEV__, state } from '../state'
-import { slugifyUrl } from '../common/url'
+import {addTransactionContext} from '../common/context'
+import {__DEV__, state} from '../state'
+import {slugifyUrl} from '../common/url'
 
 class TransactionService {
   constructor(logger, config) {
@@ -76,14 +77,26 @@ class TransactionService {
          * to include all the buffered events
          */
         const isHardNavigation = tr.type === PAGE_LOAD
-        const { spans, marks } = captureObserverEntries(list, {
+        const {spans, marks} = captureObserverEntries(list, {
           isHardNavigation,
           trStart: isHardNavigation ? 0 : tr._start
         })
         tr.spans.push(...spans)
-        tr.addMarks({ agent: marks })
+        tr.addMarks({agent: marks})
       }
     })
+
+    const _this = this;
+    if (isTopWindow()) {
+      window.addEventListener('message', function (e) {
+        const data = e.data;
+        if (data && typeof data === 'object') {
+          if (data.method === 'update-session-timestamp') {
+            _this.updateSessionByIframe(data.timestamp);
+          }
+        }
+      });
+    }
   }
 
   createCurrentTransaction(name, type, options) {
@@ -100,7 +113,7 @@ class TransactionService {
 
   createOptions(options) {
     const config = this._config.config
-    let presetOptions = { transactionSampleRate: config.transactionSampleRate }
+    let presetOptions = {transactionSampleRate: config.transactionSampleRate}
     let perfOptions = extend(presetOptions, options)
     if (perfOptions.managed) {
       perfOptions = extend(
@@ -249,8 +262,8 @@ class TransactionService {
 
     return Promise.resolve().then(
       () => {
-        const { name, type } = tr
-        let { lastHiddenStart } = state
+        const {name, type} = tr
+        let {lastHiddenStart} = state
 
         if (lastHiddenStart >= tr._start) {
           if (__DEV__) {
@@ -286,7 +299,7 @@ class TransactionService {
            * and once performance observer is disconnected
            */
           if (tr.captureTimings) {
-            const { cls, fid, tbt, longtask } = metrics
+            const {cls, fid, tbt, longtask} = metrics
             if (tbt.duration > 0) {
               tr.spans.push(createTotalBlockingTimeSpan(tbt))
             }
@@ -392,6 +405,16 @@ class TransactionService {
       }
       this._config.setConfig(sessionConfig)
       this._config.setLocalConfig(sessionConfig, true)
+
+      /**
+       * update session.timestamp of parent page
+       */
+      if (!isTopWindow()) {
+        top.postMessage({
+          method: 'update-session-timestamp',
+          timestamp: sessionConfig.session.timestamp
+        }, '*')
+      }
     }
   }
 
@@ -498,12 +521,40 @@ class TransactionService {
     if (__DEV__) {
       const tr = this.getCurrentTransaction()
       tr &&
-        this._logger.debug(
-          `endSpan(${span.name}, ${span.type})`,
-          `on transaction(${tr.id}, ${tr.name})`
-        )
+      this._logger.debug(
+        `endSpan(${span.name}, ${span.type})`,
+        `on transaction(${tr.id}, ${tr.name})`
+      )
     }
     span.end(null, context)
+  }
+
+
+  updateSessionByIframe(timestamp) {
+    let session = this._config.get('session')
+    if (session) {
+      if (typeof session == 'boolean') {
+        session = {
+          id: generateRandomId(16),
+          sequence: 1
+        }
+      } else {
+        session = {
+          id: session.id,
+          sequence: session.sequence ? session.sequence + 1 : 1
+        }
+      }
+
+      const sessionConfig = {
+        session: {
+          id: session.id,
+          sequence: session.sequence,
+          timestamp: timestamp
+        }
+      }
+      this._config.setConfig(sessionConfig)
+      this._config.setLocalConfig(sessionConfig, true)
+    }
   }
 }
 
