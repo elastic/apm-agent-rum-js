@@ -431,6 +431,10 @@ function isBeaconInspectionEnabled() {
   return false
 }
 
+function isTopWindow() {
+  return !!(top === self)
+}
+
 export {
   extend,
   merge,
@@ -470,5 +474,6 @@ export {
   isPerfTimelineSupported,
   isBrowser,
   isPerfTypeSupported,
-  isBeaconInspectionEnabled
+  isBeaconInspectionEnabled,
+  isTopWindow
 }
