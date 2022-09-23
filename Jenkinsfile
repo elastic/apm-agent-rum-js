@@ -13,8 +13,6 @@ pipeline {
     CODECOV_SECRET = 'secret/apm-team/ci/apm-agent-rum-codecov'
     SAUCELABS_SECRET = 'secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum'
     DOCKER_ELASTIC_SECRET = 'secret/apm-team/ci/docker-registry/prod'
-    GITHUB_CHECK_ITS_NAME = 'Integration Tests'
-    ITS_PIPELINE = 'apm-integration-tests-selector-mbp/main'
     OPBEANS_REPO = 'opbeans-frontend'
     NPMRC_SECRET = 'secret/jenkins-ci/npmjs/elasticmachine'
     TOTP_SECRET = 'totp/code/npmjs-elasticmachine'
@@ -177,28 +175,6 @@ pipeline {
                 wrappingUp()
               }
             }
-          }
-        }
-        stage('Integration Tests') {
-          agent none
-          when {
-            beforeAgent true
-            allOf {
-              anyOf {
-                changeRequest()
-                expression { return !params.Run_As_Main_Branch }
-              }
-              expression { return env.ONLY_DOCS == "false" }
-            }
-          }
-          steps {
-            build(job: env.ITS_PIPELINE, propagate: false, wait: false,
-                  parameters: [string(name: 'INTEGRATION_TEST', value: 'RUM'),
-                               string(name: 'BUILD_OPTS', value: "--rum-agent-branch ${env.GIT_BASE_COMMIT}"),
-                               string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_ITS_NAME),
-                               string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-                               string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT)])
-            githubNotify(context: "${env.GITHUB_CHECK_ITS_NAME}", description: "${env.GITHUB_CHECK_ITS_NAME} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${env.ITS_PIPELINE.replaceAll('/','+')}")
           }
         }
         /**
