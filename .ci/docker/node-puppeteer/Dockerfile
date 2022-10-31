@@ -13,6 +13,8 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     && apt-get update \
     && apt-get install -y \
       google-chrome-unstable \
+      libdrm2 \
+      libgbm1 \
       libxss1 \
       libxtst6 \
       fonts-ipafont-gothic \
