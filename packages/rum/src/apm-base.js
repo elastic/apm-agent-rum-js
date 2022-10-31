@@ -57,6 +57,8 @@ export default class ApmBase {
   }
 
   init(config) {
+    console.log('this is test');
+
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
       const [
