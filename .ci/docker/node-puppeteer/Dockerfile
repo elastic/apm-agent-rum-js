@@ -19,7 +19,7 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
       fonts-wqy-zenhei \
       fonts-thai-tlwg \
       fonts-kacst \
-      ttf-freefont \
+      fonts-freefont-ttf \
       --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
