@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-STACK_VERSION=${1:-8.4.2}
+STACK_VERSION=${1:-8.5.0}
 USER_ID="$(id -u):$(id -g)"
 NODEJS_VERSION=$(cat ./dev-utils/.node-version)
 
