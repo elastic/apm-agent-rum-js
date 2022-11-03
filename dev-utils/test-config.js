@@ -167,7 +167,10 @@ function getBrowserList(pkg = 'default') {
       {
         browserName: 'firefox',
         browserVersion: 'latest',
-        platformName: 'Windows 10'
+        platformName: 'Windows 10',
+        'sauce:options': {
+          geckodriverVersion: '0.30.0' // reason: https://github.com/karma-runner/karma-sauce-launcher/issues/275
+        }
       }
     ]
   }
