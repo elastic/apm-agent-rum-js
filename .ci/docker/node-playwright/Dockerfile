@@ -110,4 +110,5 @@ RUN apt-get -qq install -y wget --no-install-recommends \
         fonts-wqy-zenhei \
         fonts-thai-tlwg \
         fonts-kacst \
+        fonts-freefont-ttf \
         --no-install-recommends
