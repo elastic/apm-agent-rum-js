@@ -90,6 +90,7 @@ module.exports = function (config) {
       }
     }
   })
+  console.log('LOG: prepareConfig WEBPACK')
   const preparedConfig = prepareConfig(config)
   preparedConfig.preprocessors = {
     [specPattern]: ['webpack']
