@@ -8,7 +8,7 @@ if [ "${ARCH}" != "x86_64" ] ; then
   exit 0
 fi
 
-readonly NODEJS_VERSION="$(cat ./dev-utils/.node-version)"
+readonly NODEJS_VERSION="$(cat .nvmrc)"
 
 FLAVOURS="playwright
 puppeteer"
