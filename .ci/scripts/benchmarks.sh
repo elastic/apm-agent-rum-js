@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 USER_ID="$(id -u):$(id -g)"
-NODEJS_VERSION=$(cat ./dev-utils/.node-version)
+NODEJS_VERSION=$(cat .nvmrc)
 
 USER_ID="${USER_ID}" \
 NODEJS_VERSION="${NODEJS_VERSION}" \
