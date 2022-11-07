@@ -90,7 +90,7 @@ pipeline {
               deleteDir()
               unstash 'source'
               script{
-                docker.image('node:12').inside(){
+                docker.image('node:14').inside(){
                   dir("${BASE_DIR}"){
                     sh(label: "Lint", script: 'HOME=$(pwd) .ci/scripts/lint.sh')
                     bundlesize()
