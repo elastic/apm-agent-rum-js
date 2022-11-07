@@ -105,100 +105,14 @@ pipeline {
             }
           }
         }
-        stage('Test Puppeteer') {
-          when {
-            beforeAgent true
-            allOf {
-              expression { return env.ONLY_DOCS == "false" }
-              not {
-                expression { return isTag() }
-              }
-            }
-          }
-          matrix {
-            axes {
-              axis {
-                name 'ELASTIC_STACK_VERSION'
-                // The below line is part of the bump release automation
-                // if you change anything please modifies the file
-                // .ci/bump-stack-release-version.sh
-                values '8.0.0-SNAPSHOT', '8.5.0'
-              }
-              axis {
-                name 'SCOPE'
-                values (
-                  '@elastic/apm-rum',
-                  '@elastic/apm-rum-core',
-                  '@elastic/apm-rum-react',
-                  '@elastic/apm-rum-angular',
-                  '@elastic/apm-rum-vue',
-                )
-              }
-            }
-            stages {
-              stage('Scope Test') {
-                steps {
-                  runTest(stack: env.ELASTIC_STACK_VERSION, scope: env.SCOPE, allocateNode: true)
-                }
-              }
-            }
-          }
-        }
-        stage('Stack 8.0.0-SNAPSHOT SauceLabs') {
-          agent { label 'linux && immutable' }
-          environment {
-            MODE = "saucelabs"
-          }
-          when {
-            allOf {
-              anyOf {
-                branch 'main'
-                changeRequest()
-              }
-              expression { return params.saucelab_test }
-              expression { return env.ONLY_DOCS == "false" }
-              // Releases from main should skip this particular stage.
-              not {
-                allOf {
-                  branch 'main'
-                  expression { return params.release }
-                }
-              }
-            }
-          }
-          steps {
-            runAllScopes(stack: "8.0.0-SNAPSHOT")
-          }
-          post {
-            cleanup {
-              dir("${BASE_DIR}") {
-                wrappingUp()
-              }
-            }
-          }
-        }
         /**
         Run Benchmarks and send the results to ES.
         */
         stage('Benchmarks') {
           when {
             beforeAgent true
-            allOf {
-              anyOf {
-                branch 'main'
-                expression { return params.Run_As_Main_Branch }
-                expression { return env.BENCHMARK_UPDATED != "false" }
-                expression { return env.GITHUB_COMMENT?.contains('benchmark tests') }
-              }
-              expression { return params.bench_ci }
-              expression { return env.ONLY_DOCS == "false" }
-              // Releases from main should skip this particular stage.
-              not {
-                allOf {
-                  branch 'main'
-                  expression { return params.release }
-                }
-              }
+            not {
+              expression { return isTag() }
             }
           }
           parallel {
