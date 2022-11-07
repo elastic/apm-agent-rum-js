@@ -188,8 +188,11 @@ function prepareConfig(config, packageName) {
     config.transports = ['polling']
   }
 
-  console.log('prepareConfig ------', config)
-  return config.customLaunchers.flags
+  console.log(
+    'prepareConfig ------',
+    JSON.stringify(config.customLaunchers, null, 2)
+  )
+  return config
 }
 
 module.exports = {
