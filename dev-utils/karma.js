@@ -130,10 +130,10 @@ function prepareConfig(config, packageName) {
     config.plugins.push('karma-chrome-launcher')
 
     if (!isSauce) {
-      config.browsers = ['HeadlessChromium']
+      config.browsers = ['ChromeHeadlessNoSandbox']
       config.customLaunchers = {
-        HeadlessChromium: {
-          base: 'ChromiumHeadless',
+        ChromeHeadlessNoSandbox: {
+          base: 'ChromeHeadless',
           flags: [
             '--no-sandbox', // required to run without privileges in docker
             '--remote-debugging-port=9222',
