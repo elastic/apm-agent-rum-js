@@ -188,6 +188,7 @@ function prepareConfig(config, packageName) {
     config.transports = ['polling']
   }
 
+  console.log('prepareConfig ------', config)
   return config
 }
 
