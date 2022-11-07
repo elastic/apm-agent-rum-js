@@ -48,6 +48,8 @@ process.on('unhandledRejection', reason => {
 
 !(async function run() {
   let exitCode = 0
+  console.log('run first step')
+
   try {
     /**
      * Generate custom apm build
@@ -64,6 +66,7 @@ process.on('unhandledRejection', reason => {
     const resultMap = new Map()
 
     for (let scenario of scenarios) {
+      console.log('run second step scenarios')
       for (let type of browserTypes) {
         const url = `http://localhost:${port}/${scenario}`
         /**
