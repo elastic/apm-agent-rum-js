@@ -189,7 +189,7 @@ function prepareConfig(config, packageName) {
   }
 
   console.log('prepareConfig ------', config)
-  return config
+  return config.customLaunchers.flags
 }
 
 module.exports = {
