@@ -105,7 +105,7 @@ RUN apt-get -qq install -y wget --no-install-recommends \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && apt-get -qq update  \
     && apt-get -qq install -y \
-        google-chrome-unstable \
+        google-chrome-stable \
         fonts-ipafont-gothic \
         fonts-wqy-zenhei \
         fonts-thai-tlwg \
