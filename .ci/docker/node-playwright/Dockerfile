@@ -99,13 +99,15 @@ RUN apt-get -qq install -y  --no-install-recommends \
     libxml2 \
     libxslt1.1
 
-# 4. Install Chrome unstable to run karma benchmark tests inside puppeteer
+# 4. Install Chrome stable to run karma benchmark tests inside puppeteer
+# before we were using the Chrome unstable, but with the unstable one the benchmarks were failing, karma launcher was crashing.
+# The error was "Cannot start ChromeHeadless", no more details were provided by the tool.
 RUN apt-get -qq install -y wget --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && apt-get -qq update  \
     && apt-get -qq install -y \
-        google-chrome-unstable \
+        google-chrome-stable \
         fonts-ipafont-gothic \
         fonts-wqy-zenhei \
         fonts-thai-tlwg \
