@@ -24,6 +24,7 @@
     "serve": "node ./dev-utils/run-script.js startTestServers",
     "coverage": "lerna run build:module && lerna run karma:coverage",
     "bench:dev": "lerna run build:module && node ./scripts/benchmarks.js",
+    "package:snapshot": "npx lerna exec npm pack",
     "clean": "npx lerna exec -- rm -rf dist/",
     "release-ci": "lerna publish --otp=${TOTP_CODE} --yes && npm run github-release"
   },
