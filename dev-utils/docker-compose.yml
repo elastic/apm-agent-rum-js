@@ -136,6 +136,8 @@ services:
       context: ../.ci/docker/node-puppeteer
       args:
         - NODEJS_VERSION=${NODEJS_VERSION}
+    cap_add:
+      - SYS_ADMIN
     container_name: node-puppeteer
     image: docker.elastic.co/observability-ci/node-puppeteer:${NODEJS_VERSION}
     environment:
