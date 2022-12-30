@@ -4,9 +4,9 @@ on:
   pull_request:
     # Don't trigger if it's only docs files
     paths:
-      - '**'
-      - '!**/*.asciidoc'
-      - '!*/*.md'
+      - "**"
+      - "!**/*.asciidoc"
+      - "!*/*.md"
 
 # Probably needs to be moved to inputs?
 env:
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-          cache: 'npm'
+          cache: npm
       - name: Lint
         run: .ci/scripts/lint.sh
       - name: Bundle Size
@@ -34,11 +34,11 @@ jobs:
           - 8.0.0-SNAPSHOT
           - 8.5.1
         scope:
-          - @elastic/apm-rum
-          - @elastic/apm-rum-core
-          - @elastic/apm-rum-react
-          - @elastic/apm-rum-angular
-          - @elastic/apm-rum-vue
+          - "@elastic/apm-rum"
+          - "@elastic/apm-rum-core"
+          - "@elastic/apm-rum-react"
+          - "@elastic/apm-rum-angular"
+          - "@elastic/apm-rum-vue"
     runs-on: ubuntu-latest
     name: ${{ matrix.scope }} - ${{ matrix.elastic-stack-version }}
     env:
