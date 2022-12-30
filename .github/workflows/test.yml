@@ -14,7 +14,10 @@ jobs:
       - name: Lint
         run: .ci/scripts/lint.sh
       - name: Bundle Size
-        run: npm run bundlesize | tee bundlesize.txt
-      - run: cat bundlesize.txt
-
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm run bundlesize | tee bundlesize.txt
+          grep -e "\(FAIL|PASS\) bundlesize.txt | cut -d ":" -f 2 > bundlesize-lines.txt
+          cat bundlesize-lines.txt
 
