@@ -1,0 +1,20 @@
+name: test
+
+on: pull_request
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: 'npm'
+      - name: Lint
+        run: .ci/scripts/lint.sh
+      - name: Bundle Size
+        run: npm run bundlesize | tee bundlesize.txt
+      - run: cat bundlesize.txt
+
+

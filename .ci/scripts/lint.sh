@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
-npm install
+set -e
+npm ci
 npm run lint
 scripts/lint-commits.sh
