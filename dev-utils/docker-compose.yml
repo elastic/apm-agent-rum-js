@@ -146,7 +146,7 @@ services:
       - KIBANA_URL=${KIBANA_URL}
       - BUILD_NUMBER=${BUILD_NUMBER}
       - BRANCH_NAME=${BRANCH_NAME}
-      - JENKINS_URL=${JENKINS_URL}
+      - CI=${CI}
       - SAUCE_USERNAME=${SAUCE_USERNAME}
       - SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}
       - MODE=${MODE}
@@ -178,7 +178,7 @@ services:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}
       - BRANCH_NAME=${BRANCH_NAME}
-      - JENKINS_URL=${JENKINS_URL}
+      - CI=${CI}
       - REPORT_FILE=${REPORT_FILE}
     command: >
       /bin/bash -c "set -x
@@ -213,7 +213,7 @@ services:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}
       - BRANCH_NAME=${BRANCH_NAME}
-      - JENKINS_URL=${JENKINS_URL}
+      - CI=${CI}
       - REPORT_FILE=${REPORT_FILE}
       - APM_SERVER_URL=http://apm-server:8200
     command: >
