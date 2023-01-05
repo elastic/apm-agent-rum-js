@@ -21,7 +21,10 @@ jobs:
         with:
           node-version: 14
           cache: npm
+      - run: echo '${{ toJSON(github.event) }}'
       - name: Lint
+        env:
+          CHANGE_ID: ${{ github.event. }}
         run: .ci/scripts/lint.sh
       - name: Bundle Size
         continue-on-error: true
