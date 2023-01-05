@@ -24,8 +24,6 @@ jobs:
       - name: Debug
         run: echo '${{ toJSON(github.event.pull_request) }}'
       - name: Lint
-        env:
-          CHANGE_ID: ${{ github.event. }}
         run: .ci/scripts/lint.sh
       - name: Bundle Size
         continue-on-error: true
