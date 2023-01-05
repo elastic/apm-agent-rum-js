@@ -22,7 +22,7 @@ jobs:
           node-version: 14
           cache: npm
       - name: Debug
-        run: echo '${{ toJSON(github.event) }}'
+        run: echo '${{ toJSON(github.event.pull_request) }}'
       - name: Lint
         env:
           CHANGE_ID: ${{ github.event. }}
