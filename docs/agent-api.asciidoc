@@ -158,6 +158,10 @@ This argument is optional. The following options are supported:
 
 ** `managed` - Controls whether the transaction is managed by the agent or not. Defaults to `false`.
 
+** `canReuse` - Controls whether the transaction is reused by the agent or not. Defaults to `false`.
+
+** `reuseThreshold` - The amount of time it is allowed for a transaction to be reused in another startTransaction. Defaults to `5000`.
+
 Use this method to create a custom transaction. 
 
 By default, custom transactions are not managed by the agent, however, you can start a managed transaction
