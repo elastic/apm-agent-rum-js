@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-STACK_VERSION=${1:-8.6.0}
+STACK_VERSION=${1:-8.6.1}
 USER_ID="$(id -u):$(id -g)"
 NODEJS_VERSION=$(cat .nvmrc)
 
