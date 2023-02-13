@@ -1,0 +1,60 @@
+---
+name: Bump elastic stack to latest version
+
+actions:
+  default:
+    title: '[updatecli] Bump elastic stack version to {{ source "latestRelease" }}'
+    kind: github/pullrequest
+    spec:
+      labels:
+        - dependencies
+    scmid: default
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: '{{ requiredEnv "GIT_USER" }}'
+      email: '{{ requiredEnv "GIT_EMAIL" }}'
+      owner: elastic
+      repository: apm-agent-rum-js
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      username: '{{ requiredEnv "GIT_USER" }}'
+      branch: main
+
+sources:
+  latestRelease:
+    name: Get Latest Elastic Release
+    kind: githubrelease
+    transformers:
+      - trimprefix: v
+    spec:
+      owner: elastic
+      repository: elasticsearch
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      username: '{{ requiredEnv "GIT_USER" }}'
+      versionfilter:
+        kind: regex
+        pattern: ^v8\.(\d+)\.(\d+)$
+
+conditions:
+  dockerTag:
+    name: Is docker image elasticsearch:{{ source "latestRelease" }} published
+    kind: dockerimage
+    spec:
+      image: elasticsearch
+      tag: '{{ source "latestRelease" }}'
+    sourceid: latestRelease
+
+targets:
+
+  update-jenkinsfile:
+    name: 'Update elastic stack version to {{ source "latestRelease" }}'
+    sourceid: latestRelease
+    scmid: default
+    kind: file
+    spec:
+      file: Jenkinsfile
+      content: '"{{ source `latestRelease` }}"'
+      matchpattern: '"[0-9]+\.[0-9]+\.[0-9]+"'
+
