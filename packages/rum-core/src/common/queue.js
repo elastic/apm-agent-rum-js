@@ -23,6 +23,8 @@
  *
  */
 
+import { runInOwnZone } from './utils'
+
 class Queue {
   constructor(onFlush, opts = {}) {
     this.onFlush = onFlush
@@ -33,7 +35,9 @@ class Queue {
   }
 
   _setTimer() {
-    this.timeoutId = setTimeout(() => this.flush(), this.flushInterval)
+    this.timeoutId = runInOwnZone(() =>
+      setTimeout(() => this.flush(), this.flushInterval)
+    )
   }
 
   _clear() {

@@ -32,7 +32,8 @@ import {
   isPlatformSupported,
   scheduleMicroTask,
   scheduleMacroTask,
-  isBrowser
+  isBrowser,
+  runInOwnZone
 } from './common/utils'
 import { patchAll, patchEventHandler } from './common/patching'
 import { observePageVisibility, observePageClicks } from './common/observers'
@@ -86,5 +87,6 @@ export {
   CLICK,
   bootstrap,
   observePageVisibility,
-  observePageClicks
+  observePageClicks,
+  runInOwnZone
 }
