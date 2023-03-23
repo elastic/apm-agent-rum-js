@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
-  <% include head %>
+  <%- include('head') -%>
   <body>
     <% for(var i=0; i < images.length; i++) { %>
     <img src="<%= images[i] %>" />
-    <% } %> <% include init %>
+    <% } %> <%- include('init') -%>
   </body>
 </html>
