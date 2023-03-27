@@ -40,7 +40,7 @@ function getTestEnvironmentVariables() {
     branch: process.env.BRANCH_NAME,
     mode: process.env.MODE,
     sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
-    isJenkins: process.env.JENKINS_URL,
+    isCI: process.env.JENKINS_URL || process.env.GITHUB_API_URL,
     serverUrl: process.env.APM_SERVER_URL || DEFAULT_APM_SERVER_URL,
     mockBackendUrl: 'http://localhost:8003',
     stackVersion: process.env.STACK_VERSION || ''

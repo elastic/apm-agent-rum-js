@@ -21,6 +21,7 @@
     "test:unit": "lerna run test:unit --scope=$SCOPE --no-prefix --concurrency=1",
     "build": "lerna run build",
     "bundlesize": "lerna run build:module && lerna run bundlesize",
+    "ci:bundlesize": "bash ./scripts/ci-bundlesize.sh",
     "serve": "node ./dev-utils/run-script.js startTestServers",
     "coverage": "lerna run build:module && lerna run karma:coverage",
     "bench:dev": "lerna run build:module && node ./scripts/benchmarks.js",

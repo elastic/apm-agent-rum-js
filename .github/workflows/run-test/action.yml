@@ -1,0 +1,77 @@
+---
+
+name: common tasks
+description: Install specific JDK and run a command
+
+inputs:
+  goal:
+    description: 'Goal to execute'
+    required: true
+  stack-version:
+    description: 'Stack Version'
+    required: true
+  scope:
+    description: 'Scope'
+    default: ''
+    type: string
+  mode:
+    description: 'Mode to use'
+    default: 'none'
+    type: choice
+    options:
+      - none
+      - saucelabs
+  vault-url:
+    description: 'Vault URL'
+    required: true
+  vault-role-id:
+    description: 'Vault role ID'
+    required: true
+  vault-secret-id:
+    description: 'Vault secret ID'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: '.nvmrc'
+    - uses: elastic/apm-pipeline-library/.github/actions/docker-login@current
+      with:
+        registry: 'docker.elastic.co'
+        url: ${{ inputs.vault-url }}
+        roleId: ${{ inputs.vault-role-id }}
+        secretId: ${{ inputs.vault-secret-id }}
+        secret: ${{ env.DOCKER_ELASTIC_SECRET }}
+    - name: Pull and build docker infra
+      run: './.ci/scripts/pull_and_build.sh'
+      shell: bash
+    - uses: hashicorp/vault-action@v2.5.0
+      if: ${{ inputs.mode == 'saucelabs' }}
+      with:
+        url: ${{ inputs.vault-url }}
+        roleId: ${{ inputs.vault-role-id }}
+        secretId: ${{ inputs.vault-secret-id }}
+        method: approle
+        secrets: |
+          ${{ env.SAUCELABS_SECRET }} SAUCE_USERNAME | SAUCE_USERNAME ;
+          ${{ env.SAUCELABS_SECRET }} SAUCE_ACCESS_KEY | SAUCE_ACCESS_KEY
+    - name: Run tests Elastic Stack ${{ matrix.stack-version }} - ${{ matrix.scope }} - ${{ fromJSON('{"none":"Puppeteer"}')[inputs.mode] || inputs.mode }}
+      run: './.ci/scripts/test.sh'
+      shell: bash
+      env:
+        APM_SERVER_PORT: '8200'
+        APM_SERVER_URL: 'http://apm-server:8200'
+        KIBANA_URL: 'http://kibana:5601'
+        GOAL: ${{ inputs.goal }}
+        MODE: ${{ inputs.mode }}
+        SCOPE: ${{ inputs.scope }}
+        STACK_VERSION: ${{ inputs.stack-version }}
+    - name: Store test results
+      if: success() || failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: |
+          packages/**/reports/TESTS-*.xml

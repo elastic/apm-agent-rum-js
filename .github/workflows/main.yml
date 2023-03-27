@@ -1,0 +1,141 @@
+---
+
+name: main
+
+on:
+  workflow_dispatch:
+    inputs:
+      saucelab_test:
+        description: 'Enable run a Sauce lab test'
+        default: true
+        required: false
+        type: boolean
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '**.asciidoc'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '**.asciidoc'
+
+# Limit the access of the generated GITHUB_TOKEN
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  DOCKER_ELASTIC_SECRET: secret/observability-team/ci/docker-registry/prod
+  SAUCELABS_SECRET: secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum
+  CODECOV_SECRET: secret/apm-team/ci/apm-agent-rum-codecov
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+      - run: '.ci/scripts/lint.sh'
+      - run: 'npm run ci:bundlesize'
+        id: bundlesize
+      - uses: actions/github-script@v6
+        env:
+          BUNDLESIZE_PASS: ${{ steps.bundlesize.outputs.bundlesize_pass }}
+          BUNDLESIZE_FAIL: ${{ steps.bundlesize.outputs.bundlesize_fail }}
+        with:
+          script: |
+            const { BUNDLESIZE_PASS, BUNDLESIZE_FAIL } = process.env;
+            let state = 'success';
+            if (BUNDLESIZE_FAIL > 0) {
+              state = 'failure';
+            }
+            github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: state,
+              context: `${context.workflow} / Bundlesize: ${BUNDLESIZE_PASS} pass / ${BUNDLESIZE_FAIL} fail`,
+            });
+
+  test-puppeteer:
+    name: Test Puppeteer
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        stack-version:
+          - '8.0.0-SNAPSHOT'
+          - '8.6.1'
+        scope:
+          - '@elastic/apm-rum'
+          - '@elastic/apm-rum-core'
+          - '@elastic/apm-rum-react'
+          - '@elastic/apm-rum-angular'
+          - '@elastic/apm-rum-vue'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run puppeteer tests
+        uses: ./.github/workflows/run-test
+        with:
+          goal: 'test'
+          mode: 'none'
+          scope: ${{ matrix.scope }}
+          stack-version: ${{ matrix.stack-version }}
+          vault-url: ${{ secrets.VAULT_ADDR }}
+          vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
+          vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
+
+  test-saucelabs:
+    name: Test SauceLabs
+    # Inputs aren't defined on some events
+    # When undefined, we need to emulate the default value
+    if: inputs.saucelab_test == true || inputs.saucelab_test == null
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        stack-version:
+          - '8.0.0-SNAPSHOT'
+        scope:
+          - '@elastic/apm-rum'
+          - '@elastic/apm-rum-core'
+          - '@elastic/apm-rum-react'
+          - '@elastic/apm-rum-angular'
+          - '@elastic/apm-rum-vue'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run saucelabs tests
+        uses: ./.github/workflows/run-test
+        with:
+          goal: 'test'
+          mode: 'saucelabs'
+          scope: ${{ matrix.scope }}
+          stack-version: ${{ matrix.stack-version }}
+          vault-url: ${{ secrets.VAULT_ADDR }}
+          vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
+          vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run coverage
+        uses: ./.github/workflows/run-test
+        with:
+          goal: 'coverage'
+          mode: 'none'
+          stack-version: '8.6.1'
+          vault-url: ${{ secrets.VAULT_ADDR }}
+          vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
+          vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
