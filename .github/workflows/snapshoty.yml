@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - main
-      - feature/github-actions
     paths-ignore:
       - '**.md'
       - '**.asciidoc'
