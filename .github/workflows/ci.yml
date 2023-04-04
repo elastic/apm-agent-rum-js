@@ -1,6 +1,6 @@
 ---
 
-name: main
+name: ci
 
 on:
   workflow_dispatch:
@@ -61,8 +61,7 @@ jobs:
               state = 'failure';
             }
             github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              ...context.repo,
               sha: context.sha,
               state: state,
               context: `${context.workflow} / Bundlesize: ${BUNDLESIZE_PASS} pass / ${BUNDLESIZE_FAIL} fail`,
@@ -88,7 +87,6 @@ jobs:
         uses: ./.github/workflows/run-test
         with:
           goal: 'test'
-          mode: 'none'
           scope: ${{ matrix.scope }}
           stack-version: ${{ matrix.stack-version }}
           vault-url: ${{ secrets.VAULT_ADDR }}
@@ -134,7 +132,6 @@ jobs:
         uses: ./.github/workflows/run-test
         with:
           goal: 'coverage'
-          mode: 'none'
           stack-version: '8.6.1'
           vault-url: ${{ secrets.VAULT_ADDR }}
           vault-role-id: ${{ secrets.VAULT_ROLE_ID }}

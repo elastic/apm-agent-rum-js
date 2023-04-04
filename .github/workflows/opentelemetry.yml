@@ -5,6 +5,7 @@ on:
   workflow_run:
     workflows:
       - bump-elastic-stack
+      - ci
     types: [completed]
 
 jobs:
