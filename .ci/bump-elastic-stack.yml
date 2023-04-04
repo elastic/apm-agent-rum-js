@@ -48,13 +48,12 @@ conditions:
 
 targets:
 
-  update-jenkinsfile:
+  update-ci-workflow:
     name: 'Update elastic stack version to {{ source "latestRelease" }}'
     sourceid: latestRelease
     scmid: default
     kind: file
     spec:
-      file: Jenkinsfile
+      file: .github/workflows/ci.yml
       content: '"{{ source `latestRelease` }}"'
       matchpattern: '"[0-9]+\.[0-9]+\.[0-9]+"'
-
