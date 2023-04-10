@@ -10,7 +10,7 @@ While initializing the agent you can provide the following configuration options
 * *Type:* String
 * *Required*
 
-The Elastic APM service name is used to differentiate data from each of your services. 
+The Elastic APM service name is used to differentiate data from each of your services.
 Can only contain alphanumeric characters, spaces, underscores, and dashes (must match ^[a-zA-Z0-9 _-]+$).
 
 [float]
@@ -33,7 +33,7 @@ The server prefix URL used to make requests to the APM Server. Some ad blockers 
 from the browser if the default server prefix URL is being used. Using a custom server prefix URL can be used to
 evade the ad blocker.
 
-NOTE: If the default server prefix URL is overwritten, the reverse proxy that sits between the 
+NOTE: If the default server prefix URL is overwritten, the reverse proxy that sits between the
 APM Server and the rum agent must reroute traffic to `/intake/v${apiVersion}/rum/events`
 so the APM Server knows what intake API to use.
 
@@ -47,7 +47,7 @@ so the APM Server knows what intake API to use.
 The version of the app.
 This could be the version from your `package.json` file,
 a git commit reference,
-or any other string that might help you reference a specific version. 
+or any other string that might help you reference a specific version.
 This option is used on the APM Server to find the right sourcemap file to apply to the stack trace.
 
 
@@ -78,8 +78,8 @@ var options = {
 * *Type:* Boolean
 * *Default:* `true`
 
-A Boolean value that specifies if the agent should automatically instrument the application to collect 
-performance metrics for the application. 
+A Boolean value that specifies if the agent should automatically instrument the application to collect
+performance metrics for the application.
 
 NOTE: Both active and instrument needs to be true for instrumentation to be running.
 
@@ -234,7 +234,7 @@ Distributed tracing is enabled by default. Use this option to disable it.
 
 This option can be set to an array containing one or more Strings or RegExp objects and determines which origins should be monitored as part of distributed tracing.
 This option is consulted when the agent is about to add the distributed tracing HTTP header (`traceparent`) to a request.
-Please note that each item in the array should be a valid URL containing the origin (other parts of the url are ignored) or a RegExp object. If an item in the array is a string, an exact match will be performed. If it's a RegExp object, its test function will be called with the request origin. 
+Please note that each item in the array should be a valid URL containing the origin (other parts of the url are ignored) or a RegExp object. If an item in the array is a string, an exact match will be performed. If it's a RegExp object, its test function will be called with the request origin.
 
 [source,js]
 ----
@@ -252,7 +252,7 @@ var options = {
 
 When distributed tracing is enabled, this option can be used to propagate the https://www.w3.org/TR/trace-context/#tracestate-header[tracestate]
 HTTP header to the configured origins. Before enabling this flag, make sure to change your <<server-configuration, server configuration>> to avoid
-Cross-Origin Resource Sharing errors. 
+Cross-Origin Resource Sharing errors.
 
 [float]
 [[event-throttling]]
@@ -294,7 +294,7 @@ In most cases, this means when the tab/window of the page is closed.
 
 NOTE: Currently, only <<transaction-sample-rate, transaction sample rate>> can be configured via Kibana.
 
-NOTE: This feature requires APM Server v7.5 or later and that the APM Server is configured with `kibana.enabled: true`.
+NOTE: This feature requires APM Server v7.5 or later.
 More information is available in {apm-app-ref}/agent-configuration.html[APM Agent configuration].
 
 
@@ -307,7 +307,7 @@ More information is available in {apm-app-ref}/agent-configuration.html[APM Agen
 * *Default:* `[]`
 
 An array containing a list of transaction names that should be ignored when sending the payload to the APM server.
-It can be set to an array containing one or more Strings or RegExp objects. If an element in the array is a String, an exact match will be performed. 
+It can be set to an array containing one or more Strings or RegExp objects. If an element in the array is a String, an exact match will be performed.
 If an element in the array is a RegExp object, its test function will be called with the name of the transation.
 
 [source,js]
@@ -360,12 +360,12 @@ Arguments:
 
 `apmRequest` can be used to change or reject requests that are made to the
 APM Server. This config can be set to a function, which is called whenever the agent
-needs to make a request to the APM Server. 
+needs to make a request to the APM Server.
 
-The callback function is called with a single argument and is expected to return 
-an output synchronously. If the return value is `true` then the agent continues 
-with making the (potentially modified) request to the APM Server. 
- 
+The callback function is called with a single argument and is expected to return
+an output synchronously. If the return value is `true` then the agent continues
+with making the (potentially modified) request to the APM Server.
+
 If this function returns a falsy value the request is discarded with a warning in the console.
 
 The following example adds a header to the HTTP request:
