@@ -3,13 +3,6 @@
 name: ci
 
 on:
-  workflow_dispatch:
-    inputs:
-      saucelab_test:
-        description: 'Enable run a Sauce lab test'
-        default: true
-        required: false
-        type: boolean
   push:
     branches:
       - main
@@ -27,11 +20,6 @@ on:
 permissions:
   contents: read
   statuses: write
-
-env:
-  DOCKER_ELASTIC_SECRET: secret/observability-team/ci/docker-registry/prod
-  SAUCELABS_SECRET: secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum
-  CODECOV_SECRET: secret/apm-team/ci/apm-agent-rum-codecov
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -89,39 +77,6 @@ jobs:
           goal: 'test'
           scope: ${{ matrix.scope }}
           stack-version: ${{ matrix.stack-version }}
-          vault-url: ${{ secrets.VAULT_ADDR }}
-          vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
-          vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
-
-  test-saucelabs:
-    name: Test SauceLabs
-    # Inputs aren't defined on some events
-    # When undefined, we need to emulate the default value
-    if: inputs.saucelab_test == true || inputs.saucelab_test == null
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-      matrix:
-        stack-version:
-          - '8.0.0-SNAPSHOT'
-        scope:
-          - '@elastic/apm-rum'
-          - '@elastic/apm-rum-core'
-          - '@elastic/apm-rum-react'
-          - '@elastic/apm-rum-angular'
-          - '@elastic/apm-rum-vue'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run saucelabs tests
-        uses: ./.github/workflows/run-test
-        with:
-          goal: 'test'
-          mode: 'saucelabs'
-          scope: ${{ matrix.scope }}
-          stack-version: ${{ matrix.stack-version }}
-          vault-url: ${{ secrets.VAULT_ADDR }}
-          vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
-          vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
 
   coverage:
     name: Coverage
@@ -133,9 +88,6 @@ jobs:
         with:
           goal: 'coverage'
           stack-version: '8.6.1'
-          vault-url: ${{ secrets.VAULT_ADDR }}
-          vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
-          vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
 
   all:
     if: always()
@@ -143,7 +95,6 @@ jobs:
     needs:
       - lint
       - test-puppeteer
-      - test-saucelabs
       - coverage
     steps:
       - id: check

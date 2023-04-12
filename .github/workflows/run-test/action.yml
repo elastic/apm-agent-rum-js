@@ -23,13 +23,13 @@ inputs:
       - saucelabs
   vault-url:
     description: 'Vault URL'
-    required: true
+    required: false
   vault-role-id:
     description: 'Vault role ID'
-    required: true
+    required: false
   vault-secret-id:
     description: 'Vault secret ID'
-    required: true
+    required: false
 
 runs:
   using: "composite"
