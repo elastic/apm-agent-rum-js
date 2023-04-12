@@ -20,7 +20,7 @@ scms:
       repository: apm-agent-rum-js
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       username: '{{ requiredEnv "GIT_USER" }}'
-      branch: feature/github-actions
+      branch: main
 
 sources:
   latestRelease:

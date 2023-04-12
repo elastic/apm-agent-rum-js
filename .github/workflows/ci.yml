@@ -64,7 +64,7 @@ jobs:
               ...context.repo,
               sha: context.sha,
               state: state,
-              context: `${context.workflow} / Bundlesize: ${{ steps.bundlesize.outputs.bundlesize_pass }} pass / ${BUNDLESIZE_FAIL} fail`,
+              context: `${context.workflow} / Bundlesize: ${BUNDLESIZE_PASS} pass / ${BUNDLESIZE_FAIL} fail`,
             });
 
   test-puppeteer:
