@@ -15,6 +15,9 @@ do
   USER_ID="$(id -u):$(id -g)" \
   NODEJS_VERSION=$(cat .nvmrc) \
   STACK_VERSION=${STACK_VERSION} \
+  APM_SERVER_PORT=${APM_SERVER_PORT} \
+  APM_SERVER_URL=${APM_SERVER_URL} \
+  KIBANA_URL=${KIBANA_URL} \
   docker-compose \
     -f ./dev-utils/docker-compose.yml \
     --log-level INFO \
@@ -22,7 +25,7 @@ do
     --quiet-pull \
     --exit-code-from node-puppeteer \
     --remove-orphans \
-    node-puppeteer && break;
+    node-puppeteer;
     status=${?}
     if [ "${status}" -eq "0" ]; then
       break
