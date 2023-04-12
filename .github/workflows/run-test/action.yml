@@ -37,13 +37,6 @@ runs:
     - uses: actions/setup-node@v3
       with:
         node-version-file: '.nvmrc'
-    # - uses: elastic/apm-pipeline-library/.github/actions/docker-login@current
-    #   with:
-    #     registry: 'docker.elastic.co'
-    #     url: ${{ inputs.vault-url }}
-    #     roleId: ${{ inputs.vault-role-id }}
-    #     secretId: ${{ inputs.vault-secret-id }}
-    #     secret: ${{ env.DOCKER_ELASTIC_SECRET }}
     - name: Pull and build docker infra
       run: './.ci/scripts/pull_and_build.sh'
       shell: bash
