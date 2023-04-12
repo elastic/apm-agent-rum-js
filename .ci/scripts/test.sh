@@ -23,6 +23,11 @@ do
     --exit-code-from node-puppeteer \
     --remove-orphans \
     node-puppeteer && break;
+    status=${?}
+    if [ "${status}" -eq "0" ]; then
+      break
+    fi
   sleep 5;
 done
-echo "Exit code from docker-compose $?"
+echo "Exit code from docker-compose ${status}"
+exit ${status}

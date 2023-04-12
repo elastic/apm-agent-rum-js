@@ -6,6 +6,7 @@ on:
     workflows:
       - bump-elastic-stack
       - ci
+      - ci-extends
     types: [completed]
 
 jobs:

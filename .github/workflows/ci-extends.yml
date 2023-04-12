@@ -1,6 +1,6 @@
 ---
 
-name: ci
+name: ci-extends
 
 on:
   workflow_dispatch:
