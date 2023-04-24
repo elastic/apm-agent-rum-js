@@ -5,7 +5,7 @@ on:
   workflow_run:
     workflows:
       - ci
-      - ci-extends
+      - ci-saucelabs
     types:
       - completed
 
