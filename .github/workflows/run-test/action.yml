@@ -43,9 +43,9 @@ runs:
     - uses: hashicorp/vault-action@v2.5.0
       if: |
         (inputs.mode == 'saucelabs')
-        && (inputs.vault-url != null && inputs.vault-url !== '')
-        && (inputs.vault-role-id != null && inputs.vault-role-id !== '')
-        && (inputs.vault-secret-id != null && inputs.vault-secret-id !== '')
+        && (inputs.vault-url != null && inputs.vault-url != '')
+        && (inputs.vault-role-id != null && inputs.vault-role-id != '')
+        && (inputs.vault-secret-id != null && inputs.vault-secret-id != '')
       with:
         url: ${{ inputs.vault-url }}
         roleId: ${{ inputs.vault-role-id }}
