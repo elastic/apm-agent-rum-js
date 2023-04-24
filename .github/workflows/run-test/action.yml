@@ -41,7 +41,6 @@ runs:
       run: './.ci/scripts/pull_and_build.sh'
       shell: bash
     - uses: hashicorp/vault-action@v2.5.0
-      if: inputs.mode == 'saucelabs'
       if: |
         (inputs.mode == 'saucelabs')
         && (inputs.vault-url != null && inputs.vault-url !== '')
