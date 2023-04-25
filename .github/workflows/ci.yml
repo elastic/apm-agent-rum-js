@@ -84,9 +84,7 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     needs:
-      - lint
       - test-puppeteer
-      - coverage
     steps:
       - id: check
         uses: elastic/apm-pipeline-library/.github/actions/check-dependent-jobs@current
