@@ -2,7 +2,7 @@
 set -xeo pipefail
 
 # Run if we're not on Jenkins
-if [[ -n "${JENKINS_URL}" ]]; then
+if [[ -z "${CI}" ]]; then
   export PATH=$(npm bin):${PATH}
   export HOME=$(pwd)
   if [[ -z "${CHANGE_ID}" ]]; then

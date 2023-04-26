@@ -21,8 +21,8 @@ x-metadata: &metadata
   - name: 'custom'
     data:
       project: 'apm-agent-rum-js'
-  # Add jenkins metadata
-  - name: 'jenkins'
+  # Add github_actions metadata
+  - name: 'github_actions'
 
 # List of artifacts
 artifacts:
@@ -31,22 +31,22 @@ artifacts:
     # Files pattern to match
     files_pattern: 'elastic-apm-rum-(?P<app_version>\d+\.\d+\.\d+)\.tgz'
     # File layout on GCS bucket
-    output_pattern: '{project}/{jenkins_branch_name}/elastic-apm-rum-{app_version}-{jenkins_git_commit_short}.tgz'
+    output_pattern: '{project}/{github_branch_name}/elastic-apm-rum-{app_version}-{github_sha_short}.tgz'
     # List of metadata processors to use.
     metadata: *metadata
   - path: './packages/rum-angular'
     files_pattern: 'elastic-apm-rum-angular-(?P<app_version>\d+\.\d+\.\d+)\.tgz'
-    output_pattern: '{project}/{jenkins_branch_name}/elastic-apm-rum-angular-{app_version}-{jenkins_git_commit_short}.tgz'
+    output_pattern: '{project}/{github_branch_name}/elastic-apm-rum-angular-{app_version}-{github_sha_short}.tgz'
     metadata: *metadata
   - path: './packages/rum-core'
     files_pattern: 'elastic-apm-rum-core-(?P<app_version>\d+\.\d+\.\d+)\.tgz'
-    output_pattern: '{project}/{jenkins_branch_name}/elastic-apm-rum-angular-{app_version}-{jenkins_git_commit_short}.tgz'
+    output_pattern: '{project}/{github_branch_name}/elastic-apm-rum-angular-{app_version}-{github_sha_short}.tgz'
     metadata: *metadata
   - path: './packages/rum-react'
     files_pattern: 'elastic-apm-rum-react-(?P<app_version>\d+\.\d+\.\d+)\.tgz'
-    output_pattern: '{project}/{jenkins_branch_name}/elastic-apm-rum-react-{app_version}-{jenkins_git_commit_short}.tgz'
+    output_pattern: '{project}/{github_branch_name}/elastic-apm-rum-react-{app_version}-{github_sha_short}.tgz'
     metadata: *metadata
   - path: './packages/rum-vue'
     files_pattern: 'elastic-apm-rum-vue-(?P<app_version>\d+\.\d+\.\d+)\.tgz'
-    output_pattern: '{project}/{jenkins_branch_name}/elastic-apm-rum-vue-{app_version}-{jenkins_git_commit_short}.tgz'
+    output_pattern: '{project}/{github_branch_name}/elastic-apm-rum-vue-{app_version}-{github_sha_short}.tgz'
     metadata: *metadata

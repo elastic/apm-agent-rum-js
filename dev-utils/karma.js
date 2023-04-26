@@ -111,10 +111,10 @@ function prepareConfig(config, packageName) {
   console.log('Global test Configuration: ', globalConfig)
   const { agentConfig, testConfig } = globalConfig
 
-  const { isJenkins, sauceLabs: isSauce } = testConfig
+  const { isCI, sauceLabs: isSauce } = testConfig
   let buildId = `ApmJs-${agentConfig.name}`
 
-  if (isJenkins) {
+  if (isCI) {
     console.log('prepareConfig: Run in Jenkins')
     buildId =
       buildId +
@@ -178,7 +178,7 @@ function prepareConfig(config, packageName) {
     console.log('prepareConfig: Run in SauceLab mode')
     config.sauceLabs.build = buildId
     console.log('saucelabs.build:', buildId)
-    if (isJenkins) {
+    if (isCI) {
       config.sauceLabs.tags = [testConfig.branch, process.env.STACK_VERSION]
     } else if (testConfig.branch === 'main') {
       config.sauceLabs.tags = [testConfig.branch]
