@@ -117,13 +117,11 @@ The agent supports <<framework-integrations,integrations with certain frameworks
 To instrument custom metrics, like rendering time or mounting time of components on frameworks like React, Angular, Vue,
 etc., use the <<custom-transactions,custom transactions API>>.
 
-The core RUM agent supports websites based on multi-page (MPA) and single page (SPA) architectures, out of the box. This means that for SPAs to use <<framework-integrations,framework specific integrations>> is a recommendation rather than a requirement. We recommend them for the following reasons:
+The core RUM agent supports websites based on multi-page (MPA) and single-page architectures (SPA). The core RUM agent can be used on its own with SPA sites, but we recommend using our framework-specific integrations for the following reasons:
 
-* They group pages by routes better. This results in `transaction.name` mapped to the actual application route path the users have declared in their SPA application.
-* They exactly know when an SPA navigation is rendered, the core RUM agent does not know that and waits for the last network request before considering the SPA transition is finished. The integration packages on the other hand hook into the component lifecycle and measures the duration of the SPA transition correctly.
-* They improve error capturing. For instance, when an error is thrown inside an Angular application, the default error handler doesn’t rethrow them as browser events, which makes them invisible to the core RUM agent. The integration automatically captures those errors, too.
-
-To be clear, the core RUM agent can be used on its own with SPA sites, however also using the framework integration provides the additional capabilities shown.
+* *Pages are better grouped by routes*: This results in the `transaction.name` field mapping to the actual application route path declared in the SPA application.
+* *Exact SPA navigation rendering*: Integration packages hook into the component lifecycle and measure the duration of the SPA transaction correctly. The core RUM agent is unable to determine when an SPA navigation is rendered and instead waits for the last network request before considering the SPA transition is finished.
+* *Improved error capturing*: For example, when an error is thrown inside an Angular application, the framework integration will automatically capture it. The core RUM agent, however, is unable to capture the error as the default error handler doesn’t rethrow the error as a browser event.
 
 [float]
 [[platforms]]
