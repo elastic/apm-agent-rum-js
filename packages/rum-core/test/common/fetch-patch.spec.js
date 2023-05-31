@@ -77,6 +77,20 @@ describe('fetchPatch', function () {
         })
       })
 
+      it('should fetch correctly with a URL Object as input', function (done) {
+        var promise = window.fetch(new URL(window.location.origin))
+        expect(promise).toBeDefined()
+        expect(typeof promise.then).toBe('function')
+        expect(events.map(e => e.event)).toEqual(['schedule'])
+        promise.then(function (resp) {
+          expect(resp).toBeDefined()
+          Promise.resolve().then(function () {
+            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+            done()
+          })
+        })
+      })
+
       it('should produce task events when fetch fails', function (done) {
         var promise = window.fetch('http://localhost:54321/')
         promise.catch(function (error) {
