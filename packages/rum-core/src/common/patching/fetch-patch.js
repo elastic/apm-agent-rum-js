@@ -74,9 +74,9 @@ export function patchFetch(callback) {
     var fetchSelf = this
     var args = arguments
     var request, url
-    if (typeof input === 'string') {
+    if (typeof input === 'string' || input instanceof URL) {
       request = new Request(input, init)
-      url = input
+      url = request.url
     } else if (input) {
       request = input
       url = request.url
