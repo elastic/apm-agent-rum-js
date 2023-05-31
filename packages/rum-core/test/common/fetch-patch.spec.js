@@ -78,7 +78,7 @@ describe('fetchPatch', function () {
       })
 
       it('should fetch correctly with a URL Object as input', function (done) {
-        var promise = window.fetch(new URL(window.location.origin))
+        var promise = window.fetch(new URL(new Request('/').url))
         expect(promise).toBeDefined()
         expect(typeof promise.then).toBe('function')
         expect(events.map(e => e.event)).toEqual(['schedule'])
