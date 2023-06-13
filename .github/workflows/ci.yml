@@ -79,8 +79,7 @@ jobs:
           scope: ${{ matrix.scope }}
           stack-version: ${{ matrix.stack-version }}
 
-  all-tests-puppeteer:
-    name: All Tests Puppeteer
+  all:
     if: always()
     runs-on: ubuntu-latest
     needs:
