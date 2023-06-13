@@ -13,9 +13,9 @@ An overview is listed below, and a complete walk-through is available in the
 {apm-guide-ref}/source-map-how-to.html[generate and upload a source map] guide.
 
 1. Set the <<service-version,`serviceVersion`>> when initializing the RUM Agent.
-2. {apm-guide-ref}/source-map-how-to.html#sourcemap-rum-generate[Generate a source map]
+2. {apm-guide-ref}/source-map-how-to.html#source-map-rum-generate[Generate a source map]
 for your application with the `serviceVersion` from step one.
-3. {apm-guide-ref}/source-map-how-to.html#sourcemap-rum-upload[Enable and upload the source map file] to APM Server.
+3. {apm-guide-ref}/source-map-how-to.html#source-map-rum-upload[Enable and upload the source map file] to APM Server.
 
 // Don't link to this section
 [[secret-token]]
