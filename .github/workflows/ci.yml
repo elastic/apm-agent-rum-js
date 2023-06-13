@@ -38,23 +38,24 @@ jobs:
       - run: '.ci/scripts/lint.sh'
       - run: 'npm run ci:bundlesize'
         id: bundlesize
-      - uses: actions/github-script@v6
-        env:
-          BUNDLESIZE_PASS: ${{ steps.bundlesize.outputs.bundlesize_pass }}
-          BUNDLESIZE_FAIL: ${{ steps.bundlesize.outputs.bundlesize_fail }}
-        with:
-          script: |
-            const { BUNDLESIZE_PASS, BUNDLESIZE_FAIL } = process.env;
-            let state = 'success';
-            if (BUNDLESIZE_FAIL > 0) {
-              state = 'failure';
-            }
-            github.rest.repos.createCommitStatus({
-              ...context.repo,
-              sha: context.sha,
-              state: state,
-              context: `${context.workflow} / Bundlesize: ${BUNDLESIZE_PASS} pass / ${BUNDLESIZE_FAIL} fail`,
-            });
+# TODO: This fails on forked PRs
+#      - uses: actions/github-script@v6
+#        env:
+#          BUNDLESIZE_PASS: ${{ steps.bundlesize.outputs.bundlesize_pass }}
+#          BUNDLESIZE_FAIL: ${{ steps.bundlesize.outputs.bundlesize_fail }}
+#        with:
+#          script: |
+#            const { BUNDLESIZE_PASS, BUNDLESIZE_FAIL } = process.env;
+#            let state = 'success';
+#            if (BUNDLESIZE_FAIL > 0) {
+#              state = 'failure';
+#            }
+#            github.rest.repos.createCommitStatus({
+#              ...context.repo,
+#              sha: context.sha,
+#              state: state,
+#              context: `${context.workflow} / Bundlesize: ${BUNDLESIZE_PASS} pass / ${BUNDLESIZE_FAIL} fail`,
+#            });
 
   test-puppeteer:
     name: Test Puppeteer
@@ -79,11 +80,11 @@ jobs:
           scope: ${{ matrix.scope }}
           stack-version: ${{ matrix.stack-version }}
 
-  all-tests-puppeteer:
-    name: All Tests Puppeteer
+  all:
     if: always()
     runs-on: ubuntu-latest
     needs:
+      - lint
       - test-puppeteer
     steps:
       - id: check
