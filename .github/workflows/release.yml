@@ -11,6 +11,9 @@ permissions:
 jobs:
   release-npm:
     runs-on: ubuntu-latest
+    permissions:
+      # Needed to wrtie the release changelog
+      contents: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -26,18 +29,22 @@ jobs:
       - name: Read NPM vault secrets
         uses: hashicorp/vault-action@v2.5.0
         with:
-          url: ${{ secrets.VAULT_ADDR }}
           method: approle
+          url: ${{ secrets.VAULT_ADDR }}
           roleId: ${{ secrets.VAULT_ROLE_ID }}
           secretId: ${{ secrets.VAULT_SECRET_ID }}
           secrets: |
-            secret/jenkins-ci/npmjs/elasticmachine token | NPMJS_TOKEN ;
             totp/code/npmjs-elasticmachine code | TOTP_CODE
 
+      - uses: elastic/apm-pipeline-library/.github/actions/setup-npmrc@current
+        with:
+          vault-url: ${{ secrets.VAULT_ADDR }}
+          vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
+          vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
+          secret: secret/jenkins-ci/npmjs/elasticmachine
+          secret-key: token
+
       - name: Publish the release
-        permissions:
-          # Needed to wrtie the release changelog
-          contents: write
         run: npm run release-ci
 
   release-cdn:
