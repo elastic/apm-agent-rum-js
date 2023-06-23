@@ -156,6 +156,7 @@ function runBenchmarks() {
        */
       let ndJSONOutput = '{"index": { "_index": "benchmarks-rum-js" }}' + '\n'
       ndJSONOutput += JSON.stringify(output)
+      ndJSONOutput += '\n'
 
       const outputPath = join(PKG_DIR, outputFile)
       await pWriteFile(outputPath, ndJSONOutput)

@@ -245,7 +245,7 @@ async function postPayload(url, payload) {
       },
       body: data.join('')
     })
-    return response.text()
+    return response.statusText
   } catch (error) {
     return error
   }
@@ -345,12 +345,17 @@ const iterations = 10
   }
 
   if (outputFile) {
-    const outputPath = join(__dirname, '../', outputFile)
-    let ndJSONOutput =
-      '{"index": { "_index": "benchmarks-rum-load-test" }}' + '\n'
-    ndJSONOutput += JSON.stringify(results)
-    await writeFile(outputPath, ndJSONOutput)
+    let ndJSONOutput = ''
+    for (const result of results) {
+      ndJSONOutput += ndJsonStringify({
+        index: {
+          _index: 'benchmarks-rum-load-test'
+        }
+      })
+      ndJSONOutput += ndJsonStringify(result)
+    }
+    await writeFile(join(__dirname, '../', outputFile), ndJSONOutput)
   } else {
-    console.log(result)
+    console.log(results)
   }
 })()
