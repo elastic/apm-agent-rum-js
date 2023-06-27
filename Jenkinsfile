@@ -166,82 +166,6 @@ pipeline {
             }
           }
         }
-        stage('Release') {
-          options {
-            skipDefaultCheckout()
-            timeout(time: 12, unit: 'HOURS')
-          }
-          environment {
-            HOME = "${env.WORKSPACE}"
-          }
-          when {
-            beforeAgent true
-            allOf {
-              branch 'main'
-              expression { return params.release }
-            }
-          }
-          stages {
-            stage('Notify') {
-              options { skipDefaultCheckout() }
-              steps {
-                setEnvVar('PRE_RELEASE_STAGE', 'false')
-                deleteDir()
-                unstash 'source'
-                dir("${BASE_DIR}") {
-                  prepareRelease() {
-                    script {
-                      sh(label: 'Lerna version dry-run', script: 'npx lerna version --no-push --yes', returnStdout: true)
-                      def releaseVersions = sh(label: 'Gather versions from last commit', script: 'git log -1 --format="%b"', returnStdout: true)
-                      log(level: 'INFO', text: "Versions: ${releaseVersions}")
-                      notifyStatus(slackStatus: 'warning', subject: "[${env.REPO}] Release ready to be pushed",
-                                   body: "Please go to (<${env.BUILD_URL}input|here>) to approve or reject within 12 hours.\n Changes: ${releaseVersions}")
-                      input(message: 'Should we release a new version?', ok: 'Yes, we should.',
-                            parameters: [text(description: 'Look at the versions to be released. They cannot be edited here',
-                                              defaultValue: "${releaseVersions}", name: 'versions')])
-                    }
-                  }
-                }
-              }
-            }
-            stage('Release CI') {
-              options { skipDefaultCheckout() }
-              steps {
-                deleteDir()
-                unstash 'source'
-                dir("${BASE_DIR}") {
-                  prepareRelease() {
-                    sh 'npm run release-ci'
-                  }
-                }
-              }
-              post {
-                success {
-                  notifyStatus(slackStatus: 'good', subject: "[${env.REPO}] Release published", body: "Great news, the release has been done successfully. (<${env.RUN_DISPLAY_URL}|Open>). \n Release URL: (<https://github.com/elastic/apm-agent-rum-js/releases|Here>)")
-                }
-                always {
-                  script {
-                    currentBuild.description = "${currentBuild.description?.trim() ? currentBuild.description : ''} released"
-                  }
-                  archiveArtifacts(allowEmptyArchive: true, artifacts: "${env.BASE_DIR}/packages/rum/dist/bundles/*.js")
-                }
-              }
-            }
-            stage('Publish CDN') {
-              options { skipDefaultCheckout() }
-              steps {
-                dir("${BASE_DIR}") {
-                  uploadToCDN()
-                }
-              }
-            }
-          }
-          post {
-            failure {
-              notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Release failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
-            }
-          }
-        }
         stage('Opbeans') {
           options { skipDefaultCheckout() }
           when {
@@ -272,48 +196,6 @@ pipeline {
     failure {
       whenTrue(params.release && env.PRE_RELEASE_STAGE == 'true') {
         notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] Pre-release steps failed", body: "(<${env.RUN_DISPLAY_URL}|Open>)")
-      }
-    }
-  }
-}
-
-def uploadToCDN() {
-  def source = 'packages/rum/dist/bundles/*.js'
-  def target = 'gs://apm-rum-357700bc'
-  def secret = 'secret/gce/elastic-cdn/service-account/apm-rum-admin'
-  def version = sh(label: 'Get package version', script: 'jq --raw-output .version packages/rum/package.json', returnStdout: true)
-  def majorVersion = "${version.split('\\.')[0]}.x"
-
-  // Publish version with the semver format and cache them for 1 year.
-  publishToCDN(headers: ["Cache-Control:public,max-age=31536000,immutable"],
-               source: "${source}",
-               target: "${target}/${version}",
-               secret: "${secret}")
-
-  // Publish major.x and cache for 7 days
-  publishToCDN(headers: ["Cache-Control:public,max-age=604800,immutable"],
-               source: "${source}",
-               target: "${target}/${majorVersion}",
-               secret: "${secret}")
-
-  // Prepare index.html, publish and cache for 7 days
-  sh(label: 'prepare index.html', script: """ sed "s#VERSION#${majorVersion}#g" .ci/scripts/index.html.template > index.html""")
-  publishToCDN(headers: ["Cache-Control:public,max-age=604800,immutable"],
-               source: "index.html",
-               target: "${target}",
-               secret: "${secret}")
-}
-
-def prepareRelease(String nodeVersion='node:lts', Closure body){
-  withNpmrc(secret: "${env.NPMRC_SECRET}", path: "${env.WORKSPACE}/${env.BASE_DIR}") {
-    docker.image(nodeVersion).inside(){
-      withEnv(["HOME=${env.WORKSPACE}/${env.BASE_DIR}"]) {
-        withGitRelease(credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken') {
-          sh 'npm ci'
-          withTotpVault(secret: "${env.TOTP_SECRET}", code_var_name: 'TOTP_CODE'){
-            body()
-          }
-        }
       }
     }
   }

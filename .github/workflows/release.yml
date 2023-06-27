@@ -1,0 +1,130 @@
+name: release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-npm:
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to wrtie the release changelog
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Read NPM vault secrets
+        uses: hashicorp/vault-action@v2.5.0
+        with:
+          method: approle
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          secrets: |
+            totp/code/npmjs-elasticmachine code | TOTP_CODE
+
+      - uses: elastic/apm-pipeline-library/.github/actions/setup-npmrc@current
+        with:
+          vault-url: ${{ secrets.VAULT_ADDR }}
+          vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
+          vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
+          secret: secret/jenkins-ci/npmjs/elasticmachine
+          secret-key: token
+
+      - name: Publish the release
+        run: npm run release-ci
+
+  release-cdn:
+    runs-on: ubuntu-latest
+    env:
+      BUCKET_NAME: 'apm-rum-357700bc'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build dist
+        run: npm run build
+
+      - uses: hashicorp/vault-action@v2.5.0
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          method: approle
+          secrets: |
+            secret/gce/elastic-cdn/service-account/apm-rum-admin value | GOOGLE_CREDENTIALS ;
+
+      - name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ env.GOOGLE_CREDENTIALS }}'
+          create_credentials_file: true
+
+      - id: prepare-release
+        name: 'Prepare CDN release'
+        run: echo "versions=$(npm run --silent ci:prepare-release)" >> ${GITHUB_OUTPUT}
+
+      - id: 'upload-files-version'
+        uses: 'google-github-actions/upload-cloud-storage@v1'
+        with:
+          parent: false
+          path: 'packages/rum/dist/bundles/'
+          destination: '${{ env.BUCKET_NAME }}/${{ fromJSON(steps.prepare-release.outputs.versions).version }}'
+          glob: '*.js'
+          process_gcloudignore: false
+
+      - id: 'upload-files-major-version'
+        uses: 'google-github-actions/upload-cloud-storage@v1'
+        with:
+          parent: false
+          path: 'packages/rum/dist/bundles/'
+          destination: '${{ env.BUCKET_NAME }}/${{ fromJSON(steps.prepare-release.outputs.versions).major_version }}'
+          glob: '*.js'
+          process_gcloudignore: false
+
+      - id: 'upload-file-index'
+        uses: 'google-github-actions/upload-cloud-storage@v1'
+        with:
+          parent: false
+          path: 'index.html'
+          destination: '${{ env.BUCKET_NAME }}'
+          process_gcloudignore: false
+
+  status:
+    if: always()
+    needs:
+      - release-npm
+      - release-cdn
+    runs-on: ubuntu-latest
+    steps:
+      - id: check
+        uses: elastic/apm-pipeline-library/.github/actions/check-dependent-jobs@current
+        with:
+          needs: ${{ toJSON(needs) }}
+      - uses: elastic/apm-pipeline-library/.github/actions/notify-build-status@current
+        with:
+          status: ${{ steps.check.outputs.status }}
+          vaultUrl: ${{ secrets.VAULT_ADDR }}
+          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
+          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
+          slackChannel: "#apm-agent-js"
+          message: "Build result for release publication"
