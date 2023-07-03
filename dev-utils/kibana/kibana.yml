@@ -72,8 +72,11 @@ xpack.fleet.agentPolicies:
                       value: http://fleet-server:8200
                       frozen: true
                     - name: rum_allow_headers
-                      value: 
+                      value:
                         - x-custom-header
+                      frozen: true
+                    - name: expvar_enabled
+                      value: true
                       frozen: true
           - name: Fleet Server
             package:

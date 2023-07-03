@@ -18,7 +18,6 @@ services:
       - "xpack.security.authc.api_key.enabled=true"
       - "logger.org.elasticsearch=${ES_LOG_LEVEL:-error}"
       - "action.destructive_requires_name=false"
-      - "path.data=/usr/share/elasticsearch/data/${STACK_VERSION}"
     ulimits:
       memlock:
         soft: -1

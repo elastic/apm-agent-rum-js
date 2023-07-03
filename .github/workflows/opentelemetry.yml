@@ -7,6 +7,7 @@ on:
       - bump-elastic-stack
       - ci
       - ci-saucelabs
+      - microbenchmark
     types: [completed]
 
 jobs:
