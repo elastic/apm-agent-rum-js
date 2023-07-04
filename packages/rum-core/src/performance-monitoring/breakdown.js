@@ -142,7 +142,7 @@ function getSpanBreakdown(
     span: details,
     samples: {
       'span.self_time.count': getValue(count),
-      'span.self_time.sum.us': getValue(duration)
+      'span.self_time.sum.us': getValue(duration * 1000)
     }
   }
 }
