@@ -185,6 +185,15 @@ NOTE: After each flush of the queue, the next flush isn't scheduled until an ite
 
 This option overrides the page load transactions trace ID.
 
+[float]
+[[page-load-parent-id]]
+=== `pageLoadParentId`
+
+* *Type:* String
+
+This option allows the creation of the page load transaction as child of an existing one. By default,
+the agent treats it as the root transaction.
+
 
 [float]
 [[page-load-sampled]]
