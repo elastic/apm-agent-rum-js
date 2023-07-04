@@ -290,30 +290,14 @@ export function compressError(error) {
 
 export function compressMetricsets(breakdowns) {
   return breakdowns.map(({ span, samples }) => {
-    const isSpan = span != null
-    if (isSpan) {
-      return {
-        y: { t: span.type },
-        sa: {
-          ysc: {
-            v: samples['span.self_time.count'].value
-          },
-          yss: {
-            v: samples['span.self_time.sum.us'].value
-          }
-        }
-      }
-    }
     return {
+      y: { t: span.type },
       sa: {
-        xdc: {
-          v: samples['transaction.duration.count'].value
+        ysc: {
+          v: samples['span.self_time.count'].value
         },
-        xds: {
-          v: samples['transaction.duration.sum.us'].value
-        },
-        xbc: {
-          v: samples['transaction.breakdown.count'].value
+        yss: {
+          v: samples['span.self_time.sum.us'].value
         }
       }
     }

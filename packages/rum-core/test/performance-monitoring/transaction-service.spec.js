@@ -648,12 +648,7 @@ describe('TransactionService', function () {
 
     config.events.observe(TRANSACTION_END, () => {
       const breakdown = tr.breakdownTimings
-      expect(breakdown[0].samples).toEqual({
-        'transaction.duration.count': { value: 1 },
-        'transaction.duration.sum.us': { value: 30 },
-        'transaction.breakdown.count': { value: 1 }
-      })
-      expect(breakdown[1]).toEqual({
+      expect(breakdown[0]).toEqual({
         transaction: { name: 'transaction', type: 'custom' },
         span: { type: 'app', subtype: undefined },
         samples: {
@@ -661,7 +656,7 @@ describe('TransactionService', function () {
           'span.self_time.sum.us': { value: 0 }
         }
       })
-      expect(breakdown[2]).toEqual({
+      expect(breakdown[1]).toEqual({
         transaction: { name: 'transaction', type: 'custom' },
         span: { type: 'ext', subtype: 'http' },
         samples: {
