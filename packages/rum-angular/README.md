@@ -7,7 +7,6 @@ You can find our documentation [on our website](https://www.elastic.co/guide/en/
 
 If you are interested in contributing to Elastic APM JavaScript agent, please see [our contributing guide](CONTRIBUTING.md).
 
-
 ## License
 This project is [MIT licensed](LICENSE).
 
