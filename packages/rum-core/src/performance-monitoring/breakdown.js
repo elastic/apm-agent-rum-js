@@ -153,18 +153,8 @@ function getSpanBreakdown(
  */
 export function captureBreakdown(transaction, timings = PERF.timing) {
   const breakdowns = []
-  const trDuration = transaction.duration()
   const { name, type, sampled } = transaction
   const transactionDetails = { name, type }
-
-  breakdowns.push({
-    transaction: transactionDetails,
-    samples: {
-      'transaction.duration.count': getValue(1),
-      'transaction.duration.sum.us': getValue(trDuration),
-      'transaction.breakdown.count': getValue(sampled ? 1 : 0)
-    }
-  })
 
   /**
    * Capture breakdown metrics only for sampled transactions
