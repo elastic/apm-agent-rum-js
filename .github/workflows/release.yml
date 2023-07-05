@@ -43,7 +43,7 @@ jobs:
           secret-key: token
 
       - name: Publish the release
-        run: npm run release-ci
+        run: npm run ci:release
 
   release-cdn:
     runs-on: ubuntu-latest
