@@ -666,7 +666,7 @@ describe('TransactionService', function () {
         span: { type: 'ext', subtype: 'http' },
         samples: {
           'span.self_time.count': { value: 2 },
-          'span.self_time.sum.us': { value: 40 }
+          'span.self_time.sum.us': { value: 40000 }
         }
       })
       done()
