@@ -120,7 +120,7 @@ describe('Breakdown metrics', () => {
         value: 1
       },
       'span.self_time.sum.us': {
-        value: 20
+        value: 20000
       }
     })
   })
@@ -140,12 +140,12 @@ describe('Breakdown metrics', () => {
 
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 20 }
+      'span.self_time.sum.us': { value: 20000 }
     })
 
     expect(breakdown['bar.baz']).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 20 }
+      'span.self_time.sum.us': { value: 20000 }
     })
   })
 
@@ -164,7 +164,7 @@ describe('Breakdown metrics', () => {
 
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 2 },
-      'span.self_time.sum.us': { value: 30 }
+      'span.self_time.sum.us': { value: 30000 }
     })
   })
 
@@ -183,11 +183,11 @@ describe('Breakdown metrics', () => {
     })
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 30 }
+      'span.self_time.sum.us': { value: 30000 }
     })
     expect(breakdown['ext.http']).toEqual({
       'span.self_time.count': { value: 2 },
-      'span.self_time.sum.us': { value: 40 }
+      'span.self_time.sum.us': { value: 40000 }
     })
   })
 
@@ -206,11 +206,11 @@ describe('Breakdown metrics', () => {
     })
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 15 }
+      'span.self_time.sum.us': { value: 15000 }
     })
     expect(breakdown['ext.http']).toEqual({
       'span.self_time.count': { value: 2 },
-      'span.self_time.sum.us': { value: 20 }
+      'span.self_time.sum.us': { value: 20000 }
     })
   })
 
@@ -232,11 +232,11 @@ describe('Breakdown metrics', () => {
     })
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 10 }
+      'span.self_time.sum.us': { value: 10000 }
     })
     expect(breakdown['ext.http']).toEqual({
       'span.self_time.count': { value: 3 },
-      'span.self_time.sum.us': { value: 30 }
+      'span.self_time.sum.us': { value: 30000 }
     })
   })
 
@@ -260,7 +260,7 @@ describe('Breakdown metrics', () => {
     })
     expect(breakdown['ext.http']).toEqual({
       'span.self_time.count': { value: 2 },
-      'span.self_time.sum.us': { value: 30 }
+      'span.self_time.sum.us': { value: 30000 }
     })
   })
 
@@ -279,15 +279,15 @@ describe('Breakdown metrics', () => {
     })
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 10 }
+      'span.self_time.sum.us': { value: 10000 }
     })
     expect(breakdown['foo']).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 15 }
+      'span.self_time.sum.us': { value: 15000 }
     })
     expect(breakdown['bar']).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 10 }
+      'span.self_time.sum.us': { value: 10000 }
     })
   })
 
@@ -304,11 +304,11 @@ describe('Breakdown metrics', () => {
     })
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 20 }
+      'span.self_time.sum.us': { value: 20000 }
     })
     expect(breakdown['ext.http']).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 10 }
+      'span.self_time.sum.us': { value: 10000 }
     })
   })
 
@@ -327,11 +327,11 @@ describe('Breakdown metrics', () => {
     })
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 10 }
+      'span.self_time.sum.us': { value: 10000 }
     })
     expect(breakdown['ext.http']).toEqual({
       'span.self_time.count': { value: 2 },
-      'span.self_time.sum.us': { value: 25 }
+      'span.self_time.sum.us': { value: 25000 }
     })
   })
 
@@ -350,11 +350,11 @@ describe('Breakdown metrics', () => {
     })
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 30 }
+      'span.self_time.sum.us': { value: 30000 }
     })
     expect(breakdown['ext.http']).toEqual({
       'span.self_time.count': { value: 2 },
-      'span.self_time.sum.us': { value: 25 }
+      'span.self_time.sum.us': { value: 25000 }
     })
   })
 
@@ -372,7 +372,7 @@ describe('Breakdown metrics', () => {
     })
     expect(breakdown.app).toEqual({
       'span.self_time.count': { value: 1 },
-      'span.self_time.sum.us': { value: 30 }
+      'span.self_time.sum.us': { value: 30000 }
     })
 
     expect(breakdown['ext.http']).toBeUndefined()
