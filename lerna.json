@@ -9,6 +9,7 @@
       "allowBranch": ["main", "4.x"],
       "conventionalCommits": true,
       "message": "chore(release): publish",
+      "changelogPreset": "conventionalcommits",
       "gitRemote": "upstream",
       "loglevel": "verbose"
     },
