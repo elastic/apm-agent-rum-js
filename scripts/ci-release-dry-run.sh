@@ -10,6 +10,7 @@ DRYRUN_PATH="${WORKSPACE}/dryrun.txt"
 
 # to avoid Detached git HEAD error in CI
 git checkout -b lerna_release_dry_run
+git stash
 
 npm run release-dry-run | tee "${DRYRUN_PATH}" || true
 
