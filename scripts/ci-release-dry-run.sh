@@ -24,8 +24,8 @@ if [ ! -z "${GITHUB_OUTPUT}" ]; then
   echo "$EOF" >> "$GITHUB_OUTPUT"
 fi
 
+# For better verfication always echo this
+echo "versions generated from the dry run command: $VERSIONING"
+
 # Cleanup
 rm -rf "${WORKSPACE}"
-
-# exits the temporal branch
-git checkout -
