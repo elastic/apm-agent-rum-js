@@ -38,9 +38,8 @@ jobs:
         with:
           node-version-file: '.nvmrc'
       - run: '.ci/scripts/lint.sh'
-      - name: workaround for detached HEAD
-        run: |
-          git checkout ${GITHUB_REF#refs/heads/} -f
+      - run: git checkout -b dry-run-branch -f
+        id: createdryrunbranch
       - run: 'npm run ci:release-dry-run'
         id: release-dry-run
       - run: 'npm run ci:bundlesize'
