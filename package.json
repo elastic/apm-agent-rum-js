@@ -12,6 +12,7 @@
     "prerelease": "npm test && npm run clean",
     "release": "lerna publish && npm run github-release",
     "release-package": "node scripts/publish-package",
+    "release-dry-run": "npx lerna version --no-push --yes --allow-branch '*'",
     "github-release": "node scripts/github-release",
     "build-docs": "PREVIEW=1 sh ./scripts/build_docs.sh apm-agent-rum-js ./docs ./build",
     "lint": "run-p --silent lint:*",
@@ -28,7 +29,8 @@
     "package:snapshot": "npx lerna exec npm pack",
     "clean": "npx lerna exec -- rm -rf dist/",
     "ci:prepare-release": "node ./scripts/ci-prepare-release.js",
-    "ci:release": "lerna publish --otp=${TOTP_CODE} --yes && npm run github-release"
+    "ci:release": "lerna publish --otp=${TOTP_CODE} --yes && npm run github-release",
+    "ci:release-dry-run": "bash ./scripts/ci-release-dry-run.sh"
   },
   "lint-staged": {
     "*.{js,jsx,ts}": [
