@@ -18,11 +18,11 @@ npm run release-dry-run | tee "${DRYRUN_PATH}" || true
 # Extract passed and failed
 VERSIONING=$(git log -1 --format="%b")
 if [ ! -z "${GITHUB_OUTPUT}" ]; then
-  echo "if you wanted to release the agent, the versions would be: \n${VERSIONING}" >> "${GITHUB_OUTPUT}"
+  EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+  echo "DRYRUN_RESPONSE<<$EOF" >> "$GITHUB_OUTPUT"
+  echo "dryrun_response=${VERSIONING}" >> "${GITHUB_OUTPUT}"
+  echo "$EOF" >> "$GITHUB_OUTPUT"
 fi
-## also show this on standard output in order to make debuggability easier until we have the comment added in github :)
-echo "if you wanted to release the agent, the versions would be: \n${VERSIONING}"
-
 
 # Cleanup
 rm -rf "${WORKSPACE}"
