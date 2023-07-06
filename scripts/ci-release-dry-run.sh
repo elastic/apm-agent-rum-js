@@ -8,6 +8,11 @@ trap 's=$?; echo >&2 "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 WORKSPACE=$(mktemp -d)
 DRYRUN_PATH="${WORKSPACE}/dryrun.txt"
 
+# Setup git env to allow lerna to generate versions properly
+git checkout -b dry-run-branch -f
+git config user.email "CI email"
+git config user.name "CI name"
+
 npm run release-dry-run | tee "${DRYRUN_PATH}" || true
 
 # Extract passed and failed
