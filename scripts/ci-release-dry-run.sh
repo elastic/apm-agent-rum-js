@@ -8,6 +8,9 @@ trap 's=$?; echo >&2 "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 WORKSPACE=$(mktemp -d)
 DRYRUN_PATH="${WORKSPACE}/dryrun.txt"
 
+# to avoid Detached git HEAD error in CI
+git checkout -b lerna_release_dry_run
+
 npm run release-dry-run | tee "${DRYRUN_PATH}" || true
 
 # Extract passed and failed
@@ -21,3 +24,6 @@ echo "if you wanted to release the agent, the versions would be: \n${VERSIONING}
 
 # Cleanup
 rm -rf "${WORKSPACE}"
+
+# exits the temporal branch
+git checkout -
