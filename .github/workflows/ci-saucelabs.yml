@@ -16,6 +16,12 @@ on:
     paths-ignore:
       - '**.md'
       - '**.asciidoc'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '**.asciidoc'
 
 # Limit the access of the generated GITHUB_TOKEN
 permissions:
