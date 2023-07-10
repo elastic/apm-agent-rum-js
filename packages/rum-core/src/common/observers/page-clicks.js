@@ -74,20 +74,7 @@ function getTransactionMetadata(target) {
     context: null
   }
 
-  const tagName = target.tagName.toLowerCase()
-
-  // use custom html attribute 'data-transaction-name' - otherwise fall back to "tagname" + "name"-Attribute
-  let transactionName = tagName
-  if (!!target.dataset.transactionName) {
-    transactionName = target.dataset.transactionName
-  } else {
-    const name = target.getAttribute('name')
-    if (!!name) {
-      transactionName = `${tagName}["${name}"]`
-    }
-  }
-
-  metadata.transactionName = transactionName
+  metadata.transactionName = buildTransactionName(target)
 
   let classes = target.getAttribute('class')
   if (classes) {
@@ -95,4 +82,35 @@ function getTransactionMetadata(target) {
   }
 
   return metadata
+}
+
+// builds the name of a transaction from the given target
+// Strategy: use custom html attribute 'data-transaction-name' - otherwise fall back to "tagname" + "name"-Attribute
+function buildTransactionName(target) {
+  // Verify if a custom transaction name has been defined
+  const dtName = findCustomTransactionName(target)
+  if (dtName) {
+    return dtName
+  }
+
+  const tagName = target.tagName.toLowerCase()
+  // "tagname" + "name"-Attribute
+  const name = target.getAttribute('name')
+  if (!!name) {
+    return `${tagName}["${name}"]`
+  }
+
+  // Just use the tagName
+  return tagName.toLowerCase()
+}
+
+function findCustomTransactionName(target) {
+  if (target.closest) {
+    // Leverage closest API to traverse the element and its parents
+    const element = target.closest('[data-transaction-name]')
+    return element ? element.dataset.transactionName : null
+  }
+
+  // browsers which don't support closest API will just look at the target element
+  return target.dataset.transactionName
 }

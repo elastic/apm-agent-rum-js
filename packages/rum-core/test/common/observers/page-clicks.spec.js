@@ -31,6 +31,7 @@ import {
   PERFORMANCE_MONITORING
 } from '../../../src/common/constants'
 import { observePageClicks } from '../../../src/common/observers'
+import { describeIf } from '../../../../../dev-utils/jasmine'
 
 describe('observePageClicks', () => {
   let serviceFactory
@@ -139,4 +140,31 @@ describe('observePageClicks', () => {
 
     cancelHistorySub()
   })
+
+  describeIf(
+    'browsers supporting closest API',
+    () => {
+      it('should respect the custom transaction name in a nested HTML structure', () => {
+        unobservePageClicks = observePageClicks(transactionService)
+        let button = document.createElement('button')
+        let span = document.createElement('span')
+        button.setAttribute('data-transaction-name', 'nested-html')
+        button.appendChild(span)
+        containerElement.appendChild(button)
+        // The structured represented here is:
+        /**
+         * <button data-transaction-name="nested-html">
+         *   <span></span>
+         * </button>
+         */
+
+        // Perform the click on the span - which is descendant of the button node
+        span.click()
+
+        let tr = transactionService.getCurrentTransaction()
+        expect(tr.name).toBe('Click - nested-html')
+      })
+    },
+    document.body.closest
+  )
 })
