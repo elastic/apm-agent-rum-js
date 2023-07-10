@@ -192,6 +192,7 @@ type TransactionEvents = 'transaction:start' | 'transaction:end'
 type InstrumentationTypes =
   | 'page-load'
   | 'eventtarget'
+  | 'click'
   | 'error'
   | 'history'
   | 'fetch'
