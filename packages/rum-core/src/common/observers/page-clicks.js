@@ -25,6 +25,9 @@
 
 import { USER_INTERACTION } from '../constants'
 
+const INTERACTIVE_SELECTOR =
+  'a[data-transaction-name], button[data-transaction-name]'
+
 export function observePageClicks(transactionService) {
   const clickHandler = event => {
     // Real user clicks interactions will always be related to an Element.
@@ -107,7 +110,8 @@ function buildTransactionName(target) {
 function findCustomTransactionName(target) {
   if (target.closest) {
     // Leverage closest API to traverse the element and its parents
-    const element = target.closest('[data-transaction-name]')
+    // only links and buttons are considered.
+    const element = target.closest(INTERACTIVE_SELECTOR)
     return element ? element.dataset.transactionName : null
   }
 
