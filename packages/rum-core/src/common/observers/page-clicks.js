@@ -104,7 +104,7 @@ function buildTransactionName(target) {
   }
 
   // Just use the tagName
-  return tagName.toLowerCase()
+  return tagName
 }
 
 function findCustomTransactionName(target) {
