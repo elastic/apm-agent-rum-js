@@ -144,25 +144,52 @@ describe('observePageClicks', () => {
   describeIf(
     'browsers supporting closest API',
     () => {
-      it('should respect the custom transaction name in a nested HTML structure', () => {
-        unobservePageClicks = observePageClicks(transactionService)
-        let button = document.createElement('button')
-        let span = document.createElement('span')
-        button.setAttribute('data-transaction-name', 'nested-html')
-        button.appendChild(span)
-        containerElement.appendChild(button)
-        // The structured represented here is:
-        /**
-         * <button data-transaction-name="nested-html">
-         *   <span></span>
-         * </button>
-         */
+      let childElement = document.createElement('span')
+      ;[
+        {
+          name:
+            'should use customTransactionName when click target is a <button> descendant',
+          parentTagName: 'button',
+          customTransactionName: 'button-custom-name',
+          expected: 'Click - button-custom-name'
+        },
+        {
+          name:
+            'should use customTransactionName when click target is a <a> descendant',
+          parentTagName: 'a',
+          customTransactionName: 'a-custom-name-html',
+          expected: 'Click - a-custom-name-html'
+        },
+        {
+          name:
+            'should not use customTransactionName when click target is not descendant from <button> nor <a>',
+          parentTagName: 'div',
+          customTransactionName: 'div-custom-name-html',
+          expected: 'Click - span'
+        }
+      ].forEach(({ name, parentTagName, customTransactionName, expected }) => {
+        it(`${name}`, () => {
+          unobservePageClicks = observePageClicks(transactionService)
+          let parentElement = document.createElement(parentTagName)
+          parentElement.setAttribute(
+            'data-transaction-name',
+            customTransactionName
+          )
+          parentElement.appendChild(childElement)
+          containerElement.appendChild(parentElement)
+          // The structured represented here is:
+          /**
+           * <{{parentTagName}} data-transaction-name="{{customTransactionName}}">
+           *   <span></span>
+           * </{{parentTagName}}>
+           */
 
-        // Perform the click on the span - which is descendant of the button node
-        span.click()
+          // Perform the click on the span - which is descendant of the defined {{parentElement}} node
+          childElement.click()
 
-        let tr = transactionService.getCurrentTransaction()
-        expect(tr.name).toBe('Click - nested-html')
+          let tr = transactionService.getCurrentTransaction()
+          expect(tr.name).toBe(expected)
+        })
       })
     },
     document.body.closest
