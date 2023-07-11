@@ -32,10 +32,14 @@ jobs:
       statuses: write
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
       - run: '.ci/scripts/lint.sh'
+      - run: 'npm run ci:release-dry-run'
+        id: release-dry-run
       - run: 'npm run ci:bundlesize'
         id: bundlesize
 # TODO: This fails on forked PRs
