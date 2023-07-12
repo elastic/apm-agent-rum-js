@@ -16,6 +16,12 @@ on:
     paths-ignore:
       - '**.md'
       - '**.asciidoc'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '**.asciidoc'
 
 # Limit the access of the generated GITHUB_TOKEN
 permissions:
@@ -35,7 +41,11 @@ jobs:
     name: Test SauceLabs
     # Inputs aren't defined on some events
     # When undefined, we need to emulate the default value
-    if: inputs.saucelab_test == true || inputs.saucelab_test == null
+    if: |
+      inputs.saucelab_test == true || inputs.saucelab_test == null
+      && (github.event_name != 'pull_request'
+        || github.event_name == 'pull_request'
+        && github.event.pull_request.head.repo.fork == false)
     runs-on: ubuntu-latest
     strategy:
       # Saucelab doesn't support running test in //.

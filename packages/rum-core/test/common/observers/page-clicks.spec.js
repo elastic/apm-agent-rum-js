@@ -31,6 +31,7 @@ import {
   PERFORMANCE_MONITORING
 } from '../../../src/common/constants'
 import { observePageClicks } from '../../../src/common/observers'
+import { describeIf } from '../../../../../dev-utils/jasmine'
 
 describe('observePageClicks', () => {
   let serviceFactory
@@ -139,4 +140,58 @@ describe('observePageClicks', () => {
 
     cancelHistorySub()
   })
+
+  describeIf(
+    'browsers supporting closest API',
+    () => {
+      let childElement = document.createElement('span')
+      ;[
+        {
+          name:
+            'should use customTransactionName when click target is a <button> descendant',
+          parentTagName: 'button',
+          customTransactionName: 'button-custom-name',
+          expected: 'Click - button-custom-name'
+        },
+        {
+          name:
+            'should use customTransactionName when click target is a <a> descendant',
+          parentTagName: 'a',
+          customTransactionName: 'a-custom-name-html',
+          expected: 'Click - a-custom-name-html'
+        },
+        {
+          name:
+            'should not use customTransactionName when click target is not descendant from <button> nor <a>',
+          parentTagName: 'div',
+          customTransactionName: 'div-custom-name-html',
+          expected: 'Click - span'
+        }
+      ].forEach(({ name, parentTagName, customTransactionName, expected }) => {
+        it(`${name}`, () => {
+          unobservePageClicks = observePageClicks(transactionService)
+          let parentElement = document.createElement(parentTagName)
+          parentElement.setAttribute(
+            'data-transaction-name',
+            customTransactionName
+          )
+          parentElement.appendChild(childElement)
+          containerElement.appendChild(parentElement)
+          // The structured represented here is:
+          /**
+           * <{{parentTagName}} data-transaction-name="{{customTransactionName}}">
+           *   <span></span>
+           * </{{parentTagName}}>
+           */
+
+          // Perform the click on the span - which is descendant of the defined {{parentElement}} node
+          childElement.click()
+
+          let tr = transactionService.getCurrentTransaction()
+          expect(tr.name).toBe(expected)
+        })
+      })
+    },
+    document.body.closest
+  )
 })
