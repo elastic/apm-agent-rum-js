@@ -10,7 +10,7 @@
       "conventionalCommits": true,
       "message": "chore(release): publish",
       "changelogPreset": "conventionalcommits",
-      "gitRemote": "upstream",
+      "gitRemote": "origin",
       "loglevel": "verbose"
     },
     "run": {

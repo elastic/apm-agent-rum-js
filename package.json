@@ -29,8 +29,7 @@
     "package:snapshot": "npx lerna exec npm pack",
     "clean": "npx lerna exec -- rm -rf dist/",
     "ci:prepare-release": "node ./scripts/ci-prepare-release.js",
-    "ci:release": "lerna publish --otp=${TOTP_CODE} --yes && npm run github-release",
-    "ci:release-dry-run": "bash ./scripts/ci-release-dry-run.sh"
+    "ci:release": "node ./scripts/ci-release.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts}": [
@@ -128,6 +127,7 @@
     "eslint-plugin-react": "^7.17.0",
     "eslint-plugin-rulesdir": "^0.1.0",
     "eslint-plugin-standard": "^4.0.1",
+    "execa": "^7.1.1",
     "express": "^4.17.3",
     "express-http-proxy": "^1.6.0",
     "faker": "^5.1.0",
@@ -156,6 +156,7 @@
     "lodash": "^4.17.20",
     "ng-packagr": "^12.0.5",
     "node-fetch": "^2.6.1",
+    "npm-auth-to-token": "^1.0.0",
     "npm-run-all": "^4.1.5",
     "npmlog": "^4.1.2",
     "playwright": "^1.14.0",
