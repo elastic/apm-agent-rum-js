@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@2.1.7...@elastic/apm-rum-angular@3.0.0) (2023-07-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* **rum-angular:** support angular ivy (#1380)
+
+### Features
+
+* **rum-angular:** support angular ivy ([#1380](https://github.com/elastic/apm-agent-rum-js/issues/1380)) ([50bf76d](https://github.com/elastic/apm-agent-rum-js/commit/50bf76d963d862c1667f2ecf03229f80f0d2c002))
+
+
+
 ## [2.1.7](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@2.1.6...@elastic/apm-rum-angular@2.1.7) (2022-06-14)
 
 **Note:** Version bump only for package @elastic/apm-rum-angular

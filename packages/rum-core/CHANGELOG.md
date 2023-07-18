@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.18.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.17.0...@elastic/apm-rum-core@5.18.0) (2023-07-18)
+
+
+### Features
+
+* **rum-core:** enhance user transaction name obtaining ([#1390](https://github.com/elastic/apm-agent-rum-js/issues/1390)) ([1144b9f](https://github.com/elastic/apm-agent-rum-js/commit/1144b9fd3b84f49eca543a95e9bdf61a9aa37835))
+
+
+### Bug Fixes
+
+* check supportedEntryTypes when starting observer ([#1246](https://github.com/elastic/apm-agent-rum-js/issues/1246)) ([c906018](https://github.com/elastic/apm-agent-rum-js/commit/c906018b6273268f1bab8d1c152b64ba6486345a))
+* report breakdown span time in microseconds ([#1381](https://github.com/elastic/apm-agent-rum-js/issues/1381)) ([a0b4368](https://github.com/elastic/apm-agent-rum-js/commit/a0b43687649bc4342ee08c112181d0368d6eda6c))
+* **rum:** stop recording transaction breakdown metrics ([#1382](https://github.com/elastic/apm-agent-rum-js/issues/1382)) ([be1c619](https://github.com/elastic/apm-agent-rum-js/commit/be1c619f65d76cccd6ed139380294b3f4ee590a3))
+
+
+
 # [5.17.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.16.0...@elastic/apm-rum-core@5.17.0) (2022-06-14)
 
 
