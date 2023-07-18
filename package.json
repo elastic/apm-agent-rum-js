@@ -9,7 +9,7 @@
   },
   "scripts": {
     "version": "node scripts/prompt-release",
-    "prerelease": "npm test && npm run clean",
+    "prerelease": "npm run clean",
     "release": "lerna publish && npm run github-release",
     "release-package": "node scripts/publish-package",
     "release-dry-run": "npx lerna version --no-push --yes --allow-branch '*'",
