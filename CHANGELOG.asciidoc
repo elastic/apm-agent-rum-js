@@ -39,11 +39,10 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 ===== Features
 * Support for Angular 16 is made available via `@elastic/apm-rum-angular@3.0.0`: {pull}1380[#1380]
 * Improve user-interaction transactions naming. Unsupported browsers: IE11 {pull}1390[#1390]
-* Add `apmRequest` config to TypeScript typings: {pull}1254[#1254]
-* Add `sendCredentials` config to TypeScript typings: {pull}1243[#1243]
+* Add `apmRequest` and `sendCredentials` config to TypeScript typings: {pull}1254[#1254] {pull}1243[#1243]
 
 ===== Bug fixes
-* Check if a performance metric is available before trying to measure it: {pull}1246[#1246]
+* Fix warnings where performance entries are not supported: {pull}1246[#1246]
 
 [[release-notes-5.12.0]]
 ==== 5.12.0 (2022-06-14)
