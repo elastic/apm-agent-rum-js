@@ -29,6 +29,21 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.13.0]]
+==== 5.13.0 (2023-07-19)
+[float]
+===== Potentially breaking changes
+* Previously, breakdown timings were reported as milliseconds values in the `span.self_time.sum.us` field, which was wrong. From now on, it will be reported as microsecond values to match the APM specification: {pull}1381[#1381]
+* The metrics `transaction.duration.sum.us`, `transaction.duration.count` and `transaction.breakdown.count` are no longer recorded: {pull}1382[#1382]
+
+===== Features
+* Support for Angular 16 is made available via `@elastic/apm-rum-angular@3.0.0`: {pull}1380[#1380]
+* Improve user-interaction transactions naming. Unsupported browsers: IE11 {pull}1390[#1390]
+* Add `apmRequest` and `sendCredentials` config to TypeScript typings: {pull}1254[#1254] {pull}1243[#1243]
+
+===== Bug fixes
+* Fix warnings where performance entries are not supported: {pull}1246[#1246]
+
 [[release-notes-5.12.0]]
 ==== 5.12.0 (2022-06-14)
 [float]
