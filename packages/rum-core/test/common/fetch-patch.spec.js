@@ -52,6 +52,24 @@ describe('fetchPatch', function () {
     describe('when response cannot be read from a stream', () => {
       let originalCloneFn
 
+      function createFetchArgs(method = 'POST') {
+        const fetchArgs = {
+          url: window.location.href,
+          options: {
+            method,
+            headers: { custom: 'value' }
+          }
+        }
+
+        return fetchArgs
+      }
+
+      function validateFetchData(fetchData, expectedData) {
+        expect(fetchData.url).toBe(expectedData.url)
+        expect(fetchData.method).toBe(expectedData.options.method)
+        expect(fetchData.target.headers.has('custom')).toBe(true)
+      }
+
       beforeEach(() => {
         originalCloneFn = window.Response.prototype.clone
         window.Response.prototype.clone = function () {
@@ -64,10 +82,16 @@ describe('fetchPatch', function () {
       })
 
       it('should fetch correctly', function (done) {
-        var promise = window.fetch('/')
+        const fetchArgs = createFetchArgs('GET')
+        var promise = window.fetch(fetchArgs.url, fetchArgs.options)
         expect(promise).toBeDefined()
         expect(typeof promise.then).toBe('function')
         expect(events.map(e => e.event)).toEqual(['schedule'])
+
+        // Validate that fetch has been called with the proper data
+        const data = events[0].task.data
+        validateFetchData(data, fetchArgs)
+
         promise.then(function (resp) {
           expect(resp).toBeDefined()
           Promise.resolve().then(function () {
@@ -77,11 +101,39 @@ describe('fetchPatch', function () {
         })
       })
 
-      it('should fetch correctly with a URL Object as input', function (done) {
-        var promise = window.fetch(new URL(new Request('/').url))
+      it('should fetch correctly when using REQUEST object as input', function (done) {
+        const fetchArgs = createFetchArgs('PATCH')
+        var promise = window.fetch(
+          new Request(fetchArgs.url, fetchArgs.options)
+        )
         expect(promise).toBeDefined()
         expect(typeof promise.then).toBe('function')
         expect(events.map(e => e.event)).toEqual(['schedule'])
+
+        // Validate that fetch has been called with the proper data
+        const data = events[0].task.data
+        validateFetchData(data, fetchArgs)
+
+        promise.then(function (resp) {
+          expect(resp).toBeDefined()
+          Promise.resolve().then(function () {
+            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+            done()
+          })
+        })
+      })
+
+      it('should fetch correctly with a URL object as input', function (done) {
+        const fetchArgs = createFetchArgs('PUT')
+        var promise = window.fetch(new URL(fetchArgs.url), fetchArgs.options)
+        expect(promise).toBeDefined()
+        expect(typeof promise.then).toBe('function')
+        expect(events.map(e => e.event)).toEqual(['schedule'])
+
+        // Validate that fetch has been called with the proper data
+        const data = events[0].task.data
+        validateFetchData(data, fetchArgs)
+
         promise.then(function (resp) {
           expect(resp).toBeDefined()
           Promise.resolve().then(function () {
