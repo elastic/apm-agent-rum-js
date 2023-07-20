@@ -81,64 +81,45 @@ describe('fetchPatch', function () {
         window.Response.prototype.clone = originalCloneFn
       })
 
-      it('should fetch correctly', function (done) {
-        const fetchArgs = createFetchArgs('GET')
-        var promise = window.fetch(fetchArgs.url, fetchArgs.options)
-        expect(promise).toBeDefined()
-        expect(typeof promise.then).toBe('function')
-        expect(events.map(e => e.event)).toEqual(['schedule'])
+      // Testing fetch with different input types
+      ;[
+        {
+          name: 'should fetch correctly when using string as input',
+          fetchArgs: createFetchArgs('GET'),
+          fetchFn(fetchArgs) {
+            return window.fetch(fetchArgs.url, fetchArgs.options)
+          }
+        },
+        {
+          name: 'should fetch correctly when using REQUEST object as input',
+          fetchArgs: createFetchArgs('PATCH'),
+          fetchFn(fetchArgs) {
+            return window.fetch(new Request(fetchArgs.url, fetchArgs.options))
+          }
+        },
+        {
+          name: 'should fetch correctly when using URL object as input',
+          fetchArgs: createFetchArgs('PUT'),
+          fetchFn(fetchArgs) {
+            return window.fetch(new URL(fetchArgs.url), fetchArgs.options)
+          }
+        }
+      ].forEach(({ name, fetchArgs, fetchFn }) => {
+        it(`${name}`, function (done) {
+          var promise = fetchFn(fetchArgs)
+          expect(typeof promise.then).toBe('function')
+          expect(events.map(e => e.event)).toEqual(['schedule'])
 
-        // Validate that fetch has been called with the proper data
-        const data = events[0].task.data
-        validateFetchData(data, fetchArgs)
+          // Validate that fetch has been called with the proper data
+          const data = events[0].task.data
+          validateFetchData(data, fetchArgs)
 
-        promise.then(function (resp) {
-          expect(resp).toBeDefined()
-          Promise.resolve().then(function () {
-            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-            done()
-          })
-        })
-      })
-
-      it('should fetch correctly when using REQUEST object as input', function (done) {
-        const fetchArgs = createFetchArgs('PATCH')
-        var promise = window.fetch(
-          new Request(fetchArgs.url, fetchArgs.options)
-        )
-        expect(promise).toBeDefined()
-        expect(typeof promise.then).toBe('function')
-        expect(events.map(e => e.event)).toEqual(['schedule'])
-
-        // Validate that fetch has been called with the proper data
-        const data = events[0].task.data
-        validateFetchData(data, fetchArgs)
-
-        promise.then(function (resp) {
-          expect(resp).toBeDefined()
-          Promise.resolve().then(function () {
-            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-            done()
-          })
-        })
-      })
-
-      it('should fetch correctly with a URL object as input', function (done) {
-        const fetchArgs = createFetchArgs('PUT')
-        var promise = window.fetch(new URL(fetchArgs.url), fetchArgs.options)
-        expect(promise).toBeDefined()
-        expect(typeof promise.then).toBe('function')
-        expect(events.map(e => e.event)).toEqual(['schedule'])
-
-        // Validate that fetch has been called with the proper data
-        const data = events[0].task.data
-        validateFetchData(data, fetchArgs)
-
-        promise.then(function (resp) {
-          expect(resp).toBeDefined()
-          Promise.resolve().then(function () {
-            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-            done()
+          promise.then(function (resp) {
+            expect(resp).toBeDefined()
+            Promise.resolve().then(function () {
+              expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+              done()
+            })
           })
         })
       })
