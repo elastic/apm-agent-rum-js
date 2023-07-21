@@ -74,9 +74,18 @@ export function patchFetch(callback) {
     var fetchSelf = this
     var args = arguments
     var request, url
-    if (typeof input === 'string') {
+    var isURL = input instanceof URL
+    if (typeof input === 'string' || isURL) {
       request = new Request(input, init)
-      url = input
+      if (isURL) {
+        url = request.url
+      } else {
+        // when the input is a string, the url value should be copied from it, rather than from request.url
+        // this is important, there are existing users using relative urls when using fetch, which generates a span.name like 'GET /path-example'
+        // switching to request.url like we do now with the introduction of URL objects support would start changing existing spans
+        // the name would start being something like 'GET http://the-url-of-the-web-page.tld/path-example' which would cause unexpected results in the Kibana side
+        url = input
+      }
     } else if (input) {
       request = input
       url = request.url

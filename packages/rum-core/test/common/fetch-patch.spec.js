@@ -52,6 +52,24 @@ describe('fetchPatch', function () {
     describe('when response cannot be read from a stream', () => {
       let originalCloneFn
 
+      function createFetchArgs(method = 'POST') {
+        const fetchArgs = {
+          url: window.location.href,
+          options: {
+            method,
+            headers: { custom: 'value' }
+          }
+        }
+
+        return fetchArgs
+      }
+
+      function validateFetchData(fetchData, expectedData) {
+        expect(fetchData.url).toBe(expectedData.url)
+        expect(fetchData.method).toBe(expectedData.options.method)
+        expect(fetchData.target.headers.has('custom')).toBe(true)
+      }
+
       beforeEach(() => {
         originalCloneFn = window.Response.prototype.clone
         window.Response.prototype.clone = function () {
@@ -63,16 +81,45 @@ describe('fetchPatch', function () {
         window.Response.prototype.clone = originalCloneFn
       })
 
-      it('should fetch correctly', function (done) {
-        var promise = window.fetch('/')
-        expect(promise).toBeDefined()
-        expect(typeof promise.then).toBe('function')
-        expect(events.map(e => e.event)).toEqual(['schedule'])
-        promise.then(function (resp) {
-          expect(resp).toBeDefined()
-          Promise.resolve().then(function () {
-            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
-            done()
+      // Testing fetch with different input types
+      ;[
+        {
+          name: 'should fetch correctly when using string as input',
+          fetchArgs: createFetchArgs('GET'),
+          fetchFn(fetchArgs) {
+            return window.fetch(fetchArgs.url, fetchArgs.options)
+          }
+        },
+        {
+          name: 'should fetch correctly when using REQUEST object as input',
+          fetchArgs: createFetchArgs('PATCH'),
+          fetchFn(fetchArgs) {
+            return window.fetch(new Request(fetchArgs.url, fetchArgs.options))
+          }
+        },
+        {
+          name: 'should fetch correctly when using URL object as input',
+          fetchArgs: createFetchArgs('PUT'),
+          fetchFn(fetchArgs) {
+            return window.fetch(new URL(fetchArgs.url), fetchArgs.options)
+          }
+        }
+      ].forEach(({ name, fetchArgs, fetchFn }) => {
+        it(`${name}`, function (done) {
+          var promise = fetchFn(fetchArgs)
+          expect(typeof promise.then).toBe('function')
+          expect(events.map(e => e.event)).toEqual(['schedule'])
+
+          // Validate that fetch has been called with the proper data
+          const data = events[0].task.data
+          validateFetchData(data, fetchArgs)
+
+          promise.then(function (resp) {
+            expect(resp).toBeDefined()
+            Promise.resolve().then(function () {
+              expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+              done()
+            })
           })
         })
       })
