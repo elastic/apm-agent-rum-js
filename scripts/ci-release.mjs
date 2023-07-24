@@ -141,6 +141,6 @@ async function prodMode() {
   try {
     await main()
   } catch (err) {
-    console.log(err)
+    raiseError(err)
   }
 })()
