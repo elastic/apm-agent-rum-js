@@ -26,6 +26,8 @@
 import * as process from 'node:process'
 import fetch from 'node-fetch'
 import { execa } from 'execa'
+import { writeFile } from 'node:fs/promises'
+import * as path from 'node:path'
 
 function raiseError(msg) {
   console.log(msg)
@@ -72,9 +74,29 @@ async function dryRunMode() {
   }
 
   try {
-    await execa("npx", ["npm-auth-to-token", "-u", "test", "-p", "test", "-e", "test@test.com", "-r", registryUrl])
-      .pipeStdout(process.stdout)
-      .pipeStderr(process.stderr)
+    // Ref: https://github.com/npm/npm-registry-client/blob/856eefea40a2a88618835978e281300e3406924b/lib/adduser.js#L63-L68
+    const response = await fetch(`${registryUrl}/-/user/org.couchdb.user:test`, {
+      method: "PUT",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: "test",
+        password: "test",
+        email: "test@elastic.co"
+      })
+    });
+
+    let npmrcData = "registry=http://localhost:4873\n"
+    if (response.status === 201) {
+      const { token: token } = await response.json()
+      npmrcData += `//localhost:4873/:_authToken=${token}\n`
+    } else {
+      raiseError("Failed to add user to private registry")
+    }
+
+    await writeFile(path.join(process.cwd(), '.npmrc'), npmrcData)
   } catch (err) {
     raiseError("Failed to login to private registry")
   }
