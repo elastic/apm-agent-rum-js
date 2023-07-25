@@ -30,7 +30,12 @@ import {
   FIRST_INPUT,
   LAYOUT_SHIFT
 } from '../common/constants'
-import { noop, PERF, isPerfTypeSupported } from '../common/utils'
+import {
+  noop,
+  PERF,
+  isPerfTypeSupported,
+  isRedirectInfoAvailable
+} from '../common/utils'
 import Span from './span'
 
 export const metrics = {
@@ -265,7 +270,9 @@ export function captureObserverEntries(list, { isHardNavigation, trStart }) {
    * To avoid capturing the unload event handler effect
    * as part of the page-load transaction duration
    */
-  const unloadDiff = timing.fetchStart - timing.navigationStart
+  const unloadDiff = isRedirectInfoAvailable()
+    ? 0
+    : timing.fetchStart - timing.navigationStart
   const fcpEntry = list.getEntriesByName(FIRST_CONTENTFUL_PAINT)[0]
   if (fcpEntry) {
     const fcp = parseInt(

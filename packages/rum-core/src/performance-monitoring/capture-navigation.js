@@ -253,7 +253,13 @@ const COMPRESSED_NAV_TIMING_MARKS = [
 ]
 
 function getNavigationTimingMarks(timing) {
-  const { fetchStart, navigationStart, responseStart, responseEnd } = timing
+  const {
+    redirectStart,
+    fetchStart,
+    navigationStart,
+    responseStart,
+    responseEnd
+  } = timing
   /**
    * Detect if NavigationTiming data is buggy and discard
    * capturing navigation marks for the transaction
@@ -269,7 +275,9 @@ function getNavigationTimingMarks(timing) {
     const marks = {}
     NAVIGATION_TIMING_MARKS.forEach(function (timingKey) {
       const m = timing[timingKey]
-      if (m && m >= fetchStart) {
+      if (isRedirectInfoAvailable()) {
+        marks[timingKey] = parseInt(m - redirectStart)
+      } else if (m && m >= fetchStart) {
         marks[timingKey] = parseInt(m - fetchStart)
       }
     })
@@ -330,7 +338,6 @@ function captureNavigation(transaction) {
     transaction._start = trStart
 
     const timings = PERF.timing
-    // redirect info is only available for same-origin redirects
     const baseTime = isRedirectInfoAvailable()
       ? timings.redirectStart
       : timings.fetchStart

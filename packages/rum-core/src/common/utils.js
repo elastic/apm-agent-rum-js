@@ -227,6 +227,7 @@ function getTimeOrigin() {
   return PERF.timing.fetchStart
 }
 
+// redirect info is only available for same-origin redirects
 function isRedirectInfoAvailable() {
   return PERF.timing.redirectStart > 0
 }
