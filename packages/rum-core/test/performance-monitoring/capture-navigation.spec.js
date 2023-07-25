@@ -151,7 +151,33 @@ describe('Capture hard navigation', function () {
     ])
   })
 
-  it('should populate desination context only for requestStart span', () => {
+  it('should handle a redirection', function () {
+    // Add redirect info
+    timings.redirectStart = 1572362095000
+    timings.redirectEnd = 1572362095181
+    let spans = createNavigationTimingSpans(
+      timings,
+      timings.redirectStart,
+      transactionStart,
+      transactionEnd
+    )
+
+    expect(spans.map(mapSpan)).toEqual([
+      { name: 'Redirect', _end: 181, _start: 0 },
+      { name: 'Domain lookup', _end: 201, _start: 182 },
+      { name: 'Making a connection to the server', _end: 269, _start: 201 },
+      { name: 'Requesting and receiving the document', _end: 390, _start: 270 },
+      {
+        name: 'Parsing the document, executing sync. scripts',
+        _end: 723,
+        _start: 346
+      },
+      { name: 'Fire "DOMContentLoaded" event', _end: 835, _start: 815 },
+      { name: 'Fire "load" event', _end: 1145, _start: 1143 }
+    ])
+  })
+
+  it('should populate destination context only for requestStart span', () => {
     const spans = createNavigationTimingSpans(
       timings,
       timings.fetchStart,

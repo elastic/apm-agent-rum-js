@@ -227,6 +227,10 @@ function getTimeOrigin() {
   return PERF.timing.fetchStart
 }
 
+function isRedirectInfoAvailable() {
+  return PERF.timing.redirectStart > 0
+}
+
 function stripQueryStringFromUrl(url) {
   return url && url.split('?')[0]
 }
@@ -450,6 +454,7 @@ export {
   getCurrentScript,
   getElasticScript,
   getTimeOrigin,
+  isRedirectInfoAvailable,
   generateRandomId,
   getEarliestSpan,
   getLatestNonXHRSpan,

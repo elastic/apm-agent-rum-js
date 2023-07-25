@@ -35,7 +35,8 @@ import {
 import {
   stripQueryStringFromUrl,
   PERF,
-  isPerfTimelineSupported
+  isPerfTimelineSupported,
+  isRedirectInfoAvailable
 } from '../common/utils'
 import { state } from '../state'
 
@@ -47,6 +48,7 @@ import { state } from '../state'
  * eventPairs[2] -> name of the span
  */
 const eventPairs = [
+  ['redirectStart', 'redirectEnd', 'Redirect'],
   ['domainLookupStart', 'domainLookupEnd', 'Domain lookup'],
   ['connectStart', 'connectEnd', 'Making a connection to the server'],
   ['requestStart', 'responseEnd', 'Requesting and receiving the document'],
@@ -328,19 +330,20 @@ function captureNavigation(transaction) {
     transaction._start = trStart
 
     const timings = PERF.timing
-    createNavigationTimingSpans(
-      timings,
-      timings.fetchStart,
-      trStart,
-      trEnd
-    ).forEach(span => {
-      span.traceId = transaction.traceId
-      span.sampled = transaction.sampled
-      if (span.pageResponse && transaction.options.pageLoadSpanId) {
-        span.id = transaction.options.pageLoadSpanId
+    // redirect info is only available for same-origin redirects
+    const baseTime = isRedirectInfoAvailable()
+      ? timings.redirectStart
+      : timings.fetchStart
+    createNavigationTimingSpans(timings, baseTime, trStart, trEnd).forEach(
+      span => {
+        span.traceId = transaction.traceId
+        span.sampled = transaction.sampled
+        if (span.pageResponse && transaction.options.pageLoadSpanId) {
+          span.id = transaction.options.pageLoadSpanId
+        }
+        transaction.spans.push(span)
       }
-      transaction.spans.push(span)
-    })
+    )
 
     /**
      * Page load marks that are gathered from NavigationTiming API
