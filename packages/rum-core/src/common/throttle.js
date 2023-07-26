@@ -23,6 +23,8 @@
  *
  */
 
+import { runInOwnZone } from './utils'
+
 export default function throttle(fn, onThrottle, opts) {
   var context = this
   var limit = opts.limit
@@ -32,10 +34,12 @@ export default function throttle(fn, onThrottle, opts) {
   return function () {
     counter++
     if (typeof timeoutId === 'undefined') {
-      timeoutId = setTimeout(function () {
-        counter = 0
-        timeoutId = undefined
-      }, interval)
+      runInOwnZone(() => {
+        timeoutId = setTimeout(function () {
+          counter = 0
+          timeoutId = undefined
+        }, interval)
+      })
     }
     if (counter > limit && typeof onThrottle === 'function') {
       return onThrottle.apply(context, arguments)

@@ -24,6 +24,7 @@
  */
 
 import { HTTP_REQUEST_TIMEOUT } from '../constants'
+import { runInOwnZone } from '../utils'
 import { isResponseSuccessful } from './response-status'
 
 // keepalive flag tends to limit the payload size to 64 KB
@@ -60,7 +61,7 @@ export function sendFetchRequest(
   if (typeof AbortController === 'function') {
     const controller = new AbortController()
     timeoutConfig.signal = controller.signal
-    setTimeout(() => controller.abort(), timeout)
+    runInOwnZone(() => setTimeout(() => controller.abort(), timeout))
   }
 
   let fetchResponse

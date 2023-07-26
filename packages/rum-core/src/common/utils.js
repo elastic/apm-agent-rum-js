@@ -431,6 +431,25 @@ function isBeaconInspectionEnabled() {
   return false
 }
 
+/**
+ * Run the given function in a separate zone if ZoneJs used.
+ * i.e. in Angular, where this can be used to let functions like `setTimeout` and `setInterval` not block the stabilization.
+ * (https://angular.io/api/core/ApplicationRef#isStable)
+ */
+function runInOwnZone(fn) {
+  if (typeof window.Zone === 'undefined') {
+    return fn()
+  }
+
+  if (!window.ApmZone) {
+    window.ApmZone = Zone.root.fork({
+      name: 'ApmZone'
+    })
+  }
+
+  return window.ApmZone.run(fn)
+}
+
 export {
   extend,
   merge,
@@ -470,5 +489,6 @@ export {
   isPerfTimelineSupported,
   isBrowser,
   isPerfTypeSupported,
-  isBeaconInspectionEnabled
+  isBeaconInspectionEnabled,
+  runInOwnZone
 }

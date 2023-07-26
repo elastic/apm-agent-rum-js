@@ -23,6 +23,8 @@
  *
  */
 
+import { runInOwnZone } from './utils'
+
 const RAF_TIMEOUT = 100
 
 /**
@@ -43,7 +45,7 @@ export default function afterFrame(callback) {
     cancelAnimationFrame(raf)
     setTimeout(callback)
   }
-  const timeout = setTimeout(handler, RAF_TIMEOUT)
+  const timeout = runInOwnZone(() => setTimeout(handler, RAF_TIMEOUT))
 
   const raf = requestAnimationFrame(handler)
 }
