@@ -26,6 +26,7 @@
 import { fcpEntries } from '../fixtures/paint-entries'
 import resourceEntries from '../fixtures/resource-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
+import { TIMING_LEVEL1_ENTRY as timings } from '../fixtures/navigation-entries'
 import { TIMING_LEVEL2_ENTRIES } from '../fixtures/navigation-entries'
 import longtaskEntries from '../fixtures/longtask-entries'
 import largestContentfulPaintEntries from '../fixtures/lcp-entries'
@@ -76,5 +77,22 @@ export function mockGetEntriesByType() {
 
   return function unMock() {
     window.performance.getEntriesByType = _getEntriesByType
+  }
+}
+
+export function mockPerformanceTimingEntries(customEntries = {}) {
+  const perfTiming = window.performance.timing
+  const timingsObj = {
+    ...timings,
+    ...customEntries
+  }
+
+  Object.defineProperty(window.performance, 'timing', {
+    writable: true,
+    value: timingsObj
+  })
+
+  return function unMock() {
+    window.performance.timing = perfTiming
   }
 }

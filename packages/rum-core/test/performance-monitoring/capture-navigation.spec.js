@@ -39,7 +39,10 @@ import resourceEntries from '../fixtures/resource-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import navTimingSpans from '../fixtures/navigation-timing-span-snapshot'
 import { TIMING_LEVEL1_ENTRY as timings } from '../fixtures/navigation-entries'
-import { mockGetEntriesByType } from '../utils/globals-mock'
+import {
+  mockGetEntriesByType,
+  mockPerformanceTimingEntries
+} from '../utils/globals-mock'
 
 const spanSnapshot = navTimingSpans.map(mapSpan)
 
@@ -495,15 +498,9 @@ describe('Capture hard navigation', function () {
       }
     ].forEach(({ name, redirectStart, redirectEnd, expected }) => {
       it(name, function () {
-        const perfTiming = window.performance.timing
-        const timingsObj = {
-          ...timings,
+        unMock = mockPerformanceTimingEntries({
           redirectStart,
           redirectEnd
-        }
-        Object.defineProperty(window.performance, 'timing', {
-          writable: true,
-          value: timingsObj
         })
 
         const navTimingSpansSpy = spyOnFunction(
@@ -523,7 +520,7 @@ describe('Capture hard navigation', function () {
           tr._end // transaction end
         )
 
-        window.performance.timing = perfTiming
+        unMock()
       })
     })
   })
