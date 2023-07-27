@@ -211,7 +211,7 @@ describe('Context', () => {
       ...trContext
     })
 
-    const unmock = mockGetEntriesByType()
+    const unMock = mockGetEntriesByType()
     const pageloadTr = new Transaction('test', PAGE_LOAD)
     pageloadTr.end()
     addTransactionContext(pageloadTr, configContext)
@@ -231,6 +231,6 @@ describe('Context', () => {
       ...userContext
     })
 
-    unmock()
+    unMock()
   })
 })

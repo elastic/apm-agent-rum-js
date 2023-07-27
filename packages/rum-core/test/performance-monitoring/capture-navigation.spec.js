@@ -317,7 +317,7 @@ describe('Capture hard navigation', function () {
   })
 
   it('should capture resource/user timing spans for soft navigation', function () {
-    const unmock = mockGetEntriesByType()
+    const unMock = mockGetEntriesByType()
     const tr = new Transaction('test', ROUTE_CHANGE)
     tr.captureTimings = true
     const xhrSpan = tr.startSpan('GET http://example.com', 'external.http')
@@ -333,11 +333,11 @@ describe('Capture hard navigation', function () {
         span.type === 'app'
     )
     expect(foundSpans.length).toBeGreaterThanOrEqual(3)
-    unmock()
+    unMock()
   })
 
   it('should capture resource/user timings when captureTimings flag is set', function () {
-    const unmock = mockGetEntriesByType()
+    const unMock = mockGetEntriesByType()
     const tr = new Transaction('test', 'test')
     tr.captureTimings = true
     tr._start = transactionStart
@@ -348,7 +348,7 @@ describe('Capture hard navigation', function () {
       span => span.type === 'resource' || span.type === 'app'
     )
     expect(foundSpans.length).toBeGreaterThanOrEqual(2)
-    unmock()
+    unMock()
   })
 
   it('should capture agent marks in page load transaction', function () {
@@ -498,7 +498,7 @@ describe('Capture hard navigation', function () {
       }
     ].forEach(({ name, redirectStart, redirectEnd, expected }) => {
       it(name, function () {
-        unMock = mockPerformanceTimingEntries({
+        const unMock = mockPerformanceTimingEntries({
           redirectStart,
           redirectEnd
         })
@@ -514,8 +514,8 @@ describe('Capture hard navigation', function () {
         captureNavigation(tr)
 
         expect(navTimingSpansSpy).toHaveBeenCalledWith(
-          timingsObj, // timings
-          timingsObj[expected], // baseTime
+          performance.timing, // timings
+          performance.timing[expected], // baseTime
           0, // transaction start
           tr._end // transaction end
         )
