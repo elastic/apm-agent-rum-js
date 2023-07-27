@@ -39,7 +39,7 @@ import {
   isPerfTypeSupported,
   generateRandomId
 } from '../common/utils'
-import { captureNavigation } from './capture-navigation'
+import { captureNavigation } from './navigation/capture-navigation'
 import {
   PAGE_LOAD,
   NAME_UNKNOWN,

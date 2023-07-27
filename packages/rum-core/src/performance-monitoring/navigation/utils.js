@@ -22,31 +22,30 @@
  * THE SOFTWARE.
  *
  */
-import { captureNavigation } from '../../src/performance-monitoring/navigation/capture-navigation'
-import Transaction from '../../src/performance-monitoring/transaction'
-import { PAGE_LOAD, ROUTE_CHANGE } from '../../src/common/constants'
 
-suite('CaptureNavigation', () => {
-  const options = {
-    startTime: 0,
-    transactionSampleRate: 1
-  }
-  const endTime = 10000
+import { MAX_SPAN_DURATION } from '../../common/constants'
 
-  benchmark('hard navigation', () => {
-    const pageLoadTr = new Transaction('/index', PAGE_LOAD, options)
-    pageLoadTr.captureTimings = true
-    pageLoadTr.end(endTime)
-    captureNavigation(pageLoadTr)
-  })
+/**
+ * start, end, baseTime - unsigned long long(PerformanceTiming)
+ * representing the moment, in milliseconds since the UNIX epoch
+ *
+ * trStart & trEnd - DOMHighResTimeStamp, measured in milliseconds.
+ *
+ * We have to convert the long values in milliseconds before doing the comparision
+ * eg: end - baseTime <= transactionEnd
+ */
+function shouldCreateSpan(start, end, trStart, trEnd, baseTime = 0) {
+  return (
+    typeof start === 'number' &&
+    typeof end === 'number' &&
+    start >= baseTime &&
+    end > start &&
+    start - baseTime >= trStart &&
+    end - baseTime <= trEnd &&
+    end - start < MAX_SPAN_DURATION &&
+    start - baseTime < MAX_SPAN_DURATION &&
+    end - baseTime < MAX_SPAN_DURATION
+  )
+}
 
-  benchmark('soft navigation', () => {
-    /**
-     * Does not include navigation timing spans and agent marks
-     */
-    const nonPageLoadTr = new Transaction('/index', ROUTE_CHANGE, options)
-    nonPageLoadTr.captureTimings = true
-    nonPageLoadTr.end(endTime)
-    captureNavigation(nonPageLoadTr)
-  })
-})
+export { shouldCreateSpan }

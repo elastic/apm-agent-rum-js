@@ -227,11 +227,6 @@ function getTimeOrigin() {
   return PERF.timing.fetchStart
 }
 
-// redirect info is only available for same-origin redirects
-function isRedirectInfoAvailable() {
-  return PERF.timing.redirectStart > 0
-}
-
 function stripQueryStringFromUrl(url) {
   return url && url.split('?')[0]
 }
@@ -436,6 +431,11 @@ function isBeaconInspectionEnabled() {
   return false
 }
 
+// redirect info is only available for same-origin redirects
+function isRedirectInfoAvailable(timing) {
+  return timing.redirectStart > 0
+}
+
 export {
   extend,
   merge,
@@ -455,7 +455,6 @@ export {
   getCurrentScript,
   getElasticScript,
   getTimeOrigin,
-  isRedirectInfoAvailable,
   generateRandomId,
   getEarliestSpan,
   getLatestNonXHRSpan,
@@ -476,5 +475,6 @@ export {
   isPerfTimelineSupported,
   isBrowser,
   isPerfTypeSupported,
-  isBeaconInspectionEnabled
+  isBeaconInspectionEnabled,
+  isRedirectInfoAvailable
 }

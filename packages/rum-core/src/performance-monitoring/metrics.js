@@ -270,7 +270,7 @@ export function captureObserverEntries(list, { isHardNavigation, trStart }) {
    * To avoid capturing the unload event handler effect
    * as part of the page-load transaction duration
    */
-  const unloadDiff = isRedirectInfoAvailable()
+  const unloadDiff = isRedirectInfoAvailable(timing)
     ? 0
     : timing.fetchStart - timing.navigationStart
   const fcpEntry = list.getEntriesByName(FIRST_CONTENTFUL_PAINT)[0]

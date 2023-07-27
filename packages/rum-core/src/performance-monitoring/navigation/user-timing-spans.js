@@ -22,31 +22,31 @@
  * THE SOFTWARE.
  *
  */
-import { captureNavigation } from '../../src/performance-monitoring/navigation/capture-navigation'
-import Transaction from '../../src/performance-monitoring/transaction'
-import { PAGE_LOAD, ROUTE_CHANGE } from '../../src/common/constants'
 
-suite('CaptureNavigation', () => {
-  const options = {
-    startTime: 0,
-    transactionSampleRate: 1
+import { USER_TIMING_THRESHOLD } from '../../common/constants'
+import { shouldCreateSpan } from './utils'
+import Span from '../span'
+
+function createUserTimingSpans(entries, trStart, trEnd) {
+  const userTimingSpans = []
+  for (let i = 0; i < entries.length; i++) {
+    const { name, startTime, duration } = entries[i]
+    const end = startTime + duration
+
+    if (
+      duration <= USER_TIMING_THRESHOLD ||
+      !shouldCreateSpan(startTime, end, trStart, trEnd)
+    ) {
+      continue
+    }
+    const kind = 'app'
+    const span = new Span(name, kind)
+    span._start = startTime
+    span.end(end)
+
+    userTimingSpans.push(span)
   }
-  const endTime = 10000
+  return userTimingSpans
+}
 
-  benchmark('hard navigation', () => {
-    const pageLoadTr = new Transaction('/index', PAGE_LOAD, options)
-    pageLoadTr.captureTimings = true
-    pageLoadTr.end(endTime)
-    captureNavigation(pageLoadTr)
-  })
-
-  benchmark('soft navigation', () => {
-    /**
-     * Does not include navigation timing spans and agent marks
-     */
-    const nonPageLoadTr = new Transaction('/index', ROUTE_CHANGE, options)
-    nonPageLoadTr.captureTimings = true
-    nonPageLoadTr.end(endTime)
-    captureNavigation(nonPageLoadTr)
-  })
-})
+export { createUserTimingSpans }
