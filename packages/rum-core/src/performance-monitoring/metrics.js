@@ -267,12 +267,17 @@ export function captureObserverEntries(list, { isHardNavigation, trStart }) {
    */
   const timing = PERF.timing
   /**
+   *
    * To avoid capturing the unload event handler effect
    * as part of the page-load transaction duration
    */
-  const unloadDiff = isRedirectInfoAvailable(timing)
-    ? 0
-    : timing.fetchStart - timing.navigationStart
+  let unloadDiff = timing.fetchStart - timing.navigationStart
+  if (isRedirectInfoAvailable(timing)) {
+    // this makes sure the FCP startTime includes the redirect time
+    // otherwise the mark would not show up properly in the UI waterfall
+    unloadDiff = 0
+  }
+
   const fcpEntry = list.getEntriesByName(FIRST_CONTENTFUL_PAINT)[0]
   if (fcpEntry) {
     const fcp = parseInt(
