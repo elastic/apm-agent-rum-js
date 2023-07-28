@@ -106,10 +106,13 @@ function getNavigationTimingMarks(timing) {
     const marks = {}
     NAVIGATION_TIMING_MARKS.forEach(function (timingKey) {
       const m = timing[timingKey]
-      if (isRedirectInfoAvailable(timing)) {
-        marks[timingKey] = parseInt(m - redirectStart)
-      } else if (m && m >= fetchStart) {
-        marks[timingKey] = parseInt(m - fetchStart)
+      if (m && m >= fetchStart) {
+        if (isRedirectInfoAvailable(timing)) {
+          // make sure navigation marks will show up after the Redirect span
+          marks[timingKey] = parseInt(m - redirectStart)
+        } else {
+          marks[timingKey] = parseInt(m - fetchStart)
+        }
       }
     })
     return marks
