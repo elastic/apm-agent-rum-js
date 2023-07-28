@@ -23,7 +23,7 @@
  *
  */
 
-import * as navTiming from '../../src/performance-monitoring/navigation/navigation-timing-spans'
+import * as navTiming from '../../src/performance-monitoring/navigation/navigation-timing'
 import {
   captureNavigation,
   createNavigationTimingSpans,

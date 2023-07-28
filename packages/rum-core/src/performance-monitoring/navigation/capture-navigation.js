@@ -30,9 +30,9 @@ import {
 } from '../../common/utils'
 import { PAGE_LOAD, RESOURCE, MEASURE } from '../../common/constants'
 import { state } from '../../state'
-import { createNavigationTimingSpans } from './navigation-timing-spans'
-import { createUserTimingSpans } from './user-timing-spans'
-import { createResourceTimingSpans } from './resource-timing-spans'
+import { createNavigationTimingSpans } from './navigation-timing'
+import { createUserTimingSpans } from './user-timing'
+import { createResourceTimingSpans } from './resource-timing'
 import { getPageLoadMarks } from './marks'
 
 function captureNavigation(transaction) {
