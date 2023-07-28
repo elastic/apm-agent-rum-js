@@ -73,7 +73,7 @@ function captureNavigation(transaction) {
 
     const timings = PERF.timing
     const baseTime = isRedirectInfoAvailable(timings)
-      ? timings.redirectStart
+      ? timings.redirectStart // make sure navigation spans will show up after the Redirect span
       : timings.fetchStart
 
     createNavigationTimingSpans(timings, baseTime, trStart, trEnd).forEach(
