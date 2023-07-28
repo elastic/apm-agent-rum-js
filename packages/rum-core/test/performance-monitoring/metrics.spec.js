@@ -42,6 +42,7 @@ import {
 import longtaskEntries from '../fixtures/longtask-entries'
 import fidEntries from '../fixtures/fid-entries'
 import { fcpEntries } from '../fixtures/paint-entries'
+import { canMockPerfTimingApi } from '..'
 
 describe('Metrics', () => {
   describe('PerfEntryRecorder', () => {
@@ -113,48 +114,51 @@ describe('Metrics', () => {
           firstContentfulPaint: jasmine.any(Number)
         })
       })
-      ;[
-        {
-          name:
-            'should subtract the unload event duration from FCP when there is no redirection',
-          navigationEntries: {
-            navigationStart: 0,
-            fetchStart: 30
+
+      if (canMockPerfTimingApi()) {
+        ;[
+          {
+            name:
+              'should subtract the unload event duration from FCP when there is no redirection',
+            navigationEntries: {
+              navigationStart: 0,
+              fetchStart: 30
+            },
+            originalFcp: 200,
+            expectedFcp: 170
           },
-          originalFcp: 200,
-          expectedFcp: 170
-        },
-        {
-          name: 'should keep the FCP as it is when there is a redirection',
-          navigationEntries: {
-            navigationStart: 0,
-            redirectStart: 20,
-            fetchStart: 30
-          },
-          originalFcp: 200,
-          expectedFcp: 200
-        }
-      ].forEach(({ name, navigationEntries, originalFcp, expectedFcp }) => {
-        it(name, () => {
-          const originalFcpEntry = fcpEntries[0]
-          // fcp startTime
-          fcpEntries[0].startTime = originalFcp
+          {
+            name: 'should keep the FCP as it is when there is a redirection',
+            navigationEntries: {
+              navigationStart: 0,
+              redirectStart: 20,
+              fetchStart: 30
+            },
+            originalFcp: 200,
+            expectedFcp: 200
+          }
+        ].forEach(({ name, navigationEntries, originalFcp, expectedFcp }) => {
+          it(name, () => {
+            const originalFcpEntry = fcpEntries[0]
+            // fcp startTime
+            fcpEntries[0].startTime = originalFcp
 
-          // unload event duration (timing.fetchStart - timing.navigationStart)
-          const unMock = mockPerformanceTimingEntries(navigationEntries)
+            // unload event duration (timing.fetchStart - timing.navigationStart)
+            const unMock = mockPerformanceTimingEntries(navigationEntries)
 
-          list.getEntriesByName.and.callFake(mockObserverEntryNames)
-          const { marks } = captureObserverEntries(list, {
-            isHardNavigation: true
+            list.getEntriesByName.and.callFake(mockObserverEntryNames)
+            const { marks } = captureObserverEntries(list, {
+              isHardNavigation: true
+            })
+            expect(marks).toEqual({
+              firstContentfulPaint: expectedFcp
+            })
+
+            fcpEntries[0] = originalFcpEntry
+            unMock()
           })
-          expect(marks).toEqual({
-            firstContentfulPaint: expectedFcp
-          })
-
-          fcpEntries[0] = originalFcpEntry
-          unMock()
         })
-      })
+      }
     })
 
     it('should create long tasks attribution data in span context', () => {

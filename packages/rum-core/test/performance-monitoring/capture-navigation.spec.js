@@ -39,6 +39,7 @@ import resourceEntries from '../fixtures/resource-entries'
 import userTimingEntries from '../fixtures/user-timing-entries'
 import navTimingSpans from '../fixtures/navigation-timing-span-snapshot'
 import { TIMING_LEVEL1_ENTRY as timings } from '../fixtures/navigation-entries'
+import { canMockPerfTimingApi } from '../'
 import {
   mockGetEntriesByType,
   mockPerformanceTimingEntries
@@ -480,50 +481,52 @@ describe('Capture hard navigation', function () {
     })
   })
 
-  describe('baseTime when calculating createNavigationTimingSpans', function () {
-    ;[
-      {
-        name:
-          'should use redirectStart as a baseTime when there is redirection',
-        redirectStart: 1,
-        redirectEnd: 2,
-        expected: 'redirectStart'
-      },
-      {
-        name:
-          'should use fetchStart as a baseTime when there is no redirection',
-        redirectStart: 0,
-        redirectEnd: 0,
-        expected: 'fetchStart'
-      }
-    ].forEach(({ name, redirectStart, redirectEnd, expected }) => {
-      it(name, function () {
-        const unMock = mockPerformanceTimingEntries({
-          redirectStart,
-          redirectEnd
+  if (canMockPerfTimingApi()) {
+    describe('baseTime when calculating createNavigationTimingSpans', function () {
+      ;[
+        {
+          name:
+            'should use redirectStart as a baseTime when there is redirection',
+          redirectStart: 1,
+          redirectEnd: 2,
+          expected: 'redirectStart'
+        },
+        {
+          name:
+            'should use fetchStart as a baseTime when there is no redirection',
+          redirectStart: 0,
+          redirectEnd: 0,
+          expected: 'fetchStart'
+        }
+      ].forEach(({ name, redirectStart, redirectEnd, expected }) => {
+        it(name, function () {
+          const unMock = mockPerformanceTimingEntries({
+            redirectStart,
+            redirectEnd
+          })
+
+          const navTimingSpansSpy = spyOnFunction(
+            navTiming,
+            'createNavigationTimingSpans'
+          ).and.callThrough()
+
+          const tr = new Transaction('test', PAGE_LOAD)
+          tr.captureTimings = true
+          tr.end()
+          captureNavigation(tr)
+
+          expect(navTimingSpansSpy).toHaveBeenCalledWith(
+            performance.timing, // timings
+            performance.timing[expected], // baseTime
+            0, // transaction start
+            tr._end // transaction end
+          )
+
+          unMock()
         })
-
-        const navTimingSpansSpy = spyOnFunction(
-          navTiming,
-          'createNavigationTimingSpans'
-        ).and.callThrough()
-
-        const tr = new Transaction('test', PAGE_LOAD)
-        tr.captureTimings = true
-        tr.end()
-        captureNavigation(tr)
-
-        expect(navTimingSpansSpy).toHaveBeenCalledWith(
-          performance.timing, // timings
-          performance.timing[expected], // baseTime
-          0, // transaction start
-          tr._end // transaction end
-        )
-
-        unMock()
       })
     })
-  })
+  }
 
   describe('Buggy Navigation Timing data', () => {
     it('when timestamps are 0-based instead of unix epoch', () => {
