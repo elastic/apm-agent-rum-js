@@ -35,7 +35,7 @@ jobs:
         run: npm ci
 
       - name: Read NPM vault secrets
-        if: inputs.dry-run != null && !inputs.dry-run
+        if: inputs.dry-run != null && inputs.dry-run == false
         uses: hashicorp/vault-action@v2.7.3
         with:
           method: approle
@@ -47,7 +47,7 @@ jobs:
 
       - name: Configure npm registry
         uses: elastic/apm-pipeline-library/.github/actions/setup-npmrc@current
-        if: inputs.dry-run != null && !inputs.dry-run
+        if: inputs.dry-run != null && inputs.dry-run == false
         with:
           vault-url: ${{ secrets.VAULT_ADDR }}
           vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
@@ -123,7 +123,7 @@ jobs:
           process_gcloudignore: false
 
   status:
-    if: inputs.dry-run != null && !inputs.dry-run
+    if: inputs.dry-run != null && inputs.dry-run == false
     needs:
       - release
     runs-on: ubuntu-latest
