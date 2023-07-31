@@ -55,15 +55,19 @@ jobs:
           secret: secret/jenkins-ci/npmjs/elasticmachine
           secret-key: token
 
-      - name: Configure git user
-        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
-
       - name: Configure github token
         uses: elastic/apm-pipeline-library/.github/actions/github-token@current
         with:
           url: ${{ secrets.VAULT_ADDR }}
           roleId: ${{ secrets.VAULT_ROLE_ID }}
           secretId: ${{ secrets.VAULT_SECRET_ID }}
+
+      - name: Configure git user
+        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
+        with:
+          username: ${{ env.GIT_USER }}
+          email: ${{ env.GIT_EMAIL }}
+          token: ${{ env.GITHUB_TOKEN }}
 
       - name: Publish the release
         env:
@@ -129,7 +133,7 @@ jobs:
           process_gcloudignore: false
 
   status:
-    if: inputs.dry-run == false
+    if: always()
     needs:
       - release
     runs-on: ubuntu-latest
@@ -139,6 +143,7 @@ jobs:
         with:
           needs: ${{ toJSON(needs) }}
       - uses: elastic/apm-pipeline-library/.github/actions/notify-build-status@current
+        if: inputs.dry-run == false
         with:
           status: ${{ steps.check.outputs.status }}
           vaultUrl: ${{ secrets.VAULT_ADDR }}
