@@ -431,6 +431,11 @@ function isBeaconInspectionEnabled() {
   return false
 }
 
+// redirect info is only available for same-origin redirects
+function isRedirectInfoAvailable(timing) {
+  return timing.redirectStart > 0
+}
+
 export {
   extend,
   merge,
@@ -470,5 +475,6 @@ export {
   isPerfTimelineSupported,
   isBrowser,
   isPerfTypeSupported,
-  isBeaconInspectionEnabled
+  isBeaconInspectionEnabled,
+  isRedirectInfoAvailable
 }
