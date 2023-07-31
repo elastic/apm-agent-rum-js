@@ -27,7 +27,7 @@ import { Promise } from './polyfills'
 import {
   NAVIGATION_TIMING_MARKS,
   COMPRESSED_NAV_TIMING_MARKS
-} from '../performance-monitoring/capture-navigation'
+} from '../performance-monitoring/navigation/marks'
 import { isBeaconInspectionEnabled } from './utils'
 
 /**

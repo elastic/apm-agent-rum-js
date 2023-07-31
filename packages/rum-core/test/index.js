@@ -27,6 +27,7 @@ import { createServiceFactory as originalFactory } from '../src'
 import Transaction from '../src/performance-monitoring/transaction'
 import { captureBreakdown } from '../src/performance-monitoring/breakdown'
 import { APM_SERVER } from '@elastic/apm-rum-core'
+import { mockPerformanceTimingEntries } from './utils/globals-mock'
 
 export function createServiceFactory() {
   var serviceFactory = originalFactory()
@@ -111,4 +112,20 @@ export function generateErrors(count) {
     result.push(new Error('error #' + i))
   }
   return result
+}
+
+// IE11 and Android 4.0 don't allow to monkey patch window.performance.timing API
+export function canMockPerfTimingApi() {
+  const anyValue = 567
+  const unMock = mockPerformanceTimingEntries({
+    redirectStart: anyValue
+  })
+
+  const redirectStart = performance.timing.redirectStart
+  if (redirectStart != anyValue) {
+    return false
+  }
+
+  unMock()
+  return true
 }
