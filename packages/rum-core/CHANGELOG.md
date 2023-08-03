@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.19.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.18.0...@elastic/apm-rum-core@5.19.0) (2023-08-03)
+
+
+### Features
+
+* **rum:** add redirect span for same-origin redirect ([#1400](https://github.com/elastic/apm-agent-rum-js/issues/1400)) ([bcd14bf](https://github.com/elastic/apm-agent-rum-js/commit/bcd14bfc69377bc82880afc45813efa7acde0e70))
+
+
+### Bug Fixes
+
+* **rum-core:** add URL object support in fetch instrumentation ([#1398](https://github.com/elastic/apm-agent-rum-js/issues/1398)) ([d71a093](https://github.com/elastic/apm-agent-rum-js/commit/d71a09361f22c67eef849f693830932858f9b230))
+
+
+
 ## [5.18.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.17.0...@elastic/apm-rum-core@5.18.0) (2023-07-18)
 
 
