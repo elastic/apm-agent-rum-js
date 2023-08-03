@@ -23,9 +23,24 @@ jobs:
         ports:
           - 4873:4873
     steps:
+      - name: Configure github token
+        uses: elastic/apm-pipeline-library/.github/actions/github-token@current
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+
+      - name: Configure git user
+        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
+        with:
+          username: ${{ env.GIT_USER }}
+          email: ${{ env.GIT_EMAIL }}
+          token: ${{ env.GITHUB_TOKEN }}
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          token: ${{ env.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v3
         with:
@@ -54,20 +69,6 @@ jobs:
           vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
           secret: secret/jenkins-ci/npmjs/elasticmachine
           secret-key: token
-
-      - name: Configure github token
-        uses: elastic/apm-pipeline-library/.github/actions/github-token@current
-        with:
-          url: ${{ secrets.VAULT_ADDR }}
-          roleId: ${{ secrets.VAULT_ROLE_ID }}
-          secretId: ${{ secrets.VAULT_SECRET_ID }}
-
-      - name: Configure git user
-        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
-        with:
-          username: ${{ env.GIT_USER }}
-          email: ${{ env.GIT_EMAIL }}
-          token: ${{ env.GITHUB_TOKEN }}
 
       - name: Publish the release
         env:
