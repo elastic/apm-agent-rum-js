@@ -45,7 +45,7 @@ export default function FunctionalComponent(props) {
 
   return (
     <div id="func-container">
-      {props.match.path + '\n'} {count}
+      {props.path + '\n'} {count}
       <Suspense fallback={<div>Loading...</div>}>
         <LazyComponent />
       </Suspense>

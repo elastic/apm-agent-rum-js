@@ -24,6 +24,7 @@
  */
 
 import React from 'react'
+import { useFinishTransactionEffect } from './finish-transaction-effect'
 import {
   Routes,
   useLocation,
@@ -31,7 +32,6 @@ import {
   matchRoutes,
   createRoutesFromChildren
 } from 'react-router-dom'
-import { afterFrame } from '@elastic/apm-rum-core'
 import hoistNonReactStatics from 'hoist-non-react-statics'
 
 function getApmRoutes(apm) {
@@ -48,6 +48,8 @@ function getApmRoutes(apm) {
       // that's why we use `location.pathname` instead of `location`
       [location.pathname, navigationType, props.children]
     )
+
+    useFinishTransactionEffect(apm.getCurrentTransaction())
 
     return <Routes {...props} />
   }
@@ -70,12 +72,10 @@ function handleRouteChange(apm, routes, location, navigationType) {
 
   // just for navigationType PUSH and POP
   const name = getRouteFromLocation(routes, location)
-  const transaction = apm.startTransaction(name, 'route-change', {
+  apm.startTransaction(name, 'route-change', {
     managed: true,
     canReuse: true
   })
-
-  afterFrame(() => transaction && transaction.detectFinish())
 }
 
 export function getRouteFromLocation(routes, location) {

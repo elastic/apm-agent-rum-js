@@ -26,6 +26,7 @@
 import React from 'react'
 import hoistStatics from 'hoist-non-react-statics'
 import { afterFrame, LOGGING_SERVICE } from '@elastic/apm-rum-core'
+import { useFinishTransactionEffect } from './finish-transaction-effect'
 
 /**
  * Check if the given component is class based component
@@ -97,25 +98,7 @@ function getWithTransaction(apm) {
             return tr
           })
 
-          /**
-           * React guarantees the parent component effects are run after the child components effects
-           * So once all the child components effects are run, we run the detectFinish logic
-           * which ensures if the transaction can be completed or not.
-           */
-          React.useEffect(() => {
-            afterFrame(() => transaction && transaction.detectFinish())
-            return () => {
-              /**
-               * Incase the transaction is never ended, we check if the transaction
-               * can be closed during unmount phase
-               *
-               * We call detectFinish instead of forcefully ending the transaction
-               * since it could be a redirect route and we might prematurely close
-               * the currently running transaction
-               */
-              transaction && transaction.detectFinish()
-            }
-          }, [])
+          useFinishTransactionEffect(transaction)
 
           return <Component transaction={transaction} {...props} />
         }
