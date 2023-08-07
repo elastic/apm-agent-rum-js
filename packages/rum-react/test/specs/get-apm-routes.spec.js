@@ -188,7 +188,7 @@ describe('ApmRoutes', function () {
     )
   })
 
-  fit('should handle redirection', function () {
+  it('should handle redirection', function () {
     const ApmRoutes = getApmRoutes(apmBase)
     const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     spyOn(transactionService, 'startTransaction')
