@@ -39,7 +39,7 @@ function getApmRoutes(apm) {
     const location = useLocation()
     const navigationType = useNavigationType()
 
-    React.useEffect(
+    React.useLayoutEffect(
       () => {
         const routes = createRoutesFromChildren(props.children)
         handleNavigation(apm, routes, location)
