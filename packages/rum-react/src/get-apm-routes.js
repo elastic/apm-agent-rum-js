@@ -86,8 +86,8 @@ export function getRouteFromLocation(routes, location) {
   const branches = matchRoutes(routes, location)
   let builtPath = ''
   if (branches) {
-    for (let x = 0; x < branches.length; x++) {
-      const branch = branches[x]
+    for (let index = 0; index < branches.length; index++) {
+      const branch = branches[index]
       const route = branch.route
       if (route) {
         if (route.index) {
@@ -131,11 +131,8 @@ export function getRouteFromLocation(routes, location) {
 }
 
 export function getNumberOfUrlSegments(url) {
-  return url
-    .split(/\\?\//)
-    .filter(
-      currentSegment => currentSegment.length > 0 && currentSegment !== ','
-    ).length
+  return url.split('/').filter(currentSegment => currentSegment.length > 0)
+    .length
 }
 
 export { getApmRoutes }
