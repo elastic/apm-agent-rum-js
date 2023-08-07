@@ -58,6 +58,10 @@ function getApmRoutes(apm) {
 }
 
 function handleRouteChange(apm, routes, location, navigationType) {
+  if (!apm.isActive()) {
+    return
+  }
+
   // one of the cases when REPLACE gets triggered is when someone clicks on a link that leads to the current page
   // we don't want to handle this case
   if (navigationType === 'REPLACE') {
