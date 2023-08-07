@@ -134,10 +134,10 @@ describe('ApmRoutes', function () {
 
     transactionService.startTransaction.calls.reset()
 
-    // /**
-    //  * Update query on existing route
-    //  * do not trigger a new transaction
-    //  */
+    /**
+     * Update query on existing route
+     * do not trigger a new transaction
+     */
     navigate('/new?test=foo')
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
   })

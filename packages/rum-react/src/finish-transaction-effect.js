@@ -27,6 +27,11 @@ import React from 'react'
 import { afterFrame } from '@elastic/apm-rum-core'
 
 function useFinishTransactionEffect(transaction) {
+  /**
+   * React guarantees the parent component effects are run after the child components effects
+   * So once all the child components effects are run, we run the detectFinish logic
+   * which ensures if the transaction can be completed or not.
+   */
   React.useEffect(() => {
     afterFrame(() => {
       transaction && transaction.detectFinish()
