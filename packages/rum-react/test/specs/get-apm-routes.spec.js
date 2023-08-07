@@ -34,7 +34,13 @@ import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 
 Enzyme.configure({ adapter: new Adapter() })
 
-import { MemoryRouter as Router, Route, useNavigate } from 'react-router-dom'
+import {
+  MemoryRouter as Router,
+  Route,
+  useNavigate,
+  useLocation,
+  Navigate
+} from 'react-router-dom'
 import { ApmBase } from '@elastic/apm-rum'
 import {
   createServiceFactory,
@@ -182,21 +188,27 @@ describe('ApmRoutes', function () {
     )
   })
 
-  it('should handle Index Route', function () {
+  fit('should handle redirection', function () {
     const ApmRoutes = getApmRoutes(apmBase)
     const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
     spyOn(transactionService, 'startTransaction')
 
+    const RedirectComponent = () => {
+      const location = useLocation()
+      return <Navigate to={`/home`} replace state={{ location }} />
+    }
+
     mount(
-      <Router>
+      <Router initialEntries={['/redirect']}>
         <ApmRoutes>
-          <Route index element={<Component />} />
+          <Route path="/home" element={<Component name="Elastic" />} />
+          <Route path="/redirect" element={<RedirectComponent />} />
         </ApmRoutes>
       </Router>
     )
 
     expect(transactionService.startTransaction).toHaveBeenCalledWith(
-      '/',
+      '/home',
       'route-change',
       {
         canReuse: true,
