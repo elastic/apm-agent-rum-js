@@ -42,7 +42,7 @@ function getApmRoutes(apm) {
     React.useLayoutEffect(
       () => {
         const routes = createRoutesFromChildren(props.children)
-        handleNavigation(apm, routes, location)
+        handleRouteChange(apm, routes, location)
       },
       // query param changes should not trigger this effect
       // that's why we use `location.pathname` instead of `location`
@@ -57,7 +57,7 @@ function getApmRoutes(apm) {
   return ApmRoutes
 }
 
-function handleNavigation(apm, routes, location, navigationType) {
+function handleRouteChange(apm, routes, location, navigationType) {
   // one of the cases when REPLACE gets triggered is when someone clicks on a link that leads to the current page
   // because of that, the route-change transaction should not be started
   if (navigationType === 'REPLACE') {
