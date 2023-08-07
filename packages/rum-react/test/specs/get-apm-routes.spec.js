@@ -52,7 +52,7 @@ import { getGlobalConfig } from '../../../../dev-utils/test-config'
 let navigate
 function Component(props) {
   // React-router util which allows navigating between routes
-  // Cleaner than handling the history manually
+  // Cleaner than handling the history api manually
   navigate = useNavigate()
 
   return <h1>Testing, {props.name}</h1>
@@ -62,15 +62,19 @@ describe('ApmRoutes', function () {
   const { serverUrl, serviceName } = getGlobalConfig().agentConfig
   let serviceFactory, apmBase
 
-  beforeEach(() => {
-    serviceFactory = createServiceFactory()
-    apmBase = new ApmBase(serviceFactory, false)
-    apmBase.init({
-      active: true,
+  function createApm(active) {
+    const apmBase = new ApmBase(serviceFactory, false)
+    return apmBase.init({
+      active,
       serverUrl,
       serviceName,
       disableInstrumentations: ['page-load', 'error']
     })
+  }
+
+  beforeEach(() => {
+    serviceFactory = createServiceFactory()
+    apmBase = createApm(true)
   })
 
   it('should display Component', function () {
@@ -215,5 +219,22 @@ describe('ApmRoutes', function () {
         managed: true
       }
     )
+  })
+
+  it('should not startTransaction when rum is inactive', function () {
+    apmBase = createApm(false)
+    const ApmRoutes = getApmRoutes(apmBase)
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
+    spyOn(transactionService, 'startTransaction')
+
+    mount(
+      <Router>
+        <ApmRoutes>
+          <Route index element={<Component />} />
+        </ApmRoutes>
+      </Router>
+    )
+
+    expect(transactionService.startTransaction).not.toHaveBeenCalled()
   })
 })
