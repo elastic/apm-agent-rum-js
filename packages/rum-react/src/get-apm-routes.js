@@ -59,18 +59,12 @@ function getApmRoutes(apm) {
   return ApmRoutes
 }
 
-function handleRouteChange(apm, routes, location, navigationType) {
+function handleRouteChange(apm, routes, location) {
   if (!apm.isActive()) {
     return
   }
 
-  // one of the cases when REPLACE gets triggered is when someone clicks on a link that leads to the current page
-  // we don't want to handle this case
-  if (navigationType === 'REPLACE') {
-    return
-  }
-
-  // just for navigationType PUSH and POP
+  // all the navigation types start a transaction, including REPLACE since we want to capture redirections
   const name = getRouteFromLocation(routes, location)
   apm.startTransaction(name, 'route-change', {
     managed: true,
