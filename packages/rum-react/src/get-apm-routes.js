@@ -59,7 +59,7 @@ function getApmRoutes(apm) {
 
 function handleRouteChange(apm, routes, location, navigationType) {
   // one of the cases when REPLACE gets triggered is when someone clicks on a link that leads to the current page
-  // because of that, the route-change transaction should not be started
+  // we don't want to handle this case
   if (navigationType === 'REPLACE') {
     return
   }
@@ -109,7 +109,7 @@ export function getRouteFromLocation(routes, location) {
             // make sure wildcard routes are also handled
             const isWildcardRoute = builtPath.slice(-2) === '/*'
 
-            // One case where the number of / can differ if we have an element like
+            // One case where the number of / can differ is if we have an element like
             // <Route path="/users/:userId/?:extraID?" element={<Users />}/>
             if (
               getNumberOfUrlSegments(builtPath) !==
