@@ -245,6 +245,10 @@ describe('ApmRoutes', function () {
       navigate = useNavigate()
       const [searchParams] = useSearchParams()
 
+      if (searchParams.toString() === 'test=elastic') {
+        return <div>hello Elastic</div>
+      }
+
       return (
         <div>
           <Child params={searchParams.toString()} />
@@ -280,8 +284,8 @@ describe('ApmRoutes', function () {
       }
     )
 
-    var childComponent = rendered.find(Child)
-    expect(childComponent.text()).toBe('Query params: ')
+    var component = rendered.find(ComponentWithChild)
+    expect(component.text()).toBe('Query params: ')
 
     transactionService.startTransaction.calls.reset()
 
@@ -289,8 +293,7 @@ describe('ApmRoutes', function () {
     navigate('?test=elastic')
 
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
-
-    // Confirm the child component content is different than before
-    expect(childComponent.text()).toBe('Query params: test=elastic')
+    // Confirm the component content is different than before
+    expect(component.text()).toBe('hello Elastic')
   })
 })
