@@ -156,6 +156,12 @@ function getBrowserList(pkg = 'default') {
   let browsers = []
   if (pkg === 'default') {
     browsers = getDefaultBrowsers()
+  } else if (pkg === 'react') {
+    // react router 6 doesn't support IE 11, we get rid of it
+    // https://github.com/remix-run/react-router/issues/8220#issuecomment-961326123
+    return getDefaultBrowsers().filter(
+      browser => browser.browserName != 'internet explorer'
+    )
   } else if (pkg === 'vue') {
     // Vue 3 dropped support for IE 11 and older browsers,
     // so we use modern browsers ro run the tests
