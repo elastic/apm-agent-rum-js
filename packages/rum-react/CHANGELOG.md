@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.4.4...@elastic/apm-rum-react@2.0.0) (2023-08-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* **rum-react:** support react-router 6 (#1410)
+
+### Features
+
+* **rum-react:** support react-router 6 ([#1410](https://github.com/elastic/apm-agent-rum-js/issues/1410)) ([401c9dd](https://github.com/elastic/apm-agent-rum-js/commit/401c9dd18d48663ed199cd30db88e21a3b89038e))
+
+
+
 ### [1.4.4](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@1.4.3...@elastic/apm-rum-react@1.4.4) (2023-08-03)
 
 **Note:** Version bump only for package @elastic/apm-rum-react
