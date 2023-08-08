@@ -39,6 +39,11 @@ function getApmRoutes(apm) {
     const location = useLocation()
     const navigationType = useNavigationType()
 
+    // This effect makes sure the route-change transaction starts before the underlying components are painted
+    // It's essential for POP navigations (when the user clicks the back or forward buttons in the browser)
+    // When using useEffect, the agent was not associating ajax requests to
+    // the route-change transaction. Instead, it was creating a http-request transaction and discarding
+    // the route-change transaction for lack of spans.
     React.useLayoutEffect(
       () => {
         const routes = createRoutesFromChildren(props.children)
