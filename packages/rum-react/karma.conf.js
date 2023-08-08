@@ -24,6 +24,7 @@
  */
 
 const { baseConfig, prepareConfig } = require('../../dev-utils/karma.js')
+const { getBrowserList } = require('../../dev-utils/test-config')
 const {
   getWebpackConfig,
   PACKAGE_TYPES,
@@ -33,7 +34,11 @@ const {
 module.exports = function (config) {
   config.set(baseConfig)
   config.set({
-    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.REACT)
+    webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.REACT),
+    customLaunchers: getBrowserList('react').map(launcher => ({
+      ...launcher,
+      base: 'SauceLabs'
+    }))
   })
   const preparedConfig = prepareConfig(config, 'rum-react')
   config.set(preparedConfig)

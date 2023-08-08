@@ -33,7 +33,7 @@ const {
 module.exports = {
   entry: {
     general: path.join(__dirname, 'general.js'),
-    switch: path.join(__dirname, 'switch.js')
+    routes: path.join(__dirname, 'routes.js')
   },
   output: {
     path: path.resolve(__dirname),

@@ -23,49 +23,31 @@
  *
  */
 
-import '@babel/polyfill'
-import 'whatwg-fetch'
-import React, { Suspense } from 'react'
-import { render } from 'react-dom'
-import { BrowserRouter, Link, Switch } from 'react-router-dom'
-import FunctionalComponent from '../components/func-component'
-import { ApmRoute } from '../../../src'
-import createApmBase from '..'
+import React from 'react'
+import { afterFrame } from '@elastic/apm-rum-core'
 
-const apm = createApmBase({
-  logLevel: 'debug',
-  serviceName: 'apm-agent-rum-switch-e2e-react',
-  serviceVersion: '0.0.1',
-  pageLoadTransactionName: '/notfound'
-})
-const NotFound = () => <div>Not Found</div>
-
-function App() {
-  return (
-    <React.Fragment>
-      <ul>
-        <li>
-          <Link id="functional" to="/func">
-            Functional
-          </Link>
-        </li>
-      </ul>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Switch>
-          <ApmRoute path="/func" component={FunctionalComponent} />
-          <ApmRoute component={NotFound} />
-        </Switch>
-      </Suspense>
-    </React.Fragment>
-  )
+function useFinishTransactionEffect(transaction) {
+  /**
+   * React guarantees the parent component effects are run after the child components effects
+   * So once all the child components effects are run, we run the detectFinish logic
+   * which ensures if the transaction can be completed or not.
+   */
+  React.useEffect(() => {
+    afterFrame(() => {
+      transaction && transaction.detectFinish()
+    })
+    return () => {
+      /**
+       * Incase the transaction is never ended, we check if the transaction
+       * can be closed during unmount phase
+       *
+       * We call detectFinish instead of forcefully ending the transaction
+       * since it could be a redirect route and we might prematurely close
+       * the currently running transaction
+       */
+      transaction && transaction.detectFinish()
+    }
+  }, [])
 }
 
-render(
-  <BrowserRouter basename="/test/e2e/with-router/">
-    <App />
-  </BrowserRouter>,
-  document.getElementById('app'),
-  () => {
-    apm.getCurrentTransaction().detectFinish()
-  }
-)
+export { useFinishTransactionEffect }

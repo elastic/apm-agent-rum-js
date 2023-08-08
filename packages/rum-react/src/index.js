@@ -25,9 +25,9 @@
 
 import { apm } from '@elastic/apm-rum'
 import { getWithTransaction } from './get-with-transaction'
-import { getApmRoute } from './get-apm-route'
+import { getApmRoutes } from './get-apm-routes'
 
 const withTransaction = getWithTransaction(apm)
-const ApmRoute = getApmRoute(apm)
+const ApmRoutes = getApmRoutes(apm)
 
-export { withTransaction, ApmRoute }
+export { withTransaction, ApmRoutes }

@@ -44,7 +44,7 @@ class TopicComponent extends React.Component {
     return (
       <div>
         <h3>
-          <span>{this.props.match.path}</span>
+          <span>{this.props.path}</span>
         </h3>
         <span>{this.state.userName}</span>
       </div>

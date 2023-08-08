@@ -27,11 +27,17 @@ import '@babel/polyfill'
 import 'whatwg-fetch'
 import React, { Suspense, lazy } from 'react'
 import { render } from 'react-dom'
-import { BrowserRouter, Route, Link, Redirect } from 'react-router-dom'
+import {
+  BrowserRouter,
+  Route,
+  Link,
+  Navigate,
+  useLocation
+} from 'react-router-dom'
 import MainComponent from '../components/main-component'
 import TopicComponent from '../components/topic-component'
 import FunctionalComponent from '../components/func-component'
-import { ApmRoute } from '../../../src'
+import { ApmRoutes } from '../../../src'
 import createApmBase from '..'
 
 const apm = createApmBase({
@@ -55,6 +61,10 @@ const ManualComponent = lazy(() => {
   })
 })
 
+const RedirectComponent = () => {
+  const location = useLocation()
+  return <Navigate to={`/home`} replace state={{ location }} />
+}
 class App extends React.Component {
   render() {
     return (
@@ -84,30 +94,28 @@ class App extends React.Component {
           </ul>
 
           <hr />
-          <ApmRoute
-            exact
-            path="/"
-            component={() => (
-              <Redirect
-                to={{
-                  pathname: '/home'
-                }}
-              />
-            )}
-          />
-          <ApmRoute path="/home" component={MainComponent} />
-          <Route path="/about" render={() => <div>about</div>} />
-          <ApmRoute path="/func" component={FunctionalComponent} />
-          <ApmRoute path="/topics" component={TopicComponent} />
-          <ApmRoute path="/topic/:id" component={TopicComponent} />
-          <Route
-            path="/manual"
-            component={() => (
-              <Suspense fallback={<div>Loading...</div>}>
-                <ManualComponent />
-              </Suspense>
-            )}
-          />
+          <ApmRoutes>
+            <Route path="/" element={<RedirectComponent />} />
+            <Route path="/home" element={<MainComponent path="/home" />} />
+            <Route
+              path="/func"
+              element={<FunctionalComponent path="/func" />}
+            />
+            <Route path="/topics" element={<TopicComponent path="/topics" />} />
+            <Route
+              path="/topic/:id"
+              element={<TopicComponent path="/topic/:id" />}
+            />
+            <Route path="/about" element={<div>about</div>} />
+            <Route
+              path="/manual"
+              element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <ManualComponent />
+                </Suspense>
+              }
+            />
+          </ApmRoutes>
         </div>
         <div id="test-element">Passed</div>
       </div>

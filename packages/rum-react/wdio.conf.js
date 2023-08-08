@@ -24,5 +24,10 @@
  */
 
 const { getWebdriveBaseConfig } = require('../../dev-utils/webdriver')
+const { getBrowserList } = require('../../dev-utils/test-config')
 
-exports.config = getWebdriveBaseConfig(__dirname)
+exports.config = getWebdriveBaseConfig(
+  __dirname,
+  './test/e2e/**/*.e2e-spec.js',
+  getBrowserList('react')
+)

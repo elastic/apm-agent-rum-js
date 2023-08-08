@@ -28,7 +28,7 @@ import React from 'react'
 class MainComponent extends React.Component {
   constructor(props) {
     super(props)
-    var path = this.props.match.path
+    var path = this.props.path
     this.state = {
       userName: '',
       path

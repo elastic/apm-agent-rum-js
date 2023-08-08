@@ -25,8 +25,8 @@
 
 const { getLastServerCall } = require('../../../../../dev-utils/webdriver')
 
-describe('Using Switch component of react router', function () {
-  beforeAll(() => browser.url('/test/e2e/with-router/switch.html'))
+describe('Using Routes component of react router', function () {
+  beforeAll(() => browser.url('/test/e2e/with-router/routes.html'))
 
   it('should render the react app on route change', function () {
     let sendEvents = getLastServerCall(0, 1).sendEvents
