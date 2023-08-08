@@ -39,6 +39,7 @@ import {
   Route,
   useNavigate,
   useLocation,
+  useSearchParams,
   Navigate
 } from 'react-router-dom'
 import { ApmBase } from '@elastic/apm-rum'
@@ -236,5 +237,60 @@ describe('ApmRoutes', function () {
     )
 
     expect(transactionService.startTransaction).not.toHaveBeenCalled()
+  })
+
+  it('should not start transaction when child changes after a queryparam update', function () {
+    let navigate
+    function ComponentWithChild() {
+      navigate = useNavigate()
+      const [searchParams] = useSearchParams()
+
+      return (
+        <div>
+          <Child params={searchParams.toString()} />
+        </div>
+      )
+    }
+
+    function Child(props) {
+      return <h1>Query params: {props.params}</h1>
+    }
+
+    const ApmRoutes = getApmRoutes(apmBase)
+    const transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
+    spyOn(transactionService, 'startTransaction')
+
+    const rendered = mount(
+      <Router>
+        <ApmRoutes initialEntries={['/', 'home']}>
+          <Route path="/" element={<ComponentWithChild />}></Route>
+          <Route path="/home" element={<ComponentWithChild />}></Route>
+        </ApmRoutes>
+      </Router>
+    )
+
+    // Navigate to home
+    navigate('/home')
+    expect(transactionService.startTransaction).toHaveBeenCalledWith(
+      '/home',
+      'route-change',
+      {
+        canReuse: true,
+        managed: true
+      }
+    )
+
+    var childComponent = rendered.find(Child)
+    expect(childComponent.text()).toBe('Query params: ')
+
+    transactionService.startTransaction.calls.reset()
+
+    // Update query param
+    navigate('?test=elastic')
+
+    expect(transactionService.startTransaction).not.toHaveBeenCalled()
+
+    // Confirm the child component content is different than before
+    expect(childComponent.text()).toBe('Query params: test=elastic')
   })
 })
