@@ -20,16 +20,53 @@ npm install @elastic/apm-rum-react --save
 The React integration package provides two approaches to instrumenting your application:
 
 [float]
-===== Instrumenting application routes
+===== Instrumenting application routes with @elastic/apm-rum-react >= 2.0.0
+
+To instrument the application routes, you can use `ApmRoutes` component provided in the package.
+`ApmRoutes` creates a transaction that has the path of the `Route` as its name and has `route-change`
+as its type.
+
+NOTE: `ApmRoutes` only supports applications using version `6` of the
+https://github.com/remix-run/react-router[`react-router`] library.
+
+NOTE: `RouterProvider` instrumentation is not currently supported.
+
+First import `ApmRoutes` from the `@elastic/apm-rum-react` package:
+
+[source,js]
+----
+import { ApmRoutes } from '@elastic/apm-rum-react'
+----
+
+Then, use the `ApmRoutes` component from the `react-router` library. Every `<Route>` wrapped by `<ApmRoutes>` will be monitored.
+
+[source,js]
+----
+class App extends React.Component {
+  render() {
+    return (
+      <BrowserRouter>
+        <ApmRoutes>
+          <Route path="/" element={<HomeComponent />} />
+          <Route path="/about" element={<AboutComponent />} />
+        </ApmRoutes>
+      </BrowserRouter>
+    )
+  }
+}
+----
+
+[float]
+===== Instrumenting application routes with @elastic/apm-rum-react < 2.0.0
 
 To instrument the application routes, you can use `ApmRoute` component provided in the package. 
 `ApmRoute` creates a transaction that has the path of the `Route` as its name and has `route-change`
 as its type.
 
-NOTE: Currently `ApmRoute` only supports applications using 
-https://github.com/ReactTraining/react-router[`react-router`] library.
+NOTE: `ApmRoute` only supports applications using versions `4` and `5` of the
+https://github.com/remix-run/react-router[`react-router`] library.
 
-First you should import `ApmRoute` from the `@elastic/apm-rum-react` package:
+First import `ApmRoute` from the `@elastic/apm-rum-react` package:
 
 [source,js]
 ----
@@ -74,7 +111,7 @@ please instrument the individual component using `withTransaction` in these case
 [float]
 ===== Instrumenting individual React components
 
-First you should import `withTransaction` from the `@elastic/apm-rum-react` package:
+First import `withTransaction` from the `@elastic/apm-rum-react` package:
 
 [source,js]
 ----
