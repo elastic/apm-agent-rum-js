@@ -80,7 +80,8 @@ describe('ErrorLogging', function () {
       error.anObject = obj
       error.aFunction = function noop() {}
       error.null = null
-      errorLogging.logErrorEvent({ error })
+      const labels = { severity: 1 }
+      errorLogging.logErrorEvent({ error }, { labels })
       const events = getEvents()
       expect(events.length).toBe(1)
       const errorData = events[0][ERRORS]
@@ -89,6 +90,7 @@ describe('ErrorLogging', function () {
       expect(errorData.context.custom.anObject).toBeUndefined()
       expect(errorData.context.custom.aFunction).toBeUndefined()
       expect(errorData.context.custom.null).toBeUndefined()
+      expect(errorData.context.tags.severity).toBe(1)
 
       clearQueue()
       apmServer

@@ -76,7 +76,7 @@ class ErrorLogging {
   /**
    * errorEvent = { message, filename, lineno, colno, error }
    */
-  createErrorDataModel(errorEvent) {
+  createErrorDataModel(errorEvent, options) {
     const frames = createStackTraces(stackParser, errorEvent)
     const filteredFrames = filterInvalidFrames(frames)
 
@@ -98,6 +98,10 @@ class ErrorLogging {
       if (customProperties) {
         errorContext.custom = customProperties
       }
+    }
+
+    if (options && typeof options.labels === 'object') {
+      errorContext.tags = options.labels
     }
 
     if (!errorType) {
@@ -150,11 +154,11 @@ class ErrorLogging {
     return truncateModel(ERROR_MODEL, errorObject)
   }
 
-  logErrorEvent(errorEvent) {
+  logErrorEvent(errorEvent, options) {
     if (typeof errorEvent === 'undefined') {
       return
     }
-    var errorObject = this.createErrorDataModel(errorEvent)
+    var errorObject = this.createErrorDataModel(errorEvent, options)
     if (typeof errorObject.exception.message === 'undefined') {
       return
     }
@@ -202,14 +206,14 @@ class ErrorLogging {
     this.logErrorEvent(errorEvent)
   }
 
-  logError(messageOrError) {
+  logError(messageOrError, options) {
     let errorEvent = {}
     if (typeof messageOrError === 'string') {
       errorEvent.message = messageOrError
     } else {
       errorEvent.error = messageOrError
     }
-    return this.logErrorEvent(errorEvent)
+    return this.logErrorEvent(errorEvent, options)
   }
 }
 
