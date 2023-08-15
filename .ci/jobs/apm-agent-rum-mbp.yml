@@ -1,5 +1,0 @@
----
-- job:
-    name: apm-agent-rum/apm-agent-rum-mbp
-    display-name: APM Agent RUM
-    description: Elastic APM Real User Monitoring (RUM) JavaScript agent
