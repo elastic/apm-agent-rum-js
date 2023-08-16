@@ -2,7 +2,7 @@
 
 === `Agent` API
 
-You can access agent API after initializing the agent: 
+You can access agent API after initializing the agent:
 
 [source,js]
 ----
@@ -45,7 +45,7 @@ The given `context` argument must be an object and can contain the following pro
 
 The provided user context is stored under `context.user` in Elasticsearch on both errors and transactions.
 
-It’s possible to call this function multiple times within the scope of the same active transaction. 
+It’s possible to call this function multiple times within the scope of the same active transaction.
 For each call, the properties of the context argument are shallow merged with the context previously given.
 
 
@@ -62,7 +62,7 @@ Call this to enrich collected errors and transactions with any information that 
 
 The provided custom context is stored under `context.custom` in Elasticsearch on both errors and transactions.
 
-It’s possible to call this function multiple times within the scope of the same active transaction. 
+It’s possible to call this function multiple times within the scope of the same active transaction.
 For each call, the properties of the context argument are shallow merged with the context previously given.
 
 The given `context` argument must be an object and can contain any property that can be JSON encoded.
@@ -153,12 +153,12 @@ Arguments:
 
 * `type` - The type of the transaction (string). Defaults to `custom`
 
-* `options` - Options to modify the created transaction (object). 
+* `options` - Options to modify the created transaction (object).
 This argument is optional. The following options are supported:
 
 ** `managed` - Controls whether the transaction is managed by the agent or not. Defaults to `false`.
 
-Use this method to create a custom transaction. 
+Use this method to create a custom transaction.
 
 By default, custom transactions are not managed by the agent, however, you can start a managed transaction
  by passing `{ managed: true }` as the `options` argument.
@@ -245,12 +245,17 @@ Use this method to get the current active transaction. If there is no active tra
 
 [source,js]
 ----
-apm.captureError(error)
+apm.captureError(error, options)
 ----
 
 Arguments:
 
 * `error` - An instance of `Error`.
+
+* `options` - Options to modify the captured error (object).
+This argument is optional. The following options are supported:
+
+** `labels` - Key/value pairs of labels to add to the error.
 
 Use this method to manually send an error to APM Server:
 
@@ -276,11 +281,11 @@ Arguments:
 * `callback` - A callback function to execute once the event is fired.
 
 
-Use this method to listen for RUM agent internal events. 
+Use this method to listen for RUM agent internal events.
 
 The following events are supported for the transaction lifecycle:
 
-* `transaction:start` event is fired on every transaction start. 
+* `transaction:start` event is fired on every transaction start.
 * `transaction:end` event is fired on transaciton end and before it is added to the queue to be sent to APM Server.
 
 The callback function for these events receives the corresponding transaction object
