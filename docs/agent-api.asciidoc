@@ -281,7 +281,7 @@ Use this method to listen for RUM agent internal events.
 The following events are supported for the transaction lifecycle:
 
 * `transaction:start` event is fired on every transaction start. 
-* `transaction:end` event is fired on transaciton end and before it is added to the queue to be sent to APM Server.
+* `transaction:end` event is fired on transaction end and before it is added to the queue to be sent to APM Server.
 
 The callback function for these events receives the corresponding transaction object
  as its only argument. The transaction object can be modified through
