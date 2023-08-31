@@ -2,7 +2,7 @@
 == Source Maps
 
 TIP: Additional information on the source map endpoint is available in the
-APM Server's {apm-guide-ref}//source-map-how-to.html[source map documentation].
+APM Server's {apm-guide-ref}/source-map-how-to.html[source map documentation].
 Don't forget, you must enable {apm-guide-ref}/input-apm.html[RUM support] in the APM Server for this endpoint to work.
 
 It's a common practice to minify JavaScript bundles.
