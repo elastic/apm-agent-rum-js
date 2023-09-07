@@ -39,6 +39,8 @@ Access-Control-Allow-Origin: *
 Access-Control-Allow-Origin: your page's origin
 ----
 
+NOTE: `Access-Control-Allow-Origin: *` will not match `localhost` in some browsers (e.g. https://bugs.chromium.org/p/chromium/issues/detail?id=67743[in Chrome]), causing `Script error` messages in local development environments when the configuration is otherwise correct.
+
 TIP: To learn more about how browsers handle script errors, see the MDN page on the https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror#notes[onerror] event.
 
 
