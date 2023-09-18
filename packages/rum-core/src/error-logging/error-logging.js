@@ -33,6 +33,7 @@ import stackParser from 'error-stack-parser'
  * List of keys to be ignored from getting added to custom error properties
  */
 const IGNORE_KEYS = ['stack', 'message']
+const PROMISE_REJECTION_PREFIX = 'Unhandled promise rejection: '
 
 function getErrorProperties(error) {
   /**
@@ -172,7 +173,6 @@ class ErrorLogging {
   }
 
   logPromiseEvent(promiseRejectionEvent) {
-    const prefix = 'Unhandled promise rejection: '
     let { reason } = promiseRejectionEvent
     if (reason == null) {
       reason = '<no reason specified>'
@@ -186,18 +186,10 @@ class ErrorLogging {
       const name = reason.name ? reason.name + ': ' : ''
       errorEvent = {
         error: reason,
-        message: prefix + name + reason.message
+        message: PROMISE_REJECTION_PREFIX + name + reason.message
       }
     } else {
-      reason =
-        typeof reason === 'object'
-          ? '<object>'
-          : typeof reason === 'function'
-          ? '<function>'
-          : reason
-      errorEvent = {
-        message: prefix + reason
-      }
+      errorEvent = this._parseRejectReason(reason)
     }
     this.logErrorEvent(errorEvent)
   }
@@ -210,6 +202,32 @@ class ErrorLogging {
       errorEvent.error = messageOrError
     }
     return this.logErrorEvent(errorEvent)
+  }
+
+  _parseRejectReason(reason) {
+    const errorEvent = {
+      message: PROMISE_REJECTION_PREFIX
+    }
+
+    if (Array.isArray(reason)) {
+      errorEvent.message += '<object>'
+    } else if (typeof reason === 'object') {
+      try {
+        errorEvent.message += JSON.stringify(reason)
+        errorEvent.error = reason
+      } catch (error) {
+        // fallback. JSON.stringify can throw exceptions in different circumstances.
+        // please, see this link for more info:
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#exceptions
+        errorEvent.message += '<object>'
+      }
+    } else if (typeof reason === 'function') {
+      errorEvent.message += '<function>'
+    } else {
+      errorEvent.message += reason
+    }
+
+    return errorEvent
   }
 }
 

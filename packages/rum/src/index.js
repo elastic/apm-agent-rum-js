@@ -50,6 +50,7 @@ function getApmBase() {
 }
 
 const apmBase = getApmBase()
+
 const init = apmBase.init.bind(apmBase)
 
 export default init
