@@ -91,7 +91,7 @@ function getDefaultBrowsers() {
     },
     {
       browserName: 'internet explorer',
-      platformName: 'Windows 8.1',
+      platformName: 'Windows 10',
       browserVersion: '11'
     },
     {
