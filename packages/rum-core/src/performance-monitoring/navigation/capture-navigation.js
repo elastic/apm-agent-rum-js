@@ -42,6 +42,10 @@ function captureNavigation(transaction) {
    * transactions set this flag to true
    */
   if (!transaction.captureTimings) {
+    if (transaction.type === PAGE_LOAD) {
+      // Unsampled page-load transactions should also start at the beginning of navigation
+      transaction._start = 0
+    }
     return
   }
 
