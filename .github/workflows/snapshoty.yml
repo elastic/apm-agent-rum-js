@@ -21,6 +21,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
+      - run: npm ci
       - run: npm run package:snapshot
 
       - name: Publish snaphosts
