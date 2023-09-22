@@ -26,29 +26,31 @@
 const { getLastServerCall } = require('../../../../../dev-utils/webdriver')
 
 describe('Using Routes component of react router', function () {
-  beforeAll(() => browser.url('/test/e2e/with-router/routes.html'))
+  beforeAll(async () => {
+    await browser.url('/test/e2e/with-router/routes.html')
+  })
 
-  it('should render the react app on route change', function () {
-    let sendEvents = getLastServerCall(0, 1).sendEvents
-    let [pageLoadTransaction] = sendEvents.transactions
+  it('should render the react app on route change', async () => {
+    let result = await getLastServerCall(0, 1)
+    let [pageLoadTransaction] = result.sendEvents.transactions
 
     expect(pageLoadTransaction.type).toBe('page-load')
     expect(pageLoadTransaction.name).toBe('/notfound')
-    browser.waitUntil(
-      () => {
+    await browser.waitUntil(
+      async () => {
         /**
          * Click a link to trigger the rendering of functional componnet
          */
-        $('#functional').click()
-        const componentContainer = $('#func-container')
-        return componentContainer.getText().indexOf('/func') !== -1
+        await $('#functional').click()
+        const componentContainer = await $('#func-container')
+        return (await componentContainer.getText()).indexOf('/func') !== -1
       },
       5000,
       'expected functional component to be rendered'
     )
 
-    sendEvents = getLastServerCall(0, 1).sendEvents
-    let [routeTransaction] = sendEvents.transactions
+    result = await getLastServerCall(0, 1)
+    let [routeTransaction] = result.sendEvents.transactions
 
     expect(routeTransaction.name).toBe('/func')
     expect(routeTransaction.type).toBe('route-change')
