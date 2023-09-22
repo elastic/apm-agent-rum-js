@@ -27,7 +27,7 @@ const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
 const { Server } = require('karma')
-const { default: Launcher } = require('@wdio/cli')
+const { Launcher } = require('@wdio/cli')
 const sauceConnectLauncher = require('sauce-connect-launcher')
 const JasmineRunner = require('jasmine')
 
