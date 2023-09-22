@@ -203,6 +203,9 @@ function getCommonWebpackConfig(bundleType, packageType) {
     performance: {
       hints: false
     },
+    output: {
+      hashFunction: 'xxhash64'
+    },
     module: {
       rules: [
         {
