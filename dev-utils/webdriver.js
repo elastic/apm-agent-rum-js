@@ -247,14 +247,14 @@ function isPageLoaded() {
   })
 }
 
-function getLastServerCall(errorCount = 0, transactionCount = 0) {
+async function getLastServerCall(errorCount = 0, transactionCount = 0) {
   const { name = '', version = '' } = getBrowserInfo()
   console.log(
     `Waiting for minimum ${errorCount} Errors and ${transactionCount} Transactions in`,
     name,
     version
   )
-  const serverCalls = browser.executeAsync(
+  const serverCalls = await browser.executeAsync(
     function (errorCount, transactionCount, done) {
       var apmServerMock = window.elasticApm.serviceFactory.getService(
         'ApmServer'
@@ -350,8 +350,8 @@ function getBrowserInfo() {
   }
 }
 
-function getBrowserFeatures() {
-  return browser.executeAsync(function (done) {
+async function getBrowserFeatures() {
+  return await browser.executeAsync(function (done) {
     done({
       EventTarget: !!window.EventTarget
     })
