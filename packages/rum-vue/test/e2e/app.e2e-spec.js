@@ -26,31 +26,33 @@
 const { getLastServerCall } = require('../../../../dev-utils/webdriver')
 
 describe('Vue router integration', function () {
-  beforeAll(() => browser.url('/test/e2e/'))
+  beforeAll(async () => {
+    await browser.url('/test/e2e/')
+  })
 
-  it('should run vue app and capture route-change events', function () {
-    let sendEvents = getLastServerCall(0, 1).sendEvents
-    const [pageLoadTransaction] = sendEvents.transactions
+  it('should run vue app and capture route-change events', async () => {
+    let result = await getLastServerCall(0, 1)
+    const [pageLoadTransaction] = result.sendEvents.transactions
 
     expect(pageLoadTransaction.type).toBe('page-load')
     expect(pageLoadTransaction.name).toBe('/')
     expect(pageLoadTransaction.spans.length).toBeGreaterThan(1)
 
-    browser.waitUntil(
-      () => {
+    await browser.waitUntil(
+      async () => {
         /**
          * route to /fetch
          */
-        $('#fetch').click()
-        const fetchResult = $('#content')
-        return fetchResult.getText().indexOf('loaded data.json') !== -1
+        await $('#fetch').click()
+        const fetchResult = await $('#content')
+        return (await fetchResult.getText()).indexOf('loaded data.json') !== -1
       },
       5000,
       'expected data.json to be loaded'
     )
 
-    sendEvents = getLastServerCall(0, 1).sendEvents
-    const [routeTransaction] = sendEvents.transactions
+    result = await getLastServerCall(0, 1)
+    const [routeTransaction] = result.sendEvents.transactions
 
     expect(routeTransaction.name).toBe('/fetch')
     expect(routeTransaction.type).toBe('route-change')
@@ -63,17 +65,19 @@ describe('Vue router integration', function () {
 })
 
 describe('Script setup syntax', function () {
-  beforeAll(() => browser.url('/test/e2e/'))
+  beforeAll(async () => {
+    await browser.url('/test/e2e/')
+  })
 
-  it('should be supported', function () {
-    browser.waitUntil(
-      () => {
+  it('should be supported', async () => {
+    await browser.waitUntil(
+      async () => {
         /**
          * route to /syntax
          */
-        $('#syntax').click()
-        const supportResult = $('#script-setup-syntax-support')
-        return supportResult.getText() === 'true'
+        await $('#syntax').click()
+        const supportResult = await $('#script-setup-syntax-support')
+        return (await supportResult.getText()) === 'true'
       },
       5000,
       'expected script setup syntax to be supported'
