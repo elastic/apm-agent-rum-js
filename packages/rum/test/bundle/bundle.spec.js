@@ -27,7 +27,8 @@ const { join } = require('path')
 const webpack = require('webpack')
 const {
   getWebpackConfig,
-  BUNDLE_TYPES
+  BUNDLE_TYPES,
+  WEBPACK_HASH_FN
 } = require('../../../../dev-utils/build')
 const rimraf = require('rimraf')
 
@@ -58,7 +59,8 @@ function getConfig(entry) {
     output: {
       path: BUNDLE_DIST_DIR,
       filename: 'bundle.js',
-      libraryTarget: 'umd'
+      libraryTarget: 'umd',
+      hashFunction: WEBPACK_HASH_FN
     },
     ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD)
   }

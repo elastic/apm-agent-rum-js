@@ -32,7 +32,8 @@ const webpack = require('webpack')
 const TerserPlugin = require('terser-webpack-plugin')
 const {
   getWebpackConfig,
-  BUNDLE_TYPES
+  BUNDLE_TYPES,
+  WEBPACK_HASH_FN
 } = require('../../../../dev-utils/build')
 const { runs, noOfImages } = require('./config')
 
@@ -49,7 +50,8 @@ function customApmBuild(filename) {
       filename,
       path: path.join(dist, 'bundles'),
       library: '[name]',
-      libraryTarget: 'umd'
+      libraryTarget: 'umd',
+      hashFunction: WEBPACK_HASH_FN
     },
     ...getWebpackConfig(BUNDLE_TYPES.BROWSER_ESM_PROD),
     ...{

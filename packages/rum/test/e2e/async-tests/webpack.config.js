@@ -28,7 +28,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { getGlobalConfig } = require('../../../../../dev-utils/test-config')
 const {
   getWebpackConfig,
-  BUNDLE_TYPES
+  BUNDLE_TYPES,
+  WEBPACK_HASH_FN
 } = require('../../../../../dev-utils/build')
 
 const { serverUrl, mockBackendUrl } = getGlobalConfig().testConfig
@@ -38,7 +39,8 @@ module.exports = {
   entry: path.join(__dirname, 'app.js'),
   output: {
     path: path.resolve(__dirname),
-    filename: 'app.e2e-bundle.min.js'
+    filename: 'app.e2e-bundle.min.js',
+    hashFunction: WEBPACK_HASH_FN
   },
   ...commonConfig,
   plugins: [

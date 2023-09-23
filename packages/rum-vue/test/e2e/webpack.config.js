@@ -27,7 +27,8 @@ const path = require('path')
 const {
   getWebpackConfig,
   BUNDLE_TYPES,
-  PACKAGE_TYPES
+  PACKAGE_TYPES,
+  WEBPACK_HASH_FN
 } = require('../../../../dev-utils/build')
 
 module.exports = {
@@ -36,7 +37,8 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname),
-    filename: 'app.e2e-bundle.js'
+    filename: 'app.e2e-bundle.js',
+    hashFunction: WEBPACK_HASH_FN
   },
   ...getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.VUE)
 }
