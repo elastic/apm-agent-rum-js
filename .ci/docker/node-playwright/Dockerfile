@@ -1,19 +1,22 @@
+#Dockerfile for docker.elastic.co/observability-ci/node-playwright:${NODEJS_VERSION}
+# When changing Node version, please build the Docker image for RUM here:
+#   https://apm-ci.elastic.co/job/apm-shared/job/apm-docker-images-pipeline/build?delay=0sec
+# Remember checking the 'rum' parameter
 # Little bit customized version of microsoft/playwright:bionic image
 ARG NODEJS_VERSION
-FROM ubuntu:jammy
+FROM ubuntu:bionic
 # this second declaration is needed because ARG before FROM works differently. See https://docs.docker.com/compose/compose-file/#args
 ARG NODEJS_VERSION
 
 # 1. Install node
- RUN apt-get update && apt-get install -y ca-certificates curl gnupg && \
- mkdir -p /etc/apt/keyrings && \
- curl -sL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
- echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODEJS_VERSION.x nodistro main" | \
- tee /etc/apt/sources.list.d/nodesource.list && \
- apt-get update && apt-get install nodejs -y && \
- rm -rf /etc/apt/keyrings && rm /etc/apt/sources.list.d/nodesource.list
+RUN apt-get -qq update && apt-get -qq install -y curl && \
+    curl -sL https://deb.nodesource.com/setup_${NODEJS_VERSION}.x | bash - && \
+    apt-get -qq install -y nodejs
 
-# 2. Install Browser (Chrome, Firefox and Webkit) dependencies
+# 2. Install git (used to tag commit in benchmark runner)
+RUN apt-get -qq install -y git --no-install-recommends
+
+# 3. Install Browser (Chrome, Firefox and Webkit) dependencies
 RUN apt-get -qq install -y  --no-install-recommends \
     fonts-liberation \
     libasound2  \
@@ -21,7 +24,6 @@ RUN apt-get -qq install -y  --no-install-recommends \
     libatk1.0-0 \
     libatspi2.0-0 \
     libcairo2 \
-    libpango-1.0 \
     libcups2 \
     libdbus-1-3 \
     libdrm2 \
@@ -43,7 +45,7 @@ RUN apt-get -qq install -y  --no-install-recommends \
     libxshmfence1 \
     xvfb \
     fonts-noto-color-emoji \
-    fonts-unifont \
+    ttf-unifont \
     libfontconfig \
     libfreetype6 \
     xfonts-cyrillic \
@@ -51,7 +53,7 @@ RUN apt-get -qq install -y  --no-install-recommends \
     fonts-ipafont-gothic \
     fonts-wqy-zenhei \
     fonts-tlwg-loma-otf \
-    fonts-freefont-ttf \
+    ttf-ubuntu-font-family \
     ffmpeg \
     libcairo-gobject2 \
     libdbus-glib-1-2 \
@@ -69,7 +71,7 @@ RUN apt-get -qq install -y  --no-install-recommends \
     gstreamer1.0-plugins-base \
     gstreamer1.0-plugins-good \
     libbrotli1 \
-    libenchant-2-dev \
+    libenchant1c2a \
     libepoxy0 \
     libevdev2 \
     libgl1 \
@@ -79,41 +81,23 @@ RUN apt-get -qq install -y  --no-install-recommends \
     libharfbuzz-icu0 \
     libharfbuzz0b \
     libhyphen0 \
-    libicu-dev \
+    libicu60 \
     libjpeg-turbo8 \
     libnotify4 \
     libopenjp2-7 \
     libopus0 \
     libpng16-16 \
     libsecret-1-0 \
-    libvpx-dev \
+    libvpx5 \
     libwayland-client0 \
     libwayland-egl1 \
     libwayland-server0 \
-    libwebp-dev \
+    libwebp6 \
     libwebpdemux2 \
     libwoff1 \
     libxkbcommon0 \
     libxml2 \
-    libxslt1.1 \
-    libc6 \
-    libexpat1 \
-    libgcc1 \
-    libstdc++6 \
-    libxss1 \
-    libxtst6
-
-
-# 3. the node-gyp we use is only compatible with Python versions less than 3.10,
-# so we need to make sure we use a previous version
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get -qq install -y software-properties-common g++ build-essential && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get -qq install -y python3.9
-
-# 3.1 make python 3.9 the default version (for python and for python3)
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+    libxslt1.1
 
 # 4. Install Chrome stable to run karma benchmark tests inside puppeteer
 # before we were using the Chrome unstable, but with the unstable one the benchmarks were failing, karma launcher was crashing.
