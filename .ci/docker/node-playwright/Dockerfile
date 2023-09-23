@@ -104,24 +104,28 @@ RUN apt-get -qq install -y  --no-install-recommends \
     libxtst6
 
 
-# 3. Install Chromium to run karma benchmark tests inside puppeteer
-# before we were using the Chrome unstable, but with the unstable one the benchmarks were failing, karma launcher was crashing.
-# The error was "Cannot start ChromeHeadless", no more details were provided by the tool.
-RUN apt-get -qq install -y \
-    chromium-browser \
-    fonts-ipafont-gothic \
-    fonts-wqy-zenhei \
-    fonts-thai-tlwg \
-    fonts-kacst \
-    --no-install-recommends
-
-# 4. the node-gyp we use is only compatible with Python versions less than 3.10,
+# 3. the node-gyp we use is only compatible with Python versions less than 3.10,
 # so we need to make sure we use a previous version
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -qq install -y software-properties-common g++ build-essential && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get -qq install -y python3.9
 
-# 4.1 make python 3.9 the default version (for python and for python3)
+# 3.1 make python 3.9 the default version (for python and for python3)
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+
+# 4. Install Chrome stable to run karma benchmark tests inside puppeteer
+# before we were using the Chrome unstable, but with the unstable one the benchmarks were failing, karma launcher was crashing.
+# The error was "Cannot start ChromeHeadless", no more details were provided by the tool.
+RUN apt-get -qq install -y wget --no-install-recommends \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && apt-get -qq update  \
+    && apt-get -qq install -y \
+        google-chrome-stable \
+        fonts-ipafont-gothic \
+        fonts-wqy-zenhei \
+        fonts-thai-tlwg \
+        fonts-kacst \
+        --no-install-recommends
