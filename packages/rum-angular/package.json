@@ -26,7 +26,7 @@
     "test": "NODE_OPTIONS='--openssl-legacy-provider' npm run test:sauce",
     "script": "node ../../dev-utils/run-script.js",
     "karma:dev": "ng test --watch",
-    "karma:coverage": "ng test --code-coverage"
+    "karma:coverage": "NODE_OPTIONS='--openssl-legacy-provider' ng test --code-coverage"
   },
   "dependencies": {
     "@elastic/apm-rum": "file:../rum",
