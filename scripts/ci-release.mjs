@@ -26,7 +26,7 @@
 import * as process from 'node:process'
 import fetch from 'node-fetch'
 import { execa } from 'execa'
-import { writeFile } from 'node:fs/promises'
+import { appendFile } from 'node:fs/promises'
 import * as path from 'node:path'
 
 function raiseError(msg) {
@@ -36,20 +36,21 @@ function raiseError(msg) {
 
 async function gitContext() {
   try {
-    const { stdout: username } = await execa("git", ["config", "user.name"])
-    const { stdout: email } = await execa("git", ["config", "user.email"])
+    const { stdout: username } = await execa('git', ['config', 'user.name'])
+    const { stdout: email } = await execa('git', ['config', 'user.email'])
     return {
-      username: username,
-      email: email
+      username,
+      email
     }
   } catch (err) {
-    raiseError("Failed to extract git context")
+    raiseError('Failed to extract git context')
   }
 }
 
 // Script logic
 async function main() {
-  const isDryRun = process.env.DRY_RUN == null || process.env.DRY_RUN !== 'false'
+  const isDryRun =
+    process.env.DRY_RUN == null || process.env.DRY_RUN !== 'false'
 
   // Extract git context
   const ctx = await gitContext()
@@ -63,76 +64,88 @@ async function main() {
 }
 
 async function dryRunMode() {
-  console.log("Running in dry-run mode")
+  console.log('Running in dry-run mode')
 
-  const registryUrl = process.env.REGISTRY_URL || "http://localhost:4873"
+  const registryUrl = process.env.REGISTRY_URL || 'http://localhost:4873'
   console.log(`Checking local registry url: ${registryUrl}`)
   try {
-    await fetch(registryUrl);
+    await fetch(registryUrl)
   } catch (err) {
     raiseError("The local registry isn't available")
   }
 
   try {
     // Ref: https://github.com/npm/npm-registry-client/blob/856eefea40a2a88618835978e281300e3406924b/lib/adduser.js#L63-L68
-    const response = await fetch(`${registryUrl}/-/user/org.couchdb.user:test`, {
-      method: "PUT",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        name: "test",
-        password: "test",
-        email: "test@elastic.co"
-      })
-    });
+    const response = await fetch(
+      `${registryUrl}/-/user/org.couchdb.user:test`,
+      {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: 'test',
+          password: 'test',
+          email: 'test@elastic.co'
+        })
+      }
+    )
 
-    let npmrcData = "registry=http://localhost:4873\n"
+    let npmrcData = 'registry=http://localhost:4873\n'
     if (response.status === 201) {
       const { token: token } = await response.json()
       npmrcData += `//localhost:4873/:_authToken=${token}\n`
     } else {
-      raiseError("Failed to add user to private registry")
+      raiseError('Failed to add user to private registry')
     }
-
-    await writeFile(path.join(process.cwd(), '.npmrc'), npmrcData)
+    // since we modify the .npmrc (which is a tracked file) in dry-run mode to interact with verdaccio
+    // we don't want lerna to fail with the error "uncommited changes in the workspace".
+    // because of that we tell git to ignore the .npmrc change
+    await execa('git', ['update-index', '--skip-worktree', '.npmrc'], {
+      stdin: process.stdin
+    })
+    await appendFile(path.join(process.cwd(), '.npmrc'), '\n' + npmrcData)
   } catch (err) {
-    raiseError("Failed to login to private registry")
+    raiseError('Failed to login to private registry')
   }
 
   try {
-    await execa("npx", ["lerna", "publish", `--registry=${registryUrl}`, "--no-push", "--yes"], {stdin: process.stdin})
+    await execa(
+      'npx',
+      ['lerna', 'publish', `--registry=${registryUrl}`, '--no-push', '--yes'],
+      { stdin: process.stdin }
+    )
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
   } catch (err) {
-    raiseError("Failed to publish npm packages")
+    raiseError('Failed to publish npm packages')
   }
 
-  await execa("git", ["diff", process.cwd()])
+  await execa('git', ['diff', process.cwd()])
     .pipeStdout(process.stdout)
     .pipeStderr(process.stderr)
 
-  await execa("git", ["log", "-1", "--stat", process.cwd()])
+  await execa('git', ['log', '-1', '--stat', process.cwd()])
     .pipeStdout(process.stdout)
     .pipeStderr(process.stderr)
 }
 
 async function prodMode() {
-  console.log("Running in prod mode")
+  console.log('Running in prod mode')
 
   const totpCode = process.env.TOTP_CODE
-  if (totpCode == null || totpCode === "") {
+  if (totpCode == null || totpCode === '') {
     raiseError("The 'TOTP_CODE' env var isn't defined")
   }
 
   const githubToken = process.env.GITHUB_TOKEN
-  if (githubToken == null || githubToken === "") {
+  if (githubToken == null || githubToken === '') {
     raiseError("The 'GITHUB_TOKEN' env var isn't defined")
   }
 
   try {
-    await execa("npx", ["lerna", "publish", `--otp=${totpCode}`, "--yes"], {
+    await execa('npx', ['lerna', 'publish', `--otp=${totpCode}`, '--yes'], {
       stdin: process.stdin,
       env: {
         GH_TOKEN: githubToken
@@ -141,11 +154,11 @@ async function prodMode() {
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
   } catch (err) {
-    raiseError("Failed to publish npm packages")
+    raiseError('Failed to publish npm packages')
   }
 
   try {
-    await execa("npm", ["run", "github-release"], {
+    await execa('npm', ['run', 'github-release'], {
       stdin: process.stdin,
       env: {
         GITHUB_TOKEN: githubToken
@@ -154,7 +167,7 @@ async function prodMode() {
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
   } catch (err) {
-    raiseError("Failed to publish github release")
+    raiseError('Failed to publish github release')
   }
 }
 
