@@ -188,7 +188,8 @@ services:
         cd /app
         export
         npm install
-        npm install playwright@1.18.1 --unsafe-perm=true --allow-root
+        npm install playwright@1.38.0 --unsage-perm=true --allow-root
+        npx playwright install --with-deps
         set -eo pipefail
         npx lerna run build:module
         node ./scripts/benchmarks.js ${REPORT_FILE}"
