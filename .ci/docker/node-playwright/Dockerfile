@@ -10,7 +10,7 @@ ARG NODEJS_VERSION
 
 # 1. Install node
 RUN apt-get -qq update && apt-get -qq install -y curl && \
-    curl -sL https://deb.nodesource.com/setup_${NODEJS_VERSION}.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get -qq install -y nodejs
 
 # 2. Install git (used to tag commit in benchmark runner)
