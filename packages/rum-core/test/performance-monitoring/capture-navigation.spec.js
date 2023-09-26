@@ -53,7 +53,7 @@ function mapSpan(s) {
 
 describe('Capture hard navigation', function () {
   /**
-   * Arbitrary value considering the transcation end would be called
+   * Arbitrary value considering the transaction end would be called
    * after load event has finished
    */
   const transactionEnd = timings.loadEventEnd + 100
@@ -396,6 +396,25 @@ describe('Capture hard navigation', function () {
     tr.end()
     captureNavigation(tr)
     expect(tr.marks.custom.testMark).toEqual(start + markValue)
+  })
+
+  // relevant for sampled and unsampled PAGE LOAD transactions:
+  ;[
+    {
+      value: true,
+      description: 'enabled'
+    },
+    {
+      value: false,
+      description: 'disabled'
+    }
+  ].forEach(({ value, description }) => {
+    it(`should set transaction._start to 0 for PAGE_LOAD when captureTimings flag is ${description}`, function () {
+      const tr = new Transaction('test', PAGE_LOAD)
+      tr.captureTimings = value
+      captureNavigation(tr)
+      expect(tr._start).toBe(0)
+    })
   })
 
   it('should not add API calls as resource timing spans', function () {
