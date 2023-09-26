@@ -42,8 +42,10 @@ function captureNavigation(transaction) {
    * transactions set this flag to true
    */
   if (!transaction.captureTimings) {
-    // Make sure page load transactions always starts at 0 irrespective if we capture navigation metrics or not
-    // otherwise we would be reporting different page load durations for sampled and unsampled transactions
+    /**
+     * Make sure page load transactions always starts at 0 irrespective if we capture navigation metrics or not
+     * otherwise we would be reporting different page load durations for sampled and unsampled transactions
+     */
     if (transaction.type === PAGE_LOAD) {
       transaction._start = 0
     }
