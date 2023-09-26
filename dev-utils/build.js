@@ -56,6 +56,11 @@ const PACKAGE_TYPES = {
   VUE: 'VUE'
 }
 
+// the default webpack hash doesn't work properly with Node >= 17
+// there will no zero-config solution until webpack 6
+// please, see more info here https://github.com/webpack/webpack/issues/14532#issuecomment-947525539
+const WEBPACK_HASH_FN = 'xxhash64'
+
 // We must exclude `parse5` from the packages we ignore
 // because otherwise it would not be transpiled. Therefore,
 // it would break IE11.
@@ -311,5 +316,6 @@ module.exports = {
   getWebpackConfig,
   getWebpackReleaseConfig,
   BUNDLE_TYPES,
-  PACKAGE_TYPES
+  PACKAGE_TYPES,
+  WEBPACK_HASH_FN
 }

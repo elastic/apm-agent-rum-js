@@ -26,7 +26,8 @@
 const { join, resolve } = require('path')
 const {
   getWebpackConfig,
-  BUNDLE_TYPES
+  BUNDLE_TYPES,
+  WEBPACK_HASH_FN
 } = require('../../../../../dev-utils/build')
 
 module.exports = {
@@ -34,7 +35,8 @@ module.exports = {
   output: {
     filename: 'app.e2e-bundle.min.js',
     path: resolve(__dirname),
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    hashFunction: WEBPACK_HASH_FN
   },
   ...getWebpackConfig(BUNDLE_TYPES.BROWSER_PROD)
 }

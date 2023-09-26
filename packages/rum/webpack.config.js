@@ -26,6 +26,7 @@
 const { join } = require('path')
 const {
   BUNDLE_TYPES,
+  WEBPACK_HASH_FN,
   getWebpackReleaseConfig
 } = require('../../dev-utils/build')
 
@@ -38,6 +39,7 @@ const devConfig = entry => ({
   output: {
     filename: '[name].umd.js',
     path: OUTPUT_DIR,
+    hashFunction: WEBPACK_HASH_FN,
     library: '[name]',
     libraryTarget: 'umd'
   }
@@ -47,7 +49,8 @@ const prodConfig = name => ({
   ...getWebpackReleaseConfig(BUNDLE_TYPES.BROWSER_PROD, name),
   output: {
     filename: '[name].umd.min.js',
-    path: OUTPUT_DIR
+    path: OUTPUT_DIR,
+    hashFunction: WEBPACK_HASH_FN
   }
 })
 

@@ -24,24 +24,25 @@
  */
 
 describe('async-tests', function () {
-  it('should run the usecase', function () {
-    browser.url('/test/e2e/async-tests/async-e2e.html')
+  it('should run the usecase', async () => {
+    await browser.url('/test/e2e/async-tests/async-e2e.html')
 
     // Since the page-load transaction ends after a delay
     // we need to make sure we have the payload before doing the assertions
     let transactionPayload
-    browser.waitUntil(
-      () => {
+    await browser.waitUntil(
+      async () => {
         /**
          * Payload is set in the EJS template.
          * Its not possible to inject the ApmServerMock for standalone
          * tests as the application code is different from the APM Agent bundle code
          */
-        transactionPayload = browser.execute(
+        transactionPayload = await browser.execute(
           'return window.TRANSACTION_PAYLOAD'
         )
 
-        return $('#test-element').getText() === 'Passed' && !!transactionPayload
+        const elem = await $('#test-element')
+        return (await elem.getText()) === 'Passed' && !!transactionPayload
       },
       5000,
       'expected element #test-element and transaction payload'

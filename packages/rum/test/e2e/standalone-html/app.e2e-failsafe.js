@@ -24,34 +24,36 @@
  */
 
 describe('standalone-html', function () {
-  it('should run application without errors for base bundle', function () {
-    browser.url('/test/e2e/standalone-html/index.html')
-    browser.waitUntil(
-      () => {
-        return $('#test-element').getText() === 'Passed'
+  it('should run application without errors for base bundle', async () => {
+    await browser.url('/test/e2e/standalone-html/index.html')
+    await browser.waitUntil(
+      async () => {
+        const elem = await $('#test-element')
+        return (await elem.getText()) === 'Passed'
       },
       10000,
       'expected element #test-element'
     )
 
-    const capturedErrors = browser.execute(function () {
+    const capturedErrors = await browser.execute(function () {
       return window.capturedTestErrors
     })
     console.error('CapturedErrors', capturedErrors)
     expect(capturedErrors.length).toEqual(0)
   })
 
-  it('should run application without errors for opentracing bundle', function () {
+  it('should run application without errors for opentracing bundle', async () => {
     browser.url('/test/e2e/standalone-html/opentracing.html')
     browser.waitUntil(
-      () => {
-        return $('#test-element').getText() === 'Passed'
+      async () => {
+        const elem = await $('#test-element')
+        return (await elem.getText()) === 'Passed'
       },
       10000,
       'expected element #test-element'
     )
 
-    const capturedErrors = browser.execute(function () {
+    const capturedErrors = await browser.execute(function () {
       return window.capturedTestErrors
     })
     console.error('CapturedErrors', capturedErrors)

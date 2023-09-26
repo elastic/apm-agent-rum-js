@@ -72,6 +72,7 @@ process.on('unhandledRejection', reason => {
         const key = `${scenario}.${type}`
         resultMap.set(key, getCommonFields({ browser: type, url, scenario }))
         for (let i = 0; i < runs; i++) {
+          console.log('Launching browser ', type)
           const browser = await launchBrowser(type)
           const metrics = await gatherRawMetrics(browser, url)
           Object.assign(metrics, { scenario: key, url })

@@ -19,14 +19,14 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "ng build --configuration production",
-    "build:e2e": "ng build app --configuration production",
-    "test:unit": "ng test",
-    "test:e2e": "npm run script runE2eTests packages/rum-angular/wdio.conf.js",
-    "test:sauce": "npm run script runSauceTests packages/rum-angular true test:unit build:e2e test:e2e",
-    "test": "npm run test:sauce",
+    "build:e2e": "NODE_OPTIONS='--openssl-legacy-provider' ng build app --configuration production",
+    "test:unit": "NODE_OPTIONS='--openssl-legacy-provider' ng test",
+    "test:e2e": "NODE_OPTIONS='--openssl-legacy-provider' npm run script runE2eTests packages/rum-angular/wdio.conf.js",
+    "test:sauce": "NODE_OPTIONS='--openssl-legacy-provider' npm run script runSauceTests packages/rum-angular true test:unit build:e2e test:e2e",
+    "test": "NODE_OPTIONS='--openssl-legacy-provider' npm run test:sauce",
     "script": "node ../../dev-utils/run-script.js",
     "karma:dev": "ng test --watch",
-    "karma:coverage": "ng test --code-coverage"
+    "karma:coverage": "NODE_OPTIONS='--openssl-legacy-provider' ng test --code-coverage"
   },
   "dependencies": {
     "@elastic/apm-rum": "file:../rum",
