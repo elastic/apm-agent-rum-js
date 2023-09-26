@@ -108,6 +108,7 @@ jobs:
         run: echo "versions=$(npm run --silent ci:prepare-release)" >> ${GITHUB_OUTPUT}
 
       - id: 'upload-files-version'
+        if: inputs.dry-run == false
         uses: 'google-github-actions/upload-cloud-storage@v1'
         with:
           parent: false
@@ -117,6 +118,7 @@ jobs:
           process_gcloudignore: false
 
       - id: 'upload-files-major-version'
+        if: inputs.dry-run == false
         uses: 'google-github-actions/upload-cloud-storage@v1'
         with:
           parent: false
@@ -126,6 +128,7 @@ jobs:
           process_gcloudignore: false
 
       - id: 'upload-file-index'
+        if: inputs.dry-run == false
         uses: 'google-github-actions/upload-cloud-storage@v1'
         with:
           parent: false
