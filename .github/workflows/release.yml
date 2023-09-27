@@ -142,22 +142,22 @@ jobs:
           headers: |-
             cache-control: public,max-age=604800,immutable
 
-  status:
-    if: always()
-    needs:
-      - release
-    runs-on: ubuntu-latest
-    steps:
-      - id: check
-        uses: elastic/apm-pipeline-library/.github/actions/check-dependent-jobs@current
-        with:
-          needs: ${{ toJSON(needs) }}
-      - uses: elastic/apm-pipeline-library/.github/actions/notify-build-status@current
-        if: inputs.dry-run == false
-        with:
-          status: ${{ steps.check.outputs.status }}
-          vaultUrl: ${{ secrets.VAULT_ADDR }}
-          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
-          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-          slackChannel: "#apm-agent-js"
-          message: "Build result for release publication"
+  # status:
+  #   if: always()
+  #   needs:
+  #     - release
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - id: check
+  #       uses: elastic/apm-pipeline-library/.github/actions/check-dependent-jobs@current
+  #       with:
+  #         needs: ${{ toJSON(needs) }}
+  #     - uses: elastic/apm-pipeline-library/.github/actions/notify-build-status@current
+  #       if: inputs.dry-run == false
+  #       with:
+  #         status: ${{ steps.check.outputs.status }}
+  #         vaultUrl: ${{ secrets.VAULT_ADDR }}
+  #         vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
+  #         vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
+  #         slackChannel: "#apm-agent-js"
+  #         message: "Build result for release publication"
