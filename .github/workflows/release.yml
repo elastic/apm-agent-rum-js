@@ -60,6 +60,12 @@ jobs:
           secrets: |
             totp/code/npmjs-elasticmachine code | TOTP_CODE
 
+      # This prevent lerna command from throwing this error:
+      # "Working tree has uncommitted changes, please commit or remove the following changes before continuing"
+      - name: Ignore git uncommited changes
+        run: |
+          git update-index --skip-worktree .npmrc
+
       - name: Configure npm registry
         uses: elastic/apm-pipeline-library/.github/actions/setup-npmrc@current
         if: inputs.dry-run == false
