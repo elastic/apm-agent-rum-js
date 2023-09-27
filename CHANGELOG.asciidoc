@@ -29,6 +29,18 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.15.0]]
+==== 5.15.0 (2023-09-27)
+[float]
+===== Potentially breaking changes
+* Previously, there was a start time discrepancy between sampled and unsampled page load transactions, which was wrong. From now on,
+the agent will set the same start time for both of them.
+
+Custom dashboards built using the page load duration will see an effect with the solution: {pull}1435[#1435]
+
+===== Features
+* Capture errors from objects thrown from the promise rejection events including the `reason and custom properties`: {pull}1428[#1428]
+
 [[release-notes-5.14.0]]
 ==== 5.14.0 (2023-08-03)
 [float]
