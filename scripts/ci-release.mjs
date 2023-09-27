@@ -101,12 +101,7 @@ async function dryRunMode() {
     } else {
       raiseError('Failed to add user to private registry')
     }
-    // since we modify the .npmrc (which is a tracked file) in dry-run mode to interact with verdaccio
-    // we don't want lerna to fail with the error "uncommited changes in the workspace".
-    // because of that we tell git to ignore the .npmrc change
-    await execa('git', ['update-index', '--skip-worktree', '.npmrc'], {
-      stdin: process.stdin
-    })
+
     await appendFile(path.join(process.cwd(), '.npmrc'), '\n' + npmrcData)
   } catch (err) {
     raiseError('Failed to login to private registry')
