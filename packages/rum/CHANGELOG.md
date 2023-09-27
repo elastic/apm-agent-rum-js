@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.15.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.14.0...@elastic/apm-rum@5.15.0) (2023-09-27)
+
+
+### Features
+
+* **rum-core:** stringify rejected obj ([#1428](https://github.com/elastic/apm-agent-rum-js/issues/1428)) ([9785834](https://github.com/elastic/apm-agent-rum-js/commit/9785834cb1f48b5a461ff4f8b21f4a914f4f6c3f))
+
+
+
 ## [5.14.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.13.0...@elastic/apm-rum@5.14.0) (2023-08-03)
 
 
