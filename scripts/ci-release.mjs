@@ -59,7 +59,9 @@ async function main() {
   if (isDryRun) {
     await dryRunMode()
   } else {
-    await prodMode()
+    console.log('SEE changes to be committed: \n\n')
+    await execa('git', ['status']).pipeStdout(process.stdout)
+    // await prodMode()
   }
 }
 
