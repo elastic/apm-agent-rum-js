@@ -31,10 +31,10 @@ jobs:
     permissions:
       statuses: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
       - run: '.ci/scripts/lint.sh'
@@ -74,7 +74,7 @@ jobs:
           - '@elastic/apm-rum-angular'
           - '@elastic/apm-rum-vue'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run puppeteer tests
         uses: ./.github/workflows/run-test
         with:
@@ -99,7 +99,7 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run coverage
         uses: ./.github/workflows/run-test
         with:
