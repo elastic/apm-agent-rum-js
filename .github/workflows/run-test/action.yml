@@ -34,13 +34,13 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
         node-version-file: '.nvmrc'
     - name: Pull and build docker infra
       run: './.ci/scripts/pull_and_build.sh'
       shell: bash
-    - uses: hashicorp/vault-action@v2.5.0
+    - uses: hashicorp/vault-action@v2.7.4
       if: |
         (inputs.mode == 'saucelabs')
         && (inputs.vault-url != null && inputs.vault-url != '')
