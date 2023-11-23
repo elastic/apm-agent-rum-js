@@ -15,8 +15,16 @@ permissions:
   contents: read
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: are changes only for version?
+        run: echo 'TBC'
+
   release:
     runs-on: ubuntu-latest
+    needs:
+      - validate
     permissions:
       # Needed to write the release changelog
       contents: write
