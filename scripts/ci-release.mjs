@@ -108,7 +108,7 @@ async function dryRunMode() {
   try {
     await execa(
       'npx',
-      ['lerna', 'publish', `--registry=${registryUrl}`, '--no-push', '--yes'],
+      ['lerna', 'publish', `--registry=${registryUrl}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes'],
       { stdin: process.stdin }
     )
       .pipeStdout(process.stdout)
@@ -140,12 +140,10 @@ async function prodMode() {
   }
 
   try {
-    await execa('npx', ['lerna', 'publish', `--otp=${totpCode}`, '--yes'], {
-      stdin: process.stdin,
-      env: {
-        GH_TOKEN: githubToken
-      }
-    })
+    await execa('npx',
+      ['lerna', 'publish', `--otp=${totpCode}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes'],
+      { stdin: process.stdin}
+    )
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
   } catch (err) {

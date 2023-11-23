@@ -28,6 +28,7 @@
     "package:snapshot": "lerna exec npm pack",
     "clean": "lerna exec -- rm -rf dist/",
     "ci:prepare-release": "node ./scripts/ci-prepare-release.js",
+    "ci:pre-release": "node ./scripts/ci-pre-release.mjs",
     "ci:release": "node ./scripts/ci-release.mjs"
   },
   "lint-staged": {
