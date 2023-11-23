@@ -1,12 +1,10 @@
+---
+# When triggered it will prepare the release by creating a Pull Request with the
+# changes to be merged, then the automation will run and release it.
 name: pre-release
 
 on:
-  workflow_dispatch:
-    inputs:
-      dry-run:
-        type: boolean
-        description: 'Run release process in dry-run mode'
-        default: true
+  workflow_dispatch: ~
 
 permissions:
   contents: read
@@ -49,13 +47,11 @@ jobs:
       - name: Ignore git uncommitted changes
         run: git update-index --skip-worktree .npmrc
 
-      - name: Pre-release
-        env:
-          DRY_RUN: ${{ inputs.dry-run }}
+      - name: Create PR with the release to be reviewed
         run: npm run ci:pre-release
 
   status:
-    if: always() && inputs.dry-run == false
+    if: always()
     needs:
       - release
     runs-on: ubuntu-latest
