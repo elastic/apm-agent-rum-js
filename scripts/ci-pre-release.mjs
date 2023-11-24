@@ -23,9 +23,17 @@
  *
  */
 
-const { version } = require('../packages/rum/package.json')
 import { execa } from 'execa'
-const process = require('node:process')
+import * as process from 'node:process'
+// To read the version then use https://nodejs.org/api/esm.html#no-require-exports-or-moduleexports
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
+const { version } = require('../packages/rum/package.json')
+
+function raiseError(msg) {
+  console.log(msg)
+  process.exit(1)
+}
 
 // Script logic
 async function main() {
@@ -33,14 +41,27 @@ async function main() {
   if (githubToken == null || githubToken === '') {
     raiseError("The 'GITHUB_TOKEN' env var isn't defined")
   }
+
+  const branch = `release/${version}-next`
+
   try {
-    await execa('git', ['checkout', '-b', 'release/'+version], {
+    await execa('git', ['checkout', '-b', branch], {
       stdin: process.stdin
     })
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
   } catch (err) {
     raiseError('Failed to create git branch')
+  }
+
+  try {
+    await execa('git', ['push', 'origin', branch], {
+      stdin: process.stdin
+    })
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
+  } catch (err) {
+    raiseError('Failed to push git branch')
   }
 
   try {
@@ -57,18 +78,17 @@ async function main() {
   }
 
   try {
-    await execa('gh', ['pr', 'create', '--title', 'release ' + version, '--body', 'When merged then a new release happens', '--label', 'release', '--reviewer', 'v1v'], {
+    await execa('gh', ['pr', 'create', '--fill-first'], {
       stdin: process.stdin,
       env: {
         GH_TOKEN: githubToken
       }
     })
-      .pipeStdout(process.stdout)
+      .pipeStdout('.pr.txt')
       .pipeStderr(process.stderr)
   } catch (err) {
     raiseError('Failed to create GitHub PR')
   }
-
 }
 
 // Entrypoint
