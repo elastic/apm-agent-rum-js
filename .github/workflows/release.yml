@@ -4,15 +4,19 @@
 name: release
 
 on:
-  workflow_dispatch: ~
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        type: boolean
+        description: 'Run release process in dry-run mode'
+        default: true
 
 permissions:
   contents: read
 
 env:
-  DRY_RUN: false
-  ELASTIC_CDN_BUCKET_NAME: apm-rum-357700bc
-  ELASTIC_CDN_CREDENTIALS: secret/gce/elastic-cdn/service-account/apm-rum-admin
+  ELASTIC_CDN_BUCKET_NAME: ${{ inputs.dry-run == false && 'apm-rum-357700bc' || 'oblt-apm-agent-rum-js-ci' }}
+  ELASTIC_CDN_CREDENTIALS: ${{ inputs.dry-run == false && 'secret/gce/elastic-cdn/service-account/apm-rum-admin' || 'secret/observability-team/ci/service-account/apm-agent-rum-js' }}
   SLACK_BUILD_MESSAGE: "Build: (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>)"
 
 jobs:
@@ -53,7 +57,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Read NPM vault secrets
+      - name: Read NPM vault TOTP
+        if: inputs.dry-run == false
         uses: hashicorp/vault-action@v2.7.3
         with:
           method: approle
@@ -70,6 +75,7 @@ jobs:
           git update-index --skip-worktree .npmrc
 
       - name: Configure npm registry
+        if: inputs.dry-run == false
         uses: elastic/apm-pipeline-library/.github/actions/setup-npmrc@current
         with:
           vault-url: ${{ secrets.VAULT_ADDR }}
@@ -79,6 +85,8 @@ jobs:
           secret-key: token
 
       - name: Publish the release
+        env:
+          DRY_RUN: "${{ inputs.dry-run }}"
         run: npm run ci:release
 
       - name: Read GCE vault secrets
@@ -136,7 +144,7 @@ jobs:
           headers: |-
             cache-control: public,max-age=604800,immutable
 
-      - if: ${{ success() }}
+      - if: ${{ success() && inputs.dry-run == false }}
         uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
         with:
           url: ${{ secrets.VAULT_ADDR }}
@@ -146,7 +154,7 @@ jobs:
           message: |
             :runner: [${{ github.repository }}] Release has been published. ${{ env.SLACK_BUILD_MESSAGE }}
 
-      - if: ${{ failure() }}
+      - if: ${{ failure() && inputs.dry-run == false }}
         uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
         with:
           url: ${{ secrets.VAULT_ADDR }}
