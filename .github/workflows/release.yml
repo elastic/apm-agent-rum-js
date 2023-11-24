@@ -34,6 +34,13 @@ jobs:
           roleId: ${{ secrets.VAULT_ROLE_ID }}
           secretId: ${{ secrets.VAULT_SECRET_ID }}
 
+      - name: Configure git user
+        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
+        with:
+          username: ${{ env.GIT_USER }}
+          email: ${{ env.GIT_EMAIL }}
+          token: ${{ env.GITHUB_TOKEN }}
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
