@@ -35,8 +35,73 @@ function raiseError(msg) {
   process.exit(1)
 }
 
+async function gitContext() {
+  try {
+    const { stdout: username } = await execa('git', ['config', 'user.name'])
+    const { stdout: email } = await execa('git', ['config', 'user.email'])
+    return {
+      username,
+      email
+    }
+  } catch (err) {
+    raiseError('Failed to extract git context')
+  }
+}
+
 // Script logic
 async function main() {
+  const isDryRun =
+    process.env.DRY_RUN == null || process.env.DRY_RUN !== 'false'
+
+  // Extract git context
+  const ctx = await gitContext()
+  console.log(`Git User: username=${ctx.username}, email=${ctx.email}`)
+
+  if (isDryRun) {
+    await dryRunMode()
+  } else {
+    await prodMode()
+  }
+}
+
+// Script logic
+async function dryRunMode() {
+  console.log('Running in dry-run mode')
+
+  const githubToken = process.env.GITHUB_TOKEN
+  if (githubToken == null || githubToken === '') {
+    raiseError("The 'GITHUB_TOKEN' env var isn't defined")
+  }
+
+  const branch = `release/${version}-next`
+
+  try {
+    await execa('git', ['checkout', '-b', branch], {
+      stdin: process.stdin
+    })
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
+  } catch (err) {
+    raiseError('Failed to create git branch')
+  }
+
+  try {
+    await execa('npx', ['lerna', 'version', '--no-push', '--no-git-tag-version', '--no-changelog', 'yes'], {
+      stdin: process.stdin,
+      env: {
+        GH_TOKEN: githubToken
+      }
+    })
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
+  } catch (err) {
+    raiseError('Failed to version npm')
+  }
+}
+
+async function prodMode() {
+  console.log('Running in prod mode')
+
   const githubToken = process.env.GITHUB_TOKEN
   if (githubToken == null || githubToken === '') {
     raiseError("The 'GITHUB_TOKEN' env var isn't defined")
