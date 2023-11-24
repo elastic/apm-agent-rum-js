@@ -4,27 +4,20 @@
 name: release
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'CHANGELOG.md'
-      - 'package.json'
+  workflow_dispatch: ~
 
 permissions:
   contents: read
 
-jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - name: are changes only for version?
-        run: echo 'TBC'
+env:
+  DRY_RUN: false
+  ELASTIC_CDN_BUCKET_NAME: apm-rum-357700bc
+  ELASTIC_CDN_CREDENTIALS: secret/gce/elastic-cdn/service-account/apm-rum-admin
+  SLACK_BUILD_MESSAGE: "Build: (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>)"
 
+jobs:
   release:
     runs-on: ubuntu-latest
-    needs:
-      - validate
     permissions:
       # Needed to write the release changelog
       contents: write
@@ -54,7 +47,6 @@ jobs:
         run: npm ci
 
       - name: Read NPM vault secrets
-        if: inputs.dry-run == false
         uses: hashicorp/vault-action@v2.7.3
         with:
           method: approle
@@ -80,21 +72,7 @@ jobs:
           secret-key: token
 
       - name: Publish the release
-        env:
-          DRY_RUN: true
         run: npm run ci:release
-
-      - name: Setup credentials
-        env:
-          DRY_RUN: true
-        run: |
-          if [ "${DRY_RUN}" == "false" ]; then
-            echo 'ELASTIC_CDN_BUCKET_NAME=apm-rum-357700bc' >> ${GITHUB_ENV}
-            echo 'ELASTIC_CDN_CREDENTIALS=secret/gce/elastic-cdn/service-account/apm-rum-admin' >> ${GITHUB_ENV}
-          else
-            echo 'ELASTIC_CDN_BUCKET_NAME=oblt-apm-agent-rum-js-ci' >> ${GITHUB_ENV}
-            echo 'ELASTIC_CDN_CREDENTIALS=secret/observability-team/ci/service-account/apm-agent-rum-js' >> ${GITHUB_ENV}
-          fi
 
       - name: Read GCE vault secrets
         uses: hashicorp/vault-action@v2.7.3
@@ -151,21 +129,22 @@ jobs:
           headers: |-
             cache-control: public,max-age=604800,immutable
 
-  status:
-    if: always()
-    needs:
-      - release
-    runs-on: ubuntu-latest
-    steps:
-      - id: check
-        uses: elastic/apm-pipeline-library/.github/actions/check-dependent-jobs@current
+      - if: ${{ success() }}
+        uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
         with:
-          needs: ${{ toJSON(needs) }}
-      - uses: elastic/apm-pipeline-library/.github/actions/notify-build-status@current
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          channel: "#apm-agent-js"
+          message: |
+            :runner: [${{ github.repository }}] Release has been published. ${{ env.SLACK_BUILD_MESSAGE }}
+
+      - if: ${{ failure() }}
+        uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
         with:
-          status: ${{ steps.check.outputs.status }}
-          vaultUrl: ${{ secrets.VAULT_ADDR }}
-          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
-          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-          slackChannel: "#apm-agent-js"
-          message: "Build result for release publication"
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          channel: "#apm-agent-js"
+          message: |
+            :ghost: [${{ github.repository }}] Release failed. ${{ env.SLACK_BUILD_MESSAGE }}

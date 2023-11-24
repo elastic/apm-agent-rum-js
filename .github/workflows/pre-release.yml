@@ -1,6 +1,6 @@
 ---
 # When triggered it will prepare the release by creating a Pull Request with the
-# changes to be merged, then the automation will run and release it.
+# changes to be merged. Then it will be possible to run the release manually
 name: pre-release
 
 on:
@@ -8,6 +8,9 @@ on:
 
 permissions:
   contents: read
+
+env:
+  SLACK_BUILD_MESSAGE: "Build: (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>)"
 
 jobs:
   release:
@@ -47,24 +50,30 @@ jobs:
       - name: Ignore git uncommitted changes
         run: git update-index --skip-worktree .npmrc
 
-      - name: Create PR with the release to be reviewed
-        run: npm run ci:pre-release
+      - name: Create PR with the required changes to be released
+        id: pre-release
+        run: |
+          npm run ci:pre-release
+          if [ -e .pr.txt ] ; then
+            echo "pr=$(cat .pr.txt)" >> "$GITHUB_OUTPUT"
+          fi
 
-  status:
-    if: always()
-    needs:
-      - release
-    runs-on: ubuntu-latest
-    steps:
-      - id: check
-        uses: elastic/apm-pipeline-library/.github/actions/check-dependent-jobs@current
+      - if: ${{ success() }}
+        uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
         with:
-          needs: ${{ toJSON(needs) }}
-      - uses: elastic/apm-pipeline-library/.github/actions/notify-build-status@current
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          channel: "#apm-agent-js"
+          message: |
+            :runner: [${{ github.repository }}] Pre Release has been triggered. Review the PR ${{ steps.pre-release.outputs.pr }}. ${{ env.SLACK_BUILD_MESSAGE }}
+
+      - if: ${{ failure() }}
+        uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
         with:
-          status: ${{ steps.check.outputs.status }}
-          vaultUrl: ${{ secrets.VAULT_ADDR }}
-          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
-          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-          slackChannel: "#apm-agent-js"
-          message: "Build result for pre-release"
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          channel: "#apm-agent-js"
+          message: |
+            :ghost: [${{ github.repository }}] Pre Release failed. ${{ env.SLACK_BUILD_MESSAGE }}
