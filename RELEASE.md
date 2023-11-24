@@ -42,8 +42,12 @@ Before releasing, be sure to update the following documentation:
 
 The release process is also automated in the way any specific commit from the main branch can be potentially released, for such it's required the below steps:
 
-* Go to the [GitHub Actions](https://github.com/elastic/apm-agent-rum-js/actions/workflows/release.yml) workflow.
+* Go to the [GitHub Actions](https://github.com/elastic/apm-agent-rum-js/actions/workflows/pre-release.yml) workflow.
 * Click on `Run workflow` and select the `main` branch.
 * Click on `Run workflow`.
 * Wait for completion.
+* Review the PR with the changes when merged
+* Go to the [GitHub Actions](https://github.com/elastic/apm-agent-rum-js/actions/workflows/release.yml) workflow.
+* Click on `Run workflow` and select the `main` branch.
+* Click on `Run workflow`.
 * You can go to the `https://www.npmjs.com/package/@elastic/apm-rum` and [GitHub releases](https://github.com/elastic/apm-agent-rum-js/releases) to validate that the bundles and release notes have been published.
