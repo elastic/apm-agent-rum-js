@@ -401,6 +401,10 @@ function isPerfTypeSupported(type) {
   )
 }
 
+function isPerfInteractionCountSupported() {
+  return 'interactionCount' in performance
+}
+
 /**
  * The goal of this is to make sure that HAR files
  * can be created containing beacons with the payload readable
@@ -475,6 +479,7 @@ export {
   isPerfTimelineSupported,
   isBrowser,
   isPerfTypeSupported,
+  isPerfInteractionCountSupported,
   isBeaconInspectionEnabled,
   isRedirectInfoAvailable
 }

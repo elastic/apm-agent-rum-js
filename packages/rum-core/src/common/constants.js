@@ -74,6 +74,7 @@ const USER_INTERACTION = 'user-interaction'
 const HTTP_REQUEST_TYPE = 'http-request'
 const TEMPORARY_TYPE = 'temporary'
 const NAME_UNKNOWN = 'Unknown'
+const PAGE_EXIT = 'page-exit'
 
 const TRANSACTION_TYPE_ORDER = [
   PAGE_LOAD,
@@ -144,6 +145,7 @@ const FIRST_CONTENTFUL_PAINT = 'first-contentful-paint'
 const LARGEST_CONTENTFUL_PAINT = 'largest-contentful-paint'
 const FIRST_INPUT = 'first-input'
 const LAYOUT_SHIFT = 'layout-shift'
+const EVENT = 'event'
 
 /**
  * Event types sent to APM Server on the queue
@@ -193,6 +195,7 @@ export {
   PAGE_LOAD,
   ROUTE_CHANGE,
   NAME_UNKNOWN,
+  PAGE_EXIT,
   TYPE_CUSTOM,
   USER_TIMING_THRESHOLD,
   TRANSACTION_START,
@@ -232,6 +235,7 @@ export {
   TRUNCATED_TYPE,
   FIRST_INPUT,
   LAYOUT_SHIFT,
+  EVENT,
   OUTCOME_SUCCESS,
   OUTCOME_FAILURE,
   OUTCOME_UNKNOWN,

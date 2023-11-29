@@ -30,7 +30,7 @@ import {
   captureObserverEntries,
   metrics,
   createTotalBlockingTimeSpan
-} from './metrics'
+} from './metrics/metrics'
 import {
   extend,
   getEarliestSpan,

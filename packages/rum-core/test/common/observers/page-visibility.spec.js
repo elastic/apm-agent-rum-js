@@ -39,6 +39,7 @@ import {
   setDocumentVisibilityState
 } from '../..'
 import { spyOnFunction, waitFor } from '../../../../../dev-utils/jasmine'
+import * as inpReporter from '../../../src/performance-monitoring/metrics/inp/report'
 
 describe('observePageVisibility', () => {
   let serviceFactory
@@ -92,7 +93,20 @@ describe('observePageVisibility', () => {
   // the observed events by the agent...
   ;['visibilitychange', 'pagehide'].forEach(eventName => {
     describe(`when page becomes hidden due to ${eventName.toUpperCase()} event`, () => {
-      describe(`with every transaction already ended`, () => {
+      it('should report INP', () => {
+        const reportSpy = spyOnFunction(inpReporter, 'reportInp')
+        unobservePageVisibility = observePageVisibility(
+          configService,
+          transactionService
+        )
+
+        hidePageSynthetically(eventName)
+
+        expect(reportSpy).toHaveBeenCalledTimes(1)
+        expect(reportSpy).toHaveBeenCalledWith(transactionService)
+      })
+
+      describe('with every transaction already ended', () => {
         it('should dispatch the QUEUE_FLUSH event', () => {
           const dispatchEventSpy = spyOn(configService, 'dispatchEvent')
 
@@ -120,7 +134,7 @@ describe('observePageVisibility', () => {
         })
       })
 
-      describe(`with a transaction that has not ended yet`, () => {
+      describe('with a transaction that has not ended yet', () => {
         // Starts performanceMonitoring to observe how transaction ends
         function startsPerformanceMonitoring() {
           const performanceMonitoring = serviceFactory.getService(

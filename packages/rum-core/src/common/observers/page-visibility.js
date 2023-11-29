@@ -26,6 +26,7 @@
 import { QUEUE_ADD_TRANSACTION, QUEUE_FLUSH } from '../constants'
 import { state } from '../../state'
 import { now } from '../utils'
+import { reportInp } from '../../performance-monitoring/metrics/inp/report'
 
 /**
  * @param configService
@@ -70,11 +71,14 @@ export function observePageVisibility(configService, transactionService) {
 }
 
 /**
- * Ends an ongoing transaction if any and flushes the events queue
+ * Executes when page becomes hidden
  * @param configService
  * @param transactionService
  */
 function onPageHidden(configService, transactionService) {
+  reportInp(transactionService)
+
+  // Ends an ongoing transaction if any and flushes the events queue
   const tr = transactionService.getCurrentTransaction()
   if (tr) {
     const unobserve = configService.observeEvent(QUEUE_ADD_TRANSACTION, () => {

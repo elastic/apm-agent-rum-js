@@ -24,7 +24,7 @@
  */
 
 import { Url } from './url'
-import { PAGE_LOAD, NAVIGATION } from './constants'
+import { PAGE_LOAD, PAGE_EXIT, NAVIGATION } from './constants'
 import { getServerTimingInfo, PERF, isPerfTimelineSupported } from './utils'
 
 const LEFT_SQUARE_BRACKET = 91 // [
@@ -150,11 +150,20 @@ function getNavigationContext(data) {
   return { destination }
 }
 
-export function getPageContext() {
+export function getPageContext(transaction) {
+  let url = location.href
+  // don't overwrite context url for page-exit transactions
+  if (transaction && transaction.type === PAGE_EXIT) {
+    transaction.ensureContext()
+    if (transaction.context.page && transaction.context.page.url) {
+      url = transaction.context.page.url
+    }
+  }
+
   return {
     page: {
       referer: document.referrer,
-      url: location.href
+      url
     }
   }
 }
@@ -184,7 +193,7 @@ export function addTransactionContext(
   // eslint-disable-next-line no-unused-vars
   { tags, ...configContext } = {}
 ) {
-  const pageContext = getPageContext()
+  const pageContext = getPageContext(transaction)
   let responseContext = {}
   if (transaction.type === PAGE_LOAD && isPerfTimelineSupported()) {
     let entries = PERF.getEntriesByType(NAVIGATION)

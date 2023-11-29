@@ -34,6 +34,7 @@ import {
 } from '../common/constants'
 
 import { serviceCreators } from '../common/service-factory'
+import { observeUserInteractions, reportInp } from './metrics/inp'
 
 function registerServices() {
   serviceCreators[TRANSACTION_SERVICE] = serviceFactory => {
@@ -65,4 +66,4 @@ function registerServices() {
   }
 }
 
-export { registerServices }
+export { registerServices, observeUserInteractions, reportInp }

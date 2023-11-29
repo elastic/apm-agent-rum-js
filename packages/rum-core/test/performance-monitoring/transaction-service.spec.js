@@ -43,7 +43,7 @@ import {
 import { state } from '../../src/state'
 import { isPerfTypeSupported } from '../../src/common/utils'
 import Transaction from '../../src/performance-monitoring/transaction'
-import { metrics } from '../../src/performance-monitoring/metrics'
+import { metrics } from '../../src/performance-monitoring/metrics/metrics'
 
 describe('TransactionService', function () {
   var transactionService
