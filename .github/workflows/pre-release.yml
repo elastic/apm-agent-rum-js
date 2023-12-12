@@ -63,6 +63,7 @@ jobs:
           npm run ci:pre-release
           if [ -e .pr.txt ] ; then
             echo "pr=$(cat .pr.txt)" >> "$GITHUB_OUTPUT"
+            rm .pr.txt
           fi
 
       - if: ${{ success() && inputs.dry-run == false }}

@@ -120,17 +120,7 @@ async function prodMode() {
   }
 
   try {
-    await execa('git', ['push', 'origin', branch], {
-      stdin: process.stdin
-    })
-      .pipeStdout(process.stdout)
-      .pipeStderr(process.stderr)
-  } catch (err) {
-    raiseError('Failed to push git branch')
-  }
-
-  try {
-    await execa('npx', ['lerna', 'version', '--yes'], {
+    await execa('npx', ['lerna', 'version', '--yes', '--no-push'], {
       stdin: process.stdin,
       env: {
         GH_TOKEN: githubToken
@@ -140,6 +130,18 @@ async function prodMode() {
       .pipeStderr(process.stderr)
   } catch (err) {
     raiseError('Failed to version npm')
+  }
+
+  // As long as lerna version uses --no-push then it's required to push the commits
+  // this will avoid pushing the git tag too.
+  try {
+    await execa('git', ['push', 'origin', branch], {
+      stdin: process.stdin
+    })
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
+  } catch (err) {
+    raiseError('Failed to push git branch')
   }
 
   try {
