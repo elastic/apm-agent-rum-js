@@ -190,8 +190,7 @@ function storeUserInteraction(entry) {
   } else {
     inpState.longestInteractions.push({
       id: entry.interactionId,
-      duration: entry.duration,
-      entry
+      duration: entry.duration
     })
   }
 
