@@ -30,6 +30,7 @@ import { TRANSACTION_SERVICE, EVENT } from '../../../../src/common/constants'
 import * as utils from '../../../../src/common/utils'
 
 import { spyOnFunction } from '../../../../../../dev-utils/jasmine'
+import Transaction from '../../../../src/performance-monitoring/transaction'
 
 if (utils.isPerfTypeSupported(EVENT)) {
   describe('reportInp', () => {
@@ -77,6 +78,12 @@ if (utils.isPerfTypeSupported(EVENT)) {
         const tr = reportInp(transactionService)
         const duration = tr._end - tr._start
         expect(duration).toBeGreaterThanOrEqual(1)
+      })
+
+      it('should make sure transaction ends with the pageHidden mode', () => {
+        const endSpy = spyOnFunction(Transaction.prototype, 'endPageHidden')
+        reportInp(transactionService)
+        expect(endSpy).toHaveBeenCalledTimes(1)
       })
 
       it('should restore INP tracking information', () => {

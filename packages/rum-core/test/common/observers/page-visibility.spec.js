@@ -159,7 +159,7 @@ describe('observePageVisibility', () => {
 
         it('should end the transaction', () => {
           const transaction = createTransaction()
-          const endTransactionSpy = spyOn(transaction, 'end')
+          const endTransactionSpy = spyOn(transaction, 'endPageHidden')
           spyOn(transactionService, 'getCurrentTransaction').and.returnValue(
             transaction
           )

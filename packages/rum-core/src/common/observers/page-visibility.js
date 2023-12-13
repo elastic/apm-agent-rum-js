@@ -91,7 +91,7 @@ function onPageHidden(configService, transactionService) {
       unobserve()
     })
 
-    tr.end()
+    tr.endPageHidden()
   } else {
     configService.dispatchEvent(QUEUE_FLUSH)
     state.lastHiddenStart = now()

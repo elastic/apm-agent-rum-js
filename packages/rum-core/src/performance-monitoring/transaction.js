@@ -54,6 +54,8 @@ class Transaction extends SpanBase {
 
     this.sampleRate = this.options.transactionSampleRate
     this.sampled = Math.random() <= this.sampleRate
+
+    this.endedPageHidden = false
   }
 
   addMarks(obj) {
@@ -195,6 +197,15 @@ class Transaction extends SpanBase {
 
   isManaged() {
     return !!this.options.managed
+  }
+
+  /*
+    Makes sure that a transaction ended while the page was becoming hidden
+    it's not discarded for that very same reason.
+  */
+  endPageHidden(endTime) {
+    this.endedPageHidden = true
+    this.end(endTime)
   }
 }
 
