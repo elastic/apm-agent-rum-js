@@ -172,7 +172,8 @@ function getBrowserList(pkg = 'default') {
       },
       {
         browserName: 'firefox',
-        browserVersion: 'latest',
+        // beware that if we update to 99 or more we will need to cope with https://github.com/karma-runner/karma-sauce-launcher/issues/275
+        browserVersion: '98',
         platformName: 'Windows 10',
         'sauce:options': {
           geckodriverVersion: '0.30.0' // reason: https://github.com/karma-runner/karma-sauce-launcher/issues/275
