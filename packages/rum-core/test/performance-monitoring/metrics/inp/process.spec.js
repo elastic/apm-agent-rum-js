@@ -213,7 +213,6 @@ if (utils.isPerfTypeSupported(EVENT)) {
 
           processUserInteractions(list)
 
-          // But we should increase the interaction counter
           expect(interactionCount()).toBe(2)
         })
       })
