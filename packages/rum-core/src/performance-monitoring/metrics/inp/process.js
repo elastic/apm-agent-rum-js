@@ -148,6 +148,18 @@ export function restoreINPState() {
 
 // Stores user interaction
 function storeUserInteraction(entry) {
+  // Don't store interactions that are faster than the current ones
+  // This also makes sure we don't store repeated values
+  const leastSlow =
+    inpState.longestInteractions[inpState.longestInteractions.length - 1]
+  if (
+    typeof leastSlow !== 'undefined' &&
+    entry.duration <= leastSlow.duration &&
+    entry.interactionId != leastSlow.id
+  ) {
+    return
+  }
+
   /**
    * different entries can share the same interactionId
    * Please see the EventTiming spec for more details about
