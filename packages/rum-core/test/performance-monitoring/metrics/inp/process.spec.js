@@ -204,6 +204,43 @@ if (utils.isPerfTypeSupported(EVENT)) {
         expect(candidates[0].duration).toBe(75)
       })
 
+      it('should not store duplicated values', () => {
+        list.getEntries.and.callFake(() => {
+          return [
+            { interactionId: 3007, duration: 100 },
+            { interactionId: 3014, duration: 100 }
+          ]
+        })
+
+        processUserInteractions(list)
+
+        const candidates = inpCandidates()
+        expect(candidates.length).toBe(1)
+      })
+
+      it('should not store interactions that are faster than the current INP candidates', () => {
+        list.getEntries.and.callFake(() => {
+          return [
+            { interactionId: 3007, duration: 150 },
+            { interactionId: 3014, duration: 250 }
+          ]
+        })
+
+        processUserInteractions(list)
+        let candidates = inpCandidates()
+        expect(candidates.length).toBe(2)
+
+        // Report a faster interaction
+        list.getEntries.and.callFake(() => {
+          return [{ interactionId: 3021, duration: 135 }]
+        })
+        processUserInteractions(list)
+
+        // The number of inp candidates should still be the same
+        candidates = inpCandidates()
+        expect(candidates.length).toBe(2)
+      })
+
       describe('when performance.interactionCount is NOT available', () => {
         it('should estimate interactionCount from the entries reported by PerformanceObserver', () => {
           interactionCountSpy.and.returnValue(false)
