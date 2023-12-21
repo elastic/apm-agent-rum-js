@@ -33,7 +33,7 @@ const INP_THRESHOLD = 40
 // The Google guideline is just to track the 10 longest interactions as INP candidates
 const MAX_INTERACTIONS_TO_CONSIDER = 10
 
-const inpState = {
+export const inpState = {
   minInteractionId: Infinity,
   maxInteractionId: 0,
   interactionCount: 0,
@@ -137,14 +137,6 @@ export function calculateInp() {
 
 export function interactionCount() {
   return performance.interactionCount || inpState.interactionCount
-}
-
-export function inpCandidates() {
-  return inpState.longestInteractions
-}
-
-export function setInteractionCount(count) {
-  inpState.interactionCount = count
 }
 
 export function restoreINPState() {

@@ -25,12 +25,11 @@
 
 import * as utils from '../../../../src/common/utils'
 import {
+  inpState,
   observeUserInteractions,
   processUserInteractions,
   interactionCount,
-  inpCandidates,
   restoreINPState,
-  setInteractionCount,
   calculateInp
 } from '../../../../src/performance-monitoring/metrics/inp/process'
 import { PerfEntryRecorder } from '../../../../src/performance-monitoring/metrics/metrics'
@@ -38,6 +37,14 @@ import { spyOnFunction } from '../../../../../../dev-utils/jasmine'
 import { EVENT } from '../../../../src/common/constants'
 
 if (utils.isPerfTypeSupported(EVENT)) {
+  function setInteractionCount(count) {
+    inpState.interactionCount = count
+  }
+
+  function inpCandidates() {
+    return inpState.longestInteractions
+  }
+
   describe('INP', () => {
     let interactionCountSpy
     const list = {
