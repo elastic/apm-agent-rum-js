@@ -34,7 +34,8 @@ import {
 } from '../common/constants'
 
 import { serviceCreators } from '../common/service-factory'
-import { observeUserInteractions, reportInp } from './metrics/inp'
+import { observeUserInteractions } from './metrics/inp/process'
+import { reportInp } from './metrics/inp/report'
 
 function registerServices() {
   serviceCreators[TRANSACTION_SERVICE] = serviceFactory => {
