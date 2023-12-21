@@ -172,19 +172,14 @@ function storeUserInteraction(entry) {
    * Please see the EventTiming spec for more details about
    * the algorithm: https://www.w3.org/TR/event-timing/#sec-computing-interactionid
    */
-  let foundIndex = -1
-  let i = 0
-  while (i < inpState.longestInteractions.length && foundIndex === -1) {
-    if (inpState.longestInteractions[i].id === entry.interactionId) {
-      foundIndex = i
-    }
-    i++
-  }
-
-  if (foundIndex >= 0) {
+  const filteredInteraction = inpState.longestInteractions.filter(
+    interaction => interaction.id === entry.interactionId
+  )
+  if (filteredInteraction.length > 0) {
     // Override existing interaction
-    inpState.longestInteractions[foundIndex].duration = Math.max(
-      inpState.longestInteractions[foundIndex].duration,
+    const foundInteraction = filteredInteraction[0]
+    foundInteraction.duration = Math.max(
+      foundInteraction.duration,
       entry.duration
     )
   } else {
