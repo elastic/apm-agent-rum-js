@@ -251,8 +251,7 @@ class TransactionService {
       () => {
         const { name, type } = tr
         let { lastHiddenStart } = state
-
-        if (lastHiddenStart >= tr._start && !tr.endedPageHidden) {
+        if (lastHiddenStart >= tr._start) {
           if (__DEV__) {
             this._logger.debug(
               `transaction(${tr.id}, ${name}, ${type}) was discarded! The page was hidden during the transaction!`

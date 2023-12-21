@@ -59,7 +59,7 @@ if (utils.isPerfTypeSupported(EVENT)) {
       it('should create page-exit transaction', () => {
         const hardNavigatedPage = performance.getEntriesByType('navigation')[0]
         const restoreINPSpy = spyOnFunction(inpProcessor, 'restoreINPState')
-        const endSpy = spyOnFunction(Transaction.prototype, 'endPageHidden')
+        const endSpy = spyOnFunction(Transaction.prototype, 'end')
         endSpy.and.callThrough() // To make sure we can calculate the transaction duration
 
         const tr = reportInp(transactionService)

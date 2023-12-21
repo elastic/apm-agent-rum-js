@@ -76,9 +76,26 @@ export function observePageVisibility(configService, transactionService) {
  * @param transactionService
  */
 function onPageHidden(configService, transactionService) {
-  reportInp(transactionService)
+  const inpTr = reportInp(transactionService)
+  // we don't want to flush the queue for every transaction that is ended when page becomes hidden
+  // and given the async nature of the ending process of transactions
+  // will need to coordinate the flushing process
+  if (inpTr) {
+    const unobserve = configService.observeEvent(QUEUE_ADD_TRANSACTION, () => {
+      // At this point the INP transaction is in the queue
+      // so let's end the managed transaction if any and flush
+      endManagedTransaction(configService, transactionService)
+      unobserve()
+    })
+  } else {
+    // In the absence of INP transaction
+    // let's just end the managed transaction if any and flush
+    endManagedTransaction(configService, transactionService)
+  }
+}
 
-  // Ends an ongoing transaction if any and flushes the events queue
+// Ends an ongoing managed transaction if any and flushes the events queue
+function endManagedTransaction(configService, transactionService) {
   const tr = transactionService.getCurrentTransaction()
   if (tr) {
     const unobserve = configService.observeEvent(QUEUE_ADD_TRANSACTION, () => {
@@ -91,7 +108,7 @@ function onPageHidden(configService, transactionService) {
       unobserve()
     })
 
-    tr.endPageHidden()
+    tr.end()
   } else {
     configService.dispatchEvent(QUEUE_FLUSH)
     state.lastHiddenStart = now()

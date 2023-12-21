@@ -57,7 +57,7 @@ export function reportInp(transactionService) {
     // make sure that transaction's duration is > 0
     // we do the +1 because INP can be also reported as 0
     const endTime = startTime + inp + 1
-    inpTr.endPageHidden(endTime)
+    inpTr.end(endTime)
 
     // restart INP tracking information
     // since users can enter and leave the page multiple times

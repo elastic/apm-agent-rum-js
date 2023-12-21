@@ -741,18 +741,6 @@ describe('TransactionService', function () {
     state.lastHiddenStart = lastHiddenStart
   })
 
-  it('should not discard transaction ended when page was becoming hidden', async () => {
-    let { lastHiddenStart } = state
-    state.lastHiddenStart = performance.now() + 1000
-    let tr = transactionService.startTransaction('test-name', 'test-type')
-    await tr.endPageHidden()
-    expect(logger.debug).not.toHaveBeenCalledWith(
-      `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
-    )
-
-    state.lastHiddenStart = lastHiddenStart
-  })
-
   it('should set session information on transaction', () => {
     config.setConfig({ session: true })
     const tr = new Transaction('test', 'test')
