@@ -202,7 +202,7 @@ function storeUserInteraction(entry) {
  * the reasons why interactionCount is important are:
  * 1. To get the proper percentile 98 when calculating the INP value.
  * 2. To report INP as 0 (rather than undefined) in those circumstances where the PerformanceObserver doesn't report entries.
- *    That can happen because the min value for durationThreshold is 16 then interactions faster than that will not be reported.
+ *    That can happen because interactions faster than 16ms will not be taken into account.
  *    Note: a first-input entry duration can be less than 16, which is also helpful for this
  *
  * Again, these are Google conventions/guidelines and things might change in the future.
