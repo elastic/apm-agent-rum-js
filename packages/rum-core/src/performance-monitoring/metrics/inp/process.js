@@ -46,6 +46,7 @@ export const inpState = {
 export function observeUserInteractions(
   recorder = new PerfEntryRecorder(processUserInteractions)
 ) {
+  const isPerfCountSupported = isPerfInteractionCountSupported()
   /**
    * We set the lowest threshold (16) supported by browsers
    * this way we can estimate the total number of different user interactions which is essential to calculate P98, among other things.
@@ -53,9 +54,7 @@ export function observeUserInteractions(
    * threshold will be 40, which is the value Google recommends as the default threshold
    * https://github.com/GoogleChrome/web-vitals/blob/3806160ffbc93c3c4abf210a167b81228172b31c/src/onINP.ts#L203
    */
-  const durationThreshold = isPerfInteractionCountSupported()
-    ? INP_THRESHOLD
-    : 16 // lowest threshold supported by browsers
+  const durationThreshold = isPerfCountSupported ? INP_THRESHOLD : 16 // lowest threshold supported by browsers
 
   recorder.start(EVENT, {
     buffered: true,
@@ -70,7 +69,7 @@ export function observeUserInteractions(
    * detector that checks if there has been a interaction with a duration less than 16ms.
    * Once `performance.interactionCount` is exposed, this logic will not be useful anymore
    */
-  if (!isPerfInteractionCountSupported()) {
+  if (!isPerfCountSupported) {
     recorder.start(FIRST_INPUT)
   }
 }
