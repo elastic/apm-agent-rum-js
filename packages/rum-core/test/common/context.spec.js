@@ -23,11 +23,7 @@
  *
  */
 
-import {
-  addSpanContext,
-  addTransactionContext,
-  getPageContext
-} from '../../src/common/context'
+import { addSpanContext, addTransactionContext } from '../../src/common/context'
 import resourceEntries from '../fixtures/resource-entries'
 import Span from '../../src/performance-monitoring/span'
 import Transaction from '../../src/performance-monitoring/transaction'
@@ -238,31 +234,14 @@ describe('Context', () => {
     unMock()
   })
 
-  describe('getPageContext', () => {
-    it('should reuse the url already attached in a page-exit transaction', () => {
-      const tr = new Transaction(PAGE_EXIT, PAGE_EXIT)
-      tr.addContext({
-        page: {
-          url: 'the-url-to-reuse'
-        }
-      })
-
-      expect(getPageContext(tr).page.url).toBe('the-url-to-reuse')
+  it('should make sure that the page-exit transaction page context remains as it was defined', () => {
+    const tr = new Transaction(PAGE_EXIT, PAGE_EXIT)
+    tr.addContext({
+      page: {
+        url: 'the-url-to-reuse'
+      }
     })
-
-    it('should use location.href when transaction type is not page-exit', () => {
-      const tr = new Transaction(PAGE_LOAD, PAGE_LOAD)
-      tr.addContext({
-        page: {
-          url: 'the-url-will-be-ignored'
-        }
-      })
-
-      expect(getPageContext(tr).page.url).toBe(location.href)
-    })
-
-    it('should use location.href when no transaction is given', () => {
-      expect(getPageContext().page.url).toBe(location.href)
-    })
+    addTransactionContext(tr)
+    expect(tr.context.page.url).toBe('the-url-to-reuse')
   })
 })

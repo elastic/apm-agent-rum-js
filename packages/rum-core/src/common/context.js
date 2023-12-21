@@ -150,20 +150,11 @@ function getNavigationContext(data) {
   return { destination }
 }
 
-export function getPageContext(transaction) {
-  let url = location.href
-  // don't overwrite context url for page-exit transactions
-  if (transaction && transaction.type === PAGE_EXIT) {
-    transaction.ensureContext()
-    if (transaction.context.page && transaction.context.page.url) {
-      url = transaction.context.page.url
-    }
-  }
-
+export function getPageContext() {
   return {
     page: {
       referer: document.referrer,
-      url
+      url: location.href
     }
   }
 }
@@ -193,9 +184,15 @@ export function addTransactionContext(
   // eslint-disable-next-line no-unused-vars
   { tags, ...configContext } = {}
 ) {
-  const pageContext = getPageContext(transaction)
+  const pageContext = getPageContext()
   let responseContext = {}
-  if (transaction.type === PAGE_LOAD && isPerfTimelineSupported()) {
+
+  if (transaction.type === PAGE_EXIT) {
+    transaction.ensureContext()
+    if (transaction.context.page && transaction.context.page.url) {
+      pageContext.page.url = transaction.context.page.url
+    }
+  } else if (transaction.type === PAGE_LOAD && isPerfTimelineSupported()) {
     let entries = PERF.getEntriesByType(NAVIGATION)
     if (entries && entries.length > 0) {
       responseContext = {
