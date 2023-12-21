@@ -194,7 +194,7 @@ function storeUserInteraction(entry) {
     })
   }
 
-  // Make sure we always keep the slowest interactions descendingly sorted
+  // Sort the interactions to keep the slowest interactions at the end and keep only the max interactions
   inpState.longestInteractions.sort((a, b) => b.duration - a.duration)
   inpState.longestInteractions.splice(MAX_INTERACTIONS_TO_CONSIDER)
 }
