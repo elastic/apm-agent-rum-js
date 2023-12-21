@@ -53,42 +53,23 @@ if (utils.isPerfTypeSupported(EVENT)) {
 
     describe('when metric is >= 0', () => {
       beforeEach(() => {
-        calculateInpSpy.and.returnValue(100)
+        calculateInpSpy.and.returnValue(0)
       })
 
       it('should create page-exit transaction', () => {
-        const tr = reportInp(transactionService)
-        expect(tr.type).toBe('page-exit')
-      })
-
-      it('should attach inp label to transaction', () => {
-        const tr = reportInp(transactionService)
-        expect(tr.context.tags.inp_value).toBe(100)
-      })
-
-      it('should add the "hard-navigation" page URL to the transaction context', () => {
         const hardNavigatedPage = performance.getEntriesByType('navigation')[0]
-        const tr = reportInp(transactionService)
-        expect(tr.context.page.url).toBe(hardNavigatedPage.name)
-      })
+        const restoreINPSpy = spyOnFunction(inpProcessor, 'restoreINPState')
+        const endSpy = spyOnFunction(Transaction.prototype, 'endPageHidden')
+        endSpy.and.callThrough() // To make sure we can calculate the transaction duration
 
-      it('should make sure transaction duration is > 0', () => {
-        // Setting 0 here to emphasize that even in this case the transaction has duration
-        calculateInpSpy.and.returnValue(0)
         const tr = reportInp(transactionService)
         const duration = tr._end - tr._start
+
+        expect(tr.type).toBe('page-exit')
+        expect(tr.context.tags.inp_value).toBe(0)
+        expect(tr.context.page.url).toBe(hardNavigatedPage.name)
         expect(duration).toBeGreaterThanOrEqual(1)
-      })
-
-      it('should make sure transaction ends with the pageHidden mode', () => {
-        const endSpy = spyOnFunction(Transaction.prototype, 'endPageHidden')
-        reportInp(transactionService)
         expect(endSpy).toHaveBeenCalledTimes(1)
-      })
-
-      it('should restore INP tracking information', () => {
-        const restoreINPSpy = spyOnFunction(inpProcessor, 'restoreINPState')
-        reportInp(transactionService)
         expect(restoreINPSpy).toHaveBeenCalledTimes(1)
       })
     })
