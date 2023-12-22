@@ -154,7 +154,7 @@ describe('PerformanceMonitoring', function () {
 
   it('should initialize and notify the transaction has been added to the queue', async () => {
     performanceMonitoring.init()
-    spyOn(configService, 'dispatchEvent')
+    spyOn(configService, 'dispatchEvent').and.callThrough()
 
     const tr = performanceMonitoring._transactionService.startTransaction(
       'transaction',

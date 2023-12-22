@@ -65,7 +65,7 @@ describe('TransactionService', function () {
     spyOn(logger, 'debug')
 
     config = new Config()
-    spyOn(config, 'dispatchEvent')
+    spyOn(config, 'dispatchEvent').and.callThrough()
     transactionService = new TransactionService(logger, config)
   })
 

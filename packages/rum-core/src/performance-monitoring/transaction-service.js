@@ -228,7 +228,7 @@ class TransactionService {
       if (__DEV__) {
         this._logger.debug(`startTransaction(${tr.id}, ${tr.name}, ${tr.type})`)
       }
-      this._config.dispatchEvent(TRANSACTION_START, [tr])
+      this._config.events.send(TRANSACTION_START, [tr])
     }
 
     return tr
@@ -340,7 +340,7 @@ class TransactionService {
         const configContext = this._config.get('context')
         addTransactionContext(tr, configContext)
 
-        this._config.dispatchEvent(TRANSACTION_END, [tr])
+        this._config.events.send(TRANSACTION_END, [tr])
         if (__DEV__) {
           this._logger.debug(
             `end transaction(${tr.id}, ${tr.name}, ${tr.type})`,
