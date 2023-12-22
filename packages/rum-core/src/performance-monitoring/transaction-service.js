@@ -45,6 +45,7 @@ import {
   NAME_UNKNOWN,
   TRANSACTION_START,
   TRANSACTION_END,
+  TRANSACTION_DISCARD,
   TEMPORARY_TYPE,
   TRANSACTION_TYPE_ORDER,
   LARGEST_CONTENTFUL_PAINT,
@@ -227,7 +228,7 @@ class TransactionService {
       if (__DEV__) {
         this._logger.debug(`startTransaction(${tr.id}, ${tr.name}, ${tr.type})`)
       }
-      this._config.events.send(TRANSACTION_START, [tr])
+      this._config.dispatchEvent(TRANSACTION_START, [tr])
     }
 
     return tr
@@ -257,6 +258,7 @@ class TransactionService {
               `transaction(${tr.id}, ${name}, ${type}) was discarded! The page was hidden during the transaction!`
             )
           }
+          this._config.dispatchEvent(TRANSACTION_DISCARD)
           return
         }
 
@@ -266,6 +268,7 @@ class TransactionService {
               `transaction(${tr.id}, ${name}, ${type}) is ignored`
             )
           }
+          this._config.dispatchEvent(TRANSACTION_DISCARD)
           return
         }
 
@@ -337,7 +340,7 @@ class TransactionService {
         const configContext = this._config.get('context')
         addTransactionContext(tr, configContext)
 
-        this._config.events.send(TRANSACTION_END, [tr])
+        this._config.dispatchEvent(TRANSACTION_END, [tr])
         if (__DEV__) {
           this._logger.debug(
             `end transaction(${tr.id}, ${tr.name}, ${tr.type})`,

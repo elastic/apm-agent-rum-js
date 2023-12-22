@@ -32,13 +32,15 @@ import {
   TRANSACTION_END,
   PAGE_LOAD,
   ROUTE_CHANGE,
+  TEMPORARY_TYPE,
   LONG_TASK,
   LARGEST_CONTENTFUL_PAINT,
   PAINT,
   TRUNCATED_TYPE,
   FIRST_INPUT,
   LAYOUT_SHIFT,
-  LOCAL_CONFIG_KEY
+  LOCAL_CONFIG_KEY,
+  TRANSACTION_DISCARD
 } from '../../src/common/constants'
 import { state } from '../../src/state'
 import { isPerfTypeSupported } from '../../src/common/utils'
@@ -63,6 +65,7 @@ describe('TransactionService', function () {
     spyOn(logger, 'debug')
 
     config = new Config()
+    spyOn(config, 'dispatchEvent')
     transactionService = new TransactionService(logger, config)
   })
 
@@ -731,6 +734,7 @@ describe('TransactionService', function () {
     expect(logger.debug).toHaveBeenCalledWith(
       `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
     )
+    expect(config.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_DISCARD)
 
     state.lastHiddenStart = performance.now() - 1000
     tr = transactionService.startTransaction('test-name', 'test-type')
@@ -739,6 +743,28 @@ describe('TransactionService', function () {
       `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
     )
     state.lastHiddenStart = lastHiddenStart
+  })
+
+  it('should discard TEMPORARY_TYPE transactions', async () => {
+    let tr = transactionService.startTransaction('test-name', TEMPORARY_TYPE)
+    await tr.end()
+    expect(logger.debug).toHaveBeenCalledWith(
+      `transaction(${tr.id}, ${tr.name}, ${tr.type}) is ignored`
+    )
+    expect(config.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_DISCARD)
+  })
+
+  it('should discard transaction configured to be ignored', async () => {
+    config.setConfig({
+      ignoreTransactions: ['ignore-tr']
+    })
+    let tr = transactionService.startTransaction('ignore-tr', 'type')
+    await tr.end()
+    config.setConfig({ ignoreTransactions: [] })
+    expect(logger.debug).toHaveBeenCalledWith(
+      `transaction(${tr.id}, ${tr.name}, ${tr.type}) is ignored`
+    )
+    expect(config.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_DISCARD)
   })
 
   it('should set session information on transaction', () => {

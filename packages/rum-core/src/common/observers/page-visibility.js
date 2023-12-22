@@ -23,7 +23,11 @@
  *
  */
 
-import { QUEUE_ADD_TRANSACTION, QUEUE_FLUSH } from '../constants'
+import {
+  QUEUE_ADD_TRANSACTION,
+  QUEUE_FLUSH,
+  TRANSACTION_DISCARD
+} from '../constants'
 import { state } from '../../state'
 import { now } from '../utils'
 import { reportInp } from '../../performance-monitoring/metrics/inp/report'
@@ -98,15 +102,33 @@ function onPageHidden(configService, transactionService) {
 function endManagedTransaction(configService, transactionService) {
   const tr = transactionService.getCurrentTransaction()
   if (tr) {
-    const unobserve = configService.observeEvent(QUEUE_ADD_TRANSACTION, () => {
-      configService.dispatchEvent(QUEUE_FLUSH)
-      state.lastHiddenStart = now()
+    // Make sure that we still update lastHiddenStart if the managed transaction
+    // ends up being discarded
+    const unobserveDiscard = configService.observeEvent(
+      TRANSACTION_DISCARD,
+      () => {
+        state.lastHiddenStart = now()
 
-      // unsubscribe listener to execute it only once.
-      // otherwise in SPAs we might be finding situations where we would be executing
-      // this logic as many times as we observed to this event
-      unobserve()
-    })
+        // unsubscribe listeners to execute it only once.
+        // otherwise in SPAs we might be finding situations where we would be executing
+        // this logic as many times as we observed to this event
+        unobserveDiscard()
+        unobserveQueueAdd()
+      }
+    )
+    const unobserveQueueAdd = configService.observeEvent(
+      QUEUE_ADD_TRANSACTION,
+      () => {
+        configService.dispatchEvent(QUEUE_FLUSH)
+        state.lastHiddenStart = now()
+
+        // unsubscribe listeners to execute it only once.
+        // otherwise in SPAs we might be finding situations where we would be executing
+        // this logic as many times as we observed to this event
+        unobserveQueueAdd()
+        unobserveDiscard()
+      }
+    )
 
     tr.end()
   } else {
