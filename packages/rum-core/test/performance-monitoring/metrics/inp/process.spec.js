@@ -37,15 +37,15 @@ import { spyOnFunction } from '../../../../../../dev-utils/jasmine'
 import { EVENT } from '../../../../src/common/constants'
 
 if (utils.isPerfTypeSupported(EVENT)) {
-  function setInteractionCount(count) {
-    inpState.interactionCount = count
-  }
-
-  function inpCandidates() {
-    return inpState.longestInteractions
-  }
-
   describe('INP', () => {
+    function setInteractionCount(count) {
+      inpState.interactionCount = count
+    }
+
+    function inpCandidates() {
+      return inpState.longestInteractions
+    }
+
     let interactionCountSpy
     const list = {
       getEntries: jasmine.createSpy()
