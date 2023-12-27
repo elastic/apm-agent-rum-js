@@ -29,6 +29,12 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+[[release-notes-5.16.0]]
+==== 5.16.0 (2023-12-27)
+[float]
+===== Features
+* Add Support for https://web.dev/articles/inp[Interaction to Next Paint (INP) metric]. This new metric, which replaces FID, will be available in the User Experience App from version 8.12.0 of the Elastic Stack. {pull}1462[#1462]
+
 [[release-notes-5.15.0]]
 ==== 5.15.0 (2023-09-27)
 [float]
