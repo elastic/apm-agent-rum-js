@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.21.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.20.0...@elastic/apm-rum-core@5.21.0) (2023-12-27)
+
+
+### Features
+
+* **rum:** report INP metric ([#1462](https://github.com/elastic/apm-agent-rum-js/issues/1462)) ([866f066](https://github.com/elastic/apm-agent-rum-js/commit/866f066687a789252712c69301384d5473e22228))
+
+
+
 ## [5.20.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.19.0...@elastic/apm-rum-core@5.20.0) (2023-09-27)
 
 
