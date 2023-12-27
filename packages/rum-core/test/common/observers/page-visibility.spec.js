@@ -30,7 +30,8 @@ import {
   QUEUE_FLUSH,
   TRANSACTION_SERVICE,
   CONFIG_SERVICE,
-  PERFORMANCE_MONITORING
+  PERFORMANCE_MONITORING,
+  TEMPORARY_TYPE
 } from '../../../src/common/constants'
 import * as utils from '../../../src/common/utils'
 import {
@@ -39,8 +40,18 @@ import {
   setDocumentVisibilityState
 } from '../..'
 import { spyOnFunction, waitFor } from '../../../../../dev-utils/jasmine'
+import * as inpReporter from '../../../src/performance-monitoring/metrics/inp/report'
+import * as inpProcessor from '../../../src/performance-monitoring/metrics/inp/process'
 
 describe('observePageVisibility', () => {
+  // Starts performanceMonitoring to observe how transaction ends
+  function startsPerformanceMonitoring() {
+    const performanceMonitoring = serviceFactory.getService(
+      PERFORMANCE_MONITORING
+    )
+    performanceMonitoring.init()
+  }
+
   let serviceFactory
   let configService
   let transactionService
@@ -92,7 +103,35 @@ describe('observePageVisibility', () => {
   // the observed events by the agent...
   ;['visibilitychange', 'pagehide'].forEach(eventName => {
     describe(`when page becomes hidden due to ${eventName.toUpperCase()} event`, () => {
-      describe(`with every transaction already ended`, () => {
+      it('should report INP', async () => {
+        // Arrange
+        const dispatchEventSpy = spyOn(
+          configService,
+          'dispatchEvent'
+        ).and.callThrough()
+        const reportSpy = spyOnFunction(
+          inpReporter,
+          'reportInp'
+        ).and.callThrough()
+        const calculateInpSpy = spyOnFunction(inpProcessor, 'calculateInp')
+        calculateInpSpy.and.returnValue(100) // makes sure the inp transaction is created
+        unobservePageVisibility = observePageVisibility(
+          configService,
+          transactionService
+        )
+        startsPerformanceMonitoring()
+
+        // Act
+        hidePageSynthetically(eventName)
+        await waitFor(() => dispatchEventSpy.calls.any())
+
+        // Assert
+        expect(reportSpy).toHaveBeenCalledTimes(1)
+        expect(reportSpy).toHaveBeenCalledWith(transactionService)
+        expect(dispatchEventSpy).toHaveBeenCalledWith(QUEUE_FLUSH)
+      })
+
+      describe('with every transaction already ended', () => {
         it('should dispatch the QUEUE_FLUSH event', () => {
           const dispatchEventSpy = spyOn(configService, 'dispatchEvent')
 
@@ -120,15 +159,7 @@ describe('observePageVisibility', () => {
         })
       })
 
-      describe(`with a transaction that has not ended yet`, () => {
-        // Starts performanceMonitoring to observe how transaction ends
-        function startsPerformanceMonitoring() {
-          const performanceMonitoring = serviceFactory.getService(
-            PERFORMANCE_MONITORING
-          )
-          performanceMonitoring.init()
-        }
-
+      describe('with a transaction that has not ended yet', () => {
         function createTransaction() {
           const transaction = transactionService.startTransaction(
             'test-tr',
@@ -159,84 +190,65 @@ describe('observePageVisibility', () => {
           expect(endTransactionSpy).toHaveBeenCalledTimes(1)
         })
 
-        it('should dispatch the QUEUE_FLUSH event once the transaction ends and added to the queue', async () => {
-          // Arrange
-          const transaction = createTransaction()
-          const dispatchEventSpy = spyOn(
-            configService,
-            'dispatchEvent'
-          ).and.callThrough()
-          spyOn(transactionService, 'getCurrentTransaction').and.returnValue(
-            transaction
-          )
-          startsPerformanceMonitoring()
+        describe('event listeners', () => {
+          ;[
+            {
+              name: 'should fire when transaction is added to the queue',
+              createTransaction,
+              customAssertions: ({ dispatchEventSpy }) => {
+                // should dispatch the QUEUE_FLUSH event
+                expect(dispatchEventSpy).toHaveBeenCalledWith(QUEUE_FLUSH)
+              }
+            },
+            {
+              name: 'should fire when transaction is discarded',
+              createTransaction: () => {
+                const tr = createTransaction()
+                // make sure transaction will be discarded
+                tr.type = TEMPORARY_TYPE
 
-          // Act
-          unobservePageVisibility = observePageVisibility(
-            configService,
-            transactionService
-          )
-          hidePageSynthetically(eventName)
-          await waitFor(() => dispatchEventSpy.calls.any())
+                return tr
+              },
+              customAssertions: utils.noop
+            }
+          ].forEach(({ name, createTransaction, customAssertions }) => {
+            it(`${name}`, async () => {
+              // Arrange
+              const anyTime = 1234567834
+              spyOnFunction(utils, 'now').and.returnValue(anyTime)
+              const unobserveSpy = jasmine.createSpy()
+              const observeEvent = configService.observeEvent.bind(
+                configService
+              )
+              spyOn(configService, 'observeEvent').and.callFake((name, fn) => {
+                observeEvent(name, fn)
+                return unobserveSpy
+              })
+              const transaction = createTransaction()
+              const dispatchEventSpy = spyOn(
+                configService,
+                'dispatchEvent'
+              ).and.callThrough()
+              spyOn(
+                transactionService,
+                'getCurrentTransaction'
+              ).and.returnValue(transaction)
+              startsPerformanceMonitoring()
 
-          // Assert
-          expect(dispatchEventSpy).toHaveBeenCalledWith(QUEUE_FLUSH)
-        })
+              // Act
+              unobservePageVisibility = observePageVisibility(
+                configService,
+                transactionService
+              )
+              hidePageSynthetically(eventName)
+              await waitFor(() => dispatchEventSpy.calls.any())
 
-        it('should remove the QUEUE_ADD_TRANSACTION event listener once the transaction ends and added to the queue', async () => {
-          // Arrange
-          const unobserveSpy = jasmine.createSpy()
-          const observeEvent = configService.observeEvent.bind(configService)
-          spyOn(configService, 'observeEvent').and.callFake((name, fn) => {
-            observeEvent(name, fn)
-            return unobserveSpy
+              // Assert
+              customAssertions({ dispatchEventSpy })
+              expect(unobserveSpy).toHaveBeenCalledTimes(2)
+              expect(state.lastHiddenStart).toBe(anyTime)
+            })
           })
-          const transaction = createTransaction()
-          const dispatchEventSpy = spyOn(
-            configService,
-            'dispatchEvent'
-          ).and.callThrough()
-          spyOn(transactionService, 'getCurrentTransaction').and.returnValue(
-            transaction
-          )
-          startsPerformanceMonitoring()
-
-          // Act
-          unobservePageVisibility = observePageVisibility(
-            configService,
-            transactionService
-          )
-          hidePageSynthetically(eventName)
-          await waitFor(() => dispatchEventSpy.calls.any())
-
-          // Assert
-          expect(unobserveSpy).toHaveBeenCalledTimes(1)
-        })
-
-        it('should set lastHiddenStart once the transaction ends and added to the queue', async () => {
-          // Arrange
-          const anyTime = 1234567834
-          spyOnFunction(utils, 'now').and.returnValue(anyTime)
-          const transaction = createTransaction()
-          const dispatchEventSpy = spyOn(
-            configService,
-            'dispatchEvent'
-          ).and.callThrough()
-          spyOn(transactionService, 'getCurrentTransaction').and.returnValue(
-            transaction
-          )
-          startsPerformanceMonitoring()
-
-          // Act
-          unobservePageVisibility = observePageVisibility(
-            configService,
-            transactionService
-          )
-          hidePageSynthetically(eventName)
-          await waitFor(() => dispatchEventSpy.calls.any())
-
-          // Assert
-          expect(state.lastHiddenStart).toBe(anyTime)
         })
       })
     })

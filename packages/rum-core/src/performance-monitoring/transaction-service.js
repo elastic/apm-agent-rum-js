@@ -30,7 +30,7 @@ import {
   captureObserverEntries,
   metrics,
   createTotalBlockingTimeSpan
-} from './metrics'
+} from './metrics/metrics'
 import {
   extend,
   getEarliestSpan,
@@ -45,6 +45,7 @@ import {
   NAME_UNKNOWN,
   TRANSACTION_START,
   TRANSACTION_END,
+  TRANSACTION_IGNORE,
   TEMPORARY_TYPE,
   TRANSACTION_TYPE_ORDER,
   LARGEST_CONTENTFUL_PAINT,
@@ -251,13 +252,13 @@ class TransactionService {
       () => {
         const { name, type } = tr
         let { lastHiddenStart } = state
-
         if (lastHiddenStart >= tr._start) {
           if (__DEV__) {
             this._logger.debug(
               `transaction(${tr.id}, ${name}, ${type}) was discarded! The page was hidden during the transaction!`
             )
           }
+          this._config.dispatchEvent(TRANSACTION_IGNORE)
           return
         }
 
@@ -267,6 +268,7 @@ class TransactionService {
               `transaction(${tr.id}, ${name}, ${type}) is ignored`
             )
           }
+          this._config.dispatchEvent(TRANSACTION_IGNORE)
           return
         }
 

@@ -24,7 +24,7 @@
  */
 
 import { Url } from './url'
-import { PAGE_LOAD, NAVIGATION } from './constants'
+import { PAGE_LOAD, PAGE_EXIT, NAVIGATION } from './constants'
 import { getServerTimingInfo, PERF, isPerfTimelineSupported } from './utils'
 
 const LEFT_SQUARE_BRACKET = 91 // [
@@ -186,7 +186,13 @@ export function addTransactionContext(
 ) {
   const pageContext = getPageContext()
   let responseContext = {}
-  if (transaction.type === PAGE_LOAD && isPerfTimelineSupported()) {
+
+  if (transaction.type === PAGE_EXIT) {
+    transaction.ensureContext()
+    if (transaction.context.page && transaction.context.page.url) {
+      pageContext.page.url = transaction.context.page.url
+    }
+  } else if (transaction.type === PAGE_LOAD && isPerfTimelineSupported()) {
     let entries = PERF.getEntriesByType(NAVIGATION)
     if (entries && entries.length > 0) {
       responseContext = {

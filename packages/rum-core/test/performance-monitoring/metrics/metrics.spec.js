@@ -31,18 +31,21 @@ import {
   metrics,
   calculateCumulativeLayoutShift,
   createLongTaskSpans
-} from '../../src/performance-monitoring/metrics'
-import { LARGEST_CONTENTFUL_PAINT, LONG_TASK } from '../../src/common/constants'
-import { isPerfTypeSupported } from '../../src/common/utils'
+} from '../../../src/performance-monitoring/metrics/metrics'
+import {
+  LARGEST_CONTENTFUL_PAINT,
+  LONG_TASK
+} from '../../../src/common/constants'
+import { isPerfTypeSupported } from '../../../src/common/utils'
 import {
   mockObserverEntryTypes,
   mockObserverEntryNames,
   mockPerformanceTimingEntries
-} from '../utils/globals-mock'
-import longtaskEntries from '../fixtures/longtask-entries'
-import fidEntries from '../fixtures/fid-entries'
-import { fcpEntries } from '../fixtures/paint-entries'
-import { canMockPerfTimingApi } from '..'
+} from '../../utils/globals-mock'
+import longtaskEntries from '../../fixtures/longtask-entries'
+import fidEntries from '../../fixtures/fid-entries'
+import { fcpEntries } from '../../fixtures/paint-entries'
+import { canMockPerfTimingApi } from '../..'
 
 describe('Metrics', () => {
   describe('PerfEntryRecorder', () => {

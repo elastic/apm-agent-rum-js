@@ -49,7 +49,8 @@ import {
   LOGGING_SERVICE,
   CONFIG_SERVICE,
   APM_SERVER,
-  PERFORMANCE_MONITORING
+  PERFORMANCE_MONITORING,
+  TRANSACTION_IGNORE
 } from '../../src/common/constants'
 import { state } from '../../src/state'
 import patchEventHandler from '../common/patch'
@@ -153,7 +154,7 @@ describe('PerformanceMonitoring', function () {
 
   it('should initialize and notify the transaction has been added to the queue', async () => {
     performanceMonitoring.init()
-    spyOn(configService, 'dispatchEvent')
+    spyOn(configService, 'dispatchEvent').and.callThrough()
 
     const tr = performanceMonitoring._transactionService.startTransaction(
       'transaction',
@@ -193,6 +194,16 @@ describe('PerformanceMonitoring', function () {
     expect(payload.spans[0].type).toBe('span1type')
     expect(payload.spans[0].start).toBe(parseInt(span._start - tr._start))
     expect(payload.spans[0].duration).toBe(parseInt(span._end - span._start))
+  })
+
+  it('should notify when a transaction has been filtered out', function () {
+    spyOn(configService, 'dispatchEvent')
+    var tr = new Transaction('transaction-no-duration', 'transaction-type')
+    tr.end()
+
+    var payload = performanceMonitoring.createTransactionPayload(tr)
+    expect(payload).toBeUndefined()
+    expect(configService.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_IGNORE)
   })
 
   it('should sendPageLoadMetrics', function (done) {

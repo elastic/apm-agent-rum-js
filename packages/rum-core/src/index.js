@@ -26,7 +26,10 @@
 // export public core APIs.
 
 import { registerServices as registerErrorServices } from './error-logging'
-import { registerServices as registerPerfServices } from './performance-monitoring'
+import {
+  registerServices as registerPerfServices,
+  observeUserInteractions
+} from './performance-monitoring'
 import { ServiceFactory } from './common/service-factory'
 import {
   isPlatformSupported,
@@ -84,6 +87,7 @@ export {
   ERROR_LOGGING,
   EVENT_TARGET,
   CLICK,
+  observeUserInteractions,
   bootstrap,
   observePageVisibility,
   observePageClicks
