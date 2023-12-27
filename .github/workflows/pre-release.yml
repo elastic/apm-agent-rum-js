@@ -1,0 +1,87 @@
+---
+# When triggered it will prepare the release by creating a Pull Request with the
+# changes to be merged. Then it will be possible to run the release manually
+name: pre-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        type: boolean
+        description: 'Run release process in dry-run mode'
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  SLACK_BUILD_MESSAGE: "Build: (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>)"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to write the release changelog
+      contents: write
+    steps:
+      - name: Configure github token
+        uses: elastic/apm-pipeline-library/.github/actions/github-token@current
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+
+      - name: Configure git user
+        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
+        with:
+          username: ${{ env.GIT_USER }}
+          email: ${{ env.GIT_EMAIL }}
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # This prevent lerna command from throwing this error:
+      # "Working tree has uncommitted changes, please commit or remove the following changes before continuing"
+      - name: Ignore git uncommitted changes
+        run: git update-index --skip-worktree .npmrc
+
+      - name: Create PR with the required changes to be released
+        id: pre-release
+        env:
+          DRY_RUN: "${{ inputs.dry-run }}"
+        run: |
+          npm run ci:pre-release
+          if [ -e .pr.txt ] ; then
+            echo "pr=$(cat .pr.txt)" >> "$GITHUB_OUTPUT"
+            rm .pr.txt
+          fi
+
+      - if: ${{ success() && inputs.dry-run == false }}
+        uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          channel: "#apm-agent-js"
+          message: |
+            :runner: [${{ github.repository }}] Pre Release has been triggered. Review the PR ${{ steps.pre-release.outputs.pr }}. ${{ env.SLACK_BUILD_MESSAGE }}
+
+      - if: ${{ failure() && inputs.dry-run == false }}
+        uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          channel: "#apm-agent-js"
+          message: |
+            :ghost: [${{ github.repository }}] Pre Release failed. ${{ env.SLACK_BUILD_MESSAGE }}

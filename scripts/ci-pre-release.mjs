@@ -23,11 +23,12 @@
  *
  */
 
-import * as process from 'node:process'
-import fetch from 'node-fetch'
 import { execa } from 'execa'
-import { appendFile } from 'node:fs/promises'
-import * as path from 'node:path'
+import * as process from 'node:process'
+// To read the version then use https://nodejs.org/api/esm.html#no-require-exports-or-moduleexports
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
+const { version } = require('../packages/rum/package.json')
 
 function raiseError(msg) {
   console.log(msg)
@@ -63,104 +64,97 @@ async function main() {
   }
 }
 
+// Script logic
 async function dryRunMode() {
   console.log('Running in dry-run mode')
-
-  const registryUrl = process.env.REGISTRY_URL || 'http://localhost:4873'
-  console.log(`Checking local registry url: ${registryUrl}`)
-  try {
-    await fetch(registryUrl)
-  } catch (err) {
-    raiseError("The local registry isn't available")
-  }
-
-  try {
-    // Ref: https://github.com/npm/npm-registry-client/blob/856eefea40a2a88618835978e281300e3406924b/lib/adduser.js#L63-L68
-    const response = await fetch(
-      `${registryUrl}/-/user/org.couchdb.user:test`,
-      {
-        method: 'PUT',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: 'test',
-          password: 'test',
-          email: 'test@elastic.co'
-        })
-      }
-    )
-
-    let npmrcData = 'registry=http://localhost:4873\n'
-    if (response.status === 201) {
-      const { token: token } = await response.json()
-      npmrcData += `//localhost:4873/:_authToken=${token}\n`
-    } else {
-      raiseError('Failed to add user to private registry')
-    }
-
-    await appendFile(path.join(process.cwd(), '.npmrc'), '\n' + npmrcData)
-  } catch (err) {
-    raiseError('Failed to login to private registry')
-  }
-
-  try {
-    await execa(
-      'npx',
-      ['lerna', 'publish', 'from-package', `--registry=${registryUrl}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes'],
-      { stdin: process.stdin }
-    )
-      .pipeStdout(process.stdout)
-      .pipeStderr(process.stderr)
-  } catch (err) {
-    raiseError('Failed to publish npm packages')
-  }
-
-  await execa('git', ['diff', process.cwd()])
-    .pipeStdout(process.stdout)
-    .pipeStderr(process.stderr)
-
-  await execa('git', ['log', '-1', '--stat', process.cwd()])
-    .pipeStdout(process.stdout)
-    .pipeStderr(process.stderr)
-}
-
-async function prodMode() {
-  console.log('Running in prod mode')
-
-  const totpCode = process.env.TOTP_CODE
-  if (totpCode == null || totpCode === '') {
-    raiseError("The 'TOTP_CODE' env var isn't defined")
-  }
 
   const githubToken = process.env.GITHUB_TOKEN
   if (githubToken == null || githubToken === '') {
     raiseError("The 'GITHUB_TOKEN' env var isn't defined")
   }
 
+  const branch = `release/${version}-next`
+
   try {
-    await execa('npx',
-      ['lerna', 'publish', 'from-package', `--otp=${totpCode}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes'],
-      { stdin: process.stdin}
-    )
+    await execa('git', ['checkout', '-b', branch], {
+      stdin: process.stdin
+    })
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
   } catch (err) {
-    raiseError('Failed to publish npm packages')
+    raiseError('Failed to create git branch')
   }
 
   try {
-    await execa('npm', ['run', 'github-release'], {
+    await execa('npx', ['lerna', 'version', '--no-push', '--no-git-tag-version', '--no-changelog', 'yes'], {
       stdin: process.stdin,
       env: {
-        GITHUB_TOKEN: githubToken
+        GH_TOKEN: githubToken
       }
     })
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
   } catch (err) {
-    raiseError('Failed to publish github release')
+    raiseError('Failed to version npm')
+  }
+}
+
+async function prodMode() {
+  console.log('Running in prod mode')
+
+  const githubToken = process.env.GITHUB_TOKEN
+  if (githubToken == null || githubToken === '') {
+    raiseError("The 'GITHUB_TOKEN' env var isn't defined")
+  }
+
+  const branch = `release/${version}-next`
+
+  try {
+    await execa('git', ['checkout', '-b', branch], {
+      stdin: process.stdin
+    })
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
+  } catch (err) {
+    raiseError('Failed to create git branch')
+  }
+
+  try {
+    await execa('npx', ['lerna', 'version', '--yes', '--no-push'], {
+      stdin: process.stdin,
+      env: {
+        GH_TOKEN: githubToken
+      }
+    })
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
+  } catch (err) {
+    raiseError('Failed to version npm')
+  }
+
+  // As long as lerna version uses --no-push then it's required to push the commits
+  // this will avoid pushing the git tag too.
+  try {
+    await execa('git', ['push', 'origin', branch], {
+      stdin: process.stdin
+    })
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
+  } catch (err) {
+    raiseError('Failed to push git branch')
+  }
+
+  try {
+    await execa('gh', ['pr', 'create', '--fill-first'], {
+      stdin: process.stdin,
+      env: {
+        GH_TOKEN: githubToken
+      }
+    })
+      .pipeStdout('.pr.txt')
+      .pipeStderr(process.stderr)
+  } catch (err) {
+    raiseError('Failed to create GitHub PR')
   }
 }
 
@@ -169,6 +163,6 @@ async function prodMode() {
   try {
     await main()
   } catch (err) {
-    raiseError(err)
+    console.log(err)
   }
 })()
