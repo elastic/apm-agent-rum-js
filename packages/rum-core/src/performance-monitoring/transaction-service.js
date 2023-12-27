@@ -45,7 +45,7 @@ import {
   NAME_UNKNOWN,
   TRANSACTION_START,
   TRANSACTION_END,
-  TRANSACTION_DISCARD,
+  TRANSACTION_IGNORE,
   TEMPORARY_TYPE,
   TRANSACTION_TYPE_ORDER,
   LARGEST_CONTENTFUL_PAINT,
@@ -258,7 +258,7 @@ class TransactionService {
               `transaction(${tr.id}, ${name}, ${type}) was discarded! The page was hidden during the transaction!`
             )
           }
-          this._config.dispatchEvent(TRANSACTION_DISCARD)
+          this._config.dispatchEvent(TRANSACTION_IGNORE)
           return
         }
 
@@ -268,7 +268,7 @@ class TransactionService {
               `transaction(${tr.id}, ${name}, ${type}) is ignored`
             )
           }
-          this._config.dispatchEvent(TRANSACTION_DISCARD)
+          this._config.dispatchEvent(TRANSACTION_IGNORE)
           return
         }
 

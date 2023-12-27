@@ -50,7 +50,7 @@ import {
   CONFIG_SERVICE,
   APM_SERVER,
   PERFORMANCE_MONITORING,
-  TRANSACTION_DISCARD
+  TRANSACTION_IGNORE
 } from '../../src/common/constants'
 import { state } from '../../src/state'
 import patchEventHandler from '../common/patch'
@@ -203,9 +203,7 @@ describe('PerformanceMonitoring', function () {
 
     var payload = performanceMonitoring.createTransactionPayload(tr)
     expect(payload).toBeUndefined()
-    expect(configService.dispatchEvent).toHaveBeenCalledWith(
-      TRANSACTION_DISCARD
-    )
+    expect(configService.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_IGNORE)
   })
 
   it('should sendPageLoadMetrics', function (done) {

@@ -40,7 +40,7 @@ import {
   FIRST_INPUT,
   LAYOUT_SHIFT,
   LOCAL_CONFIG_KEY,
-  TRANSACTION_DISCARD
+  TRANSACTION_IGNORE
 } from '../../src/common/constants'
 import { state } from '../../src/state'
 import { isPerfTypeSupported } from '../../src/common/utils'
@@ -734,7 +734,7 @@ describe('TransactionService', function () {
     expect(logger.debug).toHaveBeenCalledWith(
       `transaction(${tr.id}, ${tr.name}, ${tr.type}) was discarded! The page was hidden during the transaction!`
     )
-    expect(config.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_DISCARD)
+    expect(config.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_IGNORE)
 
     state.lastHiddenStart = performance.now() - 1000
     tr = transactionService.startTransaction('test-name', 'test-type')
@@ -751,7 +751,7 @@ describe('TransactionService', function () {
     expect(logger.debug).toHaveBeenCalledWith(
       `transaction(${tr.id}, ${tr.name}, ${tr.type}) is ignored`
     )
-    expect(config.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_DISCARD)
+    expect(config.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_IGNORE)
   })
 
   it('should discard transaction configured to be ignored', async () => {
@@ -764,7 +764,7 @@ describe('TransactionService', function () {
     expect(logger.debug).toHaveBeenCalledWith(
       `transaction(${tr.id}, ${tr.name}, ${tr.type}) is ignored`
     )
-    expect(config.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_DISCARD)
+    expect(config.dispatchEvent).toHaveBeenCalledWith(TRANSACTION_IGNORE)
   })
 
   it('should set session information on transaction', () => {

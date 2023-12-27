@@ -26,7 +26,7 @@
 import {
   QUEUE_ADD_TRANSACTION,
   QUEUE_FLUSH,
-  TRANSACTION_DISCARD
+  TRANSACTION_IGNORE
 } from '../constants'
 import { state } from '../../state'
 import { now } from '../utils'
@@ -82,8 +82,8 @@ export function observePageVisibility(configService, transactionService) {
 function onPageHidden(configService, transactionService) {
   const inpTr = reportInp(transactionService)
   // we don't want to flush the queue for every transaction that is ended when page becomes hidden
-  // and given the async nature of the ending process of transactions
-  // will need to coordinate the flushing process
+  // as transaction ends are scheduled async as microtasks(promise),
+  // so we are coordinating the flushing process
   if (inpTr) {
     const unobserve = configService.observeEvent(QUEUE_ADD_TRANSACTION, () => {
       // At this point the INP transaction is in the queue
@@ -105,7 +105,7 @@ function endManagedTransaction(configService, transactionService) {
     // Make sure that we still update lastHiddenStart if the managed transaction
     // ends up being discarded
     const unobserveDiscard = configService.observeEvent(
-      TRANSACTION_DISCARD,
+      TRANSACTION_IGNORE,
       () => {
         state.lastHiddenStart = now()
 

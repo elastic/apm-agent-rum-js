@@ -48,7 +48,7 @@ import {
   OUTCOME_SUCCESS,
   OUTCOME_UNKNOWN,
   QUEUE_ADD_TRANSACTION,
-  TRANSACTION_DISCARD
+  TRANSACTION_IGNORE
 } from '../common/constants'
 import {
   truncateModel,
@@ -425,6 +425,6 @@ export default class PerformanceMonitoring {
       return this.createTransactionDataModel(transaction)
     }
 
-    this._configService.dispatchEvent(TRANSACTION_DISCARD)
+    this._configService.dispatchEvent(TRANSACTION_IGNORE)
   }
 }

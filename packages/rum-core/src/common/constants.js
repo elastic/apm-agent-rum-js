@@ -110,7 +110,7 @@ const TRANSACTION_END = 'transaction:end'
 const CONFIG_CHANGE = 'config:change'
 const QUEUE_FLUSH = 'queue:flush'
 const QUEUE_ADD_TRANSACTION = 'queue:add_transaction'
-const TRANSACTION_DISCARD = 'transaction:discard'
+const TRANSACTION_IGNORE = 'transaction:ignore'
 
 /**
  * Events types that are used to toggle auto instrumentations
@@ -204,7 +204,7 @@ export {
   CONFIG_CHANGE,
   QUEUE_FLUSH,
   QUEUE_ADD_TRANSACTION,
-  TRANSACTION_DISCARD,
+  TRANSACTION_IGNORE,
   XMLHTTPREQUEST,
   FETCH,
   HISTORY,
