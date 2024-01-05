@@ -9,9 +9,26 @@ FROM ubuntu:bionic
 ARG NODEJS_VERSION
 
 # 1. Install node
-RUN apt-get -qq update && apt-get -qq install -y curl && \
-    curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
-    apt-get -qq install -y nodejs
+RUN \
+  apt-get update > /dev/null \
+  && apt-get install -y --no-install-recommends \
+    "ca-certificates=*" \
+    "curl=*" \
+    "gnupg=*" \
+    "lsb-release=*" \
+  && mkdir -p /etc/apt/keyrings
+RUN \
+  if [ "${NODEJS_VERSION}" = "14" ]; then \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODEJS_VERSION}.x $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/nodesource.list; \
+  else \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODEJS_VERSION}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list; \
+  fi
+RUN \
+  apt-get update > /dev/null \
+  && apt-get install -y --no-install-recommends \
+    "nodejs=*"
 
 # 2. Install git (used to tag commit in benchmark runner)
 RUN apt-get -qq install -y git --no-install-recommends

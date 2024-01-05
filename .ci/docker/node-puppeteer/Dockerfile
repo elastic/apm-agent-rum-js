@@ -4,13 +4,26 @@ FROM ubuntu:jammy
 ARG NODEJS_VERSION
 
 # Install node
- RUN apt-get update && apt-get install -y ca-certificates curl gnupg && \
- mkdir -p /etc/apt/keyrings && \
- curl -sL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
- echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODEJS_VERSION.x nodistro main" | \
- tee /etc/apt/sources.list.d/nodesource.list && \
- apt-get update && apt-get install nodejs -y && \
- rm -rf /etc/apt/keyrings && rm /etc/apt/sources.list.d/nodesource.list
+RUN \
+  apt-get update > /dev/null \
+  && apt-get install -y --no-install-recommends \
+    "ca-certificates=*" \
+    "curl=*" \
+    "gnupg=*" \
+    "lsb-release=*" \
+  && mkdir -p /etc/apt/keyrings
+RUN \
+  if [ "${NODEJS_VERSION}" = "14" ]; then \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODEJS_VERSION}.x $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/nodesource.list; \
+  else \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODEJS_VERSION}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list; \
+  fi
+RUN \
+  apt-get update > /dev/null \
+  && apt-get install -y --no-install-recommends \
+    "nodejs=*"
 
 # the node-gyp we use is only compatible with Python versions less than 3.10,
 # so we need to make sure we use a previous version
