@@ -18,7 +18,7 @@ pip install docker-compose>=1.25.4
 for i in {1..3};
 do
   USER_ID="$(id -u):$(id -g)" \
-  NODEJS_VERSION=$(cat .nvmrc) \
+  NODEJS_VERSION=$(cat .ci/.node-version) \
   STACK_VERSION=${STACK_VERSION} \
   APM_SERVER_PORT=${APM_SERVER_PORT} \
   APM_SERVER_URL=${APM_SERVER_URL} \

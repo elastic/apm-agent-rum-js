@@ -66,6 +66,6 @@ runs:
       if: success() || failure()
       uses: actions/upload-artifact@v4
       with:
-        name: test-results
+        name: test-results-${{ github.run_id }}-${{ github.run_attempt }}-${{ inputs.goal }}
         path: |
           packages/**/reports/TESTS-*.xml
