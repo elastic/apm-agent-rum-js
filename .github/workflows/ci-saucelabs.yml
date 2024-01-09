@@ -60,7 +60,7 @@ jobs:
           - '@elastic/apm-rum-angular'
           - '@elastic/apm-rum-vue'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run saucelabs tests
         uses: ./.github/workflows/run-test
         with:

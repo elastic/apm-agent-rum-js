@@ -45,12 +45,12 @@ jobs:
           email: ${{ env.GIT_EMAIL }}
           token: ${{ env.GITHUB_TOKEN }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ env.GITHUB_TOKEN }}
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
 
@@ -59,7 +59,7 @@ jobs:
 
       - name: Read NPM vault TOTP
         if: inputs.dry-run == false
-        uses: hashicorp/vault-action@v2.7.3
+        uses: hashicorp/vault-action@v2.7.4
         with:
           method: approle
           url: ${{ secrets.VAULT_ADDR }}
@@ -90,7 +90,7 @@ jobs:
         run: npm run ci:release
 
       - name: Read GCE vault secrets
-        uses: hashicorp/vault-action@v2.7.3
+        uses: hashicorp/vault-action@v2.7.4
         with:
           method: approle
           url: ${{ secrets.VAULT_ADDR }}
@@ -100,7 +100,7 @@ jobs:
             ${{ env.ELASTIC_CDN_CREDENTIALS }} value | GOOGLE_CREDENTIALS ;
 
       - name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+        uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ env.GOOGLE_CREDENTIALS }}'
           create_credentials_file: true
@@ -111,7 +111,7 @@ jobs:
 
       - id: 'upload-files-version'
         if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js') }}
-        uses: 'google-github-actions/upload-cloud-storage@v1'
+        uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           parent: false
           path: 'packages/rum/dist/bundles/'
@@ -123,7 +123,7 @@ jobs:
 
       - id: 'upload-files-major-version'
         if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js') }}
-        uses: 'google-github-actions/upload-cloud-storage@v1'
+        uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           parent: false
           path: 'packages/rum/dist/bundles/'
@@ -135,7 +135,7 @@ jobs:
 
       - id: 'upload-file-index'
         if: ${{ always() && hashFiles('index.html') }}
-        uses: 'google-github-actions/upload-cloud-storage@v1'
+        uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           parent: false
           path: 'index.html'
