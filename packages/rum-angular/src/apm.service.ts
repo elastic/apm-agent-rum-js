@@ -74,8 +74,13 @@ export class ApmService {
         if (!transaction) {
           return
         }
-
         /**
+         * Decide whether to enable dynamic URL feature 
+         */
+        if (this.apm.isDynamicUrl()) {
+          transaction.name = event.url;
+        } else {
+         /**
          * The below logic must be placed in NavigationEnd since
          * the we depend on the current route state to get the path
          *
@@ -85,26 +90,25 @@ export class ApmService {
          * Traverse the activated route tree to figure out the nested
          * route path
          */
-        const route = this.router.routerState.root.firstChild
-
-        if (route) {
-          let child = route
-          let path = '/' + child.routeConfig.path
-          while (child) {
-            child = child.firstChild
-            if (child && child.routeConfig) {
-              const currentPath = child.routeConfig.path
-              /**
-               * Ignore empty path's in the route config
-               */
-              if (currentPath) {
-                path += '/' + currentPath
+          const route = this.router.routerState.root.firstChild
+          if (route) {
+            let child = route
+            let path = '/' + child.routeConfig.path
+            while (child) {
+              child = child.firstChild
+              if (child && child.routeConfig) {
+                const currentPath = child.routeConfig.path
+                /**
+                 * Ignore empty path's in the route config
+                 */
+                if (currentPath) {
+                  path += '/' + currentPath
+                }
               }
             }
+            transaction.name = path
           }
-          transaction.name = path
         }
-
         afterFrame(() => transaction.detectFinish())
       }
     })

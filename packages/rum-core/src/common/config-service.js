@@ -94,7 +94,8 @@ class Config {
       context: {},
       session: false,
       apmRequest: null,
-      sendCredentials: false
+      sendCredentials: false,
+      useDynamiclUrl: false,
     }
 
     this.events = new EventHandler()

@@ -57,6 +57,11 @@ export default class ApmBase {
     return this.isEnabled() && this._initialized && configService.get('active')
   }
 
+  isDynamicUrl(){
+    const configService = this.serviceFactory.getService(CONFIG_SERVICE)
+    return this.isEnabled() && this._initialized && configService.get('useDynamiclUrl')
+  }
+
   init(config) {
     if (this.isEnabled() && !this._initialized) {
       this._initialized = true
