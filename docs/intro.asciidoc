@@ -20,7 +20,7 @@ captures the following information:
 * API requests (XMLHttpRequest and Fetch)
 * Single page application navigations
 * <<user-interactions, User interactions>> (click events that trigger network activity)
-* <<user-centric-metrics, User-centric metrics>> (Long tasks, FCP, LCP, FID, etc.)
+* <<user-centric-metrics, User-centric metrics>> (Long tasks, FCP, LCP, INP, etc.)
 * Page information (URLs visited and referrer)
 * Network connection information
 * JavaScript errors
