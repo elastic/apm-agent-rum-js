@@ -63,9 +63,9 @@ INP is one of the https://web.dev/vitals/[core web vitals] metrics,
 and you can read more about INP in the https://web.dev/articles/inp[web.dev docs].
 To provide a good user experience, Google recommends an INP of *fewer than 200 milliseconds*.
 
-// `First input delay (FID)`::
-// FID quantifies the experience of the user when they interact with the page during the page load. It is measured as the time between when a user first interacts with your site (mouse clicks, taps, select dropdowns, etc.) to the time when the
-// browser can respond to that interaction. FID is one of the https://web.dev/vitals/[core web vitals] metrics and available only in Chrome >85 via https://wicg.github.io/event-timing/[Event Timing API]. FID is captured as `First Input Delay` span for `page-load` transaction. Maintain FID *below 100 milliseconds* to provide a good user experience.
+`First input delay (FID)`::
+FID quantifies the experience of the user when they interact with the page during the page load. It is measured as the time between when a user first interacts with your site (mouse clicks, taps, select dropdowns, etc.) to the time when the
+browser can respond to that interaction. FID is one of the https://web.dev/vitals/[core web vitals] metrics and available only in Chrome >85 via https://wicg.github.io/event-timing/[Event Timing API]. FID is captured as `First Input Delay` span for `page-load` transaction. Maintain FID *below 100 milliseconds* to provide a good user experience.
 
 `Total blocking time (TBT)`::
 The sum of the blocking time (duration above 50 ms) for each long task that occurs between the First contentful paint and the time when the transaction is completed. https://web.dev/tbt/[Total blocking time] is a
