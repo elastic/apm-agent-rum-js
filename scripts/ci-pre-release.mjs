@@ -99,7 +99,7 @@ async function dryRunMode() {
   }
 
   try {
-    await execa('git', ['--no-pager', 'diff'], {
+    await execa('git', ['--no-pager', 'diff', 'HEAD~1'], {
       stdin: process.stdin
     })
       .pipeStdout(process.stdout)
