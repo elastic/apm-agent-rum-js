@@ -86,7 +86,7 @@ async function dryRunMode() {
   }
 
   try {
-    await execa('npx', ['lerna', 'version', '--no-push', '--no-git-tag-version', '--no-changelog', 'yes'], {
+    await execa('npx', ['lerna', 'version', '--yes', '--no-push'], {
       stdin: process.stdin,
       env: {
         GH_TOKEN: githubToken
@@ -96,6 +96,16 @@ async function dryRunMode() {
       .pipeStderr(process.stderr)
   } catch (err) {
     raiseError('Failed to version npm')
+  }
+
+  try {
+    await execa('git', ['--no-pager', 'diff', 'HEAD~1'], {
+      stdin: process.stdin
+    })
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
+  } catch (err) {
+    raiseError('Failed to git diff')
   }
 }
 
