@@ -33,10 +33,10 @@ Trigged when the browser finishes loading its document and dependent resources: 
 Duration from the browser making an HTTP request for the initial document to the first byte of the page being received. TTFB is available from the Navigation Timing API as the `reponseStart` timestamp, and captured as transaction mark `transaction.marks.agent.timeToFirstByte` in the ElasticSearch document.
 
 To capture the overall user experience of the page including all of the above information plus additional resource requests that might be
-triggered during the execution of dependent resources, the `page-load` transaction duration might not always reflect the 
-https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event[Load] event of the browser and can extend beyond the event. 
+triggered during the execution of dependent resources, the `page-load` transaction duration might not always reflect the
+https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event[Load] event of the browser and can extend beyond the event.
 
-If you are interested in accurately measuring the duration of load event, the information can be extracted by using 
+If you are interested in accurately measuring the duration of load event, the information can be extracted by using
 `Fire load event` Span or from the Transaction marks available as `transaction.marks.agent.domComplete` in the Elasticsearch document.
 
 NOTE: The page load transaction is measured relative to the `fetchStart` timestamp from the Navigation Timing API.
@@ -52,9 +52,16 @@ To understand the performance characteristics of a web page beyond the page load
 Focusses on the initial rendering and measures the time from when the page starts loading to when any part of the page's content is displayed on the screen. The agent uses the https://www.w3.org/TR/paint-timing/#first-contentful-paint[Paint timing API] available in the browser to capture the timing information. FCP is captured as transaction mark for `page-load` transaction for all chromium-based browsers (Chrome >60, Edge >79, Opera >47, etc.).
 
 `Largest contentful paint (LCP)`::
-A new page-load metric that denotes the time from when the page starts loading to when the critical element (largest text, image, video elements) is displayed on the screen. LCP is available in the browser through 
+A new page-load metric that denotes the time from when the page starts loading to when the critical element (largest text, image, video elements) is displayed on the screen. LCP is available in the browser through
 https://wicg.github.io/largest-contentful-paint/[LargestContentfulPaint API] which relies on the draft https://wicg.github.io/element-timing/[Element Timing API]. LCP is one of the https://web.dev/vitals/[core web vitals] metrics and
 available only in Chrome >77. Captured as transaction mark for `page-load` transaction, maintain LCP within the first *2.5 seconds* of page-load to provide a good user experience.
+
+Interaction to next paint (INP)::
+INP quantifies responsiveness to user interactions.
+The INP value comes from measuring the latency of all click, tap, and keyboard interactions that happen throughout a single page visit and choosing the longest interaction observed.
+INP is one of the https://web.dev/vitals/[core web vitals] metrics,
+and you can read more about INP in the https://web.dev/articles/inp[web.dev docs].
+To provide a good user experience, Google recommends an INP of *fewer than 200 milliseconds*.
 
 `First input delay (FID)`::
 FID quantifies the experience of the user when they interact with the page during the page load. It is measured as the time between when a user first interacts with your site (mouse clicks, taps, select dropdowns, etc.) to the time when the
@@ -84,12 +91,12 @@ The https://www.w3.org/TR/user-timing/[User Timing] spec exposes API for develop
 The RUM agent automatically instruments click event listeners that are
 registered by the application. The click events are captured as `user-interaction`
 transactions. However, to avoid sending too many `user-interaction` transactions
-to the server, the agent discards transactions with no spans (e.g. no network activity). Furthermore, 
+to the server, the agent discards transactions with no spans (e.g. no network activity). Furthermore,
 if the click interaction results in route change, then a `route-change`
 transaction would be captured instead.
 
-The transaction name can be influenced either by using the `name` or preferably the `data-transaction-name` HTML attribute. 
-Examples of transaction names based on the html attributes present: 
+The transaction name can be influenced either by using the `name` or preferably the `data-transaction-name` HTML attribute.
+Examples of transaction names based on the html attributes present:
 
 * `<button></button>`: `Click - button`
 
@@ -102,9 +109,9 @@ Examples of transaction names based on the html attributes present:
 [[spa]]
 === Single Page Applications
 
-All history `pushState` events will be captured as transactions. 
+All history `pushState` events will be captured as transactions.
 Most of these transactions can be enhanced by using framework specific integrations.
-For all unsupported frameworks/libraries, you can instrument the application 
+For all unsupported frameworks/libraries, you can instrument the application
 by creating <<custom-transactions,custom transactions>> and custom spans with the <<apm-start-span,span API>>.
 
 
