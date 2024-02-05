@@ -44,8 +44,8 @@ jobs:
     if: |
       inputs.saucelab_test == true || inputs.saucelab_test == null
       && (github.event_name != 'pull_request'
-        || github.event_name == 'pull_request'
-        && github.event.pull_request.head.repo.fork == false)
+        || ( github.event_name == 'pull_request'
+        && github.event.pull_request.head.repo.fork == false ))
     runs-on: ubuntu-latest
     strategy:
       # Saucelab doesn't support running test in //.
@@ -84,3 +84,10 @@ jobs:
         with:
           needs: ${{ toJSON(needs) }}
       - run: ${{ steps.check.outputs.isSuccess }}
+        ## Use the condition in the step so the job runs always even if
+        ## test-saucelabs failed.
+        if: |
+          inputs.saucelab_test == true || inputs.saucelab_test == null
+          && (github.event_name != 'pull_request'
+            || ( github.event_name == 'pull_request'
+            && github.event.pull_request.head.repo.fork == false ))
