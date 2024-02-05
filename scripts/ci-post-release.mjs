@@ -25,6 +25,7 @@
 
 import * as process from 'node:process'
 import { execa } from 'execa'
+import * as fs from 'fs'
 
 function raiseError(msg) {
   console.log(msg)
@@ -74,9 +75,12 @@ async function prodMode() {
   }
 
   try {
+
+    console.log(` > List lerna versions`)
+
     await execa('npx',
       ['lerna', 'list', '-l', '--json'],
-      { stdin: process.stdin}
+      { stdin: process.stdin }
     )
       .pipeStdout('lerna-list.txt')
       .pipeStderr(process.stderr)
@@ -102,15 +106,23 @@ async function prodMode() {
       }
     })
 
+    console.log(` >> Get sha commit for ${core}`)
     // Get the sha commit for @elastic/apm-rum-core, if something bad then this is a genuine error.
-    const {commit} = await execa('git', ['rev-list', '-n', '1', `${core}`], { stdin: process.stdin})
+    const {stdout} = await execa('git', ['rev-list', '-n', '1', `${core}`], { stdin: process.stdin })
+      .pipeStderr(process.stderr)
+    console.log(` >> ${core} = ${stdout}`)
 
     // Checkout the commit, if something bad then this is a genuine error.
-    await execa('git', ['checkout', `${commit}`], { stdin: process.stdin})
+    await execa('git', ['checkout', `${stdout}`], { stdin: process.stdin })
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
+
     ids.forEach(tag => {
       // if it's already a tag then say that!
       try {
-        execa('git', ['rev-parse', `${tag}`], { stdin: process.stdin})
+        execa('git', ['rev-parse', `${tag}`], { stdin: process.stdin })
+          .pipeStdout(process.stdout)
+          .pipeStderr(process.stderr)
         console.log(`${tag} already exists. There is no need to tag it`)
       } catch (err) {
         // otherwise retag, if something bad then this is a genuine error.
@@ -125,6 +137,7 @@ async function prodMode() {
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
   } catch (err) {
+    console.log(`${err}`)
     raiseError('Failed to tag all the versions.')
   }
 
