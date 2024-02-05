@@ -29,7 +29,8 @@
     "clean": "lerna exec -- rm -rf dist/",
     "ci:prepare-release": "node ./scripts/ci-prepare-release.js",
     "ci:pre-release": "node ./scripts/ci-pre-release.mjs",
-    "ci:release": "node ./scripts/ci-release.mjs"
+    "ci:release": "node ./scripts/ci-release.mjs",
+    "ci:post-release": "node ./scripts/ci-post-release.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts}": [
