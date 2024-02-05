@@ -123,8 +123,9 @@ async function prodMode() {
         execa('git', ['rev-parse', `${tag}`], { stdin: process.stdin })
           .pipeStdout(process.stdout)
           .pipeStderr(process.stderr)
-        console.log(`${tag} already exists. There is no need to tag it`)
+        console.log(` >> ${tag} already exists. There is no need to tag it`)
       } catch (err) {
+        console.log(` >> ${tag} does not exist.`)
         // otherwise retag, if something bad then this is a genuine error.
         execa('git', ['tag', `${tag}`], { stdin: process.stdin })
           .pipeStdout(process.stdout)
