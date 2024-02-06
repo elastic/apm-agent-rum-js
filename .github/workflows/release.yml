@@ -144,6 +144,11 @@ jobs:
           headers: |-
             cache-control: public,max-age=604800,immutable
 
+      - name: Post-release
+        env:
+          DRY_RUN: "${{ inputs.dry-run }}"
+        run: npm run ci:post-release
+
       - if: ${{ success() && inputs.dry-run == false }}
         uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
         with:
