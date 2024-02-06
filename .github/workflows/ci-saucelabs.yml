@@ -44,8 +44,8 @@ jobs:
     if: |
       inputs.saucelab_test == true || inputs.saucelab_test == null
       && (github.event_name != 'pull_request'
-        || github.event_name == 'pull_request'
-        && github.event.pull_request.head.repo.fork == false)
+        || ( github.event_name == 'pull_request'
+        && github.event.pull_request.head.repo.fork == false ))
     runs-on: ubuntu-latest
     strategy:
       # Saucelab doesn't support running test in //.
@@ -74,7 +74,12 @@ jobs:
 
   all-tests-saucelabs:
     name: All Tests SauceLabs
-    if: always()
+    if: |
+      always()
+      && (inputs.saucelab_test == true || inputs.saucelab_test == null)
+      && (github.event_name != 'pull_request'
+          || (github.event_name == 'pull_request'
+              && github.event.pull_request.head.repo.fork == false))
     runs-on: ubuntu-latest
     needs:
       - test-saucelabs
