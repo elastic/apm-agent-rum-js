@@ -112,7 +112,9 @@ function findCustomTransactionName(target) {
     // Leverage closest API to traverse the element and its parents
     // only links and buttons are considered.
     const element = target.closest(INTERACTIVE_SELECTOR)
-    return element ? element.dataset.transactionName : null
+    return element
+      ? element.dataset.transactionName
+      : target.dataset.transactionName
   }
 
   // browsers which don't support closest API will just look at the target element

@@ -165,7 +165,7 @@ describe('observePageClicks', () => {
             'should not use customTransactionName when click target is not descendant from <button> nor <a>',
           parentTagName: 'div',
           customTransactionName: 'div-custom-name-html',
-          expected: 'Click - span'
+          expected: 'Click - div-custom-name-html'
         }
       ].forEach(({ name, parentTagName, customTransactionName, expected }) => {
         it(`${name}`, () => {
