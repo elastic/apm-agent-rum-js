@@ -59,7 +59,7 @@ jobs:
 
       - name: Read NPM vault TOTP
         if: inputs.dry-run == false
-        uses: hashicorp/vault-action@v2.7.4
+        uses: hashicorp/vault-action@v3.0.0
         with:
           method: approle
           url: ${{ secrets.VAULT_ADDR }}
@@ -90,7 +90,7 @@ jobs:
         run: npm run ci:release
 
       - name: Read GCE vault secrets
-        uses: hashicorp/vault-action@v2.7.4
+        uses: hashicorp/vault-action@v3.0.0
         with:
           method: approle
           url: ${{ secrets.VAULT_ADDR }}
