@@ -89,6 +89,8 @@ jobs:
       - name: Publish the release
         env:
           DRY_RUN: "${{ inputs.dry-run }}"
+          # See https://github.com/lerna/lerna/issues/3657
+          NPM_CONFIG_PROVENANCE: true
         run: npm run ci:release
 
       - name: Read GCE vault secrets
