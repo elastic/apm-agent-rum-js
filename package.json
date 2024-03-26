@@ -151,7 +151,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "^0.0.31",
     "karma-webpack": "^5.0.0",
-    "lerna": "^4.0.0",
+    "lerna": "^6.6.2",
     "license-checker": "^25.0.1",
     "lint-staged": "^12.1.5",
     "lodash": "^4.17.20",
