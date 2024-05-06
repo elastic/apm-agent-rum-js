@@ -114,6 +114,7 @@ jobs:
         run: echo "versions=$(npm run --silent ci:prepare-release)" >> ${GITHUB_OUTPUT}
 
       - name: generate build provenance
+      if: ${{ hashFiles('packages/rum/dist/bundles/*.js') }}
         uses: github-early-access/generate-build-provenance@main
         with:
           subject-path: "${{ github.workspace }}/packages/rum/dist/bundles/*.js"
