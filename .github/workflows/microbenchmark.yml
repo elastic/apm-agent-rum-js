@@ -5,7 +5,7 @@ on:
     inputs:
       stack_version:
         description: 'Stack Version'
-        default: '8.13.3'
+        default: '8.13.4'
         required: false
   push:
     branches:
@@ -28,7 +28,7 @@ jobs:
         name: Run buildkite pipeline
         uses: elastic/apm-pipeline-library/.github/actions/buildkite@current
         env:
-          STACK_VERSION: ${{ inputs.stack_version || '8.13.3' }}
+          STACK_VERSION: ${{ inputs.stack_version || '8.13.4' }}
         with:
           vaultUrl: ${{ secrets.VAULT_ADDR }}
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
