@@ -18,7 +18,7 @@ jobs:
 
       - uses: elastic/oblt-actions/updatecli/run@v1
         with:
-          command: "apply --config .ci/bump-elastic-stack.yml"
+          command: "--experimental apply --config .ci/bump-elastic-stack.yml"
         env:
           GITHUB_TOKEN: ${{ secrets.UPDATECLI_GH_TOKEN }}
 

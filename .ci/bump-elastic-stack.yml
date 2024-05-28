@@ -20,6 +20,7 @@ scms:
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       branch: main
+      commitusingapi: true
 
 sources:
   latestRelease:
