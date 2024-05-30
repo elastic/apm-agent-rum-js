@@ -21,23 +21,17 @@ permissions:
 jobs:
   microbenchmark:
     runs-on: ubuntu-latest
-    # wait up to 1 hour
     timeout-minutes: 60
     steps:
-      - id: buildkite
-        name: Run buildkite pipeline
-        uses: elastic/apm-pipeline-library/.github/actions/buildkite@current
+      - name: Run buildkite pipeline
+        uses: elastic/oblt-actions/buildkite/run@v1.4.0
         env:
           STACK_VERSION: ${{ inputs.stack_version || '8.13.4' }}
         with:
-          vaultUrl: ${{ secrets.VAULT_ADDR }}
-          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
-          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
+          token: ${{ secrets.BUILDKITE_TOKEN }}
           pipeline: apm-agent-microbenchmark
-          triggerMessage: "${{ github.repository }}@${{ github.ref_name }}"
-          waitFor: true
-          printBuildLogs: true
-          buildEnvVars: |
+          wait-for: true
+          env-vars: |
             script=.ci/scripts/bench.sh
             repo=apm-agent-rum-js
             sha=${{ github.sha }}
@@ -45,12 +39,10 @@ jobs:
             BRANCH_NAME=${{ github.ref_name }}
 
       - if: ${{ failure() }}
-        uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
+        uses: elastic/oblt-actions/slack/send@v1.4.0
         with:
-          url: ${{ secrets.VAULT_ADDR }}
-          roleId: ${{ secrets.VAULT_ROLE_ID }}
-          secretId: ${{ secrets.VAULT_SECRET_ID }}
-          channel: "#apm-agent-js"
+          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel-id: "#apm-agent-js"
           message: |
             :ghost: [${{ github.repository }}] microbenchmark *${{ github.ref_name }}* failed to run in Buildkite.
             Build: (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>)
