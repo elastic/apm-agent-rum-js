@@ -13,6 +13,11 @@ pip3 install docker==6.1.3
 
 pip install docker-compose>=1.25.4
 
+# https://github.com/docker/docker-py/issues/3256
+pip3 uninstall requests
+pip3 install requests==2.31.0
+
+
 # Tests are run within the node-puppeteer container and can fails.
 # To avoid flakiness, we retry up to 3 times to run them.
 for i in {1..3};
