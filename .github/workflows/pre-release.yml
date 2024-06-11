@@ -24,7 +24,7 @@ jobs:
       # Needed to write the release changelog
       contents: write
     env:
-      GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:

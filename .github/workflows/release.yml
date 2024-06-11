@@ -31,7 +31,7 @@ jobs:
         ports:
           - 4873:4873
     env:
-      GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
     steps:
 
       - uses: actions/checkout@v4
