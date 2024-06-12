@@ -27,9 +27,6 @@ on:
 permissions:
   contents: read
 
-env:
-  CODECOV_SECRET: secret/apm-team/ci/apm-agent-rum-codecov
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
