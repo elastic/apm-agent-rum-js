@@ -28,8 +28,6 @@ permissions:
   contents: read
 
 env:
-  DOCKER_ELASTIC_SECRET: secret/observability-team/ci/docker-registry/prod
-  SAUCELABS_SECRET: secret/apm-team/ci/apm-agent-rum-saucelabs@elastic/apm-rum
   CODECOV_SECRET: secret/apm-team/ci/apm-agent-rum-codecov
 
 concurrency:
@@ -68,9 +66,8 @@ jobs:
           mode: 'saucelabs'
           scope: ${{ matrix.scope }}
           stack-version: ${{ matrix.stack-version }}
-          vault-url: ${{ secrets.VAULT_ADDR }}
-          vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
-          vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
+          sauce-username: ${{ secrets.SAUCE_USERNAME }}
+          sauce-access-key: ${{ secrets.SAUCE_ACCESS_KEY }}
 
   all-tests-saucelabs:
     name: All Tests SauceLabs
