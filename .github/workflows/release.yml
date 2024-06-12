@@ -30,25 +30,16 @@ jobs:
         image: verdaccio/verdaccio:5
         ports:
           - 4873:4873
+    env:
+      GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
     steps:
-      - name: Configure github token
-        uses: elastic/apm-pipeline-library/.github/actions/github-token@current
-        with:
-          url: ${{ secrets.VAULT_ADDR }}
-          roleId: ${{ secrets.VAULT_ROLE_ID }}
-          secretId: ${{ secrets.VAULT_SECRET_ID }}
-
-      - name: Configure git user
-        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
-        with:
-          username: ${{ env.GIT_USER }}
-          email: ${{ env.GIT_EMAIL }}
-          token: ${{ env.GITHUB_TOKEN }}
 
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ env.GITHUB_TOKEN }}
+
+      - uses: elastic/oblt-actions/git/setup@v1
 
       - uses: actions/setup-node@v4
         with:
@@ -150,21 +141,17 @@ jobs:
         run: npm run ci:post-release
 
       - if: ${{ success() && inputs.dry-run == false }}
-        uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
+        uses: elastic/oblt-actions/slack/send@v1
         with:
-          url: ${{ secrets.VAULT_ADDR }}
-          roleId: ${{ secrets.VAULT_ROLE_ID }}
-          secretId: ${{ secrets.VAULT_SECRET_ID }}
-          channel: "#apm-agent-js"
+          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel-id: "#apm-agent-js"
           message: |
             :runner: [${{ github.repository }}] Release has been published. ${{ env.SLACK_BUILD_MESSAGE }}
 
       - if: ${{ failure() && inputs.dry-run == false }}
-        uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
+        uses: elastic/oblt-actions/slack/send@v1
         with:
-          url: ${{ secrets.VAULT_ADDR }}
-          roleId: ${{ secrets.VAULT_ROLE_ID }}
-          secretId: ${{ secrets.VAULT_SECRET_ID }}
-          channel: "#apm-agent-js"
+          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel-id: "#apm-agent-js"
           message: |
             :ghost: [${{ github.repository }}] Release failed. ${{ env.SLACK_BUILD_MESSAGE }}
