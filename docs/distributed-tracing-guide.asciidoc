@@ -29,6 +29,7 @@ var apm = initApm({
 This effectively tells the agent to add the distributed tracing HTTP header (`traceparent`)
 to requests made to `https://api.example.com`.
 
+Note that when an item in the array is a string, an exact match will be performed. If it’s a RegExp object, its test function will be called with the request origin.
 
 [float]
 [[enable-tracestate]]
