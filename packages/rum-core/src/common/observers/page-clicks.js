@@ -108,13 +108,15 @@ function buildTransactionName(target) {
 }
 
 function findCustomTransactionName(target) {
+  const trCustomNameAttribute = 'data-transaction-name'
+  const fallbackName = target.getAttribute(trCustomNameAttribute)
   if (target.closest) {
     // Leverage closest API to traverse the element and its parents
     // only links and buttons are considered.
     const element = target.closest(INTERACTIVE_SELECTOR)
-    return element ? element.dataset.transactionName : null
+    return element ? element.getAttribute(trCustomNameAttribute) : fallbackName
   }
 
-  // browsers which don't support closest API will just look at the target element
-  return target.dataset.transactionName
+  // browsers (such as IE11) which don't support closest API will just look at the target element
+  return fallbackName
 }
