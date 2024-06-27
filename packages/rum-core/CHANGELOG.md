@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [5.21.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.21.0...@elastic/apm-rum-core@5.21.1) (2024-06-27)
+
+
+### Bug Fixes
+
+* **rum:** make sure custom transaction name logic is IE11 compliant ([#1511](https://github.com/elastic/apm-agent-rum-js/issues/1511)) ([b192e28](https://github.com/elastic/apm-agent-rum-js/commit/b192e2892a2bc142aa810cfd0bc7937563cb8d2d))
+
+
+
 ## [5.21.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.20.0...@elastic/apm-rum-core@5.21.0) (2023-12-27)
 
 
