@@ -29,6 +29,14 @@ See Conventional Commits (https://conventionalcommits.org) for commit guidelines
 [[release-notes-5.x]]
 === RUM JS Agent version 5.x
 
+
+[[release-notes-5.16.1]]
+==== 5.16.1 (2024-06-27)
+[float]
+===== Bug fixes
+* User interaction click transactions will report correct transaction names for IE11 {pull}1511[#1511]
+
+
 [[release-notes-5.16.0]]
 ==== 5.16.0 (2023-12-27)
 [float]
