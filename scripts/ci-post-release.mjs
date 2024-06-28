@@ -106,8 +106,27 @@ async function prodMode() {
       }
     })
 
+    // The existing release automation is not tagging the core module
+    // this was intentionally changed to support the new release automation of
+    // reviewing the changes and then raising a PR to bump the version.
+    // As a consequence, the tags need to be created explicitly rather than
+    // with the lerna automation.
+    // Let's tag the core module if it's not tagged yet.
+    try {
+      console.log(` >> Get sha commit for ${core} and check if it's tagged already.`)
+      const {stdout} = await execa('git', ['rev-list', '-n', '1', `${core}`], { stdin: process.stdin })
+        .pipeStderr(process.stderr)
+      console.log(` >> ${core} = ${stdout}`)
+    } catch (err) {
+      console.log(` >> ${core} has not been tagged yet. Let's tag it now.`)
+      // otherwise tag, if something bad then this is a genuine error.
+      execa('git', ['tag', `${core}`], { stdin: process.stdin })
+        .pipeStdout(process.stdout)
+        .pipeStderr(process.stderr)
+    }
+
     console.log(` >> Get sha commit for ${core}`)
-    // Get the sha commit for @elastic/apm-rum-core, if something bad then this is a genuine error.
+    // Get the sha commit for core, if something bad then this is a genuine error.
     const {stdout} = await execa('git', ['rev-list', '-n', '1', `${core}`], { stdin: process.stdin })
       .pipeStderr(process.stderr)
     console.log(` >> ${core} = ${stdout}`)
