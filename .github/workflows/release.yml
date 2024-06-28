@@ -25,6 +25,8 @@ jobs:
     permissions:
       # Needed to write the release changelog
       contents: write
+      # Needed to the provenance generation
+      id-token: write
     services:
       verdaccio:
         image: verdaccio/verdaccio:5
@@ -78,6 +80,8 @@ jobs:
       - name: Publish the release
         env:
           DRY_RUN: "${{ inputs.dry-run }}"
+          # See https://github.com/lerna/lerna/issues/3657
+          NPM_CONFIG_PROVENANCE: true
         run: npm run ci:release
 
       - name: Read GCE vault secrets
@@ -100,8 +104,14 @@ jobs:
         name: 'Prepare CDN release'
         run: echo "versions=$(npm run --silent ci:prepare-release)" >> ${GITHUB_OUTPUT}
 
+      - name: generate build provenance
+        if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js')
+        uses: github-early-access/generate-build-provenance@main
+        with:
+          subject-path: "${{ github.workspace }}/packages/rum/dist/bundles/*.js"
+
       - id: 'upload-files-version'
-        if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js') }}
+        if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js') && inputs.dry-run == false }}
         uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           parent: false
@@ -113,7 +123,7 @@ jobs:
             cache-control: public,max-age=31536000,immutable
 
       - id: 'upload-files-major-version'
-        if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js') }}
+        if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js') && inputs.dry-run == false }}
         uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           parent: false
@@ -125,7 +135,7 @@ jobs:
             cache-control: public,max-age=604800,immutable
 
       - id: 'upload-file-index'
-        if: ${{ always() && hashFiles('index.html') }}
+        if: ${{ always() && hashFiles('index.html') && inputs.dry-run == false }}
         uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           parent: false
