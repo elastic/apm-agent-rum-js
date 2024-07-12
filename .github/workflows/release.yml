@@ -48,37 +48,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Read NPM vault TOTP
-        if: inputs.dry-run == false
-        uses: hashicorp/vault-action@v3.0.0
-        with:
-          method: approle
-          url: ${{ secrets.VAULT_ADDR }}
-          roleId: ${{ secrets.VAULT_ROLE_ID }}
-          secretId: ${{ secrets.VAULT_SECRET_ID }}
-          secrets: |
-            totp/code/npmjs-elasticmachine code | TOTP_CODE
-
       # This prevent lerna command from throwing this error:
       # "Working tree has uncommitted changes, please commit or remove the following changes before continuing"
       - name: Ignore git uncommitted changes
         run: |
           git update-index --skip-worktree .npmrc
 
-      - name: Configure npm registry
-        if: inputs.dry-run == false
-        uses: elastic/apm-pipeline-library/.github/actions/setup-npmrc@current
-        with:
-          vault-url: ${{ secrets.VAULT_ADDR }}
-          vault-role-id: ${{ secrets.VAULT_ROLE_ID }}
-          vault-secret-id: ${{ secrets.VAULT_SECRET_ID }}
-          secret: secret/jenkins-ci/npmjs/elasticmachine
-          secret-key: token
-
       - name: Publish the release
         env:
           DRY_RUN: "${{ inputs.dry-run }}"
-        run: npm run ci:release
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+          npm run ci:release
 
       - name: Read GCE vault secrets
         uses: hashicorp/vault-action@v3.0.0
