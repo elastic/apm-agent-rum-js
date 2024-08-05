@@ -86,7 +86,7 @@ $ npx lerna bootstrap
 Tests fall under unit, integration and end-to-end tests. Before running the test, we have to start the APM server manually since all the APM payload data are sent to the server.
 
 ```sh
-NODEJS_VERSION=<nodeVersion> STACK_VERSION=<version> docker-compose -f ./dev-utils/docker-compose.yml up -d apm-server
+NODEJS_VERSION=<nodeVersion> STACK_VERSION=<version> docker compose -f ./dev-utils/docker-compose.yml up -d apm-server
 # nodeVersion - corresponds to NodeJS version to be used when building the test images
 # version - corresponds to Elastic Stack versions
 ```

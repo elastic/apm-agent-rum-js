@@ -10,14 +10,14 @@ NODEJS_VERSION=14
 USER_ID="${USER_ID}" \
 NODEJS_VERSION="${NODEJS_VERSION}" \
 STACK_VERSION=${STACK_VERSION} \
-docker-compose -f ./dev-utils/docker-compose.yml down \
+docker compose -f ./dev-utils/docker-compose.yml down \
   --remove-orphans \
   --volumes || true
 
 USER_ID="${USER_ID}" \
 NODEJS_VERSION="${NODEJS_VERSION}" \
 STACK_VERSION=${STACK_VERSION} \
-docker-compose -f ./dev-utils/docker-compose.yml up \
+docker compose -f ./dev-utils/docker-compose.yml up \
   --build \
   --exit-code-from load-testing \
   load-testing
