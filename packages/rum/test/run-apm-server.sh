@@ -1,3 +1,3 @@
 #docker run -p 127.0.0.1:8200:8201 elastic/apm-server:6.2.4 /bin/sh -c "apm-server -e -E output.elasticsearch.password=$(ELASTICSEARCH_PASSWORD) -E output.elasticsearch.username=$(ELASTICSEARCH_USERNAME) -E output.elasticsearch.hosts=['$(ELASTICSEARCH_SERVICE_HOST):$(ELASTICSEARCH_SERVICE_PORT)'] -E apm-server.expvar.enabled=true -E apm-server.frontend.enabled=true -E apm-server.frontend.rate_limit=100000 -E apm-server.host=0.0.0.0:8200 -E apm-server.read_timeout=1m -E apm-server.shutdown_timeout=2m -E apm-server.write_timeout=1m"
-STACK_VERSION=6.2.4 APM_SERVER_PORT=8001 docker-compose up apm-server
-#STACK_VERSION=6.2.4 docker-compose -f ./test/docker-compose.yml start apm-server
+STACK_VERSION=6.2.4 APM_SERVER_PORT=8001 docker compose up apm-server
+#STACK_VERSION=6.2.4 docker compose -f ./test/docker compose.yml start apm-server
