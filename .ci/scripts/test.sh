@@ -28,9 +28,8 @@ do
   APM_SERVER_PORT=${APM_SERVER_PORT} \
   APM_SERVER_URL=${APM_SERVER_URL} \
   KIBANA_URL=${KIBANA_URL} \
-  docker compose \
+  docker --log-level INFO compose \
     -f ./dev-utils/docker-compose.yml \
-    --log-level INFO \
     up \
     --quiet-pull \
     --exit-code-from node-puppeteer \
