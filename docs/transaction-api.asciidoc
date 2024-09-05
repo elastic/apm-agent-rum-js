@@ -126,7 +126,7 @@ it will also get tagged with the same labels.
 Labels are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via <<apm-set-custom-context,`apm.setCustomContext()`>>).
 
 TIP: Before using custom labels, ensure you understand the different types of
-{apm-guide-ref}/metadata.html[metadata] that are available.
+{observability-guide}/apm-api-metadata.html[metadata] that are available.
 
 Arguments:
 

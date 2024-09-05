@@ -10,17 +10,17 @@ without losing the ability to quickly and easily debug your applications.
 
 There are three steps required to enable, upload, and apply a source map to error stack traces.
 An overview is listed below, and a complete walk-through is available in the
-{apm-guide-ref}/sourcemaps.html[generate and upload a source map] guide.
+{observability-guide}/apm-source-map-how-to.html[generate and upload a source map] guide.
 
 1. Set the <<service-version,`serviceVersion`>> when initializing the RUM Agent.
-2. {apm-guide-ref}/sourcemaps.html#sourcemap-rum-generate[Generate a source map]
+2. {observability-guide}/apm-source-map-how-to.html#apm-source-map-rum-generate[Generate a source map]
 for your application with the `serviceVersion` from step one.
-3. {apm-guide-ref}/sourcemaps.html#sourcemap-rum-upload[Enable and upload the source map file] to APM Server.
+3. {observability-guide}/apm-source-map-how-to.html#apm-source-map-rum-upload[Enable and upload the source map file] to APM Server.
 
 // Don't link to this section
 [[secret-token]]
-You can also configure a {apm-guide-ref}/secret-token.html[secret token] or
-{apm-guide-ref}/api-key.html[API key] to restrict the uploading of sourcemaps.
+You can also configure a {observability-guide}/apm-secret-token.html[secret token] or
+{observability-guide}/apm-api-key.html[API key] to restrict the uploading of sourcemaps.
 
 TIP: Don't forget,
-you must enable {apm-guide-ref}/configuration-rum.html[RUM support] in the APM Server for this endpoint to work.
+you must enable {observability-guide}/apm-configuration-rum.html[RUM support] in the APM Server for this endpoint to work.
