@@ -2,7 +2,7 @@
 == Set up the Agent
 
 To start reporting your web page performance to Elastic APM,
-you must first {apm-guide-ref}/configuration-rum.html[enable the RUM endpoint] in your `apm-server` configuration. 
+you must first {observability-guide}/apm-configuration-rum.html[enable the RUM endpoint] in your `apm-server` configuration.
 
 Once the APM Server endpoint has been configured, you can:
 
@@ -78,7 +78,7 @@ Install the Real User Monitoring APM agent as a dependency to your application:
 
 [source,bash]
 ----
-npm install @elastic/apm-rum --save 
+npm install @elastic/apm-rum --save
 ----
 
 Configure the agent:
@@ -88,13 +88,13 @@ Configure the agent:
 import { init as initApm } from '@elastic/apm-rum'
 
 const apm = initApm({
-  
+
   // Set required service name (allowed characters: a-z, A-Z, 0-9, -, _, and space)
   serviceName: '',
 
   // Set custom APM Server URL (default: http://localhost:8200)
   serverUrl: 'http://localhost:8200',
-  
+
   // Set service version (required for sourcemap feature)
   serviceVersion: ''
 })
@@ -130,7 +130,7 @@ You can learn more about this in https://webpack.js.org/plugins/environment-plug
 [float]
 ==== Rollup
 
-For optimized rollup production build, include the replace plugin which ensures the right build environment is used. 
+For optimized rollup production build, include the replace plugin which ensures the right build environment is used.
 
 [source, js]
 ----
@@ -152,7 +152,7 @@ If APM Server is deployed in an origin different than the page's origin,
 you will need to configure Cross-Origin Resource Sharing (CORS).
 
 A list of permitted origins can be supplied to the
-{apm-guide-ref}/configuration-rum.html#rum-allow-origins[`apm-server.rum.allow_origins`]
+{observability-guide}/apm-configuration-rum.html#apm-rum-allow-origins[`apm-server.rum.allow_origins`]
 configuration option.
 By default, APM Server allows all origins.
 
