@@ -55,9 +55,9 @@ runs:
         STACK_VERSION: ${{ inputs.stack-version }}
     - name: Store test results
       if: success() || failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: test-results
+        name: test-results-${{ inputs.goal }}-${{ inputs.mode }}-${{ inputs.scope }}-${{ inputs.stack-version }}
         path: |
           packages/**/reports/TESTS-*.xml
     - name: Reset environment
