@@ -21,6 +21,6 @@ jobs:
       - uses: elastic/oblt-actions/test-report@v1
         with:
           artifact: /test-results(.*)/      # artifact name pattern
-          name: 'Test Report $1'               # Name of the check run which will be created
+          name: 'Test Report $1             # Name of the check run which will be created
           path: "**/*.xml"                  # Path to test results (inside artifact .zip)
           reporter: java-junit              # Format of test results
