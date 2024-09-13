@@ -63,6 +63,8 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
           npm run ci:release
 
+        # The permissions configuration for this can be found at
+        # https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/apm-agent-rum-js/02-gcp-oidc.tf
       - uses: elastic/oblt-actions/google/auth@v1
         with:
           project-id: ${{ env.ELASTIC_CDN_PROJECT_ID }}
