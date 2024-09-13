@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 env:
-  ELASTIC_CDN_BUCKET_NAME: ${{ inputs.dry-run == false && 'apm-rum-357700bc' || 'oblt-apm-agent-rum-js-ci' }}
+  ELASTIC_CDN_BUCKET_NAME: ${{ inputs.dry-run == false && 'apm-rum-357700bc' || 'oblt-apm-rum-test' }}
   ELASTIC_CDN_PROJECT_ID: ${{ inputs.dry-run == false && 'elastic-cdn-4ae000ab' || 'elastic-observability-ci' }}
   ELASTIC_CDN_PROJECT_NUMBER: ${{ inputs.dry-run == false && '382950469386' || '911195782929' }}
   SLACK_BUILD_MESSAGE: "Build: (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>)"
