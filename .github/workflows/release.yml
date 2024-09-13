@@ -13,7 +13,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 env:
   ELASTIC_CDN_BUCKET_NAME: ${{ inputs.dry-run == false && 'apm-rum-357700bc' || 'oblt-apm-agent-rum-js-ci' }}
@@ -27,6 +26,7 @@ jobs:
     permissions:
       # Needed to write the release changelog
       contents: write
+      id-token: write
     services:
       verdaccio:
         image: verdaccio/verdaccio:5
