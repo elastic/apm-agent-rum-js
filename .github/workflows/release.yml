@@ -16,7 +16,6 @@ permissions:
 
 env:
   ELASTIC_CDN_BUCKET_NAME: ${{ inputs.dry-run == false && 'apm-rum-357700bc' || 'oblt-apm-rum-test' }}
-  ELASTIC_CDN_PROJECT_ID: ${{ inputs.dry-run == false && 'elastic-cdn-4ae000ab' || 'elastic-observability-ci' }}
   ELASTIC_CDN_PROJECT_NUMBER: ${{ inputs.dry-run == false && '382950469386' || '911195782929' }}
   SLACK_BUILD_MESSAGE: "Build: (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>)"
 
@@ -67,7 +66,6 @@ jobs:
         # https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/apm-agent-rum-js/02-gcp-oidc.tf
       - uses: elastic/oblt-actions/google/auth@v1
         with:
-          project-id: ${{ env.ELASTIC_CDN_PROJECT_ID }}
           project-number: ${{ env.ELASTIC_CDN_PROJECT_NUMBER }}
 
       - id: prepare-release
