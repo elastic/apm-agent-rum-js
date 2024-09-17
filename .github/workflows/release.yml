@@ -63,7 +63,9 @@ jobs:
           npm run ci:release
 
         # The permissions configuration for this can be found at
-        # https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/apm-agent-rum-js/02-gcp-oidc.tf
+        # https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/apm-agent-rum-js/02-gcp-oidc-elastic-cdn.tf
+        # and
+        # https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/apm-agent-rum-js/02-gcp-oidc-elastic-observability.tf
       - uses: elastic/oblt-actions/google/auth@v1
         with:
           project-number: ${{ env.ELASTIC_CDN_PROJECT_NUMBER }}
