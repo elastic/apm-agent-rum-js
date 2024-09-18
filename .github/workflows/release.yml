@@ -103,7 +103,7 @@ jobs:
         uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           parent: false
-          path: 'index2.html'
+          path: 'index.html'
           destination: '${{ env.ELASTIC_CDN_BUCKET_NAME }}/test'
           process_gcloudignore: false
           headers: |-
