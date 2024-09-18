@@ -55,12 +55,12 @@ jobs:
         run: |
           git update-index --skip-worktree .npmrc
 
-      - name: Publish the release
-        env:
-          DRY_RUN: "${{ inputs.dry-run }}"
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
-          npm run ci:release
+#      - name: Publish the release
+#        env:
+#          DRY_RUN: "${{ inputs.dry-run }}"
+#        run: |
+#          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+#          npm run ci:release
 
         # The permissions configuration for this can be found at
         # https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/apm-agent-rum-js/02-gcp-oidc-elastic-cdn.tf
