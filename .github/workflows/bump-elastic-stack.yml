@@ -25,7 +25,8 @@ jobs:
           permissions: >-
             {
               "contents": "write",
-              "pull_requests": "write"
+              "pull_requests": "write",
+              "workflows": "write"
             }
 
       - uses: elastic/oblt-actions/updatecli/run@v1
