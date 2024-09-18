@@ -103,29 +103,29 @@ jobs:
         uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           parent: false
-          path: 'index.html'
+          path: 'index2.html'
           destination: '${{ env.ELASTIC_CDN_BUCKET_NAME }}/test'
           process_gcloudignore: false
           headers: |-
             cache-control: public,max-age=604800,immutable
 
-      - name: Post-release
-        env:
-          DRY_RUN: "${{ inputs.dry-run }}"
-        run: npm run ci:post-release
+#      - name: Post-release
+#        env:
+#          DRY_RUN: "${{ inputs.dry-run }}"
+#        run: npm run ci:post-release
 
-      - if: ${{ success() && inputs.dry-run == false }}
-        uses: elastic/oblt-actions/slack/send@v1
-        with:
-          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel-id: "#apm-agent-js"
-          message: |
-            :runner: [${{ github.repository }}] Release has been published. ${{ env.SLACK_BUILD_MESSAGE }}
-
-      - if: ${{ failure() && inputs.dry-run == false }}
-        uses: elastic/oblt-actions/slack/send@v1
-        with:
-          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel-id: "#apm-agent-js"
-          message: |
-            :ghost: [${{ github.repository }}] Release failed. ${{ env.SLACK_BUILD_MESSAGE }}
+#      - if: ${{ success() && inputs.dry-run == false }}
+#        uses: elastic/oblt-actions/slack/send@v1
+#        with:
+#          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+#          channel-id: "#apm-agent-js"
+#          message: |
+#            :runner: [${{ github.repository }}] Release has been published. ${{ env.SLACK_BUILD_MESSAGE }}
+#
+#      - if: ${{ failure() && inputs.dry-run == false }}
+#        uses: elastic/oblt-actions/slack/send@v1
+#        with:
+#          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+#          channel-id: "#apm-agent-js"
+#          message: |
+#            :ghost: [${{ github.repository }}] Release failed. ${{ env.SLACK_BUILD_MESSAGE }}
