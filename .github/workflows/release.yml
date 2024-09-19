@@ -23,24 +23,37 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      # Needed to write the release changelog
-      contents: write
+      contents: read
       id-token: write
     services:
       verdaccio:
         image: verdaccio/verdaccio:5
         ports:
           - 4873:4873
-    env:
-      GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
     steps:
+
+      - name: Get token
+        id: get_token
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        with:
+          app_id: ${{ secrets.OBS_AUTOMATION_APP_ID }}
+          private_key: ${{ secrets.OBS_AUTOMATION_APP_PEM }}
+          permissions: >-
+            {
+              "contents": "write",
+              "pull_requests": "write"
+            }
+          repositories: >-
+            ["apm-agent-rum-js"]
 
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ env.GITHUB_TOKEN }}
+          token: ${{ steps.get_token.outputs.token }}
 
       - uses: elastic/oblt-actions/git/setup@v1
+        with:
+          github-token: ${{ steps.get_token.outputs.token }}
 
       - uses: actions/setup-node@v4
         with:
@@ -73,6 +86,9 @@ jobs:
       - id: prepare-release
         name: 'Prepare CDN release'
         run: echo "versions=$(npm run --silent ci:prepare-release)" >> ${GITHUB_OUTPUT}
+        env:
+          # as long as we use the GitHub app for generating the token, we need to pass the token to the action
+          GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
 
       - id: 'upload-files-version'
         if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js') }}
@@ -112,6 +128,8 @@ jobs:
       - name: Post-release
         env:
           DRY_RUN: "${{ inputs.dry-run }}"
+          # as long as we use the GitHub app for generating the token, we need to pass the token to the action
+          GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
         run: npm run ci:post-release
 
       - if: ${{ success() && inputs.dry-run == false }}
