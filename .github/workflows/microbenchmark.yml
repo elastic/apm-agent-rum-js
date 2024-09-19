@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Run buildkite pipeline
-        uses: elastic/oblt-actions/buildkite/run@v1.4.0
+        uses: elastic/oblt-actions/buildkite/run@v1
         env:
           STACK_VERSION: ${{ inputs.stack_version || '8.14.1' }}
         with:
@@ -39,7 +39,7 @@ jobs:
             BRANCH_NAME=${{ github.ref_name }}
 
       - if: ${{ failure() }}
-        uses: elastic/oblt-actions/slack/send@v1.4.0
+        uses: elastic/oblt-actions/slack/send@v1
         with:
           bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
           channel-id: "#apm-agent-js"
