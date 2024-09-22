@@ -107,7 +107,8 @@ declare module '@elastic/apm-rum' {
       method: string
       payload?: string
       headers?: Record<string, string>
-    }) => boolean
+    }) => boolean,
+    transactionContextCallback?: (...args: any[]) => any
   }
 
   type Init = (options?: AgentConfigOptions) => ApmBase
