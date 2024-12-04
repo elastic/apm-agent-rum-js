@@ -66,7 +66,7 @@ jobs:
       matrix:
         stack-version:
           - '8.0.0-SNAPSHOT'
-          - '8.14.1'
+          - '8.15.5'
         scope:
           - '@elastic/apm-rum'
           - '@elastic/apm-rum-core'
@@ -90,10 +90,10 @@ jobs:
       - test-puppeteer
     steps:
       - id: check
-        uses: elastic/apm-pipeline-library/.github/actions/check-dependent-jobs@current
+        uses: elastic/oblt-actions/check-dependent-jobs@v1
         with:
-          needs: ${{ toJSON(needs) }}
-      - run: ${{ steps.check.outputs.isSuccess }}
+          jobs: ${{ toJSON(needs) }}
+      - run: ${{ steps.check.outputs.is-success }}
 
   coverage:
     name: Coverage
@@ -104,4 +104,4 @@ jobs:
         uses: ./.github/workflows/run-test
         with:
           goal: 'coverage'
-          stack-version: '8.14.1'
+          stack-version: '8.15.5'
