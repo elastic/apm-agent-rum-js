@@ -101,7 +101,15 @@ class TransactionService {
 
   createOptions(options) {
     const config = this._config.config
-    let presetOptions = { transactionSampleRate: config.transactionSampleRate }
+    let presetOptions = { 
+      transactionSampleRate: config.transactionSampleRate
+    }
+    if (config.transactionContextCallback) {
+      presetOptions = {
+        ...presetOptions,
+        transactionContextCallback: config.transactionContextCallback
+      }
+    }
     let perfOptions = extend(presetOptions, options)
     if (perfOptions.managed) {
       perfOptions = extend(
@@ -481,6 +489,13 @@ class TransactionService {
           managed: true
         })
       )
+    }
+
+    if (this._config.config.transactionContextCallback) {
+      options = {
+        ...options,
+        tags: this._config.config.transactionContextCallback()
+      }
     }
 
     const span = tr.startSpan(name, type, options)
