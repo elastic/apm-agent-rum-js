@@ -240,7 +240,9 @@ function isFunction(value) {
   return typeof value === 'function'
 }
 
-function baseExtend(dst, objs, deep) {
+function baseExtend(objs, deep) {
+  var dst = Object.create(null)
+
   for (var i = 0, ii = objs.length; i < ii; ++i) {
     var obj = objs[i]
     if (!isObject(obj) && !isFunction(obj)) continue
@@ -284,12 +286,12 @@ function getCurrentScript() {
   }
 }
 
-function extend(dst) {
-  return baseExtend(dst, slice.call(arguments, 1), false)
+function extend() {
+  return baseExtend(slice.call(arguments), false)
 }
 
-function merge(dst) {
-  return baseExtend(dst, slice.call(arguments, 1), true)
+function merge() {
+  return baseExtend(slice.call(arguments), true)
 }
 
 function isUndefined(obj) {
