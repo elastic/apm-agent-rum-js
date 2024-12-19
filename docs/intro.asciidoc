@@ -9,7 +9,7 @@ This enables you to analyze performance throughout your microservice architectur
 
 [NOTE]
 ====
-The Elastic APM RUM JavaScript Agent is not compatible with {serverless-docs}[{serverless-full}].
+The Elastic APM RUM JavaScript Agent is _not_ compatible with {serverless-docs}[{serverless-full}] -- it cannot send data to the APM endpoint for serverless projects.
 ====
 
 [float]
