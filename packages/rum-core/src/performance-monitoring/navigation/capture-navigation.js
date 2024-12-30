@@ -102,8 +102,8 @@ function captureNavigation(transaction) {
     * the page load transaction, which is useful for e.g Synthetics.
     */
 
-    if (tr.options.pageLoadParentId) {
-      tr.parentId = tr.options.pageLoadParentId
+    if (transaction.options.pageLoadParentId) {
+      transaction.parentId = transaction.options.pageLoadParentId
     }
 
     /**
