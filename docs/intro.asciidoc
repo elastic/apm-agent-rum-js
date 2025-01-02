@@ -7,6 +7,11 @@ It has built-in support for popular platforms and frameworks, and an API for cus
 The Agent also supports <<distributed-tracing-guide,distributed tracing>> for all outgoing requests.
 This enables you to analyze performance throughout your microservice architecture -- all in one view.
 
+[NOTE]
+====
+The Elastic APM RUM JavaScript Agent is _not_ compatible with {serverless-docs}[{serverless-full}] -- it cannot send data to the APM endpoint for serverless projects.
+====
+
 [float]
 [[features]]
 === Features
