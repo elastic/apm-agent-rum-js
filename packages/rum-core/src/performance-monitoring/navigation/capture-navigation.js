@@ -98,7 +98,7 @@ function captureNavigation(transaction) {
 
     /**
     * Set the parent id of the transaction to the page load parent ID.
-    * This means that the backend transcaction will be the parent of
+    * This means that the backend transaction will be the parent of
     * the page load transaction, which is useful for e.g Synthetics.
     */
 
