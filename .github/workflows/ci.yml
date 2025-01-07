@@ -87,8 +87,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: fix Node-Gyp Build Error
-        run: sudo apt-get install g++ build-essential
+      # Temporary fix for "ValueError: invalid mode: 'rU' while trying to load binding.gyp"
+      # See https://github.com/nodejs/node-gyp/issues/2219
+      # This can be removed when "node-gyp" is updated
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
       - uses: actions/setup-node@v4
         with:
