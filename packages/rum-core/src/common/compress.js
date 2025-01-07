@@ -232,6 +232,7 @@ export function compressTransaction(transaction) {
 
   const tr = {
     id: transaction.id,
+    pid: transaction.parent_id,
     tid: transaction.trace_id,
     n: transaction.name,
     t: transaction.type,
