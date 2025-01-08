@@ -85,6 +85,7 @@ class Config {
       pageLoadTraceId: '',
       pageLoadSpanId: '',
       pageLoadSampled: false,
+      pageLoadParentId: '',
       pageLoadTransactionName: '',
       propagateTracestate: false,
       transactionSampleRate: 1.0,

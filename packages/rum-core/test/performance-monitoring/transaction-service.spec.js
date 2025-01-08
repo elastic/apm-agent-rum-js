@@ -261,6 +261,28 @@ describe('TransactionService', function () {
     })
   })
 
+  it('should set page load parentId before ending the transaction', function (done) {
+    config.setConfig({
+      pageLoadParentId: 'test-page-load-parent-id'
+    })
+    transactionService = new TransactionService(logger, config)
+
+    const tr = transactionService.startTransaction(undefined, 'page-load', {
+      managed: true
+    })
+
+    tr.detectFinish()
+
+    /**
+     * For page load transaction we set the transaction parentId using
+     * transaction.onEnd
+     */
+    config.events.observe(TRANSACTION_END, tr => {
+      expect(tr.parentId).toBe('test-page-load-parent-id')
+      done()
+    })
+  })
+
   it('should capture resources from navigation timing', function (done) {
     const unMock = mockGetEntriesByType()
 
@@ -360,6 +382,16 @@ describe('TransactionService', function () {
       unMock()
       done()
     })
+  })
+
+  it('should consider page load parentId', function () {
+    config.setConfig({
+      pageLoadParentId: 'test-page-load-parent-id'
+    })
+
+    transactionService = new TransactionService(logger, config)
+    const tr = sendPageLoadMetrics()
+    expect(tr.options.pageLoadParentId).toBe('test-page-load-parent-id')
   })
 
   it('should call createCurrentTransaction once per startTransaction', function () {
