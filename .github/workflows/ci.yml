@@ -107,7 +107,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - lint
-      - test
+      - npm-ci
       - test-puppeteer
     steps:
       - id: check
