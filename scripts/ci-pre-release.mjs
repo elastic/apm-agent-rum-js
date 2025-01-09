@@ -117,7 +117,7 @@ async function prodMode() {
     raiseError("The 'GITHUB_TOKEN' env var isn't defined")
   }
 
-  const branch = `release/${version}-next`
+  const branch = `prerelease/${version}-next`
 
   try {
     await execa('git', ['checkout', '-b', branch], {
