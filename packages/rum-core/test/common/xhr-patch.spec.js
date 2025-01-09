@@ -190,6 +190,7 @@ describe('xhrPatch', function () {
     const req = new window.XMLHttpRequest()
     const getEvents = registerEventListener(req)
     req.open('GET', 'https://elastic.co/guide', true)
+    req.timeout = 1
     req.addEventListener('loadend', () => {
       expect(getEvents(done).map(e => e.event)).toEqual(['schedule', 'invoke'])
     })
