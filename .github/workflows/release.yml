@@ -79,6 +79,7 @@ jobs:
       - name: Publish the release
         env:
           DRY_RUN: "${{ inputs.dry-run }}"
+          GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
           npm run ci:release
