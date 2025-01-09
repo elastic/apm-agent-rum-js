@@ -6,7 +6,7 @@
   "registry": "https://registry.npmjs.org",
   "command": {
     "version": {
-      "allowBranch": ["main", "4.x", "release", "release/*"],
+      "allowBranch": ["main", "4.x", "release", "prerelease/*"],
       "conventionalCommits": true,
       "message": "chore(release): publish",
       "changelogPreset": "conventionalcommits",
