@@ -155,7 +155,7 @@ async function prodMode() {
   }
 
   try {
-    await execa('gh', ['pr', 'create', '--fill-first'], {
+    await execa('gh', ['pr', 'create', '--fill-first', '--head', branch], {
       stdin: process.stdin,
       env: {
         GH_TOKEN: githubToken
