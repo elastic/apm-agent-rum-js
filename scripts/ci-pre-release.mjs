@@ -73,7 +73,7 @@ async function dryRunMode() {
     raiseError("The 'GITHUB_TOKEN' env var isn't defined")
   }
 
-  const branch = `release/${version}-next`
+  const branch = `prerelease/${version}-next`
 
   try {
     await execa('git', ['checkout', '-b', branch], {
@@ -155,7 +155,7 @@ async function prodMode() {
   }
 
   try {
-    await execa('gh', ['pr', 'create', '--fill-first'], {
+    await execa('gh', ['pr', 'create', '--fill-first', '--head', branch], {
       stdin: process.stdin,
       env: {
         GH_TOKEN: githubToken
