@@ -66,7 +66,7 @@ jobs:
       matrix:
         stack-version:
           - '8.0.0-SNAPSHOT'
-          - '8.15.5'
+          - '8.16.2'
         scope:
           - '@elastic/apm-rum'
           - '@elastic/apm-rum-core'
@@ -125,4 +125,4 @@ jobs:
         uses: ./.github/workflows/run-test
         with:
           goal: 'coverage'
-          stack-version: '8.15.5'
+          stack-version: '8.16.2'
