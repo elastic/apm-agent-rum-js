@@ -88,7 +88,7 @@ class Transaction extends SpanBase {
       // is not setting explicitly the threshold and instead expecting to rely on the one by default.
       this.options.reuseThreshold = options.reuseThreshold
 
-      extend(this.options, options)
+      this.options = extend(this.options, options)
     }
   }
 

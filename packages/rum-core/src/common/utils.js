@@ -284,12 +284,12 @@ function getCurrentScript() {
   }
 }
 
-function extend(dst) {
-  return baseExtend(dst, slice.call(arguments, 1), false)
+function extend() {
+  return baseExtend(Object.create(null), slice.call(arguments), false)
 }
 
-function merge(dst) {
-  return baseExtend(dst, slice.call(arguments, 1), true)
+function merge() {
+  return baseExtend(Object.create(null), slice.call(arguments), true)
 }
 
 function isUndefined(obj) {

@@ -77,7 +77,7 @@ class SpanBase {
   addContext(...context) {
     if (context.length === 0) return
     this.ensureContext()
-    merge(this.context, ...context)
+    this.context = merge(this.context, ...context)
   }
 
   end(endTime) {

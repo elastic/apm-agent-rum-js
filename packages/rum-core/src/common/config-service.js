@@ -190,7 +190,7 @@ class Config {
         Math.round(transactionSampleRate * 10000) / 10000
     }
 
-    merge(this.config, properties)
+    this.config = merge(this.config, properties)
     this.events.send(CONFIG_CHANGE, [this.config])
   }
 
