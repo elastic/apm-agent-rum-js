@@ -129,11 +129,6 @@ async function dryRunMode() {
 async function prodMode() {
   console.log('Running in prod mode')
 
-  const totpCode = process.env.TOTP_CODE
-  if (totpCode == null || totpCode === '') {
-    raiseError("The 'TOTP_CODE' env var isn't defined")
-  }
-
   const githubToken = process.env.GITHUB_TOKEN
   if (githubToken == null || githubToken === '') {
     raiseError("The 'GITHUB_TOKEN' env var isn't defined")
@@ -141,7 +136,7 @@ async function prodMode() {
 
   try {
     await execa('npx',
-      ['lerna', 'publish', 'from-package', `--otp=${totpCode}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes'],
+      ['lerna', 'publish', 'from-package', '--no-push', '--no-git-tag-version', '--no-changelog', '--yes'],
       { stdin: process.stdin}
     )
       .pipeStdout(process.stdout)

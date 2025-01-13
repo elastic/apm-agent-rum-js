@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [5.22.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.22.0...@elastic/apm-rum-core@5.22.1) (2025-01-10)
+
+
+### Bug Fixes
+
+* **rum-core:** fix for `merge` utility function ([#1555](https://github.com/elastic/apm-agent-rum-js/issues/1555)) ([0d1eda5](https://github.com/elastic/apm-agent-rum-js/commit/0d1eda5b90e2930806e8d1cb733454bd8db12e89))
+
+
+
+## [5.22.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.21.1...@elastic/apm-rum-core@5.22.0) (2025-01-09)
+
+
+### Features
+
+* add pageLoadParentId configuration ([#1521](https://github.com/elastic/apm-agent-rum-js/issues/1521)) ([25143ab](https://github.com/elastic/apm-agent-rum-js/commit/25143ab2c0a057cc1f6510fcced0a739c5cce792))
+
+
+
 ### [5.21.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.21.0...@elastic/apm-rum-core@5.21.1) (2024-06-27)
 
 
