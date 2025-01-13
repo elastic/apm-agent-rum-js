@@ -651,6 +651,34 @@ describe('TransactionService', function () {
 
       transaction.end(pageLoadTime + 1000)
     })
+
+    it('should capture tags from dispatch context', done => {
+      config.setConfig({
+        transactionContextCallback: () => {
+          let stack
+          try {
+            throw new Error('')
+          }
+          catch (error) {
+            stack = error.stack || ''
+          }
+          stack = stack.split('\n').map(function (line) { return line.trim(); })
+          return { stack };
+        }
+      })
+      const transactionService = new TransactionService(logger, config)
+
+      const tr1 = transactionService.startTransaction(
+        'transaction1',
+        'transaction'
+      )
+
+      tr1.onEnd = () => {
+        expect(tr1.options.tags.stack).toBeTruthy()
+        done()
+      }
+      tr1.end()
+    })
   })
 
   it('should truncate active spans after transaction ends', () => {

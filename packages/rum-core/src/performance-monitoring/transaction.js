@@ -54,6 +54,13 @@ class Transaction extends SpanBase {
 
     this.sampleRate = this.options.transactionSampleRate
     this.sampled = Math.random() <= this.sampleRate
+
+    if (this.options.transactionContextCallback) {
+      this.options = {
+        ...this.options,
+        tags: this.options.transactionContextCallback()
+      }
+    }
   }
 
   addMarks(obj) {
