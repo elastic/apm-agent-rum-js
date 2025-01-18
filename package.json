@@ -71,7 +71,7 @@
   "license": "MIT",
   "homepage": "https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html",
   "devDependencies": {
-    "@angular-devkit/build-angular": "^12.0.4",
+    "@angular-devkit/build-angular": "^18.2.5",
     "@angular/cli": "^12.0.4",
     "@angular/common": "^12.0.4",
     "@angular/compiler": "^12.0.4",
@@ -155,7 +155,7 @@
     "license-checker": "^25.0.1",
     "lint-staged": "^12.1.5",
     "lodash": "^4.17.20",
-    "ng-packagr": "^12.0.5",
+    "ng-packagr": "^18.2.1",
     "node-fetch": "^2.6.1",
     "npm-run-all": "^4.1.5",
     "npmlog": "^4.1.2",
