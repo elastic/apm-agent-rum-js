@@ -96,7 +96,8 @@ class Config {
       session: false,
       apmRequest: null,
       sendCredentials: false,
-      transactionContextCallback: null
+      transactionContextCallback: null,
+      spanContextCallback: null
     }
 
     this.events = new EventHandler()

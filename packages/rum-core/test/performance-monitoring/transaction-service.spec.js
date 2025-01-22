@@ -652,18 +652,19 @@ describe('TransactionService', function () {
       transaction.end(pageLoadTime + 1000)
     })
 
-    it('should capture tags from dispatch context', done => {
+    it('should capture tags from transaction dispatch context', done => {
       config.setConfig({
         transactionContextCallback: () => {
           let stack
           try {
             throw new Error('')
-          }
-          catch (error) {
+          } catch (error) {
             stack = error.stack || ''
           }
-          stack = stack.split('\n').map(function (line) { return line.trim(); })
-          return { stack };
+          stack = stack.split('\n').map(function (line) {
+            return line.trim()
+          })
+          return { stack }
         }
       })
       const transactionService = new TransactionService(logger, config)
@@ -674,10 +675,36 @@ describe('TransactionService', function () {
       )
 
       tr1.onEnd = () => {
-        expect(tr1.options.tags.stack).toBeTruthy()
+        expect(tr1.context.tags.stack).toBeTruthy()
         done()
       }
       tr1.end()
+    })
+
+    it('should capture tags from span dispatch context', done => {
+      config.setConfig({
+        spanContextCallback: () => {
+          let stack
+          try {
+            throw new Error('')
+          } catch (error) {
+            stack = error.stack || ''
+          }
+          stack = stack.split('\n').map(function (line) {
+            return line.trim()
+          })
+          return { stack }
+        }
+      })
+      const transactionService = new TransactionService(logger, config)
+
+      const sp1 = transactionService.startSpan('span1', 'span')
+
+      sp1.onEnd = () => {
+        expect(sp1.context.tags.stack).toBeTruthy()
+        done()
+      }
+      sp1.end()
     })
   })
 
