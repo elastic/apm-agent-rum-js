@@ -104,17 +104,32 @@ class TransactionService {
     let presetOptions = {
       transactionSampleRate: config.transactionSampleRate
     }
-    if (config.transactionContextCallback) {
-      presetOptions = {
-        ...presetOptions,
-        transactionContextCallback: config.transactionContextCallback
+    if (typeof config.transactionContextCallback === 'function') {
+      const tCC = function () {
+        let tags = {}
+        try {
+          tags = config.transactionContextCallback()
+        } catch (err) {
+          this._logger.error(
+            'Failed to execute transaction context callback',
+            err
+          )
+        }
+        return tags
       }
+      presetOptions.transactionContextCallback = tCC.bind(this)
     }
-    if (config.spanContextCallback) {
-      presetOptions = {
-        ...presetOptions,
-        spanContextCallback: config.spanContextCallback
+    if (typeof config.spanContextCallback === 'function') {
+      const sCC = function () {
+        let tags = {}
+        try {
+          tags = config.spanContextCallback()
+        } catch (err) {
+          this._logger.error('Failed to execute span context callback', err)
+        }
+        return tags
       }
+      presetOptions.spanContextCallback = sCC.bind(this)
     }
     let perfOptions = extend(presetOptions, options)
     if (perfOptions.managed) {
@@ -298,7 +313,7 @@ class TransactionService {
           if (name === NAME_UNKNOWN && pageLoadTransactionName) {
             tr.name = pageLoadTransactionName
           }
-          
+
           /**
            * Capture the TBT as span after observing for all long task entries
            * and once performance observer is disconnected

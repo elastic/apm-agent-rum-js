@@ -40,17 +40,8 @@ class Span extends SpanBase {
     }
     this.sync = this.options.sync
 
-    if (
-      this.options.spanContextCallback &&
-      typeof this.options.spanContextCallback === 'function'
-    ) {
-      let tags
-      try {
-        tags = this.options.spanContextCallback()
-        this.addLabels(tags)
-      } catch (e) {
-        console.error('Failed to execute span context callback', e)
-      }
+    if (this.options.spanContextCallback) {
+      this.addLabels(this.options.spanContextCallback())
     }
   }
 
