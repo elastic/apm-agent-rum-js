@@ -55,17 +55,8 @@ class Transaction extends SpanBase {
     this.sampleRate = this.options.transactionSampleRate
     this.sampled = Math.random() <= this.sampleRate
 
-    if (
-      this.options.transactionContextCallback &&
-      typeof this.options.transactionContextCallback === 'function'
-    ) {
-      let tags
-      try {
-        tags = this.options.transactionContextCallback()
-        this.addLabels(tags)
-      } catch (e) {
-        console.error('Failed to execute transaction context callback', e)
-      }
+    if (this.options.transactionContextCallback) {
+      this.addLabels(this.options.transactionContextCallback())
     }
   }
 
@@ -111,14 +102,8 @@ class Transaction extends SpanBase {
     }
     let opts = extend({}, options)
 
-    if (
-      this.options.spanContextCallback &&
-      typeof this.options.spanContextCallback === 'function'
-    ) {
-      opts = {
-        ...opts,
-        spanContextCallback: this.options.spanContextCallback
-      }
+    if (this.options.spanContextCallback) {
+      opts.spanContextCallback = this.options.spanContextCallback
     }
 
     opts.onEnd = trc => {

@@ -107,8 +107,8 @@ declare module '@elastic/apm-rum' {
       method: string
       payload?: string
       headers?: Record<string, string>
-    }) => boolean,
-    transactionContextCallback?: (...args: any[]) => any,
+    }) => boolean
+    transactionContextCallback?: (...args: any[]) => any
     spanContextCallback?: (...args: any[]) => any
   }
 

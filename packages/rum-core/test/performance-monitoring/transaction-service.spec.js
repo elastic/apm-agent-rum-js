@@ -706,6 +706,40 @@ describe('TransactionService', function () {
       }
       sp1.end()
     })
+
+    it('should safely catch and log errors for an invalid callback', () => {
+      logger = new LoggingService()
+      spyOn(logger, 'error')
+
+      config.setConfig({
+        transactionContextCallback: () => {
+          throw new Error('Error in transaction callback')
+        },
+        spanContextCallback: () => {
+          throw new Error('Error in span callback')
+        }
+      })
+      const transactionService = new TransactionService(logger, config)
+
+      const tr1 = transactionService.startTransaction(
+        'transaction1',
+        'transaction'
+      )
+      expect(logger.error).toHaveBeenCalledWith(
+        'Failed to execute transaction context callback',
+        new Error('Error in transaction callback')
+      )
+      logger.error.calls.reset()
+
+      const sp1 = tr1.startSpan('span1', 'span')
+      expect(logger.error).toHaveBeenCalledWith(
+        'Failed to execute span context callback',
+        new Error('Error in span callback')
+      )
+
+      sp1.end()
+      tr1.end()
+    })
   })
 
   it('should truncate active spans after transaction ends', () => {
