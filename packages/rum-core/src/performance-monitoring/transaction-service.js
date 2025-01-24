@@ -117,7 +117,9 @@ class TransactionService {
         }
         return tags
       }
-      presetOptions.transactionContextCallback = tCC.bind(this)
+      presetOptions.transactionContextCallback = tCC.bind({
+        _logger: this._logger
+      })
     }
     if (typeof config.spanContextCallback === 'function') {
       const sCC = function () {
@@ -129,7 +131,9 @@ class TransactionService {
         }
         return tags
       }
-      presetOptions.spanContextCallback = sCC.bind(this)
+      presetOptions.spanContextCallback = sCC.bind({
+        _logger: this._logger
+      })
     }
     let perfOptions = extend(presetOptions, options)
     if (perfOptions.managed) {
