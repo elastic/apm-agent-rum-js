@@ -101,39 +101,31 @@ class TransactionService {
 
   createOptions(options) {
     const config = this._config.config
+    const logger = this._logger
     let presetOptions = {
       transactionSampleRate: config.transactionSampleRate
     }
     if (typeof config.transactionContextCallback === 'function') {
-      const tCC = function () {
+      presetOptions.transactionContextCallback = function () {
         let tags = {}
         try {
           tags = config.transactionContextCallback()
         } catch (err) {
-          this._logger.error(
-            'Failed to execute transaction context callback',
-            err
-          )
+          logger.error('Failed to execute transaction context callback', err)
         }
         return tags
       }
-      presetOptions.transactionContextCallback = tCC.bind({
-        _logger: this._logger
-      })
     }
     if (typeof config.spanContextCallback === 'function') {
-      const sCC = function () {
+      presetOptions.spanContextCallback = function () {
         let tags = {}
         try {
           tags = config.spanContextCallback()
         } catch (err) {
-          this._logger.error('Failed to execute span context callback', err)
+          logger.error('Failed to execute span context callback', err)
         }
         return tags
       }
-      presetOptions.spanContextCallback = sCC.bind({
-        _logger: this._logger
-      })
     }
     let perfOptions = extend(presetOptions, options)
     if (perfOptions.managed) {
