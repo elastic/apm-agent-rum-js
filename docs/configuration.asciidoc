@@ -452,7 +452,7 @@ var options = {
 ----
 
 
-[function]
+[float]
 [[span-context-callback]]
 ==== `spanContextCallback`
 
