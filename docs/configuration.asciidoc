@@ -421,7 +421,7 @@ NOTE: If APM Server is deployed in an origin different than the page’s origin,
 <<configuring-cors, configure Cross-Origin Resource Sharing (CORS)>>.
 
 
-[function]
+[float]
 [[transaction-context-callback]]
 ==== `transactionContextCallback`
 
