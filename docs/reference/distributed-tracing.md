@@ -99,13 +99,13 @@ var apm = initApm({
 
 The `pageLoadSpanId` should be set to the parent ID of the backend transaction. Most Elastic APM backend agents provide methods to extract this information. Please refer to the relevant Agent’s API for more information:
 
-* [.NET Agent: `EnsureParentId()`](apm-agent-dotnet://docs/reference/public-api.md)
-* [Java Agent: `ensureParentId()`](apm-agent-java://docs/reference/public-api.md)
+* [.NET Agent: `EnsureParentId()`](apm-agent-dotnet://reference/public-api.md)
+* [Java Agent: `ensureParentId()`](apm-agent-java://reference/public-api.md)
 * Python Agent:
 
-    * [Flask integration](apm-agent-python://docs/reference/flask-support.md)
-    * [Django integration](apm-agent-python://docs/reference/django-support.md)
+    * [Flask integration](apm-agent-python://reference/flask-support.md)
+    * [Django integration](apm-agent-python://reference/django-support.md)
 
-* [Ruby Agent: `EnsureParent()`](apm-agent-ruby://docs/reference/api-reference.md)
-* [Go Agent: `EnsureParent()`](apm-agent-go://docs/reference/api-documentation.md)
-* [Node.js Agent distributed tracing guide](apm-agent-nodejs://docs/reference/distributed-tracing.md)
+* [Ruby Agent: `EnsureParent()`](apm-agent-ruby://reference/api-reference.md)
+* [Go Agent: `EnsureParent()`](apm-agent-go://reference/api-documentation.md)
+* [Node.js Agent distributed tracing guide](apm-agent-nodejs://reference/distributed-tracing.md)
