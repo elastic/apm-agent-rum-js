@@ -100,7 +100,7 @@ export default {
 </script>
 ```
 
-In case of both SFC and Composition API usage via the recommended `<script setup>` syntax the access of the instance is supported by the vue [plugin injection](https://vuejs.org/guide/components/provide-inject.md#inject)
+In case of both SFC and Composition API usage via the recommended `<script setup>` syntax the access of the instance is supported by the vue [plugin injection](https://vuejs.org/guide/components/provide-inject.html#inject)
 
 ```html
 <template>
@@ -123,7 +123,7 @@ onUnmounted(() =>
 </script>
 ```
 
-`ApmVuePlugin` expects the router option to be an instance of VueRouter since it uses the [navigation guards](https://next.router.vuejs.org/guide/advanced/navigation-guards.md) functionality.
+`ApmVuePlugin` expects the router option to be an instance of VueRouter since it uses the [navigation guards](https://next.router.vuejs.org/guide/advanced/navigation-guards.html) functionality.
 
 Once the plugin is initialized, both page load and SPA navigation events will be captured as transactions with the `path` of the route as its name and `page-load` or `route-change` as type.
 
