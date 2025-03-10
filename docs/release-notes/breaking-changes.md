@@ -7,7 +7,7 @@ mapped_pages:
 # Elastic APM Real User Monitoring JavaScript Agent breaking changes [elastic-apm-real-user-monitoring-javascript-agent-breaking-changes]
 Before you upgrade, carefully review the Elastic APM Real User Monitoring JavaScript Agent breaking changes and take the necessary steps to mitigate any issues.
 
-To learn how to upgrade, check out <uprade docs>.
+% To learn how to upgrade, check out <upgrade docs>.
 
 % ## Next version [elastic-apm-real-user-monitoring-javascript-agent-nextversion-breaking-changes]
 % **Release date:** Month day, year
