@@ -13,7 +13,7 @@ While initializing the agent you can provide the following configuration options
 * **Type:** String
 * **Required**
 
-The Elastic APM service name is used to differentiate data from each of your services. Can only contain alphanumeric characters, spaces, underscores, and dashes (must match ^[a-zA-Z0-9 _-]+$).
+The Elastic APM service name is used to differentiate data from each of your services. Can only contain alphanumeric characters, spaces, underscores, and dashes (must match `^[a-zA-Z0-9 _-]+$`).
 
 
 ## `serverUrl` [server-url]
