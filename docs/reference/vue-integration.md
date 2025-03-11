@@ -1,49 +1,49 @@
-[[vue-integration]]
-=== Vue integration
+---
+mapped_pages:
+  - https://www.elastic.co/guide/en/apm/agent/rum-js/current/vue-integration.html
+---
+
+# Vue integration [vue-integration]
 
 This document covers how to use Real User Monitoring JavaScript agent with Vue applications.
 
-[[vue-supported-versions]]
-==== Supported versions
+## Supported versions [vue-supported-versions]
 
 This integration supports Vue.js versions ≥ 3.0
 
+::::{note}
+If you are using an Vuejs version < 3.0, use @elastic/apm-rum-vue 1.x to instrument your application. Details are available in a [prior release](https://www.elastic.co/guide/en/apm/agent/rum-js/4.x/vue-integration.html).
+::::
 
-NOTE: If you are using an Vuejs version < 3.0, use @elastic/apm-rum-vue 1.x to instrument your application. Details are available in a https://www.elastic.co/guide/en/apm/agent/rum-js/4.x/vue-integration.html[prior release].
 
 
-[[installing-vue-integration]]
-==== Installing Elastic APM Vue package
+## Installing Elastic APM Vue package [installing-vue-integration]
 
 Install the `@elastic/apm-rum-vue` package as a dependency to your application:
 
-[source,bash]
-----
+```bash
 npm install --save @elastic/apm-rum-vue
-----
+```
 
-[float]
-==== Using APM Plugin
-[source,js]
-----
+
+### Using APM Plugin [_using_apm_plugin]
+
+```js
 app.use(ApmVuePlugin, options)
-----
+```
 
-===== Options
+### Options [_options]
 
-* `config` (required) - RUM agent <<configuration,configuration options>>.
+* `config` (required) - RUM agent [configuration options](/reference/configuration.md).
 * `router` (optional) - Instance of Vue Router. If provided, will start capturing both page load and SPA navigation events as transactions with path of the route as its name.
-* `captureErrors` (optional) - If enabled, will install a global Vue error handler to capture render errors inside the components. Defaults to `true`.
-  The plugin captures the component name, lifecycle hook and file name (if it's available) as part of the error context.
+* `captureErrors` (optional) - If enabled, will install a global Vue error handler to capture render errors inside the components. Defaults to `true`. The plugin captures the component name, lifecycle hook and file name (if it’s available) as part of the error context.
 
 
-[float]
-==== Instrumenting your Vue application
+### Instrumenting your Vue application [_instrumenting_your_vue_application]
 
 The package exposes `ApmVuePlugin` which is a Vue Plugin and can be installed in your application using `Vue.use` method.
 
-[source,js]
-----
+```js
 import { createApp, defineComponent, h } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { ApmVuePlugin } from '@elastic/apm-rum-vue'
@@ -71,16 +71,14 @@ createApp(App)
   })
   // app specific code
   .mount('#app')
-----
+```
 
 
-[float]
-==== Accessing agent instance inside components
+### Accessing agent instance inside components [_accessing_agent_instance_inside_components]
 
 Instance of the agent can be accessed inside all the components using `this.$apm`
 
-[source,html]
-----
+```html
 <template>
   <div>Component timings as span</div>
 </template>
@@ -100,12 +98,11 @@ export default {
   }
 }
 </script>
-----
+```
 
-In case of both SFC and Composition API usage via the recommended `<script setup>` syntax the access of the instance is supported by the vue https://vuejs.org/guide/components/provide-inject.html#inject[plugin injection]
+In case of both SFC and Composition API usage via the recommended `<script setup>` syntax the access of the instance is supported by the vue [plugin injection](https://vuejs.org/guide/components/provide-inject.html#inject)
 
-[source,html]
-----
+```html
 <template>
   <div>Component timings as span</div>
 </template>
@@ -124,10 +121,11 @@ onUnmounted(() =>
   span.value.end()
 )
 </script>
-----
+```
 
-`ApmVuePlugin` expects the router option to be an instance of VueRouter since it uses the
-https://next.router.vuejs.org/guide/advanced/navigation-guards.html[navigation guards] functionality.
+`ApmVuePlugin` expects the router option to be an instance of VueRouter since it uses the [navigation guards](https://next.router.vuejs.org/guide/advanced/navigation-guards.html) functionality.
 
-Once the plugin is initialized, both page load and SPA navigation events will be captured
-as transactions with the `path` of the route as its name and `page-load` or `route-change` as type.
+Once the plugin is initialized, both page load and SPA navigation events will be captured as transactions with the `path` of the route as its name and `page-load` or `route-change` as type.
+
+
+

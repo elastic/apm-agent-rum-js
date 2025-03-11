@@ -1,0 +1,31 @@
+project: 'APM Real User Monitoring (RUM) JavaScript Agent reference'
+toc:
+  - file: index.md
+  - file: set-up-apm-real-user-monitoring-javascript-agent.md
+    children:
+      - file: install-agent.md
+      - file: configuring-cors.md
+  - file: supported-technologies.md
+  - file: configuration.md
+  - file: api-reference.md
+    children:
+      - file: agent-api.md
+      - file: transaction-api.md
+      - file: span-api.md
+  - file: source-maps.md
+  - file: framework-specific-integrations.md
+    children:
+      - file: react-integration.md
+      - file: angular-integration.md
+      - file: vue-integration.md
+  - file: distributed-tracing.md
+  - file: breakdown-metrics.md
+  - file: opentracing.md
+  - file: advanced-topics.md
+    children:
+      - file: longtasks.md
+      - file: typescript.md
+      - file: custom-transaction-name.md
+      - file: custom-transactions.md
+  - file: performance-tuning.md
+  - file: upgrading.md
