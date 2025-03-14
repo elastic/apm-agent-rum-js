@@ -35,8 +35,8 @@ Use `npm run github-release` in the root directory, the script takes care packag
 
 Before releasing, be sure to update the following documentation:
 
-- Update `CHANGELOG.asciidoc` to add release notes for the new version. Headings should follow this format: `==== x.x.x (yyyy-MM-dd)`.
-- For Major and minor releases: Add a new row to the EOL table in `docs/upgrading.asciidoc`. The EOL date is the release date plus 18 months.
+- Update `docs/release-notes/index.md` to add release notes for the new version. Headings should follow this format: `## x.x.x`.
+- For Major and minor releases: Add a new row to the EOL table in `docs/reference/upgrading.md`. The EOL date is the release date plus 18 months.
 
 ## CI based
 
