@@ -75,7 +75,7 @@ For more information, check [#477](https://github.com/elastic/apm-agent-rum-js/i
 If you’re using Elastic backend agents, you must upgrade them to a version that also supports the official W3C tracecontext headers.
 ::::
 
-::::{dropdown} `addTags` replaced with `addLabels
+::::{dropdown} `addTags` replaced with `addLabels`
 `addTags`, which was deprecated in version `4.1`, has been removed. 
 
 For more information, check [#215](https://github.com/elastic/apm-agent-rum-js/issues/215).
