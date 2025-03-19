@@ -9,13 +9,42 @@ Upgrades between minor versions of the agent, like from 3.1 to 3.2 are always ba
 
 Before upgrading the agent, be sure to review the:
 
-* [Agent release notes](/release-notes/index.md)
+* [Agent release notes](/release-notes/release-notes.md)
 * [Agent and Server compatibility chart](docs-content://solutions/observability/apps/apm-agent-compatibility.md)
 
-The following upgrade guides are also available:
+## Upgrade APM Server [v5-upgrade-server]
+Version `5.x` of the RUM Agent requires APM Server version >= `7.0`. The [APM Server `7.0` upgrade guide](https://www.elastic.co/guide/en/apm/guide/7.17/upgrading-to-70.html) can help with the upgrade process.
 
-* [Upgrade to version 5.x](/release-notes/breaking-changes.md) - Follow this guide to upgrade from version `4.x` to version `5.x` of the Elastic APM RUM JS Agent.
+::::{note}
+APM Server version >= `7.0` requires Elasticsearch and Kibana versions >= `7.0` as well.
+::::
 
+## Upgrade backend agents [v5-upgrade-agents]
+All Elastic APM agents have been upgraded to support the changes in the RUM Agent. You must upgrade your backend agents to the minimum versions listed below for all features to work:
+
+| Agent name | Agent Version |
+| --- | --- |
+| **Go Agent** | >= `1.6` |
+| **Java Agent** | >= `1.14` |
+| **.NET Agent** | >= `1.3` |
+| **Node.js Agent** | >= `3.4` |
+| **Python Agent** | >= `5.4` |
+| **Ruby Agent** | >= `3.5` |
+
+## Upgrade the RUM agent [v5-update-rum-agent]
+Update or download the latest version of the RUM Agent using your [preferred installation method](/reference/install-agent.md).
+
+If your old configuration used one of the removed config options (listed below), update your configuration to use the new config options instead.
+
+Removed configurations:
+
+* `errorThrottleLimit` removed in favor of [`eventsLimit`](/reference/configuration.md#events-limit).
+* `errorThrottleInterval` removed in favor of [`eventsLimit`](/reference/configuration.md#events-limit).
+* `transactionThrottleLimit` removed in favor of [`eventsLimit`](/reference/configuration.md#events-limit).
+* `transactionThrottleInterval` removed in favor of [`eventsLimit`](/reference/configuration.md#events-limit).
+* `apm.addTags()` removed in favor of [`apm.addLabels()`](/reference/agent-api.md#apm-add-labels).
+* `span.addTags()` removed in favor of [`span.addLabels()`](/reference/span-api.md#span-add-labels).
+* `transaction.addTags()` removed in favor of [`transaction.addLabels()`](/reference/transaction-api.md#transaction-add-labels).
 
 ## End of life dates [end-of-life-dates]
 

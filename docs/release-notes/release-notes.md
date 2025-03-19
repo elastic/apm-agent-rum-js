@@ -4,9 +4,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/release-notes-5.x.html
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/release-notes.html
 ---
-# Elastic APM Real User Monitoring JavaScript Agent release notes [elastic-apm-rum-javascript-agent-release-notes]
+# {{apm-rum-agent}} release notes [elastic-apm-rum-javascript-agent-release-notes]
 
-Review the changes, fixes, and more in each version of Elastic APM Real User Monitoring JavaScript Agent.
+Review the changes, fixes, and more in each version of {{apm-rum-agent}}.
 
 To check for security updates, go to [Security announcements for the Elastic stack](https://discuss.elastic.co/c/announcements/security-announcements/31).
 
