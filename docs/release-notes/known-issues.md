@@ -1,5 +1,5 @@
 ---
-navigation_title: "Elastic APM Real User Monitoring JavaScript Agent"
+navigation_title: "Known issues"
 
 ---
 # Elastic APM Real User Monitoring JavaScript Agent known issues [elastic-apm-rum-javascript-agent-known-issues]
