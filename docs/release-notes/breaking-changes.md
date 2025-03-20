@@ -1,5 +1,5 @@
 ---
-navigation_title: "Elastic APM Real User Monitoring JavaScript Agent"
+navigation_title: "Breaking changes"
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/upgrade-to-v5.html
 ---
