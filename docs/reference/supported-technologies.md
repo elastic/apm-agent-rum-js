@@ -103,7 +103,7 @@ The core RUM agent supports websites based on multi-page (MPA) and single-page a
 
 The following platforms are supported:
 
-:::{image} ../images/compatibility.png
+:::{image} images/compatibility.png
 :alt: Elastic APM RUM Agent compatibility
 :::
 
