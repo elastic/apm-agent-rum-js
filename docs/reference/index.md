@@ -36,5 +36,5 @@ The agent uses browser timing APIs such as [Navigation Timing](https://w3c.githu
 
 ## Additional Components [additional-components]
 
-APM Agents work in conjunction with the [APM Server](docs-content://reference/ingestion-tools/observability/apm.md), [Elasticsearch](docs-content://get-started/index.md), and [Kibana](docs-content://get-started/the-stack.md). The [APM Guide](docs-content://reference/ingestion-tools/observability/apm.md) provides details on how these components work together, and provides a matrix outlining [Agent and Server compatibility](docs-content://solutions/observability/apps/apm-agent-compatibility.md).
+APM Agents work in conjunction with the [APM Server](docs-content://reference/apm/observability/apm.md), [Elasticsearch](docs-content://get-started/index.md), and [Kibana](docs-content://get-started/the-stack.md). The [APM Guide](docs-content://reference/apm/observability/apm.md) provides details on how these components work together, and provides a matrix outlining [Agent and Server compatibility](docs-content://solutions/observability/apps/apm-agent-compatibility.md).
 
