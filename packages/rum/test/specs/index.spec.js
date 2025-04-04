@@ -74,7 +74,9 @@ describe('index', function () {
     try {
       throw new Error('ApmBase test error')
     } catch (error) {
-      apmBase.captureError(error)
+      apmBase.captureError(error, {
+        labels: { testLabelKey: 'testLabelValue' }
+      })
       expect(apmServer.sendEvents).not.toHaveBeenCalled()
 
       if (isPlatformSupported()) {
@@ -82,6 +84,10 @@ describe('index', function () {
         setTimeout(() => {
           expect(apmServer.sendEvents).toHaveBeenCalled()
           var callData = apmServer.sendEvents.calls.mostRecent()
+          var eventData = callData.args[0][0]
+          expect(eventData.errors.context.tags.testLabelKey).toBe(
+            'testLabelValue'
+          )
           callData.returnValue.then(
             () => {
               // Wait before ending the test to make sure the result are processed by the agent.
