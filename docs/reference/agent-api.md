@@ -215,12 +215,15 @@ Use this method to get the current active transaction. If there is no active tra
 ## `apm.captureError()` [capture-error]
 
 ```js
-apm.captureError(error)
+apm.captureError(error, options)
 ```
 
 Arguments:
 
 * `error` - An instance of `Error`.
+* `options` - The following options are supported:
+
+  * `labels` - Add additional context with labels, these labels will be added to the error along with the labels from the current transaction.
 
 Use this method to manually send an error to APM Server:
 
