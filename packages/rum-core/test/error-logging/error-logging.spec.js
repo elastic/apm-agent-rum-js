@@ -73,6 +73,9 @@ describe('ErrorLogging', function () {
     try {
       throw new Error('unittest error')
     } catch (error) {
+      const opts = {
+        labels: { testLabelKey: 'testLabelValue' }
+      }
       error.test = 'hamid'
       error.aDate = new Date('2017-01-12T00:00:00.000Z')
       var obj = { test: 'test' }
@@ -80,12 +83,13 @@ describe('ErrorLogging', function () {
       error.anObject = obj
       error.aFunction = function noop() {}
       error.null = null
-      errorLogging.logErrorEvent({ error })
+      errorLogging.logErrorEvent({ error }, opts)
       const events = getEvents()
       expect(events.length).toBe(1)
       const errorData = events[0][ERRORS]
       expect(errorData.context.custom.test).toBe('hamid')
       expect(errorData.context.custom.aDate).toBe('2017-01-12T00:00:00.000Z') // toISOString()
+      expect(errorData.context.tags).toEqual({ testLabelKey: 'testLabelValue' })
       expect(errorData.context.custom.anObject).toBeUndefined()
       expect(errorData.context.custom.aFunction).toBeUndefined()
       expect(errorData.context.custom.null).toBeUndefined()
@@ -172,7 +176,10 @@ describe('ErrorLogging', function () {
     const errorEvent = {
       error: new Error(testErrorMessage)
     }
-    const errorData = errorLogging.createErrorDataModel(errorEvent)
+    const opts = {
+      labels: { testLabelKey: 'testLabelValue' }
+    }
+    const errorData = errorLogging.createErrorDataModel(errorEvent, opts)
     expect(errorData.context).toEqual(
       jasmine.objectContaining({
         page: {
@@ -184,7 +191,8 @@ describe('ErrorLogging', function () {
           foo: 'bar',
           bar: 20
         },
-        user: { id: 12, username: 'test' }
+        user: { id: 12, username: 'test' },
+        tags: { testLabelKey: 'testLabelValue' }
       })
     )
     transaction.end()
@@ -309,6 +317,27 @@ describe('ErrorLogging', function () {
       errorLogging.logError('test error')
       expect(apmServer.sendEvents).not.toHaveBeenCalled()
       expect(apmServer.queue.items.length).toBe(4)
+    }
+  })
+
+  it('should add error with context to queue', function () {
+    apmServer.init()
+    configService.setConfig({
+      serviceName: 'serviceName'
+    })
+    spyOn(apmServer, 'sendEvents')
+    try {
+      throw new Error('error with context')
+    } catch (error) {
+      const opts = {
+        labels: { testLabelKey: 'testLabelValue' }
+      }
+      errorLogging.logError('test error', opts)
+      expect(apmServer.sendEvents).not.toHaveBeenCalled()
+      expect(apmServer.queue.items.length).toBe(1)
+      expect(apmServer.queue.items[0].errors.context).toEqual(
+        jasmine.objectContaining({ tags: { testLabelKey: 'testLabelValue' } })
+      )
     }
   })
 

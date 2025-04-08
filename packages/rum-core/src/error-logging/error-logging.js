@@ -24,7 +24,7 @@
  */
 
 import { createStackTraces, filterInvalidFrames } from './stack-trace'
-import { generateRandomId, merge, extend } from '../common/utils'
+import { generateRandomId, merge, extend, setLabel } from '../common/utils'
 import { getPageContext } from '../common/context'
 import { truncateModel, ERROR_MODEL } from '../common/truncate'
 import stackParser from 'error-stack-parser'
@@ -77,7 +77,7 @@ class ErrorLogging {
   /**
    * errorEvent = { message, filename, lineno, colno, error }
    */
-  createErrorDataModel(errorEvent) {
+  createErrorDataModel(errorEvent, opts) {
     const frames = createStackTraces(stackParser, errorEvent)
     const filteredFrames = filterInvalidFrames(frames)
 
@@ -99,6 +99,11 @@ class ErrorLogging {
       if (customProperties) {
         errorContext.custom = customProperties
       }
+    }
+    if (opts && opts.labels) {
+      var keys = Object.keys(opts.labels)
+      errorContext.tags = {}
+      keys.forEach(k => setLabel(k, opts.labels[k], errorContext.tags))
     }
 
     if (!errorType) {
@@ -151,11 +156,11 @@ class ErrorLogging {
     return truncateModel(ERROR_MODEL, errorObject)
   }
 
-  logErrorEvent(errorEvent) {
+  logErrorEvent(errorEvent, opts) {
     if (typeof errorEvent === 'undefined') {
       return
     }
-    var errorObject = this.createErrorDataModel(errorEvent)
+    var errorObject = this.createErrorDataModel(errorEvent, opts)
     if (typeof errorObject.exception.message === 'undefined') {
       return
     }
@@ -194,14 +199,14 @@ class ErrorLogging {
     this.logErrorEvent(errorEvent)
   }
 
-  logError(messageOrError) {
+  logError(messageOrError, opts) {
     let errorEvent = {}
     if (typeof messageOrError === 'string') {
       errorEvent.message = messageOrError
     } else {
       errorEvent.error = messageOrError
     }
-    return this.logErrorEvent(errorEvent)
+    return this.logErrorEvent(errorEvent, opts)
   }
 
   _parseRejectReason(reason) {
