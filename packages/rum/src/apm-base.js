@@ -316,10 +316,10 @@ export default class ApmBase {
     }
   }
 
-  captureError(error, opt) {
+  captureError(error, opts) {
     if (this.isEnabled()) {
       var errorLogging = this.serviceFactory.getService(ERROR_LOGGING)
-      return errorLogging.logError(error, opt)
+      return errorLogging.logError(error, opts)
     }
   }
 

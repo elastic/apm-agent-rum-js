@@ -146,7 +146,7 @@ declare module '@elastic/apm-rum' {
       options?: SpanOptions
     ): Span | undefined
     getCurrentTransaction(): Transaction | undefined
-    captureError(error: Error | string, opt?: ErrorOptions): void
+    captureError(error: Error | string, opts?: ErrorOptions): void
     addFilter(fn: FilterFn): void
   }
   const apmBase: ApmBase
