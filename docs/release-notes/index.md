@@ -19,6 +19,12 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 % ### Fixes [elastic-apm-rum-javascript-agent-versionext-fixes]
 
+## 5.17.0 [elastic-apm-rum-javascript-agent-5170-release-notes]
+**Release date:** April 9, 2025
+
+### Features and enhancements [elastic-apm-rum-javascript-agent-5170-features-enhancements]
+* Add support to add labels in captured errors [#1594](https://github.com/elastic/apm-agent-rum-js/pull/1594)
+
 ## 5.16.1 [elastic-apm-rum-javascript-agent-5161-release-notes]
 **Release date:** June 27, 2024
 
