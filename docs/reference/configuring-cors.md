@@ -7,7 +7,7 @@ mapped_pages:
 
 If APM Server is deployed in an origin different than the page’s origin, you will need to configure Cross-Origin Resource Sharing (CORS).
 
-A list of permitted origins can be supplied to the [`apm-server.rum.allow_origins`](docs-content://solutions/observability/apps/configure-real-user-monitoring-rum.md#apm-rum-allow-origins) configuration option. By default, APM Server allows all origins.
+A list of permitted origins can be supplied to the [`apm-server.rum.allow_origins`](docs-content://solutions/observability/apm/configure-real-user-monitoring-rum.md#apm-rum-allow-origins) configuration option. By default, APM Server allows all origins.
 
 
 ## How CORS works [_how_cors_works]
