@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.23.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.22.1...@elastic/apm-rum-core@5.23.0) (2025-04-09)
+
+
+### Features
+
+* **rum-core:** add support for adding labels to captured errors ([#1594](https://github.com/elastic/apm-agent-rum-js/issues/1594)) ([3d1ce71](https://github.com/elastic/apm-agent-rum-js/commit/3d1ce71ca0f0946d3ea7445ea2fc7f581b09d32b))
+
+
+
 ### [5.22.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.22.0...@elastic/apm-rum-core@5.22.1) (2025-01-10)
 
 
