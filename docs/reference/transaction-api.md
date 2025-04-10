@@ -102,7 +102,7 @@ Add several labels on the transaction. If an error happens during the transactio
 Labels are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via [`apm.setCustomContext()`](/reference/agent-api.md#apm-set-custom-context)).
 
 ::::{tip}
-Before using custom labels, ensure you understand the different types of [metadata](docs-content://solutions/observability/apps/elastic-apm-events-intake-api.md#apm-api-metadata-overview) that are available.
+Before using custom labels, ensure you understand the different types of [metadata](docs-content://solutions/observability/apm/elastic-apm-events-intake-api.md#apm-api-metadata-overview) that are available.
 ::::
 
 

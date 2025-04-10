@@ -104,7 +104,7 @@ To disable `user-interaction` transactions,  add `eventtarget` or `click` to thi
 
 The environment where the service being monitored is deployed, e.g. "production", "development", "test", etc.
 
-Environments allow you to easily filter data on a global level in the APM app. It’s important to be consistent when naming environments across agents. See [environment selector](docs-content://solutions/observability/apps/filter-application-data.md#apm-filter-your-data-service-environment-filter) in the APM app for more information.
+Environments allow you to easily filter data on a global level in the APM app. It’s important to be consistent when naming environments across agents. See [environment selector](docs-content://solutions/observability/apm/filter-data.md#apm-filter-your-data-service-environment-filter) in the APM app for more information.
 
 ::::{note}
 This feature is fully supported in the APM app in Kibana versions >= 7.2. You must use the query bar to filter for a specific environment in versions prior to 7.2.
@@ -265,7 +265,7 @@ Currently, only [transaction sample rate](#transaction-sample-rate) can be confi
 
 
 ::::{note}
-This feature requires APM Server v7.5 or later. More information is available in [APM Agent configuration](docs-content://solutions/observability/apps/apm-agent-central-configuration.md).
+This feature requires APM Server v7.5 or later. More information is available in [APM Agent configuration](docs-content://solutions/observability/apm/apm-agent-central-configuration.md).
 ::::
 
 
