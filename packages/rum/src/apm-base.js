@@ -72,7 +72,7 @@ export default class ApmBase {
       /**
        * Set Agent version to be sent as part of metadata to the APM Server
        */
-      configService.setVersion('5.16.3')
+      configService.setVersion('5.17.0')
       this.config(config)
       /**
        * Set level here to account for both active and inactive cases
@@ -316,10 +316,10 @@ export default class ApmBase {
     }
   }
 
-  captureError(error) {
+  captureError(error, opts) {
     if (this.isEnabled()) {
       var errorLogging = this.serviceFactory.getService(ERROR_LOGGING)
-      return errorLogging.logError(error)
+      return errorLogging.logError(error, opts)
     }
   }
 

@@ -112,6 +112,10 @@ declare module '@elastic/apm-rum' {
     spanContextCallback?: () => Labels
   }
 
+  export interface ErrorOptions {
+    labels: Labels
+  }
+
   type Init = (options?: AgentConfigOptions) => ApmBase
   const init: Init
 
@@ -144,7 +148,7 @@ declare module '@elastic/apm-rum' {
       options?: SpanOptions
     ): Span | undefined
     getCurrentTransaction(): Transaction | undefined
-    captureError(error: Error | string): void
+    captureError(error: Error | string, opts?: ErrorOptions): void
     addFilter(fn: FilterFn): void
   }
   const apmBase: ApmBase

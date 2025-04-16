@@ -64,7 +64,7 @@ It’s possible to call this function multiple times within the scope of the sam
 The given `context` argument must be an object and can contain any property that can be JSON encoded.
 
 ::::{tip}
-Before using custom context, ensure you understand the different types of [metadata](docs-content://solutions/observability/apps/elastic-apm-events-intake-api.md#apm-api-metadata-overview) that are available.
+Before using custom context, ensure you understand the different types of [metadata](docs-content://solutions/observability/apm/elastic-apm-events-intake-api.md#apm-api-metadata-overview) that are available.
 ::::
 
 
@@ -80,7 +80,7 @@ Set labels on transactions and errors. Starting with APM Server 7.6+, the labels
 Labels are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via [`apm.setCustomContext()`](#apm-set-custom-context)). You can set multiple labels.
 
 ::::{tip}
-Before using custom labels, ensure you understand the different types of [metadata](docs-content://solutions/observability/apps/elastic-apm-events-intake-api.md#apm-api-metadata-overview) that are available.
+Before using custom labels, ensure you understand the different types of [metadata](docs-content://solutions/observability/apm/elastic-apm-events-intake-api.md#apm-api-metadata-overview) that are available.
 ::::
 
 
@@ -215,12 +215,15 @@ Use this method to get the current active transaction. If there is no active tra
 ## `apm.captureError()` [capture-error]
 
 ```js
-apm.captureError(error)
+apm.captureError(error, options)
 ```
 
 Arguments:
 
 * `error` - An instance of `Error`.
+* `options` - The following options are supported:
+
+  * `labels` - Add additional context with labels, these labels will be added to the error along with the labels from the current transaction.
 
 Use this method to manually send an error to APM Server:
 
