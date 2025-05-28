@@ -59,7 +59,7 @@ https://unpkg.com/elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.j
 
 [source,html]
 ----
-<script src="https://your-cdn-host.com/path/to/elastic-apm-js-base.umd.min.js" crossorigin></script>
+<script src="https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js" crossorigin></script>
 <script>
   elasticApm.init({
     serviceName: '',
