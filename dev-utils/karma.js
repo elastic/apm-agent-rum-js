@@ -108,7 +108,6 @@ const baseConfig = {
 
 function prepareConfig(config, packageName) {
   const globalConfig = getGlobalConfig(packageName)
-  console.log('Global test Configuration: ', globalConfig)
   const { agentConfig, testConfig } = globalConfig
 
   const { isCI, sauceLabs: isSauce } = testConfig
