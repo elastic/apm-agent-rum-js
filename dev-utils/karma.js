@@ -108,7 +108,6 @@ const baseConfig = {
 
 function prepareConfig(config, packageName) {
   const globalConfig = getGlobalConfig(packageName)
-  console.log('Global test Configuration: ', globalConfig)
   const { agentConfig, testConfig } = globalConfig
 
   const { isCI, sauceLabs: isSauce } = testConfig
@@ -186,6 +185,7 @@ function prepareConfig(config, packageName) {
     config.reporters.push('dots', 'saucelabs')
     config.browsers = Object.keys(config.customLaunchers)
     config.transports = ['polling']
+    console.log('sauceLabsConfg', config)
   }
 
   return config

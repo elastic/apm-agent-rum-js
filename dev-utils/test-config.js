@@ -86,8 +86,8 @@ function getDefaultBrowsers() {
     },
     {
       browserName: 'safari',
-      platformName: 'macOS 10.15',
-      browserVersion: '13'
+      platformName: 'macOS 11.00',
+      browserVersion: '14'
     },
     {
       browserName: 'internet explorer',
@@ -110,17 +110,17 @@ function getAppiumBrowsersForKarma() {
     {
       platformName: 'Android',
       browserName: 'Browser',
-      appiumVersion: '1.20.2',
+      appiumVersion: '1.22.1',
       deviceName: 'Android Emulator',
       platformVersion: '5.1'
     },
     {
       platformName: 'iOS',
       browserName: 'safari',
-      appiumVersion: '1.13.0',
+      appiumVersion: '1.22.3',
       deviceName: 'iPhone Simulator',
       deviceOrientation: 'portrait',
-      platformVersion: '12.2'
+      platformVersion: '14.0'
     }
   ]
 }
@@ -135,18 +135,20 @@ function getAppiumBrowsersForWebdriver() {
       browserName: 'Browser',
       'appium:deviceName': 'Android Emulator',
       'appium:platformVersion': '5.1',
+      'appium:automationName': 'UiAutomator2',
       'sauce:options': {
-        appiumVersion: '1.20.2'
+        appiumVersion: '1.22.1'
       }
     },
     {
       platformName: 'iOS',
       browserName: 'Safari',
       'appium:deviceName': 'iPad Simulator',
-      'appium:platformVersion': '12.2',
+      'appium:platformVersion': '14.0',
+      'appium:automationName': 'XCUITest',
       'sauce:options': {
-        appiumVersion: '1.13.0',
-        deviceOrientation: 'portrait'
+        appiumVersion: '1.22.3',
+        deviceOrientation: 'PORTRAIT'
       }
     }
   ]
