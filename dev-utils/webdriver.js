@@ -148,8 +148,6 @@ function getWebdriveBaseConfig(
   specs = './test/e2e/**/*.e2e-spec.js',
   capabilities
 ) {
-  // TODO: check if these are valid for SauceLabs
-  console.log('getWebdriveBaseConfig:capabilities', capabilities)
   const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
   /**
    * Skip the ios platform on E2E tests because of script

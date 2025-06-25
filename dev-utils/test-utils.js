@@ -26,7 +26,7 @@
 const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
-const { Server } = require('karma')
+const { Server, config } = require('karma')
 const { Launcher } = require('@wdio/cli')
 const sauceConnectLauncher = require('sauce-connect-launcher')
 const JasmineRunner = require('jasmine')
@@ -118,9 +118,13 @@ function runSauceConnect(config, callback) {
 }
 
 function runKarma(configFile) {
-  const server = new Server({ configFile, singleRun: true }, exitCode =>
-    process.exit(exitCode)
-  )
+  // const server = new Server({ configFile, singleRun: true }, exitCode =>
+  //   process.exit(exitCode)
+  // )
+  console.log('runKarma:configFile', configFile)
+  const conf = config.parseConfig(configFile, { singleRun: true })
+  console.log('runKarma:conf', conf)
+  const server = new Server(conf, exitCode => process.exit(exitCode))
   server.start()
 }
 
