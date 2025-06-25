@@ -169,9 +169,6 @@ function getWebdriveBaseConfig(
     })
     .filter(({ platformName }) => platformName !== 'iOS')
 
-  // TODO: check if these are valid for SauceLabs
-  console.log('getWebdriveBaseConfig:capabilities:changed', capabilities)
-
   const baseConfig = {
     runner: 'local',
     specs: glob.sync(join(path, specs)),
