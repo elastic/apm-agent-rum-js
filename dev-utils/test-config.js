@@ -110,17 +110,17 @@ function getAppiumBrowsersForKarma() {
     {
       platformName: 'Android',
       browserName: 'Browser',
-      appiumVersion: '1.20.2',
+      appiumVersion: '1.22.1',
       deviceName: 'Android Emulator',
       platformVersion: '5.1'
     },
     {
       platformName: 'iOS',
       browserName: 'safari',
-      appiumVersion: '1.13.0',
+      appiumVersion: '1.22.3',
       deviceName: 'iPhone Simulator',
       deviceOrientation: 'portrait',
-      platformVersion: '12.2'
+      platformVersion: '14.0'
     }
   ]
 }
