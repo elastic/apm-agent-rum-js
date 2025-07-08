@@ -29,17 +29,17 @@ describe('AfterFrame', () => {
   it('should be called after micro tasks', done => {
     let count = 0
     afterFrame(() => {
-      console.log('afterFrame::: expect')
+      console.log('afterFrame microtask::: expect')
       expect(count).toBe(2)
       done()
     })
     Promise.resolve().then(() => {
-      console.log('afterFrame::: resolved promise')
+      console.log('afterFrame microtask::: resolved promise')
       count++
     })
 
     new MutationObserver(() => {
-      console.log('afterFrame::: mutation observer callback')
+      console.log('afterFrame microtask::: mutation observer callback')
       count++
     }).observe(document.body, {
       attributes: true
@@ -51,17 +51,24 @@ describe('AfterFrame', () => {
   it('should be called after tasks', done => {
     let count = 0
     afterFrame(() => {
+      console.log('afterFrame task::: expect')
       expect(count).toBe(2)
       done()
     })
 
-    setTimeout(() => count++, 0)
+    setTimeout(() => {
+      console.log('afterFrame task::: setTimeout callback')
+      count++
+    }, 0)
 
     /**
      * Technique Used by react to enqueue task
      */
     const channel = new MessageChannel()
-    channel.port1.onmessage = () => count++
+    channel.port1.onmessage = () => {
+      console.log('afterFrame task::: message channel on message')
+      count++
+    }
     channel.port2.postMessage(undefined)
   })
 
