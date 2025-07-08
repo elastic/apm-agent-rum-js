@@ -32,9 +32,15 @@ describe('AfterFrame', () => {
       expect(count).toBe(2)
       done()
     })
-    Promise.resolve().then(() => count++)
+    Promise.resolve().then(() => {
+      console.log('afterFrame::: resolved promise')
+      count++
+    })
 
-    new MutationObserver(() => count++).observe(document.body, {
+    new MutationObserver(() => {
+      console.log('afterFrame::: mutation observer callback')
+      count++
+    }).observe(document.body, {
       attributes: true
     })
     // Trigger mutation observer callback
