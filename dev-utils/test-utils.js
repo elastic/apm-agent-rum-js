@@ -118,12 +118,7 @@ function runSauceConnect(config, callback) {
 }
 
 function runKarma(configFile) {
-  // const server = new Server({ configFile, singleRun: true }, exitCode =>
-  //   process.exit(exitCode)
-  // )
-  console.log('runKarma:configFile', configFile)
   const conf = config.parseConfig(configFile, { singleRun: true })
-  console.log('runKarma:conf', conf)
   const server = new Server(conf, exitCode => process.exit(exitCode))
   server.start()
 }

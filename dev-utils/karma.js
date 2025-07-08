@@ -185,7 +185,6 @@ function prepareConfig(config, packageName) {
     config.reporters.push('dots', 'saucelabs')
     config.browsers = Object.keys(config.customLaunchers)
     config.transports = ['polling']
-    console.log('sauceLabsConfg', config)
   }
 
   return config
