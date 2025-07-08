@@ -29,6 +29,7 @@ describe('AfterFrame', () => {
   it('should be called after micro tasks', done => {
     let count = 0
     afterFrame(() => {
+      console.log('afterFrame::: expect')
       expect(count).toBe(2)
       done()
     })
