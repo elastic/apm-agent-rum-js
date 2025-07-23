@@ -187,7 +187,7 @@ services:
         npx --version
         cd /app
         export
-        npm install
+        npm ci
         npm install playwright@1.18.1 --unsafe-perm=true --allow-root
         set -eo pipefail
         npx lerna run build:module
