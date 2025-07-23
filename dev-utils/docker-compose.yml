@@ -187,10 +187,10 @@ services:
         npx --version
         cd /app
         export
-        npm ci
+        npm install
         npm install playwright@1.18.1 --unsafe-perm=true --allow-root
         set -eo pipefail
-        npx lerna run build:module
+        npx lerna@4.0.0 run build:module
         node ./scripts/benchmarks.js ${REPORT_FILE}"
     mem_limit: 2000m
     volumes:
