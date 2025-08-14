@@ -5,7 +5,7 @@ on:
     inputs:
       stack_version:
         description: 'Stack Version'
-        default: '8.19.0'
+        default: '8.19.2'
         required: false
   push:
     branches:
@@ -26,7 +26,7 @@ jobs:
       - name: Run buildkite pipeline
         uses: elastic/oblt-actions/buildkite/run@v1
         env:
-          STACK_VERSION: ${{ inputs.stack_version || '8.19.0' }}
+          STACK_VERSION: ${{ inputs.stack_version || '8.19.2' }}
         with:
           token: ${{ secrets.BUILDKITE_TOKEN }}
           pipeline: apm-agent-microbenchmark
