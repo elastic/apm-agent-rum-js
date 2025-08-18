@@ -28,6 +28,7 @@ import { createServiceFactory, patchEventHandler } from '../../../src'
 import {
   HISTORY,
   TRANSACTION_SERVICE,
+  CONFIG_SERVICE,
   PERFORMANCE_MONITORING
 } from '../../../src/common/constants'
 import { observePageClicks } from '../../../src/common/observers'
@@ -39,10 +40,12 @@ describe('observePageClicks', () => {
   let performanceMonitoring
   let unobservePageClicks
   let containerElement
+  let configService
 
   beforeEach(() => {
     serviceFactory = createServiceFactory()
     transactionService = serviceFactory.getService(TRANSACTION_SERVICE)
+    configService = serviceFactory.getService(CONFIG_SERVICE)
     performanceMonitoring = serviceFactory.getService(PERFORMANCE_MONITORING)
     containerElement = document.createElement('div')
     document.body.appendChild(containerElement)
@@ -55,7 +58,7 @@ describe('observePageClicks', () => {
   })
 
   it('should create user interaction transaction when clicking on DOM element', () => {
-    unobservePageClicks = observePageClicks(transactionService)
+    unobservePageClicks = observePageClicks(configService, transactionService)
 
     let element = document.createElement('button')
     containerElement.appendChild(element)
@@ -80,7 +83,7 @@ describe('observePageClicks', () => {
   })
 
   it('should not create user interaction transaction when click event corresponds to a non-Element target', () => {
-    unobservePageClicks = observePageClicks(transactionService)
+    unobservePageClicks = observePageClicks(configService, transactionService)
 
     window.dispatchEvent(createCustomEvent('click'))
     let tr = transactionService.getCurrentTransaction()
@@ -94,7 +97,7 @@ describe('observePageClicks', () => {
   it('should respect the transaction type priority order', function () {
     const historySubFn = performanceMonitoring.getHistorySub()
     const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)
-    unobservePageClicks = observePageClicks(transactionService)
+    unobservePageClicks = observePageClicks(configService, transactionService)
 
     let element = document.createElement('button')
     containerElement.appendChild(element)
@@ -119,7 +122,7 @@ describe('observePageClicks', () => {
   it('should respect the custom transaction name', function () {
     const historySubFn = performanceMonitoring.getHistorySub()
     const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)
-    unobservePageClicks = observePageClicks(transactionService)
+    unobservePageClicks = observePageClicks(configService, transactionService)
 
     let element = document.createElement('button')
     containerElement.appendChild(element)
@@ -136,6 +139,34 @@ describe('observePageClicks', () => {
 
     let tr = transactionService.getCurrentTransaction()
     expect(tr.name).toBe('Click - purchase-transaction')
+    expect(tr.type).toBe('route-change')
+
+    cancelHistorySub()
+  })
+
+  it('should respect the transactionNameCustomAttribute config for transaction name', function () {
+    const historySubFn = performanceMonitoring.getHistorySub()
+    const cancelHistorySub = patchEventHandler.observe(HISTORY, historySubFn)
+    unobservePageClicks = observePageClicks(configService, transactionService)
+    configService.setConfig({
+      transactionNameCustomAttribute: 'data-test-subj'
+    })
+
+    let element = document.createElement('button')
+    containerElement.appendChild(element)
+    element.setAttribute('data-test-subj', 'data-test-subj-attr')
+
+    const listener = () => {
+      let tr = transactionService.getCurrentTransaction()
+      expect(tr.type).toBe('user-interaction')
+      history.pushState(undefined, undefined, 'test')
+    }
+
+    element.addEventListener('click', listener)
+    element.click()
+
+    let tr = transactionService.getCurrentTransaction()
+    expect(tr.name).toBe('Click - data-test-subj-attr')
     expect(tr.type).toBe('route-change')
 
     cancelHistorySub()
@@ -194,7 +225,10 @@ describe('observePageClicks', () => {
           expected
         }) => {
           it(`${name}`, () => {
-            unobservePageClicks = observePageClicks(transactionService)
+            unobservePageClicks = observePageClicks(
+              configService,
+              transactionService
+            )
             let parentElement = document.createElement(parentTagName)
             let childElement = document.createElement('span')
             if (parentCustomTransactionName) {
