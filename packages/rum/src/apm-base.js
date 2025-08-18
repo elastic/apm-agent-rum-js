@@ -124,7 +124,7 @@ export default class ApmBase {
 
         observePageVisibility(configService, transactionService)
         if (flags[EVENT_TARGET] && flags[CLICK]) {
-          observePageClicks(transactionService)
+          observePageClicks(configService, transactionService)
         }
         observeUserInteractions()
       } else {

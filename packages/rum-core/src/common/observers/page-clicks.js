@@ -25,17 +25,20 @@
 
 import { USER_INTERACTION } from '../constants'
 
-const INTERACTIVE_SELECTOR =
-  'a[data-transaction-name], button[data-transaction-name]'
+const interactiveSelector = attribute => `a[${attribute}], button[${attribute}]`
 
-export function observePageClicks(transactionService) {
+export function observePageClicks(configService, transactionService) {
   const clickHandler = event => {
     // Real user clicks interactions will always be related to an Element.
     // And since the goal is to maximise the capture of such interactions
     // events synthetically dispatched through Window (window.dispatch) and Document (document.dispatch)
     // will not be handled.
     if (event.target instanceof Element) {
-      createUserInteractionTransaction(transactionService, event.target)
+      createUserInteractionTransaction(
+        configService,
+        transactionService,
+        event.target
+      )
     }
   }
 
@@ -48,8 +51,18 @@ export function observePageClicks(transactionService) {
   }
 }
 
-function createUserInteractionTransaction(transactionService, target) {
-  const { transactionName, context } = getTransactionMetadata(target)
+function createUserInteractionTransaction(
+  configService,
+  transactionService,
+  target
+) {
+  const transactionNameCustomAttribute = configService.get(
+    'transactionNameCustomAttribute'
+  )
+  const { transactionName, context } = getTransactionMetadata(
+    target,
+    transactionNameCustomAttribute
+  )
 
   /**
    * We reduce the reusability threshold to make sure
@@ -71,13 +84,16 @@ function createUserInteractionTransaction(transactionService, target) {
   }
 }
 
-function getTransactionMetadata(target) {
+function getTransactionMetadata(target, transactionNameCustomAttribute) {
   const metadata = {
     transactionName: null,
     context: null
   }
 
-  metadata.transactionName = buildTransactionName(target)
+  metadata.transactionName = buildTransactionName(
+    target,
+    transactionNameCustomAttribute
+  )
 
   let classes = target.getAttribute('class')
   if (classes) {
@@ -88,10 +104,17 @@ function getTransactionMetadata(target) {
 }
 
 // builds the name of a transaction from the given target
-// Strategy: use custom html attribute 'data-transaction-name' - otherwise fall back to "tagname" + "name"-Attribute
-function buildTransactionName(target) {
+// Strategy:
+// if transactionNameCustomAttribute config option is set, use that
+// if not, use custom html attribute 'data-transaction-name'
+// otherwise fall back to "tagname" + "name"-Attribute
+function buildTransactionName(target, transactionNameCustomAttribute) {
   // Verify if a custom transaction name has been defined
-  const dtName = findCustomTransactionName(target)
+  const dtName = findCustomTransactionName(
+    target,
+    transactionNameCustomAttribute
+  )
+  console.log('dtName:', dtName)
   if (dtName) {
     return dtName
   }
@@ -107,13 +130,15 @@ function buildTransactionName(target) {
   return tagName
 }
 
-function findCustomTransactionName(target) {
-  const trCustomNameAttribute = 'data-transaction-name'
+function findCustomTransactionName(target, transactionNameCustomAttribute) {
+  const trCustomNameAttribute =
+    transactionNameCustomAttribute || 'data-transaction-name'
   const fallbackName = target.getAttribute(trCustomNameAttribute)
+  console.log('fallbackName:', fallbackName)
   if (target.closest) {
     // Leverage closest API to traverse the element and its parents
     // only links and buttons are considered.
-    const element = target.closest(INTERACTIVE_SELECTOR)
+    const element = target.closest(interactiveSelector(trCustomNameAttribute))
     return element ? element.getAttribute(trCustomNameAttribute) : fallbackName
   }
 

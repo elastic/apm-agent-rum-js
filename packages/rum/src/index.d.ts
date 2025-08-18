@@ -95,6 +95,7 @@ declare module '@elastic/apm-rum' {
     transactionThrottleLimit?: number
     transactionThrottleInterval?: number
     transactionSampleRate?: number
+    transactionNameCustomAttribute?: string
     centralConfig?: boolean
     ignoreTransactions?: Array<string | RegExp>
     propagateTracestate?: boolean

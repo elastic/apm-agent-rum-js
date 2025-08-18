@@ -89,6 +89,7 @@ class Config {
       pageLoadTransactionName: '',
       propagateTracestate: false,
       transactionSampleRate: 1.0,
+      transactionNameCustomAttribute: '',
       centralConfig: false,
       monitorLongtasks: true,
       apiVersion: 2,
