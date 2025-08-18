@@ -114,7 +114,7 @@ function buildTransactionName(target, transactionNameCustomAttribute) {
     target,
     transactionNameCustomAttribute
   )
-  console.log('dtName:', dtName)
+
   if (dtName) {
     return dtName
   }
@@ -134,7 +134,7 @@ function findCustomTransactionName(target, transactionNameCustomAttribute) {
   const trCustomNameAttribute =
     transactionNameCustomAttribute || 'data-transaction-name'
   const fallbackName = target.getAttribute(trCustomNameAttribute)
-  console.log('fallbackName:', fallbackName)
+
   if (target.closest) {
     // Leverage closest API to traverse the element and its parents
     // only links and buttons are considered.
