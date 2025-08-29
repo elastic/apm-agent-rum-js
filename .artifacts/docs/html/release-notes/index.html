@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en" class="h-screen" xmlns="http://www.w3.org/1999/html">
+<head hx-head="merge">
+		<meta charset="utf-8">
+	<title>Elastic APM Real User Monitoring JavaScript Agent release notes | APM RUM JavaScript agent</title>
+	<meta name="description" content="Review the changes, fixes, and more in each version of Elastic APM Real User Monitoring JavaScript Agent. To check for security updates, go to Security...">
+		<link rel="preload" href="/_static/InterVariable.e6ec8b96.woff2" as="font" type="font/woff2" crossorigin>
+		<link rel="preload" href="/_static/MierB-Regular.efa24115.woff2" as="font" type="font/woff2" crossorigin>
+		<link rel="preload" href="/_static/MierB-Bold.01af95ca.woff2" as="font" type="font/woff2" crossorigin>
+		<link rel="preload" href="/_static/MierB-Demi.845945e0.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="stylesheet preload" as="style" type="text/css" href="/_static/styles.css?v=4eec718956f93254" crossorigin/>
+	<script src="/_static/custom-elements.js?v=4f585028e4b5ca00" defer></script>
+	<script src="/_static/main.js?v=373d0d2da5378b96" defer></script>
+		<link rel="canonical" href="https://docs-v3-preview.elastic.dev/release-notes" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="apple-touch-icon" sizes="57x57" href="https://elastic.co/apple-icon-57x57.png"/>
+<link rel="apple-touch-icon" sizes="60x60" href="https://elastic.co/apple-icon-60x60.png"/>
+<link rel="apple-touch-icon" sizes="72x72" href="https://elastic.co/apple-icon-72x72.png"/>
+<link rel="apple-touch-icon" sizes="76x76" href="https://elastic.co/apple-icon-76x76.png"/>
+<link rel="apple-touch-icon" sizes="114x114" href="https://elastic.co/apple-icon-114x114.png"/>
+<link rel="apple-touch-icon" sizes="120x120" href="https://elastic.co/apple-icon-120x120.png"/>
+<link rel="apple-touch-icon" sizes="144x144" href="https://elastic.co/apple-icon-144x144.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="https://elastic.co/apple-icon-152x152.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="https://elastic.co/apple-icon-180x180.png"/>
+<link rel="apple-touch-icon" sizes="192x192" href="https://elastic.co/apple-icon-192x192.png"/>
+<link rel="icon" type="image/png" href="https://elastic.co/favicon-32x32.png" sizes="32x32"/>
+<link rel="shortcut icon" href="https://elastic.co/favicon.ico" type="image/x-icon"/>
+<link rel="icon" href="https://elastic.co/favicon.ico" type="image/x-icon"/>
+<link rel="apple-touch-icon-precomposed" sizes="64x64" href="https://elastic.co/favicon_64x64_16bit.png"/>
+<link rel="apple-touch-icon-precomposed" sizes="32x32" href="https://elastic.co/favicon_32x32.png"/>
+<link rel="apple-touch-icon-precomposed" sizes="16x16" href="https://elastic.co/favicon_16x16.png"/>
+<link rel="icon" type="image/png" href="https://elastic.co/android-chrome-192x192.png" sizes="192x192"/>
+<link rel="icon" type="image/png" href="https://elastic.co/favicon-96x96.png" sizes="96x96"/>
+<link rel="icon" type="image/png" href="https://elastic.co/favicon-16x16.png" sizes="16x16"/>
+<link rel="icon" type="image/png" href="https://elastic.co/favicon-48x48.png" sizes="48x48"/>
+
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="htmx-config" content='{"selfRequestsOnly": true}'>
+	<meta property="og:type" content="website"/>
+	<meta property="og:title" content="Elastic APM Real User Monitoring JavaScript Agent release notes | APM RUM JavaScript agent"/>
+	<meta property="og:description" content="Review the changes, fixes, and more in each version of Elastic APM Real User Monitoring JavaScript Agent. To check for security updates, go to Security..."/>
+	<meta property="og:image" content="https://www.elastic.co/static-res/images/social_media_default.png"/>
+	<meta property="og:image:alt" content="Elastic | The Search AI Company"/>
+		<meta property="og:url" content="https://docs-v3-preview.elastic.dev/release-notes" />
+	<meta property="docs:feature:lazy-load-navigation" content="False" />
+
+				<meta class="elastic" name="product_version" content="9.0+"/>
+			<meta name="DC.identifier" content="9.0+"/>
+			<link rel="alternate" type="text/markdown" href="/release-notes.md" title="Markdown export"/>
+			<meta class="elastic" name="product_name" content="Elastic Observability,APM,APM Agent"/>
+			<meta name="DC.subject" content="Elastic Observability,APM,APM Agent"/>
+
+</head>
+
+<body
+	class="group/body text-ink has-[#primary-nav-hamburger:checked]:overflow-hidden"
+	hx-ext="preload, head-support"
+	data-docs-builder-version="32D9FBCF"
+	data-root-path="/"
+	hx-boost="true" hx-swap="none" hx-push-url="true" hx-indicator="#htmx-indicator"
+	>
+	<header class="sticky top-0 z-50 bg-blue-developer text-white h-(--offset-top) flex items-center">
+		<div class="max-w-(--max-layout-width) w-full mx-auto flex justify-between items-center">
+			<label role="button" class="md:hidden cursor-pointer" for="pages-nav-hamburger">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12"/>
+				</svg>
+			</label>
+			<a href="/" class="flex items-center gap-2 text-lg font-semibold px-4">
+				<img src="/_static/logo-elastic-glyph-color.svg?v=f602ddacafcf3057" alt="" width="32" height="32">
+				apm-agent-rum-js
+			</a>
+			<search-or-ask-ai></search-or-ask-ai>
+		</div>
+	</header>
+
+<div id="main-container" class="flex flex-col items-center border-t-1 border-grey-20">
+	
+		<div class="max-w-(--max-layout-width) w-full h-full grid
+					grid-cols-1
+					md:grid-cols-[var(--max-sidebar-width)_1fr]
+				">
+			<aside class="sidebar bg-white fixed md:sticky shadow-2xl md:shadow-none left-[100%] group-has-[#pages-nav-hamburger:checked]/body:left-0 bottom-0 md:left-auto pl-6 md:pl-2 top-[calc(var(--offset-top)+1px)] w-[80%] md:w-auto shrink-0 border-r-1 border-r-grey-20 z-40 md:z-auto">
+	
+	<nav
+		id="pages-nav"
+		class="sidebar-nav h-full">
+		
+<div class="pb-20 font-body" id="nav-tree">
+		<a
+			href="/reference/"
+			 hx-select-oob=#content-container,#toc-nav preload=mousedown
+			class="inline-block mx-4 mt-6 font-semibold text-ink hover:text-black">
+			APM RUM JavaScript agent
+		</a>
+
+		<ul class="block px-4">
+					<li class="flex flex-wrap group-navigation mt-6">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/reference/"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center font-semibold">
+					APM RUM JavaScript agent
+				</a>
+					<label for="02CDD01C" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="02CDD01C"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex flex-wrap group-navigation mt-4">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/reference/set-up-apm-real-user-monitoring-javascript-agent"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center ">
+					Set up the APM Real User Monitoring JavaScript Agent
+				</a>
+					<label for="7622CB06" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="7622CB06"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/install-agent"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Install the Agent
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/configuring-cors"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Configure CORS
+			</a>
+		</li>
+				</ul>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/supported-technologies"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Supported technologies
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/configuration"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Configuration
+			</a>
+		</li>
+		<li class="flex flex-wrap group-navigation mt-4">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/reference/api-reference"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center ">
+					API reference
+				</a>
+					<label for="DDED4E09" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="DDED4E09"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/agent-api"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Agent API
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/transaction-api"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Transaction API
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/span-api"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Span API
+			</a>
+		</li>
+				</ul>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/source-maps"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Source maps
+			</a>
+		</li>
+		<li class="flex flex-wrap group-navigation mt-4">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/reference/framework-specific-integrations"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center ">
+					Framework-specific integrations
+				</a>
+					<label for="117A9950" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="117A9950"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/react-integration"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				React integration
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/angular-integration"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Angular integration
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/vue-integration"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Vue integration
+			</a>
+		</li>
+				</ul>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/distributed-tracing"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Distributed tracing
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/breakdown-metrics"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Breakdown metrics
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/opentracing"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				OpenTracing
+			</a>
+		</li>
+		<li class="flex flex-wrap group-navigation mt-4">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/reference/advanced-topics"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center ">
+					Advanced topics
+				</a>
+					<label for="2604054B" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="2604054B"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/longtasks"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				How to interpret long task spans in the UI
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/typescript"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Using with TypeScript
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/custom-transaction-name"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Custom page load transaction names
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/custom-transactions"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Custom Transactions
+			</a>
+		</li>
+				</ul>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/performance-tuning"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Performance tuning
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/upgrading"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Upgrading
+			</a>
+		</li>
+				</ul>
+		</li>
+		<li class="flex flex-wrap group-navigation mt-6">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/release-notes/"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center font-semibold">
+					Elastic APM Real User Monitoring JavaScript Agent
+				</a>
+					<label for="BA03D554" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="BA03D554"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/release-notes/known-issues"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Known issues
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/release-notes/breaking-changes"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Breaking changes
+			</a>
+		</li>
+				</ul>
+		</li>
+
+		</ul>
+</div>
+
+	</nav>
+	<label role="button" for="pages-nav-hamburger" class="absolute md:hidden top-7 -right-12 bg-white p-1 rounded-full border-1 border-grey-20 cursor-pointer z-99">
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+			<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+		</svg>
+	</label>
+</aside>
+<label for="pages-nav-hamburger" aria-hidden="true" class="hidden group-has-[#pages-nav-hamburger:checked]/body:block md:hidden! fixed top-0 left-0 right-0 bottom-0 bg-black/50 z-30 ">
+	
+</label>
+
+			<div class="lg:grid lg:grid-cols-[1fr_var(--max-sidebar-width)]">
+				<aside class="sidebar md:block w-full lg:max-w-65 md:order-2 px-6 md:px-10 lg:px-0">
+	<nav id="toc-nav" class="sidebar-nav lg:h-full flex flex-row-reverse lg:block items-center gap-4">
+		<div class="mt-6">
+			<version-dropdown current-version='9.0&#x2B;' items='[]'>
+				<div class="h-8"></div>
+			</version-dropdown>
+		</div>
+		<ul class="mt-6 hidden md:flex items-center lg:block gap-4">
+			<li class="view-as-markdown lg:not-first:mt-1">
+				<a href="/release-notes.md" class="link text-sm" target="_blank">
+					<svg class="link-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 -1 24 24">
+						<path fill="currentColor" d="M22.131725 19.247H1.9386225C1.0239525 19.247 0.25 18.47305 0.25 17.558375v-11.11675c0 -0.914675 0.7739525 -1.688625 1.6886225 -1.688625H22.061375c0.914675 0 1.688625 0.77395 1.688625 1.688625v11.11675c0 0.914675 -0.7036 1.688625 -1.618275 1.688625ZM1.9386225 5.87875c-0.2814375 0 -0.562875 0.281425 -0.562875 0.562875v11.11675c0 0.3518 0.2814375 0.562875 0.562875 0.562875H22.061375c0.3518 0 0.562875 -0.281425 0.562875 -0.562875v-11.11675c0 -0.3518 -0.281425 -0.562875 -0.562875 -0.562875l-20.1227525 0ZM3.62725 15.86975V8.130225h2.2515l2.2515 2.814375 2.251475 -2.814375h2.2515V15.86975h-2.2515V11.437125L8.13025 14.2515l-2.2515 -2.814375V15.86975h-2.2515Zm14.1422 0L14.392225 12.140725h2.251475v-4.0105h2.2515v3.940125h2.2515L17.76945 15.86975Z" stroke-width="0.25"></path>
+					</svg>
+					View as markdown
+				</a>
+			</li>
+				<li class="edit-this-page lg:not-first:mt-1 ">
+					<a href="https://github.com/elastic/apm-agent-rum-js/edit/add-applies-to/docs/release-notes/index.md" class="link text-sm" target="_blank">
+						<svg class="link-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/>
+						</svg>
+						Edit this page
+					</a>
+				</li>
+			<li class="report-an-issue lg:not-first:mt-1">
+				<a href="https://github.com/elastic/docs-content/issues/new?template=issue-report.yaml&amp;link=https://docs-v3-preview.elastic.dev/release-notes/&amp;labels=source:web" class="link text-sm" target="_blank">
+					<svg class="link-icon" viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" fill="currentColor"/>
+					</svg>
+					Report an issue
+				</a>
+			</li>
+		</ul>
+		<div class="pt-6 hidden lg:block">
+				<div>
+					<div class="font-bold mb-2">On this page</div>
+					<div class="relative toc-progress-container font-body">
+						<div class="toc-progress-indicator absolute top-0 h-0 w-[1px] bg-blue-elastic transition-all duration-200 ease-out "></div>
+						<ul class="block w-full">
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5170-release-notes">
+										5.17.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5170-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5161-release-notes">
+										5.16.1
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5161-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5160-release-notes">
+										5.16.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5160-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5150-release-notes">
+										5.15.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5150-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5140-release-notes">
+										5.14.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5140-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5140-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5130-release-notes">
+										5.13.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5130-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5130-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5120-release-notes">
+										5.12.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5120-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5120-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5111-release-notes">
+										5.11.1
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5111-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5111-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5110-release-notes">
+										5.11.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5110-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5110-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5102-release-notes">
+										5.10.2
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5102-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5101-release-notes">
+										5.10.1
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5101-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5101-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-5100-release-notes">
+										5.10.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5100-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-5100-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-591-release-notes">
+										5.9.1
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-591-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-590-release-notes">
+										5.9.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-591-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-590-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-580-release-notes">
+										5.8.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-590-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-572-release-notes">
+										5.7.2
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-572-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-571-release-notes">
+										5.7.1
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-571-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-570-release-notes">
+										5.7.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-570-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-563-release-notes">
+										5.6.3
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-563-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-563-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-562-release-notes">
+										5.6.2
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-562-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-561-release-notes">
+										5.6.1
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-561-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-561-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-560-release-notes">
+										5.6.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-560-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-560-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-550-release-notes">
+										5.5.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-550-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-550-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-540-release-notes">
+										5.4.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-540-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-530-release-notes">
+										5.3.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-530-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-521-release-notes">
+										5.2.1
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-521-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-521-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-520-release-notes">
+										5.2.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-520-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-520-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-511-release-notes">
+										5.1.1
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-511-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-511-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-510-release-notes">
+										5.1.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-510-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-510-fixes">
+										Fixes
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#elastic-apm-rum-javascript-agent-500-release-notes">
+										5.0.0
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 ml-4"
+										href="#elastic-apm-rum-javascript-agent-500-features-enhancements">
+										Features and enhancements
+									</a>
+								</li>
+						</ul>
+					</div>
+				</div>
+
+		</div>
+
+	</nav>
+</aside>
+
+				<div class="justify-center grid
+						grid-cols-1
+						px-6 lg:px-0
+						lg:grid-cols-[1fr_var(--max-text-width)_1fr]
+						lg:order-1
+						">
+					<div class="spacer"></div>
+					<main id="content-container" class="w-full flex flex-col relative pb-30 overflow-x-hidden">
+						<div class="w-full absolute top-0 left-0 right-0 htmx-indicator" id="htmx-indicator" role="status">
+							<div class="h-[2px] w-full overflow-hidden">
+								<div class="progress w-full h-full bg-pink-70 left-right"></div>
+							</div>
+							<div class="sr-only">Loading</div>
+						</div>
+						<div class="content-container md:px-4">
+							
+<ol id="breadcrumbs" class="block items-center w-full py-6" itemscope="" itemtype="https://schema.org/BreadcrumbList">
+	
+	<li class="inline text-ink-light text-sm leading-[1.2em]" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+		<span class="px-1">/</span>
+	</li>
+</ol>
+
+						</div>
+						
+						<article id="markdown-content" class="content-container markdown-content md:px-4">
+							<input type="checkbox" class="hidden" id="pages-nav-hamburger">
+							<section id="elastic-docs-v3">
+	<h1>Elastic APM Real User Monitoring JavaScript Agent release notes</h1>
+
+		<p class="applies applies-block">
+		
+
+			<span class="applicable-info" data-tippy-content="Available on Elastic&nbsp;Stack unless otherwise specified.
+
+If this functionality is unavailable or behaves differently when deployed on ECH, ECE, ECK, or a self-managed installation, it will be indicated on the page.">
+				<span class="applicable-name">Stack</span>
+
+
+				<span class="applicable-meta applicable-meta-ga">
+				</span>
+			</span>
+			<span class="applicable-info" data-tippy-content="Not available on Elastic&nbsp;Cloud&nbsp;Serverless unless otherwise specified.">
+				<span class="applicable-name">Serverless</span>
+
+
+					<span class="applicable-separator"></span>
+				<span class="applicable-meta applicable-meta-unavailable">
+						<span
+							class="applicable-lifecycle applicable-lifecycle-unavailable">Unavailable</span>
+				</span>
+			</span>
+			<span class="applicable-info" data-tippy-content="Available on Application&nbsp;Performance&nbsp;Monitoring Agent for Real&nbsp;User&nbsp;Monitoring unless otherwise specified.">
+				<span class="applicable-name">APM Agent RUM</span>
+
+
+				<span class="applicable-meta applicable-meta-ga">
+				</span>
+			</span>
+
+
+
+		</p>
+	<p>Review the changes, fixes, and more in each version of Elastic APM Real User Monitoring JavaScript Agent.</p>
+<p>To check for security updates, go to <a href="https://discuss.elastic.co/c/announcements/security-announcements/31" target="_blank" rel="noopener noreferrer">Security announcements for the Elastic stack</a>.</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5170-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5170-release-notes">5.17.0</a></h2>
+</div>
+<p><strong>Release date:</strong> April 9, 2025</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5170-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5170-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Add support to add labels in captured errors <a href="https://github.com/elastic/apm-agent-rum-js/pull/1594" target="_blank" rel="noopener noreferrer">#1594</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5161-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5161-release-notes">5.16.1</a></h2>
+</div>
+<p><strong>Release date:</strong> June 27, 2024</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5161-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5161-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>User interaction click transactions will report correct transaction names for IE11 <a href="https://github.com/elastic/apm-agent-rum-js/pull/1511" target="_blank" rel="noopener noreferrer">#1511</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5160-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5160-release-notes">5.16.0</a></h2>
+</div>
+<p><strong>Release date:</strong> December 27, 2023</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5160-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5160-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Add Support for <a href="https://web.dev/articles/inp" target="_blank" rel="noopener noreferrer">Interaction to Next Paint (INP) metric</a>. This new metric, which replaces FID, will be available in the User Experience App from version 8.12.0 of the Elastic Stack. <a href="https://github.com/elastic/apm-agent-rum-js/pull/1462" target="_blank" rel="noopener noreferrer">#1462</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5150-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5150-release-notes">5.15.0</a></h2>
+</div>
+<p><strong>Release date:</strong> September 27, 2023</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5150-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5150-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Capture errors from objects thrown from the promise rejection events including the <code>reason and custom properties</code>: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1428" target="_blank" rel="noopener noreferrer">#1428</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5140-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5140-release-notes">5.14.0</a></h2>
+</div>
+<p><strong>Release date:</strong> August 3, 2023</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5140-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5140-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Add redirect span to the page-load transaction: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1400" target="_blank" rel="noopener noreferrer">#1400</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5140-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5140-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Fetch API instrumentation now handles requests with <code>URL</code> objects. <a href="https://github.com/elastic/apm-agent-rum-js/pull/1398" target="_blank" rel="noopener noreferrer">#1398</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5130-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5130-release-notes">5.13.0</a></h2>
+</div>
+<p><strong>Release date:</strong> July 19, 2023</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5130-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5130-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Support for Angular 16 is made available via <code>@elastic/apm-rum-angular@3.0.0</code>: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1380" target="_blank" rel="noopener noreferrer">#1380</a></li>
+<li>Improve user-interaction transactions naming. Unsupported browsers: IE11 <a href="https://github.com/elastic/apm-agent-rum-js/pull/1390" target="_blank" rel="noopener noreferrer">#1390</a></li>
+<li>Add <code>apmRequest</code> and <code>sendCredentials</code> config to TypeScript typings: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1254" target="_blank" rel="noopener noreferrer">#1254</a> <a href="https://github.com/elastic/apm-agent-rum-js/pull/1243" target="_blank" rel="noopener noreferrer">#1243</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5130-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5130-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Fix warnings where performance entries are not supported: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1246" target="_blank" rel="noopener noreferrer">#1246</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5120-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5120-release-notes">5.12.0</a></h2>
+</div>
+<p><strong>Release date:</strong> June 14, 2022</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5120-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5120-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Introduce new config option <a href="/reference/configuration#send-credentials" hx-select-oob="#main-container" preload="mousedown"><code>sendCredentials</code></a>. This allows the agent to send cookies to APM servers that are behind reverse proxies that need requests to be authenticated: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1238" target="_blank" rel="noopener noreferrer">#1238</a></li>
+<li>Agent now warns users if they provide non-existent config options when initializing it: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1230" target="_blank" rel="noopener noreferrer">#1230</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5120-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5120-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Capture the stacktrace of a SyntaxError triggered because of a malformed JavaScript code. Before this fix the agent was capturing an empty stacktrace: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1239" target="_blank" rel="noopener noreferrer">#1239</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5111-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5111-release-notes">5.11.1</a></h2>
+</div>
+<p><strong>Release date:</strong> May 16, 2022</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5111-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5111-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Span’s outcome is now set to <code>Unknown</code> when a Fetch/XHR request is aborted. The outcome can be found in the metadata information of the span details in APM UI: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1211" target="_blank" rel="noopener noreferrer">#1211</a></li>
+<li>Allow users the ability to disable compression for the events sent to APM server. This is helpful for debugging purposes while inspecting via Devtools and also for generating HAR file. Please see our <a href="https://docs-v3-preview.elastic.dev/elastic/docs-content/tree/main/troubleshoot/observability/apm-agent-rum-js/apm-real-user-monitoring-javascript-agent#disable-events-payload-compression" hx-select-oob="#main-container" preload="mousedown">troubleshooting</a> guide for more information: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1214" target="_blank" rel="noopener noreferrer">#1214</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5111-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5111-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>The instrumentation of fetch API consumes a response as a readable stream properly. Before this fix the related span was being ended on the start of the response rather than on the end of it: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1213" target="_blank" rel="noopener noreferrer">#1213</a></li>
+<li>Agent now can listen to all click events on the page. Users can enable/disable click instrumentation via <code>disableInstrumentation: [&quot;click&quot;]</code>. <code>eventtarget</code> instrumentation flag will be deprecated in favor of <code>click</code> and will be removed in the future releases: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1219" target="_blank" rel="noopener noreferrer">#1219</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5110-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5110-release-notes">5.11.0</a></h2>
+</div>
+<p><strong>Release date:</strong> April 20, 2022</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5110-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5110-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Events are now beaconed when the user abandons or backgrounds the page, this makes sure the agent never miss an event. Before this change it was only sending them every interval configurable via <code>flushInterval</code>. Unsupported browsers: Firefox, IE11: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1146" target="_blank" rel="noopener noreferrer">#1146</a></li>
+</ul>
+<div class="admonition note">
+	<div class="admonition-title">
+		
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+					</svg>
+		<span>Note</span>
+	</div>
+	<div class="admonition-content"><p>Transactions based on the <a href="/reference/supported-technologies" hx-select-oob="#main-container" preload="mousedown">supported technologies</a> and <a href="/reference/custom-transactions#custom-managed-transactions" hx-select-oob="#main-container" preload="mousedown">custom managed transactions</a> are the only ones taken into account.</p>
+</div>
+</div>
+<ul>
+<li><strong>rum-vue:</strong> Introduce script setup syntax support: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1194" target="_blank" rel="noopener noreferrer">#1194</a></li>
+<li>Override reuse threshold when redefining a transaction. This will permit the agent not to miss data on slow network connections: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1196" target="_blank" rel="noopener noreferrer">#1196</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5110-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5110-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Report Largest Contentful Paint (LCP) properly. Before this fix the agent was not giving the browser enough time to capture LCP entries that are post on-load: <a href="https://github.com/elastic/apm-agent-rum-js/pull/1190" target="_blank" rel="noopener noreferrer">#1190</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5102-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5102-release-notes">5.10.2</a></h2>
+</div>
+<p><strong>Release date:</strong> February 3, 2022</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5102-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5102-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>create user-interaction transactions based on the element on which the event occurred rather than the element on which the event handler has been attached. All web applications that rely on event delegation will benefit from this: <a href="https://github.com/elastic/apm-agent-rum-js/issues/969" target="_blank" rel="noopener noreferrer">#969</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5101-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5101-release-notes">5.10.1</a></h2>
+</div>
+<p><strong>Release date:</strong> January 10, 2022</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5101-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5101-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li><strong>rum-core:</strong> update Cumulative layout shift(CLS) calculation following the new guidelines from Google: <code>maximum session window with 1 second gap, capped at 5 seconds.</code>: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1033" target="_blank" rel="noopener noreferrer">#1033</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5101-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5101-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li><strong>rum-angular:</strong> recover compatibility with Angular 9.0.x: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1115" target="_blank" rel="noopener noreferrer">#1115</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5100-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5100-release-notes">5.10.0</a></h2>
+</div>
+<p><strong>Release date:</strong> December 7, 2021</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5100-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5100-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Introduce new config option <code>serverUrlPrefix</code> to make the APM server URL configurable: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1078" target="_blank" rel="noopener noreferrer">#1078</a></li>
+<li>Expose Transaction, Span, TransactionOptions and SpanOptions types definition: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1045" target="_blank" rel="noopener noreferrer">#1045</a> and <a href="https://github.com/elastic/apm-agent-rum-js/issues/995" target="_blank" rel="noopener noreferrer">#995</a></li>
+<li>Set the values to empty string for deprecated span destination metrics: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1098" target="_blank" rel="noopener noreferrer">#1098</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-5100-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-5100-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Check the existence of navigation timing data when compressing transaction marks: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1104" target="_blank" rel="noopener noreferrer">#1104</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-591-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-591-release-notes">5.9.1</a></h2>
+</div>
+<p><strong>Release date:</strong> July 15, 2021</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-591-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-591-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Validate <code>apmRequest</code> function is called for every request sent to the APM server when compression is enabled: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1055" target="_blank" rel="noopener noreferrer">#1055</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-590-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-590-release-notes">5.9.0</a></h2>
+</div>
+<p><strong>Release date:</strong> July 13, 2021</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-591-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-591-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Add support for <a href="/reference/configuration#apm-request" hx-select-oob="#main-container" preload="mousedown">apmRequest configuration</a> that allows users to pass a custom function that can be used to modify the request sent to the APM server: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1018" target="_blank" rel="noopener noreferrer">#1018</a></li>
+<li>Support for React 17 is made available via <code>@elastic/apm-rum-react</code> package: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1031" target="_blank" rel="noopener noreferrer">#1031</a></li>
+<li>Support for Angular 12 is made available via <code>@elastic/apm-rum-angular</code> package: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1028" target="_blank" rel="noopener noreferrer">#1028</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-590-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-590-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Update incorrect typings for adding labels to transaction and spans: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1017" target="_blank" rel="noopener noreferrer">#1017</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-580-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-580-release-notes">5.8.0</a></h2>
+</div>
+<p><strong>Release date:</strong> April 19, 2021</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-590-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-590-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>First draft of session information is added for <code>page-load</code> Transactions (disabled by default): <a href="https://github.com/elastic/apm-agent-rum-js/issues/634" target="_blank" rel="noopener noreferrer">#634</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-572-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-572-release-notes">5.7.2</a></h2>
+</div>
+<p><strong>Release date:</strong> April 2, 2021</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-572-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-572-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Transaction marks for the APM server V3 spec was mapped to incorrect field which resulted in Kibana User Expererience App missing some of the core data. This only affects users who had set config <code>apiVersion</code> &gt; 2: <a href="https://github.com/elastic/apm-agent-rum-js/issues/1007" target="_blank" rel="noopener noreferrer">#1007</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-571-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-571-release-notes">5.7.1</a></h2>
+</div>
+<p><strong>Release date:</strong> March 17, 2021</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-571-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-571-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Discard buffered longtasks spans from page load transactions getting added to subsequent route change and other auto auto-instrumented transactions resulting in incorrect start time for those transactions: <a href="https://github.com/elastic/apm-agent-rum-js/issues/989" target="_blank" rel="noopener noreferrer">#989</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-570-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-570-release-notes">5.7.0</a></h2>
+</div>
+<p><strong>Release date:</strong> March 15, 2021</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-570-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-570-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Support regular expression for detecting distributed tracing origins (<code>distributedTracingOrigins</code>): <a href="https://github.com/elastic/apm-agent-rum-js/issues/943" target="_blank" rel="noopener noreferrer">#943</a></li>
+<li>Capture buffered longtask entries: <a href="https://github.com/elastic/apm-agent-rum-js/issues/964" target="_blank" rel="noopener noreferrer">#964</a></li>
+<li>Expose agent configuration TypeScript definition: <a href="https://github.com/elastic/apm-agent-rum-js/issues/979" target="_blank" rel="noopener noreferrer">#979</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-563-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-563-release-notes">5.6.3</a></h2>
+</div>
+<p><strong>Release date:</strong> February 2, 2021</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-563-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-563-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Propagate sampling weight through tracestate header: <a href="https://github.com/elastic/apm-agent-rum-js/issues/845" target="_blank" rel="noopener noreferrer">#845</a></li>
+<li>Add necessary scripts to load test APM server with RUM payload: <a href="https://github.com/elastic/apm-agent-rum-js/issues/948" target="_blank" rel="noopener noreferrer">#948</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-563-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-563-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Handle null reason in promise rejection event: <a href="https://github.com/elastic/apm-agent-rum-js/issues/940" target="_blank" rel="noopener noreferrer">#940</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-562-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-562-release-notes">5.6.2</a></h2>
+</div>
+<p><strong>Release date:</strong> November 6, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-562-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-562-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Add transaction sampling rate precision which ensures <code>transaction_sample_rate</code> configuration option has a maximum precision of 4 decimal places: <a href="https://github.com/elastic/apm-agent-rum-js/issues/927" target="_blank" rel="noopener noreferrer">#927</a></li>
+<li>Add <code>outcome</code> field to applicable transactions and spans that is used by the APM UI for displaying the error rate chart: <a href="https://github.com/elastic/apm-agent-rum-js/issues/904" target="_blank" rel="noopener noreferrer">#904</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-561-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-561-release-notes">5.6.1</a></h2>
+</div>
+<p><strong>Release date:</strong> September 29, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-561-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-561-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Longtasks are now aggregated under the experience field to make querying faster: <a href="https://github.com/elastic/apm-agent-rum-js/issues/900" target="_blank" rel="noopener noreferrer">#900</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-561-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-561-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Check for a Webkit Navigation timing API bug is added to avoid having incorrect navigation marks: <a href="https://github.com/elastic/apm-agent-rum-js/issues/903" target="_blank" rel="noopener noreferrer">#903</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-560-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-560-release-notes">5.6.0</a></h2>
+</div>
+<p><strong>Release date:</strong> September 17, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-560-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-560-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Add new method signaturtes to the exported type definitions: <a href="https://github.com/elastic/apm-agent-rum-js/issues/890" target="_blank" rel="noopener noreferrer">#890</a></li>
+<li>Improve the span creation time when there is an active transaction on page: <a href="https://github.com/elastic/apm-agent-rum-js/issues/883" target="_blank" rel="noopener noreferrer">#883</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-560-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-560-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Frameworks should not be automatically instrumented when the apm is inactive : <a href="https://github.com/elastic/apm-agent-rum-js/issues/885" target="_blank" rel="noopener noreferrer">#885</a></li>
+<li>Add default XHR timeout for compressed requests to APM server: <a href="https://github.com/elastic/apm-agent-rum-js/issues/897" target="_blank" rel="noopener noreferrer">#897</a></li>
+<li>Measure First Input Delay metrics properly for page load transactions: <a href="https://github.com/elastic/apm-agent-rum-js/issues/899" target="_blank" rel="noopener noreferrer">#899</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-550-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-550-release-notes">5.5.0</a></h2>
+</div>
+<p><strong>Release date:</strong> August 18, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-550-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-550-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Provide an API to block all auto instrumented transactions created by the agent through <code>transaction.block</code> method. Users can also use the <code>startSpan</code> API to create blocking spans to control this behaviour: <a href="https://github.com/elastic/apm-agent-rum-js/issues/866" target="_blank" rel="noopener noreferrer">#866</a></li>
+<li>Expose options to create blocking spans from the agent API via <code>startSpan</code>: <a href="https://github.com/elastic/apm-agent-rum-js/issues/875" target="_blank" rel="noopener noreferrer">#875</a></li>
+<li>Capture Cumulative layout shift(CLS), Total blocking time(TBT) and First input delay(FID) as part of experience metrics under page-load transactions: <a href="https://github.com/elastic/apm-agent-rum-js/issues/838" target="_blank" rel="noopener noreferrer">#838</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-550-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-550-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Track various XHR states like timeouts, errors and aborts and end all managed transactions correctly: <a href="https://github.com/elastic/apm-agent-rum-js/issues/871" target="_blank" rel="noopener noreferrer">#871</a></li>
+<li>Fix inconsistencies in the XHR timings by removing the task scheduling logic: <a href="https://github.com/elastic/apm-agent-rum-js/issues/871" target="_blank" rel="noopener noreferrer">#871</a></li>
+<li>Accept the user provided <code>logLevel</code> configuration when agent is not active: <a href="https://github.com/elastic/apm-agent-rum-js/issues/861" target="_blank" rel="noopener noreferrer">#861</a></li>
+<li>Opentracing Tracer should return Noop on unsupported platforms: <a href="https://github.com/elastic/apm-agent-rum-js/issues/872" target="_blank" rel="noopener noreferrer">#872</a>s</li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-540-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-540-release-notes">5.4.0</a></h2>
+</div>
+<p><strong>Release date:</strong> July 29, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-540-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-540-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Agent now uses the new CompressionStream API available on modern browsers to gzip compress the payload sent to the APM server. This yields a huge reduction of around ~96% in the payload size for an example web application when compared with the v3 specification: <a href="https://github.com/elastic/apm-agent-rum-js/issues/572" target="_blank" rel="noopener noreferrer">#572</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-530-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-530-release-notes">5.3.0</a></h2>
+</div>
+<p><strong>Release date:</strong> July 6, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-530-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-530-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Introduced better grouping strategy for all managed transactions based on the current browser’s location by default instead of grouping all transactions under <code>UNKNOWN</code> category: <a href="https://github.com/elastic/apm-agent-rum-js/issues/827" target="_blank" rel="noopener noreferrer">#827</a></li>
+<li>Capture XHR, Fetch calls as spans that happened before the agent script is downloaded using the browser’s Resource Timing API: <a href="https://github.com/elastic/apm-agent-rum-js/issues/825" target="_blank" rel="noopener noreferrer">#825</a></li>
+<li>Populate <code>span.destination.*</code> context fields for Navigation Timing span that denotes the HTML downloading phase: <a href="https://github.com/elastic/apm-agent-rum-js/issues/829" target="_blank" rel="noopener noreferrer">#829</a></li>
+<li>Use Page Visibility API to discard transactions if the page was backgrounded at any point during the lifetime of the transaction: <a href="https://github.com/elastic/apm-agent-rum-js/issues/295" target="_blank" rel="noopener noreferrer">#295</a></li>
+<li>Add <code>apiVersion</code> config to TypeScript typings: <a href="https://github.com/elastic/apm-agent-rum-js/issues/833" target="_blank" rel="noopener noreferrer">#833</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-521-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-521-release-notes">5.2.1</a></h2>
+</div>
+<p><strong>Release date:</strong> June 24, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-521-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-521-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Added support for path array in <code>&lt;ApmRoute&gt;</code> React component that associates the transaction based on the mounted path: <a href="https://github.com/elastic/apm-agent-rum-js/issues/702" target="_blank" rel="noopener noreferrer">#702</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-521-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-521-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Capture Total Blocking Time (TBT) only after all longtask entries are observed: <a href="https://github.com/elastic/apm-agent-rum-js/issues/803" target="_blank" rel="noopener noreferrer">#803</a></li>
+<li>Do not capture page load transaction marks when the NavigationTiming data from the browsers are not trustable: <a href="https://github.com/elastic/apm-agent-rum-js/issues/818" target="_blank" rel="noopener noreferrer">#818</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-520-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-520-release-notes">5.2.0</a></h2>
+</div>
+<p><strong>Release date:</strong> May 28, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-520-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-520-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Agent now supports compressing events payload sent to the APM server via new configuration <a href="/reference/configuration#api-version" hx-select-oob="#main-container" preload="mousedown">apiVersion</a>. It yeilds a huge reduction of around ~45% in the payload size for average sized web pages: <a href="https://github.com/elastic/apm-agent-rum-js/issues/768" target="_blank" rel="noopener noreferrer">#768</a></li>
+<li>Capture First Input Delay(FID) as Span for page-load transaction: <a href="https://github.com/elastic/apm-agent-rum-js/issues/732" target="_blank" rel="noopener noreferrer">#732</a></li>
+<li>Capture Total Blocking Time(TBT) as Span for page-load transaction: <a href="https://github.com/elastic/apm-agent-rum-js/issues/781" target="_blank" rel="noopener noreferrer">#781</a></li>
+<li>Refactor ServiceFactory class to use constant service names: <a href="https://github.com/elastic/apm-agent-rum-js/issues/238" target="_blank" rel="noopener noreferrer">#238</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-520-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-520-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Allow setting labels before agent is initialized: <a href="https://github.com/elastic/apm-agent-rum-js/issues/780" target="_blank" rel="noopener noreferrer">#780</a></li>
+<li>Use single instance of apm across all packages: <a href="https://github.com/elastic/apm-agent-rum-js/issues/791" target="_blank" rel="noopener noreferrer">#791</a></li>
+<li>User defined types for managed transactions are considered of high precedence: <a href="https://github.com/elastic/apm-agent-rum-js/issues/758" target="_blank" rel="noopener noreferrer">#758</a></li>
+<li>Add span subtype information in payload without camelcasing: <a href="https://github.com/elastic/apm-agent-rum-js/issues/753" target="_blank" rel="noopener noreferrer">#753</a></li>
+<li>Treat truncated spans percentage as regular span in breakdown calculation: <a href="https://github.com/elastic/apm-agent-rum-js/issues/776" target="_blank" rel="noopener noreferrer">#776</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-511-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-511-release-notes">5.1.1</a></h2>
+</div>
+<p><strong>Release date:</strong> April 15, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-511-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-511-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Performance Observer is used to measure FirstContentfulPaint Metric: <a href="https://github.com/elastic/apm-agent-rum-js/issues/731" target="_blank" rel="noopener noreferrer">#731</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-511-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-511-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Avoid full component re-rerender when query params are updated on current <code>ApmRoute</code> inside child components: <a href="https://github.com/elastic/apm-agent-rum-js/issues/748" target="_blank" rel="noopener noreferrer">#748</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-510-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-510-release-notes">5.1.0</a></h2>
+</div>
+<p><strong>Release date:</strong> April 8, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-510-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-510-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Route change transactions now includes the browsers next paint frame: <a href="https://github.com/elastic/apm-agent-rum-js/issues/404" target="_blank" rel="noopener noreferrer">#404</a></li>
+<li>Support differential loading with Angular CLI: <a href="https://github.com/elastic/apm-agent-rum-js/issues/607" target="_blank" rel="noopener noreferrer">#607</a></li>
+<li>Reduced the bundle size by modifying the random number generator algorithm: <a href="https://github.com/elastic/apm-agent-rum-js/issues/705" target="_blank" rel="noopener noreferrer">#705</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-510-fixes"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-510-fixes">Fixes</a></h3>
+</div>
+<ul>
+<li>Handle when errors are thrown in unsupported browsers: <a href="https://github.com/elastic/apm-agent-rum-js/issues/707" target="_blank" rel="noopener noreferrer">#707</a></li>
+<li>Captured API calls are duplicated as spans in IE: <a href="https://github.com/elastic/apm-agent-rum-js/issues/723" target="_blank" rel="noopener noreferrer">#723</a></li>
+</ul>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-500-release-notes"><h2><a class="headerlink" href="#elastic-apm-rum-javascript-agent-500-release-notes">5.0.0</a></h2>
+</div>
+<p><strong>Release date:</strong> March 18, 2020</p>
+<div class="heading-wrapper" id="elastic-apm-rum-javascript-agent-500-features-enhancements"><h3><a class="headerlink" href="#elastic-apm-rum-javascript-agent-500-features-enhancements">Features and enhancements</a></h3>
+</div>
+<ul>
+<li>Monitor longtasks by default during active transaction: <a href="https://github.com/elastic/apm-agent-rum-js/issues/601" target="_blank" rel="noopener noreferrer">#601</a></li>
+<li>Set sync field only for synchronous spans: <a href="https://github.com/elastic/apm-agent-rum-js/issues/619" target="_blank" rel="noopener noreferrer">#619</a></li>
+</ul>
+
+</section>
+
+						</article>
+						<footer id="prev-next-nav" class="content-container mt-20 px-4">
+	<div class="flex flex-wrap lg:flex-nowrap gap-2 mt-2">
+		<div class="w-full">
+				<a 
+					href="/reference/upgrading"
+					 hx-select-oob=#main-container preload=mousedown
+					class="flex h-full items-center text-ink-light hover:black border-1 border-grey-20 hover:border-grey-80 rounded-lg p-6 shadow-md"
+				>
+					<svg class="size-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+					</svg>
+					<div>
+						<div class="text-xs lg:text-sm">Previous</div>
+						<div class="text-base lg:text-xl text-black">Upgrading</div>
+					</div>
+				</a>
+		</div>
+		<div class="w-full">
+				<a 
+					href="/release-notes/known-issues"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="flex h-full items-center justify-end text-ink-light hover:black border-1 border-grey-20 hover:border-grey-80 rounded-lg p-6 shadow-md text-right"
+				>
+					<div>
+						<div class="text-xs lg:text-sm">Next</div>
+						<div class="text-base lg:text-xl text-black">Known issues</div>
+					</div>
+					<svg class="size-6 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+					</svg>
+				</a>
+		</div>
+	</div>
+</footer>
+
+					</main>
+					<div class="spacer"></div>
+				</div>
+			</div>
+		</div>
+
+</div>
+
+<footer class="py-12 px-6 w-full mx-auto bg-ink-dark">
+	<div class="max-w-(--max-layout-width) w-full mx-auto">
+	<div class="text-grey-20 text-[12px]">
+		<a href="https://www.elastic.co/">
+			<img class="block" loading="lazy" alt="Elastic logo" src="/_static/logo-elastic-horizontal-white.svg?v=19bc4040eda89518" width="120" height="41"/>
+		</a>
+	</div>
+	<div class="text-grey-20 text-[12px] bg-ink-dark grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
+		<div>
+			<ul class="mt-4 flex gap-3">
+				<li>
+					<a class="underline hover:text-white" href="https://www.elastic.co/legal/trademarks">Trademarks</a>
+				</li>
+				<li>
+					<a class="underline hover:text-white" href="https://www.elastic.co/legal/terms-of-use">Terms of Use</a>
+				</li>
+				<li>
+					<a class="underline hover:text-white" href="https://www.elastic.co/legal/privacy-statement">Privacy</a>
+				</li>
+				<li>
+					<a class="underline hover:text-white" href="https://www.elastic.co/sitemap">Sitemap</a>
+				</li>
+			</ul>
+			<p class="mt-4">
+				© 2025 Elasticsearch B.V. All Rights Reserved.
+			</p>
+		</div>
+		<div class="mt-4">
+			<p>
+				This content is available in different formats for convenience only. All original licensing terms apply.
+			</p>
+			<p class="mt-4">
+				Elasticsearch is a trademark of Elasticsearch B.V., registered in the U.S. and in other countries. Apache, Apache Lucene, Apache Hadoop, Hadoop, HDFS and the yellow elephant logo are trademarks of the Apache Software Foundation in the United States and/or other countries. 
+			</p>
+		</div>
+	</div>
+	</div>
+</footer>
+
+
+</body>
+</html>

@@ -9,7 +9,7 @@ applies_to:
   product:
     apm_agent_rum: ga
 products:
-  - id: cloud-serverless
+
   - id: observability
   - id: apm
 ---

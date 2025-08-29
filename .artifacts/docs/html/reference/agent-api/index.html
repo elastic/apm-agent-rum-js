@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en" class="h-screen" xmlns="http://www.w3.org/1999/html">
+<head hx-head="merge">
+		<meta charset="utf-8">
+	<title>Agent API | APM RUM JavaScript agent</title>
+	<meta name="description" content="You can access agent API after initializing the agent: Initializes the agent with the given configuration and returns itself. Under the hood init does...">
+		<link rel="preload" href="/_static/InterVariable.e6ec8b96.woff2" as="font" type="font/woff2" crossorigin>
+		<link rel="preload" href="/_static/MierB-Regular.efa24115.woff2" as="font" type="font/woff2" crossorigin>
+		<link rel="preload" href="/_static/MierB-Bold.01af95ca.woff2" as="font" type="font/woff2" crossorigin>
+		<link rel="preload" href="/_static/MierB-Demi.845945e0.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="stylesheet preload" as="style" type="text/css" href="/_static/styles.css?v=4eec718956f93254" crossorigin/>
+	<script src="/_static/custom-elements.js?v=4f585028e4b5ca00" defer></script>
+	<script src="/_static/main.js?v=373d0d2da5378b96" defer></script>
+		<link rel="canonical" href="https://docs-v3-preview.elastic.dev/reference/agent-api" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="apple-touch-icon" sizes="57x57" href="https://elastic.co/apple-icon-57x57.png"/>
+<link rel="apple-touch-icon" sizes="60x60" href="https://elastic.co/apple-icon-60x60.png"/>
+<link rel="apple-touch-icon" sizes="72x72" href="https://elastic.co/apple-icon-72x72.png"/>
+<link rel="apple-touch-icon" sizes="76x76" href="https://elastic.co/apple-icon-76x76.png"/>
+<link rel="apple-touch-icon" sizes="114x114" href="https://elastic.co/apple-icon-114x114.png"/>
+<link rel="apple-touch-icon" sizes="120x120" href="https://elastic.co/apple-icon-120x120.png"/>
+<link rel="apple-touch-icon" sizes="144x144" href="https://elastic.co/apple-icon-144x144.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="https://elastic.co/apple-icon-152x152.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="https://elastic.co/apple-icon-180x180.png"/>
+<link rel="apple-touch-icon" sizes="192x192" href="https://elastic.co/apple-icon-192x192.png"/>
+<link rel="icon" type="image/png" href="https://elastic.co/favicon-32x32.png" sizes="32x32"/>
+<link rel="shortcut icon" href="https://elastic.co/favicon.ico" type="image/x-icon"/>
+<link rel="icon" href="https://elastic.co/favicon.ico" type="image/x-icon"/>
+<link rel="apple-touch-icon-precomposed" sizes="64x64" href="https://elastic.co/favicon_64x64_16bit.png"/>
+<link rel="apple-touch-icon-precomposed" sizes="32x32" href="https://elastic.co/favicon_32x32.png"/>
+<link rel="apple-touch-icon-precomposed" sizes="16x16" href="https://elastic.co/favicon_16x16.png"/>
+<link rel="icon" type="image/png" href="https://elastic.co/android-chrome-192x192.png" sizes="192x192"/>
+<link rel="icon" type="image/png" href="https://elastic.co/favicon-96x96.png" sizes="96x96"/>
+<link rel="icon" type="image/png" href="https://elastic.co/favicon-16x16.png" sizes="16x16"/>
+<link rel="icon" type="image/png" href="https://elastic.co/favicon-48x48.png" sizes="48x48"/>
+
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="htmx-config" content='{"selfRequestsOnly": true}'>
+	<meta property="og:type" content="website"/>
+	<meta property="og:title" content="Agent API | APM RUM JavaScript agent"/>
+	<meta property="og:description" content="You can access agent API after initializing the agent: Initializes the agent with the given configuration and returns itself. Under the hood init does..."/>
+	<meta property="og:image" content="https://www.elastic.co/static-res/images/social_media_default.png"/>
+	<meta property="og:image:alt" content="Elastic | The Search AI Company"/>
+		<meta property="og:url" content="https://docs-v3-preview.elastic.dev/reference/agent-api" />
+	<meta property="docs:feature:lazy-load-navigation" content="False" />
+
+				<meta class="elastic" name="product_version" content="9.0+"/>
+			<meta name="DC.identifier" content="9.0+"/>
+			<link rel="alternate" type="text/markdown" href="/reference/agent-api.md" title="Markdown export"/>
+			<meta class="elastic" name="product_name" content="Elastic Observability,APM,APM Agent"/>
+			<meta name="DC.subject" content="Elastic Observability,APM,APM Agent"/>
+
+</head>
+
+<body
+	class="group/body text-ink has-[#primary-nav-hamburger:checked]:overflow-hidden"
+	hx-ext="preload, head-support"
+	data-docs-builder-version="32D9FBCF"
+	data-root-path="/"
+	hx-boost="true" hx-swap="none" hx-push-url="true" hx-indicator="#htmx-indicator"
+	>
+	<header class="sticky top-0 z-50 bg-blue-developer text-white h-(--offset-top) flex items-center">
+		<div class="max-w-(--max-layout-width) w-full mx-auto flex justify-between items-center">
+			<label role="button" class="md:hidden cursor-pointer" for="pages-nav-hamburger">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12"/>
+				</svg>
+			</label>
+			<a href="/" class="flex items-center gap-2 text-lg font-semibold px-4">
+				<img src="/_static/logo-elastic-glyph-color.svg?v=f602ddacafcf3057" alt="" width="32" height="32">
+				apm-agent-rum-js
+			</a>
+			<search-or-ask-ai></search-or-ask-ai>
+		</div>
+	</header>
+
+<div id="main-container" class="flex flex-col items-center border-t-1 border-grey-20">
+	
+		<div class="max-w-(--max-layout-width) w-full h-full grid
+					grid-cols-1
+					md:grid-cols-[var(--max-sidebar-width)_1fr]
+				">
+			<aside class="sidebar bg-white fixed md:sticky shadow-2xl md:shadow-none left-[100%] group-has-[#pages-nav-hamburger:checked]/body:left-0 bottom-0 md:left-auto pl-6 md:pl-2 top-[calc(var(--offset-top)+1px)] w-[80%] md:w-auto shrink-0 border-r-1 border-r-grey-20 z-40 md:z-auto">
+	
+	<nav
+		id="pages-nav"
+		class="sidebar-nav h-full">
+		
+<div class="pb-20 font-body" id="nav-tree">
+		<a
+			href="/reference/"
+			 hx-select-oob=#content-container,#toc-nav preload=mousedown
+			class="inline-block mx-4 mt-6 font-semibold text-ink hover:text-black">
+			APM RUM JavaScript agent
+		</a>
+
+		<ul class="block px-4">
+					<li class="flex flex-wrap group-navigation mt-6">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/reference/"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center font-semibold">
+					APM RUM JavaScript agent
+				</a>
+					<label for="02CDD01C" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="02CDD01C"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex flex-wrap group-navigation mt-4">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/reference/set-up-apm-real-user-monitoring-javascript-agent"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center ">
+					Set up the APM Real User Monitoring JavaScript Agent
+				</a>
+					<label for="7622CB06" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="7622CB06"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/install-agent"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Install the Agent
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/configuring-cors"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Configure CORS
+			</a>
+		</li>
+				</ul>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/supported-technologies"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Supported technologies
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/configuration"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Configuration
+			</a>
+		</li>
+		<li class="flex flex-wrap group-navigation mt-4">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/reference/api-reference"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center ">
+					API reference
+				</a>
+					<label for="DDED4E09" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="DDED4E09"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/agent-api"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Agent API
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/transaction-api"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Transaction API
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/span-api"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Span API
+			</a>
+		</li>
+				</ul>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/source-maps"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Source maps
+			</a>
+		</li>
+		<li class="flex flex-wrap group-navigation mt-4">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/reference/framework-specific-integrations"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center ">
+					Framework-specific integrations
+				</a>
+					<label for="117A9950" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="117A9950"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/react-integration"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				React integration
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/angular-integration"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Angular integration
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/vue-integration"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Vue integration
+			</a>
+		</li>
+				</ul>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/distributed-tracing"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Distributed tracing
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/breakdown-metrics"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Breakdown metrics
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/opentracing"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				OpenTracing
+			</a>
+		</li>
+		<li class="flex flex-wrap group-navigation mt-4">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/reference/advanced-topics"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center ">
+					Advanced topics
+				</a>
+					<label for="2604054B" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="2604054B"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/longtasks"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				How to interpret long task spans in the UI
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/typescript"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Using with TypeScript
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/custom-transaction-name"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Custom page load transaction names
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/custom-transactions"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Custom Transactions
+			</a>
+		</li>
+				</ul>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/performance-tuning"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Performance tuning
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/reference/upgrading"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Upgrading
+			</a>
+		</li>
+				</ul>
+		</li>
+		<li class="flex flex-wrap group-navigation mt-6">
+			<div class="peer grid grid-cols-[1fr_auto] w-full">
+				<a
+					href="/release-notes/"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="sidebar-link pr-2 content-center font-semibold">
+					Elastic APM Real User Monitoring JavaScript Agent
+				</a>
+					<label for="BA03D554" class="group/label flex mr-2 items-start">
+						<div class="hover:bg-grey-20 rounded-sm p-1 cursor-pointer">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="shrink-0 -rotate-90 group-has-checked/label:rotate-0 w-3.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+							</svg>
+						</div>
+						<input
+							id="BA03D554"
+							type="checkbox"
+							class="hidden"
+							aria-hidden="true">
+					</label>
+			</div>
+				<ul class="w-full hidden peer-has-checked:block ml-4">
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/release-notes/known-issues"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Known issues
+			</a>
+		</li>
+		<li class="flex group/li pr-8 mt-4">
+			<a
+				href="/release-notes/breaking-changes"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+				class="sidebar-link grow group-[.current]/li:text-blue-elastic!"
+			>
+				Breaking changes
+			</a>
+		</li>
+				</ul>
+		</li>
+
+		</ul>
+</div>
+
+	</nav>
+	<label role="button" for="pages-nav-hamburger" class="absolute md:hidden top-7 -right-12 bg-white p-1 rounded-full border-1 border-grey-20 cursor-pointer z-99">
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+			<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+		</svg>
+	</label>
+</aside>
+<label for="pages-nav-hamburger" aria-hidden="true" class="hidden group-has-[#pages-nav-hamburger:checked]/body:block md:hidden! fixed top-0 left-0 right-0 bottom-0 bg-black/50 z-30 ">
+	
+</label>
+
+			<div class="lg:grid lg:grid-cols-[1fr_var(--max-sidebar-width)]">
+				<aside class="sidebar md:block w-full lg:max-w-65 md:order-2 px-6 md:px-10 lg:px-0">
+	<nav id="toc-nav" class="sidebar-nav lg:h-full flex flex-row-reverse lg:block items-center gap-4">
+		<div class="mt-6">
+			<version-dropdown current-version='9.0&#x2B;' items='[]'>
+				<div class="h-8"></div>
+			</version-dropdown>
+		</div>
+		<ul class="mt-6 hidden md:flex items-center lg:block gap-4">
+			<li class="view-as-markdown lg:not-first:mt-1">
+				<a href="/reference/agent-api.md" class="link text-sm" target="_blank">
+					<svg class="link-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 -1 24 24">
+						<path fill="currentColor" d="M22.131725 19.247H1.9386225C1.0239525 19.247 0.25 18.47305 0.25 17.558375v-11.11675c0 -0.914675 0.7739525 -1.688625 1.6886225 -1.688625H22.061375c0.914675 0 1.688625 0.77395 1.688625 1.688625v11.11675c0 0.914675 -0.7036 1.688625 -1.618275 1.688625ZM1.9386225 5.87875c-0.2814375 0 -0.562875 0.281425 -0.562875 0.562875v11.11675c0 0.3518 0.2814375 0.562875 0.562875 0.562875H22.061375c0.3518 0 0.562875 -0.281425 0.562875 -0.562875v-11.11675c0 -0.3518 -0.281425 -0.562875 -0.562875 -0.562875l-20.1227525 0ZM3.62725 15.86975V8.130225h2.2515l2.2515 2.814375 2.251475 -2.814375h2.2515V15.86975h-2.2515V11.437125L8.13025 14.2515l-2.2515 -2.814375V15.86975h-2.2515Zm14.1422 0L14.392225 12.140725h2.251475v-4.0105h2.2515v3.940125h2.2515L17.76945 15.86975Z" stroke-width="0.25"></path>
+					</svg>
+					View as markdown
+				</a>
+			</li>
+				<li class="edit-this-page lg:not-first:mt-1 ">
+					<a href="https://github.com/elastic/apm-agent-rum-js/edit/add-applies-to/docs/reference/agent-api.md" class="link text-sm" target="_blank">
+						<svg class="link-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/>
+						</svg>
+						Edit this page
+					</a>
+				</li>
+			<li class="report-an-issue lg:not-first:mt-1">
+				<a href="https://github.com/elastic/docs-content/issues/new?template=issue-report.yaml&amp;link=https://docs-v3-preview.elastic.dev/reference/agent-api&amp;labels=source:web" class="link text-sm" target="_blank">
+					<svg class="link-icon" viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" fill="currentColor"/>
+					</svg>
+					Report an issue
+				</a>
+			</li>
+		</ul>
+		<div class="pt-6 hidden lg:block">
+				<div>
+					<div class="font-bold mb-2">On this page</div>
+					<div class="relative toc-progress-container font-body">
+						<div class="toc-progress-indicator absolute top-0 h-0 w-[1px] bg-blue-elastic transition-all duration-200 ease-out "></div>
+						<ul class="block w-full">
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#apm-init">
+										apm.init([config])
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#apm-set-user-context">
+										apm.setUserContext()
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#apm-set-custom-context">
+										apm.setCustomContext()
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#apm-add-labels">
+										apm.addLabels()
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#apm-add-filter">
+										apm.addFilter()
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#apm-start-transaction">
+										apm.startTransaction()
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#apm-start-span">
+										apm.startSpan()
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#set-initial-page-load-name">
+										apm.setInitialPageLoadName()
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#get-current-transaction">
+										apm.getCurrentTransaction()
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#capture-error">
+										apm.captureError()
+									</a>
+								</li>
+								<li class="has-[:hover]:border-l-grey-80 items-center px-4 border-l-1 border-l-grey-20 has-[.current]:border-l-blue-elastic!">
+									<a
+										class="sidebar-link inline-block my-1.5 "
+										href="#observe">
+										apm.observe()
+									</a>
+								</li>
+						</ul>
+					</div>
+				</div>
+
+		</div>
+
+	</nav>
+</aside>
+
+				<div class="justify-center grid
+						grid-cols-1
+						px-6 lg:px-0
+						lg:grid-cols-[1fr_var(--max-text-width)_1fr]
+						lg:order-1
+						">
+					<div class="spacer"></div>
+					<main id="content-container" class="w-full flex flex-col relative pb-30 overflow-x-hidden">
+						<div class="w-full absolute top-0 left-0 right-0 htmx-indicator" id="htmx-indicator" role="status">
+							<div class="h-[2px] w-full overflow-hidden">
+								<div class="progress w-full h-full bg-pink-70 left-right"></div>
+							</div>
+							<div class="sr-only">Loading</div>
+						</div>
+						<div class="content-container md:px-4">
+							
+<ol id="breadcrumbs" class="block items-center w-full py-6" itemscope="" itemtype="https://schema.org/BreadcrumbList">
+		<li class="inline text-ink-light text-sm leading-[1.2em]" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+			<a
+				hx-disable="true"
+				itemprop="item"
+				href="/reference/api-reference"
+				 hx-select-oob=#content-container,#toc-nav preload=mousedown
+			>
+				<span itemprop="name" class="hover:text-black">API reference</span>
+			</a>
+			<meta itemprop="position" content="1">
+		</li>
+	
+	<li class="inline text-ink-light text-sm leading-[1.2em]" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+		<span class="px-1">/</span>
+	</li>
+</ol>
+
+						</div>
+						
+						<article id="markdown-content" class="content-container markdown-content md:px-4">
+							<input type="checkbox" class="hidden" id="pages-nav-hamburger">
+							<section id="elastic-docs-v3">
+	<h1>Agent API</h1>
+
+		<p class="applies applies-block">
+		
+
+			<span class="applicable-info" data-tippy-content="Available on Elastic&nbsp;Stack unless otherwise specified.
+
+If this functionality is unavailable or behaves differently when deployed on ECH, ECE, ECK, or a self-managed installation, it will be indicated on the page.">
+				<span class="applicable-name">Stack</span>
+
+
+				<span class="applicable-meta applicable-meta-ga">
+				</span>
+			</span>
+			<span class="applicable-info" data-tippy-content="Not available on Elastic&nbsp;Cloud&nbsp;Serverless unless otherwise specified.">
+				<span class="applicable-name">Serverless</span>
+
+
+					<span class="applicable-separator"></span>
+				<span class="applicable-meta applicable-meta-unavailable">
+						<span
+							class="applicable-lifecycle applicable-lifecycle-unavailable">Unavailable</span>
+				</span>
+			</span>
+			<span class="applicable-info" data-tippy-content="Available on Application&nbsp;Performance&nbsp;Monitoring Agent for Real&nbsp;User&nbsp;Monitoring unless otherwise specified.">
+				<span class="applicable-name">APM Agent RUM</span>
+
+
+				<span class="applicable-meta applicable-meta-ga">
+				</span>
+			</span>
+
+
+
+		</p>
+	<p>You can access agent API after initializing the agent:</p>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">var apm = require('@elastic/apm-rum').init(...)
+</code></pre>
+	</div>
+</div>
+<div class="heading-wrapper" id="apm-init"><h2><a class="headerlink" href="#apm-init"><code>apm.init([config])</code></a></h2>
+</div>
+<p>Initializes the agent with the given <a href="/reference/configuration" hx-select-oob="#content-container,#toc-nav" preload="mousedown">configuration</a> and returns itself. Under the hood init does the following</p>
+<ul>
+<li>Registers a global <code>error</code> listener to track JavaScript errors on the page.</li>
+<li>Adds a <code>onload</code> event listener to collect the page load metrics.</li>
+</ul>
+<div class="admonition note">
+	<div class="admonition-title">
+		
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+					</svg>
+		<span>Note</span>
+	</div>
+	<div class="admonition-content"><p>When the agent is inactive, both <code>error</code> and <code>onload</code> listeners will not be registered on the page</p>
+</div>
+</div>
+<div class="admonition note">
+	<div class="admonition-title">
+		
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+					</svg>
+		<span>Note</span>
+	</div>
+	<div class="admonition-content"><p>Both XHR and Fetch API are patched as soon as the agent script is executed on the page and does not get changed even if the agent is inactive. The reason is to allow users to initialize the agent asynchronously on the page.</p>
+</div>
+</div>
+<div class="heading-wrapper" id="apm-set-user-context"><h2><a class="headerlink" href="#apm-set-user-context"><code>apm.setUserContext()</code></a></h2>
+</div>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">apm.setUserContext(context)
+</code></pre>
+	</div>
+</div>
+<p>Call this method to enrich collected performance data and errors with information about the user.</p>
+<p>The given <code>context</code> argument must be an object and can contain the following properties (all optional):</p>
+<ul>
+<li><code>id</code> - The users ID</li>
+<li><code>username</code> - The users username</li>
+<li><code>email</code> - The users e-mail</li>
+</ul>
+<p>The provided user context is stored under <code>context.user</code> in Elasticsearch on both errors and transactions.</p>
+<p>It’s possible to call this function multiple times within the scope of the same active transaction. For each call, the properties of the context argument are shallow merged with the context previously given.</p>
+<div class="heading-wrapper" id="apm-set-custom-context"><h2><a class="headerlink" href="#apm-set-custom-context"><code>apm.setCustomContext()</code></a></h2>
+</div>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">apm.setCustomContext(context)
+</code></pre>
+	</div>
+</div>
+<p>Call this to enrich collected errors and transactions with any information that you think will help you debug performance issues or errors.</p>
+<p>The provided custom context is stored under <code>context.custom</code> in Elasticsearch on both errors and transactions.</p>
+<p>It’s possible to call this function multiple times within the scope of the same active transaction. For each call, the properties of the context argument are shallow merged with the context previously given.</p>
+<p>The given <code>context</code> argument must be an object and can contain any property that can be JSON encoded.</p>
+<div class="admonition tip">
+	<div class="admonition-title">
+		
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/>
+					</svg>
+		<span>Tip</span>
+	</div>
+	<div class="admonition-content"><p>Before using custom context, ensure you understand the different types of <a href="https://docs-v3-preview.elastic.dev/elastic/docs-content/tree/main/solutions/observability/apm/elastic-apm-events-intake-api#apm-api-metadata-overview" hx-select-oob="#main-container" preload="mousedown">metadata</a> that are available.</p>
+</div>
+</div>
+<div class="heading-wrapper" id="apm-add-labels"><h2><a class="headerlink" href="#apm-add-labels"><code>apm.addLabels()</code></a></h2>
+</div>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">apm.addLabels({ [name]: value })
+</code></pre>
+	</div>
+</div>
+<p>Set labels on transactions and errors. Starting with APM Server 7.6+, the labels are added to spans as well.</p>
+<p>Labels are key/value pairs that are indexed by Elasticsearch and therefore searchable (as opposed to data set via <a href="#apm-set-custom-context"><code>apm.setCustomContext()</code></a>). You can set multiple labels.</p>
+<div class="admonition tip">
+	<div class="admonition-title">
+		
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/>
+					</svg>
+		<span>Tip</span>
+	</div>
+	<div class="admonition-content"><p>Before using custom labels, ensure you understand the different types of <a href="https://docs-v3-preview.elastic.dev/elastic/docs-content/tree/main/solutions/observability/apm/elastic-apm-events-intake-api#apm-api-metadata-overview" hx-select-oob="#main-container" preload="mousedown">metadata</a> that are available.</p>
+</div>
+</div>
+<p>Arguments:</p>
+<ul>
+<li><code>name</code> - Any string. All periods (.), asterisks (*), and double quotation marks (&quot;) will be replaced by underscores (_), as those characters have special meaning in Elasticsearch</li>
+<li><code>value</code> - Any string, boolean, or number. All other data types will be converted to a string before being sent to the APM Server.</li>
+</ul>
+<div class="admonition warning">
+	<div class="admonition-title">
+		
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+					</svg>
+		<span>Warning</span>
+	</div>
+	<div class="admonition-content"><p>Avoid defining too many user-specified labels. Defining too many unique fields in an index is a condition that can lead to a <a href="https://docs-v3-preview.elastic.dev/elastic/docs-content/tree/main/manage-data/data-store/mapping#mapping-limit-settings" hx-select-oob="#main-container" preload="mousedown">mapping explosion</a>.</p>
+</div>
+</div>
+<div class="heading-wrapper" id="apm-add-filter"><h2><a class="headerlink" href="#apm-add-filter"><code>apm.addFilter()</code></a></h2>
+</div>
+<p>A filter can be used to modify the APM payload before it is sent to the apm-server. This can be useful in for example redacting sensitive information from the payload:</p>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">apm.addFilter(function (payload) {
+  if (payload.errors) {
+    payload.errors.forEach(function (error) {
+      error.exception.message = error.exception.message.replace('secret', '[REDACTED]')
+    })
+  }
+  if (payload.transactions) {
+    payload.transactions.forEach(function (tr) {
+      tr.spans.forEach(function (span) {
+        if (span.context &amp;&amp; span.context.http &amp;&amp; span.context.http.url) {
+          var url = new URL(span.context.http.url)
+          if (url.searchParams.get('token')) {
+            url.searchParams.set('token', 'REDACTED')
+          }
+          span.context.http.url = url.toString()
+        }
+      })
+    })
+  }
+  // Make sure to return the payload
+  return payload
+})
+</code></pre>
+	</div>
+</div>
+<div class="admonition note">
+	<div class="admonition-title">
+		
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+					</svg>
+		<span>Note</span>
+	</div>
+	<div class="admonition-content"><p>The payload will be dropped if one of the filters return a falsy value.</p>
+</div>
+</div>
+<div class="heading-wrapper" id="apm-start-transaction"><h2><a class="headerlink" href="#apm-start-transaction"><code>apm.startTransaction()</code></a></h2>
+</div>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">const transaction = apm.startTransaction(name, type, options)
+</code></pre>
+	</div>
+</div>
+<p>Starts and returns a new transaction.</p>
+<p>Arguments:</p>
+<ul>
+<li><p><code>name</code> - The name of the transaction (string). Defaults to <code>Unknown</code></p>
+</li>
+<li><p><code>type</code> - The type of the transaction (string). Defaults to <code>custom</code></p>
+</li>
+<li><p><code>options</code> - Options to modify the created transaction (object). This argument is optional. The following options are supported:</p>
+<ul>
+<li><code>managed</code> - Controls whether the transaction is managed by the agent or not. Defaults to <code>false</code>.</li>
+</ul>
+</li>
+</ul>
+<p>Use this method to create a custom transaction.</p>
+<p>By default, custom transactions are not managed by the agent, however, you can start a managed transaction by passing <code>{ managed: true }</code> as the <code>options</code> argument.</p>
+<p>There are some differences between managed and unmanaged transactions:</p>
+<ul>
+<li>For managed transactions, the agent keeps track of the relevant tasks during the lifetime of the transaction and automatically ends it once all of the tasks are finished. Unmanaged transactions need to be ended manually by calling the <a href="/reference/transaction-api#transaction-end" hx-select-oob="#content-container,#toc-nav" preload="mousedown"><code>end</code></a> method.</li>
+<li>Managed transactions include information captured via our auto-instrumentations (e.g. XHR spans). See <a href="/reference/supported-technologies" hx-select-oob="#content-container,#toc-nav" preload="mousedown">Supported Technologies</a> for a list of instrumentations.</li>
+<li>There can only be one managed transaction at any given time — starting a second managed transaction will end the previous one. There are no limits for unmanaged transactions.</li>
+</ul>
+<div class="admonition note">
+	<div class="admonition-title">
+		
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+					</svg>
+		<span>Note</span>
+	</div>
+	<div class="admonition-content"><p>This method returns <code>undefined</code> if apm is disabled or if <a href="/reference/configuration#active" hx-select-oob="#content-container,#toc-nav" preload="mousedown">active</a> flag is set to <code>false</code> in the config.</p>
+</div>
+</div>
+<div class="heading-wrapper" id="apm-start-span"><h2><a class="headerlink" href="#apm-start-span"><code>apm.startSpan()</code></a></h2>
+</div>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">const span = apm.startSpan(name, type, options)
+</code></pre>
+	</div>
+</div>
+<p>Starts and returns a new span associated with the current active transaction.</p>
+<p>Arguments:</p>
+<ul>
+<li><p><code>name</code> - The name of the span (string). Defaults to <code>Unknown</code></p>
+</li>
+<li><p><code>type</code> - The type of the span (string). Defaults to <code>custom</code></p>
+</li>
+<li><p><code>options</code> - The following options are supported:</p>
+<ul>
+<li><code>blocking</code> - Blocks the associated transaction from ending until this span is ended. Blocked spans automatically create an internal task. Defaults to false.</li>
+<li><code>parentId</code> - Parent id associated with the new span. Defaults to current transaction id</li>
+<li><code>sync</code> - Denotes if the span is synchronous or asynchronous. Defaults to null</li>
+</ul>
+</li>
+</ul>
+<p>Blocked spans allow users to control the early closing of <a href="/reference/custom-transactions#custom-managed-transactions" hx-select-oob="#content-container,#toc-nav" preload="mousedown">managed transactions</a> in few cases when the app contains lots of async activity which cannot be tracked by the agent.</p>
+<div class="admonition note">
+	<div class="admonition-title">
+		
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+					</svg>
+		<span>Note</span>
+	</div>
+	<div class="admonition-content"><p>This method returns <code>undefined</code> if apm is disabled or if <a href="/reference/configuration#active" hx-select-oob="#content-container,#toc-nav" preload="mousedown">active</a> flag is set to <code>false</code> in the config.</p>
+</div>
+</div>
+<div class="heading-wrapper" id="set-initial-page-load-name"><h2><a class="headerlink" href="#set-initial-page-load-name"><code>apm.setInitialPageLoadName()</code></a></h2>
+</div>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">apm.setInitialPageLoadName(name)
+</code></pre>
+	</div>
+</div>
+<p>Arguments:</p>
+<ul>
+<li><code>name</code> - The name of the page-load transaction (string).</li>
+</ul>
+<p>Use this method to set the name of the <code>page-load</code> transaction that is sent automatically on page load event. See the <a href="/reference/custom-transaction-name" hx-select-oob="#content-container,#toc-nav" preload="mousedown">custom initial page load transaction names</a> documentation for more details.</p>
+<div class="heading-wrapper" id="get-current-transaction"><h2><a class="headerlink" href="#get-current-transaction"><code>apm.getCurrentTransaction()</code></a></h2>
+</div>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">apm.getCurrentTransaction()
+</code></pre>
+	</div>
+</div>
+<p>Use this method to get the current active transaction. If there is no active transaction it will return <code>undefined</code>.</p>
+<div class="heading-wrapper" id="capture-error"><h2><a class="headerlink" href="#capture-error"><code>apm.captureError()</code></a></h2>
+</div>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">apm.captureError(error, options)
+</code></pre>
+	</div>
+</div>
+<p>Arguments:</p>
+<ul>
+<li><p><code>error</code> - An instance of <code>Error</code>.</p>
+</li>
+<li><p><code>options</code> - The following options are supported:</p>
+<ul>
+<li><code>labels</code> - Add additional context with labels, these labels will be added to the error along with the labels from the current transaction.</li>
+</ul>
+</li>
+</ul>
+<p>Use this method to manually send an error to APM Server:</p>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">apm.captureError(new Error('&lt;error-message&gt;'))
+</code></pre>
+	</div>
+</div>
+<div class="heading-wrapper" id="observe"><h2><a class="headerlink" href="#observe"><code>apm.observe()</code></a></h2>
+</div>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">apm.observe(name, callback)
+</code></pre>
+	</div>
+</div>
+<p>Arguments:</p>
+<ul>
+<li><code>name</code> - The name of the event.</li>
+<li><code>callback</code> - A callback function to execute once the event is fired.</li>
+</ul>
+<p>Use this method to listen for RUM agent internal events.</p>
+<p>The following events are supported for the transaction lifecycle:</p>
+<ul>
+<li><code>transaction:start</code> event is fired on every transaction start.</li>
+<li><code>transaction:end</code> event is fired on transaction end and before it is added to the queue to be sent to APM Server.</li>
+</ul>
+<p>The callback function for these events receives the corresponding transaction object as its only argument. The transaction object can be modified through methods and properties documented in <a href="/reference/transaction-api" hx-select-oob="#content-container,#toc-nav" preload="mousedown">Transaction API</a>:</p>
+<div class="highlight-js notranslate">
+	<div class="highlight">
+		<pre><code class="language-js">apm.observe('transaction:start', function (transaction) {
+  if (transaction.type === 'custom') {
+    transaction.name = window.document.title
+    transaction.addLabels({ 'custom-label': 'custom-value' })
+  }
+})
+</code></pre>
+	</div>
+</div>
+
+</section>
+
+						</article>
+						<footer id="prev-next-nav" class="content-container mt-20 px-4">
+	<div class="flex flex-wrap lg:flex-nowrap gap-2 mt-2">
+		<div class="w-full">
+				<a 
+					href="/reference/api-reference"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="flex h-full items-center text-ink-light hover:black border-1 border-grey-20 hover:border-grey-80 rounded-lg p-6 shadow-md"
+				>
+					<svg class="size-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+					</svg>
+					<div>
+						<div class="text-xs lg:text-sm">Previous</div>
+						<div class="text-base lg:text-xl text-black">API reference</div>
+					</div>
+				</a>
+		</div>
+		<div class="w-full">
+				<a 
+					href="/reference/transaction-api"
+					 hx-select-oob=#content-container,#toc-nav preload=mousedown
+					class="flex h-full items-center justify-end text-ink-light hover:black border-1 border-grey-20 hover:border-grey-80 rounded-lg p-6 shadow-md text-right"
+				>
+					<div>
+						<div class="text-xs lg:text-sm">Next</div>
+						<div class="text-base lg:text-xl text-black">Transaction API</div>
+					</div>
+					<svg class="size-6 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+					</svg>
+				</a>
+		</div>
+	</div>
+</footer>
+
+					</main>
+					<div class="spacer"></div>
+				</div>
+			</div>
+		</div>
+
+</div>
+
+<footer class="py-12 px-6 w-full mx-auto bg-ink-dark">
+	<div class="max-w-(--max-layout-width) w-full mx-auto">
+	<div class="text-grey-20 text-[12px]">
+		<a href="https://www.elastic.co/">
+			<img class="block" loading="lazy" alt="Elastic logo" src="/_static/logo-elastic-horizontal-white.svg?v=19bc4040eda89518" width="120" height="41"/>
+		</a>
+	</div>
+	<div class="text-grey-20 text-[12px] bg-ink-dark grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
+		<div>
+			<ul class="mt-4 flex gap-3">
+				<li>
+					<a class="underline hover:text-white" href="https://www.elastic.co/legal/trademarks">Trademarks</a>
+				</li>
+				<li>
+					<a class="underline hover:text-white" href="https://www.elastic.co/legal/terms-of-use">Terms of Use</a>
+				</li>
+				<li>
+					<a class="underline hover:text-white" href="https://www.elastic.co/legal/privacy-statement">Privacy</a>
+				</li>
+				<li>
+					<a class="underline hover:text-white" href="https://www.elastic.co/sitemap">Sitemap</a>
+				</li>
+			</ul>
+			<p class="mt-4">
+				© 2025 Elasticsearch B.V. All Rights Reserved.
+			</p>
+		</div>
+		<div class="mt-4">
+			<p>
+				This content is available in different formats for convenience only. All original licensing terms apply.
+			</p>
+			<p class="mt-4">
+				Elasticsearch is a trademark of Elasticsearch B.V., registered in the U.S. and in other countries. Apache, Apache Lucene, Apache Hadoop, Hadoop, HDFS and the yellow elephant logo are trademarks of the Apache Software Foundation in the United States and/or other countries. 
+			</p>
+		</div>
+	</div>
+	</div>
+</footer>
+
+
+</body>
+</html>
