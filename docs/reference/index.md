@@ -2,16 +2,25 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/intro.html
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
+products:
+  - id: cloud-serverless
+  - id: observability
+  - id: apm
 ---
 
 # APM RUM JavaScript agent [intro]
 
 The Elastic APM Real User Monitoring (RUM) JavaScript Agent provides detailed performance metrics and error tracking of your web applications. It has built-in support for popular platforms and frameworks, and an API for custom instrumentation.
 
-The Agent also supports [distributed tracing](/reference/distributed-tracing.md) for all outgoing requests. This enables you to analyze performance throughout your microservice architecture — all in one view.
+The Agent also supports [distributed tracing](/reference/distributed-tracing.md) for all outgoing requests. This enables you to analyze performance throughout your microservice architecture — all in one view.
 
 ::::{note}
-The Elastic APM RUM JavaScript Agent is *not* compatible with [{{serverless-full}}](docs-content://deploy-manage/deploy/elastic-cloud/serverless.md) — it cannot send data to the APM endpoint for serverless projects.
+The Elastic APM RUM JavaScript Agent is *not* compatible with [{{serverless-full}}](docs-content://deploy-manage/deploy/elastic-cloud/serverless.md) — it cannot send data to the APM endpoint for serverless projects.
 
 ::::
 

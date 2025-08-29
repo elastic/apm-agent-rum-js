@@ -1,6 +1,15 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/typescript.html
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
+products:
+  - id: cloud-serverless
+  - id: observability
+  - id: apm
 ---
 
 # Using with TypeScript [typescript]

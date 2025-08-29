@@ -1,6 +1,14 @@
 ---
 navigation_title: "Known issues"
-
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
+products:
+  - id: cloud-serverless
+  - id: observability
+  - id: apm
 ---
 # Elastic APM Real User Monitoring JavaScript Agent known issues [elastic-apm-rum-javascript-agent-known-issues]
 

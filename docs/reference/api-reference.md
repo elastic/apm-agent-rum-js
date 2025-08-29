@@ -1,6 +1,15 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/api.html
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
+products:
+  - id: cloud-serverless
+  - id: observability
+  - id: apm
 ---
 
 # API reference [api]

@@ -1,11 +1,20 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/distributed-tracing-guide.html
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
+products:
+  - id: cloud-serverless
+  - id: observability
+  - id: apm
 ---
 
 # Distributed tracing [distributed-tracing-guide]
 
-Elastic APM supports distributed tracing to enable you to analyze performance throughout your microservices architecture by tracing all requests — from the initial web request to your front-end service, to queries made to your back-end services — all in one view.
+Elastic APM supports distributed tracing to enable you to analyze performance throughout your microservices architecture by tracing all requests — from the initial web request to your front-end service, to queries made to your back-end services — all in one view.
 
 
 ## Enable cross-origin requests [enable-cors]

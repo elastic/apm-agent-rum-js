@@ -2,6 +2,15 @@
 navigation_title: "Breaking changes"
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/upgrade-to-v5.html
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
+products:
+  - id: cloud-serverless
+  - id: observability
+  - id: apm
 ---
 
 # Elastic APM Real User Monitoring JavaScript Agent breaking changes [elastic-apm-real-user-monitoring-javascript-agent-breaking-changes]
@@ -75,7 +84,7 @@ Removed options:
 
 Added option:
 
-* [`eventsLimit`](/reference/configuration.md#events-limit) — Configure the number of events sent to APM Server per minute. Defaults to `80`.
+* [`eventsLimit`](/reference/configuration.md#events-limit) — Configure the number of events sent to APM Server per minute. Defaults to `80`.
 
 For more information, check [#628](https://github.com/elastic/apm-agent-rum-js/issues/628).
 
