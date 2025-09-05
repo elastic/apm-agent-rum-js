@@ -7,10 +7,6 @@ applies_to:
   serverless: unavailable
   product:
     apm_agent_rum: ga
-products:
-
-  - id: observability
-  - id: apm
 ---
 
 # APM RUM JavaScript agent [intro]

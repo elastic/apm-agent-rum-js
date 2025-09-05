@@ -6,10 +6,6 @@ applies_to:
   serverless: unavailable
   product:
     apm_agent_rum: ga
-products:
-
-  - id: observability
-  - id: apm
 ---
 
 # Install the Agent [install-the-agent]

@@ -7,10 +7,6 @@ applies_to:
   serverless: unavailable
   product:
     apm_agent_rum: ga
-products:
-
-  - id: observability
-  - id: apm
 ---
 
 # Elastic APM Real User Monitoring JavaScript Agent breaking changes [elastic-apm-real-user-monitoring-javascript-agent-breaking-changes]

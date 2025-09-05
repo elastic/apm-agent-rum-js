@@ -6,10 +6,6 @@ applies_to:
   serverless: unavailable
   product:
     apm_agent_rum: ga
-products:
-
-  - id: observability
-  - id: apm
 ---
 
 # Set up the APM Real User Monitoring JavaScript Agent [getting-started]
