@@ -43,8 +43,11 @@ runs:
         && (inputs.sauce-username != null && inputs.sauce-username != '')
       shell: bash
       run: |
-        echo "SAUCE_ACCESS_KEY=${{ inputs.sauce-access-key }}" >> $GITHUB_ENV
-        echo "SAUCE_USERNAME=${{ inputs.sauce-username }}"     >> $GITHUB_ENV
+        echo "SAUCE_ACCESS_KEY=$SAUCE_ACCESS_KEY" >> $GITHUB_ENV
+        echo "SAUCE_USERNAME=$SAUCE_USERNAME" >> $GITHUB_ENV
+      env:
+        SAUCE_ACCESS_KEY: ${{ inputs.sauce-access-key }}
+        SAUCE_USERNAME: ${{ inputs.sauce-username }}
     - name: Run tests Elastic Stack ${{ matrix.stack-version }} - ${{ matrix.scope }} - ${{ fromJSON('{"none":"Puppeteer"}')[inputs.mode] || inputs.mode }}
       run: './.ci/scripts/test.sh'
       shell: bash
@@ -55,7 +58,7 @@ runs:
         STACK_VERSION: ${{ inputs.stack-version }}
     # The upload-artifact action fails if the name contains slashes `/` or colons `:`.
     # This step creates a slugified version that will not contain these characters.
-    - uses: gacts/github-slug@b6a1ff29ef2fec9238453177601eece6cc6cb973 # 1.3.2
+    - uses: gacts/github-slug@ff88bad75209b5407ea9dbd3c9f7755634f55e29 # 1.3.3
       id: slug
       if: success() || failure()
       with:
