@@ -1,6 +1,10 @@
 ---
 navigation_title: "Known issues"
-
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
 ---
 # Elastic APM Real User Monitoring JavaScript Agent known issues [elastic-apm-rum-javascript-agent-known-issues]
 

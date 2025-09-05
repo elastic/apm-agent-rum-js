@@ -3,7 +3,13 @@ navigation_title: "Elastic APM Real User Monitoring JavaScript Agent"
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/release-notes-5.x.html
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/release-notes.html
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
 ---
+
 # Elastic APM Real User Monitoring JavaScript Agent release notes [elastic-apm-rum-javascript-agent-release-notes]
 
 Review the changes, fixes, and more in each version of Elastic APM Real User Monitoring JavaScript Agent.

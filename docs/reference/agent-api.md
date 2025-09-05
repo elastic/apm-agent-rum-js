@@ -1,6 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/agent-api.html
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
 ---
 
 # Agent API [agent-api]
@@ -155,7 +160,7 @@ There are some differences between managed and unmanaged transactions:
 
 * For managed transactions, the agent keeps track of the relevant tasks during the lifetime of the transaction and automatically ends it once all of the tasks are finished. Unmanaged transactions need to be ended manually by calling the [`end`](/reference/transaction-api.md#transaction-end) method.
 * Managed transactions include information captured via our auto-instrumentations (e.g. XHR spans). See [Supported Technologies](/reference/supported-technologies.md) for a list of instrumentations.
-* There can only be one managed transaction at any given time — starting a second managed transaction will end the previous one. There are no limits for unmanaged transactions.
+* There can only be one managed transaction at any given time — starting a second managed transaction will end the previous one. There are no limits for unmanaged transactions.
 
 ::::{note}
 This method returns `undefined` if apm is disabled or if [active](/reference/configuration.md#active) flag is set to `false` in the config.

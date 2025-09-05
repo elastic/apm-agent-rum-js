@@ -1,11 +1,16 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/breakdown-metrics-docs.html
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
 ---
 
 # Breakdown metrics [breakdown-metrics-docs]
 
-Breakdown metrics help you visualize where your application is spending the majority of its time — allowing you to find the root cause of performance problems even quicker. These metrics are calculated for each transaction based on its corresponding types.
+Breakdown metrics help you visualize where your application is spending the majority of its time — allowing you to find the root cause of performance problems even quicker. These metrics are calculated for each transaction based on its corresponding types.
 
 
 ## Page load breakdown [page-load-breakdown]
