@@ -31,7 +31,7 @@ jobs:
     permissions:
       statuses: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v4
@@ -74,7 +74,7 @@ jobs:
           - '@elastic/apm-rum-angular'
           - '@elastic/apm-rum-vue'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Run puppeteer tests
         uses: ./.github/workflows/run-test
         with:
@@ -85,7 +85,7 @@ jobs:
   npm-ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Temporary fix for "ValueError: invalid mode: 'rU' while trying to load binding.gyp"
       # See https://github.com/nodejs/node-gyp/issues/2219
@@ -120,7 +120,7 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Run coverage
         uses: ./.github/workflows/run-test
         with:
