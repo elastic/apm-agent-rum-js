@@ -35,7 +35,7 @@ jobs:
           repositories: >-
             ["apm-agent-rum-js"]
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ steps.get_token.outputs.token }}
@@ -48,11 +48,11 @@ jobs:
       # See https://github.com/nodejs/node-gyp/issues/2219
       # This can be removed when "node-gyp" is updated
       - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.10'
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version-file: '.nvmrc'
 
