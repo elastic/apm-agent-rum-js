@@ -45,4 +45,4 @@ APM Agents work in conjunction with the [APM Server](docs-content://reference/ap
 
 ## Troubleshooting
 
-If you're experiencing issues with the Elastic APM Real User Monitoring (RUM) JavaScript Agent, refer to [Troubleshooting](docs-content://troubleshoot/observability/apm-agent-rum-js/apm-real-user-monitoring-javascript-agent.md).
+If you're experiencing issues with the Elastic APM Real User Monitoring (RUM) JavaScript Agent, refer to [Troubleshoot APM Real User Monitoring JavaScript Agent](docs-content://troubleshoot/observability/apm-agent-rum-js/apm-real-user-monitoring-javascript-agent.md).
