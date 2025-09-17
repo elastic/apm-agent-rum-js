@@ -30,4 +30,4 @@ toc:
   - file: performance-tuning.md
   - file: upgrading.md
   - title: Troubleshooting
-    crosslink: docs-content:///troubleshoot/observability/apm-agent-rum-js/apm-real-user-monitoring-javascript-agent.md
+    crosslink: docs-content://troubleshoot/observability/apm-agent-rum-js/apm-real-user-monitoring-javascript-agent.md
