@@ -43,3 +43,6 @@ The agent uses browser timing APIs such as [Navigation Timing](https://w3c.githu
 
 APM Agents work in conjunction with the [APM Server](docs-content://reference/apm/observability/apm.md), [Elasticsearch](docs-content://get-started/index.md), and [Kibana](docs-content://get-started/the-stack.md). The [APM Guide](docs-content://reference/apm/observability/apm.md) provides details on how these components work together, and provides a matrix outlining [Agent and Server compatibility](docs-content://solutions/observability/apm/apm-agent-compatibility.md).
 
+## Troubleshooting
+
+If you're experiencing issues with the Elastic APM Real User Monitoring (RUM) JavaScript Agent, refer to [Troubleshoot APM Real User Monitoring JavaScript Agent](docs-content://troubleshoot/observability/apm-agent-rum-js/apm-real-user-monitoring-javascript-agent.md).
