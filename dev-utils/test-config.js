@@ -24,22 +24,10 @@
  */
 const DEFAULT_APM_SERVER_URL = 'http://localhost:8200'
 
-function getSauceConnectOptions() {
-  return {
-    username: process.env.SAUCE_USERNAME,
-    accessKey: process.env.SAUCE_ACCESS_KEY,
-    logger: console.log,
-    noSslBumpDomains: 'all',
-    tunnelIdentifier: process.env.BUILD_NUMBER,
-    connectRetries: 3
-  }
-}
-
 function getTestEnvironmentVariables() {
   return {
     branch: process.env.BRANCH_NAME,
     mode: process.env.MODE,
-    sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
     isCI: process.env.CI,
     serverUrl: process.env.APM_SERVER_URL || DEFAULT_APM_SERVER_URL,
     mockBackendUrl: 'http://localhost:8003',
@@ -102,56 +90,6 @@ function getDefaultBrowsers() {
   ]
 }
 
-/**
- * It returns the appium configuration compatible with karma-sauce-launcher
- */
-function getAppiumBrowsersForKarma() {
-  return [
-    {
-      platformName: 'Android',
-      browserName: 'Browser',
-      appiumVersion: '1.20.2',
-      deviceName: 'Android Emulator',
-      platformVersion: '5.1'
-    },
-    {
-      platformName: 'iOS',
-      browserName: 'safari',
-      appiumVersion: '1.13.0',
-      deviceName: 'iPhone Simulator',
-      deviceOrientation: 'portrait',
-      platformVersion: '12.2'
-    }
-  ]
-}
-
-/**
- * It returns the appium configuration compatible with @wdio/sauce-service
- */
-function getAppiumBrowsersForWebdriver() {
-  return [
-    {
-      platformName: 'Android',
-      browserName: 'Browser',
-      'appium:deviceName': 'Android Emulator',
-      'appium:platformVersion': '5.1',
-      'sauce:options': {
-        appiumVersion: '1.20.2'
-      }
-    },
-    {
-      platformName: 'iOS',
-      browserName: 'Safari',
-      'appium:deviceName': 'iPad Simulator',
-      'appium:platformVersion': '12.2',
-      'sauce:options': {
-        appiumVersion: '1.13.0',
-        deviceOrientation: 'portrait'
-      }
-    }
-  ]
-}
-
 function getBrowserList(pkg = 'default') {
   let browsers = []
   if (pkg === 'default') {
@@ -173,11 +111,9 @@ function getBrowserList(pkg = 'default') {
       {
         browserName: 'firefox',
         // beware that if we update to 99 or more we will need to cope with https://github.com/karma-runner/karma-sauce-launcher/issues/275
+        // TODO: add latest since we are not constrained by the issue?
         browserVersion: '98',
-        platformName: 'Windows 10',
-        'sauce:options': {
-          geckodriverVersion: '0.30.0' // reason: https://github.com/karma-runner/karma-sauce-launcher/issues/275
-        }
+        platformName: 'Windows 10'
       }
     ]
   }
@@ -212,12 +148,9 @@ function isVersionInRange(version, min) {
 }
 
 module.exports = {
-  getSauceConnectOptions,
   getTestEnvironmentVariables,
   getGlobalConfig,
   getBrowserList,
-  getAppiumBrowsersForKarma,
-  getAppiumBrowsersForWebdriver,
   parseVersion,
   isVersionInRange,
   DEFAULT_APM_SERVER_URL

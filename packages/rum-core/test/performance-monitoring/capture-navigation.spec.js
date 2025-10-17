@@ -333,6 +333,7 @@ describe('Capture hard navigation', function () {
         span.type === 'resource' ||
         span.type === 'app'
     )
+    expect(foundSpans).toEqual([])
     expect(foundSpans.length).toBeGreaterThanOrEqual(3)
     unMock()
   })

@@ -5,9 +5,6 @@
 [![codecov](https://codecov.io/gh/elastic/apm-agent-rum-js/branch/main/graph/badge.svg)](https://codecov.io/gh/elastic/apm-agent-rum-js)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/elastic-apm-base.svg)](https://saucelabs.com/u/elastic-apm-base)
-<br><sup>Cross Browser testing is provided by [Sauce Labs](https://saucelabs.com/)</sup>
-
 This is the official Real User Monitoring JavaScript agent.
 
 ## Documentation

@@ -28,7 +28,6 @@ const fs = require('fs')
 const webpack = require('webpack')
 const { Server } = require('karma')
 const { Launcher } = require('@wdio/cli')
-const sauceConnectLauncher = require('sauce-connect-launcher')
 const JasmineRunner = require('jasmine')
 
 function walkSync(dir, filter, filelist) {
@@ -105,18 +104,6 @@ function buildE2eBundles(basePath, callback) {
   })
 }
 
-function runSauceConnect(config, callback) {
-  return sauceConnectLauncher(config, (err, sauceConnectProcess) => {
-    if (err) {
-      console.error('Sauce connect Error', err)
-      return process.exit(1)
-    } else {
-      console.log('Sauce connect ready')
-      callback(sauceConnectProcess)
-    }
-  })
-}
-
 function runKarma(configFile) {
   const server = new Server({ configFile, singleRun: true }, exitCode =>
     process.exit(exitCode)
@@ -167,6 +154,5 @@ module.exports = {
   runE2eTests,
   runKarma,
   runJasmine,
-  runSauceConnect,
   dirWalkSync: walkSync
 }
