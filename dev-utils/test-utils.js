@@ -26,7 +26,7 @@
 const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
-const { Server } = require('karma')
+const { Server, config } = require('karma')
 const { Launcher } = require('@wdio/cli')
 const JasmineRunner = require('jasmine')
 
@@ -105,9 +105,8 @@ function buildE2eBundles(basePath, callback) {
 }
 
 function runKarma(configFile) {
-  const server = new Server({ configFile, singleRun: true }, exitCode =>
-    process.exit(exitCode)
-  )
+  const conf = config.parseConfig(configFile, { singleRun: true })
+  const server = new Server(conf, exitCode => process.exit(exitCode))
   server.start()
 }
 
