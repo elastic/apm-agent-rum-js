@@ -71,7 +71,7 @@
   "license": "MIT",
   "homepage": "https://www.elastic.co/guide/en/apm/agent/rum-js/current/index.html",
   "devDependencies": {
-    "@angular-devkit/build-angular": "^20.3.6",
+    "@angular-devkit/build-angular": "^12.2.17",
     "@angular/cli": "^12.2.17",
     "@angular/common": "^12.2.17",
     "@angular/compiler": "^12.2.17",
