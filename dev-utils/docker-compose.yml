@@ -5,7 +5,7 @@ services:
     environment:
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "ES_JAVA_OPTS=-XX:UseAVX=2 -Xms1g -Xmx1g"
       - "cluster.routing.allocation.disk.threshold_enabled=false"
       - "discovery.type=single-node"
       - "xpack.security.authc.anonymous.roles=remote_monitoring_collector"
