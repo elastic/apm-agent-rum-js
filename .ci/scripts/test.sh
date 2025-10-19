@@ -6,16 +6,16 @@ APM_SERVER_PORT=${APM_SERVER_PORT:-"8200"}
 APM_SERVER_URL=${APM_SERVER_URL:-"http://apm-server:8200"}
 KIBANA_URL=${KIBANA_URL:-"http://kibana:5601"}
 
-# As long as there are issues with the ssl lets use 6.1.3
-# see https://github.com/docker/docker-py/issues/3194
-pip3 uninstall docker
-pip3 install docker==6.1.3
+# # As long as there are issues with the ssl lets use 6.1.3
+# # see https://github.com/docker/docker-py/issues/3194
+# pip3 uninstall docker
+# pip3 install docker==6.1.3
 
-pip install docker-compose>=1.25.4
+# pip install docker-compose>=1.25.4
 
-# https://github.com/docker/docker-py/issues/3256
-pip3 uninstall requests
-pip3 install requests==2.31.0
+# # https://github.com/docker/docker-py/issues/3256
+# pip3 uninstall requests
+# pip3 install requests==2.31.0
 
 
 # Tests are run within the node-puppeteer container and can fails.
