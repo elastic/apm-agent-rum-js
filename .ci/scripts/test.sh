@@ -28,7 +28,7 @@ do
   APM_SERVER_PORT=${APM_SERVER_PORT} \
   APM_SERVER_URL=${APM_SERVER_URL} \
   KIBANA_URL=${KIBANA_URL} \
-  docker --log-level INFO compose \
+  docker --log-level DEBUG compose \
     -f ./dev-utils/docker-compose.yml \
     up \
     --quiet-pull \
@@ -39,13 +39,13 @@ do
     status=${?}
     if [ "${status}" -eq "0" ]; then
       break
+    else
+      echo "Docker compose failed, see the below log output"
+      # cat docker-compose.log && rm docker-compose.log
+      # cat docker-compose.err && rm docker-compose.err
+      docker compose logs;
     fi
   sleep 5;
 done
 echo "Exit code from docker compose ${status}"
-if [ "${status}" != "0" ]; then
-  echo "Docker compose failed, see the below log output"
-  cat docker-compose.log && rm docker-compose.log
-  cat docker-compose.err && rm docker-compose.err
-fi
 exit ${status}
