@@ -25,6 +25,9 @@
 
 ;(function (defineProperty) {
   Object.defineProperty = function (obj, prop, desc) {
+    if (prop === 'prototype') {
+      console.log('defineProperty prototype of', obj)
+    }
     desc.configurable = true
     return defineProperty.call(obj, obj, prop, desc)
   }
