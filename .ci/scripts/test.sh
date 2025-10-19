@@ -41,9 +41,8 @@ do
       break
     else
       echo "Docker compose failed, see the below log output"
-      # cat docker-compose.log && rm docker-compose.log
-      # cat docker-compose.err && rm docker-compose.err
-      docker compose logs;
+      cat docker-compose.log && rm docker-compose.log
+      cat docker-compose.err && rm docker-compose.err
     fi
   sleep 5;
 done
