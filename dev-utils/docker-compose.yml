@@ -1,7 +1,7 @@
 services:
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION:-8.6.1}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION:-8.19.5}
     environment:
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
@@ -46,7 +46,7 @@ services:
 
   fleet-server:
     container_name: apm-server
-    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION:-8.6.1}
+    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION:-8.19.5}
     entrypoint: "/bin/bash"
     command:
         - "-l"
@@ -81,7 +81,7 @@ services:
 
   kibana:
     container_name: kibana
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION:-8.6.1}
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION:-8.19.5}
     environment:
         ELASTICSEARCH_HOSTS: http://elasticsearch:9200
         ELASTICSEARCH_USERNAME: "${KIBANA_ES_USER:-kibana_system_user}"
