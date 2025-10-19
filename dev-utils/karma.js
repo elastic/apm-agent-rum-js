@@ -76,9 +76,6 @@ const baseConfig = {
   },
   autoWatch: false,
   browserNoActivityTimeout: 120000,
-  // customLaunchers: [...getBrowserList()].map(
-  //   launcher => ({ ...launcher })
-  // ),
   customLaunchers: getBrowserList(),
   browsers: [],
   captureTimeout: 120000, // on saucelabs it takes some time to capture browser (review this)
@@ -150,6 +147,7 @@ function prepareConfig(config, packageName) {
     }
   }
 
+  console.log('preparedConfig', config)
   return config
 }
 
