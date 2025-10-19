@@ -34,7 +34,8 @@ do
     --quiet-pull \
     --exit-code-from node-puppeteer \
     --remove-orphans \
-    node-puppeteer;
+    node-puppeteer \
+    >docker-compose.log 2>docker-compose.err;
     status=${?}
     if [ "${status}" -eq "0" ]; then
       break
@@ -42,4 +43,9 @@ do
   sleep 5;
 done
 echo "Exit code from docker compose ${status}"
+if [ "${status}" != "0" ]; then
+  echo "Docker compose failed, see the below log output"
+  cat docker-compose.log && rm docker-compose.log
+  cat docker-compose.err && rm docker-compose.err
+fi
 exit ${status}
