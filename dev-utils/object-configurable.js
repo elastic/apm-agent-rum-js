@@ -24,8 +24,24 @@
  */
 
 ;(function (defineProperty) {
-  Object.defineProperty = function (obj, prop, desc) {
-    desc.configurable = true
-    return defineProperty.call(obj, obj, prop, desc)
+  // Object.defineProperty = function (obj, prop, desc) {
+  //   desc.configurable = true
+  //   return defineProperty.call(obj, obj, prop, desc)
+  // }
+  Object.defineProperty = function () {
+    var args = Array.prototype.slice.call(arguments)
+    var obj = args[0]
+    var prop, desc
+    // Object.defineProperty(obj, prop, desc)
+    if (args.length === 3) {
+      prop = args[1]
+      desc = args[2]
+      return defineProperty.call(obj, obj, prop, desc)
+    }
+    // Object.defineProperty(obj, descs)
+    for (desc of Object.values(args[1])) {
+      desc.configurable = true
+    }
+    defineProperty.call(obj, obj, args[1])
   }
 })(Object.defineProperty)
