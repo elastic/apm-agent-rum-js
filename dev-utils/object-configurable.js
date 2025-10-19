@@ -26,7 +26,6 @@
 ;(function (defineProperty) {
   Object.defineProperty = function (obj, prop, desc) {
     desc.configurable = true
-    console.log('defineProperty', obj, prop, desc)
     return defineProperty.call(obj, obj, prop, desc)
   }
 })(Object.defineProperty)
