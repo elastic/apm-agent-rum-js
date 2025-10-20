@@ -25,6 +25,7 @@
 
 ;(function (defineProperty) {
   Object.defineProperty = function (obj, prop, desc) {
+    if (prop === 'prototype') return
     desc.configurable = true
     return defineProperty.call(obj, obj, prop, desc)
   }

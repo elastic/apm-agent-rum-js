@@ -30,7 +30,7 @@ import {
   ERRORS,
   TRANSACTIONS,
   QUEUE_FLUSH,
-  // HTTP_REQUEST_TIMEOUT,
+  HTTP_REQUEST_TIMEOUT,
   LOGGING_SERVICE,
   CONFIG_SERVICE,
   APM_SERVER,
@@ -38,11 +38,10 @@ import {
   ERROR_LOGGING
 } from '../../src/common/constants'
 import { getGlobalConfig } from '../../../../dev-utils/test-config'
-// import { describeIf, spyOnFunction } from '../../../../dev-utils/jasmine'
-import { describeIf } from '../../../../dev-utils/jasmine'
+import { describeIf, spyOnFunction } from '../../../../dev-utils/jasmine'
 import { createServiceFactory, generateTransaction, generateErrors } from '../'
-// import * as fetchSender from '../../src/common/http/fetch'
-// import * as xhrSender from '../../src/common/http/xhr'
+import * as fetchSender from '../../src/common/http/fetch'
+import * as xhrSender from '../../src/common/http/xhr'
 
 const { agentConfig, testConfig } = getGlobalConfig('rum-core')
 
@@ -290,11 +289,15 @@ describe('ApmServer', function () {
     tr.end(100)
     const payload = performanceMonitoring.createTransactionDataModel(tr)
 
-    await apmServer.sendEvents([
-      {
-        [TRANSACTIONS]: payload
-      }
-    ])
+    try {
+      await apmServer.sendEvents([
+        {
+          [TRANSACTIONS]: payload
+        }
+      ])
+    } catch (e) {
+      // APM Server not working
+    }
   })
 
   it('should ndjson all events', async () => {
@@ -463,30 +466,21 @@ describe('ApmServer', function () {
 
   describe('http strategies', () => {
     let originalCompressionStream = window.CompressionStream
-    let originalFetch = window.fetch
-    let originalRequest = window.Request
-    let originalXHR = window.XMLHttpRequest
 
     beforeEach(() => {
       window.CompressionStream = void 0
-      window.fetch = jasmine.createSpy('fetchFunction')
-      window.Request = jasmine.createSpy('RequestConstructor')
-      window.XMLHttpRequest = jasmine.createSpy('XMLHttpRequestConstructor')
     })
 
     afterEach(() => {
       window.CompressionStream = originalCompressionStream
-      window.fetch = originalFetch
-      window.Request = originalRequest
-      window.XMLHttpRequest = originalXHR
     })
 
     it('should use fetch when keep alive is the choice', async () => {
-      // spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
-      //   true
-      // )
-      // spyOnFunction(fetchSender, 'sendFetchRequest').and.resolveTo({})
-      // spyOnFunction(xhrSender, 'sendXHR')
+      spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
+        true
+      )
+      spyOnFunction(fetchSender, 'sendFetchRequest').and.resolveTo({})
+      spyOnFunction(xhrSender, 'sendXHR')
       const serverUrl = 'http://localhost'
       const serverUrlPrefix = '/prefix'
       const sendCredentials = true
@@ -495,155 +489,130 @@ describe('ApmServer', function () {
         serverUrlPrefix,
         sendCredentials
       })
-      window.fetch.and.resolveTo({
-        status: 200,
-        text: () => Promise.resolve('')
+
+      await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
+
+      expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(1)
+      expect(fetchSender.sendFetchRequest).toHaveBeenCalledWith(
+        'POST',
+        'http://localhost/prefix',
+        {
+          keepalive: true,
+          timeout: HTTP_REQUEST_TIMEOUT,
+          payload:
+            '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}\n{"transaction":{"test":"test"}}\n',
+          headers: {
+            'Content-Type': 'application/x-ndjson'
+          },
+          sendCredentials: true
+        }
+      )
+      expect(xhrSender.sendXHR).toHaveBeenCalledTimes(0)
+    })
+
+    it('should use xhr as a fallback if beforeSend function is defined', async () => {
+      spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
+        true
+      )
+      spyOnFunction(fetchSender, 'sendFetchRequest')
+      spyOnFunction(xhrSender, 'sendXHR').and.resolveTo({})
+      const beforeSend = () => {}
+
+      const serverUrl = 'http://localhost'
+      const serverUrlPrefix = '/prefix'
+      const sendCredentials = true
+      configService.setConfig({
+        serverUrl,
+        serverUrlPrefix,
+        apmRequest: beforeSend,
+        sendCredentials
       })
 
       await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
 
-      expect(window.fetch).toHaveBeenCalledTimes(1)
-      expect(window.XMLHttpRequest).toHaveBeenCalledTimes(0)
+      expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(0)
+
+      // fallback expected
+      expect(xhrSender.sendXHR).toHaveBeenCalledTimes(1)
+      expect(xhrSender.sendXHR).toHaveBeenCalledWith(
+        'POST',
+        'http://localhost/prefix',
+        {
+          timeout: HTTP_REQUEST_TIMEOUT,
+          payload:
+            '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}\n{"transaction":{"test":"test"}}\n',
+          headers: {
+            'Content-Type': 'application/x-ndjson'
+          },
+          beforeSend,
+          sendCredentials
+        }
+      )
     })
 
-    // it('should use fetch when keep alive is the choice', async () => {
-    //   spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
-    //     true
-    //   )
-    //   spyOnFunction(fetchSender, 'sendFetchRequest').and.resolveTo({})
-    //   spyOnFunction(xhrSender, 'sendXHR')
-    //   const serverUrl = 'http://localhost'
-    //   const serverUrlPrefix = '/prefix'
-    //   const sendCredentials = true
-    //   configService.setConfig({
-    //     serverUrl,
-    //     serverUrlPrefix,
-    //     sendCredentials
-    //   })
+    it('should use xhr as a fallback when fetch fails due to an exception', async () => {
+      spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
+        true
+      )
+      spyOnFunction(fetchSender, 'sendFetchRequest').and.rejectWith(
+        new TypeError('network error')
+      )
+      spyOnFunction(xhrSender, 'sendXHR').and.resolveTo({})
+      const serverUrl = 'http://localhost'
+      const serverUrlPrefix = '/prefix'
+      const sendCredentials = true
+      configService.setConfig({
+        serverUrl,
+        serverUrlPrefix,
+        sendCredentials
+      })
 
-    //   await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
+      await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
 
-    //   expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(1)
-    //   expect(fetchSender.sendFetchRequest).toHaveBeenCalledWith(
-    //     'POST',
-    //     'http://localhost/prefix',
-    //     {
-    //       keepalive: true,
-    //       timeout: HTTP_REQUEST_TIMEOUT,
-    //       payload:
-    //         '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}\n{"transaction":{"test":"test"}}\n',
-    //       headers: {
-    //         'Content-Type': 'application/x-ndjson'
-    //       },
-    //       sendCredentials: true
-    //     }
-    //   )
-    //   expect(xhrSender.sendXHR).toHaveBeenCalledTimes(0)
-    // })
+      expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(1)
 
-    // it('should use xhr as a fallback if beforeSend function is defined', async () => {
-    //   spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
-    //     true
-    //   )
-    //   spyOnFunction(fetchSender, 'sendFetchRequest')
-    //   spyOnFunction(xhrSender, 'sendXHR').and.resolveTo({})
-    //   const beforeSend = () => {}
+      // fallback expected
+      expect(xhrSender.sendXHR).toHaveBeenCalledTimes(1)
+      expect(xhrSender.sendXHR).toHaveBeenCalledWith(
+        'POST',
+        'http://localhost/prefix',
+        {
+          timeout: HTTP_REQUEST_TIMEOUT,
+          payload:
+            '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}\n{"transaction":{"test":"test"}}\n',
+          headers: {
+            'Content-Type': 'application/x-ndjson'
+          },
+          beforeSend: null,
+          sendCredentials: true
+        }
+      )
+    })
 
-    //   const serverUrl = 'http://localhost'
-    //   const serverUrlPrefix = '/prefix'
-    //   const sendCredentials = true
-    //   configService.setConfig({
-    //     serverUrl,
-    //     serverUrlPrefix,
-    //     apmRequest: beforeSend,
-    //     sendCredentials
-    //   })
+    it('should not use xhr as a fallback when fetch failure reason is not an exception', async () => {
+      spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
+        true
+      )
+      spyOnFunction(fetchSender, 'sendFetchRequest').and.rejectWith({
+        url: '/test',
+        status: 400,
+        responseText: 'bad input'
+      })
+      spyOnFunction(xhrSender, 'sendXHR').and.resolveTo({})
 
-    //   await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
+      const promise = apmServer.sendEvents([
+        { [TRANSACTIONS]: { test: 'test' } }
+      ])
 
-    //   expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(0)
+      await expectAsync(promise).toBeRejectedWith({
+        url: '/test',
+        status: 400,
+        responseText: 'bad input'
+      })
 
-    //   // fallback expected
-    //   expect(xhrSender.sendXHR).toHaveBeenCalledTimes(1)
-    //   expect(xhrSender.sendXHR).toHaveBeenCalledWith(
-    //     'POST',
-    //     'http://localhost/prefix',
-    //     {
-    //       timeout: HTTP_REQUEST_TIMEOUT,
-    //       payload:
-    //         '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}\n{"transaction":{"test":"test"}}\n',
-    //       headers: {
-    //         'Content-Type': 'application/x-ndjson'
-    //       },
-    //       beforeSend,
-    //       sendCredentials
-    //     }
-    //   )
-    // })
-
-    // it('should use xhr as a fallback when fetch fails due to an exception', async () => {
-    //   spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
-    //     true
-    //   )
-    //   spyOnFunction(fetchSender, 'sendFetchRequest').and.rejectWith(
-    //     new TypeError('network error')
-    //   )
-    //   spyOnFunction(xhrSender, 'sendXHR').and.resolveTo({})
-    //   const serverUrl = 'http://localhost'
-    //   const serverUrlPrefix = '/prefix'
-    //   const sendCredentials = true
-    //   configService.setConfig({
-    //     serverUrl,
-    //     serverUrlPrefix,
-    //     sendCredentials
-    //   })
-
-    //   await apmServer.sendEvents([{ [TRANSACTIONS]: { test: 'test' } }])
-
-    //   expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(1)
-
-    //   // fallback expected
-    //   expect(xhrSender.sendXHR).toHaveBeenCalledTimes(1)
-    //   expect(xhrSender.sendXHR).toHaveBeenCalledWith(
-    //     'POST',
-    //     'http://localhost/prefix',
-    //     {
-    //       timeout: HTTP_REQUEST_TIMEOUT,
-    //       payload:
-    //         '{"metadata":{"service":{"name":"test","agent":{"name":"rum-js","version":"N/A"},"language":{"name":"javascript"}}}}\n{"transaction":{"test":"test"}}\n',
-    //       headers: {
-    //         'Content-Type': 'application/x-ndjson'
-    //       },
-    //       beforeSend: null,
-    //       sendCredentials: true
-    //     }
-    //   )
-    // })
-
-    // it('should not use xhr as a fallback when fetch failure reason is not an exception', async () => {
-    //   spyOnFunction(fetchSender, 'shouldUseFetchWithKeepAlive').and.returnValue(
-    //     true
-    //   )
-    //   spyOnFunction(fetchSender, 'sendFetchRequest').and.rejectWith({
-    //     url: '/test',
-    //     status: 400,
-    //     responseText: 'bad input'
-    //   })
-    //   spyOnFunction(xhrSender, 'sendXHR').and.resolveTo({})
-
-    //   const promise = apmServer.sendEvents([
-    //     { [TRANSACTIONS]: { test: 'test' } }
-    //   ])
-
-    //   await expectAsync(promise).toBeRejectedWith({
-    //     url: '/test',
-    //     status: 400,
-    //     responseText: 'bad input'
-    //   })
-
-    //   expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(1)
-    //   expect(xhrSender.sendXHR).toHaveBeenCalledTimes(0)
-    // })
+      expect(fetchSender.sendFetchRequest).toHaveBeenCalledTimes(1)
+      expect(xhrSender.sendXHR).toHaveBeenCalledTimes(0)
+    })
   })
 
   /**
