@@ -333,7 +333,6 @@ describe('Capture hard navigation', function () {
         span.type === 'resource' ||
         span.type === 'app'
     )
-    // TODO: this is getting less spans, why?
     expect(foundSpans.length).toBeGreaterThanOrEqual(3)
     unMock()
   })
