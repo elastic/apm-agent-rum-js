@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-export NODEJS_VERSION=$(cat .nvmrc)
+# export NODEJS_VERSION=$(cat .nvmrc)
+export NODEJS_VERSION=18
 export STACK_VERSION=${STACK_VERSION:-8.19.5}
 
 STACK_VERSION=${STACK_VERSION} \
