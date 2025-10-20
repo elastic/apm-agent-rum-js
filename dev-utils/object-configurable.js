@@ -25,6 +25,9 @@
 
 ;(function (defineProperty) {
   Object.defineProperty = function (obj, prop, desc) {
+    // CI was giving issue about defininig the prototype of
+    // certain Objects. This patch is for use `spyOn` on functions
+    // imported from modules so we can skip this property
     if (prop === 'prototype') return
     desc.configurable = true
     return defineProperty.call(obj, obj, prop, desc)

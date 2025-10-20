@@ -289,15 +289,11 @@ describe('ApmServer', function () {
     tr.end(100)
     const payload = performanceMonitoring.createTransactionDataModel(tr)
 
-    try {
-      await apmServer.sendEvents([
-        {
-          [TRANSACTIONS]: payload
-        }
-      ])
-    } catch (e) {
-      // APM Server not working
-    }
+    await apmServer.sendEvents([
+      {
+        [TRANSACTIONS]: payload
+      }
+    ])
   })
 
   it('should ndjson all events', async () => {
