@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -xo pipefail
 
-NODEJS_VERSION=18
+NODEJS_VERSION="18"
 STACK_VERSION=${STACK_VERSION:-"8.19.5"}
 APM_SERVER_PORT=${APM_SERVER_PORT:-"8200"}
 APM_SERVER_URL=${APM_SERVER_URL:-"http://apm-server:8200"}
@@ -12,6 +12,7 @@ KIBANA_URL=${KIBANA_URL:-"http://kibana:5601"}
 for i in {1..3};
 do
   USER_ID="$(id -u):$(id -g)" \
+  NODEJS_VERSION=${NODEJS_VERSION} \
   STACK_VERSION=${STACK_VERSION} \
   APM_SERVER_PORT=${APM_SERVER_PORT} \
   APM_SERVER_URL=${APM_SERVER_URL} \
