@@ -78,7 +78,7 @@ const baseConfig = {
   browserNoActivityTimeout: 120000,
   customLaunchers: getBrowserList(),
   browsers: [],
-  captureTimeout: 120000, // on saucelabs it takes some time to capture browser (review this)
+  captureTimeout: 120000, // (review this)
   reporters: ['spec', 'failed']
 }
 
