@@ -78,7 +78,7 @@ const baseConfig = {
   browserNoActivityTimeout: 120000,
   customLaunchers: getBrowserList(),
   browsers: [],
-  captureTimeout: 120000, // (review this)
+  captureTimeout: 120000, // TODO: this had been set when using Saucelabs, a lower value might suffice now
   reporters: ['spec', 'failed']
 }
 
