@@ -52,7 +52,7 @@ jobs:
         with:
           github-token: ${{ steps.get_token.outputs.token }}
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
 
