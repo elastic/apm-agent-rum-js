@@ -35,10 +35,7 @@ module.exports = function (config) {
   config.set(baseConfig)
   config.set({
     webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.REACT),
-    customLaunchers: getBrowserList('react').map(launcher => ({
-      ...launcher,
-      base: 'SauceLabs'
-    }))
+    customLaunchers: getBrowserList('react')
   })
   const preparedConfig = prepareConfig(config, 'rum-react')
   config.set(preparedConfig)

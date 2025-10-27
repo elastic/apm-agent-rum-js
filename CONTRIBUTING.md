@@ -117,14 +117,6 @@ $ npx lerna run --scope @elastic/apm-rum karma:dev -- --grep <path-to-test-file>
 $ npx lerna run --scope @elastic/apm-rum test:integration
 ```
 
-##### E2E tests (Saucelabs)
-
-E2E tests are run on Saucelabs, Before running these tests we have to set some environment variables to run all the tests on Saucelabs
-
-```sh
-$ MODE=saucelabs SAUCE_USERNAME=<username> SAUCE_ACCESS_KEY=<access-key> npx lerna run --scope @elastic/apm-rum test:sauce
-```
-
 ### Linting
 
 We use [prettier](https://github.com/prettier/prettier) for formatting code and [eslint](https://github.com/eslint/eslint) for other linting.

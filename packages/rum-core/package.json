@@ -24,8 +24,7 @@
     "bench": "NODE_ENV=production karma start karma.bench.conf.js",
     "karma:coverage": "karma start --coverage --singleRun",
     "test:unit": "npm run script runUnitTests packages/rum-core",
-    "test:sauce": "npm run script runSauceTests packages/rum-core true test:unit",
-    "test": "npm run test:sauce",
+    "test": "npm run test:unit",
     "script": "node ../../dev-utils/run-script.js"
   },
   "files": [

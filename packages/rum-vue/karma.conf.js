@@ -35,10 +35,7 @@ module.exports = function (config) {
   config.set(baseConfig)
   config.set({
     webpack: getWebpackConfig(BUNDLE_TYPES.BROWSER_DEV, PACKAGE_TYPES.VUE),
-    customLaunchers: getBrowserList('vue').map(launcher => ({
-      ...launcher,
-      base: 'SauceLabs'
-    }))
+    customLaunchers: getBrowserList('vue')
   })
   const preparedConfig = prepareConfig(config, 'rum-vue')
   config.set(preparedConfig)
