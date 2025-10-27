@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -xo pipefail
 
-STACK_VERSION=${STACK_VERSION:-"8.19.5"}
+STACK_VERSION=${STACK_VERSION:-"8.19.6"}
 APM_SERVER_PORT=${APM_SERVER_PORT:-"8200"}
 APM_SERVER_URL=${APM_SERVER_URL:-"http://apm-server:8200"}
 KIBANA_URL=${KIBANA_URL:-"http://kibana:5601"}
