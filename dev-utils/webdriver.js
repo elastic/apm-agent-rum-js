@@ -26,12 +26,7 @@
 const Promise = require('promise-polyfill')
 const { join } = require('path')
 const glob = require('glob')
-const {
-  getSauceConnectOptions,
-  getTestEnvironmentVariables,
-  getBrowserList,
-  getAppiumBrowsersForWebdriver
-} = require('./test-config')
+const { getBrowserList } = require('./test-config')
 
 const logLevels = {
   ALL: { value: Number.MIN_VALUE },
@@ -148,33 +143,15 @@ function getWebdriveBaseConfig(
   specs = './test/e2e/**/*.e2e-spec.js',
   capabilities
 ) {
-  const { tunnelIdentifier, username, accessKey } = getSauceConnectOptions()
-  /**
-   * Skip the ios platform on E2E tests because of script
-   * timeout issue in Appium
-   */
-  const browsers = [...getBrowserList(), ...getAppiumBrowsersForWebdriver()]
-  capabilities = (capabilities || browsers)
-    .map(c => {
-      const sauceOptions = c['sauce:options'] || {}
-      sauceOptions.tunnelIdentifier = tunnelIdentifier
-      sauceOptions.seleniumVersion = '3.141.59'
-
-      return {
-        ...c,
-        'sauce:options': sauceOptions
-      }
-    })
-    .filter(({ platformName }) => platformName !== 'iOS')
+  const browsers = getBrowserList()
+  capabilities = capabilities || browsers
 
   const baseConfig = {
     runner: 'local',
     specs: glob.sync(join(path, specs)),
     maxInstancesPerCapability: 3,
-    services: ['sauce'],
     user: username,
     key: accessKey,
-    sauceConnect: false,
     capabilities,
     logLevel: 'error',
     bail: 1,
@@ -216,27 +193,23 @@ function getWebdriveBaseConfig(
     }
   }
 
-  const { sauceLabs } = getTestEnvironmentVariables()
-
-  if (!sauceLabs) {
-    Object.assign(baseConfig, {
-      automationProtocol: 'devtools',
-      capabilities: [
-        {
-          browserName: 'chrome',
-          'goog:chromeOptions': {
-            headless: true
-          }
-        },
-        {
-          browserName: 'firefox',
-          'moz:firefoxOptions': {
-            headless: true
-          }
+  Object.assign(baseConfig, {
+    automationProtocol: 'devtools',
+    capabilities: [
+      {
+        browserName: 'chrome',
+        'goog:chromeOptions': {
+          headless: true
         }
-      ]
-    })
-  }
+      },
+      {
+        browserName: 'firefox',
+        'moz:firefoxOptions': {
+          headless: true
+        }
+      }
+    ]
+  })
 
   return baseConfig
 }

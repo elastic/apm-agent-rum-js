@@ -20,13 +20,6 @@ inputs:
     type: choice
     options:
       - none
-      - saucelabs
-  sauce-username:
-    description: 'Sauce username'
-    required: false
-  sauce-access-key:
-    description: 'Sauce access key'
-    required: false
 
 runs:
   using: "composite"
@@ -37,17 +30,6 @@ runs:
     - name: Pull and build docker infra
       run: './.ci/scripts/pull_and_build.sh'
       shell: bash
-    - if: |
-        (inputs.mode == 'saucelabs')
-        && (inputs.sauce-access-key != null && inputs.sauce-access-key != '')
-        && (inputs.sauce-username != null && inputs.sauce-username != '')
-      shell: bash
-      run: |
-        echo "SAUCE_ACCESS_KEY=$SAUCE_ACCESS_KEY" >> $GITHUB_ENV
-        echo "SAUCE_USERNAME=$SAUCE_USERNAME" >> $GITHUB_ENV
-      env:
-        SAUCE_ACCESS_KEY: ${{ inputs.sauce-access-key }}
-        SAUCE_USERNAME: ${{ inputs.sauce-username }}
     - name: Run tests Elastic Stack ${{ matrix.stack-version }} - ${{ matrix.scope }} - ${{ fromJSON('{"none":"Puppeteer"}')[inputs.mode] || inputs.mode }}
       run: './.ci/scripts/test.sh'
       shell: bash
@@ -70,9 +52,3 @@ runs:
         name: test-results-${{ steps.slug.outputs.slug }}
         path: |
           packages/**/reports/TESTS-*.xml
-    - name: Reset environment
-      if: always()
-      shell: bash
-      run: |
-        echo "SAUCE_ACCESS_KEY=" >> $GITHUB_ENV
-        echo "SAUCE_USERNAME="   >> $GITHUB_ENV

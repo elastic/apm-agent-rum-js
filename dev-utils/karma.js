@@ -23,12 +23,7 @@
  *
  */
 
-const {
-  getSauceConnectOptions,
-  getBrowserList,
-  getGlobalConfig,
-  getAppiumBrowsersForKarma
-} = require('./test-config')
+const { getBrowserList, getGlobalConfig } = require('./test-config')
 const { getWebpackConfig, BUNDLE_TYPES } = require('./build')
 
 /**
@@ -40,7 +35,6 @@ const polyfills = 'test/polyfills.+(js|ts)'
 
 const specPattern =
   'test/{*.spec.+(js|ts),!(e2e|integration|node|bundle|types)/**/*.spec.+(js|ts)}'
-const { tunnelIdentifier } = getSauceConnectOptions()
 
 // makes all object properties configurable by default
 // which in jasmine is essential to spy on functions exported from modules
@@ -62,7 +56,6 @@ const baseConfig = {
     [polyfills]: ['webpack']
   },
   plugins: [
-    'karma-sauce-launcher',
     'karma-jasmine',
     'karma-failed-reporter',
     'karma-spec-reporter',
@@ -83,27 +76,10 @@ const baseConfig = {
   },
   autoWatch: false,
   browserNoActivityTimeout: 120000,
-  customLaunchers: [...getBrowserList(), ...getAppiumBrowsersForKarma()].map(
-    launcher => ({
-      ...launcher,
-      base: 'SauceLabs'
-    })
-  ),
+  customLaunchers: getBrowserList(),
   browsers: [],
-  captureTimeout: 120000, // on saucelabs it takes some time to capture browser
-  reporters: ['spec', 'failed'],
-  sauceLabs: {
-    testName: 'ApmJs',
-    startConnect: false,
-    recordVideo: false,
-    recordScreenshots: true,
-    tunnelIdentifier,
-    options: {
-      commandTimeout: 600,
-      idleTimeout: 600,
-      maxDuration: 5400
-    }
-  }
+  captureTimeout: 120000, // TODO: this had been set when using Saucelabs, a lower value might suffice now
+  reporters: ['spec', 'failed']
 }
 
 function prepareConfig(config, packageName) {
@@ -111,7 +87,7 @@ function prepareConfig(config, packageName) {
   console.log('Global test Configuration: ', globalConfig)
   const { agentConfig, testConfig } = globalConfig
 
-  const { isCI, sauceLabs: isSauce } = testConfig
+  const { isCI } = testConfig
   let buildId = `ApmJs-${agentConfig.name}`
 
   if (isCI) {
@@ -128,18 +104,15 @@ function prepareConfig(config, packageName) {
       process.env.SCOPE
 
     config.plugins.push('karma-chrome-launcher')
-
-    if (!isSauce) {
-      config.browsers = ['ChromeHeadlessNoSandbox']
-      config.customLaunchers = {
-        ChromeHeadlessNoSandbox: {
-          base: 'ChromeHeadless',
-          flags: [
-            '--no-sandbox', // required to run without privileges in docker
-            '--user-data-dir=/tmp/chrome-test-profile',
-            '--disable-web-security'
-          ]
-        }
+    config.browsers = ['ChromeHeadlessNoSandbox']
+    config.customLaunchers = {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox', // required to run without privileges in docker
+          '--user-data-dir=/tmp/chrome-test-profile',
+          '--disable-web-security'
+        ]
       }
     }
     config.plugins.push('karma-junit-reporter')
@@ -172,20 +145,6 @@ function prepareConfig(config, packageName) {
       ],
       dir: 'coverage/'
     }
-  }
-
-  if (isSauce) {
-    console.log('prepareConfig: Run in SauceLab mode')
-    config.sauceLabs.build = buildId
-    console.log('saucelabs.build:', buildId)
-    if (isCI) {
-      config.sauceLabs.tags = [testConfig.branch, process.env.STACK_VERSION]
-    } else if (testConfig.branch === 'main') {
-      config.sauceLabs.tags = [testConfig.branch]
-    }
-    config.reporters.push('dots', 'saucelabs')
-    config.browsers = Object.keys(config.customLaunchers)
-    config.transports = ['polling']
   }
 
   return config

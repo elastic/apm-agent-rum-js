@@ -198,8 +198,6 @@ describe('PerformanceMonitoring', function () {
 
   it('should notify when a transaction has been filtered out', function () {
     spyOn(configService, 'dispatchEvent')
-    // NOTE: tests in SauceLabs fail because the duration becomes 1. Setting the start & end
-    // times will ensure `duration` is 0.
     var now = Date.now()
     var tr = new Transaction('transaction-no-duration', 'transaction-type', {
       startTime: now
