@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
   ELASTIC_CDN_BUCKET_NAME: ${{ inputs.dry-run == false && 'apm-rum-357700bc' || 'oblt-apm-rum-test' }}
@@ -22,9 +23,6 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     services:
       verdaccio:
         image: verdaccio/verdaccio:5
@@ -57,7 +55,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       # This prevent lerna command from throwing this error:
       # "Working tree has uncommitted changes, please commit or remove the following changes before continuing"
