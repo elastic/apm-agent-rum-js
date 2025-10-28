@@ -24,7 +24,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@v5
+    - uses: actions/setup-node@v6
       with:
         node-version-file: '.nvmrc'
     - name: Pull and build docker infra
@@ -47,7 +47,7 @@ runs:
         to-slug: ${{ inputs.goal }}-${{ inputs.mode }}-${{ inputs.scope }}-${{ inputs.stack-version }}
     - name: Store test results
       if: success() || failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: test-results-${{ steps.slug.outputs.slug }}
         path: |
