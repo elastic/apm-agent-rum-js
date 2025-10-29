@@ -34,7 +34,8 @@
     "script": "node ../../dev-utils/run-script.js"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "repository": {
     "type": "git",

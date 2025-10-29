@@ -12,7 +12,8 @@
     "directory": "packages/rum"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "scripts": {
     "prepublishOnly": "npm run build",
