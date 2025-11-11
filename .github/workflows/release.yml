@@ -57,21 +57,13 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Install dependencies
-        run: npm ci
-
-      # This prevent lerna command from throwing this error:
-      # "Working tree has uncommitted changes, please commit or remove the following changes before continuing"
-      - name: Ignore git uncommitted changes
-        run: |
-          git update-index --skip-worktree .npmrc
-
+        run: npm ci --ignore-scripts
+      
       - name: Publish the release
         env:
           DRY_RUN: "${{ inputs.dry-run }}"
           GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
-          npm run ci:release
+        run: npm run ci:release
 
         # The permissions configuration for this can be found at
         # https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/apm-agent-rum-js/02-gcp-oidc-elastic-cdn.tf

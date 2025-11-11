@@ -46,7 +46,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       # This prevent lerna command from throwing this error:
       # "Working tree has uncommitted changes, please commit or remove the following changes before continuing"
