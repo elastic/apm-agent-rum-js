@@ -27,13 +27,7 @@ import '@babel/polyfill'
 import 'whatwg-fetch'
 import React, { Suspense, lazy } from 'react'
 import { render } from 'react-dom'
-import {
-  BrowserRouter,
-  Route,
-  Link,
-  Navigate,
-  useLocation
-} from 'react-router-dom'
+import { BrowserRouter, Route, Link, Navigate, useLocation } from 'react-router'
 import MainComponent from '../components/main-component'
 import TopicComponent from '../components/topic-component'
 import FunctionalComponent from '../components/func-component'

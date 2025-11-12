@@ -27,13 +27,7 @@ import '@babel/polyfill'
 import 'whatwg-fetch'
 import React, { Suspense } from 'react'
 import { render } from 'react-dom'
-import {
-  BrowserRouter,
-  Link,
-  Route,
-  Navigate,
-  useLocation
-} from 'react-router-dom'
+import { BrowserRouter, Link, Route, Navigate, useLocation } from 'react-router'
 import FunctionalComponent from '../components/func-component'
 import { ApmRoutes } from '../../../src'
 import createApmBase from '..'

@@ -31,7 +31,7 @@ import {
   useNavigationType,
   matchRoutes,
   createRoutesFromChildren
-} from 'react-router-dom'
+} from 'react-router'
 import hoistNonReactStatics from 'hoist-non-react-statics'
 
 function getApmRoutes(apm) {
