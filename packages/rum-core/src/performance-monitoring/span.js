@@ -39,6 +39,10 @@ class Span extends SpanBase {
       this.action = fields[2]
     }
     this.sync = this.options.sync
+
+    if (this.options.spanContextCallback) {
+      this.addLabels(this.options.spanContextCallback())
+    }
   }
 
   end(endTime, data) {

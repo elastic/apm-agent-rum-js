@@ -108,6 +108,8 @@ declare module '@elastic/apm-rum' {
       payload?: string
       headers?: Record<string, string>
     }) => boolean
+    transactionContextCallback?: () => Labels
+    spanContextCallback?: () => Labels
   }
 
   export interface ErrorOptions {

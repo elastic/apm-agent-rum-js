@@ -54,6 +54,10 @@ class Transaction extends SpanBase {
 
     this.sampleRate = this.options.transactionSampleRate
     this.sampled = Math.random() <= this.sampleRate
+
+    if (this.options.transactionContextCallback) {
+      this.addLabels(this.options.transactionContextCallback())
+    }
   }
 
   addMarks(obj) {
@@ -96,7 +100,11 @@ class Transaction extends SpanBase {
     if (this.ended) {
       return
     }
-    const opts = extend({}, options)
+    let opts = extend({}, options)
+
+    if (this.options.spanContextCallback) {
+      opts.spanContextCallback = this.options.spanContextCallback
+    }
 
     opts.onEnd = trc => {
       this._onSpanEnd(trc)

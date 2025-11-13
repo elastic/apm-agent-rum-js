@@ -368,3 +368,30 @@ If APM Server is deployed in an origin different than the page’s origin, you w
 ::::
 
 
+### `transactionContextCallback` [transaction-context-callback]
+
+* **Type:** Function
+* **Default:** `null`
+
+`transactionContextCallback` allows the agent to specify a function to be called when starting automatically instrumented transactions and spans and return
+context to be set as tags. This enables the agent to capture the context when instrumented events are fired from files which do not import the RUM agent library.
+
+The following example illustrates an example which captures the stack trace:
+
+```js
+var options = {
+  transactionContextCallback: () => {
+    let stack
+    try {
+      throw new Error('')
+    }
+    catch (error) {
+      stack = (error as Error).stack || ''
+    }
+    stack = stack.split('\n').map(function (line) { return line.trim(); })
+    return { stack };
+  }
+}
+```
+
+
