@@ -26,6 +26,7 @@
 import { getCurrentScript, setLabel, merge, extend, isUndefined } from './utils'
 import EventHandler from './event-handler'
 import { CONFIG_CHANGE, LOCAL_CONFIG_KEY } from './constants'
+import { __DEV__ } from '../state'
 
 function getConfigFromScript() {
   var script = getCurrentScript()
@@ -124,11 +125,23 @@ class Config {
   }
 
   applyFilters(data) {
-    for (var i = 0; i < this.filters.length; i++) {
-      data = this.filters[i](data)
-      if (!data) {
+    try {
+      for (var i = 0; i < this.filters.length; i++) {
+        data = this.filters[i](data)
+        if (!data) {
+          return
+        }
+      }
+      data.transactions = data.transactions.filter(t => t)
+      data.errors = data.errors.filter(e => e)
+      if (data.transactions.length === 0 && data.errors.length === 0) {
         return
       }
+    } catch (e) {
+      if (__DEV__) {
+        console.log('[Elastic APM] Error applying filters for RUM payload', e)
+      }
+      return
     }
     return data
   }

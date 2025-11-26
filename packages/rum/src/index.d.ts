@@ -187,7 +187,35 @@ interface ServiceFactory {
 }
 
 type FilterFn = (payload: Payload) => Payload | boolean | void
-type Payload = { [key: string]: any }
+// type Payload = { [key: string]: any }
+type SpanPayload = {
+  trace_id: string
+  transaction_id: string
+  parent_id: string
+  id: string
+  type: string
+  subtype: string
+  name: string
+}
+type TransactionPayload = {
+  trace_id: string
+  id: string
+  type: string
+  name: string
+  spans: SpanPayload[]
+}
+type ErrorPayload = {
+  id: string
+  exception: {
+    type: string
+    message: string
+  }
+}
+type Payload = {
+  transactions: TransactionPayload[]
+  errors: ErrorPayload[]
+  [key: string]: any
+}
 
 type TaskId = string | number
 type LabelValue = string | number | boolean
