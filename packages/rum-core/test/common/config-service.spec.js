@@ -93,7 +93,7 @@ describe('ConfigService', function () {
       throw new Error('Out of reach!')
     })
 
-    result = configService.applyFilters(payload)
+    result = configService.applyFilters(rawPayload)
     expect(result).toBeUndefined()
   })
 
