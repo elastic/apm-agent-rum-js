@@ -24,8 +24,8 @@
  */
 
 import { TestBed, ComponentFixture } from '@angular/core/testing'
-import { NgModule, Component, Injectable } from '@angular/core'
-import { Routes, Router, CanActivate } from '@angular/router'
+import { NgModule, Component } from '@angular/core'
+import { Routes, Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Location } from '@angular/common'
 import { ApmBase } from '@elastic/apm-rum'
@@ -77,19 +77,11 @@ class SlugComponent {}
 })
 class AppComponent {}
 
-@Injectable()
-class CanActivateFail implements CanActivate {
-  canActivate(): any {
-    throw Error('Navigation failed to activate!!!')
-  }
-}
-
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: 'lazy', loadChildren: () => LazyModule },
-  { path: 'slug/:id', component: SlugComponent },
-  { path: 'failing', component: SlugComponent, canActivate: [CanActivateFail] }
+  { path: 'slug/:id', component: SlugComponent }
 ]
 
 describe('ApmService', () => {
@@ -103,7 +95,7 @@ describe('ApmService', () => {
     TestBed.configureTestingModule({
       imports: [ApmModule, RouterTestingModule.withRoutes(routes)],
       declarations: [HomeComponent, AppComponent, SlugComponent],
-      providers: [ApmService, CanActivateFail]
+      providers: [ApmService]
     }).compileComponents()
 
     TestBed.overrideProvider(APM, {
@@ -263,13 +255,13 @@ describe('ApmService', () => {
       const path = location.path()
       const tr = service.apm.getCurrentTransaction()
       fixture.ngZone.run(() => {
-        router.navigate(['/failing']).then(() => {
+        router.navigate(['/invalid-route']).then(() => {
           expect(location.path()).toBe(path)
           expect(compiled.querySelector('ng-component').textContent).toBe(
             'Slug'
           )
           expect(service.apm.startTransaction).toHaveBeenCalledWith(
-            '/failing',
+            '/invalid-route',
             'route-change',
             {
               managed: true,
@@ -277,7 +269,7 @@ describe('ApmService', () => {
             }
           )
           expect(service.apm.captureError).toHaveBeenCalledWith('error')
-          expect(tr.name).toEqual('/failing')
+          expect(tr.name).toEqual('/invalid-route')
 
           done()
         })
