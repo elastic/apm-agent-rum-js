@@ -89,7 +89,11 @@ const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'lazy', loadChildren: () => LazyModule },
   { path: 'slug/:id', component: SlugComponent },
-  { path: 'invalid-route', canActivate: [CanActivateReject] }
+  {
+    path: 'invalid-route',
+    component: SlugComponent,
+    canActivate: [CanActivateReject]
+  }
 ]
 
 describe('ApmService', () => {
