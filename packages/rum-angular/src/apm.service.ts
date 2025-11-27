@@ -59,6 +59,7 @@ export class ApmService {
   }
 
   observe() {
+    const apm = this.apm
     let transaction
     this.router.events.subscribe(event => {
       const eventName = event.toString()
@@ -69,6 +70,11 @@ export class ApmService {
           canReuse: true
         })
       } else if (eventName.indexOf('NavigationError') >= 0) {
+        // @ts-expect-error - error prop not defined in types fot this angular version
+        const err = event.error
+        if (err) {
+          apm.captureError(err)
+        }
         transaction && transaction.detectFinish()
       } else if (eventName.indexOf('NavigationEnd') >= 0) {
         if (!transaction) {

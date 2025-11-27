@@ -24,8 +24,8 @@
  */
 
 import { TestBed, ComponentFixture } from '@angular/core/testing'
-import { NgModule, Component } from '@angular/core'
-import { Routes, Router } from '@angular/router'
+import { NgModule, Component, Injectable } from '@angular/core'
+import { Routes, Router, CanActivate } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Location } from '@angular/common'
 import { ApmBase } from '@elastic/apm-rum'
@@ -77,11 +77,19 @@ class SlugComponent {}
 })
 class AppComponent {}
 
+@Injectable()
+class CanActivateFail implements CanActivate {
+  canActivate(): any {
+    throw Error('Navigation failed to activate!!!')
+  }
+}
+
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: 'lazy', loadChildren: () => LazyModule },
-  { path: 'slug/:id', component: SlugComponent }
+  { path: 'slug/:id', component: SlugComponent },
+  { path: 'failing', component: SlugComponent, canActivate: [CanActivateFail] }
 ]
 
 describe('ApmService', () => {
@@ -243,6 +251,33 @@ describe('ApmService', () => {
             }
           )
           expect(tr.name).toEqual('/lazy/:id')
+
+          done()
+        })
+      })
+    })
+
+    it('should capture navigation errors', done => {
+      spyOn(service.apm, 'startTransaction').and.callThrough()
+      spyOn(service.apm, 'captureError').and.callThrough()
+      const path = location.path()
+      const tr = service.apm.getCurrentTransaction()
+      fixture.ngZone.run(() => {
+        router.navigate(['/failing']).then(() => {
+          expect(location.path()).toBe(path)
+          expect(compiled.querySelector('ng-component').textContent).toBe(
+            'Slug'
+          )
+          expect(service.apm.startTransaction).toHaveBeenCalledWith(
+            '/failing',
+            'route-change',
+            {
+              managed: true,
+              canReuse: true
+            }
+          )
+          expect(service.apm.captureError).toHaveBeenCalledWith('error')
+          expect(tr.name).toEqual('/failing')
 
           done()
         })
