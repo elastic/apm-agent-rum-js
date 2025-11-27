@@ -103,7 +103,7 @@ describe('ApmService', () => {
     TestBed.configureTestingModule({
       imports: [ApmModule, RouterTestingModule.withRoutes(routes)],
       declarations: [HomeComponent, AppComponent, SlugComponent],
-      providers: [ApmService]
+      providers: [ApmService, CanActivateFail]
     }).compileComponents()
 
     TestBed.overrideProvider(APM, {
