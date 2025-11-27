@@ -24,8 +24,8 @@
  */
 
 import { TestBed, ComponentFixture } from '@angular/core/testing'
-import { NgModule, Component } from '@angular/core'
-import { Routes, Router, NavigationError } from '@angular/router'
+import { NgModule, Component, Injectable } from '@angular/core'
+import { Routes, Router, NavigationError, CanActivate } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Location } from '@angular/common'
 import { ApmBase } from '@elastic/apm-rum'
@@ -77,11 +77,19 @@ class SlugComponent {}
 })
 class AppComponent {}
 
+@Injectable()
+class CanActivateReject implements CanActivate {
+  canActivate(): any {
+    return false
+  }
+}
+
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: 'lazy', loadChildren: () => LazyModule },
-  { path: 'slug/:id', component: SlugComponent }
+  { path: 'slug/:id', component: SlugComponent },
+  { path: 'invalid-route', canActivate: [CanActivateReject] }
 ]
 
 describe('ApmService', () => {
@@ -95,7 +103,7 @@ describe('ApmService', () => {
     TestBed.configureTestingModule({
       imports: [ApmModule, RouterTestingModule.withRoutes(routes)],
       declarations: [HomeComponent, AppComponent, SlugComponent],
-      providers: [ApmService]
+      providers: [ApmService, CanActivateReject]
     }).compileComponents()
 
     TestBed.overrideProvider(APM, {
