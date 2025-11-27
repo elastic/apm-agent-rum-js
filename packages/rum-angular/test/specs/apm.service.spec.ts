@@ -25,7 +25,7 @@
 
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { NgModule, Component } from '@angular/core'
-import { Routes, Router } from '@angular/router'
+import { Routes, Router, NavigationError } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Location } from '@angular/common'
 import { ApmBase } from '@elastic/apm-rum'
@@ -251,10 +251,16 @@ describe('ApmService', () => {
 
     it('should capture navigation errors', done => {
       spyOn(service.apm, 'startTransaction').and.callThrough()
-      spyOn(service.apm, 'captureError').and.callThrough()
+      spyOn(service.apm, 'captureError')
       const path = location.path()
       const tr = service.apm.getCurrentTransaction()
+      let err
       fixture.ngZone.run(() => {
+        router.events.subscribe(event => {
+          if (event instanceof NavigationError) {
+            err = event.error
+          }
+        })
         router.navigate(['/invalid-route']).then(() => {
           expect(location.path()).toBe(path)
           expect(compiled.querySelector('ng-component').textContent).toBe(
@@ -268,7 +274,7 @@ describe('ApmService', () => {
               canReuse: true
             }
           )
-          expect(service.apm.captureError).toHaveBeenCalledWith('error')
+          expect(service.apm.captureError).toHaveBeenCalledWith(err)
           expect(tr.name).toEqual('/invalid-route')
 
           done()
