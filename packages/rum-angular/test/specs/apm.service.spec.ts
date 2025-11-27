@@ -264,7 +264,6 @@ describe('ApmService', () => {
     it('should capture navigation errors', done => {
       spyOn(service.apm, 'startTransaction').and.callThrough()
       spyOn(service.apm, 'captureError')
-      const path = location.path()
       const tr = service.apm.getCurrentTransaction()
       let err
       fixture.ngZone.run(() => {
@@ -274,9 +273,9 @@ describe('ApmService', () => {
           }
         })
         router.navigate(['/invalid-route']).then(() => {
-          expect(location.path()).toBe(path)
+          expect(location.path()).toBe('/')
           expect(compiled.querySelector('ng-component').textContent).toBe(
-            'Slug'
+            'Home'
           )
           expect(service.apm.startTransaction).toHaveBeenCalledWith(
             '/invalid-route',
