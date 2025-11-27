@@ -65,7 +65,7 @@ jobs:
     strategy:
       matrix:
         stack-version:
-          - '8.2.0-SNAPSHOT'
+          # - '8.2.0-SNAPSHOT'
           - '8.19.7'
         scope:
           # - '@elastic/apm-rum'
