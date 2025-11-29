@@ -70,7 +70,7 @@ export class ApmService {
           canReuse: true
         })
       } else if (eventName.indexOf('NavigationError') >= 0) {
-        // @ts-expect-error - error prop not defined in types fot this angular version
+        // @ts-expect-error - error prop not defined in types for this angular version
         const err = event.error
         if (err) {
           apm.captureError(err)

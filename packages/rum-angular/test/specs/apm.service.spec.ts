@@ -25,7 +25,7 @@
 
 import { TestBed, ComponentFixture } from '@angular/core/testing'
 import { NgModule, Component, Injectable } from '@angular/core'
-import { Routes, Router, NavigationError, CanActivate } from '@angular/router'
+import { Routes, Router, Resolve } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Location } from '@angular/common'
 import { ApmBase } from '@elastic/apm-rum'
@@ -78,9 +78,9 @@ class SlugComponent {}
 class AppComponent {}
 
 @Injectable()
-class CanActivateReject implements CanActivate {
-  canActivate(): any {
-    return false
+class ResolveBogus implements Resolve<any> {
+  resolve() {
+    throw new Error('Method not implemented.')
   }
 }
 
@@ -90,9 +90,11 @@ const routes: Routes = [
   { path: 'lazy', loadChildren: () => LazyModule },
   { path: 'slug/:id', component: SlugComponent },
   {
-    path: 'invalid-route',
+    path: 'error-route',
     component: SlugComponent,
-    canActivate: [CanActivateReject]
+    resolve: {
+      data: ResolveBogus
+    }
   }
 ]
 
@@ -107,7 +109,7 @@ describe('ApmService', () => {
     TestBed.configureTestingModule({
       imports: [ApmModule, RouterTestingModule.withRoutes(routes)],
       declarations: [HomeComponent, AppComponent, SlugComponent],
-      providers: [ApmService, CanActivateReject]
+      providers: [ApmService, ResolveBogus]
     }).compileComponents()
 
     TestBed.overrideProvider(APM, {
@@ -265,31 +267,28 @@ describe('ApmService', () => {
       spyOn(service.apm, 'startTransaction').and.callThrough()
       spyOn(service.apm, 'captureError')
       const tr = service.apm.getCurrentTransaction()
-      let err
-      fixture.ngZone.run(() => {
-        router.events.subscribe(event => {
-          if (event instanceof NavigationError) {
-            err = event.error
-          }
-        })
-        router.navigate(['/invalid-route']).then(() => {
-          expect(location.path()).toBe('/')
-          // expect(compiled.querySelector('ng-component').textContent).toBe(
-          //   'Home'
-          // )
-          expect(service.apm.startTransaction).toHaveBeenCalledWith(
-            '/invalid-route',
-            'route-change',
-            {
-              managed: true,
-              canReuse: true
-            }
-          )
-          expect(service.apm.captureError).toHaveBeenCalledWith(err)
-          expect(tr.name).toEqual('/invalid-route')
 
-          done()
-        })
+      fixture.ngZone.run(() => {
+        router.navigate(['/error-route']).then(
+          () => {
+            throw new Error('navigation should fail')
+          },
+          navError => {
+            expect(location.path()).toBe('/')
+            expect(service.apm.startTransaction).toHaveBeenCalledWith(
+              '/error-route',
+              'route-change',
+              {
+                managed: true,
+                canReuse: true
+              }
+            )
+            expect(service.apm.captureError).toHaveBeenCalledWith(navError)
+            expect(tr.name).toEqual('/error-route')
+
+            done()
+          }
+        )
       })
     })
   })
