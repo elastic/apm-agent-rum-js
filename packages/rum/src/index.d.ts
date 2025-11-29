@@ -187,7 +187,6 @@ interface ServiceFactory {
 }
 
 type FilterFn = (payload: Payload) => Payload | boolean | void
-// type Payload = { [key: string]: any }
 type SpanPayload = {
   trace_id: string
   transaction_id: string
