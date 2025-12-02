@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 
 USER_ID="$(id -u):$(id -g)"
-# The migration of this to Node.js 18 will wait. To update playwright (and browsers)
-# to make it work in Node.js 18 and latest version in ubuntu (or another OS)
-# will require us to invest a certain amount of time
-NODEJS_VERSION=14
+NODEJS_VERSION=20
 
 USER_ID="${USER_ID}" \
 NODEJS_VERSION="${NODEJS_VERSION}" \
