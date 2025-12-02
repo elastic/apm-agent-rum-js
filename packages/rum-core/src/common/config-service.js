@@ -95,7 +95,8 @@ class Config {
       context: {},
       session: false,
       apmRequest: null,
-      sendCredentials: false
+      sendCredentials: false,
+      sendAllRouteChanges: false
     }
 
     this.events = new EventHandler()
