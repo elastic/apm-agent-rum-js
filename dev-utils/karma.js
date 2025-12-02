@@ -111,7 +111,9 @@ function prepareConfig(config, packageName) {
         flags: [
           '--no-sandbox', // required to run without privileges in docker
           '--user-data-dir=/tmp/chrome-test-profile',
-          '--disable-web-security'
+          '--disable-web-security',
+          '--disable-dev-shm-usage',
+          '--disable-gpu'
         ]
       }
     }

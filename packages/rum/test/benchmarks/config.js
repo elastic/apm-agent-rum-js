@@ -48,7 +48,12 @@ module.exports = {
     memorySamplingInterval: 10,
     launchOptions: {
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu'
+      ]
     }
   }
 }
