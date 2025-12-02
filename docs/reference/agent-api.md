@@ -130,7 +130,7 @@ apm.addFilter(function (payload) {
 ```
 
 ::::{note}
-The payload will be dropped if one of the filters return a falsy value.
+The payload will be dropped if one of the filters return a falsy value or if after applying all filters the transactions and errors arrays are empty.
 ::::
 
 

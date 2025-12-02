@@ -195,7 +195,6 @@
     "@elastic/apm-rum-vue": "file:packages/rum-vue"
   },
   "engines": {
-    "node": ">=12 <=16",
-    "npm": "6"
+    "node": ">=20.0.0"
   }
 }
