@@ -188,20 +188,15 @@ interface ServiceFactory {
 
 type FilterFn = (payload: Payload) => Payload | boolean | void
 type SpanPayload = {
-  trace_id: string
-  transaction_id: string
-  parent_id: string
   id: string
   type: string
-  subtype: string
   name: string
 }
 type TransactionPayload = {
-  trace_id: string
   id: string
   type: string
   name: string
-  spans: SpanPayload[]
+  spans: Partial<SpanPayload>[]
 }
 type ErrorPayload = {
   id: string
@@ -211,8 +206,8 @@ type ErrorPayload = {
   }
 }
 type Payload = {
-  transactions: TransactionPayload[]
-  errors: ErrorPayload[]
+  transactions: Partial<TransactionPayload>[]
+  errors: Partial<ErrorPayload>[]
   [key: string]: any
 }
 
