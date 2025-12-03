@@ -48,8 +48,7 @@ import {
   OUTCOME_SUCCESS,
   OUTCOME_UNKNOWN,
   QUEUE_ADD_TRANSACTION,
-  TRANSACTION_IGNORE,
-  ROUTE_CHANGE
+  TRANSACTION_IGNORE
 } from '../common/constants'
 import {
   truncateModel,
@@ -362,13 +361,8 @@ export default class PerformanceMonitoring {
         return false
       }
 
-      if (tr.sampled && tr.spans.length === 0) {
-        if (
-          tr.type === ROUTE_CHANGE &&
-          this._configService.get('sendAllRouteChanges')
-        ) {
-          return true
-        }
+      const recordEmpty = this._configService.get('recordEmptyTransactions')
+      if (tr.sampled && tr.spans.length === 0 && !recordEmpty) {
         if (__DEV__) {
           this._logginService.debug(
             `transaction(${tr.id}, ${tr.name}) was discarded! Transaction does not have any spans`

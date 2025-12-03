@@ -368,9 +368,9 @@ If APM Server is deployed in an origin different than the page’s origin, you w
 ::::
 
 
-### `sendAllRouteChanges` [send-all-route-changes]
+### `recordEmptyTransactions` [record-empty-transactions]
 
 * **Type:** Boolean
 * **Default:** `false`
 
-This allows the agent to send all `route-change` transactions regardless if it contains any spans or not. This is usefull if you want to keep track of all the navigations your app is doing.
+If you are interested also for transactions that have no spans you can set this configuration option to true. Bear in mind that sampling rate still applies even if this setting is set to `true`.
