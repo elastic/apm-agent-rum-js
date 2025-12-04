@@ -127,6 +127,23 @@ describe('PerformanceMonitoring', function () {
     )
   })
 
+  it('should allow transactions with no spans if enabled by configuration', () => {
+    spyOn(logger, 'debug').and.callThrough()
+    configService.setConfig({
+      ...agentConfig,
+      reportTransactionsWithoutSpans: true
+    })
+    const transaction1 = new Transaction('transaction', 'custom', {
+      id: 1,
+      startTime: 0,
+      managed: true
+    })
+    transaction1.end(600)
+    expect(transaction1.duration()).toBe(600)
+    expect(performanceMonitoring.filterTransaction(transaction1)).toBe(true)
+    expect(logger.debug).not.toHaveBeenCalled()
+  })
+
   it('should initialize and add transaction to the queue', async () => {
     performanceMonitoring.init()
     spyOn(apmServer, 'addTransaction')

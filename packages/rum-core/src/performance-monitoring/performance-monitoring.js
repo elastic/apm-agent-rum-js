@@ -361,7 +361,10 @@ export default class PerformanceMonitoring {
         return false
       }
 
-      if (tr.sampled && tr.spans.length === 0) {
+      const recordEmpty = this._configService.get(
+        'reportTransactionsWithoutSpans'
+      )
+      if (tr.sampled && tr.spans.length === 0 && !recordEmpty) {
         if (__DEV__) {
           this._logginService.debug(
             `transaction(${tr.id}, ${tr.name}) was discarded! Transaction does not have any spans`
