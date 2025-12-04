@@ -131,7 +131,7 @@ describe('PerformanceMonitoring', function () {
     spyOn(logger, 'debug').and.callThrough()
     configService.setConfig({
       ...agentConfig,
-      recordTransactionsWithoutSpans: true
+      reportTransactionsWithoutSpans: true
     })
     const transaction1 = new Transaction('transaction', 'custom', {
       id: 1,

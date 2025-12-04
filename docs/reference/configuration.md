@@ -368,7 +368,7 @@ If APM Server is deployed in an origin different than the page’s origin, you w
 ::::
 
 
-### `recordTransactionsWithoutSpans` [record-transactions-without-spans]
+### `reportTransactionsWithoutSpans` [report-transactions-without-spans]
 
 * **Type:** Boolean
 * **Default:** `false`

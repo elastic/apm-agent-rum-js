@@ -362,7 +362,7 @@ export default class PerformanceMonitoring {
       }
 
       const recordEmpty = this._configService.get(
-        'recordTransactionsWithoutSpans'
+        'reportTransactionsWithoutSpans'
       )
       if (tr.sampled && tr.spans.length === 0 && !recordEmpty) {
         if (__DEV__) {
