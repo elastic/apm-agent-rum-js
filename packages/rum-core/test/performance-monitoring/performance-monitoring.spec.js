@@ -129,7 +129,10 @@ describe('PerformanceMonitoring', function () {
 
   it('should allow transactions with no spans if enabled by configuration', () => {
     spyOn(logger, 'debug').and.callThrough()
-    configService.setConfig({ ...agentConfig, recordEmptyTransactions: true })
+    configService.setConfig({
+      ...agentConfig,
+      recordTransactionsWithoutSpans: true
+    })
     const transaction1 = new Transaction('transaction', 'custom', {
       id: 1,
       startTime: 0,

@@ -361,7 +361,9 @@ export default class PerformanceMonitoring {
         return false
       }
 
-      const recordEmpty = this._configService.get('recordEmptyTransactions')
+      const recordEmpty = this._configService.get(
+        'recordTransactionsWithoutSpans'
+      )
       if (tr.sampled && tr.spans.length === 0 && !recordEmpty) {
         if (__DEV__) {
           this._logginService.debug(
