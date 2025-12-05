@@ -136,7 +136,7 @@ async function prodMode() {
 
   try {
     await execa('npx',
-      ['lerna', 'publish', 'from-package', '--no-push', '--no-git-tag-version', '--no-changelog', '--yes'],
+      ['lerna', 'publish', 'from-package', '--no-push', '--no-git-tag-version', '--no-changelog', '--yes', '--loglevel=debug'],
       { stdin: process.stdin}
     )
       .pipeStdout(process.stdout)
