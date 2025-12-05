@@ -41,7 +41,7 @@ import {
   useLocation,
   useSearchParams,
   Navigate
-} from 'react-router-dom'
+} from 'react-router'
 import { ApmBase } from '@elastic/apm-rum'
 import {
   createServiceFactory,
