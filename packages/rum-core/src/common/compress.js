@@ -77,7 +77,7 @@ function compressContext(context) {
     return null
   }
   const compressed = {}
-  const { page, http, response, destination, user, custom } = context
+  const { page, http, response, destination, user, custom, tags } = context
 
   if (page) {
     compressed.p = {
@@ -112,6 +112,9 @@ function compressContext(context) {
   }
   if (custom) {
     compressed.cu = custom
+  }
+  if (tags) {
+    compressed.g = tags
   }
 
   return compressed
