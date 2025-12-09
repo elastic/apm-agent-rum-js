@@ -106,6 +106,14 @@ async function dryRunMode() {
   }
 
   try {
+    // This prevent lerna command from throwing this error in dry-run mode:
+    // "Working tree has uncommitted changes, please commit or remove the following changes before continuing"
+    await execa(
+      'git',
+      ['update-index', '--skip-worktree', '.npmrc']
+    )
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
     await execa(
       'npx',
       ['lerna', 'publish', 'from-package', `--registry=${registryUrl}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes', '--loglevel=debug'],
