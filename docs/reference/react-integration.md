@@ -138,7 +138,7 @@ When the route is rendered lazily with components using `React.lazy` or a simila
 
 ```js
 import React, { Component, Suspense, lazy } from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch } from 'react-router'
 import { withTransaction } from '@elastic/apm-rum-react'
 
 const Loading = () => <div>Loading</div>
@@ -158,5 +158,3 @@ function Routes() {
 class LazyComponent extends Component {}
 export default withTransaction('LazyComponent', 'component')(LazyComponent)
 ```
-
-
