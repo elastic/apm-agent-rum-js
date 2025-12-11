@@ -94,7 +94,9 @@ jobs:
           glob: '*.js'
           process_gcloudignore: false
           headers: |-
-            cache-control: public,max-age=31536000,immutable
+            cache-control: public
+            max-age: 31536000
+            immutable
 
       - id: 'upload-files-major-version'
         if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js') }}
@@ -106,7 +108,9 @@ jobs:
           glob: '*.js'
           process_gcloudignore: false
           headers: |-
-            cache-control: public,max-age=604800,immutable
+            cache-control: public
+            max-age: 604800
+            immutable
 
       - id: 'upload-file-index'
         if: ${{ always() && hashFiles('index.html') }}
@@ -117,7 +121,9 @@ jobs:
           destination: '${{ env.ELASTIC_CDN_BUCKET_NAME }}'
           process_gcloudignore: false
           headers: |-
-            cache-control: public,max-age=604800,immutable
+            cache-control: public
+            max-age: 604800
+            immutable
 
       - name: Post-release
         env:
