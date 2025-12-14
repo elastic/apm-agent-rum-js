@@ -47,7 +47,7 @@ runs:
         to-slug: ${{ inputs.goal }}-${{ inputs.mode }}-${{ inputs.scope }}-${{ inputs.stack-version }}
     - name: Store test results
       if: success() || failure()
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: test-results-${{ steps.slug.outputs.slug }}
         path: |
