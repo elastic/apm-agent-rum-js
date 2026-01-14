@@ -124,6 +124,23 @@ describe('fetchPatch', function () {
         })
       })
 
+      it('should fetch correctly when using REQUEST object as input with options', function (done) {
+        var fetchArgs = createFetchArgs('PATCH')
+        var newFetchArgs = createFetchArgs('POST')
+        var promise = window.fetch(
+          new Request(fetchArgs.url, fetchArgs.options),
+          newFetchArgs.options
+        )
+
+        expect(typeof promise.then).toBe('function')
+        expect(events.map(e => e.event)).toEqual(['schedule'])
+
+        // Validate that fetch has been called with the proper data
+        const data = events[0].task.data
+        validateFetchData(data, newFetchArgs)
+        done()
+      })
+
       it('should produce task events when fetch fails', function (done) {
         var promise = window.fetch('http://localhost:54321/')
         promise.catch(function (error) {
