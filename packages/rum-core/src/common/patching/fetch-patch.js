@@ -87,7 +87,7 @@ export function patchFetch(callback) {
         url = input
       }
     } else if (input) {
-      request = input
+      request = init ? new Request(input, init) : input
       url = request.url
     } else {
       return nativeFetch.apply(fetchSelf, args)
