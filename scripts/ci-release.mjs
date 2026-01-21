@@ -114,11 +114,9 @@ async function dryRunMode() {
     )
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
-    delete process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN
-    console.log('ACTIONS_ID_TOKEN_REQUEST_TOKEN value is **' + process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN + '**')
     await execa(
       'npx',
-      ['lerna', 'publish', 'from-package', `--registry=${registryUrl}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes', '--loglevel=debug'],
+      ['lerna', 'publish', 'from-package', `--registry=${registryUrl}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes', '--dry-run'],
       { stdin: process.stdin }
     )
       .pipeStdout(process.stdout)
