@@ -59,8 +59,31 @@ jobs:
 #              context: `${context.workflow} / Bundlesize: ${BUNDLESIZE_PASS} pass / ${BUNDLESIZE_FAIL} fail`,
 #            });
 
-  test-puppeteer:
-    name: Test Puppeteer
+  # test-puppeteer:
+  #   name: Test Puppeteer
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       stack-version:
+  #         - '8.2.0-SNAPSHOT'
+  #         - '8.19.8'
+  #       scope:
+  #         - '@elastic/apm-rum'
+  #         - '@elastic/apm-rum-core'
+  #         - '@elastic/apm-rum-react'
+  #         - '@elastic/apm-rum-angular'
+  #         - '@elastic/apm-rum-vue'
+  #   steps:
+  #     - uses: actions/checkout@v6
+
+  #     - name: Run puppeteer tests
+  #       uses: ./.github/workflows/run-test
+  #       with:
+  #         goal: 'test'
+  #         scope: ${{ matrix.scope }}
+  #         stack-version: ${{ matrix.stack-version }}
+  test:
+    name: Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -75,13 +98,13 @@ jobs:
           - '@elastic/apm-rum-vue'
     steps:
       - uses: actions/checkout@v6
-
-      - name: Run puppeteer tests
-        uses: ./.github/workflows/run-test
+      - uses: actions/setup-node@v6
         with:
-          goal: 'test'
-          scope: ${{ matrix.scope }}
-          stack-version: ${{ matrix.stack-version }}
+          node-version-file: '.nvmrc'
+      - name: Start Stack
+        run: STACK_VERSION=${{ matrix.stack-version }} docker compose -f ./dev-utils/docker-compose.yml up -d fleet-server
+      - name: Run Tests
+        run: SCOPE=${{ matrix.scope }} npm run test
 
   npm-ci:
     runs-on: ubuntu-latest
@@ -101,7 +124,7 @@ jobs:
     needs:
       - lint
       - npm-ci
-      - test-puppeteer
+      - test
     steps:
       - id: check
         uses: elastic/oblt-actions/check-dependent-jobs@v1
