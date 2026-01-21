@@ -114,15 +114,10 @@ async function dryRunMode() {
     )
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
-    // It appears Verdaccio does not implement trusted publishers. Unsetting the right
-    // env vars will skip OIDC requests.
-    // ref: https://github.com/lerna/lerna/blob/main/libs/core/src/lib/oidc.ts#L46
-    const env = Object.assign({}, process.env);
-    delete env.GITHUB_ACTIONS
     await execa(
       'npx',
       ['lerna', 'publish', 'from-package', `--registry=${registryUrl}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes', '--loglevel=debug'],
-      { stdin: process.stdin, env }
+      { stdin: process.stdin }
     )
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
