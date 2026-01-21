@@ -114,8 +114,8 @@ async function dryRunMode() {
     )
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
-    delete process.env.GITHUB_ACTIONS
-    console.log('GITHUB_ACTIONS value is **' + process.env.GITHUB_ACTIONS + '**')
+    delete process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN
+    console.log('ACTIONS_ID_TOKEN_REQUEST_TOKEN value is **' + process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN + '**')
     await execa(
       'npx',
       ['lerna', 'publish', 'from-package', `--registry=${registryUrl}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes', '--loglevel=debug'],
