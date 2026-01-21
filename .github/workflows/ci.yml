@@ -107,6 +107,20 @@ jobs:
         run: npm ci
       - name: Run Tests
         run: SCOPE=${{ matrix.scope }} npm run test
+      # The upload-artifact action fails if the name contains slashes `/` or colons `:`.
+      # This step creates a slugified version that will not contain these characters.
+      - uses: gacts/github-slug@91cb78e803e07ccf88570afeddeabaad93c8f4cb # 1.3.4
+        id: slug
+        if: success() || failure()
+        with:
+          to-slug: coverage-${{ matrix.scope }}-${{ matrix.stack-version }}
+      - name: Store test results
+        if: success() || failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-results-${{ steps.slug.outputs.slug }}
+          path: |
+            packages/**/reports/TESTS-*.xml
 
   # npm-ci:
   #   runs-on: ubuntu-latest
