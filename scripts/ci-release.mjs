@@ -114,6 +114,7 @@ async function dryRunMode() {
     )
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
+    console.log('GITHUB_ACTIONS value is **' + process.env.GITHUB_ACTIONS + '**')
     await execa(
       'npx',
       ['lerna', 'publish', 'from-package', `--registry=${registryUrl}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes', '--loglevel=debug'],
