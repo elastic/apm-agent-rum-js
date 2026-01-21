@@ -114,6 +114,7 @@ async function dryRunMode() {
     )
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
+    delete process.env.GITHUB_ACTIONS
     console.log('GITHUB_ACTIONS value is **' + process.env.GITHUB_ACTIONS + '**')
     await execa(
       'npx',
