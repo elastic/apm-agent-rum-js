@@ -114,13 +114,24 @@ async function dryRunMode() {
     )
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
-    await execa(
-      'npx',
-      ['lerna', 'publish', 'from-package', `--registry=${registryUrl}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes', '--dry-run'],
-      { stdin: process.stdin }
-    )
-      .pipeStdout(process.stdout)
-      .pipeStderr(process.stderr)
+    // await execa(
+    //   'npx',
+    //   ['lerna', 'publish', 'from-package', `--registry=${registryUrl}`, '--no-push', '--no-git-tag-version', '--no-changelog', '--yes', '--dry-run'],
+    //   { stdin: process.stdin }
+    // )
+    //   .pipeStdout(process.stdout)
+    //   .pipeStderr(process.stderr)
+    const root = path.join(process.cwd(), 'packages');
+    const dirs = ['rum-core', 'rum', 'rum-angular', 'rum-react', 'rum-vue'];
+    for (const dir of dirs) {
+      await execa(
+        'npm',
+        ['publish', '--registry', registryUrl, '--dry-run'],
+        { stdin: process.stdin, cwd: path.join(root, dir) }
+      )
+        .pipeStdout(process.stdout)
+        .pipeStderr(process.stderr)
+    }
   } catch (err) {
     raiseError('Failed to publish npm packages')
   }
