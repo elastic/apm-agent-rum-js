@@ -67,7 +67,7 @@ jobs:
         env:
           DRY_RUN: "${{ inputs.dry-run }}"
           GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
-          GITHUB_ACTIONS: ${{''}}
+          GITHUB_ACTIONS: ${{ inputs.dry-run && '' || 'true' }}
         run: npm run ci:release
 
         # The permissions configuration for this can be found at
