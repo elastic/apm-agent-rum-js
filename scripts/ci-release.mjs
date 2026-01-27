@@ -24,11 +24,10 @@
  */
 
 import * as process from 'node:process'
-import fetch from 'node-fetch'
 import { execa } from 'execa'
-import { appendFile } from 'node:fs/promises'
 import * as path from 'node:path'
 import { readFileSync, writeFileSync } from 'node:fs'
+import fetch from 'node-fetch'
 
 function raiseError(msg) {
   console.log(msg)
@@ -76,32 +75,10 @@ async function dryRunMode() {
   }
 
   try {
-    // Ref: https://github.com/npm/npm-registry-client/blob/856eefea40a2a88618835978e281300e3406924b/lib/adduser.js#L63-L68
-    const response = await fetch(
-      `${registryUrl}/-/user/org.couchdb.user:test`,
-      {
-        method: 'PUT',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: 'test',
-          password: 'test',
-          email: 'test@elastic.co'
-        })
-      }
-    )
-
-    let npmrcData = 'registry=http://localhost:4873\n'
-    if (response.status === 201) {
-      const { token: token } = await response.json()
-      npmrcData += `//localhost:4873/:_authToken=${token}\n`
-    } else {
-      raiseError('Failed to add user to private registry')
-    }
-
-    await appendFile(path.join(process.cwd(), '.npmrc'), '\n' + npmrcData)
+    await execa(
+      'npx',
+      ['npm-cli-login', '-u', 'test', '-p', 'test', '-e', 'test@elastic.co', '-r', registryUrl]
+    );
   } catch (err) {
     raiseError('Failed to login to private registry')
   }
@@ -119,14 +96,14 @@ async function dryRunMode() {
     
     // It appears Verdaccio does not support trusted publishers and lerna
     // has no option to disable it. Fall back to individually publishing them.
-    const root = path.join(process.cwd(), 'packages');
-    const dirs = ['rum-core', 'rum', 'rum-angular', 'rum-react', 'rum-vue'];
+    const root = path.join(process.cwd(), 'packages')
+    const dirs = ['rum-core', 'rum', 'rum-angular', 'rum-react', 'rum-vue']
     for (const dir of dirs) {
       // Verdaccio does not support provenance for now so we disable it
       // ref: https://github.com/orgs/verdaccio/discussions/3903
-      const pkgPath = path.join(root, dir, 'package.json');
-      const pkgText = readFileSync(pkgPath, {encoding: 'utf-8'});
-      writeFileSync(pkgPath, pkgText.replace('"provenance": true', '"provenance": false'));
+      const pkgPath = path.join(root, dir, 'package.json')
+      const pkgText = readFileSync(pkgPath, {encoding: 'utf-8'})
+      writeFileSync(pkgPath, pkgText.replace('"provenance": true', '"provenance": false'))
 
       // And publish
       await execa(
