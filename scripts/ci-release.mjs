@@ -28,6 +28,7 @@ import fetch from 'node-fetch'
 import { execa } from 'execa'
 import { appendFile } from 'node:fs/promises'
 import * as path from 'node:path'
+import { readFileSync, writeFileSync } from 'node:fs'
 
 function raiseError(msg) {
   console.log(msg)
@@ -108,18 +109,26 @@ async function dryRunMode() {
   try {
     // This prevent lerna command from throwing this error in dry-run mode:
     // "Working tree has uncommitted changes, please commit or remove the following changes before continuing"
-    await execa(
-      'git',
-      ['update-index', '--skip-worktree', '.npmrc']
-    )
-      .pipeStdout(process.stdout)
-      .pipeStderr(process.stderr)
+    // UPDATE: we are not using lerna because Verdaccio deosnot support provenance or trusted publishers
+    // await execa(
+    //   'git',
+    //   ['update-index', '--skip-worktree', '.npmrc']
+    // )
+    //   .pipeStdout(process.stdout)
+    //   .pipeStderr(process.stderr)
     
-    // It appears Verdaccio does not support trustes publishers and lerna
+    // It appears Verdaccio does not support trusted publishers and lerna
     // has no option to disable it. Fall back to individually publishing them.
     const root = path.join(process.cwd(), 'packages');
     const dirs = ['rum-core', 'rum', 'rum-angular', 'rum-react', 'rum-vue'];
     for (const dir of dirs) {
+      // Verdaccio does not support provenance for now so we disable it
+      // ref: https://github.com/orgs/verdaccio/discussions/3903
+      const pkgPath = path.join(root, dir, 'package.json');
+      const pkgText = readFileSync(pkgPath, {encoding: 'utf-8'});
+      writeFileSync(pkgPath, pkgText.replace('"provenance": true', '"provenance": false'));
+
+      // And publish
       await execa(
         'npm',
         ['publish', '--registry', registryUrl],
