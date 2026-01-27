@@ -41,8 +41,8 @@ jobs:
       - run: 'npm run ci:bundlesize'
         id: bundlesize
 
-  test-puppeteer:
-    name: Test Puppeteer
+  test:
+    name: Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
