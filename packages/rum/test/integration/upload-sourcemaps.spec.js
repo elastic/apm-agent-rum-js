@@ -32,7 +32,8 @@ const defaultAUth = `Basic ${Buffer.from('admin:changeme').toString('base64')}`
 const esAuth = process.env.ES_AUTH || defaultAUth
 const kibanaUrl = process.env.KIBANA_URL || 'http://localhost:5601'
 
-// This test is failing in CI and
+// This test is failing in CI and tested in Kibana repo
+// ref: https://github.com/elastic/kibana/blob/main/x-pack/solutions/observability/plugins/apm/server/routes/fleet/source_maps.test.ts
 xdescribe('Sourcemaps', function () {
   it('should upload sourcemaps', async function (done) {
     // curl http://localhost:5601/api/apm/sourcemaps -X POST -F sourcemap=@app.e2e-bundle.js.map -F service_version=0.0.1 -F bundle_filepath="/test/e2e/general-usecase/app.e2e-bundle.js" -F service_name="apm-agent-rum-test-e2e-general-usecase"
