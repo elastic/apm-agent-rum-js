@@ -438,7 +438,7 @@ describe('PerformanceMonitoring', function () {
           cancelFetchSub()
           state.bootstrapTime = origBootstrapTime
           done()
-        })
+        }, 100)
       })
       expect(transactionService.startSpan).toHaveBeenCalledWith(
         'GET /',
