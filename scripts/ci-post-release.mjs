@@ -63,7 +63,6 @@ async function main() {
 
 async function dryRunMode() {
   console.log('Running in dry-run mode')
-
 }
 
 async function prodMode() {
