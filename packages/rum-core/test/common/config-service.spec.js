@@ -68,29 +68,54 @@ describe('ConfigService', function () {
   })
 
   it('should addFilter correctly', function () {
+    var rawPayload = { transactions: [{}], errors: [{}] }
+    var filterPayload1 = { transactions: [{}, {}], errors: [{}, {}] }
+    var filterPayload2 = { transactions: [{}, {}, {}], errors: [{}, {}, {}] }
     expect(function () {
       configService.addFilter('test')
     }).toThrow()
 
     configService.addFilter(function (testArg) {
-      expect(testArg).toBe('hamid-test')
-      return 'hamid-test-1'
+      expect(testArg).toBe(rawPayload)
+      return filterPayload1
     })
 
     configService.addFilter(function (testArg) {
-      expect(testArg).toBe('hamid-test-1')
-      return 'hamid-test-2'
+      expect(testArg).toBe(filterPayload1)
+      return filterPayload2
     })
 
-    var result = configService.applyFilters('hamid-test')
-    expect(result).toBe('hamid-test-2')
+    var result = configService.applyFilters(rawPayload)
+    expect(result).toBe(filterPayload2)
 
     configService.addFilter(function () {})
     configService.addFilter(function () {
       throw new Error('Out of reach!')
     })
 
-    result = configService.applyFilters('hamid-test')
+    result = configService.applyFilters(rawPayload)
+    expect(result).toBeUndefined()
+  })
+
+  it('should applyFilters without throwing', function () {
+    var rawPayload = { transactions: [{}], errors: [{}] }
+
+    configService.addFilter(function () {
+      throw new Error('Should now throw!')
+    })
+
+    var result = configService.applyFilters(rawPayload)
+    expect(result).toBeUndefined()
+  })
+
+  it('should applyFilters and filter empty payloads', function () {
+    var rawPayload = { transactions: [{}], errors: [{}] }
+
+    configService.addFilter(function () {
+      return { transactions: [], errors: [] }
+    })
+
+    var result = configService.applyFilters(rawPayload)
     expect(result).toBeUndefined()
   })
 

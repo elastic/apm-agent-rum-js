@@ -55,10 +55,14 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
+      
+      # Latest npm (11.6.4) supports trusted publishers and Node.js v20
+      - name: Update npm
+        run: npm install -g npm@11.6.4
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
-      
+
       - name: Publish the release
         env:
           DRY_RUN: "${{ inputs.dry-run }}"
@@ -81,7 +85,7 @@ jobs:
           GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
 
       - id: 'upload-files-version'
-        if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js') }}
+        if: ${{ inputs.dry-run == false && hashFiles('packages/rum/dist/bundles/*.js') }}
         uses: 'google-github-actions/upload-cloud-storage@v3'
         with:
           parent: false
@@ -93,7 +97,7 @@ jobs:
             cache-control: public,max-age=31536000,immutable
 
       - id: 'upload-files-major-version'
-        if: ${{ always() && hashFiles('packages/rum/dist/bundles/*.js') }}
+        if: ${{ inputs.dry-run == false && hashFiles('packages/rum/dist/bundles/*.js') }}
         uses: 'google-github-actions/upload-cloud-storage@v3'
         with:
           parent: false
@@ -105,7 +109,7 @@ jobs:
             cache-control: public,max-age=604800,immutable
 
       - id: 'upload-file-index'
-        if: ${{ always() && hashFiles('index.html') }}
+        if: ${{ inputs.dry-run == false && hashFiles('index.html') }}
         uses: 'google-github-actions/upload-cloud-storage@v3'
         with:
           parent: false

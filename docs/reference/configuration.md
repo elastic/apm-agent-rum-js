@@ -368,3 +368,9 @@ If APM Server is deployed in an origin different than the page’s origin, you w
 ::::
 
 
+### `reportTransactionsWithoutSpans` [report-transactions-without-spans]
+
+* **Type:** Boolean
+* **Default:** `false`
+
+If you are interested also for transactions that have no spans you can set this configuration option to true. Bear in mind that sampling rate still applies even if this setting is set to `true`.
