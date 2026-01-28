@@ -48,7 +48,7 @@ jobs:
       matrix:
         stack-version:
           - '8.2.0-SNAPSHOT'
-          - '8.19.8'
+          - '8.19.10'
         scope:
           - '@elastic/apm-rum'
           - '@elastic/apm-rum-core'
