@@ -24,8 +24,8 @@
  */
 
 import { TestBed, ComponentFixture } from '@angular/core/testing'
-import { NgModule, Component } from '@angular/core'
-import { Routes, Router } from '@angular/router'
+import { NgModule, Component, Injectable } from '@angular/core'
+import { Routes, Router, Resolve } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { Location } from '@angular/common'
 import { ApmBase } from '@elastic/apm-rum'
@@ -77,11 +77,25 @@ class SlugComponent {}
 })
 class AppComponent {}
 
+@Injectable()
+class ResolveBogus implements Resolve<any> {
+  resolve() {
+    throw new Error('Method not implemented.')
+  }
+}
+
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: 'lazy', loadChildren: () => LazyModule },
-  { path: 'slug/:id', component: SlugComponent }
+  { path: 'slug/:id', component: SlugComponent },
+  {
+    path: 'error-route',
+    component: SlugComponent,
+    resolve: {
+      data: ResolveBogus
+    }
+  }
 ]
 
 describe('ApmService', () => {
@@ -95,7 +109,7 @@ describe('ApmService', () => {
     TestBed.configureTestingModule({
       imports: [ApmModule, RouterTestingModule.withRoutes(routes)],
       declarations: [HomeComponent, AppComponent, SlugComponent],
-      providers: [ApmService]
+      providers: [ApmService, ResolveBogus]
     }).compileComponents()
 
     TestBed.overrideProvider(APM, {
@@ -246,6 +260,35 @@ describe('ApmService', () => {
 
           done()
         })
+      })
+    })
+
+    it('should capture navigation errors', done => {
+      spyOn(service.apm, 'startTransaction').and.callThrough()
+      spyOn(service.apm, 'captureError')
+      const tr = service.apm.getCurrentTransaction()
+
+      fixture.ngZone.run(() => {
+        router.navigate(['/error-route']).then(
+          () => {
+            throw new Error('navigation should fail')
+          },
+          navError => {
+            expect(location.path()).toBe('/')
+            expect(service.apm.startTransaction).toHaveBeenCalledWith(
+              '/error-route',
+              'route-change',
+              {
+                managed: true,
+                canReuse: true
+              }
+            )
+            expect(service.apm.captureError).toHaveBeenCalledWith(navError)
+            expect(tr.name).toEqual('/error-route')
+
+            done()
+          }
+        )
       })
     })
   })

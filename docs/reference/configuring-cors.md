@@ -1,6 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/configuring-cors.html
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
 ---
 
 # Configure CORS [configuring-cors]

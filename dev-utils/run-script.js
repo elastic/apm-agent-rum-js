@@ -24,23 +24,16 @@
  */
 
 const { join } = require('path')
-const runAll = require('npm-run-all')
 const {
   runKarma,
-  runSauceConnect,
   runJasmine,
   runE2eTests: runE2eTestsUtils,
   buildE2eBundles: buildE2eBundlesUtils
 } = require('./test-utils')
 const { startTestServers } = require('./test-servers')
-const {
-  getTestEnvironmentVariables,
-  getSauceConnectOptions
-} = require('./test-config')
 const { generateNotice } = require('./dep-info')
 
 const PROJECT_DIR = join(__dirname, '../')
-const { sauceLabs } = getTestEnvironmentVariables()
 
 let cleanUps = []
 
@@ -52,25 +45,9 @@ function startServersWithCleanups() {
   return servers
 }
 
-function runUnitTests(packagePath, startSauceConnect = 'false') {
+function runUnitTests(packagePath) {
   const karmaConfigFile = join(PROJECT_DIR, packagePath, 'karma.conf.js')
-  if (startSauceConnect === 'true') {
-    return launchSauceConnect(() => runKarma(karmaConfigFile))
-  }
   runKarma(karmaConfigFile)
-}
-
-/**
- * Checks if the MODE is set to "saucelabs" and decides where to run the
- * corresponding callback function
- */
-function launchSauceConnect(callback = () => {}) {
-  if (sauceLabs) {
-    const sauceOpts = getSauceConnectOptions()
-    return runSauceConnect(sauceOpts, callback)
-  }
-  console.info('Skipping sauce tests, MODE is not set to saucelabs')
-  return callback()
 }
 
 function runIntegrationTests() {
@@ -118,63 +95,6 @@ function buildE2eBundles(basePath) {
   return buildE2eBundlesUtils(join(PROJECT_DIR, basePath))
 }
 
-function runSauceTests(packagePath, serve = 'true', ...scripts) {
-  /**
-   * Since there is no easy way to reuse the sauce connect tunnel even using same tunnel identifier,
-   * we launch the sauce connect tunnel before starting all the saucelab tests
-   */
-  if (serve === 'true') {
-    startServersWithCleanups(join(PROJECT_DIR, packagePath))
-  }
-
-  launchSauceConnect(async sauceConnectProcess => {
-    /**
-     * Decides the saucelabs test status
-     */
-    let exitCode = 0
-    const loggerOpts = {
-      stdout: process.stdout,
-      stderr: process.stderr
-    }
-    const exitProcess = () => process.exit(exitCode)
-
-    const runAllAndExit = async commands => {
-      try {
-        await runAll(commands, loggerOpts)
-      } catch (err) {
-        console.log('runSauceTests failed', err)
-        exitCode = 1
-      } finally {
-        if (sauceConnectProcess) {
-          sauceConnectProcess.close(exitProcess)
-        } else {
-          exitProcess()
-        }
-      }
-    }
-    /**
-     * `console.logs` from the tests will be truncated when the process exits
-     * To avoid truncation, we flush the data from stdout before exiting the process
-     */
-    if (process.stdout.isTTY && process.stdout._handle) {
-      process.stdout._handle.setBlocking(true)
-    }
-
-    if (!sauceLabs) {
-      /**
-       * For Angular package we use `ng` commands for running the test instead of
-       * using our custom karma runner
-       */
-      if (packagePath === 'packages/rum-angular') {
-        return await runAllAndExit(['test:unit'])
-      } else {
-        return runUnitTests(packagePath)
-      }
-    }
-    await runAllAndExit(scripts)
-  })
-}
-
 function exitHandler(exitCode) {
   if (cleanUps.length > 0) {
     console.log('Running cleanups:', cleanUps.length)
@@ -193,10 +113,8 @@ process.on('exit', exitHandler)
 process.on('SIGINT', exitHandler)
 
 const scripts = {
-  launchSauceConnect,
   generateNotice,
   runUnitTests,
-  runSauceTests,
   runE2eTests,
   runIntegrationTests,
   runNodeTests,

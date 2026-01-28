@@ -1,12 +1,11 @@
-version: "2.1"
 services:
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION:-8.6.1}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION:-8.19.6}
     environment:
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-XX:UseAVX=2 -Xms1g -Xmx1g"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
       - "cluster.routing.allocation.disk.threshold_enabled=false"
       - "discovery.type=single-node"
       - "xpack.security.authc.anonymous.roles=remote_monitoring_collector"
@@ -47,7 +46,7 @@ services:
 
   fleet-server:
     container_name: apm-server
-    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION:-8.6.1}
+    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION:-8.19.6}
     entrypoint: "/bin/bash"
     command:
         - "-l"
@@ -82,7 +81,7 @@ services:
 
   kibana:
     container_name: kibana
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION:-8.6.1}
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION:-8.19.6}
     environment:
         ELASTICSEARCH_HOSTS: http://elasticsearch:9200
         ELASTICSEARCH_USERNAME: "${KIBANA_ES_USER:-kibana_system_user}"
@@ -129,42 +128,6 @@ services:
       apm:
         aliases:
           - wait-for-apm-server
-
-  node-puppeteer:
-    build:
-      context: ../.ci/docker/node-puppeteer
-      args:
-        - NODEJS_VERSION=${NODEJS_VERSION}
-    container_name: node-puppeteer
-    image: docker.elastic.co/observability-ci/node-puppeteer:${NODEJS_VERSION}
-    environment:
-      - HOME=/app
-      - SCOPE=${SCOPE}
-      - STACK_VERSION=${STACK_VERSION}
-      - APM_SERVER_URL=${APM_SERVER_URL}
-      - KIBANA_URL=${KIBANA_URL}
-      - BUILD_NUMBER=${BUILD_NUMBER}
-      - BRANCH_NAME=${BRANCH_NAME}
-      - CI=${CI}
-      - SAUCE_USERNAME=${SAUCE_USERNAME}
-      - SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}
-      - MODE=${MODE}
-      - GOAL=${GOAL}
-      - WORKSPACE=${WORKSPACE}
-      - BASE_DIR=${BASE_DIR}
-    command: /run-test.sh
-    mem_limit: 2000m
-#    cpus: 0.5
-    depends_on:
-      fleet-server:
-        condition: service_healthy
-    volumes:
-      - ..:/app
-    networks:
-      apm:
-        aliases:
-          - node-puppeteer
-    user: ${USER_ID}
 
   node-benchmark:
     build:

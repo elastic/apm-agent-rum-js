@@ -1,6 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/apm/agent/rum-js/current/getting-started.html
+applies_to:
+  stack:
+  serverless: unavailable
+  product:
+    apm_agent_rum: ga
 ---
 
 # Set up the APM Real User Monitoring JavaScript Agent [getting-started]

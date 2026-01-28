@@ -1,6 +1,6 @@
 {
   "name": "@elastic/apm-rum-vue",
-  "version": "2.1.10",
+  "version": "2.1.11",
   "description": "Elastic APM Real User Monitoring for Vue applications",
   "keywords": [
     "elastic",
@@ -30,12 +30,12 @@
     "karma:coverage": "karma start --coverage --singleRun",
     "test:unit": "npm run script runUnitTests packages/rum-vue",
     "test:e2e": "npm run script runE2eTests packages/rum-vue/wdio.conf.js",
-    "test:sauce": "npm run script runSauceTests packages/rum-vue true build:e2e test:unit test:e2e",
-    "test": "npm run test:sauce",
+    "test": "npm run build:e2e && npm run test:unit && npm run test:e2e",
     "script": "node ../../dev-utils/run-script.js"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "repository": {
     "type": "git",

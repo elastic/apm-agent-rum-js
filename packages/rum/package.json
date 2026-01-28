@@ -1,6 +1,6 @@
 {
   "name": "@elastic/apm-rum",
-  "version": "5.17.0",
+  "version": "5.17.1",
   "description": "Elastic APM JavaScript agent",
   "main": "dist/lib/index.js",
   "module": "dist/es/index.js",
@@ -12,7 +12,8 @@
     "directory": "packages/rum"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "scripts": {
     "prepublishOnly": "npm run build",
@@ -32,8 +33,7 @@
     "test:unit": "npm run script runUnitTests packages/rum",
     "test:e2e:supported": "npm run script runE2eTests packages/rum/wdio.conf.js",
     "test:e2e:failsafe": "npm run script runE2eTests packages/rum/wdio-failsafe.conf.js",
-    "test:sauce": "npm run script runSauceTests packages/rum true build:e2e test:unit test:e2e:supported test:e2e:failsafe",
-    "test": "run-s build:e2e test:types test:node test:bundle test:integration test:sauce",
+    "test": "run-s build:e2e test:types test:node test:bundle test:integration",
     "bench": "npm run build:umd && node test/benchmarks/run.js"
   },
   "files": [

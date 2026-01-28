@@ -324,7 +324,7 @@ describe('Capture hard navigation', function () {
     const xhrSpan = tr.startSpan('GET http://example.com', 'external.http')
     xhrSpan.end()
     tr._start = transactionStart
-    tr.end()
+    tr.end(transactionEnd)
     captureNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
     const foundSpans = tr.spans.filter(
@@ -342,7 +342,7 @@ describe('Capture hard navigation', function () {
     const tr = new Transaction('test', 'test')
     tr.captureTimings = true
     tr._start = transactionStart
-    tr.end()
+    tr.end(transactionEnd)
     captureNavigation(tr)
     expect(tr.spans.length).toBeGreaterThan(1)
     const foundSpans = tr.spans.filter(

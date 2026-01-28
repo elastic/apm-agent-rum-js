@@ -26,17 +26,12 @@
 const { join } = require('path')
 const glob = require('glob')
 const { config } = require('./wdio.conf')
-const { getSauceConnectOptions } = require('../../dev-utils/test-config')
 
-const { tunnelIdentifier } = getSauceConnectOptions()
 const browserList = [
   {
     browserName: 'internet explorer',
     platformName: 'Windows 7',
-    browserVersion: '10',
-    'sauce:options': {
-      tunnelIdentifier
-    }
+    browserVersion: '10'
   }
 ]
 

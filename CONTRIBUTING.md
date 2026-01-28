@@ -86,7 +86,7 @@ $ npx lerna bootstrap
 Tests fall under unit, integration and end-to-end tests. Before running the test, we have to start the APM server manually since all the APM payload data are sent to the server.
 
 ```sh
-NODEJS_VERSION=<nodeVersion> STACK_VERSION=<version> docker compose -f ./dev-utils/docker-compose.yml up -d apm-server
+NODEJS_VERSION=<nodeVersion> STACK_VERSION=<version> docker compose -f ./dev-utils/docker-compose.yml up -d fleet-server
 # nodeVersion - corresponds to NodeJS version to be used when building the test images
 # version - corresponds to Elastic Stack versions
 ```
@@ -115,14 +115,6 @@ $ npx lerna run --scope @elastic/apm-rum karma:dev -- --grep <path-to-test-file>
 ##### Integration tests
 ```sh
 $ npx lerna run --scope @elastic/apm-rum test:integration
-```
-
-##### E2E tests (Saucelabs)
-
-E2E tests are run on Saucelabs, Before running these tests we have to set some environment variables to run all the tests on Saucelabs
-
-```sh
-$ MODE=saucelabs SAUCE_USERNAME=<username> SAUCE_ACCESS_KEY=<access-key> npx lerna run --scope @elastic/apm-rum test:sauce
 ```
 
 ### Linting
