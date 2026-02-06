@@ -64,26 +64,23 @@ async function dryRunMode() {
   console.log('Running in dry-run mode')
   
   try {
-    const { stdout, stderr } = await execa('npx',
+    const { stdout } = await execa('npx',
       ['lerna', 'publish', 'from-package', '--no-push', '--no-git-tag-version', '--no-changelog'],
       {
-        // Respond 'No' to Lerna's interactive input
-        // - Are you sure you want to publish these packages? (ynh)
+        // Respond 'No' to Lerna's prompt "Are you sure you want to publish these packages? (ynh)""
         input: 'n',
-        // verbose: true,
+        // and telling "no" makes the command fail, we expect that error
         reject: false
       }
     )
-    console.log('err >>>', stderr)
-    console.log('out >>>', stdout)
-    // If OK lerna will say somethign like 
+    // If OK lerna will say print in stdout a message like
     // "Found 5 packages to publish"
     const match = stdout.match(/Found (\d+) packages to publish/)
     if (match) {
       console.log(`Lerna will publish ${match[1]} packages.`)
     }
   } catch (err) {
-    raiseError('Failed to publish npm packages in dryRun mode')
+    raiseError('Unexpected error while publishing npm packages in dryRun mode')
   }
 }
 
