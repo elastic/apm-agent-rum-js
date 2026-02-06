@@ -76,12 +76,12 @@ async function dryRunMode() {
     )
     console.log('err >>>', stderr)
     console.log('out >>>', stdout)
-    // If OK lerna will say somethign like 
-    // "Found 5 packages to publish"
-    const match = stdout.test(/Found (\d+) packages to publish/)
-    if (match) {
-      console.log(`Lerna will publish ${match[1]} packages.`)
-    }
+    // // If OK lerna will say somethign like 
+    // // "Found 5 packages to publish"
+    // const match = stdout.test(/Found (\d+) packages to publish/)
+    // if (match) {
+    //   console.log(`Lerna will publish ${match[1]} packages.`)
+    // }
   } catch (err) {
     raiseError('Failed to publish npm packages in dryRun mode')
   }
