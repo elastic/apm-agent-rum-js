@@ -64,7 +64,7 @@ async function dryRunMode() {
   console.log('Running in dry-run mode')
   
   try {
-    const { stdout } = await execa('npx',
+    const { stdout, stderr } = await execa('npx',
       ['lerna', 'publish', 'from-package', '--no-push', '--no-git-tag-version', '--no-changelog'],
       {
         // Respond 'No' to Lerna's interactive input
@@ -74,7 +74,8 @@ async function dryRunMode() {
         reject: false
       }
     )
-    
+    console.log('err >>>', stderr)
+    console.log('out >>>', stdout)
     // If OK lerna will say somethign like 
     // "Found 5 packages to publish"
     const match = stdout.test(/Found (\d+) packages to publish/)
