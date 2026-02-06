@@ -62,24 +62,27 @@ async function main() {
 
 async function dryRunMode() {
   console.log('Running in dry-run mode')
-  // const { stdout: branch } = await execa('git', ['branch', '--show-current'])
-
+  
   try {
-    await execa('npx',
+    const { stdout } = await execa('npx',
       ['lerna', 'publish', 'from-package', '--no-push', '--no-git-tag-version', '--no-changelog'],
       {
         // Respond 'No' to Lerna's interactive input
-        // - Are you sure you want to create these versions? (ynh)
+        // - Are you sure you want to publish these packages? (ynh)
         input: 'n',
         verbose: true,
-        // reject: false
+        reject: false
       }
     )
-      .pipeStdout(process.stdout)
-      .pipeStderr(process.stderr)
-    console
+    
+    // If OK lerna will say somethign like 
+    // "Found 5 packages to publish"
+    const match = stdout.test(/Found (\d+) packages to publish/)
+    if (match) {
+      console.log(`Lerna will publish ${match[1]} packages.`)
+    }
   } catch (err) {
-    raiseError('Failed to version npm packages', err)
+    raiseError('Failed to publish npm packages in dryRun mode')
   }
 }
 
