@@ -25,9 +25,6 @@
 
 import * as process from 'node:process'
 import { execa } from 'execa'
-import * as path from 'node:path'
-import { readFileSync, writeFileSync } from 'node:fs'
-import fetch from 'node-fetch'
 
 function raiseError(msg) {
   console.log(msg)
@@ -65,66 +62,25 @@ async function main() {
 
 async function dryRunMode() {
   console.log('Running in dry-run mode')
-
-  const registryUrl = process.env.REGISTRY_URL || 'http://localhost:4873'
-  console.log(`Checking local registry url: ${registryUrl}`)
-  try {
-    await fetch(registryUrl)
-  } catch (err) {
-    raiseError("The local registry isn't available")
-  }
+  // const { stdout: branch } = await execa('git', ['branch', '--show-current'])
 
   try {
-    await execa(
-      'npx',
-      ['npm-cli-login', '-u', 'test', '-p', 'test', '-e', 'test@elastic.co', '-r', registryUrl]
-    );
+    await execa('npx',
+      ['lerna', 'publish', 'from-package', '--no-push', '--no-git-tag-version', '--no-changelog'],
+      {
+        // Respond 'No' to Lerna's interactive input
+        // - Are you sure you want to create these versions? (ynh)
+        input: 'n',
+        verbose: true,
+        // reject: false
+      }
+    )
+      .pipeStdout(process.stdout)
+      .pipeStderr(process.stderr)
+    console
   } catch (err) {
-    raiseError('Failed to login to private registry')
+    raiseError('Failed to version npm packages', err)
   }
-
-  try {
-    // This prevent lerna command from throwing this error in dry-run mode:
-    // "Working tree has uncommitted changes, please commit or remove the following changes before continuing"
-    // UPDATE: we are not using lerna because Verdaccio deosnot support provenance or trusted publishers
-    // await execa(
-    //   'git',
-    //   ['update-index', '--skip-worktree', '.npmrc']
-    // )
-    //   .pipeStdout(process.stdout)
-    //   .pipeStderr(process.stderr)
-    
-    // It appears Verdaccio does not support trusted publishers and lerna
-    // has no option to disable it. Fall back to individually publishing them.
-    const root = path.join(process.cwd(), 'packages')
-    const dirs = ['rum-core', 'rum', 'rum-angular', 'rum-react', 'rum-vue']
-    for (const dir of dirs) {
-      // Verdaccio does not support provenance for now so we disable it
-      // ref: https://github.com/orgs/verdaccio/discussions/3903
-      const pkgPath = path.join(root, dir, 'package.json')
-      const pkgText = readFileSync(pkgPath, {encoding: 'utf-8'})
-      writeFileSync(pkgPath, pkgText.replace('"provenance": true', '"provenance": false'))
-
-      // And publish
-      await execa(
-        'npm',
-        ['publish', '--registry', registryUrl],
-        { stdin: process.stdin, cwd: path.join(root, dir) }
-      )
-        .pipeStdout(process.stdout)
-        .pipeStderr(process.stderr)
-    }
-  } catch (err) {
-    raiseError('Failed to publish npm packages')
-  }
-
-  await execa('git', ['diff', process.cwd()])
-    .pipeStdout(process.stdout)
-    .pipeStderr(process.stderr)
-
-  await execa('git', ['log', '-1', '--stat', process.cwd()])
-    .pipeStdout(process.stdout)
-    .pipeStderr(process.stderr)
 }
 
 async function prodMode() {
@@ -138,7 +94,7 @@ async function prodMode() {
   try {
     await execa('npx',
       ['lerna', 'publish', 'from-package', '--no-push', '--no-git-tag-version', '--no-changelog', '--yes'],
-      { stdin: process.stdin}
+      { stdin: process.stdin }
     )
       .pipeStdout(process.stdout)
       .pipeStderr(process.stderr)
