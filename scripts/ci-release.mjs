@@ -75,6 +75,7 @@ async function dryRunMode() {
     )
     // If OK lerna will say print in stdout a message like
     // "Found 5 packages to publish"
+    console.log('stdout >>>>', stdout)
     const match = stdout.match(/Found (\d+) packages to publish/)
     if (match) {
       console.log(`Lerna will publish ${match[1]} packages.`)
