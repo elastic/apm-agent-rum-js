@@ -25,13 +25,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    services:
-      verdaccio:
-        image: verdaccio/verdaccio:5
-        ports:
-          - 4873:4873
-    steps:
 
+    steps:
       - name: Get token
         id: get_token
         uses: actions/create-github-app-token@v2
