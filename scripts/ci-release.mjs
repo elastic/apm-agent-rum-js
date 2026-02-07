@@ -73,6 +73,7 @@ async function dryRunMode() {
         reject: false
       }
     )
+
     // If OK lerna will say print in stdout a message like
     // "Found 5 packages to publish"
     const match = stdout.match(/Found (\d+) packages to publish/)
