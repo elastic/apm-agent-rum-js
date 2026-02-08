@@ -101,7 +101,8 @@ describe('fetchPatch', function () {
           name: 'should fetch correctly when using URL object as input',
           fetchArgs: createFetchArgs('PUT'),
           fetchFn(fetchArgs) {
-            return window.fetch(new URL(fetchArgs.url), fetchArgs.options)
+            const obj = { toString: () => fetchArgs.url }
+            return window.fetch(obj, fetchArgs.options)
           }
         }
       ].forEach(({ name, fetchArgs, fetchFn }) => {
