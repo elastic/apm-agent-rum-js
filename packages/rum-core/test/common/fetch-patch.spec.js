@@ -136,10 +136,17 @@ describe('fetchPatch', function () {
         expect(typeof promise.then).toBe('function')
         expect(events.map(e => e.event)).toEqual(['schedule'])
 
-        // Validate that fetch has been called with the proper data
-        const data = events[0].task.data
-        validateFetchData(data, newFetchArgs)
-        done()
+        promise.then(function (resp) {
+          expect(resp).toBeDefined()
+          Promise.resolve().then(function () {
+            // Validate that fetch has been called with the proper data
+            const data = events[0].task.data
+            validateFetchData(data, newFetchArgs)
+
+            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+            done()
+          })
+        })
       })
 
       it('should produce task events when fetch fails', function (done) {
