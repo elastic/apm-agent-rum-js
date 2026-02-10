@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.25.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.23.0...@elastic/apm-rum-core@5.25.0) (2026-02-10)
+
+### Features
+
+- **rum-core:** allow sending transactions with no spans using config ([#1665](https://github.com/elastic/apm-agent-rum-js/issues/1665)) ([a5d88c9](https://github.com/elastic/apm-agent-rum-js/commit/a5d88c9e591e231a48f7cae827c7d3fcd7bd9701))
+
+### Bug Fixes
+
+- **rum-angular:** capture angular navigation errors ([#1662](https://github.com/elastic/apm-agent-rum-js/issues/1662)) ([69c76d1](https://github.com/elastic/apm-agent-rum-js/commit/69c76d1e558eb4b6120866c51511ec52a474b572))
+- **rum-core:** handle request objects with init options in fetch patch ([#1682](https://github.com/elastic/apm-agent-rum-js/issues/1682)) ([3014a62](https://github.com/elastic/apm-agent-rum-js/commit/3014a62b9be7a3cb62165fe3f4c406f713cf6c19))
+
 ## [5.24.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.23.0...@elastic/apm-rum-core@5.24.0) (2025-12-05)
 
 ### Features

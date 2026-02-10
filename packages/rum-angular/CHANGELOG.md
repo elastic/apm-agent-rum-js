@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.0.9](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@3.0.4...@elastic/apm-rum-angular@3.0.9) (2026-02-10)
+
+### Bug Fixes
+
+- **rum-angular:** capture angular navigation errors ([#1662](https://github.com/elastic/apm-agent-rum-js/issues/1662)) ([69c76d1](https://github.com/elastic/apm-agent-rum-js/commit/69c76d1e558eb4b6120866c51511ec52a474b572))
+
 ### [3.0.8](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@3.0.4...@elastic/apm-rum-angular@3.0.8) (2025-12-05)
 
 ### Bug Fixes
