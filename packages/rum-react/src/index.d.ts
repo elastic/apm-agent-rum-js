@@ -22,19 +22,24 @@
  * THE SOFTWARE.
  *
  */
+declare module '@elastic/apm-rum-react' {
+  import type { ComponentType } from 'react'
+  import type { Routes } from 'react-router-dom'
+  import type { Transaction } from '@elastic/apm-rum'
 
-import { apm } from '@elastic/apm-rum'
-import { getWithTransaction } from './get-with-transaction'
-import { getApmRoutes } from './get-apm-routes'
+  /**
+   * React Router <Routes> wrapper that starts a managed route-change transaction.
+   */
+  export const ApmRoutes: typeof Routes
 
-/**
- * Wrap a component and create a managed APM transaction when it mounts.
- */
-const withTransaction = getWithTransaction(apm)
-
-/**
- * React Router <Routes> wrapper that starts a managed route-change transaction.
- */
-const ApmRoutes = getApmRoutes(apm)
-
-export { withTransaction, ApmRoutes }
+  /**
+   * Wrap a component and create a managed APM transaction when it mounts.
+   */
+  export const withTransaction: <T>(
+    name?: string,
+    type?: string,
+    callback?: (transaction: Transaction | undefined, props: T) => void
+  ) => (
+    component: ComponentType<T & { transaction?: Transaction }>
+  ) => ComponentType<T>
+}
