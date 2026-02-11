@@ -8,6 +8,7 @@
   "main": "dist/lib/index.js",
   "module": "dist/es/index.js",
   "source": "src/index.js",
+  "types": "src/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -27,8 +28,6 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "run-p build:main build:module",
-    "build:main": "BABEL_ENV=BROWSER_PROD npx babel src -d dist/lib",
-    "build:module": "BABEL_ENV=BROWSER_ESM_PROD npx babel src -d dist/es",
     "build:e2e": "npm run script buildE2eBundles packages/rum-react/test/e2e",
     "karma:dev": "karma start --auto-watch --restartOnFileChange",
     "karma:coverage": "karma start --coverage --singleRun",
