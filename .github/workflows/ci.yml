@@ -61,7 +61,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
       - name: Start Stack
-        run: docker compose -f ./dev-utils/docker-compose.yml up -d fleet-server || { docker compose -f ./dev-utils/docker-compose.yml logs --no-color --timestamps; exit 1 }
+        run: docker compose -f ./dev-utils/docker-compose.yml up -d fleet-server || (docker compose -f ./dev-utils/docker-compose.yml logs --no-color --timestamps && exit 1)
         env:
           STACK_VERSION: ${{ matrix.stack-version }}
       - name: Install dependencies
