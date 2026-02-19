@@ -5,7 +5,7 @@ services:
     environment:
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Dcom.sun.management.jmxremote=false -Xms1g -Xmx1g"
+      - "ES_JAVA_OPTS=-Dcom.sun.management.jmxremote=false -Djdk.internal.platform.cgroupv2.enable=false -XX:+UseContainerSupport -Xms1g -Xmx1g"
       - "cluster.routing.allocation.disk.threshold_enabled=false"
       - "discovery.type=single-node"
       - "xpack.security.authc.anonymous.roles=remote_monitoring_collector"
@@ -17,12 +17,7 @@ services:
       - "xpack.security.authc.api_key.enabled=true"
       - "logger.org.elasticsearch=${ES_LOG_LEVEL:-error}"
       - "action.destructive_requires_name=false"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
     mem_limit: 2000m
-#    cpus: 0.5
     logging:
       driver: 'json-file'
       options:
