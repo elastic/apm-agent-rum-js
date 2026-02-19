@@ -43,6 +43,8 @@ jobs:
 
   test:
     name: Test
+    # NOTE: using ubuntu-22.04 because JDK has issues with cgroups with newer kernels
+    # ref: https://bugs.openjdk.org/browse/JDK-8343191
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -73,6 +75,8 @@ jobs:
 
   coverage:
     name: Coverage
+    # NOTE: using ubuntu-22.04 because JDK has issues with cgroups with newer kernels
+    # ref: https://bugs.openjdk.org/browse/JDK-8343191
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
@@ -80,7 +84,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
       - name: Start Stack
-        run: docker compose -f ./dev-utils/docker-compose.yml up -d fleet-server
+        run: docker compose -f ./dev-utils/docker-compose.yml up -d fleet-server || (docker compose -f ./dev-utils/docker-compose.yml logs --no-color --timestamps && exit 1)
         env:
           STACK_VERSION: 8.19.11
       - name: Install dependencies
