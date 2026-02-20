@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [5.17.3](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.17.2...@elastic/apm-rum@5.17.3) (2026-02-20)
+
+### Bug Fixes
+
+- **rum:** fix addFilter param types ([#1699](https://github.com/elastic/apm-agent-rum-js/issues/1699)) ([7223638](https://github.com/elastic/apm-agent-rum-js/commit/7223638d2eb8ae0bdad13ba32e5d88870a1edfb7))
+
 ### [5.17.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum@5.17.0...@elastic/apm-rum@5.17.2) (2026-02-10)
 
 ### Bug Fixes
