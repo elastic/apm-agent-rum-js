@@ -382,7 +382,9 @@ describe('Compress', function () {
 
   it('should compress error model', () => {
     const error = generateErrors(1).map((err, i) => {
-      let model = errorLogging.createErrorDataModel(err)
+      let model = errorLogging.createErrorDataModel(err, {
+        labels: { key: 'value' }
+      })
       model.id = 'error-id-' + i
       return model
     })[0]
