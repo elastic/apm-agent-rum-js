@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [5.25.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.25.1...@elastic/apm-rum-core@5.25.2) (2026-03-09)
+
+### Bug Fixes
+
+- **rum-core:** add missing tags in errors context when compressed ([#1707](https://github.com/elastic/apm-agent-rum-js/issues/1707)) ([5ed64fe](https://github.com/elastic/apm-agent-rum-js/commit/5ed64feed6571c9dbeb13e1bb479bf8587b1076a))
+
 ### [5.25.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.25.0...@elastic/apm-rum-core@5.25.1) (2026-02-20)
 
 **Note:** Version bump only for package @elastic/apm-rum-core
