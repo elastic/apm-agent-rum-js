@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [3.0.11](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@3.0.10...@elastic/apm-rum-angular@3.0.11) (2026-03-09)
+
+**Note:** Version bump only for package @elastic/apm-rum-angular
+
 ### [3.0.10](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-angular@3.0.4...@elastic/apm-rum-angular@3.0.10) (2026-02-20)
 
 ### Bug Fixes

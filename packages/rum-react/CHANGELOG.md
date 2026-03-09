@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.0.10](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@2.0.9...@elastic/apm-rum-react@2.0.10) (2026-03-09)
+
+### Bug Fixes
+
+- **rum-react:** align exports and typings ([#1697](https://github.com/elastic/apm-agent-rum-js/issues/1697)) ([ee085bc](https://github.com/elastic/apm-agent-rum-js/commit/ee085bc5fcd5fd505eaee9aa9b69ce5716d41ee5))
+
 ### [2.0.9](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-react@2.0.3...@elastic/apm-rum-react@2.0.9) (2026-02-20)
 
 **Note:** Version bump only for package @elastic/apm-rum-react
