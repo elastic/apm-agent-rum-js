@@ -29,20 +29,20 @@ To check for security updates, go to [Security announcements for the Elastic sta
 **Release date:** February 20, 2026
 
 ### Fixes [elastic-apm-rum-javascript-agent-5174-fixes]
-* Add missing tags in errors context when compressed [#1707](https://github.com/elastic/apm-agent-rum-js/pull/1707)
+* Add missing tags to error context when compressed [#1707](https://github.com/elastic/apm-agent-rum-js/pull/1707)
 
 ## 5.17.3 [elastic-apm-rum-javascript-agent-5173-release-notes]
 **Release date:** February 20, 2026
 
 ### Fixes [elastic-apm-rum-javascript-agent-5173-fixes]
-* Fix `addFilter` param types [#1699](https://github.com/elastic/apm-agent-rum-js/pull/1699)
+* Fix `addFilter` parameter types [#1699](https://github.com/elastic/apm-agent-rum-js/pull/1699)
 
 ## 5.17.2 [elastic-apm-rum-javascript-agent-5172-release-notes]
 **Release date:** February 10, 2026
 
 ### Fixes [elastic-apm-rum-javascript-agent-5172-fixes]
 * Allow sending transactions with no spans [#1665](https://github.com/elastic/apm-agent-rum-js/pull/1665)
-* Handle request objects with init options in fetch patch [#1682](https://github.com/elastic/apm-agent-rum-js/pull/1682)
+* Handle request objects with `init` options in the fetch patch [#1682](https://github.com/elastic/apm-agent-rum-js/pull/1682)
 
 ## 5.17.1 [elastic-apm-rum-javascript-agent-5171-release-notes]
 **Release date:** December 5, 2025
