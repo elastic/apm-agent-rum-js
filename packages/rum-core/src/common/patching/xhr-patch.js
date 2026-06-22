@@ -114,7 +114,7 @@ export function patchXMLHttpRequest(callback) {
       function (self, args) {
         if (!self[XHR_IGNORE]) {
           self[XHR_METHOD] = args[0]
-          self[XHR_URL] = args[1]
+          self[XHR_URL] = (args[1] || '').toString()
           self[XHR_SYNC] = args[2] === false
         }
         return openNative.apply(self, args)
