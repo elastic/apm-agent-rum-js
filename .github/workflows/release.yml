@@ -38,7 +38,7 @@ jobs:
           repositories: |
             apm-agent-rum-js
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           token: ${{ steps.get_token.outputs.token }}
