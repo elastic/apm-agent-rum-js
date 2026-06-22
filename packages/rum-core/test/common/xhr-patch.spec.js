@@ -71,7 +71,7 @@ describe('xhrPatch', function () {
     expect(req[XHR_METHOD]).toBe('GET')
     expect(req[XHR_SYNC]).toBe(false)
 
-    var url = new URL('/url/path')
+    var url = new URL('url/path')
     req = new window.XMLHttpRequest()
     req.open('GET', url, true)
     expect(req[XHR_URL]).toBe(url.toString())
