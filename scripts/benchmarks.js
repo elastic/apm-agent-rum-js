@@ -94,22 +94,20 @@ function runBenchmarks() {
     }
   })
   lernaProcess.on('close', async () => {
-    console.log('Ran all benckmarks on folder ', PKG_DIR)
     try {
       const results = await getAllBenchmarkResults()
       if (results.length === 0) {
         console.warn('No benchmarks results found', 'Skipping this run')
         process.exit(1)
       }
-      const gitlog = execSync(
-        'git',
-        ['log', '-1', '--pretty=%h,%s', '--no-merges'],
-        { cwd: PKG_DIR }
-      )
+      const gitlog = execSync('git', [
+        'log',
+        '-1',
+        '--pretty=%h,%s',
+        '--no-merges'
+      ])
       const [commit, commitMessage] = gitlog.split(',')
-      const branch = execSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
-        cwd: PKG_DIR
-      })
+      const branch = execSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
 
       const baseOutput = {
         process: {
