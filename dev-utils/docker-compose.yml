@@ -151,6 +151,7 @@ services:
         npx playwright install --with-deps
         set -eo pipefail
         npm run bench:build
+        find /ms-playwright -name "chrome"
         node ./scripts/benchmarks.js ${REPORT_FILE}"
     mem_limit: 2000m
     volumes:
