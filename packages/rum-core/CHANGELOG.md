@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [5.25.3](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.25.2...@elastic/apm-rum-core@5.25.3) (2026-06-30)
+
+### Bug Fixes
+
+- **rum-core:** add handling of URL like objects in XHR.open ([#1754](https://github.com/elastic/apm-agent-rum-js/issues/1754)) ([05d2075](https://github.com/elastic/apm-agent-rum-js/commit/05d2075be25c5a50b566e2d3a65ba471a6632343))
+
 ### [5.25.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.25.1...@elastic/apm-rum-core@5.25.2) (2026-03-09)
 
 ### Bug Fixes
