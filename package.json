@@ -164,7 +164,7 @@
     "puppeteer": "^13.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-router": "^6.14.2",
+    "react-router": "^8.3.0",
     "react-router-dom": "^6.14.2",
     "regenerator-runtime": "^0.13.3",
     "rimraf": "^3.0.0",
