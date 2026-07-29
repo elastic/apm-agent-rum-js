@@ -23,7 +23,8 @@
  *
  */
 
-const { spawn, execSync } = require('@lerna/child-process')
+// const { spawn, execSync } = require('@lerna/child-process')
+const { spawn } = require('@lerna/child-process')
 const glob = require('glob')
 const { join } = require('path')
 const { readFile, writeFile } = require('fs')
@@ -100,14 +101,17 @@ function runBenchmarks() {
         console.warn('No benchmarks results found', 'Skipping this run')
         process.exit(1)
       }
-      const gitlog = execSync('git', [
-        'log',
-        '-1',
-        '--pretty=%h,%s',
-        '--no-merges'
-      ])
-      const [commit, commitMessage] = gitlog.split(',')
-      const branch = execSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
+      // const gitlog = execSync('git', [
+      //   'log',
+      //   '-1',
+      //   '--pretty=%h,%s',
+      //   '--no-merges'
+      // ])
+      // const [commit, commitMessage] = gitlog.split(',')
+      // const branch = execSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
+      const commit = process.env.REPORT_COMMIT
+      const branch = process.env.REPORT_BRANCH
+      console.log('commit & branch', commit, branch)
 
       const baseOutput = {
         process: {
@@ -117,7 +121,7 @@ function runBenchmarks() {
         },
         meta: {
           commit,
-          commitMessage,
+          // commitMessage,
           branch,
           agentName: 'rum-js'
         }

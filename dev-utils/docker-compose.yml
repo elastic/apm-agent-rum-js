@@ -138,6 +138,8 @@ services:
       - BRANCH_NAME=${BRANCH_NAME}
       - CI=${CI}
       - REPORT_FILE=${REPORT_FILE}
+      - REPORT_COMMIT=${REPORT_COMMIT}
+      - REPORT_BRANCH=${REPORT_BRANCH}
     command: >
       /bin/bash -c "set -x
         id
