@@ -138,7 +138,6 @@ services:
       - BRANCH_NAME=${BRANCH_NAME}
       - CI=${CI}
       - REPORT_FILE=${REPORT_FILE}
-      - CHROME_BIN=/ms-playwright/chromium-1228/chrome-linux/chrome
     command: >
       /bin/bash -c "set -x
         id
@@ -151,7 +150,7 @@ services:
         npx playwright install --with-deps
         set -eo pipefail
         npm run bench:build
-        find /ms-playwright -name "chrome"
+        export CHROME_BIN=$(find /ms-playwright -name "chrome" | grep chrome-linux)
         node ./scripts/benchmarks.js ${REPORT_FILE}"
     mem_limit: 2000m
     volumes:
