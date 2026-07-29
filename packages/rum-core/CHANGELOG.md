@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [5.25.3](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.25.2...@elastic/apm-rum-core@5.25.3) (2026-06-30)
+
+### Bug Fixes
+
+- **rum-core:** add handling of URL like objects in XHR.open ([#1754](https://github.com/elastic/apm-agent-rum-js/issues/1754)) ([05d2075](https://github.com/elastic/apm-agent-rum-js/commit/05d2075be25c5a50b566e2d3a65ba471a6632343))
+
+### [5.25.2](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.25.1...@elastic/apm-rum-core@5.25.2) (2026-03-09)
+
+### Bug Fixes
+
+- **rum-core:** add missing tags in errors context when compressed ([#1707](https://github.com/elastic/apm-agent-rum-js/issues/1707)) ([5ed64fe](https://github.com/elastic/apm-agent-rum-js/commit/5ed64feed6571c9dbeb13e1bb479bf8587b1076a))
+
+### [5.25.1](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.25.0...@elastic/apm-rum-core@5.25.1) (2026-02-20)
+
+**Note:** Version bump only for package @elastic/apm-rum-core
+
+## [5.25.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.23.0...@elastic/apm-rum-core@5.25.0) (2026-02-10)
+
+### Features
+
+- **rum-core:** allow sending transactions with no spans using config ([#1665](https://github.com/elastic/apm-agent-rum-js/issues/1665)) ([a5d88c9](https://github.com/elastic/apm-agent-rum-js/commit/a5d88c9e591e231a48f7cae827c7d3fcd7bd9701))
+
+### Bug Fixes
+
+- **rum-angular:** capture angular navigation errors ([#1662](https://github.com/elastic/apm-agent-rum-js/issues/1662)) ([69c76d1](https://github.com/elastic/apm-agent-rum-js/commit/69c76d1e558eb4b6120866c51511ec52a474b572))
+- **rum-core:** handle request objects with init options in fetch patch ([#1682](https://github.com/elastic/apm-agent-rum-js/issues/1682)) ([3014a62](https://github.com/elastic/apm-agent-rum-js/commit/3014a62b9be7a3cb62165fe3f4c406f713cf6c19))
+
 ## [5.24.0](https://github.com/elastic/apm-agent-rum-js/compare/@elastic/apm-rum-core@5.23.0...@elastic/apm-rum-core@5.24.0) (2025-12-05)
 
 ### Features

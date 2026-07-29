@@ -25,16 +25,11 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    services:
-      verdaccio:
-        image: verdaccio/verdaccio:5
-        ports:
-          - 4873:4873
-    steps:
 
+    steps:
       - name: Get token
         id: get_token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.OBS_AUTOMATION_APP_ID }}
           private-key: ${{ secrets.OBS_AUTOMATION_APP_PEM }}
@@ -43,7 +38,7 @@ jobs:
           repositories: |
             apm-agent-rum-js
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           token: ${{ steps.get_token.outputs.token }}

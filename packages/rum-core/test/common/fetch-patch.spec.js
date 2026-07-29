@@ -101,7 +101,8 @@ describe('fetchPatch', function () {
           name: 'should fetch correctly when using URL object as input',
           fetchArgs: createFetchArgs('PUT'),
           fetchFn(fetchArgs) {
-            return window.fetch(new URL(fetchArgs.url), fetchArgs.options)
+            const obj = { toString: () => fetchArgs.url }
+            return window.fetch(obj, fetchArgs.options)
           }
         }
       ].forEach(({ name, fetchArgs, fetchFn }) => {
@@ -120,6 +121,30 @@ describe('fetchPatch', function () {
               expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
               done()
             })
+          })
+        })
+      })
+
+      it('should fetch correctly when using REQUEST object as input with options', function (done) {
+        var fetchArgs = createFetchArgs('PATCH')
+        var newFetchArgs = createFetchArgs('POST')
+        var promise = window.fetch(
+          new Request(fetchArgs.url, fetchArgs.options),
+          newFetchArgs.options
+        )
+
+        expect(typeof promise.then).toBe('function')
+        expect(events.map(e => e.event)).toEqual(['schedule'])
+
+        promise.then(function (resp) {
+          expect(resp).toBeDefined()
+          Promise.resolve().then(function () {
+            // Validate that fetch has been called with the proper data
+            const data = events[0].task.data
+            validateFetchData(data, newFetchArgs)
+
+            expect(events.map(e => e.event)).toEqual(['schedule', 'invoke'])
+            done()
           })
         })
       })

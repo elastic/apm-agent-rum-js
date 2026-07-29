@@ -191,12 +191,15 @@ type SpanPayload = {
   id: string
   type: string
   name: string
+  [key: string]: any
 }
 type TransactionPayload = {
   id: string
   type: string
   name: string
   spans: Partial<SpanPayload>[]
+  context: { [key: string]: any }
+  [key: string]: any
 }
 type ErrorPayload = {
   id: string
@@ -204,6 +207,7 @@ type ErrorPayload = {
     type: string
     message: string
   }
+  [key: string]: any
 }
 type Payload = {
   transactions: Partial<TransactionPayload>[]

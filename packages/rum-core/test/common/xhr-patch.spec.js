@@ -70,6 +70,13 @@ describe('xhrPatch', function () {
     expect(req[XHR_URL]).toBe('/')
     expect(req[XHR_METHOD]).toBe('GET')
     expect(req[XHR_SYNC]).toBe(false)
+
+    var url = new URL('/url/path', location.href)
+    req = new window.XMLHttpRequest()
+    req.open('GET', url, true)
+    expect(req[XHR_URL]).toBe(url.toString())
+    expect(req[XHR_METHOD]).toBe('GET')
+    expect(req[XHR_SYNC]).toBe(false)
   })
 
   it('should produce events', function (done) {
