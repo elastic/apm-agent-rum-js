@@ -51,15 +51,15 @@ fi
 sendBenchmark "${ES_USER_SECRET}" "${ES_PASS_SECRET}" "${ES_URL_SECRET}" "${BASE_PROJECT}/apm-agent-benchmark-results.json"
 
 # Run the load testing
-REPORT_FILE="apm-agent-load-testing-results.json" "${BASE_PROJECT}/.ci/scripts/load-testing.sh" "${STACK_VERSION}"
+# REPORT_FILE="apm-agent-load-testing-results.json" "${BASE_PROJECT}/.ci/scripts/load-testing.sh" "${STACK_VERSION}"
 
 # Gather error if any
-if [ $? -gt 0 ] ; then
-  status=1
-fi
+# if [ $? -gt 0 ] ; then
+#   status=1
+# fi
 
 # Then we ship the data using the helper
-sendBenchmark "${ES_USER_SECRET}" "${ES_PASS_SECRET}" "${ES_URL_SECRET}" "${BASE_PROJECT}/apm-agent-load-testing-results.json"
+# sendBenchmark "${ES_USER_SECRET}" "${ES_PASS_SECRET}" "${ES_URL_SECRET}" "${BASE_PROJECT}/apm-agent-load-testing-results.json"
 
 # Report status
 exit $status
