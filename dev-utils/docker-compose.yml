@@ -130,7 +130,7 @@ services:
           - wait-for-apm-server
 
   node-benchmark:
-    container_name: node-playwright
+    container_name: node-benchmark
     image: mcr.microsoft.com/playwright:v1.61.0-noble
     environment:
       - HOME=/app
@@ -164,8 +164,8 @@ services:
     user: ${USER_ID}
 
   load-testing:
-    container_name: node-20
-    image: node:20
+    container_name: load-testing
+    image: mcr.microsoft.com/playwright:v1.61.0-noble
     environment:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}
