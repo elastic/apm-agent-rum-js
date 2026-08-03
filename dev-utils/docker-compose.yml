@@ -164,12 +164,8 @@ services:
     user: ${USER_ID}
 
   load-testing:
-    build:
-      context: ../.ci/docker/node-playwright
-      args:
-        - NODEJS_VERSION=${NODEJS_VERSION}
-    container_name: node-playwright
-    image: docker.elastic.co/observability-ci/node-playwright:${NODEJS_VERSION}
+    container_name: node-20
+    image: node:20
     environment:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}
