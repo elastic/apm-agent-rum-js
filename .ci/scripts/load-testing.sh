@@ -7,13 +7,11 @@ USER_ID="$(id -u):$(id -g)"
 export PATH="$HOME/.local/bin:$PATH"
 
 
-# USER_ID="${USER_ID}" \
 STACK_VERSION=${STACK_VERSION} \
 docker-compose -f ./dev-utils/docker-compose.yml down \
   --remove-orphans \
   --volumes || true
 
-# USER_ID="${USER_ID}" \
 STACK_VERSION=${STACK_VERSION} \
 docker-compose -f ./dev-utils/docker-compose.yml up \
   --build \

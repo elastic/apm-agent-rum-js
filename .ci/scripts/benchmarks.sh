@@ -5,12 +5,10 @@ USER_ID="$(id -u):$(id -g)"
 # Ensure local bin is in PATH, needed for updated docker-compose, see https://github.com/elastic/observability-robots/issues/2960
 export PATH="$HOME/.local/bin:$PATH"
 
-# USER_ID="${USER_ID}" \
 docker-compose -f ./dev-utils/docker-compose.yml down \
   --remove-orphans \
   --volumes || true
 
-# USER_ID="${USER_ID}" \
 docker-compose -f ./dev-utils/docker-compose.yml up \
   --build \
   --abort-on-container-exit \
