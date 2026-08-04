@@ -123,7 +123,17 @@ function prepareConfig(config, packageName) {
   } else {
     console.log('prepareConfig: Run in Default enviroment')
     config.plugins.push('karma-chrome-launcher')
-    config.browsers.push('Chrome')
+    config.browsers = ['ChromeHeadlessNoSandbox']
+    config.customLaunchers = {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox', // required to run without privileges in docker
+          '--user-data-dir=/tmp/chrome-test-profile',
+          '--disable-web-security'
+        ]
+      }
+    }
   }
 
   /**

@@ -3,6 +3,8 @@ node_modules
 .npm
 .DS_Store
 .idea
+.cache
+.local
 
 # Ignore all e2e related build files
 test/e2e/with-router/build

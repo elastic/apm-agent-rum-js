@@ -358,4 +358,5 @@ const iterations = 10
   } else {
     console.log(results)
   }
+  console.log('Load tests finshed')
 })()

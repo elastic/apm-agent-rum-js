@@ -130,18 +130,16 @@ services:
           - wait-for-apm-server
 
   node-benchmark:
-    build:
-      context: ../.ci/docker/node-playwright
-      args:
-        - NODEJS_VERSION=${NODEJS_VERSION}
-    container_name: node-playwright
-    image: docker.elastic.co/observability-ci/node-playwright:${NODEJS_VERSION}
+    container_name: node-benchmark
+    image: mcr.microsoft.com/playwright:v1.61.0-noble
     environment:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}
       - BRANCH_NAME=${BRANCH_NAME}
       - CI=${CI}
       - REPORT_FILE=${REPORT_FILE}
+      - REPORT_COMMIT=${REPORT_COMMIT}
+      - REPORT_BRANCH=${REPORT_BRANCH}
     command: >
       /bin/bash -c "set -x
         id
@@ -151,9 +149,10 @@ services:
         cd /app
         export
         npm install
-        npm install playwright@1.18.1 --unsafe-perm=true --allow-root
+        npx playwright install --with-deps
         set -eo pipefail
-        npx lerna run build:module
+        npm run bench:build
+        export CHROME_BIN=$(find /ms-playwright -name "chrome" | grep chrome-linux)
         node ./scripts/benchmarks.js ${REPORT_FILE}"
     mem_limit: 2000m
     volumes:
@@ -165,12 +164,8 @@ services:
     user: ${USER_ID}
 
   load-testing:
-    build:
-      context: ../.ci/docker/node-playwright
-      args:
-        - NODEJS_VERSION=${NODEJS_VERSION}
-    container_name: node-playwright
-    image: docker.elastic.co/observability-ci/node-playwright:${NODEJS_VERSION}
+    container_name: load-testing
+    image: mcr.microsoft.com/playwright:v1.61.0-noble
     environment:
       - HOME=/app
       - BUILD_NUMBER=${BUILD_NUMBER}

@@ -40,7 +40,7 @@ set +e
 status=0
 
 # Run the benchmarks
-REPORT_FILE="apm-agent-benchmark-results.json" "${BASE_PROJECT}/.ci/scripts/benchmarks.sh"
+REPORT_COMMIT="${sha}" REPORT_BRANCH="${BRANCH_NAME}" REPORT_FILE="apm-agent-benchmark-results.json" "${BASE_PROJECT}/.ci/scripts/benchmarks.sh"
 
 # Gather error if any
 if [ $? -gt 0 ] ; then
