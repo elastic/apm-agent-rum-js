@@ -358,5 +358,4 @@ const iterations = 10
   } else {
     console.log(results)
   }
-  process.exit(0)
 })()
