@@ -23,7 +23,6 @@
  *
  */
 
-// const { spawn, execSync } = require('@lerna/child-process')
 const { spawn } = require('@lerna/child-process')
 const glob = require('glob')
 const { join } = require('path')
@@ -101,18 +100,11 @@ function runBenchmarks() {
         console.warn('No benchmarks results found', 'Skipping this run')
         process.exit(1)
       }
-      // const gitlog = execSync('git', [
-      //   'log',
-      //   '-1',
-      //   '--pretty=%h,%s',
-      //   '--no-merges'
-      // ])
-      // const [commit, commitMessage] = gitlog.split(',')
-      // const branch = execSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
+      // In buildkite there ibn no repo checkout but a tar.gz download
+      // and extraction so we expect to receive branch and commit from the
+      // workflow through env vars.
       const commit = process.env.REPORT_COMMIT
       const branch = process.env.REPORT_BRANCH
-      console.log('commit & branch', commit, branch)
-
       const baseOutput = {
         process: {
           version: process.version,
@@ -121,7 +113,6 @@ function runBenchmarks() {
         },
         meta: {
           commit,
-          // commitMessage,
           branch,
           agentName: 'rum-js'
         }
