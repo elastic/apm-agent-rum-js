@@ -131,7 +131,7 @@
     "express": "^4.17.3",
     "express-http-proxy": "^1.6.0",
     "faker": "^5.1.0",
-    "gh-release-assets": "^1.1.2",
+    "gh-release-assets": "^2.0.1",
     "glob": "^7.1.6",
     "html-webpack-plugin": "^5.3.1",
     "husky": "^3.1.0",
