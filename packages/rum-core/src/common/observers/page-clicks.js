@@ -78,6 +78,7 @@ function getTransactionMetadata(target) {
   }
 
   metadata.transactionName = buildTransactionName(target)
+  metadata.elementId = target.getAttribute('id')
 
   let classes = target.getAttribute('class')
   if (classes) {
