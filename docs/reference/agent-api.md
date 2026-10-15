@@ -59,7 +59,7 @@ To clear the user context, for example when a user logs out, set all three prope
 apm.setUserContext({ id: '', username: '', email: '' })
 ```
 
-The agent omits empty user properties when sending subsequent errors and transactions to the APM Server. Passing an empty object does not clear previously set properties, because each call merges with the existing context. Clear every property that was set so that a subsequent user does not inherit the previous user's information.
+Errors captured and transactions ended after the reset omit these empty user properties. Events captured before the reset retain their original context. Passing an empty object does not clear previously set properties, because each call merges with the existing context. Clear every property that was set so that a subsequent user does not inherit the previous user's information.
 
 
 ## `apm.setCustomContext()` [apm-set-custom-context]
