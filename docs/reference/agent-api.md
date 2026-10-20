@@ -53,6 +53,14 @@ The provided user context is stored under `context.user` in Elasticsearch on bot
 
 It’s possible to call this function multiple times within the scope of the same active transaction. For each call, the properties of the context argument are shallow merged with the context previously given.
 
+To clear the user context, for example when a user logs out, set all three properties to empty strings:
+
+```js
+apm.setUserContext({ id: '', username: '', email: '' })
+```
+
+Errors captured and transactions ended after the reset omit these empty user properties. Events captured before the reset retain their original context. Passing an empty object does not clear previously set properties, because each call merges with the existing context. Clear every property that was set so that a subsequent user does not inherit the previous user's information.
+
 
 ## `apm.setCustomContext()` [apm-set-custom-context]
 
