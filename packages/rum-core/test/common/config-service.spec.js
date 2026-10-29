@@ -158,6 +158,39 @@ describe('ConfigService', function () {
     })
   })
 
+  it('should clear user context with empty strings before setting another user', () => {
+    configService.setUserContext({
+      id: 'previous-user',
+      username: 'previous-username',
+      email: 'previous@example.com'
+    })
+    configService.setCustomContext({ cart: 'current-cart' })
+
+    configService.setUserContext({})
+    expect(configService.get('context.user')).toEqual({
+      id: 'previous-user',
+      username: 'previous-username',
+      email: 'previous@example.com'
+    })
+
+    configService.setUserContext({ id: '', username: '', email: '' })
+    expect(configService.get('context.user')).toEqual({
+      id: '',
+      username: '',
+      email: ''
+    })
+    expect(configService.get('context.custom')).toEqual({
+      cart: 'current-cart'
+    })
+
+    configService.setUserContext({ id: 'next-user' })
+    expect(configService.get('context.user')).toEqual({
+      id: 'next-user',
+      username: '',
+      email: ''
+    })
+  })
+
   describe('config options', () => {
     it('should validate required config options', () => {
       const errors = configService.validate({ serviceName: 'name' })
