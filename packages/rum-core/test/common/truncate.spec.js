@@ -26,7 +26,9 @@
 import {
   truncate,
   truncateModel,
-  RESPONSE_MODEL
+  RESPONSE_MODEL,
+  TRANSACTION_MODEL,
+  ERROR_MODEL
 } from '../../src/common/truncate'
 
 /**
@@ -152,6 +154,29 @@ describe('Truncate', () => {
         stringLabel: 'str',
         booleanLabel: true
       }
+    })
+  })
+  ;[
+    { type: 'transaction', model: TRANSACTION_MODEL },
+    { type: 'error', model: ERROR_MODEL }
+  ].forEach(({ type, model }) => {
+    it(`should omit cleared user properties from ${type} payloads`, () => {
+      const payload = {
+        id: 'event-id',
+        trace_id: 'trace-id',
+        type: 'custom',
+        span_count: { started: 0 },
+        exception: {},
+        transaction: {},
+        context: {
+          user: { id: '', username: '', email: '' }
+        }
+      }
+
+      truncateModel(model, payload)
+
+      expect(Object.keys(payload.context.user)).toEqual([])
+      expect(JSON.parse(JSON.stringify(payload)).context.user).toEqual({})
     })
   })
 
