@@ -393,6 +393,16 @@ describe('Compress', function () {
     testMappedObject(error, compressed)
   })
 
+  it('should keep the exception type in the compressed error model', () => {
+    const error = errorLogging.createErrorDataModel({
+      error: new TypeError('type error')
+    })
+    const compressed = compressError(error)
+
+    expect(error.exception.type).toBe('TypeError')
+    expect(compressed.ex.t).toBe('TypeError')
+  })
+
   it('should compress payload', async () => {
     /**
      * Utility functions that helps to decompress the compressed payload and
