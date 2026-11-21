@@ -273,7 +273,7 @@ export function compressError(error) {
     ex: {
       mg: exception.message,
       st: compressStackFrames(exception.stacktrace),
-      t: error.type
+      t: exception.type
     },
     c: compressContext(error.context)
   }

@@ -382,15 +382,26 @@ describe('Compress', function () {
 
   it('should compress error model', () => {
     const error = generateErrors(1).map((err, i) => {
-      let model = errorLogging.createErrorDataModel(err, {
-        labels: { key: 'value' }
-      })
+      let model = errorLogging.createErrorDataModel(
+        { error: err },
+        { labels: { key: 'value' } }
+      )
       model.id = 'error-id-' + i
       return model
     })[0]
     const compressed = compressError(error)
 
     testMappedObject(error, compressed)
+  })
+
+  it('should keep the exception type in the compressed error model', () => {
+    const error = errorLogging.createErrorDataModel({
+      error: new TypeError('type error')
+    })
+    const compressed = compressError(error)
+
+    expect(error.exception.type).toBe('TypeError')
+    expect(compressed.ex.t).toBe('TypeError')
   })
 
   it('should compress payload', async () => {
